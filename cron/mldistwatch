@@ -998,9 +998,9 @@ Please contact modules\@perl.org if there are any open questions.
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
     if ($self->{HAS_BLIB}) {
-      push @m, qq{The distribution contains a blib/ directory and is therefore not being indexed.\n};
+      push @m, qq{The distribution contains a blib/ directory and is therefore not being indexed.\n\n};
     } elsif ($self->{HAS_MULTIPLE_ROOT}) {
-      push @m, qq{The distribution does not unpack into a single directory and is therefore not being indexed.\n};
+      push @m, qq{The distribution does not unpack into a single directory and is therefore not being indexed.\n\n};
     } else {
       my $st = $self->{INDEX_STATUS};
       if ($st && ref $st && %$st) {
@@ -1020,7 +1020,7 @@ Please contact modules\@perl.org if there are any open questions.
       } else {
         if ($pmfiles > 0) {
           push @m, qq{No package statements could be found in the distro (maybe a script
-or documentation distribution?)\n};
+or documentation distribution?)\n\n};
         } else {
           # no need to write a report at all
           return;
