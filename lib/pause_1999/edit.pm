@@ -1659,6 +1659,18 @@ and requested an upload into $her directory.});
   @m;
 }
 
+sub manifind {
+  my($self) = @_;
+  my %files = %{ExtUtils::Manifest::manifind()};
+  if (keys %files == 1 && exists $files{""} && $files{""} eq "") {
+    warn "ALERT: BUG !!!";
+    open my $ls, "zsh -c 'ls **/*(.)' |" or die;
+    %files = map { chomp; $_ => "" } <$ls>;
+    close $ls;
+  }
+  %files;
+}
+
 sub scroll_subdirs {
   my $self = shift;
   my $mgr = shift;
@@ -1670,7 +1682,7 @@ sub scroll_subdirs {
   } else {
     return "";
   }
-  my %files = %{ExtUtils::Manifest::manifind()};
+  my %files = $self->manifind;
   my %seen;
   my @dirs = sort grep !$seen{$_}++, grep s|(.+)/[^/]+|$1|, keys %files;
   return "" unless @dirs;
@@ -1823,7 +1835,7 @@ The Pause
  name="SUBMIT_pause99_delete_files_undelete" value="Undelete" />};
   push @m, "<pre>";
 
-  my %files = %{ExtUtils::Manifest::manifind()};
+  my %files = $self->manifind;
   my(%deletes,%whendele,$sth);
   if (
       $sth = $dbh->prepare(qq{SELECT deleteid, changed
@@ -5201,19 +5213,7 @@ The Pause
  name="SUBMIT_pause99_reindex_delete" value="Reindex" />};
   push @m, "<pre>";
 
-  my %files = %{ExtUtils::Manifest::manifind()};
-
-  warn sprintf "Debug: manifind found %d Files in %s",
-      scalar(keys %files), Cwd::cwd();
-
-  require Data::Dumper; warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%files],["files"])->Indent(1)->Useqq(1)->Dump; # XXX
-
-  if (keys %files == 1 && exists $files{""} && $files{""} eq "") {
-    warn "ALERT: BUG !!!";
-    open my $ls, "zsh -c 'ls **/*(.)' |" or die;
-    %files = map { chomp; $_ => undef } <$ls>;
-    close $ls;
-  }
+  my %files = $self->manifind;
 
   foreach my $f (keys %files) {
     if (
