@@ -231,10 +231,7 @@ sub watch_files {
 	  );
 
 
-    report "\nDelete candidates\n-----------------\n";
-    @listing = (); #global variable
-    mkdir qq{$PAUSE::Config->{INCOMING_LOC}/old}, 0755
-	unless -d qq{$PAUSE::Config->{INCOMING_LOC}/old};
+    mkdir qq{$PAUSE::Config->{INCOMING_LOC}/old}, 0755; # may fail
     File::Find::find(
 		     sub {
 			 stat;
@@ -256,23 +253,17 @@ sub watch_files {
 			   require File::Path;
 			   File::Path::rmtree($File::Find::name);
 			 }
-			 if (-M _ > 2) {
+                         if (-M _ > 1) {
 			   if (rename($_,"old/$_")) {
 			     # nothing to do
-			   } elsif (-M _ > 20) {
+			   } elsif (-M _ > 3) {
 			     unlink($_);
 			   }
 			   return;
 			 }
-			 push(
-			      @listing,
-			      sprintf "%-60s %8d %6.2f\n",
-			      $File::Find::name,
-			      -s _,
-			      -M _
-			     );
 		     }, $PAUSE::Config->{INCOMING_LOC});
-    report sort {substr($a,70) <=> substr($b,70)} @listing;
+
+    # old database dumps
     File::Find::find(
 		     sub {
 			 stat;
