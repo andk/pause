@@ -20,7 +20,7 @@ use URI::URL ();
 use Getopt::Long;
 
 use strict;
-use vars qw($Signal $last_str $last_time %Opt);
+use vars qw(%Opt);
 
 GetOptions(\%Opt,qw(pidfile=s)) or die;
 
@@ -28,7 +28,39 @@ open my $fh, ">", $Opt{pidfile} or die;
 print $fh $$;
 close $fh;
 
-package my_pause_send_mail;
+$SIG{HUP} = \&sighup;
+$SIG{TERM} = $SIG{INT} = \&sigtermint;
+
+sub sigtermint {
+  mypause_daemon_inspector->logge("Stopping");
+  $mypause_daemon_inspector::Signal++;
+  $mypause_daemon_inspector::Terminated++;
+}
+
+sub sighup {
+  $mypause_daemon_inspector::Signal++;
+}
+
+sub restart {
+  mypause_daemon_inspector->logge("Going to exec $^X $0");
+  exec $^X, $0;
+}
+
+umask 0002;
+
+mypause_daemon_inspector->logge("Starting in a new process");
+
+while () {
+  mypause_daemon_inspector::loop();
+  last if $mypause_daemon_inspector::Terminated;
+  sleep $PAUSE::Config->{SLEEP};
+}
+
+exit;
+
+#### SUBROUTINES ####
+
+package mypause_send_mail;
 
 sub send {
   my($self,$header,$blurb) = @_;
@@ -49,47 +81,27 @@ sub send {
   close $fh;
 }
 
-package main;
-
-my $zcat = "/bin/zcat";
-die "no executable zcat" unless -x $zcat;
-my $gzip = "/bin/gzip";
-die "no executable gzip" unless -x $gzip;
-
-$SIG{HUP} = \&sighup;
-$SIG{TERM} = $SIG{INT} = \&sigkill;
-
-sub sigkill {
-  logge("Stopping");
-  die;
-}
-
-sub sighup {
-  $Signal++;
-}
-
-sub restart {
-  logge("Going to exec $^X $0");
-  exec $^X, $0;
-}
-
-umask 0002;
-
-my $UA =  LWP::UserAgent->new;
-$UA->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
-
-logge("Starting in a new process");
-
-while () {
-  loop();
-  sleep $PAUSE::Config->{SLEEP};
-}
-
-exit;
-
-#### SUBROUTINES ####
+package mypause_daemon_inspector;
 
 sub loop {
+
+  our $UA;
+  unless ($UA) {
+    $UA =  LWP::UserAgent->new;
+    $UA->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
+  }
+  our $zcat;
+  unless ($zcat) {
+    $zcat = "/bin/zcat";
+    die "no executable zcat" unless -x $zcat;
+  }
+  our $gzip;
+  unless ($gzip) {
+    my $gzip = "/bin/gzip";
+    die "no executable gzip" unless -x $gzip;
+  }
+
+
   my($dbh,$sth,$sth2,$query);
 
   my $now    = time ;
@@ -100,7 +112,7 @@ sub loop {
 			       $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 			       { RaiseError => 0 }
 			      ) ) {
-    logge($DBI::errstr);
+    mypause_daemon_inspector->logge($DBI::errstr);
     return; # let them sleep or whatever
   }
 
@@ -116,7 +128,7 @@ sub loop {
 
   $sth = $dbh->prepare($query);
   unless ( $sth->execute ) {
-    logge($DBI::errstr);
+    mypause_daemon_inspector->logge($DBI::errstr);
     return;
   }
   my $sql = qq{SELECT fullname, asciiname
@@ -137,7 +149,7 @@ sub loop {
 
     if ( $hash->{uriid} =~ s/ (.*) \.Z$ /$1.gz/x ) {
       $query = "DELETE FROM uris WHERE uriid = '$1.Z'";
-      logge("Will try to get rid of the .Z file. Will not try [$query]");
+      mypause_daemon_inspector->logge("Will try to get rid of the .Z file. Will not try [$query]");
     }
     my $lpath  = $PAUSE::Config->{MLROOT} . $hash->{uriid};
 
@@ -154,26 +166,26 @@ sub loop {
 
 	my $request = HTTP::Request->new('HEAD', $hash->{uri});
 	my($mtime) = HTTP::Date::time2str((stat($lpath))[9]);
-	logge("Is $hash->{uri} newer than $mtime?");
+	mypause_daemon_inspector->logge("Is $hash->{uri} newer than $mtime?");
 	$request->header('If-Modified-Since' => $mtime);
 
 	my($response,$success);
 
 	$response = $UA->request($request);
 	$success = $response->is_success;
-	# logge("UA [$UA] response [$response] success [$success]");
+	# mypause_daemon_inspector->logge("UA [$UA] response [$response] success [$success]");
 
 	if ( $success ){
-	  logge("Yes");
+	  mypause_daemon_inspector->logge("Yes");
 	} else {
 	  # They didn't send success, so they have nothing new
-	  logge("No");
+	  mypause_daemon_inspector->logge("No");
 	  $hash->{dverified} = $now;
 	  next;
 	}
       }
       $hash->{dverified} = 0;
-      logge("(Re)set dverified to 0 for uriid[$hash->{uriid}]");
+      mypause_daemon_inspector->logge("(Re)set dverified to 0 for uriid[$hash->{uriid}]");
 
       getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount});
       $hash->{dverified} = $now;
@@ -181,12 +193,12 @@ sub loop {
 
     }
 
-    # too soon: logge("lpath [$lpath] uriid [$hash->{uriid}]");
+    # too soon: mypause_daemon_inspector->logge("lpath [$lpath] uriid [$hash->{uriid}]");
 
     if (! $hash->{dverified} && $lpath =~ m,/$,) { # directory
 
       my $mirror = IO::File->new(">>$PAUSE::Config->{MIRRORCONFIG}")
-	  or logge("Couldn't open $PAUSE::Config->{MIRRORCONFIG}");
+	  or mypause_daemon_inspector->logge("Couldn't open $PAUSE::Config->{MIRRORCONFIG}");
       my($package) = PAUSE::dir2user($hash->{uriid});
       my($uri) =  URI::URL->new($hash->{uri});
       my($host) = $uri->host;
@@ -205,7 +217,7 @@ sub loop {
 # skip        =not yet verified
 });
       $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
-      logge("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
+      mypause_daemon_inspector->logge("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
       $mirror->close;
       next;
     }
@@ -217,7 +229,7 @@ sub loop {
       next;
     }
 
-    # logge("lpath[$lpath] uriid[$hash->{uriid}]");
+    # mypause_daemon_inspector->logge("lpath[$lpath] uriid[$hash->{uriid}]");
 
     if ( -d $lpath ) {
       next;
@@ -226,22 +238,22 @@ sub loop {
       # otherwise this is a RE-upload of something README-ish
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
-	logge("Verified $hash->{uriid}");
+	mypause_daemon_inspector->logge("Verified $hash->{uriid}");
 	next;
       } else {
 	unlink $lpath;
       }
     }
     if ($hash->{dgot}) {
-      logge("WARNING: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
+      mypause_daemon_inspector->logge("WARNING: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
     }
 
-    # logge("Need to get uriid[$hash->{uriid}]");
+    # mypause_daemon_inspector->logge("Need to get uriid[$hash->{uriid}]");
 
     my $size;
     if ($size = getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
       $hash->{dgot} = $now;
-      logge("Got $hash->{uriid} (size $size)");
+      mypause_daemon_inspector->logge("Got $hash->{uriid} (size $size)");
       my $md5 = MD5->new;
       my $handle = IO::File->new;
       unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
@@ -294,7 +306,7 @@ No action is required on your part
                     );
 
       for my $to (@To) {
-        my_pause_send_mail->send({
+        mypause_send_mail->send({
                                   To => join(",",$to),
                                   Subject => "CPAN Upload: $hash->{uriid}",
                                   "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
@@ -302,7 +314,7 @@ No action is required on your part
                                  $blurb
                                 );
       }
-      logge("Sent email(s) about uriid[$hash->{uriid}]");
+      mypause_daemon_inspector->logge("Sent email(s) about uriid[$hash->{uriid}]");
       sleep 15;
 
 
@@ -335,7 +347,7 @@ Virtually Yours,
 $Id\n";
 
         for my $to (@To) {
-          my_pause_send_mail->send({
+          mypause_send_mail->send({
                                     To => join(",",$to),
                                     Subject => "Upload problem $hash->{uriid}"
                                    },
@@ -406,7 +418,7 @@ Virtually Yours,
 $Id\n";
 
         for my $to (@To) {
-          my_pause_send_mail->send({
+          mypause_send_mail->send({
                                     To => join(",",$to),
                                     Subject => "Upload problem $hash->{uriid}"
                                    },
@@ -420,7 +432,8 @@ $Id\n";
     }
   } continue {
     writeback($hash,$hash_orig,$dbh) if $hash;
-    restart if $Signal;
+    last if $mypause_daemon_inspector::Terminated;
+    main::restart() if $mypause_daemon_inspector::Signal;
   }
 
       $sth->finish;
@@ -432,11 +445,11 @@ sub is_valid {
   my($uriid) = shift;
   my($dir,$basename) = $uriid =~ m| \A (.*) / ([^/]+) \z |x;
   if ($basename =~ m![^A-Za-z0-9_\-\.\@\+]!) {
-    logge("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
+    mypause_daemon_inspector->logge("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   if ($dir =~ m![^A-Za-z0-9_\-\@\+/]!) { # we allow user subdirectories, see edit.pm
-    logge("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
+    mypause_daemon_inspector->logge("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   return 1;
@@ -460,19 +473,19 @@ sub getit {
     ($tmp) = $lpath =~ m,(.*)/,;
     File::Path::mkpath($tmp);
   }
-  logge("Going to fetch uriid[$uriid]");
+  mypause_daemon_inspector->logge("Going to fetch uriid[$uriid]");
   my $uri_obj;
   eval {
     $uri_obj =  URI::URL->new($uri, $PAUSE::Config->{INCOMING})
   };
 
   if ($@ || ! $uri_obj) {
-    logge("Bad URL: $uri");
+    mypause_daemon_inspector->logge("Bad URL: $uri");
     return;
   }
 
   if ($uri_obj->scheme !~ /^(http|ftp|https)?$/ ) { # Cave canem, e.g. file:
-    logge(sprintf "Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
+    mypause_daemon_inspector->logge(sprintf "Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
     return;
   }
 
@@ -481,7 +494,7 @@ sub getit {
     $uri_obj->password($PAUSE::Config->{ANON_FTP_PASS});
   }
 
-  logge(sprintf "Requesting a GET on uri [%s]", $uri_obj->abs);
+  mypause_daemon_inspector->logge(sprintf "Requesting a GET on uri [%s]", $uri_obj->abs);
   my $request = HTTP::Request->new('GET', $uri_obj->abs);
   if ($uri_obj->scheme eq "http") {
     $request->header("Accept","*"); # Microsoft Personal Web Server
@@ -489,10 +502,13 @@ sub getit {
                                     # 1997
   }
 
+  our $UA;
   my $response = $UA->request($request,$tpath);
 
+  our $zcat;
+  our $gzip;
   if ($response->code == &HTTP::Status::RC_NOT_MODIFIED) {
-    logge("no mirror: RC_NOT_MODIFIED for $tpath");
+    mypause_daemon_inspector->logge("no mirror: RC_NOT_MODIFIED for $tpath");
     return;
   } elsif ($response->is_success) {
     if ($tpath =~ /\.(Z|gz)$/){
@@ -508,7 +524,7 @@ sub getit {
 	}
       }
       if ($stat) {
-	logge($ret);
+	mypause_daemon_inspector->logge($ret);
 	my @To;
 	push @To, $PAUSE::Config->{ADMIN};
 
@@ -523,7 +539,7 @@ gives [";
 	$blurb .= "]\n\n";
 
         for my $to (@To) {
-          my_pause_send_mail->send({
+          mypause_daemon_inspector->send({
                                     To => join(",",$to),
                                     Subject => "Upload problem $uri"
                                    },
@@ -537,11 +553,11 @@ gives [";
 	$tpath =~ m/\.Z$/
        ) {
       if (-e $lpath) {
-	logge("Seem to have both a .Z and a .gz");
+	mypause_daemon_inspector->logge("Seem to have both a .Z and a .gz");
       } else {
 	my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
 	my $ret = system($system);
-	logge("Ran $system with return [$ret]");
+	mypause_daemon_inspector->logge("Ran $system with return [$ret]");
       }
     } else {
       rename($tpath,$lpath);
@@ -550,13 +566,13 @@ gives [";
   } else {
     my $logresponse = $response->error_as_HTML;
     $logresponse =~ s/\n//gs ;
-    logge($logresponse);
+    mypause_daemon_inspector->logge($logresponse);
     return;
   }
 }
 
 sub logge {
-  my($arg) = @_;
+  my($self,$arg) = @_;
   my $stamp = &timestamp." \$\$$$ v$VERSION: ";
   my @caller = caller;
   shift @caller;
@@ -571,6 +587,7 @@ sub logge {
 
 sub timestamp { # Efficiently generate a time stamp for log files
   my $time = time;	# optimise for many calls in same second
+  our($last_str,$last_time);
   return $last_str if $last_time and $time == $last_time;
   my($sec,$min,$hour,$mday,$mon,$year)
       = localtime($last_time = $time);
@@ -591,14 +608,14 @@ sub writeback {
   ($v = $hash_orig->{uriid}) =~ s/'/\\'/g;
   my $whereclause .= " WHERE uriid='$v'";
   $query .= $whereclause;
-  # logge("Going to $query");
-  $dbh->do($query) or logge("$DBI::errstr: $query");
+  # mypause_daemon_inspector->logge("Going to $query");
+  $dbh->do($query) or mypause_daemon_inspector->logge("$DBI::errstr: $query");
   if ($DBI::errstr =~ /Non unique key|Duplicate/i) {
     my $dquery = "DELETE FROM uris $whereclause";
-    logge("Non-uniq-Error; trying: $dquery");
-    $dbh->do($dquery) or logge("$DBI::errstr: $dquery");
-    logge("retry now: $query");
-    $dbh->do($query) or logge("$DBI::errstr: $query");
+    mypause_daemon_inspector->logge("Non-uniq-Error; trying: $dquery");
+    $dbh->do($dquery) or mypause_daemon_inspector->logge("$DBI::errstr: $dquery");
+    mypause_daemon_inspector->logge("retry now: $query");
+    $dbh->do($query) or mypause_daemon_inspector->logge("$DBI::errstr: $query");
   }
   return 1;
 }
