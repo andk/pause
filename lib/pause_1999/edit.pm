@@ -2452,7 +2452,7 @@ Subject: $subject\n};
        "<br />userid (entering lowercase is OK, but it will be
        uppercased by the server):<br />",
 
-       $mgr->textfield(name=>"pause99_add_user_userid", size=>9, maxlength=>9),
+       $mgr->textfield(name=>"pause99_add_user_userid", size=>12, maxlength=>9),
 
        qq{<br />full name (mailinglist name):<br />},
 
@@ -3255,7 +3255,7 @@ sub edit_mod {
         			   That's a one way move. Take care!",
 
 			   args => {
-				    size => 9,
+				    size => 12,
 				    maxlength => 9,
 				   },
 			  },
@@ -4168,7 +4168,7 @@ $blurbcopy
     # Yet better, much less bandwidth:
     $meta{userid}{type} = "textfield";
     $meta{userid}{headline} = "userid";
-    $meta{userid}{args}{size} = 9;
+    $meta{userid}{args}{size} = 12;
     $meta{userid}{args}{maxlength} = 9;
   }
   push @m, qq{<br />};
