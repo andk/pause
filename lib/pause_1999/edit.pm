@@ -8,6 +8,7 @@ use URI::Escape;
 use Text::Format;
 
 our $Valid_Userid = qr/^[A-Z]{4,9}$/;
+our $Yours = "Thanks,\n-- \nThe PAUSE\n";
 
 use utf8; # must be after the qr// for perl-5.6.1
 
@@ -1414,10 +1415,9 @@ href="mailto:},
       if ($dbh->do($query)) {
 	$success .= qq{
 
-The request is now entered into the database where the PAUSE Daemon
-will pick it up as soon as possible. Allow a few minutes, and be aware
-that it may take longer if other requests are running. We proceed only
-one at a time.
+The request is now entered into the database where the PAUSE daemon
+will pick it up as soon as possible (usually 1-2 minutes).
+
 };
 	$didit = 1;
 	push @m, (qq{
@@ -1457,9 +1457,15 @@ tool</a> for pending uploads.</p>
 		 );
 
 	$success .= qq{
+
 During upload you can watch $tmpdir (temporary upload directory), and
 then $usrdir (final upload directory). The logfile is in $tailurl/2000
 (replace 2000 with any offset from the end).
+
+You'll be notified as soon as the upload has succeeded, and if the
+uploaded package contains modules, you'll get another notification
+from the indexer a little later (usually after 1/2 hour).
+
 };
 
       } else {
@@ -1693,7 +1699,8 @@ into $her directory. The request used the following parameters:});
       $mailblurb .= sprintf qq{ %-*s [%s]\n}, $longest, $param, $v;
     }
     $mailblurb .= "\n";
-    $mailblurb .= $self->wrap($success);
+    $mailblurb .= $self->wrappar($success);
+    $mailblurb .= "\n\nThanks for your contribution,\n-- \nThe PAUSE\n";
 #    my $header = {
 #		  To => qq{$PAUSE::Config->{ADMIN}, $u->{email}, $mgr->{User}{email}},
 #		  Subject => qq{Notification from PAUSE},
@@ -1774,12 +1781,15 @@ sub wrap {
   my $self = shift;
   my $p = shift;
   my($wrapped);
-  #require Text::Wrap;
-  #eval { $wrapped = Text::Wrap::wrap("", "", $p) };
-  #if ($@) {
-  #  $wrapped = $p;
-  #}
   $wrapped = Text::Format->new("firstIndent"=>0)->format($p);
+  $wrapped;
+}
+
+sub wrappar {
+  my $self = shift;
+  my @p = split /\n\n/, shift;
+  my($wrapped);
+  $wrapped = Text::Format->new("firstIndent"=>0)->paragraphs(@p);
   $wrapped;
 }
 
@@ -2704,10 +2714,7 @@ changer that lets you set a new password for yourself. This ticket
 will expire within a few hours. If you don't need it, do nothing. By
 the way, your old password is still valid.
 
-Yours truly,
-The Pause
-
-};
+$Yours};
       my $header = {
 		    To => $email,
 		    Subject => "Your visit at $me"
@@ -2932,8 +2939,7 @@ Excerpt from a mail:<pre>
 Data entered by $mgr->{User}{fullname}.
 Please check if they are correct.
 
-The Pause
-};
+$Yours};
       my @to = ($u->{secretemail}||$u->{email}, $mgr->{MailtoAdmins});
       warn "sending to[@to]";
       warn "mailblurb[$mailblurb]";
@@ -3297,8 +3303,7 @@ mlstatus
 Data entered by $mgr->{User}{fullname} ($mgr->{User}{userid}).
 Please check if they are correct.
 
-The Pause
-};
+$Yours};
       push @to, $mgr->{User}{secretemail}||$mgr->{User}{email}
 	  unless $mgr->{User}{userid} eq $u->{userid};
       warn sprintf "sending to[%s]", join(" AND ",@to);
@@ -3527,8 +3532,7 @@ changedby
 Data entered by $mgr->{User}{fullname} ($mgr->{User}{userid}).
 Please check if they are correct.
 
-The Pause
-};
+$Yours};
       my @to = ($u->{secretemail}||$u->{email}, $mgr->{MailtoAdmins});
       push @to, $mgr->{User}{secretemail}||$mgr->{User}{email};
       warn "sending to[@to]";
@@ -3924,7 +3928,8 @@ Parts of the data listed above can be edited interactively on the
 PAUSE. See https://$server/pause/authenquery?ACTION=edit_mod
 
 Thanks for registering,
-The Pause Team
+-- 
+The PAUSE
 };
 
     my($blurb) = join "", @blurb;
@@ -4398,7 +4403,8 @@ The resulting entry would be:
 $ml_entry
 
 Thanks for registering,
-The Pause Team
+-- 
+The PAUSE
 
 PS: The following links are only valid for module list maintainers:
 
@@ -5272,8 +5278,7 @@ following files have been scheduled for reindexing.
 %s
 Estimated time, when the job will be done: %s
 
-The Pause
-},
+$Yours},
                       $mgr->{User}{fullname},
                       $blurb,
                       $eta,
