@@ -510,13 +510,11 @@ sub edit_cred {
 				   },
 			   short => "ASCII transliteration of Full Name",
 
-                           long => "If (and only if) your Full Name
-                           contains characters outside the ASCII
-                           range, please supply an ASCII
-                           transliteration that can be used in a mail
-                           header and in some terse listings that
-                           should preferably be written in ASCII.
-                           Leave empty otherwise.",
+                           long => "If your Full Name contains
+                           characters above 0x7f, please supply an
+                           ASCII transliteration that can be used in
+                           mail written in ASCII. Leave empty if you
+                           trust the Text::Unidecode module.",
 
 			  },
 	      cpan_mail_alias=>{
@@ -572,6 +570,15 @@ sub edit_cred {
           if ($wantfullname eq $wantasciiname) {
             $req->param("pause99_edit_cred_asciiname", "");
           }
+        }
+      } else {
+        # set asciiname on our own if they don't supply it
+        my $wantfullname = $req->param("pause99_edit_cred_fullname");
+        if ($wantfullname =~ /[^\040-\177]/) {
+          require Text::Unidecode;
+          $wantfullname = $mgr->any2utf8($wantfullname);
+          $wantasciiname = Text::Unidecode::unidecode($wantfullname);
+          $req->param("pause99_edit_cred_asciiname", $wantasciiname);
         }
       }
     }
@@ -1786,7 +1793,7 @@ sub delete_files {
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
   my $userhome = PAUSE::user2dir($u->{userid});
-  push @m, qq{<h3>Files in directory authors/id/$userhome</h3>};
+  push @m, qq{<h3>Files in directory authors/id/$userhome</h3>}; #};
   require Cwd;
   my $cwd = Cwd::cwd();
 
