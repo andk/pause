@@ -910,10 +910,21 @@ sub as_ds {
                      AND ugroup='pumpking'";
             my $sth = $adbh->prepare($query);
             $sth->execute;
-            $skip = 1 unless $sth->rows > 0;
-            $self->verbose(1,"Skip set to [$skip]\n");
+            if ($sth->rows > 0){
+                $skip = 0;
+                $self->verbose(1,"Yes.\n");
+            } else {
+                $skip = 1;
+                $self->verbose(1,"NO! Skip set to [$skip]\n");
+            }
             $sth->finish;
             $adbh->disconnect;
+            if ($dist =~ /\.(tgz|tar[\._-]gz|tar\.Z)$/) {
+                $suffix = $1;
+            } else {
+                $self->verbose(1,"A perl distro ($dist) with an unusual suffix!\n");
+                $self->alert("A perl distro ($dist) with an unusual suffix!");
+            }
             unless ($skip) {
                 $skip = 1 unless $self->untar;
             }
