@@ -14,6 +14,8 @@ hostgroup pause / /home /home/ftp /tmp /var
 
 hostgroup paused localhost
 
+hostgroup smmta localhost
+
 # Monitor free disk space on the server
 #
 watch pause
@@ -24,7 +26,7 @@ watch pause
 	    alert mail.alert k@localhost
 	    alertevery 1h
 
-# Monitor free disk space on the server
+# Monitor PAUSE daemon running
 #
 watch paused
     service paused
@@ -33,3 +35,13 @@ watch paused
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
 	    alertevery 3h
+
+# Monitor mail throughput
+#
+watch smmta
+    service smmta
+	interval 1h
+	monitor sm-mta.monitor
+	period wd {Sun-Sat}
+	    alert mail.alert k@localhost
+	    alertevery 1h
