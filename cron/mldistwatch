@@ -408,12 +408,20 @@ sub do_rewrite01 {
     } else {
 	warn "Coudn't open $repfile $!";
     }
-    my($modid,%firstlevel);
-    my $sth = $dbh->prepare("SELECT modid FROM mods");
+    my(%firstlevel,%achapter);
+    my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
     $sth->execute;
-    while (($modid) = $sth->fetchrow_array) {
-	$modid =~ s/:.*//;
-	$firstlevel{$modid}++;
+    while (my($modid,$chapterid) = $sth->fetchrow_array) {
+	my($root,$colo) = $modid =~ /^([^:]+)(::)?/;
+	$firstlevel{$root}++;
+        if ($colo) {
+            if (! exists $achapter{$root}) {
+                $achapter{"$root\::"} ||= $chapterid;
+            }
+        } else {
+            delete $achapter{"$root\::"};
+            $achapter{$root} ||= $chapterid;
+        }
     }
     my(%c_fn,$chapterid,$shorttitle,@chaptitle);
     $sth = $dbh->prepare("SELECT chapterid, shorttitle FROM chapters");
@@ -432,16 +440,15 @@ sub do_rewrite01 {
 
     my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
-        my %pkg = (package => $pkg, dist => $pkgdist);
-        $pkg{'package'} =~ s/:.*//;
+        my %pkg = (rootpack => $pkg, dist => $pkgdist);
+        $pkg{rootpack} =~ s/:.*//;
         # We don't want to list perl distribution
         next if $pkg{dist} =~ m|/perl-?5|;
-        if ($seen{$pkg{dist},$pkg{'package'}}++){
-            # write it in blockform for easier debugging
+        if ($seen{$pkg{dist},$pkg{rootpack}}++){
             next;
         }
-        if ($firstlevel{$pkg{'package'}}){
-            #print "01 will have: $pkg{'package'}/$pkg{dist}\n";
+        if ($firstlevel{$pkg{rootpack}}){
+            #print "01 will have: $pkg{rootpack}/$pkg{dist}\n";
         } else {
             next;
         }
@@ -475,7 +482,7 @@ sub do_rewrite01 {
         $pkg{young} =
             $pkg{mtime} > $^T - 60 * 60 * 24 * 14 ? "  +" : "";
 
-        push @listing01, [@pkg{qw/package  userdir      userid         useridfiller
+        push @listing01, [@pkg{qw/rootpack  userdir      userid         useridfiller
                                 dist     filenameonly filenamefiller size
                                 mtimestr young        mtime/}];
 
@@ -483,13 +490,13 @@ sub do_rewrite01 {
         # we just wrote something like
         # Sybase      MEWP   sybperl-2.03.tar.gz     91.8  31 Jan 1996
         # we are in authors/id/
-        $pkg{'package'} =~ s/\*$//;
+        $pkg{rootpack} =~ s/\*$//;
         ($pkg{readme} = $pkg{dist}) =~
             s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
         my $sth2 = $dbh->prepare(qq{SELECT chapterid
                                   FROM mods
-                                  WHERE modid='$pkg{'package'}'});
+                                  WHERE modid='$pkg{rootpack}'});
         $sth2->execute;
         if ($sth2->rows == 1) {
             ($pkg{chapterid}) = $sth2->fetchrow_array;
@@ -497,51 +504,56 @@ sub do_rewrite01 {
             $sth2 = $dbh->prepare(qq{SELECT chapterid
                                  FROM mods
                                  WHERE modid
-                                  LIKE '$pkg{'package'}\::%'});
+                                  LIKE '$pkg{rootpack}\::%'});
             $sth2->execute;
             ($pkg{chapterid}) = $sth2->fetchrow_array;
+        }
+        my $cheap_chapterid = $achapter{$pkg{rootpack}}
+            || $achapter{"$pkg{rootpack}\::"};
+        unless ($pkg{chapterid} eq $cheap_chapterid) {
+            warn "WARNING: rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
         }
         if (defined $pkg{chapterid}) {
             if (defined $chaptitle[$pkg{chapterid}]) {
                 $pkg{chapter} = $chaptitle[$pkg{chapterid}]
             } else {
                 $pkg{chapter} = "99_Not_In_Modulelist";
-                warn "\nfound no chapterid for $pkg{'package'}";
+                warn "\nfound no chapterid for $pkg{rootpack}";
             }
         } else {
             $pkg{chapter} = "99_Not_In_Modulelist";
-            warn "found no chapter for $pkg{'package'}";
+            warn "found no chapter for $pkg{rootpack}";
         }
         print "." if $stdout_is_terminal && !($i % 16);
-        my $bymod = "$PAUSE::Config->{MLROOT}/../../modules/by-module/$pkg{'package'}/$pkg{filenameonly}";
-        my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/by-category/$pkg{chapter}/$pkg{'package'}/$pkg{filenameonly}";
+        my $bymod = "$PAUSE::Config->{MLROOT}/../../modules/by-module/$pkg{rootpack}/$pkg{filenameonly}";
+        my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
         next if -e $bymod and -e $bycat;
 
         chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../authors/id/$pkg{dist}",
-                       "../../modules/by-module/$pkg{'package'}".
+                       "../../modules/by-module/$pkg{rootpack}".
                        "/$pkg{filenameonly}");
         chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../authors/id/$pkg{readme}",
-                       "../../modules/by-module/$pkg{'package'}".
+                       "../../modules/by-module/$pkg{rootpack}".
                        "/$pkg{readmefn}")
             if -f $pkg{readme};
         chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../authors/id/$userdir",
-                       "../../modules/by-module/$pkg{'package'}/$pkg{userid}");
+                       "../../modules/by-module/$pkg{rootpack}/$pkg{userid}");
         chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../../authors/id/$pkg{dist}",
                        "../../modules/by-category/$pkg{chapter}".
-                       "/$pkg{'package'}/$pkg{filenameonly}");
+                       "/$pkg{rootpack}/$pkg{filenameonly}");
         chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../../authors/id/$pkg{readme}",
                        "../../modules/by-category/$pkg{chapter}".
-                       "/$pkg{'package'}/$pkg{readmefn}")
+                       "/$pkg{rootpack}/$pkg{readmefn}")
             if -f $pkg{readme};
         chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../../authors/id/$userdir",
                        "../../modules/by-category/$pkg{chapter}".
-                       "/$pkg{'package'}/$pkg{userid}");
+                       "/$pkg{rootpack}/$pkg{userid}");
     }
     $list = qq{
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title>Modules on CPAN alphabetically</title></head><body>
