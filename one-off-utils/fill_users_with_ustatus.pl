@@ -20,8 +20,7 @@ use lib "/home/k/PAUSE/lib";
 use PAUSE;
 use DBI;
 
-my $Rev = q$Revision: 1.2 $;
-
+my $Rev = q$Rev$;
 print "$Rev\n";
 
 my $sharp = 1;
