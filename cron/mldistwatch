@@ -379,7 +379,8 @@ sub rewrite01 {
     while (($chapterid, $shorttitle) = $sth->fetchrow_array) {
 	$chapterid =~ s/^\s+//;
 	$chapterid =~ s/\D+.*//;
-	$chaptitle[$chapterid] = $shorttitle;
+        $shorttitle =~ s/^\d\d_//; # currently short titles have leading numbers in the database
+	$chaptitle[$chapterid] = sprintf "%02d_%s", $chapterid, $shorttitle;
     }
 
     $sth = $dbh->prepare("SELECT package, dist FROM packages");
