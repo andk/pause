@@ -702,7 +702,7 @@ maintainer
           $package{'useridlc'}   = lc $package{'userid'}
         );
         ($package{basename}) =
-            $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$)/;
+            $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$/;
 
         $html .= sprintf(
                          qq{<a href="../authors/id/%s">%s</a>%s<a
