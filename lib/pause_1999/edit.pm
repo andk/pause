@@ -6005,12 +6005,14 @@ sub dele_message {
 
   my $dbh = $mgr->connect;
   my $req = $mgr->{CGI};
-  my $sth = $dbh->prepare("SELECT * FROM messages where mfrom=? ORDER BY created desc");
+  my $sth = $dbh->prepare("SELECT * FROM messages where mfrom=? AND mstatus='active'
+ ORDER BY created desc");
   $sth->execute($mgr->{User}{userid});
   if ($sth->rows) {
     if ($req->param('SUBMIT_pause99_dele_message_sub')) {
       # get another handle
-      my $sth2 = $dbh->prepare("DELETE FROM messages WHERE mfrom=? AND c=?");
+      my $sth2 = $dbh->prepare("UPDATE messages set mstatus='deleted'
+ WHERE mfrom=? AND c=?");
       for my $m ($req->param('pause99_dele_message_m')) {
         $sth2->execute($mgr->{User}{userid}, $m);
       }
