@@ -16,6 +16,14 @@ perl -MCPAN -e 'install Bundle::Snapshot_1996_09_29_00'
 
 =head1 CONTENTS
 
+Convert::BER
+
+Mon
+
+DB_File::Lock
+
+Time::Period
+
 Encode::MIME::Header
 
 Time::HiRes
