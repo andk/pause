@@ -952,7 +952,9 @@ sub as_ds {
                 $dist =~ /TRIAL/
                ) {
                 $self->verbose(1,"  developer release\n");
-                return("N/A",1);
+                $self->{SUFFIX} = "N/A";
+                $self->{SKIP}   = 1;
+                return;
             }
             if ($dist =~ /\.(tgz|tar[\._-]gz|tar\.Z)$/) {
                 $suffix = $1;
@@ -1193,9 +1195,13 @@ Please contact modules\@perl.org if there are any open questions.
         my $self = shift;
         my(@manifind) = sort keys %{ExtUtils::Manifest::manifind()};
         my $manifound = @manifind;
-        my $dist = $self->{DIST};
-        $self->verbose(1,"Found $manifound files in dist $dist, first $manifind[0]\n");
         $self->{MANIFOUND} = \@manifind;
+        my $dist = $self->{DIST};
+        unless (@manifind){
+            $self->verbose(1,"NO FILES! in dist $dist?");
+            return;
+        }
+        $self->verbose(1,"Found $manifound files in dist $dist, first $manifind[0]\n");
     }
 
     # package PAUSE::dist;
