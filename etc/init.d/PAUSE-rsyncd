@@ -2,21 +2,23 @@
 #
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 DAEMON=/usr/bin/rsync
-PIDFILE=/var/run/rsync.pid
+# given that this filename is PAUSE-rsyncd and the conf file is rsyncd.conf
+# I plead for rsyncd.pid
+PIDFILE=/var/run/rsyncd.pid
 
-ARGS="--daemon"
+ARGS="--daemon --no-detach"
 
 test -x $DAEMON || exit 0
 
 case "$1" in
   start)
     echo -n "Starting rsync"
-    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $ARGS
+    start-stop-daemon --verbose --start --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $ARGS &
     echo "."
     ;;
   stop)
     echo -n "Stopping rsync"
-    start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
+    start-stop-daemon --verbose --stop --pidfile $PIDFILE --exec $DAEMON -- $ARGS
     echo "."
     ;;
   reload)
