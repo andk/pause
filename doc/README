@@ -42,7 +42,7 @@ section about user management.
 On PAUSE the files live in /home/k/PAUSE and the following symlinks
 make sure that installed programs find their configuration:
 
-(last time updated: 2003-07-24)
+(last time updated: 2003-07-25)
 
   /usr/local/apache/conf   -> ../../../home/k/PAUSE/apache-conf
   /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/

@@ -1,0 +1,17 @@
+MAILTO = k
+PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
+
+04 * * * *            root cleanup-incoming.pl
+04 01,13 * * *        root cron-daily.pl
+05 * * * *            root gmls-lR.pl
+07,37 * * * *         root mldistwatch
+18 04,10,16,22 * * *  root mysql-dump.pl
+20 01 * * 7           root restart-httpd
+21 * * * *            root rm_stale_links
+23 05,11,17,23 * * *  root run_mirrors.sh
+26 10 * * *           root svn-dump.pl
+27 * * * *            root sync-04pause.sh
+28 */4 * * *          root update-checksums.pl
+32 3,15 * * *         root /usr/local/bin/rsync --exclude CHECKSUMS -vrptgx /home/ftp/pub/PAUSE/authors/id/ /home/ftp/pub/backpan/authors/id/
+
+
