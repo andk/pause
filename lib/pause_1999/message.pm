@@ -21,7 +21,9 @@ sub as_string {
     push @m, qq{<dl>};
     while (my $rec = $sth->fetchrow_hashref) {
       push @m, qq{<dt>$rec->{created} from $rec->{mfrom}\@cpan.org</dt>};
-      push @m, qq{<dd>$rec->{message}</dd>};
+      push @m, qq{<dd>};
+      push @m, $mgr->escapeHTML($rec->{message});
+      push @m, qq{</dd>};
     }
     push @m, qq{</dl>};
     push @m, qq{<p>Please answer the sender so that they can delete the messages.</p>};
