@@ -29,6 +29,7 @@ print $fh $$;
 close $fh;
 
 package my_pause_send_mail;
+
 sub send {
   my($self,$header,$blurb) = @_;
   my(%tosubj);
@@ -83,6 +84,10 @@ while () {
   loop();
   sleep $PAUSE::Config->{SLEEP};
 }
+
+exit;
+
+#### SUBROUTINES ####
 
 sub loop {
   my($dbh,$sth,$sth2,$query);
@@ -300,7 +305,10 @@ No action is required on your part
       logge("Sent email(s) about uriid[$hash->{uriid}]");
       sleep 15;
 
-    } else {
+
+    } else { # ! getit()
+
+
       $hash->{nosuccesstime} = $now;
       $hash->{nosuccesscount}++;
       my $retries = 8;
@@ -594,4 +602,35 @@ sub writeback {
   }
   return 1;
 }
+
+
+__END__
+
+
+=head1 NAME
+
+paused - PAUSE Daemon
+
+=head1 SYNOPSIS
+
+ paused [--pidfile pidfile]
+
+=head1 DESCRIPTION
+
+The PAUSE daemon is a daemon that inspects the PAUSE database
+continuously for new scheduled uploads. Every upload is tried to be
+satisfied and mail is sent accordingly. After each inspection cycle it
+takes a small nap.
+
+Please RTFS for details.
+
+=head3 IMPLEMENTATION NOTES
+
+2003-09-01: I just wanted to improve the getit() function to send an
+immediate email in the case that a downloaded file C<is not in gzip
+format>, but it turned out to be more involved than expected. If we
+had a more OO style we could solve that quickier. I think the next
+revisions will do some objectification.
+
+=cut
 
