@@ -128,10 +128,11 @@ CREATE TABLE maillists (
 
 CREATE TABLE messages (
   c int(10) unsigned NOT NULL auto_increment,
-  mfrom varchar(10) default NULL,
-  mto varchar(10) default NULL,
-  created datetime default NULL,
-  message text,
+  mfrom varchar(10) binary NOT NULL default '',
+  mto varchar(10) binary NOT NULL default '',
+  created datetime NOT NULL default '0000-00-00 00:00:00',
+  message text NOT NULL,
+  mstatus enum('active','deleted') NOT NULL default 'active',
   PRIMARY KEY  (c)
 ) TYPE=MyISAM;
 
