@@ -66,6 +66,9 @@ make sure that installed programs find their configuration:
   mysql
   rsync (runs as daemon)
 
+At the time of this writing (2002-12-27), all perl scripts were
+running under 5.6.1, but mod_perl is built with 5.8.0.
+
 =head2 Database schema
 
 The files doc/*.schema.txt document the schema of the two databases. A
