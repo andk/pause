@@ -9,6 +9,7 @@ use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
 
 our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $Valid_Userid = qr/^[A-Z]{4,9}$/;
 
 sub parameter {
   my pause_1999::edit $self = shift;
@@ -1908,9 +1909,9 @@ sub add_user {
     $userid = uc($userid);
     $userid ||= "";
     my @error;
-    if ( $userid =~ m/[^A-Z]/ or length($userid)>9 ) {
+    if ( $userid !~ $Valid_Userid ) {
       my $euserid = $mgr->escapeHTML($userid);
-      push @error, qq{<b>userid[$euserid]</b> not a legal username.};
+      push @error, qq{<b>userid[$euserid]</b> does not match <b>$Valid_Userid</b>.};
     }
 
     $req->param("pause99_add_user_userid", $userid) if $userid;
@@ -2350,6 +2351,9 @@ sub request_id {
       if ($sth->rows > 0) {
         my $euserid = $mgr->escapeHTML($userid);
         push @errors, "The userid $euserid is already taken.";
+      } elsif ($userid !~ $Valid_Userid) {
+        my $euserid = $mgr->escapeHTML($userid);
+        push @errors, "The userid $euserid does not match $Valid_Userid.";
       }
       $sth->finish;
     } else {
