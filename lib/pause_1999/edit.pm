@@ -1573,7 +1573,7 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
   }
 
   if ( exists $mgr->{UserGroups}{pumpking} ) {
-    push @m, qq{\n<b>For pumkings only</b>:};
+    push @m, qq{\n<b>For pumpkings only</b>:};
     push @m, $mgr->checkbox(
 			    name    => 'pause99_add_uri_mail_announce',
 			    checked => 1,
