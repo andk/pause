@@ -9,7 +9,7 @@ Y will be blocked: he will not become primeur, not become co-maint,
 not be indexed. This is a bug, because user X "gave up primary
 maintainership". Concrete case 2003-01-17: JWIED still is co-maint for
 SQL::Statement, but that has no primary maintainer. Primary should be
-JZUCKER.
+JZUCKER. Working on this rev 116ff.
 
 
 History:
@@ -1503,6 +1503,28 @@ package in packages  package in primeur
       # print "(primeur)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
 
       return 1; # P2.1, P3.0
+    }
+
+    my($has_primeur) = $dbh->prepare(qq{SELECT package
+                                          FROM  primeur
+                                          WHERE package = ?});
+    $has_primeur->execute($package);
+    if ($has_primeur->rows == 0) {
+      my($has_owner) = $dbh->prepare(qq{SELECT modid
+                                        FROM mods
+                                        WHERE mod = ?});
+      $has_owner->execute($package);
+      if ($has_owner->rows == 0) {
+        # package has neither owner in mods nor maintainer in primeur
+        local($dbh->{RaiseError}) = 0;
+        my $ret = $dbh->do($ins_perms);
+        my $err = "";
+        $err = $dbh->errstr unless defined $ret;
+        $ret ||= "";
+        print "(ownerless)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
+
+        return 1; # P2.2, P3.0
+      }
     }
 
     my($sth_perms) = $dbh->prepare(qq{SELECT package, userid
