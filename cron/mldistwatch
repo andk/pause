@@ -1249,7 +1249,8 @@ Please contact modules\@perl.org if there are any open questions.
                         }
                     }
                 } else {
-                    $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
+                    # noisy:
+                    # $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
                 }
             } else {
                 # $self->verbose(1,"no YAML_CONTENT"); # too noisy
@@ -1416,7 +1417,7 @@ Please contact modules\@perl.org if there are any open questions.
     use constant EDUALYOUNGER => 30; # pumpkings only
     use constant EMISSPERM => 20;
     use constant EOLDRELEASE => 4;
-    use constant EMTIMEFALLING => 3;
+    use constant EMTIMEFALLING => 3; # deprecated after rev 478
     use constant EVERFALLING => 2;
     use constant OK => 1;
     our $heading =
@@ -2218,38 +2219,36 @@ has a higher version number ($oldversion)},
             }
         } else {
 
-            if (                # no version here,
-                $pp->{version} == 0
-               ) {
-                if (            # but younger or same-age file
-                    $pp->{filemtime} >= $ofilemtime
-                   ) {
+            # 2004-01-04: Stas Bekman asked to change logic here. Up
+            # to rev 478 we did not index files with a version of 0
+            # and with a falling timestamp. These strange timestamps
+            # typically happen for developers who work on more than
+            # one computer. Files that are not changed between
+            # releases keep two different timestamps from some
+            # arbitrary checkout in the past. Stas correctly suggests,
+            # we should check these cases for distmtime, not filemtime.
+
+            # so after rev. 478 we deprecate the EMTIMEFALLING constant
+
+            if ($pp->{version} == 0) {            # no version here,
+                if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
                     $self->verbose(1, "$package noversion comp $dist vs $odist: >=\n");
                     $ok++;
                 } else {
-
-                    $self->verbose(1, "ALERT: Not updating! $package noversion ".
-                                   "falling mtime
-filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]\n");
-
                     $self->index_status(
                                         $package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        PAUSE::mldistwatch::Constants::EMTIMEFALLING,
+                                        PAUSE::mldistwatch::Constants::EOLDRELEASE,
                                         qq{Not indexed because $ofile in $odist
-has a more recent modification time.},
+also has a zero version number and the distro has a more recent modification time.}
                                        );
-                    # no version and strange timestamps.
-
                 }
-
-            } elsif (
-                     # equal version here
-                     CPAN::Version->vcmp($pp->{version},$oldversion)==0
-                    ) {
+            } elsif (CPAN::Version
+                     ->vcmp($pp->{version},
+                            $oldversion)==0) {    # equal version here
                 $self->verbose(1, "$package version eq comp $dist vs $odist\n");
-                if ($tdistmtime >= $odistmtime) {
+                if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
                     $ok++;
                 } else {
                     $self->index_status(
