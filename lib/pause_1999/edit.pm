@@ -1,4 +1,5 @@
 #!/usr/bin/perl -- -*- Mode: cperl; -*-
+
 package pause_1999::edit;
 use base 'Class::Singleton';
 use pause_1999::main;
@@ -243,7 +244,7 @@ sub as_string {
   $action = $mgr->{ActionTuning}{$mgr->{Action}}{verb}
       if exists $mgr->{ActionTuning}{$mgr->{Action}};
   # $action ||= $mgr->{Action};
-  push @m, sprintf qq{<h2 class="firstheader">%s</h2>}, $action if $action;
+  push @m, sprintf qq{\n<h2 class="firstheader">%s</h2>\n}, $action if $action;
   my $sentit;
   my @err = @{$mgr->{ERROR}||[]};
   push @m, @err and $sentit++ if @err;
@@ -252,7 +253,7 @@ sub as_string {
   # warn "sentit[$sentit]";
   unless ($sentit) {
     push @m, sprintf(
-                     qq{<h2 class="firstheader">%slease choose an action from the menu.</h2>},
+                     qq{\n<h2 class="firstheader">%slease choose an action from the menu.</h2>\n},
                      $mgr->{User}{fullname} ?
                      sprintf("Hi %s,<br />p",$mgr->escapeHTML($mgr->{User}{fullname})) :
                      "P"
@@ -3488,8 +3489,10 @@ mlstatus
 	} else {
 
           if ($field eq "chapterid") {
-            die "illegal chapterid" if $strict_chapterid &&
-                ($selectedrec->{$field} !~ /^d*$/ || $param !~ /^d*$/);
+            die "illegal chapterid. selectedrec/field[$selectedrec->{$field}]".
+                "param[$param]"
+                    if $strict_chapterid &&
+                        ($selectedrec->{$field} !~ /^\d*$/ || $param !~ /^\d*$/);
             $selectedrec->{$field} =~ s/^_/ /;
             $param =~ s/^_/ /;
           }
@@ -4249,7 +4252,6 @@ $blurbcopy
     my $note = $meta{$field}{note} || "";
     push @m, qq{<p><b>$headline</b></p>};
     push @m, qq{<p><small>$note</small></p>} if $note;
-    push @m, qq{<p>};
     my $fieldtype = $meta{$field}{type} or die "empty fieldtype";
     my $fieldname = "pause99_add_mod_$field";
     # warn sprintf "field[%s]value[%s]", $field, $req->param($fieldname);
@@ -4265,18 +4267,17 @@ $blurbcopy
                               %{$meta{$field}{args} || {}}
                              );
     if ($field eq "modid") {
-      push @m, qq{<table border="1"><tr><td bgcolor="faba99">};
+      push @m, qq{<table border="1"><tr><td bgcolor="#faba99">};
       if (@hints) {
         push @m, qq{<table>};
         for (@hints) {
           push @m, qq{<tr><td>$_</td></tr>\n};
         }
-        push @m, qq{</table>\n</td><td bgcolor="faba99">};
+        push @m, qq{</table>\n</td><td bgcolor="#faba99">};
       }
       push @m, $hint_butt;
       push @m, qq{</td></tr></table>\n};
     }
-    push @m, qq{</p>\n};
   }
   push @m, qq{<br />};
   push @m, $submit_butts;
