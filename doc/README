@@ -79,6 +79,12 @@ course -- not available.
 
 =head2 User management
 
-PAUSE is running processes as user root, nobody, SVN, and UNSAFE.
+PAUSE is running processes as user root, nobody, SVN, and UNSAFE. The
+user "k" in the group "k" owns the working copy of the repository and
+all the sensitive files. Group "k" must contain all users who should
+be able to read sensitive data. So at least "nobody" (who runs the
+webserver) must be in that group. Sensitive directories and files must
+be group-readable and must not be world readable. The SSL data for the
+webserver should not even be readable by that group.
 
 =cut
