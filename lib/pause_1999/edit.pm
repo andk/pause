@@ -944,24 +944,37 @@ sub show_document {
   my $r = $mgr->{R};
   my $dir = $r->document_root;
   my @m;
-  # push @m, sprintf "%s %s", $dir, -e $dir ? "exists" : "doesn't exist. ";
+  # push @m, sprintf "DEBUG: %s %s<br />", $dir, -e $dir ? "exists" : "doesn't exist. ";
   for my $subdir ("pause", "pause/../htdocs", "pause/..", "") {
-    my $d = "$dir/$subdir/$doc";
-    next unless -f $d;
+    my $file = "$dir/$subdir/$doc";
+    next unless -f $file;
     push @m, qq{<hr noshade="noshade" />};
-    require IO::Handle;
-    my $fh = IO::Handle->new;
-    open $fh, $d or die;
+    open my $fh, $file or die;
     if ($] > 5.007) {
       binmode $fh, ":utf8";
     }
     local $/;
-    my $html = <$fh>;
-    $html =~ s/^.*?<body[^>]*>//si;
-    $html =~ s|</body>.*$||si;
-    push @m, $html;
+    my $html_in = <$fh>;
     close $fh;
+
+    use XML::SAX::ParserFactory;
+    use XML::SAX::Writer;
+    use pause_1999::saxfilter01;
+    use XML::LibXML::SAX;
+    $XML::SAX::ParserPackage = "XML::LibXML::SAX";
+
+    my @html_out;
+    my $w = XML::SAX::Writer->new(Output => \@html_out);
+    my $f = pause_1999::saxfilter01->new(Handler => $w);
+    my $p = XML::SAX::ParserFactory->parser(Handler => $f);
+    $p->parse_string($html_in);
+    shift @html_out if $html_out[0] =~ /^<\?/; # remove the XML Declaration
+    push @m, join "", @html_out;
+
     last;
+  }
+  unless (@m) {
+    push @m, "document '$doc' not found on the server";
   }
   @m;
 }

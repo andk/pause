@@ -865,8 +865,8 @@ sub version {
   for my $m (grep /pause_1999/, keys %INC) {
     $m =~ s|/|::|g;
     $m =~ s|\.pm$||;
-    my $v = $m->VERSION;
-    warn "Warning: Old style versioning in m[$m]v[$v]" if $v < 10;
+    my $v = $m->VERSION || 0;
+    warn "Warning: Strange versioning style in m[$m]v[$v]" if $v < 10;
     $version = $v if $v > $version;
   }
   $version;

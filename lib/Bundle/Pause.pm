@@ -20,6 +20,10 @@ Convert::BER
 
 Mon
 
+XML::SAX::Expat
+
+XML::SAX::Writer
+
 DB_File::Lock
 
 Time::Period
