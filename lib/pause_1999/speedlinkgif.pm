@@ -16,6 +16,7 @@ use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
 use vars qw( $Exeplan );
+our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub as_string {
   my pause_1999::speedlinkgif $self = shift;
@@ -28,17 +29,18 @@ sub as_string {
     $validator_href = "http://validator.w3.org/file-upload.html";
     $validator_comment = q{<div class="xexplain" align="right">To validate, download page first.</div><br />};
   }
+  my $version = $mgr->version;
   qq{<table width="100%">
       <tr>
-       <td rowspan="2">
+       <td rowspan="2" valign="top">
         <div class="xexplain">The PAUSE is sponsored by</div><br />
         <a href="http://www.loomes.de">
          <img src="/pause/logol1.$pngjpg" border="0" alt="Loomes Logo"
               width="273" height="78" align="left" />
         </a>
        </td>
-       <td width="100%"></td>
-       <td colspan="2">$validator_comment
+       <td width="100%" valign="top" align="center"><div class="xexplain">Rev: $version</div></td>
+       <td colspan="2" valign="top">$validator_comment
        </td>
       </tr>
       <tr>

@@ -3,8 +3,7 @@ use base 'Class::Singleton';
 use pause_1999::main;
 
 use strict;
-use vars qw($VERSION);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/;
+our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub as_string {
   my pause_1999::startform $self = shift;

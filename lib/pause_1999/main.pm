@@ -18,7 +18,8 @@ use base Apache::HeavyCGI;
 
 use strict;
 use vars qw($VERSION %entity2char $DO_UTF8);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.65 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+
 $DO_UTF8 = 1;
 require Unicode::String;
 use HTML::Entities;
@@ -135,6 +136,7 @@ UserAgent
 UserGroups
 UserId
 UserSecrets
+VERSION
 WaitDir
 WaitUserDb
 
@@ -829,6 +831,20 @@ sub fetchrow {
       }
     }
   }
+}
+
+sub version {
+  my($self) = @_;
+  return $self->{VERSION} if defined $self->{VERSION};
+  my $version = $VERSION;
+  for my $m (grep /pause_1999/, keys %INC) {
+    $m =~ s|/|::|g;
+    $m =~ s|\.pm$||;
+    my $v = $m->VERSION;
+    warn "m[$m]v[$v]" if $v < 10;
+    $version = $v if $v > $version;
+  }
+  $version;
 }
 
 1;

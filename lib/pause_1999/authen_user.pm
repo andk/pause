@@ -4,8 +4,7 @@ use Apache::Constants qw( AUTH_REQUIRED MOVED OK SERVER_ERROR );
 use base 'Class::Singleton';
 use PAUSE ();
 use strict;
-use vars qw($VERSION);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.16 $ =~ /(\d+)\.(\d+)/;
+our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 =comment
 
