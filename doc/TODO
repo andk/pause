@@ -1,5 +1,3 @@
-Work on misleading menu items logout/switch user. (Gabor Szabo)
-
 Switch the rest to 5.8.0.
 
 Complete etc/rc.d/init.d directory: mysql is missing, mon, others?
