@@ -218,12 +218,12 @@ sub loop {
       logge("WARNING: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
     }
 
-    logge("Need to get uriid[$hash->{uriid}]");
+    # logge("Need to get uriid[$hash->{uriid}]");
 
     my $size;
     if ($size = getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
       $hash->{dgot} = $now;
-      logge("Got $hash->{uri} to $hash->{uriid} (size $size)");
+      logge("Got $hash->{uriid} (size $size)");
       my $md5 = MD5->new;
       my $handle = IO::File->new;
       unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
@@ -537,14 +537,15 @@ gives [";
 sub logge {
   my($arg) = @_;
   my $stamp = &timestamp." \$\$$$ v$VERSION: ";
-  my $from = join ":", caller;
+  my @caller = caller;
+  shift @caller;
+  $caller[0] =~ s|.*/||;
+  my $from = join ":", @caller;
   # open the log file
   my $logfile = $PAUSE::Config->{PAUSE_LOG};
-  open LOG, ">>$logfile" or die "open $logfile: $!";
-  # LOG->autoflush;
-
-  print LOG $stamp, $arg, " ($from)\n";
-  close LOG;
+  open my $LOG, ">>", $logfile or die "open $logfile: $!";
+  print $LOG $stamp, $arg, " ($from)\n";
+  close $LOG;
 }
 
 sub timestamp { # Efficiently generate a time stamp for log files
