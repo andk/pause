@@ -88,9 +88,9 @@ alink="#FF0000" text="#000000"><table width="100%" border="0" cellpadding="0" ce
     use Config;
     push @l, qq{<div align="center">};
 
-    push @l, qq{<p class="motd">2002-12-25: I'm shuffling files around
-        on PAUSE. Please pay increased attention and if you encounter
-        anything suspicious, please report to
+    push @l, qq{<p class="motd">2002-12-25/26: I have been shuffling
+        bits around on PAUSE. Please pay increased attention and if
+        you encounter anything suspicious, please report to
         andreas.koenig\@anima.de. Thank you.</p>};
 
     push @l, qq{</div>};
