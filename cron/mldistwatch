@@ -428,6 +428,7 @@ sub do_rewrite01 {
     $sth = $dbh->prepare("SELECT package, dist FROM packages");
     $sth->execute;
     my(@listing01,%count,$count);
+    my(%seen);
 
     my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
@@ -435,6 +436,10 @@ sub do_rewrite01 {
         $pkg{'package'} =~ s/:.*//;
         # We don't want to list perl distribution
         next if $pkg{dist} =~ m|/perl-?5|;
+        if ($seen{$pkg{dist},$pkg{'package'}}++){
+            # write it in blockform for easier debugging
+            next;
+        }
         if ($firstlevel{$pkg{'package'}}){
             #print "01 will have: $pkg{'package'}/$pkg{dist}\n";
         } else {
@@ -464,7 +469,7 @@ sub do_rewrite01 {
         $pkg{useridfiller} = " "x(10-length($user));
         $pkg{filenameonly} = $f;
         $pkg{filenamefiller} =
-            " "x(38-length($f)-length($pkg{size}));
+            " "x(34-length($f)-length($pkg{size}));
         $pkg{mtimestr} =
             substr(HTTP::Date::time2str($pkg{mtime}),5,11);
         $pkg{young} =
