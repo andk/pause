@@ -988,7 +988,9 @@ Please contact modules\@perl.org if there are any open questions.
         my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
         my $substrdistro = substr $distro, 5;
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-        push @m, qq{
+        my $show_meta_yml = 0;
+        if ($show_meta_yml) {
+            push @m, qq{
                User: $author ($asciiname)
   Distribution file: $distrobasename
     Number of files: $nfiles
@@ -997,6 +999,16 @@ Please contact modules\@perl.org if there are any open questions.
            META.yml: $self->{YAML}
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
+        } else {
+            push @m, qq{
+               User: $author ($asciiname)
+  Distribution file: $distrobasename
+    Number of files: $nfiles
+         *.pm files: $pmfiles
+             README: $self->{README}
+  Timestamp of file: $mtime UTC
+   Time of this run: $time UTC\n\n};
+        }
         my $tf = Text::Format->new(firstIndent=>0);
 
         if (0) {
