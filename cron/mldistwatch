@@ -1177,7 +1177,7 @@ Please contact modules\@perl.org if there are any open questions.
         # very similar code is in PAUSE::package::examine_pkg
       MANI: for my $mf ( @{$self->{MANIFOUND}} ) {
             next unless $mf =~ /\.pm$/i;
-            my($inmf) = $pmfile =~ m!^[^/]+/(.+)!; # go one directory down
+            my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
             next if $inmf =~ m!^(?:t|inc)/!;
             if ($self->{YAML_CONTENT} && $self->{YAML_CONTENT}{private}) {
                 my %map = (
