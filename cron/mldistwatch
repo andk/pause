@@ -1,4 +1,4 @@
-#!/usr/local/perl-5.8/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
+#!/usr/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
 
 =pod
 
