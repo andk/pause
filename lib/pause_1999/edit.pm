@@ -5929,6 +5929,8 @@ sub share_perms_makeco {
           warn "DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]";
           if ($ret) {
             push @m, "<p>Added $other_user to co-maintainers of $selmod.</p>\n";
+          } elsif ($err =~ /Duplicate entry/) {
+            push @m, "<p>$other_user was already a co-maintainer of $selmod: skipping</p>";
           } else {
             push @m, "<p>Error trying to add $other_user to co-maintainers of
                     $selmod: $err</p>\n";
