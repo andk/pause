@@ -87,6 +87,12 @@ course -- not available.
 
 =head2 User management
 
+This section is about the fun of makeing mysql safe based on UNIX user
+and group permissions. This is dangerous stuff. Be careful here and
+follow the advice in the mysql manual about how to secure mysql in
+general. E.g. --skip-networking is highly recommended, root user
+password is a must, etc.
+
 PAUSE is running processes as user root, nobody, SVN, and UNSAFE. The
 user "k" in the group "k" owns the working copy of the repository and
 all the sensitive files. Group "k" must contain all users who should
@@ -94,5 +100,11 @@ be able to read sensitive data. So at least "nobody" (who runs the
 webserver) must be in that group. Sensitive directories and files must
 be group-readable and must not be world readable. The SSL data for the
 webserver should not even be readable by that group.
+
+This setup must ensure that the user UNSAFE cannot read the database
+account informations. On the database side this is achieved by
+granting one user delete,index,insert,select,update privileges on the
+two tables, nothing else. This is the user whose access codes are
+stored in PrivatePAUSE.pm.
 
 =cut
