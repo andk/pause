@@ -4504,7 +4504,7 @@ $blurbcopy
               a namespace for a module you have written or are going
               to write. The request will be sent off to the
               modules\@perl.org people who are maintaining the <a
-              href="http://www.perl.org/pub/CPAN/modules/00modlist.long.html">Modules
+              href="http://www.perl.org/CPAN/modules/00modlist.long.html">Modules
               List</a>. A registration is not a prerequisite for
               uploading. It is just recommended for better
               searchability of the CPAN and to avoid namespace
