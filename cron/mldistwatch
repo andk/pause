@@ -1657,11 +1657,11 @@ package in packages  package in primeur
         my $self = shift;
         my $dbh = $self->{DBH};
         my $package = $self->{PACKAGE};
-        local($dbh->{RaiseError}) = 0;
+        # local($dbh->{RaiseError}) = 0;
         my $sth_mods = $dbh->prepare("SELECT userid
                                       FROM   mods
                                       WHERE  modid = ?");
-        warn "Going to execute 'SELECT userid FROM mods WHERE modid = '$package'";
+        warn "Going to execute [SELECT userid FROM mods WHERE modid = '$package']";
         $sth_mods->execute($package) or die "FAILED";
         if ($sth_mods->rows>0) { # make sure we regard the owner as the owner
             my($mods_userid) = $sth_mods->fetchrow_array;
