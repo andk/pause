@@ -31,7 +31,7 @@ $Data::Dumper::Indent = 1;
     use File::Path qw(rmtree mkpath);
     use vars qw($Id $ISAPERL);
     $Id = q$Id$;
-    $ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
+    $ISAPERL = q{ /perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
 }
 
 
