@@ -108,6 +108,7 @@ sub loop () { # we're NOT called as a method
   my($dbh,$sth,$sth2,$query);
 
   my $now    = time ;
+  $self->{NOW} = $now;
   my $old = $now - 86400*60;
   unless ( $dbh = DBI->connect(
 			       $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
@@ -118,6 +119,7 @@ sub loop () { # we're NOT called as a method
     $self->logge($DBI::errstr);
     return; # let them sleep or whatever
   }
+  $self->{DBH} = $dbh;
 
   # Not yet known is how it could happen that 5 uploads came without a
   # userid. We didn;t catch it:-(
@@ -138,10 +140,12 @@ sub loop () { # we're NOT called as a method
                FROM users
                WHERE userid=?};
   $sth2 = $dbh->prepare($sql);
+  $self->{STH2} = $sth2;
 
   # we have a continue block, so be careful with the scope
   my($hash, $hash_orig);
-  while ( $hash  = $sth->fetchrow_hashref ) {
+ URIRECORD: while ( $hash  = $sth->fetchrow_hashref ) {
+    $self->{URIRECORD} = $hash;
     if ($] > 5.007) {
       require Encode;
       for my $k (keys %$hash) {
@@ -162,8 +166,8 @@ sub loop () { # we're NOT called as a method
     #
 
     if ($hash->{dverified}){
-      next unless $hash->{mirrorit};
-      next unless $now > $hash->{dverified} + $hash->{mirrorit}*86400;
+      next URIRECORD unless $hash->{mirrorit};
+      next URIRECORD unless $now > $hash->{dverified} + $hash->{mirrorit}*86400;
 
       if (-e $lpath) {
 
@@ -184,7 +188,7 @@ sub loop () { # we're NOT called as a method
 	  # They didn't send success, so they have nothing new
 	  $self->logge("No");
 	  $hash->{dverified} = $now;
-	  next;
+	  next URIRECORD;
 	}
       }
       $hash->{dverified} = 0;
@@ -192,7 +196,7 @@ sub loop () { # we're NOT called as a method
 
       $self->getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount});
       $hash->{dverified} = $now;
-      next;
+      next URIRECORD;
 
     }
 
@@ -222,27 +226,27 @@ sub loop () { # we're NOT called as a method
       $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
       $self->logge("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
       $mirror->close;
-      next;
+      next URIRECORD;
     }
 
     if (
 	$hash->{nosuccesstime}+$PAUSE::Config->{NO_SUCCESS_BREAK} > $now ||
 	$hash->{nosuccesscount} > $PAUSE::Config->{MAXRETRIES}
        ) {
-      next;
+      next URIRECORD;
     }
 
     # $self->logge("lpath[$lpath] uriid[$hash->{uriid}]");
 
     if ( -d $lpath ) {
-      next;
+      next URIRECORD;
     } elsif ( -s _ ) {
       # we have the file. If the database also thinks so, OK.
       # otherwise this is a RE-upload of something README-ish
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
 	$self->logge("Verified $hash->{uriid}");
-	next;
+	next URIRECORD;
       } else {
 	unlink $lpath;
       }
@@ -255,31 +259,175 @@ sub loop () { # we're NOT called as a method
 
     my $size;
     if ($size = $self->getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
-      $hash->{dgot} = $now;
-      $self->logge("Got $hash->{uriid} (size $size)");
-      my $md5 = MD5->new;
-      my $handle = IO::File->new;
-      unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
-	die "open $PAUSE::Config->{MLROOT}$hash->{uriid}: $!";
-      }
-      $md5->addfile($handle);
-      $handle->close;
-      my $hexdigest = $md5->hexdigest;
-      my($userid) = PAUSE::dir2user($hash->{uriid});
-      $sth2->execute($userid) or warn;
-      my($fullname, $asciiname) = $sth2->fetchrow_array;
-      $asciiname ||= $fullname;
-      $asciiname =~ s/[^\0-\177]/?/g;
-      my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
-      my $address  = $pma->address;
-      my @To = qq{"$asciiname" <$address>};
-      push @To, $PAUSE::Config->{CPAN_TESTERS};
-      push @To, $PAUSE::Config->{'P5P'} if
-	  $hash->{'mailto_p5p'}==1;
 
-      my $blurb = "The URL";
-      $blurb = "The uploaded file" if $hash->{uri} !~ m,/,;
-      $blurb .= qq{
+      $self->welcome_file($size);
+
+    } else { # ! getit()
+
+      $self->woe;
+
+    }
+  } continue {
+    $self->writeback($hash,$hash_orig,$dbh) if $hash;
+    last URIRECORD if $mypause_daemon_inspector::Terminated;
+    main::restart() if $mypause_daemon_inspector::Signal;
+  }
+
+      $sth->finish;
+  $sth2->finish;
+  $dbh->disconnect;
+}
+
+sub woe {
+  my($self) = @_;
+
+  my $hash = $self->{URIRECORD};
+
+  my $now = $self->{NOW};
+  $hash->{nosuccesstime} = $now;
+  $hash->{nosuccesscount}++;
+  my $retries = 8;
+  my $sth2 = $self->{STH2};
+  my $dbh  = $self->{DBH};
+  if ($hash->{nosuccesscount} == $retries) {
+    my $userid = PAUSE::dir2user($hash->{uriid});
+    $sth2->execute($userid);
+    my($fullname, $asciiname) = $sth2->fetchrow_array;
+    # fullname just to reuse sth2
+    $asciiname ||= $fullname;
+    $asciiname =~ s/[^\0-\177]/?/g;
+    my @To;
+    my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+    my $to  = $pma->address;
+    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
+
+    my $blurb = "The URL $hash->{uri},
+requested for upload as $hash->{uriid} has problems
+I have retried to fetch it $retries times to no avail.
+I'll continue to try until the maximum of $PAUSE::Config->{MAXRETRIES}
+retries is reached. Then I'll give up to give room for a
+new trial.
+
+Virtually Yours,
+$Id\n";
+
+    for my $to (@To) {
+      mypause_send_mail->send({
+                               To => join(",",$to),
+                               Subject => "Upload problem $hash->{uriid}"
+                              },
+                              $blurb
+                             );
+    }
+
+  } elsif ($hash->{nosuccesscount} == $PAUSE::Config->{MAXRETRIES}) {
+    my $cleanup = "";
+    my $extinguished = "";
+    # Gotta cleanup first
+    my $quote = $dbh->quote($hash->{uriid});
+    my $query = "DELETE FROM uris WHERE uriid=$quote";
+    my $ret = $dbh->do($query);
+    if ($ret) {
+      $cleanup .= "I have extinguished $hash->{uriid} from the database,
+so we can pretend it has never existed.\n\n";
+      $extinguished=1;
+    } else {
+      $cleanup .= "I have tried to extinguish
+  $hash->{uriid}
+from the database, but couldn't (Query[$query]erro[$DBI::errstr]).
+Seems as if the admin has to intervene\n\n";
+    }
+
+    # make sure it ends with a slash
+    # $PAUSE::Config->{INCOMING_LOC} =~ s|(?<!/)$|/|; # overly clever!
+    $PAUSE::Config->{INCOMING_LOC} =~ s|/*$|/|;
+    my $incoming_file = $PAUSE::Config->{INCOMING_LOC} . $hash->{uri};
+    if (-f $incoming_file) {
+      my $i = 1;
+      while (-f "$incoming_file~$i~") {
+        $i++;
+      }
+      if (rename $incoming_file, "$incoming_file~$i~") {
+        $cleanup .= "I have renamed the local file
+  $incoming_file
+to
+  $incoming_file~$i~\n\n";
+      } else {
+        $cleanup .= "I have tried to rename the file
+  $incoming_file
+to
+  $incoming_file~$i~
+but I couldn't ($!). Seems as if the admin has to do something\n\n";
+      }
+    }
+
+    my $userid = PAUSE::dir2user($hash->{uriid});
+    $sth2->execute($userid);
+    my($fullname, $asciiname) = $sth2->fetchrow_array;
+    $asciiname ||= $fullname;
+    $asciiname =~ s/[^\0-\177]/?/g;
+    my @To;
+    my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+    my $address  = $pma->address;
+    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
+
+    my $blurb = "PAUSE has not succeeded to get the URL
+  $hash->{uri},
+requested for upload as
+  $hash->{uriid}
+after the maximum of $PAUSE::Config->{MAXRETRIES} retries.
+I give up now.
+
+$cleanup
+Virtually Yours,
+$Id\n";
+
+    for my $to (@To) {
+      mypause_send_mail->send({
+                               To => join(",",$to),
+                               Subject => "Upload problem $hash->{uriid}"
+                              },
+                              $blurb
+                             );
+    }
+
+    # don't writeback, it would defeat removing it.
+    undef $hash if $extinguished;
+  }
+}
+
+sub welcome_file {
+  my($self,$size) = @_;
+
+  my $hash = $self->{URIRECORD};
+
+  $hash->{dgot} = $self->{NOW};
+  $self->logge("Got $hash->{uriid} (size $size)");
+  my $md5 = MD5->new;
+  my $handle = IO::File->new;
+  unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
+    die "open $PAUSE::Config->{MLROOT}$hash->{uriid}: $!";
+  }
+  $md5->addfile($handle);
+  $handle->close;
+  my $hexdigest = $md5->hexdigest;
+  my($userid) = PAUSE::dir2user($hash->{uriid});
+  my $sth2 = $self->{STH2};
+  $sth2->execute($userid) or warn;
+  my($fullname, $asciiname) = $sth2->fetchrow_array;
+  $asciiname ||= $fullname;
+  $asciiname =~ s/[^\0-\177]/?/g;
+  my $dbh = $self->{DBH};
+  my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+  my $address  = $pma->address;
+  my @To = qq{"$asciiname" <$address>};
+  push @To, $PAUSE::Config->{CPAN_TESTERS};
+  push @To, $PAUSE::Config->{'P5P'} if
+      $hash->{'mailto_p5p'}==1;
+
+  my $blurb = "The URL";
+  $blurb = "The uploaded file" if $hash->{uri} !~ m,/,;
+  $blurb .= qq{
 
     $hash->{uri}
 
@@ -292,156 +440,33 @@ has entered CPAN as
 No action is required on your part
 };
 
-      $userid = PAUSE::dir2user($hash->{uriid});
-      $sth2->execute($hash->{changedby});
-      ($fullname, $asciiname) = $sth2->fetchrow_array;
-      $asciiname ||= $fullname;
-      $asciiname =~ s/[^\0-\177]/?/g;
-      $blurb .= join("",
-                     "Request entered by: $hash->{changedby} ($fullname)\n",
-                     "Request entered on: ",
-                     HTTP::Date::time2str($hash->{changed}),
-                     "\n",
-                     "Request completed:  ",
-                     HTTP::Date::time2str(time),
-                     "\n\n",
-                     "Thanks,\n-- \n$Id"
-                    );
+  $userid = PAUSE::dir2user($hash->{uriid});
+  $sth2->execute($hash->{changedby});
+  ($fullname, $asciiname) = $sth2->fetchrow_array;
+  $asciiname ||= $fullname;
+  $asciiname =~ s/[^\0-\177]/?/g;
+  $blurb .= join("",
+                 "Request entered by: $hash->{changedby} ($fullname)\n",
+                 "Request entered on: ",
+                 HTTP::Date::time2str($hash->{changed}),
+                 "\n",
+                 "Request completed:  ",
+                 HTTP::Date::time2str(time),
+                 "\n\n",
+                 "Thanks,\n-- \n$Id"
+                );
 
-      for my $to (@To) {
-        mypause_send_mail->send({
-                                  To => join(",",$to),
-                                  Subject => "CPAN Upload: $hash->{uriid}",
-                                  "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
-                                 },
-                                 $blurb
-                                );
-      }
-      $self->logge("Sent email(s) about uriid[$hash->{uriid}]");
-      sleep 15;
-
-
-    } else { # ! getit()
-
-
-      $hash->{nosuccesstime} = $now;
-      $hash->{nosuccesscount}++;
-      my $retries = 8;
-      if ($hash->{nosuccesscount} == $retries) {
-	my $userid = PAUSE::dir2user($hash->{uriid});
-	$sth2->execute($userid);
-	my($fullname, $asciiname) = $sth2->fetchrow_array;
-        # fullname just to reuse sth2
-        $asciiname ||= $fullname;
-        $asciiname =~ s/[^\0-\177]/?/g;
-	my @To;
-        my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
-        my $to  = $pma->address;
-	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
-
-	my $blurb = "The URL $hash->{uri},
-requested for upload as $hash->{uriid} has problems
-I have retried to fetch it $retries times to no avail.
-I'll continue to try until the maximum of $PAUSE::Config->{MAXRETRIES}
-retries is reached. Then I'll give up to give room for a
-new trial.
-
-Virtually Yours,
-$Id\n";
-
-        for my $to (@To) {
-          mypause_send_mail->send({
-                                    To => join(",",$to),
-                                    Subject => "Upload problem $hash->{uriid}"
-                                   },
-                                   $blurb
-                                  );
-        }
-
-      } elsif ($hash->{nosuccesscount} == $PAUSE::Config->{MAXRETRIES}) {
-        my $cleanup = "";
-	my $extinguished = "";
-        # Gotta cleanup first
-        my $quote = $dbh->quote($hash->{uriid});
-	my $query = "DELETE FROM uris WHERE uriid=$quote";
-        my $ret = $dbh->do($query);
-	if ($ret) {
-	  $cleanup .= "I have extinguished $hash->{uriid} from the database,
-so we can pretend it has never existed.\n\n";
-	  $extinguished=1;
-	} else {
-	  $cleanup .= "I have tried to extinguish
-  $hash->{uriid}
-from the database, but couldn't (Query[$query]erro[$DBI::errstr]).
-Seems as if the admin has to intervene\n\n";
-	}
-
-        # make sure it ends with a slash
-        # $PAUSE::Config->{INCOMING_LOC} =~ s|(?<!/)$|/|; # overly clever!
-        $PAUSE::Config->{INCOMING_LOC} =~ s|/*$|/|;
-	my $incoming_file = $PAUSE::Config->{INCOMING_LOC} . $hash->{uri};
-	if (-f $incoming_file) {
-	  my $i = 1;
-	  while (-f "$incoming_file~$i~") {
-	    $i++;
-	  }
-	  if (rename $incoming_file, "$incoming_file~$i~") {
-	    $cleanup .= "I have renamed the local file
-  $incoming_file
-to
-  $incoming_file~$i~\n\n";
-	  } else {
-	    $cleanup .= "I have tried to rename the file
-  $incoming_file
-to
-  $incoming_file~$i~
-but I couldn't ($!). Seems as if the admin has to do something\n\n";
-	  }
-	}
-
-	my $userid = PAUSE::dir2user($hash->{uriid});
-	$sth2->execute($userid);
-	my($fullname, $asciiname) = $sth2->fetchrow_array;
-        $asciiname ||= $fullname;
-        $asciiname =~ s/[^\0-\177]/?/g;
-	my @To;
-        my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
-        my $address  = $pma->address;
-	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
-
-	my $blurb = "PAUSE has not succeeded to get the URL
-  $hash->{uri},
-requested for upload as
-  $hash->{uriid}
-after the maximum of $PAUSE::Config->{MAXRETRIES} retries.
-I give up now.
-
-$cleanup
-Virtually Yours,
-$Id\n";
-
-        for my $to (@To) {
-          mypause_send_mail->send({
-                                    To => join(",",$to),
-                                    Subject => "Upload problem $hash->{uriid}"
-                                   },
-                                   $blurb
-                                  );
-        }
-
-        # don't writeback, it would defeat removing it.
-        undef $hash if $extinguished;
-      }
-    }
-  } continue {
-    $self->writeback($hash,$hash_orig,$dbh) if $hash;
-    last if $mypause_daemon_inspector::Terminated;
-    main::restart() if $mypause_daemon_inspector::Signal;
+  for my $to (@To) {
+    mypause_send_mail->send({
+                             To => join(",",$to),
+                             Subject => "CPAN Upload: $hash->{uriid}",
+                             "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
+                            },
+                            $blurb
+                           );
   }
-
-      $sth->finish;
-  $sth2->finish;
-  $dbh->disconnect;
+  $self->logge("Sent email(s) about uriid[$hash->{uriid}]");
+  sleep 15;
 }
 
 sub is_valid {
@@ -574,6 +599,7 @@ gives [";
   }
 }
 
+# often called as a class method!
 sub logge {
   my($self,$arg) = @_;
   my $stamp = $self->timestamp() . " \$\$$$ v$VERSION: ";
