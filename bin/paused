@@ -54,7 +54,7 @@ sub sighup {
 }
 
 sub restart {
-  exec '/usr/bin/perl', '/home/k/bin/paused';
+  exec $^X, $0;
 }
 
 umask 0002;
@@ -177,6 +177,9 @@ sub do_loop {
       my($uri) =  URI::URL->new($hash->{uri});
       my($host) = $uri->host;
       my($path) = $uri->path;
+      for ($package,$host,$path) {
+        s/[\0-\037]/?/g;
+      }
       $mirror->print(qq{
 # package     =$package
 # site        =$host
@@ -396,9 +399,13 @@ $Id\n";
 
 sub is_valid {
   my($uriid) = shift;
-  $uriid =~ s|.*/||;
-  if ($uriid =~ m![^A-Za-z0-9_\-\.\@\+]!) {
-    do_log("basename of uriid[$uriid] seems to contain illegal characters");
+  my($dir,$basename) = $uriid =~ m| \A (.*) / ([^/]+) \z |x;
+  if ($basename =~ m![^A-Za-z0-9_\-\.\@\+]!) {
+    do_log("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
+    return;
+  }
+  if ($dir =~ m![^A-Z/\-]!) {
+    do_log("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   return 1;
@@ -411,7 +418,7 @@ sub do_getit {
 
   my $lpath  = $PAUSE::Config->{MLROOT} . $uriid;
   my $tpath  = $PAUSE::Config->{TMP} . $uriid;
-  die "Panic" if $tpath =~ s/[\'\"\;\s]//g;
+  die "Panic" if $tpath =~ s/[\\\'\"\;\s]//g;
   if ($uri =~ /\.Z$/) {
     $tpath =~ s/\.gz$/.Z/;
   }
