@@ -28,8 +28,8 @@ PrivatePAUSE.pm contains only the usernames and passwords of the mysql
 users that own the two databases. See lib/PAUSE.pm for the structure
 of the data.
 
-Other sensitive files, like the SSL key of the server and the mon.cf
-file need to be maintained separately.
+Other sensitive files, like the SSL key of the server, password files
+and the mon.cf file need to be maintained separately.
 
 =head2 File system layout
 
