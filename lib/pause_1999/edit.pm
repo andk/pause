@@ -1909,9 +1909,9 @@ sub add_user {
     $userid = uc($userid);
     $userid ||= "";
     my @error;
-    if ( $userid !~ /$Valid_Userid/ ) {
+    if ( $userid !~ $Valid_Userid ) {
       my $euserid = $mgr->escapeHTML($userid);
-      push @error, qq{<b>userid[$euserid]</b> does not match <b>/$Valid_Userid/</b>.};
+      push @error, qq{<b>userid[$euserid]</b> does not match <b>$Valid_Userid</b>.};
     }
 
     $req->param("pause99_add_user_userid", $userid) if $userid;
@@ -2350,13 +2350,13 @@ sub request_id {
       my $db = $mgr->connect;
       my $sth = $db->prepare("SELECT userid FROM users WHERE userid=?");
       $sth->execute($userid);
-      warn sprintf "userid[%s]Valid_Userid[%s]matches[%s]", $userid, $Valid_Userid, $userid =~ /$Valid_Userid/;
+      warn sprintf "userid[%s]Valid_Userid[%s]matches[%s]", $userid, $Valid_Userid, $userid =~ $Valid_Userid;
       if ($sth->rows > 0) {
         my $euserid = $mgr->escapeHTML($userid);
         push @errors, "The userid $euserid is already taken.";
-      } elsif ($userid !~ /$Valid_Userid/) {
+      } elsif ($userid !~ $Valid_Userid) {
         my $euserid = $mgr->escapeHTML($userid);
-        push @errors, "The userid $euserid does not match /$Valid_Userid/.";
+        push @errors, "The userid $euserid does not match $Valid_Userid.";
       }
       $sth->finish;
     } else {
