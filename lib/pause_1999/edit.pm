@@ -1382,9 +1382,20 @@ filename[%s]. </p>
   my $server = $r->server->server_hostname;
   my $dbh = $mgr->connect;
 
-  if ( $uri ) {
+
+
+  if (! $uri ) {
+    push @m, "\n\n<div class='noactionnoresponse'></div>\n\n";
+    
+  } else {
+    # Oh, let's process that thar URL!
+    push @m, "\n\n<blockquote class='actionresponse'>\n",
+     "<!-- start of response to user's action -->\n\n",
+    ;
+
     require URI::URL;
     eval { URI::URL->new("$uri", $PAUSE::Config->{INCOMING}); };
+
 
     if ($@) {
       die Apache::HeavyCGI::Exception
@@ -1569,8 +1580,12 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
 	}
       }
     }
+    
+    push @m, "\n<!-- end of the response to the user's action -->\n</blockquote>\n";
+    
     push @m, (qq{<hr noshade="noshade" />\n});
   }
+  
 
   if ( exists $mgr->{UserGroups}{pumpking} ) {
     push @m, qq{\n<b>For pumpkings only</b>:};

@@ -570,7 +570,11 @@ sub checkbox_group {
   for my $v (@{$arg{values} || []}) {
     push(@m,
 	 sprintf(
-		 qq{<input type="checkbox" name="%s" value="%s"%s />%s%s},
+		 qq{<span class="%s"><input type="checkbox" name="%s" value="%s"%s />%s</span>%s},
+		 
+		 "line" . (1 + (scalar(@m) % 3)),
+		  # toggle through "line1", "line2", "line3",  "line1", ...
+		 
 		 $name,
 		 $self->escapeHTML($v),
 		 exists $sel{$v} ? qq{ checked="checked"} : "",

@@ -1,3 +1,18 @@
+
+.actionresponse {
+  border: 3px #f3f dashed;
+  padding: 10px;
+  margin:  2px;
+  background-color: #eee;
+  color: black;
+}
+
+.line1, .line2, .line3 { color: black; }
+.line1 { background-color: #ffe0e0; }
+.line2 { background-color: #e0ffe0; }
+.line3 { background-color: #e0e0ff; }
+
+
 .activemenu { background: #bfb; font-size: small; line-height: 1.5; }
 .alternate1 {
   background: #f8f8f8;
