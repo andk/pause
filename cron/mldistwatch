@@ -673,16 +673,15 @@ Date:        %s
     $list = qq{
     package CPAN::Modulelist;
     # Usage: print Data::Dumper->new([CPAN::Modulelist->data])->Dump or similar
-    # cannot use vars and use strict, we normally run under Safe!
-    # use vars qw(\$cols \$data);
+    # cannot 'use strict', because we normally run under Safe
     # use strict;
 
     sub data {
       my \$result = {};
       my \$primary = "modid";
-      for (\@\$data){
+      for (\@\$CPAN::Modulelist::data){
 	my %hash;
-	\@hash{\@\$cols} = \@\$_;
+	\@hash{\@\$CPAN::Modulelist::cols} = \@\$_;
 	\$result->{\$hash{\$primary}} = \\%hash;
       }
       \$result;
@@ -690,12 +689,16 @@ Date:        %s
     }
   };
 
+
     $list .= Data::Dumper->new([
                                 $sth->{NAME},
                                 $self->as_ds($sth)
                                ],
-                               ["cols","data"]
+                               ["CPAN::Modulelist::cols",
+                                "CPAN::Modulelist::data"]
                               )->Dump;
+
+    $list =~ s/^\s+//gm;
 
     if ($list ne $olist) {
         if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
