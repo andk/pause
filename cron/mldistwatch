@@ -20,7 +20,7 @@ use PAUSE::MailAddress ();
 use CPAN; # only for CPAN::Version
 use Text::Format;
 use YAML ();
-use Getopt::Long;
+use Getopt::Long ();
 $Data::Dumper::Indent = 1;
 
 # "MAIN" at the end of file to guarantee all packages are inintialized
@@ -2415,13 +2415,17 @@ MAIN: {
     $|=1;
 
     my %Opt;
-    GetOptions(
-               \%Opt,
-               "pick=s@", # the idea is to NOT run find if they tell us
-                      # one distro, but this needs careful thinking to
-                      # not delete the whole database at some point.
-                      # So currently all that "pick" does is, it
-                      # suppresses writing of 0[123]* files.
+    Getopt::Long::GetOptions(
+                             \%Opt,
+                             "pick=s@", # the idea is to NOT run find
+                                        # if they tell us one distro,
+                                        # but this needs careful
+                                        # thinking to not delete the
+                                        # whole database at some
+                                        # point. So currently all that
+                                        # "pick" does is, it
+                                        # suppresses writing of
+                                        # 0[123]* files.
               );
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     $mldw->work;
