@@ -5825,9 +5825,51 @@ sub all_cmods {
   \%all_mods;
 }
 
+
+
+
+=pod
+
+Thanks to Slaven Rezic for his help in finding the solution how to
+produce core dumps of apache under Linux. Here are the guts:
+
+Running h2ph is required and beforehand it is recommended to test as
+root something like this:
+
+mkdir tmp
+chown nobody tmp
+cd tmp
+limit coredumpsize 30m
+perl -e '
+    require "syscall.ph";
+    require "linux/sys.ph";
+    require "linux/prctl.ph";
+    $user = shift or die;
+    my $uid = (getpwnam($user))[2];
+    $< = $> = $uid;
+    print syscall(&SYS_prctl,&PR_SET_DUMPABLE,1);
+    warn $<;
+    dump;' nobody
+ls -l core
+
+If this shows a core file when run with the same perl as the
+webserver, then it should succeed on the webserver too.
+
+You will additionally have to set coredumpsize for nobody via
+/etc/security/limits.conf and add CoreDumpDirectory
+/directory/owned/by/nobody to the httpd.conf or do something
+equivalent.
+
+=cut
+
+
 sub coredump {
   my $self = shift;
   my $mgr = shift;
+
+  die "The coredump interface was just a testbed to find out how to
+  enable coredumps on Linux. Now disabled.";
+
   require "syscall.ph";
   require "linux/sys.ph";
   require "linux/prctl.ph";
