@@ -2481,9 +2481,10 @@ Excerpt from a mail:<pre>
   my $selectedrec = {};
   my $u = $self->active_user_record($mgr);
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
-  if (my $param = $req->param("pause99_edit_ml_3")) {  # upper selectbox
+  my $param;
+  if ($param = $req->param("pause99_edit_ml_3")) {  # upper selectbox
     $selectedid = $param;
-  } elsif (my $param = $req->param("HIDDENNAME")) {
+  } elsif ($param = $req->param("HIDDENNAME")) {
     $selectedid = $param;
     $req->param("pause99_edit_ml_3",$param);
   }

@@ -4,7 +4,6 @@ use base 'Class::Singleton';
 use Apache::HeavyCGI::Layout;
 use pause_1999::main;
 use strict;
-use vars qw( $Exeplan );
 
 sub layout {
   my($self) = shift;
@@ -66,8 +65,7 @@ a.activemenu:hover { text-decoration: underline; }
 .explain { font-size: small; }
 .xexplain { font-size: x-small; }
 .firstheader { margin: 0 0 5%; }
-h4.versionspecial { margin: 0; background: #a0a; color: white; }
-p.versionspecial { margin: 0; color: #a0a; background: white; font-size: x-small; }
+p.motd { margin: 12px 1in; padding: 6px; color: black; background: yellow; font-size: small; }
 $h2special
 </style>
 </head><body bgcolor="white" link="#0000CC" vlink="#0000BB"
@@ -78,33 +76,21 @@ alink="#FF0000" text="#000000"><table width="100%" border="0" cellpadding="0" ce
   # my $url = qq{/pause/pause2.$gif};
   # push @l, qq{</td><td style="width: 100%; background-image: url($url);">};
 
-  push @l, qq{</td><td align="left" style="width: 75%;">};
-  push @l, qq{<h2 style="margin: 0 0 0 0; padding: 0 0 0 1em;">The Perl Authors Upload Server</h2>}; #};
-  push @l, qq{</td></tr></table><br />};
+  push @l, qq{</td><td align="left" style="width: 75%;"><h2
+  style="margin: 0 0 0 0; padding: 0 0 0 1em;">The Perl Authors Upload
+  Server</h2></td></tr></table><br />};
 
   #
   # MOTD
   #
 
-  if (0) {
+  if (1) {
     use Config;
     push @l, qq{<div align="center"><table><tr><td align="center">};
-    push @l, sprintf(qq{<h4 class="versionspecial">Running under %vd},
-                     $^V,
-                    );
-    push @l, sprintf(qq{, prefix %s, cf_time %s</h4>},
-                     $Config{prefix},
-                     $Config{cf_time},
-                    );
-    if ($] >= 5.008) {
 
-      push @l, qq{<p class="versionspecial">If you encounter problems during
-    your visit at PAUSE, please retry your request at <a
-    href="https://pause.perl.org:8443/pause/authenquery">Port&nbsp;8443&nbsp;(SSL)</a>,
-    where perl 5.6.1 should be running. Or, if you can't use SSL, try <a
-    href="http://pause.perl.org:8000/pause/query">Port&nbsp;8000</a>.</p>};
-
-    }
+    push @l, qq{<p class="motd">I'm shuffling files around on PAUSE. If
+    you encounter problems, please report to andreas.koenig\@anima.de.
+    Thank you.</p>};
 
     push @l, qq{</div>};
 
