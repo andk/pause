@@ -673,8 +673,9 @@ Date:        %s
     $list = qq{
     package CPAN::Modulelist;
     # Usage: print Data::Dumper->new([CPAN::Modulelist->data])->Dump or similar
-    use vars qw(\$cols \$data);
-    use strict;
+    # cannot use vars and use strict, we normally run under Safe!
+    # use vars qw(\$cols \$data);
+    # use strict;
 
     sub data {
       my \$result = {};
