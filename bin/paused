@@ -215,8 +215,10 @@ sub loop {
       }
     }
     if ($hash->{dgot}) {
-      logge("dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath] but why is it not on disk?");
+      logge("WARNING: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
     }
+
+    logge("Need to get uriid[$hash->{uriid}]");
 
     my $size;
     if ($size = getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
