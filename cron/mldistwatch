@@ -750,7 +750,7 @@ maintainer
 </item>
 },
                          @package{qw{basename useridpretty
-                                     userdir dist
+                                     userdir filenameonly
                                      useridpretty dist size mtimestr
                                      filenameonly
                                      useridlc package
