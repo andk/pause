@@ -204,7 +204,7 @@ sub do_loop {
       next;
     }
 
-    do_log("lpath[$lpath] uriid[$hash->{uriid}]");
+    # do_log("lpath[$lpath] uriid[$hash->{uriid}]");
 
     if ( -d $lpath ) {
       next;
@@ -213,7 +213,7 @@ sub do_loop {
       # otherwise this is a RE-upload of something README-ish
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
-	do_log("$hash->{uriid} verified");
+	do_log("Verified $hash->{uriid}");
 	next;
       } else {
 	unlink $lpath;
@@ -436,7 +436,7 @@ sub do_getit {
     ($tmp) = $lpath =~ m,(.*)/,;
     File::Path::mkpath($tmp);
   }
-  do_log("do_getit is going to fetch uri[$uri] uriid[$uriid] tpath[$tpath] lpath[$lpath]");
+  do_log("Going to fetch uri[$uri] uriid[$uriid] tpath[$tpath] lpath[$lpath]");
   my $uri_obj;
   eval {
     $uri_obj =  URI::URL->new($uri, $PAUSE::Config->{INCOMING})
@@ -457,7 +457,7 @@ sub do_getit {
     $uri_obj->password($PAUSE::Config->{ANON_FTP_PASS});
   }
 
-  do_log(sprintf "requesting a GET on uri [%s]", $uri_obj->abs);
+  do_log(sprintf "Requesting a GET on uri [%s]", $uri_obj->abs);
   my $request = HTTP::Request->new('GET', $uri_obj->abs);
   if ($uri_obj->scheme eq "http") {
     $request->header("Accept","*"); # Microsoft Personal Web Server
@@ -531,7 +531,7 @@ gives [";
 
 sub do_log {
   my($arg) = @_;
-  my $stamp = &timestamp."-$$ $VERSION: ";
+  my $stamp = &timestamp." \$\$$$ v$VERSION: ";
   my $from = join ":", caller;
   # open the log file
   my $logfile = $PAUSE::Config->{PAUSE_LOG};
@@ -547,7 +547,7 @@ sub timestamp { # Efficiently generate a time stamp for log files
   return $last_str if $last_time and $time == $last_time;
   my($sec,$min,$hour,$mday,$mon,$year)
       = localtime($last_time = $time);
-  $last_str = sprintf("%04d%02d%02d %02u:%02u:%02u",
+  $last_str = sprintf("%04d-%02d-%02d %02u:%02u:%02u",
 		      $year+1900,$mon+1,$mday, $hour,$min,$sec);
 }
 
@@ -564,7 +564,7 @@ sub writeback {
   ($v = $hash_orig->{uriid}) =~ s/'/\\'/g;
   my $whereclause .= " WHERE uriid='$v'";
   $query .= $whereclause;
-  do_log("Going to: $query");
+  do_log("Going to $query");
   $dbh->do($query) or do_log("$DBI::errstr: $query");
   if ($DBI::errstr =~ /Non unique key|Duplicate/i) {
     my $dquery = "DELETE FROM uris $whereclause";
