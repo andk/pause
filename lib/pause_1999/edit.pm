@@ -5887,7 +5887,7 @@ sub coredump {
   require BSD::Resource;
   my($nowsoft,$nowhard) = BSD::Resource::getrlimit(BSD::Resource::RLIMIT_CORE());
   $r->log_error("UID[$<]EUID[$>]cwd[$cwd]nowsoft[$nowsoft]nowhard[$nowhard]");
-  dump;
+  CORE::dump;
 }
 
 1;

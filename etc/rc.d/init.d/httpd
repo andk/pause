@@ -23,7 +23,7 @@ HTTPD=/usr/local/apache/bin/httpd
 # HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.8.0rc2+mp1.27
 # HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.8.0rc3+mp1.27
 # HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.6.1-2+mp-1.27
-HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.6.1-2+ssl-0.9.6e+mp1.27
+HTTPD8000=/usr/local/apache/bin/httpd
 
 # See how we were called.
 case "$1" in
