@@ -1,7 +1,5 @@
 Switch the rest to 5.8.0.
 
-Complete etc/rc.d/init.d directory: mysql is missing, mon, others?
-
 Document needed aliases and modules@ mailing list.
 
 mldistwatch: determine symlinks in modules/ symlinktrees more
@@ -10,7 +8,7 @@ efficiently
 Bouncing mails: we should do something to inform users who's mails
 bounced. Ideally we would say: "Recent mails from PAUSE to you could
 not be delivered. We tried sending you mail to foo@bar.com. As
-foo@bar.com is still your email adress according to PAUSE's database,
+foo@bar.com is still your email address according to PAUSE's database,
 there may be the need that you update your account info." Thank you.
 Step 1: write current_email_address() and put the email info in a
 permanent place on all pages.
