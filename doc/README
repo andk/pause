@@ -9,6 +9,14 @@ data for running pause.perl.org except for the SSL key and certificate
 and files containing passwords or other sensible data. To access the
 repository you need a subversion client (subversion.tigris.org).
 
+If you do not have a subversion client, a tarball of the repository is
+produced by a cronjob and accessible as in the directory
+
+    ftp://pause.perl.org/pub/PAUSE/PAUSE-code/
+
+The filenames match C< /^pause-wc-(\d+)\.tar\.gz$/ > where C< $1 > is
+the revision number of the repository.
+
 =head2 Excluded files
 
 The following files have been excluded from the repository for obvious
