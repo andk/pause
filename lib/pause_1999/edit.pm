@@ -5266,53 +5266,18 @@ sub peek_perms {
   push @m, qq{<input type="submit" name="pause99_peek_perms_sub" value="Submit" />
               </p>};
 
-=pod
-
-Bugreport 2002-04-29:
-
-1. module list says JSTOWE is owner of XML::XSLT
-2. View Perms on JSTOWE does not mention XML::XSLT
-3. View perms on XML::XSLT says, BRONG and JOSTEN be co-maint, nobody else
-
-This means, we have a owner in mods, who is neither in primeur nor in
-perms.
-
-A reindex on JSTOWE/XML-XSLT-0.40.tar.gz has
-fixed that. But, if JSTOWE now had not had a dist of XML::XSLT in his
-directory, I would not have been able to reindex it.
-We apparently have modules, that do not satisfy the INNER JOIN
-condition.
-
-We allow autors, to give up
-co-maintainership, even when they are Primary Maintainer
-or are in the Module List? Looks like a Bug. Who is in the
-Module List, must also be Primary and must also be in perms
-and that must remain that way, otherwise we are inconsistent and do not find
-out, who is responsible for a modul.
-
-TODO XXX
-
-=cut
-
-
   if (my $qterm = $cgi->param("pause99_peek_perms_query")) {
     my $by = $cgi->param("pause99_peek_perms_by");
     my @query       = (
-                qq{SELECT perms.package,
-                          perms.userid,
+                qq{SELECT mods.modid,
+                          mods.userid,
                           "modulelist"
-                   FROM perms
-                        INNER JOIN mods
-                        ON mods.modid=perms.package
-                        AND mods.userid=perms.userid
+                   FROM mods
 },
-                qq{SELECT perms.package,
-                          perms.userid,
+                qq{SELECT primeur.package,
+                          primeur.userid,
                           "first-come"
-                   FROM perms
-                        INNER JOIN primeur
-                        ON primeur.package=perms.package
-                        AND primeur.userid=perms.userid
+                   FROM primeur
 },
                 qq{SELECT perms.package,
                           perms.userid,
@@ -5321,25 +5286,41 @@ TODO XXX
 },
                );
 
-    my $where;
-    if ($by =~ /^m/) {
-      if ($by eq "me") {
-        $where = qq{WHERE perms.package=? ORDER BY perms.userid};
-      } else {
-        $where = qq{WHERE perms.package LIKE ? ORDER BY perms.userid LIMIT 1000};
-        # I saw 5.7.3 die with Out Of Memory on the query "%" when no
-        # Limit was applied
-      }
-    } elsif ($by eq "a") {
-      $where = qq{WHERE perms.userid=? ORDER BY perms.package};
-    } else {
-      die Apache::HeavyCGI::Exception
-          ->new(ERROR => "Illegal parameter for pause99_peek_perms_by");
-    }
     my $db = $mgr->connect;
     my @m1;
     my %seen;
     for my $query (@query) {
+      my %fields = (
+                    modulelist => {
+                                   package => "mods.modid",
+                                   userid  => "mods.userid",
+                                  },
+                    "first-come" => {
+                                     package => "primeur.package",
+                                     userid  => "primeur.userid",
+                                    },
+                    "co-maint" => {
+                                   package => "perms.package",
+                                   userid  => "perms.userid",
+                                  }
+                   );
+      my($qtype) = $query =~ /\"(.+)\"/;
+      my($fmap) = $fields{$qtype};
+      my $where;
+      if ($by =~ /^m/) {
+        if ($by eq "me") {
+          $where = qq{WHERE $fmap->{package}=? ORDER BY $fmap->{userid}};
+        } else {
+          $where = qq{WHERE $fmap->{package} LIKE ? ORDER BY $fmap->{userid} LIMIT 1000};
+          # I saw 5.7.3 die with Out Of Memory on the query "%" when no
+          # Limit was applied
+        }
+      } elsif ($by eq "a") {
+        $where = qq{WHERE $fmap->{userid}=? ORDER BY $fmap->{package}};
+      } else {
+        die Apache::HeavyCGI::Exception
+            ->new(ERROR => "Illegal parameter for pause99_peek_perms_by");
+      }
       $query .= $where;
       my $sth = $db->prepare($query);
       $sth->execute($qterm);
