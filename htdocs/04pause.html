@@ -1,7 +1,7 @@
 <!DOCTYPE html
  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
  "DTD/xhtml1-transitional.dtd">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>PAUSE</title></head><body>
 <h2><a href="https://pause.perl.org/pause/">The Perl Authors Upload Server</a></h2>
 <p><i>
@@ -199,7 +199,7 @@ using.</p>
 should know about</a></h3>
 
 <p>Do not upload the <b>READMEs</b> that are integrated in your distribution
-files. PAUSE is designed to take care of unwrappig your file with tar
+files. PAUSE is designed to take care of unwrapping your file with tar
 or zip, registering all the modules it finds in there, and placing the
 readme file (i.e. a file with the name <code><b>README</b></code> in
 the top level directory of your package) into your directory. PAUSE
@@ -249,6 +249,19 @@ diagnose or even solve them and inform you about their findings. So be
 prepared to get mail from them before you have closed the buffer in
 your editor.</p>
 
+<p>
+  Module::Build is an effort to overcome many deficiencies in
+  MakeMaker and CPAN. One idea in that context is the storage of
+  module-metadata in a file <a
+  href="http://module-build.sourceforge.net/META-spec-new.html">META.yml</a>,
+  that is being integrated into the module-tarball. PAUSE is supposed
+  to follow this emerging standard. The current code base of the PAUSE
+  indexer supports META.yml by extracting it and storing it in a
+  separate file that is called
+  <code><i>package-name</i><b>.meta</b></code> in the same directory.
+  The PAUSE indexer honours the contents of the <i>no_index</i> field.
+  All other fields are currently ignored.
+</p>
 
 <h3><a id="services" name="services"></a>Related services on PAUSE</h3>
 
