@@ -259,13 +259,16 @@ my $pause = "/pause";
 if (1) { # /pause/ directory
   require pause_1999::main;
 
-  for my $loc ($pause){
-    require pause_1999::fixup;
-    $Location{$loc}{PerlFixupHandler} = "pause_1999::fixup";
-  }
   if (-f "/etc/PAUSE.CLOSED") {
-    $LocationMatch{"."}{PerlHandler} = "perl_pause::disabled2";
+    my $loc = "/";
+    $Location{$loc}{SetHandler} = "perl-script";
+    $Location{$loc}{Options} = "ExecCGI";
+    $Location{$loc}{PerlHandler} = "perl_pause::disabled2";
   } else {
+    for my $loc ($pause){
+      require pause_1999::fixup;
+      $Location{$loc}{PerlFixupHandler} = "pause_1999::fixup";
+    }
     $Location{"/"}{PerlFixupHandler} = "pause_1999::index";
     for my $loc ("$pause/query", "$pause/authenquery", "$pause/mimequery"){
       # note: mimequery is experimental and will go away again
