@@ -1228,7 +1228,7 @@ Please contact modules\@perl.org if there are any open questions.
                     $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
                 }
             } else {
-                $self->verbose(1,"no YAML_CONTENT");
+                # $self->verbose(1,"no YAML_CONTENT"); # too noisy
             }
             push @pmfile, $mf;
         }
@@ -1478,7 +1478,7 @@ Please contact modules\@perl.org if there are any open questions.
                     $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
                 }
             } else {
-                $self->verbose(1,"no YAML_CONTENT");
+                # $self->verbose(1,"no YAML_CONTENT"); # too noisy
             }
             push @res, $ppp;
         }
@@ -2094,6 +2094,33 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                          &&
                          $tdistmtime >= $odistmtime) {
                     $ok++;
+                }
+            } else {
+                if (CPAN::Version->vgt($pp->{version},$oversion)) {
+                    $self->index_status($package,
+                                        $pp->{version},
+                                        $pp->{infile},
+                                        20,
+
+                                        qq{Not indexed because $ofile
+ has a dual life in $odist. Although the other package is at
+ $oldversion, the indexer lets the standalone version continue to be the
+ reference version, shadowing the version in the core. Please resolve
+ the issue by talking the package maintainer into releasing a new
+ version or find some other appropriate solution.},
+
+                                   );
+                } else {
+                    $self->index_status($package,
+                                        $pp->{version},
+                                        $pp->{infile},
+                                        50,
+
+                                        qq{Not indexed because $ofile
+ has a dual life in $odist. The other version is at $oldversion, so
+ it seems healthy not to index this version in the core.},
+
+                                   );
                 }
             }
         } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
