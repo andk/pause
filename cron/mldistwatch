@@ -1188,7 +1188,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($self) = @_;
         my @pmfile;
 
-        # very similar code is in PAUSE::package::examine_pkg
+        # very similar code is in PAUSE::package::filter_ppps
       MANI: for my $mf ( @{$self->{MANIFOUND}} ) {
             next unless $mf =~ /\.pm$/i;
             my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
@@ -1270,6 +1270,7 @@ Please contact modules\@perl.org if there are any open questions.
                                          PMFILE => $pmfile,
                                          TIME => $self->{TIME},
                                          USERID => $self->{USERID},
+                                         YAML_CONTENT => $self->{YAML_CONTENT},
                                         );
             $fio->examine_fio;
         }
@@ -1413,6 +1414,54 @@ Please contact modules\@perl.org if there are any open questions.
     }
 
     # package PAUSE::pmfile;
+    sub filter_ppps {
+        my($self,@ppps) = @_;
+        my @res;
+
+        # very similar code is in PAUSE::dist::filter_pms
+      MANI: for my $ppp ( @ppps ) {
+            if ($self->{YAML_CONTENT}){
+                if ($self->{YAML_CONTENT}{private}) {
+                    my %map = (
+                               package => qr{\z},
+                               namespace => qr{::},
+                              );
+                    for my $k (qw(package namespace)) {
+                        next unless my $v = $self->{YAML_CONTENT}{private}{$k};
+                        my $rest = $map{$k};
+                        if (ref $v eq "ARRAY") {
+                            for my $ve (@$v) {
+                                $ve =~ s|::$||;
+                                if ($ppp =~ /^$ve$rest/){
+                                    $self->verbose(1,"skipping ppp[$ppp] due to ve[$ve]");
+                                    next MANI;
+                                } else {
+                                    $self->verbose(1,"NOT skipping ppp[$ppp] due to ve[$ve]");
+                                }
+                            }
+                        } else {
+                            $v =~ s|::$||;
+                            if ($ppp =~ /^$v$rest/){
+                                $self->verbose(1,"skipping ppp[$ppp] due to v[$v]");
+                                next MANI;
+                            } else {
+                                $self->verbose(1,"NOT skipping ppp[$ppp] due to v[$v]");
+                            }
+                        }
+                    }
+                } else {
+                    $self->verbose(1,"no keyword 'private' in YAML_CONTENT");
+                }
+            } else {
+                $self->verbose(1,"no YAML_CONTENT");
+            }
+            push @res, $ppp;
+        }
+        $self->verbose(1,"res[@res]");
+        @res;
+    }
+
+    # package PAUSE::pmfile;
     sub examine_fio {
         # fio: file object
         my $self = shift;
@@ -1432,7 +1481,7 @@ Please contact modules\@perl.org if there are any open questions.
         return if $mm_parsed_version =~ m/\s/; # ignore "You suck!"
 
         my($ppp) = $self->ppp;  # packages-per-pmfile
-        my @keys_ppp = keys %$ppp;
+        my @keys_ppp = $self->filter_ppps(keys %$ppp);
         $self->verbose(1,"will check keys_ppp[@keys_ppp]\n");
 
         #
@@ -1453,6 +1502,7 @@ Please contact modules\@perl.org if there are any open questions.
                                           PMFILE => $pmfile,
                                           FIO => $self,
                                           USERID => $self->{USERID},
+                                          YAML_CONTENT => $self->{YAML_CONTENT},
                                          );
 
             $pio->examine_pkg;
@@ -1922,38 +1972,6 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         # should they be cought earlier? Maybe.
         return unless $package =~ /\w/;
         return if $package =~ /:/ && $package !~ /::/;
-
-        # very similar code is in PAUSE::dist::filter_pms
-        if ($self->{YAML_CONTENT} && $self->{YAML_CONTENT}{private}) {
-            my %map = (
-                       package => qr{\z},
-                       namespace => qr{::},
-                      );
-            for my $k (qw(package namespace)) {
-                next unless my $v = $self->{YAML_CONTENT}{private}{$k};
-                my $rest = $map{$k};
-                if (ref $v eq "ARRAY") {
-                    for my $ve (@$v) {
-                        $ve =~ s|::$||;
-                        if ($package =~ /^$ve$rest/){
-                            $self->verbose(1,"skipping package[$package] due to ve[$ve]");
-                            return;
-                        } else {
-                            $self->verbose(1,"NOT skipping package[$package] due to ve[$ve]");
-                        }
-                    }
-                } else {
-                    $v =~ s|::$||;
-                    if ($package =~ /^$v$rest/){
-                        $self->verbose(1,"skipping package[$package] due to v[$v]");
-                        return;
-                    } else {
-                        $self->verbose(1,"NOT skipping package[$package] due to v[$v]");
-                    }
-                }
-            }
-        }
-
 
         # set perms for registered owner in any case
 
