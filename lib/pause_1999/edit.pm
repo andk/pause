@@ -3407,7 +3407,6 @@ mlstatus
       } elsif ($field eq "chapterid") {
         die "chapterid not integer" if $strict_chapterid &&
             $selectedrec->{$field} !~ /^\d*$/;
-        $selectedrec->{$field} =~ s/^\s/_/;
       }
       if ($force_sel) {
 	$req->param($fieldname, $selectedrec->{$field}||"");
@@ -3462,8 +3461,6 @@ mlstatus
           } elsif ($field eq "chapterid") {
             die "param not integer" if $strict_chapterid &&
                 ($selectedrec->{$field} !~ /^\d*$/ || $param !~ /^\d*$/);
-            $selectedrec->{$field} =~ s/^_/ /;
-            $param =~ s/^_/ /;
           }
 	  $mailblurb .= sprintf($mailsprintf1,
 				$field,
@@ -3493,8 +3490,6 @@ mlstatus
                 "param[$param]"
                     if $strict_chapterid &&
                         ($selectedrec->{$field} !~ /^\d*$/ || $param !~ /^\d*$/);
-            $selectedrec->{$field} =~ s/^_/ /;
-            $param =~ s/^_/ /;
           }
 	  $mailblurb .= sprintf($mailsprintf1,
                                 $field,
@@ -3894,8 +3889,8 @@ sub add_mod {
 
     $sth = $dbh->prepare("SELECT chapterid
                           FROM   mods
-                          WHERE  modid = '$root'");
-    $sth->execute;
+                          WHERE  modid = ?");
+    $sth->execute($root);
     my $chapterid;
     if ($sth->rows == 1) {
       $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
@@ -3908,7 +3903,6 @@ sub add_mod {
       $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
     }
 
-    $chapterid =~ s/^\s/_/;
     warn "chapterid[$chapterid]";
     $req->param("pause99_add_mod_modid",$modid);
     my(@dsli) = $dsli =~ /(.?)(.?)(.?)(.?)(.?)/;
@@ -3942,14 +3936,11 @@ sub add_mod {
     my($chapterid) = $req->param('pause99_add_mod_chapterid');
     warn "chapterid[$chapterid]";
     die "chapterid not integer" if $strict_chapterid && $chapterid !~ /^\d*$/;
-    $req->param('pause99_add_mod_chapterid', $chapterid)
-        if $chapterid =~ s/^\s/_/;
     warn "chapterid[$chapterid]";
     unless ($meta{chapterid}{args}{labels}{$chapterid}) {
       push @errors, qq{The chapterid [$chapterid] is not known.};
     }
     die "chapterid not integer" if $strict_chapterid && $chapterid !~ /^\d*$/;
-    $chapterid =~ s/^_/ /;
     warn "chapterid[$chapterid]";
 
     my($statd) = $req->param('pause99_add_mod_statd');
@@ -4258,9 +4249,6 @@ $blurbcopy
     if ($field eq "chapterid") {
       my $val = $req->param($fieldname);
       die "chapterid not integer" if $strict_chapterid && $val !~ /^\d*$/;
-      if ($val =~ s/^\s/_/) {
-        $req->param($fieldname,$val);
-      }
     }
     push @m, $mgr->$fieldtype(
                               'name' => $fieldname,
@@ -4432,7 +4420,6 @@ sub apply_mod {
 
     my($chapterid) = $req->param('pause99_apply_mod_chapterid');
     die "chapterid not numeric" if $strict_chapterid && $chapterid !~ /^\d*$/;
-    $chapterid =~ s/^_/ /;
     warn "appropriate_chapterid[@appropriate_chapterid]";
     my($chap_confirmed) = $req->param('pause99_apply_mod_chapfirm');
     if (!$chapterid) {
@@ -4861,19 +4848,14 @@ sub chap_meta {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
   my $dbh = $mgr->connect;
-  my $sth3  = $dbh->prepare("SELECT chapternr, chapterid
+  my $sth3  = $dbh->prepare("SELECT chapternr, shorttitle
                              FROM   chapters");
   my(%chap);
   $sth3->execute;
-  while (my($chapternr, $chapterid) = $mgr->fetchrow($sth3, "fetchrow_array")) {
-    $chap{$chapternr} = $chapterid;
+  while (my($chapternr, $shorttitle) = $mgr->fetchrow($sth3, "fetchrow_array")) {
+    $chap{$chapternr} = sprintf "%03d %s", $chapternr, $shorttitle;
   }
-  my @sorted;
-  if (grep /^[\s_]/, keys %chap) {
-    @sorted = map { s/^\s/_/; $_ } sort map { s/_/ /; $_} keys %chap; # ARGH!
-  } else {
-    @sorted = sort { $a <=> $b } keys %chap;
-  }
+  my @sorted = sort { $a <=> $b } keys %chap;
   unshift @sorted, "";
   $chap{""} = "Please select chapter";
   $sth3->finish;
