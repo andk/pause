@@ -110,7 +110,7 @@ sub work {
     {
         $self->checkfornew();
     }
-    chdir $startdir;
+    chdir $startdir or die "Could not chdir to '$startdir'";
     rmtree $testdir;
     return if $self->{OPT}{pick};
     $self->work2;
@@ -464,6 +464,7 @@ sub rewrite01 {
         $i++;
         @pkg{qw/size mtime/} =
             (stat "$MLROOT/$pkg{dist}")[7,9];
+        next unless defined $pkg{size}; # somebody removed it while we were running
         $count++ unless $count{$pkg{dist}}++;
         $pkg{size} =
             $pkg{size} > 700000 ?
@@ -881,7 +882,7 @@ sub chdir_ln_chdir {
     my $pwd = Cwd::cwd();
     unless (-e $from){
         require Carp;
-        Carp::confess("not exists: $from from $dir");
+        Carp::confess("not exists: from[$from]dir[$dir]pwd[$pwd]");
         # return;
     }
     if (-l $from) {
