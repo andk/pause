@@ -1051,10 +1051,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->{DBH}});
-        my $to;
-        unless ($pma and $to = $pma->address) {
-            $to = "$author\@cpan.org";
-        }
+        my $to = $pma->address;
         my($msg) = Mail::Send->new(
                                    To => join(", ",
                                               $to,

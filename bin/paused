@@ -15,6 +15,7 @@ use MD5 ();
 use Mail::Send ();
 use DBI ();
 use PAUSE ();
+use PAUSE::MailAddress ();
 use URI::URL ();
 
 use strict;
@@ -239,7 +240,9 @@ sub do_loop {
       my($fullname, $asciiname) = $sth2->fetchrow_array;
       $asciiname ||= $fullname;
       $asciiname =~ s/[^\0-\177]/?/g;
-      my @To = qq{"$asciiname" <$userid\@cpan.org>};
+      my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+      my $to  = $pma->address;
+      my @To = qq{"$asciiname" <$to>};
       push @To, $PAUSE::Config->{CPAN_TESTERS};
       push @To, $PAUSE::Config->{'P5P'} if
 	  $hash->{'mailto_p5p'}==1;
@@ -297,7 +300,9 @@ No action is required on your part
         $asciiname ||= $fullname;
         $asciiname =~ s/[^\0-\177]/?/g;
 	my @To;
-	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$userid\@cpan.org>};
+        my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+        my $to  = $pma->address;
+	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
 
 	my $blurb = "The URL $hash->{uri},
 requested for upload as $hash->{uriid} has problems
@@ -363,7 +368,9 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
         $asciiname ||= $fullname;
         $asciiname =~ s/[^\0-\177]/?/g;
 	my @To;
-	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$userid\@cpan.org>};
+        my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+        my $to  = $pma->address;
+	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
 
 	my $blurb = "PAUSE has not succeeded to get the URL
   $hash->{uri},

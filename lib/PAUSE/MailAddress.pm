@@ -36,8 +36,10 @@ sub new_from_userid {
   } else {
     $sth = $dbh->prepare("SELECT email FROM users WHERE userid=?");
     $sth->execute($userid);
-    return if $sth->rows == 0;
-    ($me->{address}) = $sth->fetchrow_array;
+    if ($sth->rows >= 0){
+      ($me->{address}) = $sth->fetchrow_array;
+    }
+    $me->address ||= "$userid\@cpan.org";
   }
   bless $me, $class;
 }
