@@ -110,10 +110,11 @@ $hspecial
 
   }
 
-  if (time < 1057651200) {
+  my $downtime = 1057651200;
+  if (time < $downtime) {
     push @l, qq{<div align="center">};
     use Time::Duration;
-    my $delta = 1057658400 - time;
+    my $delta = $downtime - time;
     my $expr = Time::Duration::duration($delta);
 
     push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />On
