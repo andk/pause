@@ -1194,13 +1194,15 @@ Please contact modules\@perl.org if there are any open questions.
             my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
             next if $inmf =~ m!^(?:t|inc)/!;
             if ($self->{YAML_CONTENT}){
-                if ($self->{YAML_CONTENT}{private}) {
+                my $no_index = $self->{YAML_CONTENT}{no_index}
+                               || $self->{YAML_CONTENT}{private}; # backward compat
+                if (ref($no_index) eq 'HASH') {
                     my %map = (
                                file => qr{\z},
                                directory => qr{/},
                               );
                     for my $k (qw(file directory)) {
-                        next unless my $v = $self->{YAML_CONTENT}{private}{$k};
+                        next unless my $v = $no_index->{$k};
                         my $rest = $map{$k};
                         if (ref $v eq "ARRAY") {
                             for my $ve (@$v) {
@@ -1223,7 +1225,7 @@ Please contact modules\@perl.org if there are any open questions.
                         }
                     }
                 } else {
-                    $self->verbose(1,"no keyword 'private' in YAML_CONTENT");
+                    $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
                 }
             } else {
                 $self->verbose(1,"no YAML_CONTENT");
@@ -1442,13 +1444,15 @@ Please contact modules\@perl.org if there are any open questions.
         # very similar code is in PAUSE::dist::filter_pms
       MANI: for my $ppp ( @ppps ) {
             if ($self->{YAML_CONTENT}){
-                if ($self->{YAML_CONTENT}{private}) {
+                my $no_index = $self->{YAML_CONTENT}{no_index}
+                               || $self->{YAML_CONTENT}{private}; # backward compat
+                if (ref($no_index) eq 'HASH') {
                     my %map = (
                                package => qr{\z},
                                namespace => qr{::},
                               );
                     for my $k (qw(package namespace)) {
-                        next unless my $v = $self->{YAML_CONTENT}{private}{$k};
+                        next unless my $v = $no_index->{$k};
                         my $rest = $map{$k};
                         if (ref $v eq "ARRAY") {
                             for my $ve (@$v) {
@@ -1471,7 +1475,7 @@ Please contact modules\@perl.org if there are any open questions.
                         }
                     }
                 } else {
-                    $self->verbose(1,"no keyword 'private' in YAML_CONTENT");
+                    $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
                 }
             } else {
                 $self->verbose(1,"no YAML_CONTENT");
