@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
+#!/usr/local/bin/perl -w
 
 # Some POD is after __END__
 
@@ -125,7 +125,7 @@ sub work2 {
     $self->rewrite01();
     $self->rewrite03();
     $self->verbose(1, sprintf(
-                              "Finished rewrite03 and everything at %s",
+                              "\nFinished rewrite03 and everything at %s\n",
                               scalar localtime
                              ));
 }
@@ -321,7 +321,7 @@ sub rewrite02 {
     #
     # Rewriting 02packages.details.txt
     #
-    $self->verbose(2,"\n\nEntering rewrite02\n");
+    $self->verbose(1,"\n\nEntering rewrite02\n");
 
     my $dbh = $self->connect;
     my $MLROOT = $self->mlroot;
@@ -393,7 +393,7 @@ sub rewrite01 {
     #
     # Rewriting 01modules.index.html
     #
-    $self->verbose(2, "\nEntering rewrite01\n");
+    $self->verbose(1, "\nEntering rewrite01\n");
     my $dbh = $self->connect;
 
     my $MLROOT = $self->mlroot;
@@ -785,7 +785,7 @@ sub rewrite03 {
     #
     # Rewriting 03modlist.data
     #
-    $self->verbose(2,"\nEntering rewrite03\n");
+    $self->verbose(1,"\nEntering rewrite03\n");
 
     my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/03modlist.data";
@@ -963,7 +963,7 @@ sub mlroot {
             $self->verbose(1,"Warning: dist[$dist] has illegal filename\n");
             return 1;
         }
-        return 1 if $dist =~ /(\.readme|\.sig|CHECKSUMS)$/;
+        return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
         # Stupid to have code that needs to be maintained in two places,
         # here and in edit.pm:
         return 1 if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
@@ -2641,3 +2641,7 @@ the owner of the package
 
 =cut
 
+#Local Variables:
+#mode: cperl
+#cperl-indent-level: 4
+#End:
