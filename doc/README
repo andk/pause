@@ -34,8 +34,8 @@ PrivatePAUSE.pm contains only the usernames and passwords of the mysql
 users that own the two databases. See below for "Database schema".
 
 Other sensitive files, like the SSL key of the server, password files
-and the mon.cf file need to be maintained separately from the
-repository. See below the section about user management.
+need to be maintained separately from the repository. See below the
+section about user management.
 
 =head2 File system layout
 
@@ -49,10 +49,11 @@ make sure that installed programs find their configuration:
   /usr/local/apache/perl   -> ../../../home/k/PAUSE/apache-perl
   /etc/rsyncd.conf         -> /home/k/PAUSE/etc/rsyncd.conf
   /etc/proftpd.conf        -> /home/k/PAUSE/etc/proftpd.conf
+  /etc/mon/mon.cf          -> /home/k/PAUSE/etc/mon/mon.cf
+  /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
 
 [ (last time updated: 2002-12-25)
 
-  /etc/mon/mon.cf -> ../../home/k/PAUSE/111_sensitive/etc/mon/mon.cf
   /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
   /etc/rc.d/init.d/httpd -> /home/k/PAUSE/etc/rc.d/init.d/httpd
   /etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
