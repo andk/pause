@@ -22,7 +22,6 @@ sub parameter {
 
   # What is allowed here is allowed to anybody
   @allow_action{"who_is",
-                "pause_logout",
                 "pause_04about",
                 "pause_04imprint",
                 "pause_06history",
@@ -34,7 +33,7 @@ sub parameter {
                    "request_id",
                   );
 
-  if ($mgr->{User} && $mgr->{User}{userid}) {
+  if ($mgr->{User} && $mgr->{User}{userid} && $mgr->{User}{userid} ne "-") {
 
     # warn "userid[$mgr->{User}{userid}]";
 
@@ -47,9 +46,11 @@ sub parameter {
 		     "edit_mod",
 		     "edit_uris",
 		     "apply_mod",
+                     "pause_logout",
                      "peek_perms",
                      "reindex",
                      "share_perms",
+                     "tail_logfile",
 		    ) {
       $allow_action{$command} = undef;
       push @allow_submit, $command;
@@ -216,6 +217,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
 Please report to the administrator what you were trying to do")
 	unless $self->can($action);
     my @action_result = $self->$action($mgr);
+    # sanity check:
     for (0..$#action_result) {
       next if defined $action_result[$_];
       warn "undefined element in \@action_result: _[$_]#[$#action_result]action[$action]";
@@ -278,8 +280,8 @@ sub as_string {
         $alter ^= 1;
         $bgcolor = $alter ? "alternate1" : "alternate2";
         $mgr->{ActionTuning}{$act}{verb} ||= $act;
-	push @m, qq{<tr class="$bgcolor"><td
- ><b>$mgr->{ActionTuning}{$act}{verb}</b><!-- ($act) --></td>};
+	push @m, qq{<tr class="$bgcolor">
+<td><b>$mgr->{ActionTuning}{$act}{verb}</b><!-- ($act) --></td>};
 	for my $k (qw(priv desc)) {
 	  my $v = $mgr->{ActionTuning}{$act}{$k} || "N/A";
 	  push @m, qq{<td>$v</td>}
@@ -929,6 +931,25 @@ sub show_document {
   @m;
 }
 
+sub tail_logfile {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr = shift;
+  my $tail = 3000;
+  my($file) = $PAUSE::Config->{PAUSE_LOG};
+  if ($PAUSE::Config->{TESTHOST}) {
+    $file = "/usr/local/apache/logs/error_log"; # for testing
+  }
+  open my $fh, $file or die "Could not open $file: $!";
+  seek $fh, -$tail, 2;
+  local($/);
+  $/ = "\n";
+  <$fh>;
+  $/ = undef;
+  my $ret = "<pre>".$mgr->escapeHTML(<$fh>)."</pre>";
+  # warn "ret[$ret]";
+  $ret;
+}
+
 sub who_is {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
@@ -1000,8 +1021,8 @@ sub who_is {
     for (keys %$hash) {
       $mgr->escapeHTML($hash->{$_});
     }
-    push @m, qq{<dt><a href="$hash->{mlaid}">$hash->{mlaid}</a></dt><dd
- >$hash->{comment}<br /></dd>\n};
+    push @m, qq{<dt><a href="$hash->{mlaid}">$hash->{mlaid}</a></dt>
+<dd>$hash->{comment}<br /></dd>\n};
   }
   push @m, qq{</dl>};
   @m;
@@ -2080,19 +2101,19 @@ sub add_user {
 	  $doit = 0;
 	  $dont_clear = 1;
 	  unshift @rows, qq{
-  <h3>Not submitting, maybe we have a duplicate here</h3>
-  <p>$s_package converted the last name to [$s_code]</p>
-  <p>$query</p>
-  <table border="1">
-  <tr><td>userid</td
-  ><td>fullname</td
-  ><td>email</td
-  ><td>homepage</td
-  ><td>introduced</td
-  ><td>changedby</td
-  ><td>changed</td
-  ></tr>
-  };
+ <h3>Not submitting, maybe we have a duplicate here</h3>
+ <p>$s_package converted the last name to [$s_code]</p>
+ <p>$query</p>
+ <table border="1">
+ <tr><td>userid</td>
+ <td>fullname</td>
+ <td>email</td>
+ <td>homepage</td>
+ <td>introduced</td>
+ <td>changedby</td>
+ <td>changed</td>
+ </tr>
+};
 	  push @rows, qq{</table>\n};
 	  push @m, @rows;
 	} else {
@@ -3089,10 +3110,10 @@ sub edit_mod {
 
   if ($selectedid) {
 
-    push @m, qq{<h3>Record for $selectedrec->{modid}</h3> <p>More about
-        the meaning of the DSLIP status in the <a href=
-        "http://www.cpan.org/modules/00modlist.long.html#1)ModuleListing"
-        >module list</a>. To delete, add or rename an entry, mail to
+    push @m, qq{<h3>Record for $selectedrec->{modid}</h3><p>More
+        about the meaning of the DSLIP status in the <a href=
+        "http://www.cpan.org/modules/00modlist.long.html#1)ModuleListing">module
+        list</a>. To delete, add or rename an entry, mail to
         modules\@perl.org.</p>};
 
     my @m_modrec;

@@ -55,6 +55,7 @@ sub as_string {
     last if $priv eq "user" and ! $mgr->{User}{userid};
     last if $priv eq "admin" and ! exists $mgr->{UserGroups}{admin};
     push @m, qq{<tr><td class="menuheading" colspan="2"><b>$grouplabel{$priv} menu</b></td></tr>};
+    my $Lscat = "";
     for my $action (
                     sort {
                       $mgr->{ActionTuning}{$a}{cat}
@@ -77,6 +78,14 @@ sub as_string {
       my $class;
       warn "action undef" unless defined $action;
       warn "mgr->Action undef" unless defined $mgr->{Action};
+      my $cat = $mgr->{ActionTuning}{$action}{cat};
+      if (substr($cat,0,1) =~ tr/A-Z//) {
+        my($scat) = $cat =~ m|.+?/\d\d(.+?)/|;
+        if ($scat ne $Lscat) {
+          push @m, qq{<tr><td class="menuheading">$scat</td></tr>\n};
+          $Lscat = $scat;
+        }
+      }
       my $activemarkerleft = "";
       my $activemarkerright = "";
       my $activecol2 = "";
@@ -107,12 +116,10 @@ sub as_string {
                        $verbose,
                        $activemarkerright,
                       );
-      push @m, qq{</td><td class="menupointer">$activecol2</td></tr
->};
+      push @m, qq{</td><td class="menupointer">$activecol2</td></tr>\n};
     }
   }
-  push @m, qq{</table
->};
+  push @m, qq{</table>\n};
   @m;
 }
 

@@ -78,8 +78,7 @@ $hspecial
 </style>
 </head><body bgcolor="white" link="#0000CC" vlink="#0000BB"
  alink="#FF0000" text="#000000"><table width="100%" border="0"
- cellpadding="0" cellspacing="0"
-><tr><td valign="middle">}; #};
+ cellpadding="0" cellspacing="0"><tr><td valign="middle">}; #};
   push @l, $mgr->instance_of("pause_1999::pausegif");
   push @l, qq{</td><td nowrap="nowrap"><h4
   style="margin: 0 0 0 0; padding: 0 1em;">The Perl Authors Upload
@@ -119,10 +118,9 @@ $hspecial
 
     push @l, qq{</td><td valign="top" bgcolor="red"\n>};
     push @l, qq{&nbsp;};
-    push @l, qq{</td><td valign="top"
->};
+    push @l, qq{</td><td valign="top">};
     push @l, $mgr->instance_of("pause_1999::edit");
-    push @l, qq{</td></tr></table>};
+    push @l, qq{</td></tr></table>\n};
     push @l, qq{</form>};
   }
   push @l, qq{<hr noshade="noshade" />};

@@ -63,12 +63,6 @@ sub handler {
                                priv => "public",
                                cat => "01self/04b",
                             },
-           pause_logout => {
-                            verb => "About Logging Out",
-                            priv => "user",
-                            cat => "06usr/04",
-                            },
-
            pause_05news => {
                             verb => "PAUSE News",
                             priv => "public",
@@ -93,105 +87,141 @@ sub handler {
 
            # USER
 
+           # USER/FILES
+
            add_uri => {
                        verb => "Upload a file to CPAN",
                        priv => "user",
-                       cat => "01fil/01up",
+                       cat => "User/01Files/01up",
 
                        desc => "This is the heart of the <b>Upload
 			 Server</b>, the page most heavily used on
 			 PAUSE.",
 
                       },
+           edit_uris => {
+                         verb => "Repair a Pending Upload",
+                         priv => "user",
+                         cat => "User/01Files/02rep",
+
+                         desc => "When an upload you requested hangs
+			   for some reason, you can go here and edit
+			   the file to be uploaded.",
+
+			  },
+           delete_files => {
+                            verb => "Delete Files",
+                            priv => "user",
+                            cat => "User/01Files/03del",
+
+                            desc => "Schedule files for deletion.
+			      There is a delay until the deletion
+			      really happens. Until then you can also
+			      undelete files here.",
+
+                           },
+
+           # USER/MODULES
+
            apply_mod => {
                          verb => "Register Namespace",
                          priv => "user",
-                         cat => "02mod/01reg",
+                         cat => "User/02Modules/01reg",
 
                          desc => "Propose a new module to be added to
                             the long module list",
 
                         },
+           edit_mod => {
+                        verb => "Edit Module Metadata",
+                        priv => "user",
+                        cat => "User/02Modules/02",
+
+                        desc => "When your module is in the module
+			  list, you can edit the description and the
+			  DSLI status that are stored about it in the
+			  database.",
+
+			 },
+
+           # User/Permissions
+
+           peek_perms => {
+                          verb => "View Permissions",
+                          priv => "user",
+                          desc => "Whose uploads of what are being indexed on PAUSE",
+                          cat => "User/04Permissions/01",
+                         },
+           share_perms => {
+                           verb => "Change Permissions",
+                           priv => "user",
+                           cat => "User/04Permissions/02",
+
+                           desc => "Enable other users to upload a
+                             module for any of your namespaces, manage
+                             your own permissions.",
+
+                          },
+
+           # User/Util
+
+           tail_logfile => {
+                            verb => "Tail Daemon Logfile",
+                            priv => "user",
+                            cat => "User/05Utils/06",
+                           },
+
+           reindex => {
+                       verb => "Force Reindexing",
+                       priv => "user",
+                       cat => "User/05Utils/02",
+
+                       desc => "Tell the indexer to index a file again
+                         (e.g. after a change in the perms table)",
+
+                        },
+           # User/Account
+
            change_passwd => {
                              verb => "Change Password",
                              priv => "user",
-                             cat => "06usr/02",
+                             cat => "User/06Account/02",
 
                              desc => "Change your password any time
 				you want.",
 
                             },
-           delete_files => {
-                            verb => "Delete Files",
-                            priv => "user",
-                            cat => "01fil/03del",
-
-                            desc => "Schedule files for deletion.
-				There is a delay until the deletion
-				really happens. Until then you can
-				also undelete files here.",
-
-                           },
-	     edit_cred => {
-			   verb => "Edit Account Info",
-			   priv => "user",
-                              cat => "06usr/01",
-
-			   desc => "Edit your user name, your email
-				   addresses (both public and secret
-				   one), change the URL of your
-				   homepage.",
-
-			  },
-	     edit_mod => {
-			  verb => "Edit Module Metadata",
-			  priv => "user",
-                              cat => "02mod/02",
-
-			  desc => "When your module is in the module
-				  list, you can edit the description
-				  and the DSLI status that are stored
-				  about it in the database.",
-
-			 },
-	     edit_uris => {
-			   verb => "Repair a Pending Upload",
-			   priv => "user",
-                              cat => "01fil/02rep",
-
-			   desc => "When an upload you requested hangs
-				   for some reason, you can go here
-				   and edit the file to be uploaded.",
-
-			  },
-	     peek_perms => {
-                            verb => "View Permissions",
-                            priv => "user",
-                            desc => "Whose uploads of what are being indexed on PAUSE",
-                            cat => "04perm/01",
-		       },
-             reindex => {
-                         verb => "Force Reindexing",
+           edit_cred => {
+                         verb => "Edit Account Info",
                          priv => "user",
-                         cat => "05inx/02",
+                         cat => "User/06Account/01",
 
-                         desc => "Tell the indexer to index a file
-                                  again (e.g. after a change in the
-                                  perms table)",
+                         desc => "Edit your user name, your email
+			   addresses (both public and secret one),
+			   change the URL of your homepage.",
 
                         },
-           share_perms => {
-                           verb => "Change Permissions",
-                           priv => "user",
-                           cat => "04perm/02",
+           pause_logout => {
+                            verb => "About Logging Out",
+                            priv => "user",
+                            cat => "User/06Account/04",
+                            },
 
-                           desc => "Enable other users to upload a
-                                    module for any of your namespaces,
-                                    manage your own permissions.",
-
-                          },
 
            # ADMIN+mlrep+modlistmaint
+
+
+           add_mod => {
+
+                       verb => "Register a Module",
+                       priv => "modmaint",
+                       cat => "02mods/02",
+
+                       desc => "Register a new module in the database
+                         to be added to the module list. In
+                         development.",
+
+                      },
 
 
            add_user => {
@@ -267,18 +297,6 @@ sub handler {
 					  menu here.",
 
 				 },
-
-           add_mod =>          {
-
-                                verb => "Register a Module",
-                                priv => "modmaint",
-                                cat => "02mods/02",
-
-                                desc => "Register a new module in the
-                                 database to be added to the module
-                                 list. In development.",
-
-                               },
 
            "check_xhtml" =>    {
                                 verb => "Show bad xhtml output",
