@@ -2414,6 +2414,11 @@ sub request_id {
   my $homepage   = $req->param( 'pause99_request_id_homepage') || "";
   my $userid    = $req->param( 'pause99_request_id_userid') || "";
   my $rationale = $req->param("pause99_request_id_rationale") || "";
+  my $urat = $mgr->any2utf8($rationale);
+  if ($urat ne $rationale) {
+    $req->param("pause99_request_id_rationale", $urat);
+    $rationale = $urat;
+  }
   warn "userid[$userid]Valid_Userid[$Valid_Userid]";
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
