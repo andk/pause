@@ -10,7 +10,7 @@ use PAUSE ();
 
 my $root = $PAUSE::Config->{MLROOT};
 
-my $max = 15;
+my $max = 100; # 15 was really slow
 my $cnt = 0;
 
 $CPAN::Checksums::CAUTION = 1;
@@ -26,6 +26,12 @@ find(sub {
        return unless -d;
        local($_); # Ouch, has it bitten that the following function
                   # did something with $_. Must have been a bug in 5.00556???
+
+       # we need a way to force updatedir to run an update. If the
+       # signature needs to be replaced for some reason. I do not know
+       # which reason this will be, but it may happen. Something like
+       # $CPAN::Checksums::FORCE_UPDATE?
+
        my $ret = CPAN::Checksums::updatedir($File::Find::name);
        return if $ret == 1;
        warn "name[$File::Find::name]\n" if $DEBUG;
