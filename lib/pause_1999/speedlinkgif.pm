@@ -9,7 +9,7 @@ the filename.
 
 From 2003-01-01, Loomes is taking over.
 
-From 2003-12-05 or so, Fiz-Chemie is the Sponsor
+From 2003-11-27, Fiz-Chemie is the Sponsor.
 
 =cut
 
