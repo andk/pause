@@ -1,5 +1,25 @@
 2005-03-28  Andreas Koenig  <andk@cpan.org>
 
+	* revision 585 removed references to chapternr and after it was
+	installed, we removed the column completely. This should now be
+	the final entry in this memo, because we have the three tables
+	adjusted to each other:
+
+	CREATE TABLE applymod (
+	  [...]
+	  chapterid int(10) unsigned NOT NULL default '0',
+	  PRIMARY KEY  (modid)
+	) TYPE=MyISAM;
+	CREATE TABLE chapters (
+	  chapterid int(10) unsigned NOT NULL default '0',
+	  [...]
+	) TYPE=ISAM PACK_KEYS=1;
+	CREATE TABLE mods (
+	  [...]
+	  chapterid int(10) unsigned NOT NULL default '0',
+	  PRIMARY KEY  (modid)
+	) TYPE=ISAM PACK_KEYS=1;
+
 	* we still have the column chapternr in chapters and chapterid
 	everywhere else. So lets do
 
