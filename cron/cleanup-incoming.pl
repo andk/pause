@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-my $Id$;
+my $Id = q$Id$;
 
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
