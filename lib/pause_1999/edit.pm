@@ -553,7 +553,7 @@ sub edit_cred {
                                                 publ => "my public email address",
                                                 secr => "my secret email address",
                                                },
-                                       default => "publ",
+                                       default => "none",
                                       },
                                 short=>"The email address
  <i>$cpan_alias</i> should be configured to forward mail to ...",
