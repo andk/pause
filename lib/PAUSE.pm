@@ -38,19 +38,20 @@ for (@pauselib) {
 push @INC, @pauselib;
 $PAUSE::Config ||=
     {
-     # previously also used for ftp password:
-     ADMIN => qq{andreas.koenig\@localhost},
+     # previously also used for ftp password; still used in Error as
+     # contact address and as address to send internal notifications
+     # to:
+     ADMIN => qq{andreas.koenig\@pause.perl.org},
      ADMINS => [qq(modules\@perl.org)],
-     # only dubravka.kbx.de is reverse mapped:
-     ANON_FTP_PASS => qq{andreas.koenig\@dubravka.kbx.de},
+     ANON_FTP_PASS => qq{k\@pause.perl.org},
      AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
-                    AUTHEN_PASSWORD_FLD => "password",
-                    AUTHEN_USER_FLD => "user",
-                    AUTHEN_USER_TABLE => "usertable",
-                    CPAN_TESTERS => qq(cpan-testers\@perl.org),
-                    DELETES_EXPIRE => 60*60*72,
-                    FTPPUB => '/home/ftp/pub/PAUSE/',
-                    GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
+     AUTHEN_PASSWORD_FLD => "password",
+     AUTHEN_USER_FLD => "user",
+     AUTHEN_USER_TABLE => "usertable",
+     CPAN_TESTERS => qq(cpan-testers\@perl.org),
+     DELETES_EXPIRE => 60*60*72,
+     FTPPUB => '/home/ftp/pub/PAUSE/',
+     GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
                     GZIP => '/bin/gzip',
                     HOME => '/home/k/',
                     HTTP_ERRORLOG => '/usr/local/apache/logs/error_log',
