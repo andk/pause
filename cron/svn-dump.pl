@@ -9,6 +9,13 @@ And make an svn dump as a backup while we are at it.
 
 Remove oldest files from the target directory at the end.
 
+KNOWN BUG: We must not run svndump as root, we might cause libdb to
+           create a new logfile which would prevent that the user SVN
+           can append to that file. The solution would be to drop
+           privileges before calling svndump and to chown the
+           directories that are needed after the svndump to be owned
+           by SVN.
+
 =cut
 
 use strict;
