@@ -103,8 +103,8 @@ sub handler {
                          priv => "user",
                          cat => "02mod/01reg",
 
-                         desc => "Submit a namespace proposal for a
-                            module to the modules\@perl.org people.",
+                         desc => "Propose a new module to be added to
+                            the long module list",
 
                         },
            change_passwd => {
