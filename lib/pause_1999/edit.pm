@@ -2425,7 +2425,7 @@ Registration form with editing capabilities:
 Immediate (one click) registration:
   $host/pause/authenquery?ACTION=add_user&USERID=$sessionID&SUBMIT_pause99_add_user_Definitely=1
 MAIL
-    my $subject = 'PAUSE ID request';
+    my $subject = "PAUSE ID request ($userid; $fullname)";
     my $header = {
   	To      => $email,
   	Subject => $subject,
