@@ -1811,7 +1811,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 
     sub connect {
         my($self) = @_;
-        my $fio = $self-{FIO};
+        my $fio = $self->{FIO};
         $fio->connect;
     }
 
