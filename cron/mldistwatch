@@ -1809,6 +1809,12 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         return 1;
     }
 
+    sub connect {
+        my($self) = @_;
+        my $fio = $self-{FIO};
+        $fio->connect;
+    }
+
     sub examine_pkg {
         my $self = shift;
 
