@@ -7,7 +7,7 @@ use PAUSE ();
 use DBI;
 use File::Spec;
 
-my $incdir = $PAUSE::Config->{INCOMING_LOC};
+my $incdir = File::Spec->canonpath($PAUSE::Config->{INCOMING_LOC});
 
 my $dbh = DBI->connect(
                        $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
@@ -26,6 +26,7 @@ for my $dirent (readdir DIR) {
   next if -M $absdirent < 1/24;
   $sth->execute($dirent);
   next if $sth->rows > 0;
-  warn "Should unlink $absdirent";
+  unlink $absdirent or die "Could not unlink $absdirent: $!";
+  warn "unlinked $absdirent\n";
 }
 closedir DIR;
