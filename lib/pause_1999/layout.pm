@@ -48,42 +48,13 @@ Netscape 479 liest kommentare?
 
   push @l, qq{</title>
 <link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg" />
-<style type="text/css">
-.activemenu { background: #bfb; font-size: small; line-height: 1.5; }
-.alternate1 {
-  background: #f8f8f8;
-  padding-bottom: 12px;
-  }
-.alternate2 {
-  background: #ddd;
-  padding-bottom: 12px;
-  }
-.explain { font-size: small; }
-.firstheader { margin: 0 0 5%; }
-.menuheading { background: white;
-               font-size: small; }
-.menuitem { background: #ddf; font-size: small; line-height: 1.5; }
-.menupointer { color: green; }
-.messages { text-align: left; border: 2px dashed red; padding: 2ex; }
-.statusencr { background: #bfb;
-              text-align: center;
-                  border: green solid 2px;
-               font-size: small; }
-.statusunencr { background: #fbb;
-                text-align: center;
-                    border: red solid 2px;
-                 font-size: small; }
-.xexplain { font-size: x-small; }
-a.activemenu { text-decoration: none; }
-a.activemenu:hover { text-decoration: underline; }
-a.menuitem { text-decoration: none; }
-a.menuitem:hover { text-decoration: underline; }
-h4.altering { margin: 0 0 12px; }
-p.motd { margin: 12px 1in; padding: 6px; color: black; background: yellow; font-size: small; }
-td.activemenu { border: green solid 1px; }
+<link rel="stylesheet" type="text/css" href="/pause/pause.css" title="pause"/>
+}; #};
+  push @l, qq{<style type="text/css">
 $hspecial
 </style>
-</head><body bgcolor="white" link="#0000CC" vlink="#0000BB"
+} if $hspecial;
+  push @l, qq{</head><body bgcolor="white" link="#0000CC" vlink="#0000BB"
  alink="#FF0000" text="#000000"><table width="100%" border="0"
  cellpadding="0" cellspacing="0"><tr><td valign="middle">}; #};
   push @l, $mgr->instance_of("pause_1999::pausegif");
@@ -97,7 +68,7 @@ $hspecial
   # MOTD
   #
 
-  my $downtime = 1058428800;
+  my $downtime = 1058947200;1058428800;
   my $willlast = 7200;
   if (time < $downtime) {
     push @l, qq{<div align="center">};
@@ -110,8 +81,7 @@ $hspecial
 
     push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />On
 $httptime (that is in $expr) we'll have to close PAUSE for
-maintainance work (again). The estimated downtime is $willlast_dur. Thank
-you for your patience and sorry for the inconvenience.</p>};
+maintainance work (again). The estimated downtime is $willlast_dur.</p>};
 
     push @l, qq{</div>};
 
