@@ -24,7 +24,7 @@ use PAUSE;
 use File::Temp;
 use File::Copy qw(copy);
 
-for my $repo (qw(pause)) {
+for my $repo (qw(pause cpanpm)) {
   my $ucrepo = uc $repo;
   my $DIR = "$PAUSE::Config->{FTPPUB}/$ucrepo-code";
   unless (-d $DIR) {
