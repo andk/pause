@@ -1519,17 +1519,21 @@ will pick it up as soon as possible (usually 1-2 minutes).
 	$didit = 1;
 	push @m, (qq{
 
-<p>Query succeeded</p> <p>As it is done by a separate process, it may
-take a few minutes to complete the upload.</p>
-		    });
+<p>Query succeeded. <b>Thank you for your contribution</b></p>
 
-	push @m, (qq{
+<p>As it is done by a separate process, it may take a few minutes to
+complete the upload. The processing of your file is going on while you
+read this. There\'s no need for you to retry. The form below is only
+here in case you want to upload further files.</p>
 
-<p>The processing of your file is going on while you read this. There\'s
-no need for you to retry. The form below is only here in case you want
-to upload further files.</p>
-
-<p><b>Thank You!</b></p>
+<p><b>Please tidy up your homedir:</b> CPAN is getting larger every day which
+is nice but usually there is no need to keep old an outdated version
+of a module on several hundred mirrors. Please consider <a
+href="authenquery?ACTION=delete_files">removing</a> old versions of
+your module from PAUSE and CPAN. If you are worried that someone might
+need an old version, it can always be found on the <a
+href="http://backpan.cpan.org/authors/id/$userhome/">backpan</a>
+</p>
 
 });
 
@@ -1575,8 +1579,9 @@ Reason:</b></p><p>$errmsg</p>
 	  push @m, qq{
 
 <p>This indicates that you probably tried to upload a file that is
-already in the database. I know no way short of renaming your file and
-try again, because PAUSE doesn\'t let you upload a file twice.</p>
+already in the database. You will most probably have to rename your
+file and try again, because <b>PAUSE doesn\'t let you upload a file
+twice</b>.</p>
 
 };
 	}
