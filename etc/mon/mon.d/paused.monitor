@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+#
+use strict;
+open P, "ps auxww |";
+my $running;
+while (<P>){
+  next unless /^root.*perl.*paused$/;
+  $running++;
+}
+close P or die "Could not close P";
+unless ($running){
+  print "Process paused not found\n";
+  exit 1;
+}
