@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+
+use lib "/home/k/PAUSE/lib";
+use PAUSE ();
+
+use strict;
+use vars qw($Id $Have_warned);
+
+$Id = q$Id: rm_stale_links,v 1.10 2002/03/01 20:08:45 k Exp k $;
+
+use File::Find;
+chdir "$PAUSE::Config->{MLROOT}../..";
+find(
+     sub {
+       return if /^\.\.?$/;
+       my($dev,$ino,$mode,$nlink,$uid,$gid) = lstat($_);
+       if (-l $_ && ! -e $_){
+	 warn "unlinking stale $File::Find::name\n";
+	 $Have_warned=1;
+	 unlink $_;
+       }
+       if ($_ eq "CHECKSUMS") {
+	 opendir DIR, ".";
+	 my @readdir = readdir DIR;
+	 closedir DIR;
+	 if (@readdir == 3) {
+	   warn "unlinking orphaned $File::Find::name\n";
+	   $Have_warned=1;
+	   unlink $_ or die "Could not unlink $_: $!";
+	 }
+       }
+       return if -l $_;
+       ($dev,$ino,$mode,$nlink,$uid,$gid) = stat($_);
+       if (-d _ and $nlink == 2) { # directory without subdir
+	 opendir DIR, $_;
+	 my @readdir = readdir DIR;
+	 closedir DIR;
+	 if (@readdir == 2) {
+	   # Don't warn if we have nothing else to report. Rmdirring
+	   # occurs too often because we mirror empty dirs
+	   warn "rmdirring empty $File::Find::name\n" if $Have_warned;
+	   rmdir $_ or die "Could not rmdir $_: $!";
+	 }
+       }
+     }
+, "authors", "modules");
