@@ -1,10 +1,11 @@
 MAILTO=k
 PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 
+* * * * *             date -u > /home/ftp/tmp/02STAMP && mv /home/ftp/tmp/02STAMP /home/ftp/pub/PAUSE/authors/02STAMP
 04 * * * *            cleanup-incoming.pl
-04 01,13 * * *        cron-daily.pl
+56 08,20 * * *        cron-daily.pl
 05 * * * *            gmls-lR.pl
-13 * * * *            mldistwatch
+47 * * * *            mldistwatch
 18 04,10,16,22 * * *  mysql-dump.pl
 19,49 * * * *         publish-crontab.sh
 20 01 * * 7           restart-httpd
