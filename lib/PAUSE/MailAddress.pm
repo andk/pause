@@ -25,10 +25,12 @@ sub new_from_userid {
                              WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
   $sth->execute($userid);
   my $me = {};
+  my $addr;
   if ($sth->rows > 0) {
-    ($me->{address}) = $sth->fetchrow_array;
+    ($addr) = $sth->fetchrow_array;
   }
-  if ($me->{address}) {
+  if ($addr) {
+    $me->{address} = $addr;
     $me->{is_secret} = 1;
   } else {
     $sth = $dbh->prepare("SELECT email FROM users WHERE userid=?");
