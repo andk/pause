@@ -20,6 +20,7 @@ localityName_default		= Berlin
 0.organizationName_default	= Perl Authors Upload Server
 
 organizationalUnitName		= Organizational Unit Name (eg, section)
+organizationalUnitName_default	= Webserver 2003-2008
 
 commonName			= Common Name (eg, YOUR name)
 commonName_max			= 64

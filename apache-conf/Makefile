@@ -7,12 +7,14 @@ SSLEAY = /usr/local/ssl/bin/openssl
 
 .sslcnf.pem3:
 	[ -f "$*.pkey" ] || ${SSLEAY} genrsa -out $*.pkey 1024
-	${SSLEAY} req -config $*.sslcnf -new -key $*.pkey -x509 -nodes -days 730 -out $@
+	${SSLEAY} req -config $*.sslcnf -new -key $*.pkey -x509 -nodes -days 2060 -out $@
 
 .pem3.pem:
 	cat $*.pkey $< >| $@
 	ln -s -f $@ `${SSLEAY} x509 -noout -hash < $@`.0
-
+	${SSLEAY} x509 -noout -text -in $@
+	@echo Please take note of the fingerprint and put it into 04pause.html
+	${SSLEAY} x509 -noout -fingerprint -in $@
 
 
 # memo: Fingerprint fuer pause.kbx.de bis 16.May 2009 war

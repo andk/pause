@@ -90,13 +90,14 @@ $hspecial
   # MOTD
   #
 
-  if (0) {
+  if (time < 1058515976) {
     push @l, qq{<div align="center">};
 
-    push @l, qq{<p class="motd">FUNET, the CPAN master site is <a
-    href="http://use.perl.org/articles/03/02/16/1416231.shtml?tid=32">currently
-    broken</a>. This means that your upload will not be propagated to
-    the CPAN until this problem is fixed. Sorry <code>:-(</code> </p>};
+    push @l, qq{<p class="motd">PAUSE's old SSL certificate was about
+    to expire on 2003-05-20, so I had to issue a new one. This is why
+    your browser was asking you to confirm the new certificate. The
+    fingerprint of this certificate is <code>MD5 Fingerprint=</code>
+    and it expires on 2009-01-07.</p>};
 
     push @l, qq{</div>};
 
