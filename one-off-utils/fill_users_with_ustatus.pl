@@ -40,10 +40,10 @@ my $backpan = "/home/ftp/pub/backpan/authors/id";
 opendir my $dh, $backpan or die $!;
 for my $de1 (readdir $dh) {
   next unless $de1=~/^[A-Z]$/;
-  opendir my $dh2 = "$backpan/$de1";
+  opendir my $dh2, "$backpan/$de1" or die $!;
   for my $de2 (readdir $dh2) {
     next unless $de2=~/^[A-Z]\w$/;
-    opendir my $dh3 = "$backpan/$de1/$de2";
+    opendir my $dh3, "$backpan/$de1/$de2" or die $!;
     for my $de3 (readdir $dh3) {
       next unless $de3=~/^[A-Z]\w$/;
       $sth->execute($de3);
