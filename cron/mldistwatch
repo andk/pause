@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
 use File::Basename ();
 use File::Copy ();
-use File::Temp ();
+use File::Temp 0.14 (); # begin of OO interface
 use HTTP::Date ();
 use Mail::Send ();
 use DBI;
