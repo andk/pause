@@ -5471,7 +5471,7 @@ sub share_perms {
 
   my $subaction = $req->param("SUBACTION");
   unless ($subaction) {
-    ####################### 2.1    2.2    2.3    2.4     3.1
+    ####################### 2.1    2.2    3.1    3.2     4.1
   SUBACTION: for my $sa (qw(movepr remopr makeco remocos remome)) {
       if ($req->param("pause99_share_perms_$sa")
           or
@@ -5518,28 +5518,33 @@ sub share_perms {
 
            <td>2.2 Give up primary maintainership status (without transfering it)</td>
 
+           </tr> <tr>
+
+           <td colspan="2">3. Making and breaking co-maintainers (for both
+           modulelist owners and primary maintainers):</td>
+
            </tr>
            <tr><td><input type="submit"
            name="pause99_share_perms_makeco" value="Select" /></td>
 
-           <td>2.3 Make somebody else co-maintainer </td>
+           <td>3.1 Make somebody else co-maintainer </td>
 
            </tr>
            <tr><td><input type="submit"
            name="pause99_share_perms_remocos" value="Select" /></td>
 
-           <td>2.4 Remove co-maintainer</td>
+           <td>3.2 Remove co-maintainer</td>
 
            </tr>
            <tr>
 
-           <td colspan="2">3. co-maintainer</td>
+           <td colspan="2">4. You are co-maintainer</td>
 
            </tr>
            <tr><td><input type="submit"
            name="pause99_share_perms_remome" value="Select" /></td>
 
-           <td>3.1 Give up co-maintainership status</td></tr>
+           <td>4.1 Give up co-maintainership status</td></tr>
            </table>};
 
     return @m;
