@@ -1,4 +1,4 @@
-#!/usr/bin/perl -- -*- Mode: cperl; coding: utf-8; ... -*-
+#!/usr/bin/perl -- -*- Mode: cperl; coding: utf-8; -*-
 package pause_1999::layout;
 use base 'Class::Singleton';
 use Apache::HeavyCGI::Layout;
@@ -96,7 +96,7 @@ $hspecial
     push @l, qq{<p class="motd">PAUSE's old SSL certificate was about
     to expire on 2003-05-20, so I had to issue a new one. This is why
     your browser was asking you to confirm the new certificate. The
-    fingerprint of this certificate is <code>MD5 Fingerprint=</code>
+    fingerprint of this certificate is <code>MD5 Fingerprint=83:E9:A6:4C:EC:CC:60:A8:A1:6C:5F:30:11:53:41:06</code>
     and it expires on 2009-01-07.</p>};
 
     push @l, qq{</div>};
