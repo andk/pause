@@ -1,4 +1,4 @@
-#!/usr/bin/perl -- -*- Mode: cperl; coding: unicode-utf8; VAR: VALUE; ... -*-
+#!/usr/bin/perl -- -*- Mode: cperl; coding: utf-8 -*-
 
 
 
