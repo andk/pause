@@ -1,5 +1,29 @@
 2005-03-28  Andreas Koenig  <andk@cpan.org>
 
+	* This is what Tim suggests:
+
+	1. Add three new chapters: "Documentation", "Pragma", "Perl6".
+	
+	2. Move Pod::* and OODoc from Chapter 2 into "Documentation" chapter.
+	
+	3. Move pragma modules from Chapter 2 into "Pragma" chapter.
+	
+	4. Move Perl6::* modules from Chapter 2 into "Perl6" chapter.
+	
+	5. Rename Chapter 2 to "Language Extensions".
+
+	Which translates to:
+
+	insert into chapters values (26, "Documentation", "Documentation");
+	insert into chapters values (27, "Pragma", "Pragma");
+	insert into chapters values (28, "Perl6", "Perl6");
+	update mods set chapterid=26 where chapterid=2 and modid like 'Pod%' or modid like 'OODoc%';
+	update mods set chapterid=27 where modid rlike '^(constant|define|diagnostics|enum|integer|less|lib|overload|sigtrap|strict|subs|vars)';
+	update mods set chapterid=28 where modid like 'Perl6%';
+	update chapters set longtitle=shorttitle="Language Extensions" where chapternr=2;
+
+	and is DONE.
+
 	* Yesterday the schema change that shall put an end to confusion:
 
 	alter table chapters change chapterid longtitle char(80) not null default "";
