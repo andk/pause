@@ -120,7 +120,7 @@ use vars qw($Id $ISAPERL
 	   );
 $Id = q$Id$;
 
-print "Running $0, $Id\n";
+print "Running $0, $Id\n" if -t STDOUT;
 
 $Data::Dumper::Indent = 1;
 umask 0002;
@@ -158,7 +158,6 @@ chdir "$PAUSE::Config->{MLROOT}"
     or die "Couldn't chdir to $PAUSE::Config->{MLROOT}: $!";
 do_rewrite01();
 do_rewrite03();
-print "Goodbye\n";
 exit;
 
 
@@ -278,7 +277,7 @@ sub do_rewrite02 {
     #
     # Rewriting 02packages.details.txt
     #
-    print "\n\nEntering do_rewrite02\n";
+    print "\n\nEntering do_rewrite02\n" if -t STDOUT;
 
     my $dbh = DBI->connect(
 			   $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
@@ -306,7 +305,7 @@ sub do_rewrite02 {
     $sth->execute;
     my(@row,@listing02);
     my $numrows = $sth->rows;
-    warn "DEBUG: numrows[$numrows]";
+    warn "DEBUG: numrows[$numrows]" if -t STDOUT;
     while (@row = $sth->fetchrow_array) {
 	my($one,$two);
 	my $infile = $row[0];
@@ -353,7 +352,7 @@ sub do_rewrite01 {
     #
     # Rewriting 01modules.index.html
     #
-    print "\nEntering do_rewrite01\n";
+    print "\nEntering do_rewrite01\n" if -t STDOUT;
     my $dbh = DBI->connect(
 			   $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
 			   $PAUSE::Config->{MOD_DATA_SOURCE_USER},
@@ -396,7 +395,6 @@ sub do_rewrite01 {
     my(@listing01,%count,$count);
     my(%seen,%listit);
 
-    print "Examining package table, sizes, symlinks. Preparing \@listing01\n";
     my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
         my %pkg = (package => $pkg, dist => $pkgdist);
@@ -518,7 +516,6 @@ sub do_rewrite01 {
                        "/$pkg{'package'}/$pkg{userid}");
         print "-";
     }
-    print "Done composing the 01 document.\n";
     $list = qq{
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title>Modules on CPAN alphabetically</title></head><body>
 <h1>CPAN\'s $count modules distributions</h1>
@@ -634,7 +631,7 @@ sub do_rewrite03 {
   #
   # Rewriting 03modlist.data
   #
-  print "\nEntering do_rewrite03\n";
+  print "\nEntering do_rewrite03\n" if -t STDOUT;
 
   my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/03modlist.data";
   my $list = "";
