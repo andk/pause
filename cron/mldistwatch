@@ -29,6 +29,8 @@ $Data::Dumper::Indent = 1;
 {
     package PAUSE::mldistwatch;
     ###### data initialization ######
+    use DB_File;
+    use Fcntl qw(O_RDWR O_CREAT);
     use File::Find;
     use File::Path qw(rmtree mkpath);
     our $Id = q$Id$;
@@ -98,7 +100,7 @@ sub work {
     $self->init_all();
     $self->set_user_active_status();
     my $testdir = File::Temp::tempdir(
-                                      "test_XXXX",
+                                      "mldistwatch_work_XXXX",
                                       DIR => "/tmp",
                                       CLEANUP => 0,
                                      ) or die "Could not make a tmp directory";
@@ -180,6 +182,8 @@ sub init_all {
 sub dbfind {
     my($self) = @_;
     my %found;
+    my($fh) = File::Temp->new(TEMPLATE => "mldistwatch_dbfind_XXXX");
+    tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
     my $dbh = $self->connect;
     my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
     $sth->execute;
@@ -200,6 +204,8 @@ sub clean_up_filename {
 sub manifind {
     my($self) = @_;
     my %found;
+    my($fh) = File::Temp->new(TEMPLATE => "mldistwatch_manifind_XXXX");
+    tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
 
     my $wanted = sub {
         my $name = $self->clean_up_filename($File::Find::name);
@@ -221,15 +227,17 @@ sub checkfornew {
     my $time = time;
     my $alert;
     my @all;
+    my($fh) = File::Temp->new(TEMPLATE => "mldistwatch_all_XXXX", UNLINK=>0);
+    tie @all, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_RECNO or die;
     {
         my %seen;
         @all = sort grep { !$seen{$_}++ }
             keys %{$self->{ALLfound}},
                 keys %{$self->{ALLlasttime}};
     }
-    my $all = @all;
+    my $all = scalar @all;
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
-  BIGLOOP: for (my $i=0;@all;$self->empty_curdir) {
+  BIGLOOP: for (my $i=0;scalar @all;$self->empty_curdir) {
         my $dist = shift @all;
         #
         # Examine all files, even CHECKSUMS and READMEs
