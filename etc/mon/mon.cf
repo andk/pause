@@ -10,7 +10,7 @@
 # /usr/share/doc/mon/README.hints, /usr/share/doc/mon/README.monitors
 # and /usr/share/doc/mon/examples/mon.cf.
 
-hostgroup pause / /home /tmp /home/ftp
+hostgroup pause / /home /home/ftp /tmp /var
 
 hostgroup paused localhost
 
@@ -19,7 +19,7 @@ hostgroup paused localhost
 watch pause
     service freespace
 	interval 1m
-	monitor freespace.monitor /:150000 /home:900000 /tmp:500000 /home/ftp:4000000
+	monitor freespace.monitor /:400000 /home:900000 /home/ftp:4000000 /tmp:900000 /var:100000
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
 	    alertevery 1h
