@@ -1,0 +1,3 @@
+
+perl /home/k/PAUSE/bin/paused &
+perl /home/k/PAUSE/bin/mlmirror &
