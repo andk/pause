@@ -1,8 +1,8 @@
--- MySQL dump 8.21
+-- MySQL dump 8.22
 --
 -- Host: localhost    Database: mod
 ---------------------------------------------------------
--- Server version	3.23.49-log
+-- Server version	3.23.54-log
 
 --
 -- Table structure for table 'applymod'
@@ -73,6 +73,7 @@ CREATE TABLE deletes (
 CREATE TABLE distmtimes (
   dist char(128) binary NOT NULL default '',
   distmtime char(10) default NULL,
+  distmdatetime datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (dist)
 ) TYPE=ISAM PACK_KEYS=1;
 
@@ -116,26 +117,6 @@ CREATE TABLE maillists (
 
 --
 -- Dumping data for table 'maillists'
---
--- WHERE:  1=0
-
-
-
---
--- Table structure for table 'mirrorit'
---
-
-CREATE TABLE mirrorit (
-  mpackage char(20) binary NOT NULL default '',
-  lasttime char(10) default NULL,
-  urgencycall char(10) default NULL,
-  entered char(10) default NULL,
-  enteredby char(10) default NULL,
-  PRIMARY KEY  (mpackage)
-) TYPE=ISAM PACK_KEYS=1;
-
---
--- Dumping data for table 'mirrorit'
 --
 -- WHERE:  1=0
 
