@@ -13,7 +13,7 @@ sub as_string {
   my $user = $mgr->{HiddenUser}{userid} || $mgr->{User}{userid} or return;
   my @m;
   my $dbh = $mgr->connect;
-  my $sth = $dbh->prepare("select * from messages where mto=?");
+  my $sth = $dbh->prepare("select * from messages where mto=? AND mstatus='active'");
   $sth->execute($user);
   if ($sth->rows > 0) {
     push @m, qq{<div class="messages">};
