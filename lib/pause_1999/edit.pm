@@ -3030,8 +3030,15 @@ Excerpt from a mail:<pre>
     my $update_sel = $req->param('pause99_edit_ml_4');
     my %meta = (
 		maillistname => {
+
                                  headline => "The name of the mailing list",
-                                 note => "The name appears in the CPAN authors list, so it is good if the name contains the term <i>mailing list</i> or something equivalent",
+
+                                 note => "The name appears in the CPAN
+                                     authors list, so it is good if
+                                     the name contains the term
+                                     <i>mailing list</i> or something
+                                     equivalent",
+
 				 type => "textfield",
 				 args => {
 					  size => 50,
@@ -3056,11 +3063,10 @@ Excerpt from a mail:<pre>
                                  headline => "How to subscribe",
 
                                  note => "This is a text that
-                                     describes how to join the group
-                                     as a member. E.g. about the
-                                     mailing list <i>subscribe</i>
-                                     address or about a webpage
-                                     where they find more info.",
+                                     describes how to join the mailing
+                                     list. E.g. the mailing list
+                                     subscribe address or a URL with
+                                     more details.",
 
 				 type => "textarea",
 				 args => {
