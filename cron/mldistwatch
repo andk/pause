@@ -8,7 +8,8 @@
 +---------------------------------------------------------------+
 | We compare them with the database of distribution files and   |
 | decide if we have to examine them closer. We also create a    |
-| trivial "database" of CHECKSUMS in the very same directory.   |
+| trivial "database" of CHECKSUMS in the same directory as a    |
+| distro resides.                                               |
 +---------------------------------------------------------------+
 | We unzip new files into a tree and examine files in that tree |
 | and compare these with data about packages in the database.   |
@@ -21,49 +22,26 @@
 So we have distfilechecks, directorychecks and contentfilechecks.
 Contentchecks have two parts, files and namspaces (packages). And we
 have some sort of a scheduler that keeps track of what we have to do.
-As of this writing (July 1999) I have no time to change this into
-something modular.
 
-OK, April 2002, when seeing the need to add support for primeur table,
-started OO over this whole mess. The first class is called
-PAUSE::dist. It's just a start, bringing checkfornew down from 600 to
-80 lines, examine_pms is now the longest subroutine with >400 lines.
-All 4 functions (writechecksum, examine_dist, extract_readme, simile)
-are now in the PAUSE::dist namespace as methods.
+4 levels of classes:
 
-report() now also method in PAUSE::dist.
+PAUSE::mldistwatch       we could call it main. One object does all
 
-We want more. Another class, PAUSE::pmfile "encapsulates" what we do
-to the single pm file. PAUSE::pmfile::examine_fio() is now (2002-04-06) at
-365 lines, much better than the 600 we had before and it is indented
-less, so real visible effect.
+PAUSE::dist              each distro we find is an object of this class
 
-Now I could identify two phases within examine_fio and put the first in
-its own ppp method, so we're down to 284 lines and again less
-indenting. Let me make this clear: all I'm trying to achieve is
-shorter subroutines without breaking the program. Cleaning unclean OO
-must come later to keep the changes at a minimum.
+PAUSE::pmfile            each *.pm file in each distro is one object of
+                         this class
 
-The third class is PAUSE::package. We again wrap some object
-attributes from a PAUSE::pmfile object into the PAUSE::package objects
-underneeth and continue with examine in a new subroutine that is again
-a little leaner. Total now 1600 lines of code in 35 subroutines.
-Fealing better.
+PAUSE::package           each package statement per pm-file is an object
+                         of this class
 
-Removing support for the packages.file_md5 field in PAUSE::pmfile. One
-day we must remove the field from the table too. (DONE 2002-08-01)
 
-2003-02-10:
-
-Long time we know that the combination of print, report, alert and
-warn is a complete mess.
-
-The best way out of that seems to be that we start to write a prette
-report on every distro we touch. We send this report to an admin,
-later to the author as well. Once we have managed to have that look
-good, we can remove all of print, report, alert and warn.
-
-What is the method name? summary.
+The methods alert() and verbose() exist in all classes. Only the two
+in PAUSE::mldistwatch do something for real, the others just pass
+their arguments up in the "stack" of objects. Similarly index_status
+passes arguments up till they reach the PAUSE::dist object. From there
+they are harvested in the mail_summary() method that sends a report to
+the owner of the package
 
 =cut
 
