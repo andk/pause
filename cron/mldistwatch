@@ -606,10 +606,69 @@ category    maintainer
     }
 }
 
+sub xmlquote {
+  my @x = @_;
+  foreach my $it (@x) {
+    $it = '' unless defined $it;
+    $it =~ s<([^\n\r\t\x20\x21\x23\x27-\x3b\x3d\x3F-\x5B\x5D-\x7E])>
+            <'&#'.(ord($1)).';'>seg;
+      # turn strange things into decimal-numeric entities, no questions asked.
+  }
+  return join '', @x unless wantarray;
+  return @x;
+}
+
 sub write_01sorted {
     my($self, $listing) = @_;
     my($n) = 150;
-    my $list = qq{\n<HEAD><TITLE>Modules on CPAN sorted by upload date</TITLE></HEAD><BODY>\n<H1>CPAN\'s $n most recent uploads</H1>\n<H3>ordered by timestamp of the distributions</H3>\n\nA description of the list can be found in <A HREF="01modules.index.html">01modules.index.html</A>.\n<HR>\n<PRE>\nauthor/   distribution file                     size   uploaded\nmaintainer\n\n};
+
+    my $html = qq{\n<html><head>
+<title>Modules on CPAN sorted by upload date</title>
+<link rel="alternate" type="application/rss+xml" title="RSS"
+  href="./01modules.mtime.rss" />
+</head>
+<body>
+<h1>CPAN\'s $n most recent uploads</h1>
+<h3>ordered by timestamp of the distributions</h3>
+A description of the list can be found in 
+<a href="01modules.index.html">01modules.index.html</a>.
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="./01modules.mtime.rss"
+ style="
+ border: 3px solid;
+ border-color: #FC9 #630 #330 #F96;
+ background: #F60;
+ color: #FFF !important;
+ margin: 0;
+ padding: 0 3px;
+ font: bold .7em verdana, sans-serif;
+ text-decoration: none !important; 
+"
+>RSS</a>
+
+<hr />
+<pre>
+author/   distribution file                     size   uploaded
+maintainer
+
+};
+
+    my $rss = qq{<?xml version="1.0"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<title>Recent CPAN Uploads</title>
+<description>The $n most recent modules uploaded to CPAN</description>
+<link>http://www.cpan.org/modules/01modules.mtime.html</link>
+<language>en</language>
+<sy:updateFrequency>3</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T12:24+00:00</sy:updateBase>
+<ttl>480</ttl>
+<webMaster>cpan&#64;perl.org</webMaster>
+};
 
     my(%seen);
     for my $l (
@@ -618,8 +677,10 @@ sub write_01sorted {
               ) {
         next if $seen{$l->[4]}++; # dist
         my %package;
-        @package{qw{package userdir userid useridfiller dist filenameonly
-                    filenamefiller size mtimestr young mtime}} = @$l;
+        @package{qw{package userdir userid
+                    useridfiller dist filenameonly
+                    filenamefiller size mtimestr young mtime}}
+            = xmlquote( @$l );
 
 ##   DB<2> x \%package
 ## 0  HASH(0x8c42664)
@@ -637,23 +698,59 @@ sub write_01sorted {
 
         $package{filenamefiller} =
 	    " "x(40-length($package{filenameonly})-length($package{size}));
-        $list .= sprintf(
-                         qq{<A HREF="../authors/id/%s">%s</A>%s<A
- HREF="../authors/id/%s">%s</A> %s %s   %s\n},
+        $package{'useridpretty'} = ucfirst(
+          $package{'useridlc'}   = lc $package{'userid'}
+        );
+        ($package{basename}) =
+            $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$)/;
+
+        $html .= sprintf(
+                         qq{<a href="../authors/id/%s">%s</a>%s<a
+ href="../authors/id/%s">%s</a> %s %s   %s\n},
                          @package{qw{userdir userid useridfiller dist filenameonly
                                      filenamefiller size mtimestr}}
                         );
+
+	$rss .= sprintf qq{
+<item>
+  <title>%s : %s</title>
+  <link>http://www.cpan.org/modules/by-authors/id/%s/%s</link>
+  <description>%s uploaded %s (%s) on %s</description>
+  <guid isPermaLink="false">%s</guid>
+  <comments>http://search.cpan.org/~%s/%s/</comments>
+</item>
+},
+                         @package{qw{basename useridpretty
+                                     userdir dist
+                                     useridpretty dist size mtimestr
+                                     filenameonly
+                                     useridlc package
+                                 }};
+
         last unless --$n;
+
     }
-    $list .= q{</PRE></BODY>};
+    $html .= q{</pre>\n\n</body></html>\n};
+    $rss .= "\n</channel></rss>\n";
+
     my $MLROOT = $self->mlroot;
+
+    my $rssfile = "$MLROOT/../../modules/01modules.mtime.rss";
+    # $self->verbose(1,"Writing $rssfile\n");
+    if (open F, ">$rssfile") {
+        print F $rss;
+        close F;
+    } else {
+        die "Could not write-open >$rssfile:$!";
+    }
+
     my $repfile = "$MLROOT/../../modules/01modules.mtime.html";
     # $self->verbose(1,"Writing $repfile\n");
     if (open F, ">$repfile") {
-        print F $list;
+        print F $html;
         close F;
     } else {
-        die "Could not open >$repfile:$!";
+        die "Could not write-open >$repfile:$!";
     }
 }
 
@@ -2449,7 +2546,6 @@ MAIN: {
 }
 
 exit;
-
 
 __END__
 
