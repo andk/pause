@@ -37,15 +37,56 @@ for (@pauselib) {
 }
 push @INC, @pauselib;
 $PAUSE::Config ||= {
-		    ADMINS => [qq(modules\@perl.org)],
-		    CPAN_TESTERS => qq(cpan-testers\@perl.org),
-		    GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
-		    FTPPUB => '/home/ftp/pub/PAUSE/',
-		    MLROOT => '/home/ftp/pub/PAUSE/authors/id/',
+                    ADMIN => qq{andreas.koenig\@anima.de}, # previously also used for ftp password:
+                    ADMINS => [qq(modules\@perl.org)],
+                    ANON_FTP_PASS => qq{andreas.koenig\@dubravka.kbx.de}, # only dubravka.kbx.de is reverse mapped
+                    AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
+                    AUTHEN_PASSWORD_FLD => "password",
+                    AUTHEN_USER_FLD => "user",
+                    AUTHEN_USER_TABLE => "usertable",
+                    CPAN_TESTERS => qq(cpan-testers\@perl.org),
                     DELETES_EXPIRE => 60*60*72,
+                    FTPPUB => '/home/ftp/pub/PAUSE/',
+                    GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
+                    GZIP => '/bin/gzip',
+                    HOME => '/home/k/',
+                    HTTP_ERRORLOG => '/usr/local/apache/logs/error_log',
+                    INCOMING => 'ftp://pause.perl.org/incoming/',
+                    INCOMING_LOC => '/home/ftp/incoming/',
+                    MAXRETRIES => 16,
+                    MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
+                    MLROOT => '/home/ftp/pub/PAUSE/authors/id/',
+                    MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
+                    NO_SUCCESS_BREAK => 900,
+                    P5P => 'perl-release-announce@perl.org',
+                    PAUSE_LOG => "/home/k/PAUSE/log/paused.log",
+                    PAUSE_LOG_DIR => "/home/k/PAUSE/log/",
+                    PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
+                    PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
+                    SLEEP => 90,
+                    TIMEOUT => 60*60,
+                    TMP => '/home/ftp/tmp/',
+                    UPLOAD => 'upload@pause.perl.org',
 };
-# some more variables we should not publish are in PrivatePAUSE
+
+
 require PrivatePAUSE;
+
+
+=pod
+
+The following $PAUSE::Config keys are defined in PrivatePAUSE.pm:
+
+              AUTHEN_DATA_SOURCE_USER
+              AUTHEN_DATA_SOURCE_PW
+              MOD_DATA_SOURCE_USER
+              MOD_DATA_SOURCE_PW
+
+These are usernames and passwords in the mysql database.
+
+=cut
+
+
 
 sub filehash {
   my($file) = @_;
