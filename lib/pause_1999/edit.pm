@@ -14,6 +14,8 @@ use utf8; # must be after the qr// for perl-5.6.1
 
 our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
+our $strict_chapterid = 0;
+
 sub parameter {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
@@ -3349,6 +3351,8 @@ mlstatus
         $selectedrec->{$field} = "?" unless exists
             $meta{$field}{args}{labels}{$selectedrec->{$field}};
       } elsif ($field eq "chapterid") {
+        die "chapterid not integer" if $strict_chapterid &&
+            $selectedrec->{$field} !~ /^\d*$/;
         $selectedrec->{$field} =~ s/^\s/_/;
       }
       if ($force_sel) {
@@ -3402,6 +3406,8 @@ mlstatus
             # Truncate if necessary, the database won't do it anymore
             substr($param,44) = "" if length($param)>44;
           } elsif ($field eq "chapterid") {
+            die "param not integer" if $strict_chapterid &&
+                ($selectedrec->{$field} !~ /^\d*$/ || $param !~ /^\d*$/);
             $selectedrec->{$field} =~ s/^_/ /;
             $param =~ s/^_/ /;
           }
@@ -3429,6 +3435,8 @@ mlstatus
 	} else {
 
           if ($field eq "chapterid") {
+            die "illegal chapterid" if $strict_chapterid &&
+                ($selectedrec->{$field} !~ /^d*$/ || $param !~ /^d*$/);
             $selectedrec->{$field} =~ s/^_/ /;
             $param =~ s/^_/ /;
           }
@@ -3437,7 +3445,6 @@ mlstatus
                                 $selectedrec->{$field},
                                 "\n"
                                );
-
 	}
       } elsif ($is_only_one) {
         # as if they had selected it already
@@ -3866,7 +3873,7 @@ sub add_mod {
     my $description = join " ", @desc;
     $description ||= "";
     $req->param("pause99_add_mod_description",$description);
-    $chapterid ||= "99";
+    $chapterid ||= "";
     warn "chapterid[$chapterid]";
     $req->param("pause99_add_mod_chapterid",$chapterid);
     $req->param("pause99_add_mod_userid",$userid);
@@ -3887,12 +3894,14 @@ sub add_mod {
 
     my($chapterid) = $req->param('pause99_add_mod_chapterid');
     warn "chapterid[$chapterid]";
+    die "chapterid not integer" if $strict_chapterid && $chapterid !~ /^\d*$/;
     $req->param('pause99_add_mod_chapterid', $chapterid)
         if $chapterid =~ s/^\s/_/;
     warn "chapterid[$chapterid]";
     unless ($meta{chapterid}{args}{labels}{$chapterid}) {
       push @errors, qq{The chapterid [$chapterid] is not known.};
     }
+    die "chapterid not integer" if $strict_chapterid && $chapterid !~ /^\d*$/;
     $chapterid =~ s/^_/ /;
     warn "chapterid[$chapterid]";
 
@@ -4032,7 +4041,7 @@ sub add_mod {
     warn "chapterid[$chapterid]";
     if ($sth->rows == 1) {
       $chap_shorttitle = $mgr->fetchrow($sth, "fetchrow_array");
-      $chap_shorttitle = substr($chap_shorttitle,3);
+      $chap_shorttitle = substr($chap_shorttitle,3) if $chap_shorttitle =~ /^\d/;
     } else {
       warn "ALERT: could not find chaptertitle";
     }
@@ -4160,7 +4169,7 @@ $blurbcopy
       # triggered later on. I would believe.
       if ($req->param($param)){
         if ($param =~ /_chapterid$/) {
-          $req->param($param,"99");
+          $req->param($param,"");
         } elsif ($param =~ /_stat.$/) {
           $req->param($param,"?");
         } else {
@@ -4202,6 +4211,7 @@ $blurbcopy
     # warn sprintf "field[%s]value[%s]", $field, $req->param($fieldname);
     if ($field eq "chapterid") {
       my $val = $req->param($fieldname);
+      die "chapterid not integer" if $strict_chapterid && $val !~ /^\d*$/;
       if ($val =~ s/^\s/_/) {
         $req->param($fieldname,$val);
       }
@@ -4376,10 +4386,11 @@ sub apply_mod {
     }
 
     my($chapterid) = $req->param('pause99_apply_mod_chapterid');
+    die "chapterid not numeric" if $strict_chapterid && $chapterid !~ /^\d*$/;
     $chapterid =~ s/^_/ /;
     warn "appropriate_chapterid[@appropriate_chapterid]";
     my($chap_confirmed) = $req->param('pause99_apply_mod_chapfirm');
-    if (!$chapterid || $chapterid eq '99') {
+    if (!$chapterid) {
       push @errors, qq{No chapter given.};
     } elsif ( ! @appropriate_chapterid) {
       # That's OK, a new rootnamespace
@@ -4483,7 +4494,7 @@ sub apply_mod {
     $sth->execute($chapterid);
     if ($sth->rows == 1) {
       $chap_shorttitle = $mgr->fetchrow($sth, "fetchrow_array");
-      $chap_shorttitle = substr($chap_shorttitle,3);
+      $chap_shorttitle = substr($chap_shorttitle,3) if $chap_shorttitle =~ /^\d/;
     } else {
       warn "ALERT: could not find chaptertitle";
     }
@@ -4641,7 +4652,7 @@ $blurbcopy
       # triggered later on. I would believe.
       if ($req->param($param)){
         if ($param =~ /chapterid/) {
-          $req->param($param,"99");
+          $req->param($param,"");
         } else {
           $req->param($param,"");
         }
@@ -4812,11 +4823,20 @@ sub chap_meta {
   $sth3->execute;
   while (my($chapternr, $chapterid) = $mgr->fetchrow($sth3, "fetchrow_array")) {
     last unless $chapterid;
+    die "illegal chapterid or nr" if $strict_chapterid &&
+        ($chapternr !~ /^\d*$/ || $chapterid !~ /^\d*$/);
     $chapternr =~ s/^\s/_/; # I think, I mixed chapternr and chapterid several times!
     $chapterid =~ s/^\s/_/;
     $chap{$chapternr} = $chapterid;
   }
-  my @sorted = map { s/^\s/_/; $_ } sort map { s/_/ /; $_} keys %chap; # ARGH!
+  my @sorted;
+  if (grep /^[\s_]/, keys %chap) {
+    my @sorted = map { s/^\s/_/; $_ } sort map { s/_/ /; $_} keys %chap; # ARGH!
+  } else {
+    @sorted = sort { $a <=> $b } keys %chap;
+  }
+  unshift @sorted, "";
+  $chap{""} = "Please select chapter";
   $sth3->finish;
   return (
           chapterid => {
@@ -4824,13 +4844,13 @@ sub chap_meta {
                         headline => "Module List Chapter",
 
                         note => "The module list has all modules
-		      categorized in 24 chapters. Please pick the one
+		      categorized in chapters. Please pick the one
 		      you would prefer to have your module listed
 		      in.",
 
                         args => {
                                  size => 1,
-                                 default => "99",
+                                 default => "",
                                  values => \@sorted,
                                  labels => \%chap,
                                 },

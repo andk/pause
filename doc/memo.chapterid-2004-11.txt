@@ -1,0 +1,58 @@
+2004-11-01  Andreas Koenig  <andk@cpan.org>
+
+	* About to check in rev 519 which should contain code that is able
+	to survive several alter table commands. The change should not
+	break anything.
+
+	* Once again trying to clean up the chapterid mess.
+
+	The database has three tables with a field named chapterid. In
+	mod.mods and mod.applymod the field is char(2), in mod.chapters it
+	is char(80). But the field *chapternr* in table mod.chapters is
+	char(2). Much reason for confusion.
+
+	Besides, there is a permanent need to switch back and forth
+	between integer values and integer values with leading spaces and
+	integer values with leading underscores (because chtml does not
+	allow leading blanks). That makes changes regarding the chapter
+	stuff difficult.
+	
+	In the first round, I aim at changing the database thusly:
+
+	alter table chapters modify chapternr int(10) unsigned not null default '0';
+	alter table mods     modify chapterid int(10) unsigned not null default '0';
+	alter table applymod modify chapterid int(10) unsigned not null default '0';
+	
+	The next thing I find annoying is that the field
+	mod.chapter.shorttitle always redundantly contains the number that
+	is already in the chapternr field. And I dislike the idea that
+	"99" stands for Unknown where we could do so well with having ""
+	stand for unknown. So the next step whould be:
+
+	delete from chapters where chapternr=99;
+	chapters set shorttitle=substring(shorttitle,4);
+
+	Before doing any of the above, I try to write the code in a way
+	that works before and after the change, so its easier to switch
+	back.
+
+	The "99" thing seems low-risk, so I start addressing this
+	immediately. Everything else is protected by the global variable
+	$strict_chapterid.
+
+	Finally I would like to address the redundant number in the
+	chapterid field in the chapters table (the one with the char(80)
+	specification). Maybe something like:
+
+	update chapters set chapterid=substring(chapterid,4) where chapterid like '_)%';	update chapters set chapterid=substring(chapterid,5) where chapterid like '__)%';
+
+	And the field name should also change. But I do not yet dare to
+	start working on that.
+	
+2004-10-31  Andreas Koenig  <andk@cpan.org>
+
+	
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "memo.chapterid-2004-11.txt"
+	End:
