@@ -21,6 +21,7 @@ opendir DIR, $incdir or die;
 for my $dirent (readdir DIR) {
   next if $dirent =~ /^\.(|\.|message)\z/;
   my $absdirent = "$incdir/$dirent";
+  next unless -f $absdirent;
   next if -M $absdirent < 1/24;
   $sth->execute($dirent);
   next if $sth->rows > 0;
