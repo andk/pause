@@ -15,8 +15,9 @@ produced by a cronjob and accessible as in the directory
 
     ftp://pause.perl.org/pub/PAUSE/PAUSE-code/
 
-The filenames match C< /^pause-wc-(\d+)\.tar\.gz$/ > where C< $1 > is
-the revision number of the repository.
+The filenames of the snapshots in that directory match
+C< /^pause-wc-(\d+)\.tar\.gz$/ > where C< $1 > is the revision number of
+the repository.
 
 =head2 Excluded files
 
@@ -41,7 +42,7 @@ make sure that installed programs find their configuration:
 (last time updated: 2002-12-25)
 
   /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
-  /etc/mon/mon.cf -> ../../home/k/PAUSE/etc/mon.cf
+  /etc/mon/mon.cf -> ../../home/k/PAUSE/111_sensitive/etc/mon/mon.cf
   /etc/rc.d/init.d/httpd -> /home/k/PAUSE/etc/rc.d/init.d/httpd
   /etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
   /etc/rsyncd.conf -> /home/k/PAUSE/etc/rsyncd.conf
@@ -51,6 +52,7 @@ make sure that installed programs find their configuration:
   /usr/local/apache/conf -> ../../../home/k/PAUSE/apache-conf
   /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
   /usr/local/apache/perl -> ../../../home/k/PAUSE/apache-perl
+  /usr/local/etc/proftpd.conf -> /home/k/PAUSE/ftpd/conf/proftpd.conf
   /usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults
   /usr/local/mirror/mymirror.config -> ../../../home/k/PAUSE/mirror/mymirror.config
 
@@ -87,26 +89,27 @@ follow the advice in the mysql manual about how to secure mysql in
 general. E.g. --skip-networking is highly recommended, root user
 password is a must, etc.
 
-PAUSE is running processes as user root, nobody, SVN, and UNSAFE. The
-user "k" in the group "k" owns the working copy of the repository and
-all the sensitive files. Group "k" must contain all users who should
-be able to read sensitive data. So at least "nobody" (who runs the
-webserver) must be in that group. Sensitive directories and files must
-be group-readable and must not be world readable. The SSL data for the
-webservers should not even be readable by that group, only by root who
-starts the webservers.
+PAUSE is running processes as user root, nobody, SVN, ftp, and UNSAFE.
+The user "k" in the group "k" owns the working copy of the repository
+and all the sensitive files. Group "k" must contain all users who
+should be able to read sensitive data. So at least "nobody" (who runs
+the webserver) must be in that group. Sensitive directories and files
+must be group-readable and must not be world readable. The SSL data
+for the webservers should not even be readable by that group, only by
+root who starts the webservers.
 
 This setup must ensure that the user UNSAFE cannot read the database
 account informations. On the database side this is achieved by
-granting one user delete,index,insert,select,update privileges on the
-two tables, nothing else. This is the user whose access codes are
-stored in PrivatePAUSE.pm.
+granting delete,index,insert,select,update privileges on the two
+tables, nothing else, to one user. This is the user whose access codes
+are stored in PrivatePAUSE.pm. The root password to mysql is not
+needed by any script, so can be stored offline.
 
 =head2 Other security considerations
 
-We practice security by visibility: by giving the users as much
-information as possible about the status of their requests by sending
-them mail about every action they take.
+We practice security by visibility by giving the users as much
+information as possible about the status of their requests. This is
+mostly done by sending them mail about every action they take.
 
 Another important axiom is that we disallow overwriting of files
 except for pure documentation files. That way the whole CPAN cannot
