@@ -1,7 +1,7 @@
 #!/usr/bin/perl -- -*- mode: cperl -*-
 
-my $VERSION = substr q$Revision: 1.81 $, 10; # $Date: 2002/08/02 11:34:24 $
-my $Id = q$Id: paused,v 1.81 2002/08/02 11:34:24 k Exp k $;
+my $VERSION = substr q$Rev: 85$, 5; # $Date$
+my $Id = qq!paused, v$VERSION!;
 
 use lib "/home/k/PAUSE/lib";
 
@@ -91,7 +91,7 @@ sub do_loop {
                 AND ( dverified=''
                       OR
                       dverified > '$old'
-                    ) };
+                    ) }; #};
 
   $sth = $dbh->prepare($query);
   unless ( $sth->execute ) {
@@ -173,14 +173,14 @@ sub do_loop {
       my($host) = $uri->host;
       my($path) = $uri->path;
       $mirror->print(qq{
-package     =$package
-site        =$host
-remote_dir  =$path
-local_dir   +pub/authors/id/$package
-get_patt    =.
-max_days    =22
-recursive   =false
-skip        =not yet verified
+# package     =$package
+# site        =$host
+# remote_dir  =$path
+# local_dir   +pub/authors/id/$package
+# get_patt    =.
+# max_days    =22
+# recursive   =false
+# skip        =not yet verified
 });
       $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
       do_log("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
@@ -262,7 +262,7 @@ No action is required on your part
                      "Request completed:  ",
                      HTTP::Date::time2str(time),
                      "\n\n",
-                     "\tVirtually Yours,\n\t$Id"
+                     "\tVirtually Yours,\n$Id"
                     );
 
       my $fh = my_pause_send_mail->send({
@@ -295,7 +295,7 @@ I'll continue to try until the maximum of $PAUSE::Config->{MAXRETRIES}
 retries is reached. Then I'll give up to give room for a
 new trial.
 
-Virtually,
+Virtually Yours,
 $Id\n";
 
         my $fh = my_pause_send_mail->send({
@@ -360,7 +360,7 @@ after the maximum of $PAUSE::Config->{MAXRETRIES} retries.
 I give up now.
 
 $cleanup
-Virtually,
+Virtually Yours,
 $Id\n";
 
         my $fh = my_pause_send_mail->send({
