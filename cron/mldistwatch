@@ -1277,6 +1277,7 @@ sub as_ds {
     $ppp;
   }
 
+  # package PAUSE::pmfile;
   sub mm_unix_parse_version {
       my($parsefile) = @_;
       my $result;
@@ -1357,9 +1358,9 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
         my($comp) = Safe->new("_pause::mldistwatch");
         my $eval = qq{
                   local(\$^W) = 0;
-                  mm_unix_parse_version("$pmcp");
+                  PAUSE::pmfile::mm_unix_parse_version("$pmcp");
                  };
-        # $comp->share("*ExtUtils::MM_Unix::parse_version", "*strict::unimport");
+        $comp->share("*PAUSE::pmfile::mm_unix_parse_version");
         # $comp->permit("require"); # no strict!
         no strict;
         local $PAUSE::Config;
