@@ -3,13 +3,14 @@ package pause_1999::edit;
 use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
-use utf8;
 use Fcntl qw(O_RDWR O_RDONLY);
-
 use URI::Escape;
 
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 our $Valid_Userid = qr/^[A-Z]{4,9}$/;
+
+use utf8; # must be after the qr// for perl-5.6.1
+
+our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub parameter {
   my pause_1999::edit $self = shift;
