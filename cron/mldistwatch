@@ -140,11 +140,16 @@ sub connect {
     $self->{DBH} = $dbh;
 }
 
-sub DESTROY {
+sub disconnect {
     my $self = shift;
     return unless $self->{DBH};
     $self->{DBH}->disconnect;
     delete $self->{DBH};
+}
+
+sub DESTROY {
+    my $self = shift;
+    $self->disconnect;
 }
 
 sub init_all {
@@ -818,7 +823,7 @@ sub as_ds {
     sub delete_goner {
         my $self = shift;
         my $dist = $self->{DIST};
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         $dbh->do("DELETE FROM packages WHERE dist='$dist'");
         $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
     }
@@ -840,7 +845,7 @@ sub as_ds {
         my $self = shift;
         my $otherts = shift || 0;
         my $dist = $self->{DIST};
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         unless ($otherts){ # positive $otherts means it was alive last time
             $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
             $dbh->do("INSERT INTO distmtimes (dist) VALUES ('$dist')");
@@ -991,6 +996,12 @@ sub as_ds {
         $main->connect;
     }
 
+    sub disconnect {
+        my($self) = @_;
+        my $main = $self->{MAIN};
+        $main->disconnect;
+    }
+
     # package PAUSE::dist;
     sub mail_summary {
         my($self) = @_;
@@ -1085,7 +1096,7 @@ Please contact modules\@perl.org if there are any open questions.
             }
         }
         push @m, qq{__END__\n};
-        my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->{DBH}});
+        my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
         my $to = $pma->address;
         my($msg) = Mail::Send->new(
                                    To => join(", ",
@@ -1322,12 +1333,24 @@ Please contact modules\@perl.org if there are any open questions.
         $dio->alert($what);
     }
 
+    sub connect {
+        my($self) = @_;
+        my $dio = $self->{DIO};
+        $dio->connect;
+    }
+
+    sub disconnect {
+        my($self) = @_;
+        my $dio = $self->{DIO};
+        $dio->disconnect;
+    }
+
     # package PAUSE::pmfile;
     sub examine_fio {
         # fio: file object
         my $self = shift;
         my $dist = $self->{DIO}{DIST};
-        my $dbh = $self->{DIO}{DBH};
+        my $dbh = $self->connect;
         my $pmfile = $self->{PMFILE};
 
 
@@ -1502,6 +1525,8 @@ Please contact modules\@perl.org if there are any open questions.
             # solution to escape @s and \
         }
         my($v);
+        $self->disconnect; # no guarantee that the connection survives the fork!
+
         {
 
             package main; # seems necessary
@@ -1655,13 +1680,13 @@ package in packages  package in primeur
     # return value nonsensical
     sub give_regdowner_perms {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         local($dbh->{RaiseError}) = 0;
         my $sth_mods = $dbh->prepare("SELECT userid
                                       FROM   mods
                                       WHERE  modid = ?");
-        warn "Going to execute 'SELECT userid FROM mods WHERE modid = '$package'";
+        warn "Going to execute [SELECT userid FROM mods WHERE modid = '$package']";
         $sth_mods->execute($package) or die "FAILED";
         if ($sth_mods->rows>0) { # make sure we regard the owner as the owner
             my($mods_userid) = $sth_mods->fetchrow_array;
@@ -1694,7 +1719,7 @@ package in packages  package in primeur
         my $dist = $self->{DIST};
         my $package = $self->{PACKAGE};
         my $pp = $self->{PP};
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
 
         my($userid) = $self->{USERID};
 
@@ -1802,10 +1827,22 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         return 1;
     }
 
+    sub connect {
+        my($self) = @_;
+        my $fio = $self->{FIO};
+        $fio->connect;
+    }
+
+    sub disconnect {
+        my($self) = @_;
+        my $fio = $self->{FIO};
+        $fio->disconnect;
+    }
+
     sub examine_pkg {
         my $self = shift;
 
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -1844,7 +1881,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my $self = shift;
         my $sth_pack = shift;
 
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -2026,7 +2063,7 @@ WHERE package = '$package'
 
     sub insert_into_package {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -2056,7 +2093,7 @@ VALUES (
     # returns always the return value of print, so basically always 1
     sub checkin_into_primeur {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -2088,7 +2125,7 @@ VALUES (
 
     sub checkin {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
