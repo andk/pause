@@ -1628,6 +1628,8 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
 into $her directory. The request used the following parameters:});
     $mailblurb .= "\n";
 
+    my @mb;
+    my $longest = 0;
     for my $param ($req->param) {
       next if $param eq "HIDDENNAME";
       next if $param eq "CAN_MULTIPART";
@@ -1635,7 +1637,12 @@ into $her directory. The request used the following parameters:});
       my $v = $req->param($param);
       next unless defined $v;
       next unless length $v;
-      $mailblurb .= sprintf qq{  %-33s [%s]\n}, $param, $v;
+      $longest = length($param) if length($param) > $longest;
+      push @mb, [$param,$v];
+    }
+    for my $mb (@mb) {
+      my($param, $v) = @$mb;
+      $mailblurb .= sprintf qq{ %-*s [%s]\n}, $longest, $param, $v;
     }
     $mailblurb .= "\n";
     $mailblurb .= $self->wrap($success);
