@@ -426,7 +426,7 @@ sub whois {
             # and now for XML
 
             $xml .= qq{ <cpanid>\n};
-            $xml .= qq{  <id>$row[2]</id>\n};
+            $xml .= qq{  <id>} . escapeHTML($row[0]) . qq{</id>\n};
             $xml .= qq{  <type>author</type>\n};
             $xml .= qq{  <fullname>} . escapeHTML($row[1]) . qq{</fullname>\n};
             $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>\n}
