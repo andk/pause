@@ -1221,7 +1221,7 @@ Please contact modules\@perl.org if there are any open questions.
             $self->{README} = "No README found";
             $self->verbose(1,"No readme in $dist\n");
         }
-        my(@yaml) = grep m|/META.yml$|, @manifind;
+        my(@yaml) = grep !m|/t/|, grep m|/META\.yml$|, @manifind;
         if (@yaml) {
             if (@yaml == 1) {
                 $self->{YAML} = $yaml[0];
