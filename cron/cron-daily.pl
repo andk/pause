@@ -356,7 +356,7 @@ sub whois {
    <!-- experimental version, do not use fur further processing yet -->
 },
                       scalar(gmtime),
-                      $PAUSE::Config->{ADMIN},
+                      $Id,
                       );
     open FH, ">00whois.new" or return "Error: Can't open 00whois.new: $!";
     if ($] > 5.007) {
