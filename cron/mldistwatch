@@ -412,15 +412,11 @@ sub do_rewrite01 {
     my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
     $sth->execute;
     while (my($modid,$chapterid) = $sth->fetchrow_array) {
-	my($root,$colo) = $modid =~ /^([^:]+)(::)?/;
-	$firstlevel{$root}++;
-        if ($colo) {
-            if (! exists $achapter{$root}) {
-                $achapter{"$root\::"} ||= $chapterid;
-            }
-        } else {
-            delete $achapter{"$root\::"};
-            $achapter{$root} ||= $chapterid;
+	my(@r) = split /(::)/, $modid;
+	$firstlevel{$r[0]}++;
+        local $" = "";
+        while (@r) {
+            $achapter{"@r"} ||= $chapterid;
         }
     }
     my(%c_fn,$chapterid,$shorttitle,@chaptitle);
@@ -440,7 +436,7 @@ sub do_rewrite01 {
 
     my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
-        my %pkg = (rootpack => $pkg, dist => $pkgdist);
+        my %pkg = (rootpack => $pkg, fullpack => $pkg, dist => $pkgdist);
         $pkg{rootpack} =~ s/:.*//;
         # We don't want to list perl distribution
         next if $pkg{dist} =~ m|/perl-?5|;
@@ -490,7 +486,7 @@ sub do_rewrite01 {
         # we just wrote something like
         # Sybase      MEWP   sybperl-2.03.tar.gz     91.8  31 Jan 1996
         # we are in authors/id/
-        $pkg{rootpack} =~ s/\*$//;
+        $pkg{rootpack} =~ s/\*$//; # XXX seems stemming from already deleted code
         ($pkg{readme} = $pkg{dist}) =~
             s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
@@ -508,10 +504,21 @@ sub do_rewrite01 {
             $sth2->execute;
             ($pkg{chapterid}) = $sth2->fetchrow_array;
         }
-        my $cheap_chapterid = $achapter{$pkg{rootpack}}
-            || $achapter{"$pkg{rootpack}\::"};
-        unless ($pkg{chapterid} eq $cheap_chapterid) {
-            warn "WARNING: rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
+        my $cheap_chapterid;
+        {
+            my @r = split /(::)/, $pkg{fullpack};
+            local $" = "";
+            while (@r) {
+                if (my $ch = $achapter{"@r"}) {
+                    $cheap_chapterid = $ch;
+                    last;
+                }
+            }
+            unless ($pkg{chapterid} && $cheap_chapterid
+                    &&
+                    $pkg{chapterid} eq $cheap_chapterid) {
+                warn "WARNING: fullpack[$pkg{fullpack}] rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
+            }
         }
         if (defined $pkg{chapterid}) {
             if (defined $chaptitle[$pkg{chapterid}]) {
