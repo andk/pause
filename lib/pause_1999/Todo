@@ -1,0 +1,11 @@
+Given a report like
+
+>   HIDDENNAME                 [SKOLYCHEV]
+>   CAN_MULTIPART              [1]
+>   pause99_add_uri_uri        [http://www.ic.al.lg.ua/~ksv/Net-RawIP-0.09c.tar.gz]
+>   SUBMIT_pause99_add_uri_uri [Upload this URL]
+>   pause99_add_uri_upload     [Apache-GDGraph-0.5.tar.gz]
+>   pause99_add_uri_sub        [pause99_add_uri_uri]
+
+suppress the unneeded item pause99_add_uri_upload because it confuses
+the user and doesn't need debugging in 99.99% of all uploads.
