@@ -439,7 +439,7 @@ sub getit {
     ($tmp) = $lpath =~ m,(.*)/,;
     File::Path::mkpath($tmp);
   }
-  logge("Going to fetch uri[$uri] uriid[$uriid] tpath[$tpath] lpath[$lpath]");
+  logge("Going to fetch uriid[$uriid]");
   my $uri_obj;
   eval {
     $uri_obj =  URI::URL->new($uri, $PAUSE::Config->{INCOMING})
