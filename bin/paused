@@ -329,7 +329,7 @@ Seems as if the admin has to intervene\n\n";
 
         # make sure it ends with a slash
         # $PAUSE::Config->{INCOMING_LOC} =~ s|(?<!/)$|/|; # overly clever!
-        $PAUSE::Config->{INCOMING_LOC} =~ s|(/*$|/|;
+        $PAUSE::Config->{INCOMING_LOC} =~ s|/*$|/|;
 	my $incoming_file = $PAUSE::Config->{INCOMING_LOC} . $hash->{uri};
 	if (-f $incoming_file) {
 	  my $i = 1;
