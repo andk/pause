@@ -31,7 +31,7 @@ sub as_string {
       &&
       $mgr->{HiddenUser}{userid} ne $mgr->{User}{userid}
      ) {
-    $hu = sprintf qq{%s &lt;%s&gt;<br />},
+    $hu = sprintf qq{acting as %s &lt;%s&gt;<br />},
         $mgr->{HiddenUser}{userid},
             $mgr->escapeHTML(
                              $mgr->{HiddenUser}{secretemail}
