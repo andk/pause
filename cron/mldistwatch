@@ -1345,8 +1345,24 @@ Please contact modules\@perl.org if there are any open questions.
                 utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
                 eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
                 if ($@) {
-                    $self->{YAML_CONTENT} = {};
-                    $self->{YAML} = "META.yml found but error encountered while loading: $@";
+                    if ($@ =~ /msg: Unrecognized implicit value/) {
+                        # let's retry, but let's not expect that this
+                        # will work. MakeMaker 6.16 had a bug that
+                        # could be fixed like this, at least for
+                        # Pod::Simple
+
+                        my $cat = do { open my $f, $yaml or die; local $/; <$f> };
+                        $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
+                        eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
+                        if ($@) {
+                            $self->{YAML_CONTENT} = {};
+                            $self->{YAML} = "META.yml found but error encountered while loading: $@";
+                        }
+
+                    } else {
+                        $self->{YAML_CONTENT} = {};
+                        $self->{YAML} = "META.yml found but error encountered while loading: $@";
+                    }
                 }
             } else {
                 # Reminder: perl itself comes with a couple of META.yml
