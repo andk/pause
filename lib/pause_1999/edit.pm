@@ -5828,6 +5828,10 @@ sub all_cmods {
 sub coredump {
   my $self = shift;
   my $mgr = shift;
+  require "syscall.ph";
+  require "linux/sys.ph";
+  require "linux/prctl.ph";
+  warn syscall(&SYS_prctl,&PR_SET_DUMPABLE,1);
   chdir "/usr/local/apache/cores" or die "Couldn't chdir: $!";
   warn "**************>>>>>>>>>>     strace -p $$\n";
   sleep 10;
