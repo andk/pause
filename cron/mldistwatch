@@ -193,7 +193,7 @@ sub checkfornew {
         next BIGLOOP if $skip;
 
         $dio->read_dist;
-        $dio->extract_readme;
+        $dio->extract_readme_and_yaml;
         $dio->check_blib;
         $dio->check_multiple_root;
         $dio->examine_pms;      # will switch user
@@ -966,13 +966,13 @@ Please contact modules\@perl.org if there are any open questions.
         my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
         my $substrdistro = substr $distro, 5;
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-        $self->{README} ||= "No README found";
         push @m, qq{
                User: $author ($asciiname)
   Distribution file: $distrobasename
     Number of files: $nfiles
          *.pm files: $pmfiles
              README: $self->{README}
+           META.yml: $self->{YAML}
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
         my $tf = Text::Format->new(firstIndent=>0);
@@ -1155,16 +1155,16 @@ Please contact modules\@perl.org if there are any open questions.
     }
 
     # package PAUSE::dist;
-    sub extract_readme {
+    sub extract_readme_and_yaml {
         my $self = shift;
         my($suffix) = $self->{SUFFIX};
         return unless $suffix;
         my $dist = $self->{DIST};
         my @manifind = @{$self->{MANIFOUND}};
         my(@readme) = grep /(^|\/)readme/i, @manifind;
+        my($sans) = $dist =~ /(.*)\.\Q$suffix\E$/;
         if (@readme) {
             my $readme;
-            my($sans) = $dist =~ /(.*)\.\Q$suffix\E$/;
             if ($sans =~ /-bin-?(.*)/) {
                 my $vers_arch = quotemeta $1;
                 my @grep;
@@ -1184,8 +1184,21 @@ Please contact modules\@perl.org if there are any open questions.
             File::Copy::copy $readme, "$PAUSE::Config->{MLROOT}/$sans.readme";
             utime((stat $readme)[8,9], "$PAUSE::Config->{MLROOT}/$sans.readme");
         } else {
-            $self->{README} = "";
+            $self->{README} = "No README found";
             $self->verbose(1,"No readme in $dist\n");
+        }
+        my(@yaml) = grep m|/META.yml$|, @manifind;
+        if (@yaml) {
+            if (@yaml == 1) {
+                $self->{YAML} = $yaml[0];
+                File::Copy::copy $yaml[0], "$PAUSE::Config->{MLROOT}/$sans.meta";
+                utime((stat $yaml[0])[8,9], "$PAUSE::Config->{MLROOT}/$sans.meta");
+            } else {
+                $self->{YAML} = sprintf "%d META.yml found, ignoring", scalar @yaml;
+            }
+        } else {
+            $self->{YAML} = "No META.yml found";
+            $self->verbose(1,"No META.yml in $dist");
         }
     }
 
