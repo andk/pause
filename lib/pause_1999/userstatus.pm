@@ -27,7 +27,10 @@ sub as_string {
     }
 
     my $hu = "";
-    if ($mgr->{HiddenUser}{userid}) {
+    if ($mgr->{HiddenUser}{userid}
+        &&
+        $mgr->{HiddenUser}{userid} ne $mgr->{User}{userid}
+       ) {
       $hu = sprintf qq{%s &lt;%s&gt;<br />},
                      $mgr->{HiddenUser}{userid},
                      $mgr->escapeHTML(
