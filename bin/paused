@@ -1,4 +1,4 @@
-#!/usr/bin/perl-5.8/bin/perl -- -*- mode: cperl -*-
+#!/usr/local/perl-5.8/bin/perl -- -*- mode: cperl -*-
 
 my $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 # $Date$
