@@ -5559,16 +5559,21 @@ sub share_perms {
 
   unless ($subaction) {
 
-    push @m, qq{<p>Permissions on PAUSE come in three flavors:</p><ul>
+    push @m, qq{<p>Permissions on PAUSE come in three flavors:</p>
+
+           <ul>
            <li>registered in <i>modulelist</i>,</li> <li>primary
            maintainer, mostly on a <i>first-come-first-serve</i>
            basis</li> <li>granted permissions as
-           <i>co-maintainer</i>.</li></ul><p>You can view your current
-           set of permissions on the <a
-           href="authenquery?ACTION=peek_perms">View Permissions</a>
-           page.</p>
+           <i>co-maintainer</i>.</li></ul>
 
-           <table border="1" cellspacing="2" cellpadding="3">
+           <p>You can <i>view</i> your current set of permissions on
+           the <a href="authenquery?ACTION=peek_perms">View
+           Permissions</a> page. To <i>change</i> permissions, please
+           select one of the following 6 groups, each of which leads
+           you to a different action:</p>
+
+           <table class="texttable" cellspacing="2" cellpadding="3">
 
            <tfoot><tr><td colspan="2"><sup>*</sup>Giving up
            maintainership means becoming a co-maintainer instead. Who
@@ -5586,13 +5591,13 @@ sub share_perms {
 
            <td colspan="2">2. primary maintainer:</td>
 
-           </tr> <tr><td><input type="submit"
+           </tr> <tr><td align="right"><input type="submit"
            name="pause99_share_perms_movepr" value="Select" /></td>
 
            <td>2.1 Pass primary maintainership status to somebody else
            (giving it up at the same time)<sup>*</sup></td>
 
-           </tr> <tr><td><input
+           </tr> <tr><td align="right"><input
            type="submit" name="pause99_share_perms_remopr"
            value="Select" /></td>
 
@@ -5604,13 +5609,13 @@ sub share_perms {
            modulelist owners and primary maintainers):</td>
 
            </tr>
-           <tr><td><input type="submit"
+           <tr><td align="right"><input type="submit"
            name="pause99_share_perms_makeco" value="Select" /></td>
 
            <td>3.1 Make somebody else co-maintainer </td>
 
            </tr>
-           <tr><td><input type="submit"
+           <tr><td align="right"><input type="submit"
            name="pause99_share_perms_remocos" value="Select" /></td>
 
            <td>3.2 Remove co-maintainer</td>
@@ -5621,7 +5626,7 @@ sub share_perms {
            <td colspan="2">4. You are co-maintainer</td>
 
            </tr>
-           <tr><td><input type="submit"
+           <tr><td align="right"><input type="submit"
            name="pause99_share_perms_remome" value="Select" /></td>
 
            <td>4.1 Give up co-maintainership status</td></tr>

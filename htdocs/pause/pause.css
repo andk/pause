@@ -45,3 +45,5 @@ a.menuitem:hover { text-decoration: underline; }
 h4.altering { margin: 0 0 12px; }
 p.motd { margin: 10px 1in; padding: 5px; color: black; background: yellow; font-size: small; }
 td.activemenu { border: green solid 1px; }
+
+.texttable { border: black solid 1px; }
