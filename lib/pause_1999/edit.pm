@@ -5,6 +5,7 @@ use pause_1999::main;
 use strict;
 use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
+use Text::Format;
 
 our $Valid_Userid = qr/^[A-Z]{4,9}$/;
 
@@ -1716,11 +1717,12 @@ sub wrap {
   my $self = shift;
   my $p = shift;
   my($wrapped);
-  require Text::Wrap;
-  eval { $wrapped = Text::Wrap::wrap("", "", $p) };
-  if ($@) {
-    $wrapped = $p;
-  }
+  #require Text::Wrap;
+  #eval { $wrapped = Text::Wrap::wrap("", "", $p) };
+  #if ($@) {
+  #  $wrapped = $p;
+  #}
+  $wrapped = Text::Format->new("firstIndent"=>0)->format($p);
   $wrapped;
 }
 
@@ -2464,7 +2466,6 @@ sub request_id {
     push @m, qq{ Sending mail to: @to};
     if ($rationale) {
       # wrap it
-      require Text::Format;
       $rationale =~ s/\r\n/\n/g;
       $rationale =~ s/\r/\n/g;
       my @rat = split /\n\n/, $rationale;
@@ -4273,7 +4274,6 @@ sub apply_mod {
     my $rationale = $req->param("pause99_apply_mod_rationale") || "";
     if ($rationale) {
       # wrap it
-      require Text::Format;
       $rationale =~ s/\r\n/\n/g;
       $rationale =~ s/\r/\n/g;
       my @rat = split /\n\n/, $rationale;
@@ -4284,14 +4284,12 @@ sub apply_mod {
     my $similar = $req->param("pause99_apply_mod_similar") || "";
     if ($similar) {
       # wrap it
-      require Text::Format;
       my $tf = Text::Format->new( bodyIndent => 4, firstIndent => 4);
       $similar = $tf->format($similar);
     }
     my $communities = $req->param("pause99_apply_mod_communities") || "";
     if ($communities) {
       # wrap it
-      require Text::Format;
       my $tf = Text::Format->new( bodyIndent => 4, firstIndent => 4);
       $communities = $tf->format($communities);
     }
