@@ -1437,7 +1437,7 @@ href="mailto:},
       }
 
       if (
-	  $filename =~ /(README|readme|\.html|\.txt|\.[xy]ml)(\.gz|\.bz2)?$/
+	  $filename =~ /(README|readme|\.html|\.txt|\.[xy]ml|\.rdf)(\.gz|\.bz2)?$/
           ||
           $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!
 	 ) {
