@@ -1512,7 +1512,7 @@ package in packages  package in primeur
     if ($has_primeur->rows == 0) {
       my($has_owner) = $dbh->prepare(qq{SELECT modid
                                         FROM mods
-                                        WHERE mod = ?});
+                                        WHERE modid = ?});
       $has_owner->execute($package);
       if ($has_owner->rows == 0) {
         # package has neither owner in mods nor maintainer in primeur
