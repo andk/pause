@@ -3926,6 +3926,7 @@ $blurbcopy
 sub apply_mod {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
+  $mgr->prefer_post(1);
   my(@m);
   my $req = $mgr->{CGI};
   $mgr->{CAN_GZIP} = 0; # for debugging
