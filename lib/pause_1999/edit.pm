@@ -1888,7 +1888,7 @@ The Pause
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
     my $header = {
 		  To => join(",",keys %umailset),
-		  Subject => "Scheduled for deletion"
+		  Subject => "Scheduled for deletion $u->{userid}"
 		 };
     $mgr->send_mail($header,$blurb);
   }
@@ -5267,7 +5267,7 @@ The Pause
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
     my $header = {
 		  To => join(",",keys %umailset),
-		  Subject => "Scheduled for reindexing"
+		  Subject => "Scheduled for reindexing $u->{userid}"
 		 };
     $mgr->send_mail($header,$blurb);
 
