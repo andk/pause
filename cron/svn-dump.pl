@@ -73,7 +73,7 @@ my @sorted = map { $_->[0] }
     sort { $a->[1] <=> $b->[1] }
     map { [ "$DIR/$_", -M "$DIR/$_" ] }
     @readdir;
-while (@readdir > 24) {
-  my $dele = pop @readdir;
+while (@sorted > 24) {
+  my $dele = pop @sorted;
   unlink $dele or die;
 }
