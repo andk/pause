@@ -68,8 +68,8 @@ $hspecial
   # MOTD
   #
 
-  my $downtime = $mgr->{DownTime};
-  my $willlast = $mgr->{WillLast};
+  my $downtime = $mgr->{DownTime}||0;
+  my $willlast = $mgr->{WillLast}||0;
   if (time < $downtime) {
     push @l, qq{<div align="center">};
     use HTTP::Date;
@@ -80,10 +80,18 @@ $hspecial
     my $willlast_dur = Time::Duration::duration($willlast);
 
     push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />On
-$httptime (that is in $expr) we'll have to close PAUSE for
-maintainance work (again). The estimated downtime is $willlast_dur.</p>};
+$httptime (that is in $expr) PAUSE will be closed for maintainance
+work. The estimated downtime is $willlast_dur.</p>}; #};
 
     push @l, qq{</div>};
+
+  } elsif (time < $downtime+$willlast) {
+    my $user =  $mgr->{User}{userid};
+
+    push @l, qq{<div align="center"> <p class="motd">Hi $user, I'm a
+bit surprised to see you here. Right now PAUSE is closed for
+maintainance. Please be careful not to disturb the database operation.
+Expect failures everywhere.</p> </div>};
 
   }
 

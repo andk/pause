@@ -27,7 +27,8 @@ sub handler {
   my($r) = shift;
   my $downtime = 1059034500;
   my $willlast = 7200;
-  if (time >= $downtime && time < $downtime + $willlast) {
+  my $user = $r->connection->user;
+  if (time >= $downtime && time < $downtime + $willlast && $user ne "ANDK") {
     $r->content_type("text/html");
     $r->send_http_header;
     use Time::Duration;
