@@ -5205,7 +5205,7 @@ The Pause
 
   warn sprintf "Debug: manifind found %d Files in %s", scalar(keys %files), Cwd::cwd();
   
-  require Data::Dumper; warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([%files],["files"])->Indent(1)->Useqq(1)->Dump; # XXX
+  require Data::Dumper; warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%files],["files"])->Indent(1)->Useqq(1)->Dump; # XXX
 
   foreach my $f (keys %files) {
     if (
