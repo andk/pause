@@ -997,10 +997,11 @@ Please contact modules\@perl.org if there are any open questions.
          *.pm files: $pmfiles
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
-    if ($self->{HAS_BLIB}) {
-      push @m, qq{The distribution contains a blib/ directory and is therefore not being indexed.\n\n};
+    if (0) {
     } elsif ($self->{HAS_MULTIPLE_ROOT}) {
       push @m, qq{The distribution does not unpack into a single directory and is therefore not being indexed.\n\n};
+    } elsif ($self->{HAS_BLIB}) {
+      push @m, qq{The distribution contains a blib/ directory and is therefore not being indexed.\n\n};
     } else {
       my $st = $self->{INDEX_STATUS};
       if ($st && ref $st && %$st) {
@@ -1057,7 +1058,7 @@ or documentation distribution?)\n\n};
   # package PAUSE::dist;
   sub check_blib {
     my($self) = @_;
-    if (grep m|\bblib/|, @{$self->{MANIFOUND}}){
+    if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}){
       $self->{HAS_BLIB}++;
     }
   }
@@ -1084,13 +1085,13 @@ or documentation distribution?)\n\n};
 
     my @pmfile = grep /\.pm$/i, @{$self->{MANIFOUND}};
     for my $pmfile (@pmfile) {
-      next if $pmfile =~ /\bt\b/;
+      next if $pmfile =~ m|^[^/]+/t/|;
       #warn "going to det. version for pmfile[$pmfile]";
       if ($binary_dist) {
 	next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
                                                 # package would be
                                                 # better
-      } elsif ($pmfile =~ m|\bblib/|) {
+      } elsif ($pmfile =~ m|/blib/|) {
 	$self->alert("Still a blib directory detected:
   dist[$dist]pmfile[$pmfile]
 ");
