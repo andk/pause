@@ -16,3 +16,11 @@ foo@bar.com is still your email adress according to PAUSE's database,
 there may be the need that you update your account info." Thank you.
 Step 1: write current_email_address() and put the email info in a
 permanent place on all pages.
+
+On a related front we must revisit all places where we determine the
+email addresses where we send a message to and where we allow one mail
+with multiple addresses and where we force multiple mails. I think in
+the context of reindex I now fixed the bug that we did allow one mail
+with multiple addresses, but we did send to both secret and public
+address. That's what we must fix everywhere.
+

@@ -5227,16 +5227,22 @@ The Pause
       require Data::Dumper;
       my $dd = Data::Dumper::Dumper({ u => $u, mgrUser => $mgr->{User} });
       warn "email debugging: dd[$dd]";
+
+      # By debugging this, I found out, that $u has a secret email but
+      # $mgr->{User} doesn't. At least at the time of rev. 208.
+
     }
     if ($u->{secretemail}) {
       $umailset{qq{"$name" <$u->{secretemail}>}} = 1;
     } elsif ($u->{email}) {
       $umailset{qq{"$name" <$u->{email}>}} = 1;
     }
-    if ($mgr->{User}{secretemail}) {
-      $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
-    }elsif ($mgr->{User}{email}) {
-      $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
+    if ($mgr->{User}{userid} ne $u->{userid}) {
+      if ($mgr->{User}{secretemail}) {
+        $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
+      }elsif ($mgr->{User}{email}) {
+        $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
+      }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
     my $header = {
