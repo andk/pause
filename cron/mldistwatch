@@ -30,7 +30,7 @@ $Data::Dumper::Indent = 1;
     package PAUSE::mldistwatch;
     ###### data initialization ######
     use File::Path qw(rmtree mkpath);
-    our $Id = q$Id:$;
+    our $Id = q$Id$;
     our $ISAPERL = qr{
                    /
                    (
@@ -1285,11 +1285,6 @@ Please contact modules\@perl.org if there are any open questions.
                                    Subject => "PAUSE indexer report $substrdistro",
                                   );
         $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-        if ($PAUSE::Config->{TESTHOST}) {
-            require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$msg,\@m],[qw(msg m)])->Indent(1)->Useqq(1)->Dump; # XXX
-            print "Press RET to send, ^C to cancel";
-            <>;
-        }
         my $fh  = $msg->open('sendmail');
         print $fh @m;
         $fh->close;
