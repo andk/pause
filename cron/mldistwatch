@@ -397,7 +397,7 @@ sub do_rewrite01 {
     my(%seen,%listit);
 
     print "Examining package table, sizes, symlinks. Preparing \@listing01\n";
-    my(%usercache,%userdircache);
+    my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
         my %pkg = (package => $pkg, dist => $pkgdist);
         $pkg{'package'} =~ s/:.*//;
@@ -417,6 +417,8 @@ sub do_rewrite01 {
                 next;
             }
         }
+
+        $i++;
         @pkg{qw/size mtime/} =
             (stat "$PAUSE::Config->{MLROOT}/$pkg{dist}")[7,9];
         $count++ unless $count{$pkg{dist}}++;
@@ -482,7 +484,9 @@ sub do_rewrite01 {
             $pkg{chapter} = "99_Not_In_Modulelist";
             warn "found no chapter for $pkg{'package'}";
         }
-        print ".";
+        if (-t STDOUT) {
+            print "." unless $i % 16;
+        }
         my $bymod = "$PAUSE::Config->{MLROOT}/../../modules/by-module/$pkg{'package'}/$pkg{filenameonly}";
         my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/by-category/$pkg{chapter}/$pkg{'package'}/$pkg{filenameonly}";
         next if -e $bymod and -e $bycat;
