@@ -11,14 +11,6 @@ $Id = q$Id: rm_stale_links 385 2003-07-25 19:50:38Z k $;
 use File::Find;
 chdir "$PAUSE::Config->{MLROOT}../..";
 
-$SIG{__WARN__} = sub {
-  my $err = shift;
-  require Cwd;
-  my $cwd = Cwd::cwd();
-  require Carp;
-  Carp::cluck(sprintf "%s (cwd[%s])", $err, $cwd);
-};
-
 find(
      {
       bydepth => 1,
