@@ -101,8 +101,8 @@ sub parameter {
 
   } elsif ($param = $req->param("ABRA")) {
 
-    #TUT: if they sent ABRA, the only thing we let them do is change
-    #their password. The parameter consists of username-dot-token.
+    # TUT: if they sent ABRA, the only thing we let them do is change
+    # their password. The parameter consists of username-dot-token.
     my($user, $passwd) = $param =~ m|(.*?)\.(.*)|; #
 
     # We allow changing of the password with this password. We leave
@@ -118,17 +118,20 @@ sub parameter {
               WHERE user=? AND chpasswd=?};
     my $sth = $dbh->prepare($sql);
     if ( $sth->execute($user,$passwd) and $sth->rows ) {
-      #TUT: in the keys of %allow_action we store the methods that are
-      #allowed in this request. @allow_submit does something similar.
+      # TUT: in the keys of %allow_action we store the methods that are
+      # allowed in this request. @allow_submit does something similar.
       $allow_action{"change_passwd"} = undef;
       push @allow_submit, "change_passwd";
-      #TUT: by setting $mgr->{User}{userid}, we can let change_passwd
-      #know who we are dealing with
+
+      # TUT: by setting $mgr->{User}{userid}, we can let change_passwd
+      # know who we are dealing with
       $mgr->{User}{userid} = $user;
-      #TUT: Let's prepend they requested change_passwd. I guess, if we
-      #would drop that line, it would still work, but I like redundant
-      #coding in such cases
+
+      # TUT: Let's pretend they requested change_passwd. I guess, if we
+      # would drop that line, it would still work, but I like redundant
+      # coding in such cases
       $param = $req->param("ACTION","change_passwd"); # override
+
     } else {
       die  Apache::HeavyCGI::Exception->new(ERROR => "You tried to authenticate the
 parameter ABRA=$param, but the database doesn't know about this token.");
@@ -2583,17 +2586,19 @@ sub mailpw {
   my pause_1999::main $mgr = shift;
   my(@m,$param,$email);
   my $req = $mgr->{CGI};
-  #TUT: We reach this point in the code only if the Querystring
-  #specified ACTION=mailpw or something equivalent. The parameter ABRA
-  #is used to denote the token that we might have sent them.
+
+  # TUT: We reach this point in the code only if the Querystring
+  # specified ACTION=mailpw or something equivalent. The parameter ABRA
+  # is used to denote the token that we might have sent them.
   my $abra = $req->param("ABRA") || "";
   push @m, qq{<input type="hidden" name="ABRA" value="$abra" />};
-  #TUT: The parameter pause99_mailpw_1 denotes the userid of the user
-  #for whom a password change was requested. Note that anybody has
-  #access to that parameter, we do not authentify its origin. Of
-  #course not, because that guy says he has lost the password:-) If
-  #this parameter is there, we are asked to send a token. Otherwise
-  #they only want to see the password-requesting form.
+
+  # TUT: The parameter pause99_mailpw_1 denotes the userid of the user
+  # for whom a password change was requested. Note that anybody has
+  # access to that parameter, we do not authentify its origin. Of
+  # course not, because that guy says he has lost the password:-) If
+  # this parameter is there, we are asked to send a token. Otherwise
+  # they only want to see the password-requesting form.
   $param = $req->param("pause99_mailpw_1");
   if ( $param ) {
     $param = uc($param);
@@ -2602,8 +2607,9 @@ sub mailpw {
                                          qq{A userid of <i>$param</i>
  is not allowed, please retry with a valid userid. Nothing done.});
     }
-    #TUT: The object $mgr is our know-/be-/can-everything object. Here
-    #it connects us to the authenticating database
+
+    # TUT: The object $mgr is our know-/be-/can-everything object. Here
+    # it connects us to the authenticating database
     my $authen_dbh = $mgr->authen_connect;
     my $sql = qq{SELECT *
                  FROM usertable
@@ -2617,8 +2623,9 @@ sub mailpw {
     }
     my $rec = {};
     $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
-    #TUT: all users may have a secret and a public email. We pick what
-    #we have.
+
+    # TUT: all users may have a secret and a public email. We pick what
+    # we have.
     unless ($email = $rec->{secretemail}) {
       my $mod_dbh = $mgr->connect;
       $sql = qq{SELECT *
@@ -2631,8 +2638,9 @@ sub mailpw {
       $email = $rec->{email};
     }
     if ($email) {
-      #TUT: Before we insert a record from that table, we remove old
-      #entries so the primary key of an old record doesn't block us now.
+
+      # TUT: Before we insert a record from that table, we remove old
+      # entries so the primary key of an old record doesn't block us now.
       $sql = sprintf qq{DELETE FROM abrakadabra
                         WHERE NOW() > expires};
       $authen_dbh->do($sql);
@@ -2658,8 +2666,8 @@ sub mailpw {
 	die Apache::HeavyCGI::Exception->new(ERROR => $authen_dbh->errstr);
       }
 
-      #TUT: a bit complicated only because we switched back and forth
-      #between Apache::URI and URI::URL
+      # TUT: a bit complicated only because we switched back and forth
+      # between Apache::URI and URI::URL
       my $myurl = $mgr->myurl;
       my $me;
       if ($myurl->can("unparse")) {
@@ -2721,7 +2729,7 @@ The Pause
     return @m;
   }
 
-  #TUT: First time here, send them the password requesting form
+  # TUT: First time here, send them the password requesting form
   push @m, qq{
 
 <p>This form lets you request a ticket that enables you to set a new
@@ -2740,7 +2748,7 @@ will be mailed to that userid.</p>
 
 sub edit_ml {
   my pause_1999::edit $self = shift;
-  #TUT: The object $mgr is our know-/be-/can-everything object.
+
   my pause_1999::main $mgr = shift;
   my(@m);
   push @m, q{
