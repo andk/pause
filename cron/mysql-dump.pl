@@ -31,7 +31,7 @@ for my $struct (@$Struct) {
   my $user = $PAUSE::Config->{$struct->{cfg_user}};
   my $password = $PAUSE::Config->{$struct->{cfg_pw}};
   for my $var ($db,$user,$password) {
-    die "illegal variable value[$var]" if $var =~ /['";]/;
+    die "$Id: illegal variable value[$var]" if $var =~ /['";]/;
   }
   system "/usr/local/bin/mysqldump --lock-tables --add-drop-table --user='$user' --password='$password' '$db' > $backup_dir/.${db}dump.current";
   rename "$backup_dir/.${db}dump.current", "$backup_dir/${db}dump.current";
