@@ -1366,10 +1366,18 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
 
 =comment
 
-Let's pretend, we need no primeur table, and packages is the right
-table to have a primary maintainer registered automatically. Current
-logic goes more or less like this (leaving out the case of a perl
-dist):
+Now we have a table primeur and we have a new terminology:
+
+people in table "perms" are co-maintainers or maintainers
+
+people in table "primeur" are maintainers
+
+packages in table "packages" live there independently from permission
+tables.
+
+packages in table "mods" have an official owner. That one overrules
+both tables "primeur" and "perms".
+
 
 P1.0 If there is a registered maintainer in mods, put him into perms
      unconditionally.
@@ -1389,15 +1397,7 @@ P4.0 Work out how packages table needs to be updated.
 
  P4.2 We don't know it: simple INSERT
 
-I believe that if we introduce a field primeur, the only change would
-be in (P4.2): Never ever again would we touch the field within THIS
-process, right? Hmmm, when we delete goners in
-PAUSE::dist::delete_goner, then we could lose the primeur which is
-catastrophic. So is this a reason to introduce a primeur table? Yes.
 
-So again, we only insert into primeur once and never again.
-
-But now it's more complicated:
 
 package in packages  package in primeur
          1                   1               easy         nothing add'l to do
@@ -1465,11 +1465,9 @@ package in packages  package in primeur
     }
   }
 
-  # is_primeur_has_perms is an ugly name. It seems to me this stems
-  # from the fact that we're both guessing and setting. Don't know if
-  # we could separate that
+  # perm_check: we're both guessing and setting.
 
-  # P1.0: returns 1 if user is owner; makes him co-maintainer at the
+  # P2.1: returns 1 if user is owner; makes him co-maintainer at the
   # same time
 
   # P2.0: otherwise returns false if the package is already known in
@@ -1479,7 +1477,7 @@ package in packages  package in primeur
   # him co-maintainer AND returns 1
 
   # package PAUSE::package;
-  sub is_primeur_has_perms {
+  sub perm_check {
     my $self = shift;
     my $dist = $self->{DIST};
     my $package = $self->{PACKAGE};
@@ -1488,23 +1486,23 @@ package in packages  package in primeur
 
     my($userid) = $self->{USERID};
 
-    my $insquery = "INSERT INTO perms (package, userid) VALUES ('$package', '$userid')";
+    my $ins_perms = "INSERT INTO perms (package, userid) VALUES ('$package', '$userid')";
 
-    my($sth_primeur) = $dbh->prepare(qq{SELECT package, userid
+    my($is_primeur) = $dbh->prepare(qq{SELECT package, userid
                                          FROM   primeur
  					 WHERE  package = ? AND userid = ?}
 				     );
-    $sth_primeur->execute($package,$userid);
-    if ($sth_primeur->rows) {
+    $is_primeur->execute($package,$userid);
+    if ($is_primeur->rows) {
 
       local($dbh->{RaiseError}) = 0;
-      my $ret = $dbh->do($insquery);
+      my $ret = $dbh->do($ins_perms);
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      # print "(primeur)insquery[$insquery]ret[$ret]err[$err]\n";
+      # print "(primeur)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
 
-      return 1;
+      return 1; # P2.1, P3.0
     }
 
     my($sth_perms) = $dbh->prepare(qq{SELECT package, userid
@@ -1544,11 +1542,11 @@ package in packages  package in primeur
       # package has no existence in perms yet, so this guy is OK
 
       local($dbh->{RaiseError}) = 0;
-      my $ret = $dbh->do($insquery);
+      my $ret = $dbh->do($ins_perms);
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      print "(uploader)insquery[$insquery]ret[$ret]err[$err]\n";
+      print "(uploader)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
 
     }
     printf( # just for debugging
@@ -1582,7 +1580,7 @@ package in packages  package in primeur
 
     # Query all users with perms for this package
 
-    return unless $self->is_primeur_has_perms; # (P2.0&P3.0)
+    return unless $self->perm_check; # (P2.0&P3.0)
 
     # Sanity checks
 
