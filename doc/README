@@ -22,9 +22,6 @@ the revision number of the repository.
 The following files have been excluded from the repository for obvious
 reasons:
 
-    apache-conf/156e8318.0
-    apache-conf/18065281.0
-    apache-conf/67ff2224.0
     apache-conf/pause.pem
     apache-conf/pause.pem3
     apache-conf/pause.pkey
