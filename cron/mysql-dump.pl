@@ -2,22 +2,13 @@
 
 use strict;
 
-my $DIR = "/home/ftp/pub/PAUSE/PAUSE-data";
+use lib "/home/k/PAUSE/lib";
+use PAUSE ();
+my $DIR = "$PAUSE::Config->{FTPPUB}/PAUSE-data";
 my @m=gmtime;
 $m[5]+=1900;
 $m[4]++;
 my $D = sprintf "%04d%02d%02d%02d%02dGMT",@m[5,4,3,2,1];
-
-use lib "/home/k/PAUSE/lib";
-use PAUSE ();
-# unless ($Dbh = DBI->connect(
-#                             $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-#                             $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-#                             $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-#                             { RaiseError => 1 }
-#                            )) {
-#   die "Connect to database not possible: $DBI::errstr\n";
-# }
 
 my($dbi,$dbengine,$db) = split /:/, $PAUSE::Config->{MOD_DATA_SOURCE_NAME};
 die "Script would not work for $dbengine" unless $dbengine =~ /mysql/i;

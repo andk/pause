@@ -16,6 +16,7 @@ use File::Copy qw(copy);
 
 
 my $DIR = "$PAUSE::Config->{FTPPUB}/PAUSE-data";
+warn "DIR[$DIR]";
 unless (-d $DIR) {
   require File::Path;
   File::Path::mkpath $DIR;
