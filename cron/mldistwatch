@@ -1990,6 +1990,14 @@ has a higher version number ($oldversion)},
                                    "falling mtime
 filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]\n");
 
+                    $self->index_status(
+                                        $package,
+                                        $pp->{version},
+                                        $pp->{infile},
+                                        3,
+                                        qq{Not indexed because $ofile in $odist
+has a more recent modification time.},
+                                       );
                     # no version and strange timestamps.
 
                 }
