@@ -25,16 +25,19 @@ pause_1999::usermenu
 
 sub handler {
   my($r) = shift;
-  if (time >= 1057651200 && time < 1057658400) {
+  my $downtime = 1058428800;
+  my $willlast = 7200;
+  if (time >= $downtime && time < $downtime + $willlast) {
     $r->content_type("text/html");
     $r->send_http_header;
     use Time::Duration;
-    my $delta = 1057658400 - time;
+    my $delta = $downtime + $willlast - time;
     my $expr = Time::Duration::duration($delta);
+    my $willlast_dur = Time::Duration::duration($willlast);
 
     $r->print(qq{<html> <head><title>PAUSE CLOSED</title></head><body>
 <h1>Closed for Maintainance</h1> <p>PAUSE is closed for maintainance for
-about two hours. Estimated time of opening is in $expr.</p><p>Sorry for the
+about $willlast_dur. Estimated time of opening is in $expr.</p><p>Sorry for the
 inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </html>});
 
     return Apache::Constants::OK;

@@ -97,6 +97,26 @@ $hspecial
   # MOTD
   #
 
+  my $downtime = 1058428800;
+  my $willlast = 7200;
+  if (time < $downtime) {
+    push @l, qq{<div align="center">};
+    use HTTP::Date;
+    my $httptime = HTTP::Date::time2str($downtime);
+    use Time::Duration;
+    my $delta = $downtime - time;
+    my $expr = Time::Duration::duration($delta);
+    my $willlast_dur = Time::Duration::duration($willlast);
+
+    push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />On
+$httptime (that is in $expr) we'll have to close PAUSE for
+maintainance work (again). The estimated downtime is $willlast_dur. Thank
+you for your patience and sorry for the inconvenience.</p>};
+
+    push @l, qq{</div>};
+
+  }
+
   if (time < 1058515976) {
     push @l, qq{<div align="center">};
 
@@ -105,22 +125,6 @@ $hspecial
     your browser was asking you to confirm the new certificate. The
     fingerprint of this certificate is <code>MD5 Fingerprint=83:E9:A6:4C:EC:CC:60:A8:A1:6C:5F:30:11:53:41:06</code>
     and it expires on 2009-01-07.</p>};
-
-    push @l, qq{</div>};
-
-  }
-
-  my $downtime = 1057651200;
-  if (time < $downtime) {
-    push @l, qq{<div align="center">};
-    use Time::Duration;
-    my $delta = $downtime - time;
-    my $expr = Time::Duration::duration($delta);
-
-    push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />On
-2003-07-08 at 8 GMT (that is in $expr) we'll have to close PAUSE for
-maintainance work (again). The estimated downtime is 2 hours. Thank
-you for your patience and sorry for the inconvenience.</p>};
 
     push @l, qq{</div>};
 
