@@ -102,7 +102,6 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Manifest;
 use File::Basename ();
 use File::Copy ();
-use File::Path qw(rmtree mkpath);
 use HTTP::Date ();
 use IO::File ();
 use Mail::Send ();
@@ -112,6 +111,8 @@ use Net::Domain ();
 use CPAN;
 
 package PAUSE::mldistwatch;
+
+use File::Path qw(rmtree mkpath);
 
 use vars qw($Id $ISAPERL
 	    %ALLfound %ALLlasttime %ALL
@@ -951,12 +952,12 @@ sub as_ds {
   $PAUSE::mldistwatch::Id\n\n";
     my $author = PAUSE::dir2user($distro);
     my $time = gmtime;
-    my $mtime = gmtime((stat $distro)[9]) . " UTC";
+    my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]) . " UTC";
     my $nfiles = scalar @{$self->{MANIFOUND}};
     print $fh qq{
       CPAN author: $author
 Distribution file: $distro
-   Number of file: $nfiles
+  Number of files: $nfiles
 Timestamp of file: $mtime UTC
  Time of this run: $time UTC\n\n};
     if ($self->{HAS_BLIB}) {
