@@ -26,7 +26,8 @@ for my $dirent (readdir DIR) {
   next if -M $absdirent < 1/24;
   $sth->execute($dirent);
   next if $sth->rows > 0;
+  my $size = -s $absdirent;
   unlink $absdirent or die "Could not unlink $absdirent: $!";
-  warn "unlinked $absdirent\n";
+  warn "unlinked $absdirent ($size)\n";
 }
 closedir DIR;
