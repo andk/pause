@@ -5566,29 +5566,37 @@ sub share_perms {
            <i>co-maintainer</i>.</li></ul><p>You can view your current
            set of permissions on the <a
            href="authenquery?ACTION=peek_perms">View Permissions</a>
-           page.</p><table border="1" cellspacing="2"
-           cellpadding="3"><tr>
+           page.</p>
+
+           <table border="1" cellspacing="2" cellpadding="3">
+
+           <tfoot><tr><td colspan="2"><sup>*</sup>Giving up
+           maintainership means becoming a co-maintainer instead. Who
+           does not want to keep co-maint status, needs to give it up
+           in a second step (see 4.1).</td></tr></tfoot>
+
+           <tbody><tr>
 
            <td colspan="2">1. registered in modulelist</td>
 
            </tr> <tr><td>&nbsp;</td> <td>To enter a new
            owner or a new module status, please visit the <a
            href="authenquery?ACTION=edit_mod">Edit Module Metadata</a>
-           page.</td></tr> <tr>
+           page.<sup>*</sup></td></tr> <tr>
 
            <td colspan="2">2. primary maintainer:</td>
 
            </tr> <tr><td><input type="submit"
            name="pause99_share_perms_movepr" value="Select" /></td>
 
-           <td>2.1 Pass maintainership status to somebody else (giving
-           it up at the same time)</td>
+           <td>2.1 Pass primary maintainership status to somebody else
+           (giving it up at the same time)<sup>*</sup></td>
 
            </tr> <tr><td><input
            type="submit" name="pause99_share_perms_remopr"
            value="Select" /></td>
 
-           <td>2.2 Give up primary maintainership status (without transfering it)</td>
+           <td>2.2 Give up primary maintainership status (without transfering it)<sup>*</sup></td>
 
            </tr> <tr>
 
@@ -5617,6 +5625,7 @@ sub share_perms {
            name="pause99_share_perms_remome" value="Select" /></td>
 
            <td>4.1 Give up co-maintainership status</td></tr>
+           </tbody>
            </table>};
 
     return @m;
