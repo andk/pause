@@ -6072,9 +6072,15 @@ sub post_message {
       }
       push @m, qq{<p>Please retry.</p>};
     } else {
-      my $sth = $dbh->prepare("INSERT INTO messages VALUES (NULL,?,?,NOW(),?)");
+      # we don't sweat over the time zone, mysql does it in the zone
+      # of the server and turning it into UTC seems not worth the
+      # effort right now (2003-03-04)
+      my $sth = $dbh->prepare("INSERT INTO messages
+                                      (mfrom,mto,created,message)
+                               VALUES (?    ,?  ,NOW()  ,?      )");
       $sth->execute($mgr->{User}{userid},$mto,$mess);
-      push @m, sprintf qq{Message to <a href="?ACTION=edit_cred&amp;HIDDENNAME=%s">%s</a> posted.},
+      push @m, sprintf qq{Message to
+ <a href="?ACTION=edit_cred&amp;HIDDENNAME=%s">%s</a> posted.},
           ($mgr->escapeHTML($mto))x2;
       for my $f (qw(mto mess)) {
         $req->param("pause99_post_message_$f","");
