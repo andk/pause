@@ -14,4 +14,3 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 27 * * * *            sync-04pause.sh
 28 */4 * * *          update-checksums.pl
 32 3,15 * * *         rsync --exclude CHECKSUMS -vrptgx /home/ftp/pub/PAUSE/authors/id/ /home/ftp/pub/backpan/authors/id/
-
