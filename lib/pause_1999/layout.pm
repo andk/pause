@@ -73,7 +73,7 @@ a.activemenu:hover { text-decoration: underline; }
 .xexplain { font-size: x-small; }
 .firstheader { margin: 0 0 5%; }
 p.motd { margin: 12px 1in; padding: 6px; color: black; background: yellow; font-size: small; }
-.messages { text-align: left; border: 2px dashed red; }
+.messages { text-align: left; border: 2px dashed red; padding: 2ex; }
 $h2special
 </style>
 </head><body bgcolor="white" link="#0000CC" vlink="#0000BB"

@@ -17,10 +17,10 @@ sub as_string {
   $sth->execute($user);
   if ($sth->rows > 0) {
     push @m, qq{<div class="messages">};
-    push @m, qq{<p>Messages to user $user:</p>};
+    push @m, qq{<p>The following personal messages to user $user are stored:</p>};
     push @m, qq{<dl>};
     while (my $rec = $sth->fetchrow_hashref) {
-      push @m, qq{<dt>$rec->{created} from $rec->{mfrom}</dt>};
+      push @m, qq{<dt>$rec->{created} from $rec->{mfrom}\@cpan.org</dt>};
       push @m, qq{<dd>$rec->{message}</dd>};
     }
     push @m, qq{</dl>};
