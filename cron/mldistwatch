@@ -1003,7 +1003,11 @@ Timestamp of file: $mtime UTC
       if ($st && ref $st && %$st) {
 	print $fh qq{The following packages have been found in the distro:\n\n};
 
-        for my $p (sort { $st->{$a}{status} <=> $st->{$b}{status} } keys %$st) {
+        for my $p (sort {
+          $st->{$a}{status} <=> $st->{$b}{status}
+              or
+                  $a cmp $b
+                } keys %$st) {
           my $tf = Text::Format->new( bodyIndent => 11, firstIndent => 11);
           my $verb_status = $tf->format($st->{$p}{verb_status});
 	  $verb_status =~ s/^\s+//; # otherwise this line is too long
