@@ -344,6 +344,8 @@ sub rewrite02 {
     my $sth = $dbh->prepare(qq{SELECT package, version, dist, file
                                FROM packages
                                WHERE status='index'});
+    # the status='noindex' is there so we can manually disable
+    # indexing of packages if need be (2004-05-04 we had such a case)
     $sth->execute;
     my(@row,@listing02);
     my $numrows = $sth->rows;

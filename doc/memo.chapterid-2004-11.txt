@@ -1,3 +1,18 @@
+2005-03-21  Andreas Koenig  <andk@cpan.org>
+
+	* The "first round" of changes was done last Monday (2005-03-14)
+	and the exact commands were:
+
+	alter table chapters modify chapternr int(10) unsigned not null default '0';
+	update chapters set shorttitle=substring(shorttitle,4);
+	update chapters set chapterid=substring(chapterid,4) where chapterid like '_)%';
+	update chapters set chapterid=substring(chapterid,5) where chapterid like '__)%';
+	delete from chapters where chapternr=99;
+	alter table mods modify chapterid int(10) unsigned not null default '0';
+	alter table applymod modify chapterid int(10) unsigned not null default '0';
+
+	After one week of monitoring PAUSE I'm confident nothing broke.
+
 2004-11-01  Andreas Koenig  <andk@cpan.org>
 
 	* About to check in rev 519 which should contain code that is able

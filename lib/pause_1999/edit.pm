@@ -14,7 +14,7 @@ use utf8; # must be after the qr// for perl-5.6.1
 
 our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
-our $strict_chapterid = 0;
+our $strict_chapterid = 1;
 
 sub parameter {
   my pause_1999::edit $self = shift;
