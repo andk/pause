@@ -28,12 +28,13 @@ However, Netscape 4 had the convenient behaviour that if the server
 sent a status code of 401 (HTTP_UNAUTHORIZED), it presented the user
 with a new login dialog. This dialog could be used to login with a
 different name and different password. If the different name and
-password were bogus, this method allowed you to effectively "log out",
-in the sense that a new authentication was required to talk to PAUSE.
-If you want to get such a <i>401</i> status code once, please <a
-class="menuitem" href="authenquery?please_renegotiate_username">click
-here</a>. Internet Explorer and Mozilla do not behave like this, at
-least not on the versions I have tried. You will just get a <i>401</i>
+password were bogus, this method allowed you to effectively <i>log
+out</i>, in the sense that a new authentication was required to talk
+to PAUSE. If you want to get such a <i>401</i> status code once,
+please <a class="menuitem"
+href="authenquery?please_renegotiate_username">click here</a>.
+Internet Explorer and Mozilla do not behave like Netscape 4, at least
+not on the versions I have tried. They will just show a <i>401</i>
 page ("Authorization required" or some such) and no new
 authentification dialog box. As a consequence you can still visit
 PAUSE after that without having to type in username and password, so
