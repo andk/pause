@@ -1,0 +1,36 @@
+#! /bin/sh
+#
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+DAEMON=/home/k/PAUSE/bin/paused
+PIDFILE=/var/run/paused.pid
+
+ARGS="--pidfile=$PIDFILE"
+
+test -x $DAEMON || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting paused"
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $ARGS &
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping paused"
+    kill -TERM `cat $PIDFILE`
+    rm $PIDFILE
+    echo "."
+    ;;
+  reload)
+    if [ -f $PIDFILE ] ; then kill -HUP `cat $PIDFILE` ; fi
+    ;;
+  force-reload|restart)
+    sh $0 stop
+    sh $0 start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|force-reload|reload}"
+    exit 1
+    ;;
+esac
+
+exit 0

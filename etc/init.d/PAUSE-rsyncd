@@ -1,0 +1,35 @@
+#! /bin/sh
+#
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+DAEMON=/usr/bin/rsync
+PIDFILE=/var/run/rsync.pid
+
+ARGS="--daemon"
+
+test -x $DAEMON || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting rsync"
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $ARGS
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping rsync"
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
+    echo "."
+    ;;
+  reload)
+    echo "Not implemented."
+    ;;
+  force-reload|restart)
+    sh $0 stop
+    sh $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/rsync {start|stop|restart|force-reload|reload}"
+    exit 1
+    ;;
+esac
+
+exit 0
