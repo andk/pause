@@ -480,7 +480,7 @@ sub getit {
       if ($stat = $?) {
 	if ($ret =~ /decompression OK, trailing garbage ignored/) {
 	  rename $tpath, "$tpath.crcgarbage";
-	  my $system = "$zcat $tpath.crcgarbage | $gzip -9c > $tpath";
+	  my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
 	  system($system);
 	  $ret = `$zcat -t $tpath 2>&1`;
 	  $stat = $?;
