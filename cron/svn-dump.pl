@@ -25,7 +25,7 @@ chdir $tdir or die "Could not chdir to $tdir: $!";
 
 my($repopath) = $PAUSE::Config->{SVNPATH};
 
-$system = "$PAUSE::Config->{SVNBIN}/svn co file://$repopath pause-wc |";
+my $system = "$PAUSE::Config->{SVNBIN}/svn co file://$repopath pause-wc |";
 my $revision;
 open my $job, $system or die;
 while (<$job>) {
