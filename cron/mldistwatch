@@ -249,7 +249,7 @@ sub checkfornew {
         }
         $dh->close;
     }
-        if ($alert) {
+        if ($alert && ! $PAUSE::Config->{TESTHOST}) {
             print $alert;       # summary
             my($msg) = Mail::Send->new(
                                        To => $PAUSE::Config->{ADMIN},
@@ -1431,6 +1431,7 @@ Please contact modules\@perl.org if there are any open questions.
         return if $self->{CHOWN_UNSAFE_DONE};
         use File::Find;
         my(undef,undef,$uid,$gid) = getpwnam("UNSAFE");
+        die "user UNSAFE not found, cannot continue" unless defined $uid;
         find(sub {
                  chown $uid, $gid, $_;
              },
