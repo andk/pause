@@ -15,7 +15,7 @@ package=defaults
 # from jost krieger:
 	get_size_change=yes
 	group=0
-	hostname=pause.kbx.de
+	hostname=pause.perl.org
 	local_dir=/home/ftp/pub/PAUSE/
 	local_ignore=.*(readme|CHECKSUMS)$
 	mail_prog=/home/k/PAUSE/bin/mirrormail.pl
@@ -23,6 +23,7 @@ package=defaults
 	max_days=60
 	max_delete_files=50%
 	max_delete_dirs=50%
-	remote_password=andreas.koenig@pause.kbx.de
+        name_mappings=s:\.\./:__/:g
+	remote_password=k@pause.perl.org
 	update_log=
 	user=0

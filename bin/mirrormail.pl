@@ -60,8 +60,7 @@ for my $line (split /\n/, $stdin) {
 		    my($hash) = $sth->fetchrow_hashref;
 		    push @recipients, qq{"$hash->{fullname}" <$hash->{email}>};
 		} else {
-		    $report .= "\nWarning: No records found for query
-    $query\n";
+		    $report .= "\nWarning: No records found for query [$query] and placeholder-userid[$userid]";
 		}
 		$sth->finish;
 		$db->disconnect;
