@@ -2329,7 +2329,18 @@ sub request_id {
     unless( $email ) {
       push @errors, "You must supply an email address\n";
     }
-    unless( $userid ) {
+    if ( $userid ) {
+      $userid = uc $userid;
+      $req->param('pause99_request_id_userid', $userid);
+      my $db = $mgr->connect;
+      my $sth = $db->prepare("SELECT userid FROM users WHERE userid=?");
+      $sth->execute($userid);
+      if ($sth->rows > 0) {
+        my $euserid = $mgr->escapeHTML($userid);
+        push @errors, "The userid $euserid is already taken.";
+      }
+      $sth->finish;
+    } else {
       push @errors, "You must supply a desired user name\n";
     }
 
