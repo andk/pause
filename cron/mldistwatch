@@ -7,7 +7,9 @@ Open Bugs:
 If a package has no primeur but a co-maintainer X, the uploading user
 Y will be blocked: he will not become primeur, not become co-maint,
 not be indexed. This is a bug, because user X "gave up primary
-maintainership".
+maintainership". Concrete case 2003-01-17: JWIED still is co-maint for
+SQL::Statement, but that has no primary maintainer. Primary should be
+JZUCKER.
 
 
 History:
@@ -18,9 +20,6 @@ the distributions and checksummed them. It sent alerts. It had to
 guess a lot because it was never allowed to run Makefile.PL because of
 security risks. It fed lots of guessed and observed informations to
 the database.
-
-With all these tasks it grew to 1300 lines of code in only 16
-functions. It made me very nervous. Shame.
 
 If you try to change all this, remember: as it has to run as a
 cronjob, we must never die.
@@ -78,54 +77,8 @@ Fealing better.
 Removing support for the packages.file_md5 field in PAUSE::pmfile. One
 day we must remove the field from the table too. (DONE 2002-08-01)
 
-Let's pretend, we need no primeur table, and packages is the right
-table to have a primary maintainer registered automatically. Current
-logic goes more or less like this (leaving out the case of a perl
-dist):
-
-1. If there is a registered maintainer in mods, put him into perms
-   unconditionally.
-
-2. If perms knows about this package but current user is not in perms
-   for this package, return.
-
-   2a but if user is primeur, go on
-
-3. Give this user an entry in perms now, no matter how many there are.
-
-4. Work out how packages table needs to be updated.
-
-   4a We know this package: complicated UPDATE
-
-   4b We don't know it: simple INSERT
-
-I believe that if we introduce a field primeur, the only change would
-be in (4b): Never ever again would we touch the field within THIS
-process, right? Hmmm, when we delete goners in
-PAUSE::dist::delete_goner, then we could lose the primeur which is
-catastrophic. So is this a reason to introduce a primeur table? Yes.
-
-So again, we only insert into primeur once and never again.
-
-But now it's more complicated:
-
-package in packages  package in primeur
-         1                   1               easy         nothing add'l to do
-         0                   0               easy         4b
-         1                   0               error        4a
-         0                   1           complicated(*)   4b
-
-(*) This happens when a package is removed from CPAN completely. 
-
 BTW, the combination of print, report, alert and warn is a complete
 mess.
-
-Thanks to the above discussion I could break up
-PAUSE::package::examine_pkg into 3 further routines. Now all the
-complicated stuff is in checkin() which only has 200 lines now.
-
-Ha, and now this again is split into three, the most complicated being
-update_package with 170 lines. Relief.
 
 =cut
 
@@ -1410,6 +1363,54 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
 
 }
 
+
+=comment
+
+Let's pretend, we need no primeur table, and packages is the right
+table to have a primary maintainer registered automatically. Current
+logic goes more or less like this (leaving out the case of a perl
+dist):
+
+P1.0 If there is a registered maintainer in mods, put him into perms
+     unconditionally.
+
+P2.0 If perms knows about this package but current user is not in
+     perms for this package, return.
+
+ P2.1 but if user is primeur, go on
+
+ P2.2 but if there is no primeur, make this user primeur
+
+P3.0 Give this user an entry in perms now, no matter how many there are.
+
+P4.0 Work out how packages table needs to be updated.
+
+ P4.1 We know this package: complicated UPDATE
+
+ P4.2 We don't know it: simple INSERT
+
+I believe that if we introduce a field primeur, the only change would
+be in (P4.2): Never ever again would we touch the field within THIS
+process, right? Hmmm, when we delete goners in
+PAUSE::dist::delete_goner, then we could lose the primeur which is
+catastrophic. So is this a reason to introduce a primeur table? Yes.
+
+So again, we only insert into primeur once and never again.
+
+But now it's more complicated:
+
+package in packages  package in primeur
+         1                   1               easy         nothing add'l to do
+         0                   0               easy         4.2
+         1                   0               error        4.1
+         0                   1           complicated(*)   4.2
+
+(*) This happens when a package is removed from CPAN completely.
+
+
+=cut
+
+
 {
   package PAUSE::package;
   use vars qw($AUTOLOAD);
@@ -1464,15 +1465,20 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
     }
   }
 
-  # package PAUSE::package;
-  # returns 1 if user is owner; makes him co-maintainer at the same time
+  # is_primeur_has_perms is an ugly name. It seems to me this stems
+  # from the fact that we're both guessing and setting. Don't know if
+  # we could separate that
 
-  # otherwise returns false if the package is already known in perms
-  # table AND the user is not among the co-maintainers
+  # P1.0: returns 1 if user is owner; makes him co-maintainer at the
+  # same time
+
+  # P2.0: otherwise returns false if the package is already known in
+  # perms table AND the user is not among the co-maintainers
 
   # but if the package is not yet known in the perms table this makes
   # him co-maintainer AND returns 1
 
+  # package PAUSE::package;
   sub is_primeur_has_perms {
     my $self = shift;
     my $dist = $self->{DIST};
@@ -1572,11 +1578,11 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
 
     # set perms for registered owner in any case
 
-    $self->give_regdowner_perms; # (1)
+    $self->give_regdowner_perms; # (P1.0)
 
     # Query all users with perms for this package
 
-    return unless $self->is_primeur_has_perms; # (2&3)
+    return unless $self->is_primeur_has_perms; # (P2.0&P3.0)
 
     # Sanity checks
 
