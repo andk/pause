@@ -5887,7 +5887,7 @@ sub share_perms_makeco {
         $other_user = uc $other_user;
         my $sth1 = $db->prepare("SELECT userid
                                  FROM users
-                                 WHERE isa_list='' AND userid=?");
+                                 WHERE userid=?");
         $sth1->execute($other_user);
         die Apache::HeavyCGI::Exception
             ->new(ERROR => sprintf(
@@ -6073,7 +6073,7 @@ sub share_perms_movepr {
         $other_user = uc $other_user;
         my $sth1 = $db->prepare("SELECT userid
                                  FROM users
-                                 WHERE isa_list='' AND userid=?");
+                                 WHERE userid=?");
         $sth1->execute($other_user);
         die Apache::HeavyCGI::Exception
             ->new(ERROR => sprintf(
