@@ -1,16 +1,39 @@
-D=`perl -e '@m=gmtime; $m[5]+=1900; $m[4]++; $; = chr(37); $tmp = "$;04d$;02d$;02d"; printf $tmp, @m[5,4,3]'`
-LOGDIR=/usr/local/apache/logs
-NICE=nice
-HTTPD=/usr/local/apache/bin/httpd
+#!/usr/bin/perl
+use strict;
+our $D;
+{
+  my @m=gmtime;
+  $m[5]+=1900;
+  $m[4]++;
+  $D = sprintf "%04d%02d%02d", @m[5,4,3];
+}
+our $LOGDIR = "/usr/local/apache/logs";
+our $NICE   = "/usr/bin/nice";
+our $HTTPD  = "/usr/local/apache/bin/httpd";
+our $BZIP2  = "/usr/bin/bzip2";
+our $HTCONF = "/home/k/PAUSE/apache-conf/httpsd.conf.pause";
 
-kill `cat /usr/local/apache/logs/httpd.pid`
+{
+  my $pid = do { open my $fh, "/usr/local/apache/logs/httpd.pid" or die; <$fh>; };
+  kill 15, $pid;
+}
 
-mv $LOGDIR/access_log $LOGDIR/access_log.$D
-mv $LOGDIR/error_log $LOGDIR/error_log.$D
-mv $LOGDIR/ssl_log $LOGDIR/ssl_log~ 
+rename "$LOGDIR/access_log", "$LOGDIR/access_log.$D";
+rename "$LOGDIR/error_log",  "$LOGDIR/error_log.$D";
+rename "$LOGDIR/ssl_log",    "$LOGDIR/ssl_log~";
 
 # even sleep 20 was not enough on 2001-04-01
-sleep 30
+sleep 30;
 
-$NICE -n -11 $HTTPD -f /home/k/PAUSE/apache-conf/httpsd.conf.pause
+0 == system $NICE, "-n", "-11", $HTTPD, "-f", $HTCONF or die "error starting httpd";
 
+opendir my $dh, $LOGDIR or die "Couldn't opendir $LOGDIR: $!";
+for my $dirent (readdir $dh) {
+  next unless $dirent =~ /_log/;
+  my $f = "$LOGDIR/$dirent";
+  if ($dirent =~ /\.bz2$/) {
+    unlink $f if -M $f > 183;
+  } else {
+    system $BZIP2, "--best", $f if -M $f > 1;
+  }
+}
