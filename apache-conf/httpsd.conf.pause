@@ -110,6 +110,8 @@ ExtendedStatus On
 # For all Apache::Registry stuff a common root
 ##############################################
 Alias /perl/ /usr/local/apache/perl/
+Alias /incoming /home/ftp/incoming
+Alias /pub/PAUSE /home/ftp/pub/PAUSE
 ##############################################
 
 ##############################################

@@ -1,0 +1,5 @@
+User-Agent: *
+Disallow: /perl-status
+Disallow: /status
+Disallow: /pub
+Disallow: /perl
