@@ -2315,7 +2315,7 @@ sub request_id {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr  = shift;
 
-  my( @m, $param );
+  my(@m);
 
   my $req = $mgr->{CGI};
 
@@ -2331,10 +2331,12 @@ sub request_id {
   my $homepage   = $req->param( 'pause99_request_id_homepage'    );
   my $userid    = $req->param( 'pause99_request_id_userid' );
   my $rationale = $req->param("pause99_request_id_rationale") || "";
+  warn "userid[$userid]Valid_Userid[$Valid_Userid]";
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
     # check for errors
 
+    warn "HERE";
     my @errors = ();
     unless( $fullname ) {
       push @errors, "You must supply a name\n";
@@ -2348,6 +2350,7 @@ sub request_id {
       my $db = $mgr->connect;
       my $sth = $db->prepare("SELECT userid FROM users WHERE userid=?");
       $sth->execute($userid);
+      warn sprintf "userid[%s]Valid_Userid[%s]matches[%s]", $userid, $Valid_Userid, $userid =~ $Valid_Userid;
       if ($sth->rows > 0) {
         my $euserid = $mgr->escapeHTML($userid);
         push @errors, "The userid $euserid is already taken.";
