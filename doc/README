@@ -56,3 +56,11 @@ make sure that installed programs find their configuration:
 /etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
 
 (XXX reduce the number of necessary symlink)
+
+External programs to run PAUSE:
+
+apache with mod_perl and Apache-SSL
+perl
+mirror (the good old)
+mon
+proftpd
