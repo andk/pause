@@ -9,6 +9,8 @@ the filename.
 
 From 2003-01-01, Loomes is taking over.
 
+From 2003-12-05 or so, Fiz-Chemie is the Sponsor
+
 =cut
 
 package pause_1999::speedlinkgif;
@@ -34,9 +36,10 @@ sub as_string {
       <tr>
        <td rowspan="2" valign="top">
         <div class="xexplain">The PAUSE is sponsored by</div><br />
-        <a href="http://www.loomes.de">
-         <img src="/pause/logol1.$pnggif" border="0" alt="Loomes Logo"
-              width="273" height="78" align="left" />
+        <a href="http://www.fiz-chemie.de/">
+         <img src="http://www.fiz-chemie.de/img/fizlogo.gif" border="0"
+              alt="FIZ Chemie Berlin Logo"
+              width="239" height="58" align="left" />
         </a>
        </td>
        <td width="100%" valign="top" align="center"><div class="xexplain">Rev: $version</div></td>
