@@ -36,8 +36,8 @@ CREATE TABLE applymod (
 
 CREATE TABLE chapters (
   chapternr int(10) unsigned NOT NULL default '0',
-  chapterid char(80) default NULL,
-  shorttitle char(40) default NULL
+  longtitle char(80) NOT NULL default '',
+  shorttitle char(40) NOT NULL default ''
 ) TYPE=ISAM PACK_KEYS=1;
 
 --
