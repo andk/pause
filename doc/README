@@ -92,7 +92,8 @@ all the sensitive files. Group "k" must contain all users who should
 be able to read sensitive data. So at least "nobody" (who runs the
 webserver) must be in that group. Sensitive directories and files must
 be group-readable and must not be world readable. The SSL data for the
-webserver should not even be readable by that group.
+webservers should not even be readable by that group, only by root who
+starts the webservers.
 
 This setup must ensure that the user UNSAFE cannot read the database
 account informations. On the database side this is achieved by

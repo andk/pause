@@ -2302,7 +2302,7 @@ sub request_id {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr  = shift;
 
-  my( @m, $param, $email );
+  my( @m, $param );
 
   my $req = $mgr->{CGI};
 
@@ -4789,7 +4789,7 @@ sub index_users {
   my $name = "$mgr->{WaitUserDb}-$jobid";
   my $directory = $mgr->{WaitDir};
   warn "name[$name] directory[$directory]";
-  my $db = WAIT::Database->create(name      => $name,
+  my $wdb = WAIT::Database->create(name      => $name,
                                   directory => $directory,
                                  )
       or die "Could not create database $mgr->{WaitUserDb}: $@\n";
@@ -4801,7 +4801,7 @@ sub index_users {
                ];
 
   # create-table statement
-  my $table = $db->create_table(
+  my $table = $wdb->create_table(
                                 name => "uidx",
                                 attr => [
                                          'docid',
@@ -4817,7 +4817,7 @@ sub index_users {
   # XXX
 
   $table->close;
-  $db->close;
+  $wdb->close;
 
   @m;
 }
@@ -5296,7 +5296,7 @@ sub share_perms_remocos {
     }
     push @m, "<hr />\n";
   }
-  my $all_comaints = $self->all_comaints($mgr,$all_mods,$u);
+  $all_comaints = $self->all_comaints($mgr,$all_mods,$u);
   my @all = sort keys %$all_comaints;
   my $n = scalar @all;
   my $size = $n > 7 ? 7 : $n;
