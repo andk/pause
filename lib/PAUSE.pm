@@ -64,7 +64,9 @@ $PAUSE::Config ||= {
                     PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
                     PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
                     SLEEP => 90,
+                    # path to repository without "/trunk"
                     SVNPATH => "/home/SVN/repos/pause",
+                    # path to where we find the svn binaries
                     SVNBIN => "/home/SVN/local/subversion/bin",
                     TIMEOUT => 60*60,
                     TMP => '/home/ftp/tmp/',
