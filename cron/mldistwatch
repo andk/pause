@@ -1385,6 +1385,17 @@ Please contact modules\@perl.org if there are any open questions.
 }
 
 {
+    package PAUSE::mldistwatch::Constants;
+    use constant EMISSPERM => 20;
+    use constant EDUALOLDER => 50;
+    use constant EDUALYOUNGER => 30;
+    use constant EVERFALLING => 2;
+    use constant EMTIMEFALLING => 3;
+    use constant ERELEASEOLDER => 4;
+    use constant OK => 1;
+}
+
+{
     package PAUSE::pmfile;
     use vars qw($AUTOLOAD);
 
@@ -1934,7 +1945,7 @@ package in packages  package in primeur
                 $self->index_status($package,
                                     $pp->{version},
                                     $pp->{infile},
-                                    20,
+                                    PAUSE::mldistwatch::Constants::EMISSPERM,
                                     qq{Not indexed because permissions missing.
 Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                                    );
@@ -2105,7 +2116,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                     $self->index_status($package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        50,
+                                        PAUSE::mldistwatch::Constants::EDUALOLDER,
 
                                         qq{Not indexed because $ofile
  seems to have a dual life in $odist. Although the other package is at
@@ -2118,7 +2129,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                     $self->index_status($package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        20,
+                                        PAUSE::mldistwatch::Constants::EDUALYOUNGER,
 
                                         qq{Not indexed because $ofile
  has a dual life in $odist. The other version is at $oldversion, so
@@ -2138,7 +2149,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                 $self->index_status($package,
                                     $pp->{version},
                                     $pmfile,
-                                    2,
+                                    PAUSE::mldistwatch::Constants::EVERFALLING,
                                     qq{Not indexed because $ofile in $odist
 has a higher version number ($oldversion)},
                                    );
@@ -2171,7 +2182,7 @@ filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]\n");
                                         $package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        3,
+                                        PAUSE::mldistwatch::Constants::EMTIMEFALLING,
                                         qq{Not indexed because $ofile in $odist
 has a more recent modification time.},
                                        );
@@ -2191,7 +2202,7 @@ has a more recent modification time.},
                                         $package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        4,
+                                        PAUSE::mldistwatch::Constants::ERELEASEOLDER,
                                         qq{Not indexed because $ofile in $odist
 has the same version number and the distro has a more recent modification time.}
                                        );
@@ -2231,7 +2242,7 @@ WHERE package = '$package'
             $self->index_status($package,
                                 $pp->{version},
                                 $pp->{infile},
-                                1,
+                                PAUSE::mldistwatch::Constants::OK,
                                 "indexed",
                                );
 
@@ -2270,7 +2281,7 @@ VALUES (
         $self->index_status($package,
                             $pp->{version},
                             $pp->{infile},
-                            1,
+                            PAUSE::mldistwatch::Constants::OK,
                             "indexed",
                            );
     }
@@ -2373,6 +2384,9 @@ have some sort of a scheduler that keeps track of what we have to do.
 
 PAUSE::mldistwatch       we could call it main. One object does all the
                          work
+
+PAUSE::mldistwatch::Constants
+                         constants used for PAUSE::dist::index_status()
 
 PAUSE::dist              each distro we find is an object of this class
 
