@@ -15,7 +15,7 @@ use File::Temp;
 use File::Copy qw(copy);
 
 
-my $DIR = "$PAUSE::Config->{FTPPUB}/pub/PAUSE/PAUSE-data";
+my $DIR = "$PAUSE::Config->{FTPPUB}/PAUSE-data";
 unless (-d $DIR) {
   require File::Path;
   File::Path::mkpath $DIR;
@@ -53,10 +53,10 @@ $system = "bzip2 -9 $dout";
 system($system)==0 or die "Could not bzip2";
 
 warn "$dout.bz2 -> $DIR/pause-svndump-$revision.bz2";
-copy "$dout.bz2", "$DIR/pause-svndump-$revision.bz2"
+copy "$dout.bz2", "$DIR/pause-svndump-$revision.bz2" or die
     unless -e "$DIR/pause-svndump-$revision.bz2";
 
 warn "pause-wc-$revision.tar.bz2 -> $DIR/pause-wc-$revision.tar.bz2";
-copy "pause-wc-$revision.tar.bz2", "$DIR/pause-wc-$revision.tar.bz2"
+copy "pause-wc-$revision.tar.bz2", "$DIR/pause-wc-$revision.tar.bz2" or die
     unless -e "$DIR/pause-wc-$revision.tar.bz2";
 
