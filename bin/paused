@@ -198,7 +198,7 @@ sub loop () { # we're NOT called as a method
       $hash->{dverified} = 0;
       $self->logge("(Re)set dverified to 0 for uriid[$hash->{uriid}]");
 
-      $self->getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount});
+      $self->getit();
       $hash->{dverified} = $now;
       next URIRECORD;
 
@@ -262,21 +262,19 @@ sub loop () { # we're NOT called as a method
     # $self->logge("Need to get uriid[$hash->{uriid}]");
 
     my $size;
-    if ($size = $self->getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
-
+    if ($size = $self->getit()) {
       $self->welcome_file($size);
-
-    } else { # ! getit()
-
+    } else {
       $self->woe;
-
     }
+
   } continue {
     $self->writeback($hash,$hash_orig,$dbh) if $hash;
     last URIRECORD if $mypause_daemon_inspector::Terminated;
     main::restart() if $mypause_daemon_inspector::Signal;
   }
 
+      # disconnect, we want to sleep
       $sth->finish;
   $sth2->finish;
   $dbh->disconnect;
@@ -325,18 +323,19 @@ $Id\n";
     }
 
   } elsif ($hash->{nosuccesscount} == $PAUSE::Config->{MAXRETRIES}) {
-    my $cleanup = "";
+
+    my $clean_txt = "";
     my $extinguished = "";
     # Gotta cleanup first
     my $quote = $dbh->quote($hash->{uriid});
     my $query = "DELETE FROM uris WHERE uriid=$quote";
     my $ret = $dbh->do($query);
     if ($ret) {
-      $cleanup .= "I have extinguished $hash->{uriid} from the database,
+      $clean_txt .= "I have extinguished $hash->{uriid} from the database,
 so we can pretend it has never existed.\n\n";
       $extinguished=1;
     } else {
-      $cleanup .= "I have tried to extinguish
+      $clean_txt .= "I have tried to extinguish
   $hash->{uriid}
 from the database, but couldn't (Query[$query]erro[$DBI::errstr]).
 Seems as if the admin has to intervene\n\n";
@@ -352,12 +351,12 @@ Seems as if the admin has to intervene\n\n";
         $i++;
       }
       if (rename $incoming_file, "$incoming_file~$i~") {
-        $cleanup .= "I have renamed the local file
+        $clean_txt .= "I have renamed the local file
   $incoming_file
 to
   $incoming_file~$i~\n\n";
       } else {
-        $cleanup .= "I have tried to rename the file
+        $clean_txt .= "I have tried to rename the file
   $incoming_file
 to
   $incoming_file~$i~
@@ -375,16 +374,27 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
     my $address  = $pma->address;
     push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
 
-    my $blurb = "PAUSE has not succeeded to get the URL
+    my $blurb;
+    if ($self->{ErrNotGzip}) {
+      $blurb = "The zcat program on PAUSE identifies the resource
+  $hash->{uri}
+as being 'not in gzip format'.
+
+$clean_txt
+Virtually Yours,
+$Id\n";
+    } else {
+      $blurb = "PAUSE has not succeeded to get the URL
   $hash->{uri},
 requested for upload as
   $hash->{uriid}
 after the maximum of $PAUSE::Config->{MAXRETRIES} retries.
 I give up now.
 
-$cleanup
+$clean_txt
 Virtually Yours,
 $Id\n";
+    }
 
     for my $to (@To) {
       mypause_send_mail->send({
@@ -488,7 +498,11 @@ sub is_valid {
 }
 
 sub getit {
-  my($self,$uri,$uriid,$nosuccesscount) = @_;
+  my($self) = @_;
+
+  my $nosuccesscount = $self->{URIRECORD}{nosuccesscount};
+  my $uri            = $self->{URIRECORD}{uri};
+  my $uriid          = $self->{URIRECORD}{uriid};
 
   return unless $self->is_valid($uriid);
 
@@ -556,9 +570,9 @@ sub getit {
 	}
       }
       if ($stat) {
-	$self->logge($ret);
-	my @To;
-	push @To, $PAUSE::Config->{ADMIN};
+        $ret =~ s/\n//g;
+	$self->logge("ret[$ret]");
+	my @To = $PAUSE::Config->{ADMIN};
 
 	my $blurb = "For the resource [$uri]
 the command [zcat -t $tpath]
@@ -572,11 +586,15 @@ gives [";
 
         for my $to (@To) {
           mypause_send_mail->send({
-                                    To => join(",",$to),
+                                    To      => $to,
                                     Subject => "Upload problem $uri"
                                    },
                                    $blurb
                                   );
+        }
+        if ($ret =~ /not in gzip format/) {
+          $self->{URIRECORD}{nosuccesscount} = $PAUSE::Config->{MAXRETRIES} - 1;
+          $self->{ErrNotGzip}++;
         }
 	return;
       }
@@ -706,6 +724,9 @@ format>, but it turned out to be more involved than expected. If we
 had a more OO style we could solve that quickier. I think the next
 revisions will do some objectification. Indeed: Revs 436ff switch to
 *some* OO.
+
+2003-09-02: Revision 440 finishes the objectification. Revision 441
+tries to send that mail on C<not in gzip format>.
 
 =cut
 
