@@ -30,7 +30,7 @@ $Data::Dumper::Indent = 1;
     package PAUSE::mldistwatch;
     ###### data initialization ######
     use File::Path qw(rmtree mkpath);
-    our $Id = q$Id$;
+    our $Id = q$Id:$;
     our $ISAPERL = qr{
                    /
                    (
