@@ -10,14 +10,15 @@ sub new {
 }
 
 sub new_from_userid {
-  my($class,$userid) = @_;
-  my $dbh = DBI->connect(
-                         $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-                         $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-                         $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-                         { RaiseError => 1 }
-                        )
-      or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
+  my($class,$userid,$opt) = @_;
+  my $dbh = $opt->{dbh} ||
+      DBI->connect(
+                   $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
+                   $PAUSE::Config->{MOD_DATA_SOURCE_USER},
+                   $PAUSE::Config->{MOD_DATA_SOURCE_PW},
+                   { RaiseError => 1 }
+                  )
+          or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
   my $dsn = $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME};
   my(undef,undef,$dbname) = split /:/, $dsn;
   my $sth = $dbh->prepare("SELECT secretemail
