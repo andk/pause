@@ -38,7 +38,7 @@ sub start_element {
     } elsif ($href =~ m{^\#}) {
       # anchor
     } else {
-      $prop->{Attributes}{"{}href"}{Value} =~ s{^}{http://www.cpan.org/CPAN/modules/};
+      $prop->{Attributes}{"{}href"}{Value} =~ s{^}{http://www.cpan.org/modules/};
     }
   }
 
