@@ -976,19 +976,20 @@ CPAN::Complete
   sub mail_summary {
     my($self) = @_;
     my $distro = $self->{DIST};
+    my $author = PAUSE::dir2user($distro);
     my($msg) = Mail::Send->new(
-			       To => join(", ",$PAUSE::Config->{ADMIN}),
+			       To => join(", ",
+                                          "$author\@cpan.org",
+                                          $PAUSE::Config->{ADMIN},
+                                         ),
 			       Subject => "PAUSE Indexer report $distro"
 			      );
     $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
     my $fh  = $msg->open('sendmail');
     print $fh "The following report has been written by the PAUSE indexer.
-
-Please report to modules\@perl.org if there are any open questions.
-Thanks!
+Please contact modules\@perl.org if there are any open questions.
 
   $PAUSE::mldistwatch::Id\n";
-    my $author = PAUSE::dir2user($distro);
     my $time = gmtime;
     my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
     my $nfiles = scalar @{$self->{MANIFOUND}};
