@@ -129,7 +129,7 @@ sub set_active_status {
 
 sub connect {
     my $self = shift;
-    return $self->{DBH} if $self->{DBH};
+    # return $self->{DBH} if $self->{DBH};
     my $dbh = DBI->connect(
                            $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
                            $PAUSE::Config->{MOD_DATA_SOURCE_USER},
