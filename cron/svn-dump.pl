@@ -5,6 +5,8 @@
 
 Check current version out in a temporary directory, make a tarball.
 
+And make an svn dump as a backup while we are at it.
+
 =cut
 
 use strict;
@@ -27,17 +29,51 @@ my($repopath) = $PAUSE::Config->{SVNPATH};
 
 my $system = "$PAUSE::Config->{SVNBIN}/svn co file://$repopath pause-wc |";
 my $revision;
-open my $job, $system or die;
+my $job;
+open $job, $system or die;
 while (<$job>) {
   $revision = $1 if /Checked out revision (\d+)/;
 }
+close $job;
 die "No revision?" unless $revision;
-rename "pause-wc", "pause-wc-$revision" or die "Could not rename: $!";
+unless (-e "$DIR/pause-wc-$revision.tar.bz2"){
+  rename "pause-wc", "pause-wc-$revision" or die "Could not rename: $!";
 
-$system = "tar cjf pause-wc-$revision.tar.bz2 pause-wc-$revision";
-system($system)==0 or die "Could not svn co";
+  $system = "tar cjf pause-wc-$revision.tar.bz2 pause-wc-$revision";
+  system($system)==0 or die "Could not svn co";
 
-# warn "pause-wc-$revision.tar.bz2 -> $DIR/pause-wc-$revision.tar.bz2";
-copy "pause-wc-$revision.tar.bz2", "$DIR/pause-wc-$revision.tar.bz2" or die
-    unless -e "$DIR/pause-wc-$revision.tar.bz2";
+  # warn "pause-wc-$revision.tar.bz2 -> $DIR/pause-wc-$revision.tar.bz2";
+  copy "pause-wc-$revision.tar.bz2", "$DIR/pause-wc-$revision.tar.bz2" or die;
+}
 
+my $dout = "svn.dump";
+my $derr = "svn.err";
+
+$system = "$PAUSE::Config->{SVNBIN}/svnadmin dump $repopath > $dout 2> $derr";
+system($system)==0 or die "Could not svnadmin";
+
+open my $fh, $derr or die "Could not open $derr";
+$revision = "";
+while (<$fh>) {
+  $revision = $1 if /Dumped revision (\d+)/;
+}
+close $fh;
+die "No revision?" unless $revision;
+unless (-e "$DIR/pause-svndump-$revision.bz2"){
+  $system = "bzip2 -9 $dout";
+  system($system)==0 or die "Could not bzip2";
+
+  # warn "$dout.bz2 -> $DIR/pause-svndump-$revision.bz2";
+  copy "$dout.bz2", "$DIR/pause-svndump-$revision.bz2" or die;
+}
+
+opendir DIR, $DIR or die;
+my @readdir = grep /^pause/, readdir DIR;
+my @sorted = map { $_->[0] }
+    sort { $a->[1] <=> $b->[1] }
+    map { [ "$DIR/$_", -M "$DIR/$_" ] }
+    @readdir;
+while (@readdir > 24) {
+  my $dele = pop @readdir;
+  unlink $dele or die;
+}
