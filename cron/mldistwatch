@@ -1055,7 +1055,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($msg) = Mail::Send->new(
                                    To => join(", ",
                                               $to,
-                                              $PAUSE::Config->{ADMIN},
+                                              $PAUSE::Config->{ADMIN}, # no sec breach
                                              ),
                                    Subject => "PAUSE indexer report $substrdistro",
                                   );

@@ -241,8 +241,8 @@ sub do_loop {
       $asciiname ||= $fullname;
       $asciiname =~ s/[^\0-\177]/?/g;
       my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
-      my $to  = $pma->address;
-      my @To = qq{"$asciiname" <$to>};
+      my $address  = $pma->address;
+      my @To = qq{"$asciiname" <$address>};
       push @To, $PAUSE::Config->{CPAN_TESTERS};
       push @To, $PAUSE::Config->{'P5P'} if
 	  $hash->{'mailto_p5p'}==1;
@@ -278,14 +278,16 @@ No action is required on your part
                      "\tVirtually Yours,\n$Id"
                     );
 
-      my $fh = my_pause_send_mail->send({
-                                         To => join(",",@To),
-                                         Subject => "CPAN Upload: $hash->{uriid}",
-                                         "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
-                                        },
-                                        $blurb
-                                       );
-      do_log("Sent email about uriid[$hash->{uriid}]");
+      for my $to (@To) {
+        my_pause_send_mail->send({
+                                  To => join(",",$to),
+                                  Subject => "CPAN Upload: $hash->{uriid}",
+                                  "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
+                                 },
+                                 $blurb
+                                );
+      }
+      do_log("Sent email(s) about uriid[$hash->{uriid}]");
       sleep 15;
 
     } else {
@@ -314,12 +316,14 @@ new trial.
 Virtually Yours,
 $Id\n";
 
-        my $fh = my_pause_send_mail->send({
-                                           To => join(",",@To),
-                                           Subject => "Upload problem $hash->{uriid}"
-                                          },
-                                          $blurb
-                                         );
+        for my $to (@To) {
+          my_pause_send_mail->send({
+                                    To => join(",",$to),
+                                    Subject => "Upload problem $hash->{uriid}"
+                                   },
+                                   $blurb
+                                  );
+        }
 
       } elsif ($hash->{nosuccesscount} == $PAUSE::Config->{MAXRETRIES}) {
         my $cleanup = "";
@@ -369,8 +373,8 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
         $asciiname =~ s/[^\0-\177]/?/g;
 	my @To;
         my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
-        my $to  = $pma->address;
-	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
+        my $address  = $pma->address;
+	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
 
 	my $blurb = "PAUSE has not succeeded to get the URL
   $hash->{uri},
@@ -383,12 +387,14 @@ $cleanup
 Virtually Yours,
 $Id\n";
 
-        my $fh = my_pause_send_mail->send({
-                                           To => join(",",@To),
-                                           Subject => "Upload problem $hash->{uriid}"
-                                          },
-                                          $blurb
-                                         );
+        for my $to (@To) {
+          my_pause_send_mail->send({
+                                    To => join(",",$to),
+                                    Subject => "Upload problem $hash->{uriid}"
+                                   },
+                                   $blurb
+                                  );
+        }
 
         # don't writeback, it would defeat removing it.
         undef $hash if $extinguished;
@@ -498,12 +504,14 @@ gives [";
 	$blurb .= `ls -l $tpath`;
 	$blurb .= "]\n\n";
 
-        my $fh = my_pause_send_mail->send({
-                                           To => join(",",@To),
-                                           Subject => "Upload problem $uri"
-                                          },
-                                          $blurb
-                                         );
+        for my $to (@To) {
+          my_pause_send_mail->send({
+                                    To => join(",",$to),
+                                    Subject => "Upload problem $uri"
+                                   },
+                                   $blurb
+                                  );
+        }
 	return;
       }
     }
