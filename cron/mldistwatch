@@ -390,14 +390,10 @@ sub rewrite01 {
             $achapter{$root} ||= $chapterid;
         }
     }
-    my(%c_fn,$chapterid,$shorttitle,@chaptitle);
-    $sth = $dbh->prepare("SELECT chapterid, shorttitle FROM chapters");
+    my($chapterid,$shorttitle,@chaptitle);
+    $sth = $dbh->prepare("SELECT chapternr, shorttitle FROM chapters");
     $sth->execute;
-    @c_fn{@{$sth->{NAME}}} = 0..@{$sth->{NAME}}-1; # chapters
     while (($chapterid, $shorttitle) = $sth->fetchrow_array) {
-	$chapterid =~ s/^\s+//;
-	$chapterid =~ s/\D+.*//;
-        $shorttitle =~ s/^\d\d_//; # currently short titles have leading numbers in the database
 	$chaptitle[$chapterid] = sprintf "%02d_%s", $chapterid, $shorttitle;
     }
 
@@ -1007,15 +1003,17 @@ sub mlroot {
         my $dirname = File::Basename::dirname("$MLROOT/$dist");
         my $checksumtime = (stat "$dirname/CHECKSUMS")[9] || 0;
 
-        if ($mtime > $checksumtime - 86400) {
-            $self->writechecksum($dirname);
-        }
-        if ($mtime > $otherts) {
-            $dbh->do(qq{UPDATE distmtimes
+        if ($mtime) {
+            if ($mtime > $checksumtime - 86400) {
+                $self->writechecksum($dirname);
+            }
+            if ($mtime > $otherts) {
+                $dbh->do(qq{UPDATE distmtimes
                      SET distmtime='$mtime', distmdatetime=from_unixtime('$mtime')
                    WHERE dist='$dist'});
-            $self->verbose(1,"DEBUG5: mtime assigned [$mtime] to dist[$dist]\n");
-            return 1;
+                $self->verbose(1,"DEBUG5: mtime assigned [$mtime] to dist[$dist]\n");
+                return 1;
+            }
         }
         return;
     }
