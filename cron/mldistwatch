@@ -1351,7 +1351,7 @@ Please contact modules\@perl.org if there are any open questions.
                         # could be fixed like this, at least for
                         # Pod::Simple
 
-                        my $cat = do { open my $f, $yaml or die; local $/; <$f> };
+                        my $cat = do { open my($f), $yaml or die; local $/; <$f> };
                         $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
                         eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
                         if ($@) {
