@@ -90,7 +90,7 @@ $h2special
   # MOTD
   #
 
-  if (-e "/var/run/netreport/funet_broken.status") {
+  if (0) {
     push @l, qq{<div align="center">};
 
     push @l, qq{<p class="motd">FUNET, the CPAN master site is <a
@@ -102,6 +102,7 @@ $h2special
 
   }
 
+    push @l, $mgr->instance_of("pause_1999::message");
   if ($mgr->{ERROR} && @{$mgr->{ERROR}}) {
     push @l, qq{<h1>Error</h1><p>\n}, @{$mgr->{ERROR}},
 	qq{</p><p>Please try again, probably by using the Back button of
