@@ -442,13 +442,12 @@ sub text_pw_field {
     }
   } else {
     $val = $req->param($name);
-    $val = "" unless defined $val;
     warn "name[$name]val[$val]";
     if ($] > 5.007) {
       require Encode;
       # Warning: adding second parameter changes behavior (eats characters or so?)
-      $val = Encode::decode_utf8($val,
-                                 # Encode::FB_WARN()
+      $val = Encode::decode_utf8($val
+                                 # , Encode::FB_WARN()
                                 );
     }
     warn "name[$name]val[$val]";
