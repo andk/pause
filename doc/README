@@ -1,8 +1,13 @@
+=head1 PAUSE repository
+
 This repository is considered to contain all relevant programs and
 configuration data for running pause.perl.org except for the SSL key
 and certificate and files containing passwords or other sensible data.
 
-Deliberately excluded files are:
+=head2 Excluded files
+
+The following files have been excluded from the repository for obvious
+reasons:
 
     apache-conf/156e8318.0
     apache-conf/18065281.0
@@ -14,56 +19,69 @@ Deliberately excluded files are:
     etc/mon.cf
     privatelib/PrivatePAUSE.pm
 
-XXX describe contents of PrivatePAUSE.pm
+PrivatePAUSE.pm contains only the usernames and passwords of the mysql
+users that own the two databases. See lib/PAUSE.pm for the structure
+of the data.
+
+=head2 File system layout
 
 On PAUSE the files live in /home/k/PAUSE and the following symlinks
 make sure that installed programs find their configuration:
 
 (last time updated: 2002-12-25)
 
-/etc/cron.jobs/cron-daily.pl -> ../../home/k/PAUSE/cron/cron-daily.pl
-/etc/cron.jobs/diskwatch -> ../../home/k/PAUSE/cron/diskwatch
-/etc/cron.jobs/gmls-lR.pl -> ../../home/k/PAUSE/cron/gmls-lR.pl
-/etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
-/etc/cron.jobs/mirror_wget_rsync.sh -> ../../home/k/PAUSE/cron/mirror_wget_rsync.sh
-/etc/cron.jobs/mldistwatch -> ../../home/k/PAUSE/cron/mldistwatch
-/etc/cron.jobs/msql-dump.sh -> ../../home/k/PAUSE/cron/msql-dump.sh
-/etc/cron.jobs/mysql-dump.sh -> ../../home/k/PAUSE/cron/mysql-dump.sh
-/etc/cron.jobs/publish-crontab.sh -> ../../home/k/PAUSE/cron/publish-crontab.sh
-/etc/cron.jobs/rm_stale_links -> ../../home/k/PAUSE/cron/rm_stale_links
-/etc/cron.jobs/run_mirrors.sh -> ../../home/k/PAUSE/cron/run_mirrors.sh
-/etc/cron.jobs/sync-04pause.sh -> ../../home/k/PAUSE/cron/sync-04pause.sh
-/etc/cron.jobs/sync-franz-put.sh -> ../../home/k/PAUSE/cron/sync-franz-put.sh
-/etc/cron.jobs/update-checksums.pl -> ../../home/k/PAUSE/cron/update-checksums.pl
-/etc/mon/mon.cf -> ../../home/k/PAUSE/etc/mon.cf
-/etc/rc.d/init.d/httpd -> /home/k/PAUSE/etc/rc.d/init.d/httpd
-/etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
-/etc/rsyncd.conf -> /home/k/PAUSE/etc/rsyncd.conf
-/etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
-/home/SVN/local/subversion -> subversion-2002-12-24
-/home/SVN/local/subversion-2002-12-24/conf -> /home/k/PAUSE/apache-svn-conf
-/home/k/PAUSE/apache-conf/156e8318.0 -> pause.pem
-/home/k/PAUSE/apache-conf/18065281.0 -> pause.pem
-/home/k/PAUSE/apache-conf/67ff2224.0 -> pause.pem
-/usr/local/apache/conf -> ../../../home/k/PAUSE/apache-conf
-/usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
-/usr/local/apache/lib/Bundle -> ../../../../home/k/PAUSE/lib/Bundle
-/usr/local/apache/lib/PAUSE -> ../../../../home/k/PAUSE/lib/PAUSE
-/usr/local/apache/lib/pause_1999 -> ../../../../home/k/PAUSE/lib/pause_1999
-/usr/local/apache/libold -> ../../../home/k/PAUSE/lib
-/usr/local/apache/logs -> ../../../var/log/apache/logs
-/usr/local/apache/perl -> ../../../home/k/PAUSE/apache-perl
-/usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults
-/usr/local/mirror/mymirror.config -> ../../../home/k/PAUSE/mirror/mymirror.config
+  /etc/cron.jobs/cron-daily.pl -> ../../home/k/PAUSE/cron/cron-daily.pl
+  /etc/cron.jobs/diskwatch -> ../../home/k/PAUSE/cron/diskwatch
+  /etc/cron.jobs/gmls-lR.pl -> ../../home/k/PAUSE/cron/gmls-lR.pl
+  /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
+  /etc/cron.jobs/mirror_wget_rsync.sh -> ../../home/k/PAUSE/cron/mirror_wget_rsync.sh
+  /etc/cron.jobs/mldistwatch -> ../../home/k/PAUSE/cron/mldistwatch
+  /etc/cron.jobs/msql-dump.sh -> ../../home/k/PAUSE/cron/msql-dump.sh
+  /etc/cron.jobs/mysql-dump.sh -> ../../home/k/PAUSE/cron/mysql-dump.sh
+  /etc/cron.jobs/publish-crontab.sh -> ../../home/k/PAUSE/cron/publish-crontab.sh
+  /etc/cron.jobs/rm_stale_links -> ../../home/k/PAUSE/cron/rm_stale_links
+  /etc/cron.jobs/run_mirrors.sh -> ../../home/k/PAUSE/cron/run_mirrors.sh
+  /etc/cron.jobs/sync-04pause.sh -> ../../home/k/PAUSE/cron/sync-04pause.sh
+  /etc/cron.jobs/sync-franz-put.sh -> ../../home/k/PAUSE/cron/sync-franz-put.sh
+  /etc/cron.jobs/update-checksums.pl -> ../../home/k/PAUSE/cron/update-checksums.pl
+  /etc/mon/mon.cf -> ../../home/k/PAUSE/etc/mon.cf
+  /etc/rc.d/init.d/httpd -> /home/k/PAUSE/etc/rc.d/init.d/httpd
+  /etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
+  /etc/rsyncd.conf -> /home/k/PAUSE/etc/rsyncd.conf
+  /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
+  /home/SVN/local/subversion -> subversion-2002-12-24
+  /home/SVN/local/subversion-2002-12-24/conf -> /home/k/PAUSE/apache-svn-conf
+  /home/k/PAUSE/apache-conf/156e8318.0 -> pause.pem
+  /home/k/PAUSE/apache-conf/18065281.0 -> pause.pem
+  /home/k/PAUSE/apache-conf/67ff2224.0 -> pause.pem
+  /usr/local/apache/conf -> ../../../home/k/PAUSE/apache-conf
+  /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
+  /usr/local/apache/lib/Bundle -> ../../../../home/k/PAUSE/lib/Bundle
+  /usr/local/apache/lib/PAUSE -> ../../../../home/k/PAUSE/lib/PAUSE
+  /usr/local/apache/lib/pause_1999 -> ../../../../home/k/PAUSE/lib/pause_1999
+  /usr/local/apache/libold -> ../../../home/k/PAUSE/lib
+  /usr/local/apache/logs -> ../../../var/log/apache/logs
+  /usr/local/apache/perl -> ../../../home/k/PAUSE/apache-perl
+  /usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults
+  /usr/local/mirror/mymirror.config -> ../../../home/k/PAUSE/mirror/mymirror.config
 
 (XXX reduce the number of necessary symlink)
 
-External programs to run PAUSE:
+=head2 External programs to run PAUSE
 
-apache with mod_perl and Apache-SSL
-perl
-mirror (the good old)
-mon
-proftpd
-mysql
-rsync (runs as daemon)
+  apache with mod_perl and Apache-SSL
+  perl
+  mirror (the good old)
+  mon
+  proftpd
+  mysql
+  rsync (runs as daemon)
+
+=head2 Database schema
+
+The files doc/*.schema.txt document the schema of the two databases. A
+dump of the mod database is produced every few hours and available for
+download in the ftp area. A dump of the authen_pause database is -- of
+course -- not available.
+
+=cut

@@ -82,7 +82,7 @@ The following $PAUSE::Config keys are defined in PrivatePAUSE.pm:
               MOD_DATA_SOURCE_USER
               MOD_DATA_SOURCE_PW
 
-These are usernames and passwords in the mysql database.
+These are usernames and passwords in the two mysql databases.
 
 =cut
 
