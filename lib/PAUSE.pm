@@ -72,7 +72,7 @@ $PAUSE::Config ||=
                                   # 2004-12-xx we frequently see >20 minutes
      SLEEP => 90,
      # path to repository without "/trunk"
-     SVNPATH => "/home/SVN/repos/pause",
+     SVNPATH => "/home/SVN/repos",
      # path to where we find the svn binaries
      SVNBIN => "/usr/bin",
      TIMEOUT => 60*60,
