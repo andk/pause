@@ -620,6 +620,21 @@ sub write_01sorted {
         my %package;
         @package{qw{package userdir userid useridfiller dist filenameonly
                     filenamefiller size mtimestr young mtime}} = @$l;
+
+##   DB<2> x \%package
+## 0  HASH(0x8c42664)
+##    'dist' => 'W/WS/WSNYDER/SystemPerl-1.150.tar.gz'
+##    'filenamefiller' => '            '
+##    'filenameonly' => 'SystemPerl-1.150.tar.gz'
+##    'mtime' => 1088685199
+##    'mtimestr' => '01 Jul 2004'
+##    'package' => 'SystemC'
+##    'size' => '73k'
+##    'userdir' => 'W/WS/WSNYDER'
+##    'userid' => 'WSNYDER'
+##    'useridfiller' => '   '
+##    'young' => '  +'
+
         $package{filenamefiller} =
 	    " "x(40-length($package{filenameonly})-length($package{size}));
         $list .= sprintf(
