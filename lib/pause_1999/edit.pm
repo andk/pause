@@ -2982,9 +2982,9 @@ Excerpt from a mail:<pre>
   my($sql,@bind);
   if (exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
     $sql = qq{SELECT users.userid
-              FROM   users, list2user
-              WHERE isa_list > ''
-                 AND users.userid = list2user.maillistid
+              FROM   users JOIN list2user
+                           ON   users.userid = list2user.maillistid
+              WHERE  users.isa_list > ''
                  AND list2user.userid = ?
               ORDER BY users.userid
 };
