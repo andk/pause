@@ -2397,15 +2397,15 @@ sub request_id {
   my $showform = 0;
   my $regOK = 0;
 
-  my $fullname  = $req->param( 'pause99_request_id_fullname');
+  my $fullname  = $req->param( 'pause99_request_id_fullname') || "";
   my $ufullname = $mgr->any2utf8($fullname);
   if ($ufullname ne $fullname) {
     $req->param("pause99_request_id_fullname", $ufullname);
     $fullname = $ufullname;
   }
-  my $email     = $req->param( 'pause99_request_id_email');
-  my $homepage   = $req->param( 'pause99_request_id_homepage');
-  my $userid    = $req->param( 'pause99_request_id_userid');
+  my $email     = $req->param( 'pause99_request_id_email') || "";
+  my $homepage   = $req->param( 'pause99_request_id_homepage') || "";
+  my $userid    = $req->param( 'pause99_request_id_userid') || "";
   my $rationale = $req->param("pause99_request_id_rationale") || "";
   warn "userid[$userid]Valid_Userid[$Valid_Userid]";
 
