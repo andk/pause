@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-use CPAN::Checksums 1.016;
+use CPAN::Checksums 1.018;
 use File::Find;
 use strict;
 use vars qw($DEBUG);
@@ -18,6 +18,8 @@ $CPAN::Checksums::SIGNING_PROGRAM =
     $PAUSE::Config->{CHECKSUMS_SIGNING_PROGRAM};
 $CPAN::Checksums::SIGNING_KEY =
     $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
+$CPAN::Checksums::MIN_MTIME_CHECKSUMS =
+    $PAUSE::Config->{MIN_MTIME_CHECKSUMS} || 0;
 
 find(sub {
        return if $cnt>=$max;
