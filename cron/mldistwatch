@@ -1208,10 +1208,10 @@ Please contact modules\@perl.org if there are any open questions.
                 File::Copy::copy $yaml[0], "$MLROOT/$sans.meta";
                 utime((stat $yaml[0])[8,9], "$MLROOT/$sans.meta");
             } else {
-                $self->{YAML} = sprintf "%d META.yml found, ignoring", scalar @yaml;
+                $self->{YAML} = sprintf "%d META.yml found, ignoring\n", scalar @yaml;
             }
         } else {
-            $self->{YAML} = "No META.yml found";
+            $self->{YAML} = "No META.yml found\n";
             $self->verbose(1,"No META.yml in $dist");
         }
     }
