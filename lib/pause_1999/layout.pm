@@ -95,14 +95,13 @@ Expect failures everywhere.</p> </div>};
 
   }
 
-  if (time <   1069941600+86400*4) {
+  if (time <  1078009200 ) {
     push @l, qq{<div align="center">};
 
-    push @l, qq{<p class="motd"><b>New IP address</b><br/> On
-Thursday, Nov 27, the PAUSE box got a new home and IP address
-(195.149.117.110). A couple of things did not quite work after that
-change. We believe that we are now back to normal. Please be patient.
-Sorry for the inconvenience.</p>};
+    push @l, qq{<p class="motd"><b>Scheduled Downtime</b><br/> On
+Saturday, Feb 28, the PAUSE box may be down for several hours due to
+scheduled power outages. The exact times of the outages are not yet
+known. Sorry for the inconvenience.</p>};
 
     push @l, qq{</div>};
 
