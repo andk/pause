@@ -390,11 +390,11 @@ sub rewrite01 {
             $achapter{$root} ||= $chapterid;
         }
     }
-    my($chapterid,$shorttitle,@chaptitle);
+    my(@chaptitle);
     $sth = $dbh->prepare("SELECT chapternr, shorttitle FROM chapters");
     $sth->execute;
-    while (($chapterid, $shorttitle) = $sth->fetchrow_array) {
-	$chaptitle[$chapterid] = sprintf "%02d_%s", $chapterid, $shorttitle;
+    while (my($chapternr, $shorttitle) = $sth->fetchrow_array) {
+	$chaptitle[$chapternr] = sprintf "%02d_%s", $chapternr, $shorttitle;
     }
 
     $sth = $dbh->prepare("SELECT package, dist FROM packages");
