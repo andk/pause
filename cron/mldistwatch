@@ -1194,6 +1194,8 @@ Please contact modules\@perl.org if there are any open questions.
                                 if ($inmf =~ /^$ve$rest/){
                                     $self->verbose(1,"skipping inmf[$inmf] due to ve[$ve]");
                                     next MANI;
+                                } else {
+                                    $self->verbose(1,"NOT skipping inmf[$inmf] due to ve[$ve]");
                                 }
                             }
                         } else {
@@ -1201,6 +1203,8 @@ Please contact modules\@perl.org if there are any open questions.
                             if ($inmf =~ /^$v$rest/){
                                 $self->verbose(1,"skipping inmf[$inmf] due to v[$v]");
                                 next MANI;
+                            } else {
+                                $self->verbose(1,"NOT skipping inmf[$inmf] due to v[$v]");
                             }
                         }
                     }
