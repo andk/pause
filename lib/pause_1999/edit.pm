@@ -990,7 +990,8 @@ sub show_document {
 sub tail_logfile {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
-  my $tail = 6000;
+  my $cgi = $mgr->{CGI};
+  my $tail = $cgi->param("pause99_tail_logfile_n") || 5000;
   my($file) = $PAUSE::Config->{PAUSE_LOG};
   if ($PAUSE::Config->{TESTHOST}) {
     $file = "/usr/local/apache/logs/error_log"; # for testing
@@ -1515,7 +1516,9 @@ to upload further files.</p>
 
 	my $tmpdir = "ftp://$server/tmp/$userhome";
 	my $usrdir = "https://$server/pub/PAUSE/authors/id/$userhome";
-	my $tailurl = "https://$server/perl/user/tail_log";
+	my $tailurl = "https://$server/pause/authenquery?ACTION=tail_log" .
+            "&pause99_tail_logfile_n=6000";
+	my $etailurl = $mgr->escapeHTML($tailurl);
 	push @m, (qq{
 
 <p><b>Debugging:</b> you may want to watch the temporary directory
@@ -1524,9 +1527,7 @@ href="$tmpdir">$tmpdir</a> (be patient, this directory may not exist
 yet). If it passes some simple tests, it will be uploaded to its <a
 href="$usrdir">final destination</a>. If something's wrong, please
 check the logfile of the daemon. See the tail of it with <a
-href="$tailurl/2000">2000</a>, <a href="$tailurl/5000">5000</a>, <a
-href="$tailurl/10000">10000</a> bytes offset. You get the idea how to
-tail a custom amount ;-\) If you already know what's going wrong, you
+href="$etailurl">$etailurl</a>. If you already know what's going wrong, you
 may wish to visit the <a href="authenquery?ACTION=edit_uris">repair
 tool</a> for pending uploads.</p>
 
@@ -1535,9 +1536,7 @@ tool</a> for pending uploads.</p>
 
 	$success .= qq{
 
-During upload you can watch $tmpdir (temporary upload directory), and
-then $usrdir (final upload directory). The logfile is in $tailurl/2000
-(replace 2000 with any offset from the end).
+During upload you can watch the logfile in $tailurl.
 
 You'll be notified as soon as the upload has succeeded, and if the
 uploaded package contains modules, you'll get another notification
