@@ -5995,7 +5995,7 @@ sub dele_message {
 
   my $dbh = $mgr->connect;
   my $req = $mgr->{CGI};
-  my $sth = $dbh->prepare("SELECT * FROM messages where mfrom=? ORDER BY mto, c");
+  my $sth = $dbh->prepare("SELECT * FROM messages where mfrom=? ORDER BY created desc");
   $sth->execute($mgr->{User}{userid});
   if ($sth->rows) {
     if ($req->param('SUBMIT_pause99_dele_message_sub')) {
@@ -6023,7 +6023,7 @@ sub dele_message {
                               10-length($rec->{mto}),
                               "",
                               $rec->{created},
-                              $fmessage,
+                              $mgr->escapeHTML($fmessage),
                              );
     }
     my $field = $mgr->checkbox_group(
