@@ -2,11 +2,6 @@ Work on misleading menu items logout/switch user. (Gabor Szabo)
 
 Switch the rest to 5.8.0.
 
-Eliminate cron jobs and symlinks in /etc/cron.jobs and integrate into
-repository
-
-User- and Group-ID switch in mldistwatch
-
 cron job to dump the repository
 
 Complete etc/rc.d/init.d directory: mysql is missing, mon, others?
