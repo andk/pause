@@ -1847,29 +1847,23 @@ sub delete_files {
     }
   }
   if ($blurb) {
-    # Note: blurb self-modifying
-    $blurb =  sprintf(
-                      qq{According to a request entered by %s the
+    my @blurb = sprintf(
+                        qq{According to a request entered by %s the
 following files and the symlinks pointing to them have been scheduled
 for deletion. They will expire after 72 hours and then be deleted by a
 cronjob. Until then you can undelete them via
 https://%s/pause/authenquery?ACTION=delete_files or
 http://%s/pause/authenquery?ACTION=delete_files
-
-Note: To encourage deletions (and keep CPAN CDROMable), there is a
-project underway to maintain the complete PAUSE history on a site of
-its own, most probably history.perl.org. A preliminary version is
-available at ftp://pause.perl.org/pub/backpan/authors/id/
-
-%s
-
-The Pause
 },
                       $mgr->{User}{fullname},
                       $server,
-                      $server,
-                      $blurb,
-                     );
+                      $server);
+    push @blurb, qq{Note: to encourage deletions, all of past CPAN
+glory is collected on http://history.perl.org/backpan/};
+    push @blurb, $blurb;
+    push @blurb, qq{The Pause};
+    $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
+
     my %umailset;
     my $name = $u->{asciiname} || $u->{fullname} || "";
     my $Uname = $mgr->{User}{asciiname} || $mgr->{User}{fullname} || "";
@@ -1905,7 +1899,7 @@ The Pause
       $sth = $dbh->prepare(qq{SELECT deleteid, changed
                               FROM deletes
                               WHERE deleteid
-                              LIKE '$userhome/%'})
+                              LIKE '$userhome/%'})           #}
       and
       $sth->execute
       and
