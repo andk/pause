@@ -5438,27 +5438,31 @@ sub share_perms_remocos {
     eval {
       my @sel = $req->param("pause99_share_perms_remocos_tuples");
       my $sth1 = $db->prepare("DELETE FROM perms WHERE package=? AND userid=?");
-      for my $sel (@sel) {
-        my($selmod,$otheruser) = $sel =~ /^(\S+)\s--\s(\S+)$/;
-        die Apache::HeavyCGI::Exception
-            ->new(ERROR => "You do not seem to be owner of $selmod")
+      if (@sel) {
+        for my $sel (@sel) {
+          my($selmod,$otheruser) = $sel =~ /^(\S+)\s--\s(\S+)$/;
+          die Apache::HeavyCGI::Exception
+              ->new(ERROR => "You do not seem to be owner of $selmod")
                   unless exists $all_mods->{$selmod};
-        unless (exists $all_comaints->{$sel}) {
-          push @m, "<p>Cannot handle tuple <i>$sel</i>. If you
+          unless (exists $all_comaints->{$sel}) {
+            push @m, "<p>Cannot handle tuple <i>$sel</i>. If you
               believe, this is a bug, please complain.</p>";
-          next;
-        }
-        my $ret = $sth1->execute($selmod,$otheruser);
-        my $err = "";
-        $err = $db->errstr unless defined $ret;
-        $ret ||= "";
-        warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
-        if ($ret) {
-          push @m, "<p>Removed $otheruser from co-maintainers of $selmod.</p>\n";
-        } else {
-          push @m, "<p>Error trying to remove $otheruser from co-maintainers of
+            next;
+          }
+          my $ret = $sth1->execute($selmod,$otheruser);
+          my $err = "";
+          $err = $db->errstr unless defined $ret;
+          $ret ||= "";
+          warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
+          if ($ret) {
+            push @m, "<p>Removed $otheruser from co-maintainers of $selmod.</p>\n";
+          } else {
+            push @m, "<p>Error trying to remove $otheruser from co-maintainers of
                     $selmod: $err</p>\n";
+          }
         }
+      } else {
+        push @m, qq{<p>You need to select one or more packages. Nothing done.</p>}
       }
     };
     if ($@) {
@@ -5561,6 +5565,8 @@ sub share_perms_remome {
                     $selmod: $err</p>\n";
           }
         }
+      } else {
+        push @m, qq{<p>You need to select one or more packages. Nothing done.</p>};
       }
     };
     if ($@) {
@@ -5651,6 +5657,9 @@ sub share_perms_makeco {
                     $selmod: $err</p>\n";
           }
         }
+      } else {
+        push @m, qq{<p>You need to select one or more packages and enter a userid.
+ Nothing done.</p>};
       }
     };
     if ($@) {
@@ -5732,6 +5741,8 @@ sub share_perms_remopr {
                     from $selmod: $err</p>\n";
           }
         }
+      } else {
+        push @m, qq{<p>You need to select one or more packages. Nothing done.</p>};
       }
     };
     if ($@) {
@@ -5823,6 +5834,9 @@ sub share_perms_movepr {
                     $selmod: $err</p>\n";
           }
         }
+      } else {
+        push @m, qq{<p>You need to select one or more packages and enter a userid.
+ Nothing done.<p>};
       }
     };
     if ($@) {
