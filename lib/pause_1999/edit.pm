@@ -5829,6 +5829,8 @@ sub coredump {
   my $self = shift;
   my $mgr = shift;
   chdir "/usr/local/apache/cores" or die "Couldn't chdir: $!";
+  warn "**************>>>>>>>>>>     strace -p $$\n";
+  sleep 10;
   my $r = $mgr->{R};
   require Cwd;
   my $cwd = Cwd::cwd();
