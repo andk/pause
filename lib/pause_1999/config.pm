@@ -25,6 +25,20 @@ pause_1999::usermenu
 
 sub handler {
   my($r) = shift;
+  if (time >= 1057579200 && time < 1057582800) {
+    $r->content_type("text/html");
+    $r->send_http_header;
+    use Time::Duration;
+    my $delta = 1057582800 - time;
+    my $expr = Time::Duration::duration($delta);
+
+    $r->print(qq{<html> <head><title>PAUSE CLOSED</title></head><body>
+<h1>Closed for Maintainance</h1> <p>PAUSE is closed for maintainance for
+about two hours. Estimated time of opening is in $expr.</p><p>Sorry for the
+inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </html>});
+
+    return Apache::Constants::OK;
+  }
   my pause_1999::main $self = pause_1999::main->
       new(
 
