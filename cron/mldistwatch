@@ -109,6 +109,7 @@ use DBI;
 use PAUSE ();
 use Net::Domain ();
 use CPAN;
+use Text::Format;
 
 package PAUSE::mldistwatch;
 
@@ -228,6 +229,7 @@ sub checkfornew {
     $dio->read_dist;
     $dio->extract_readme($suffix) if $suffix;
     $dio->check_blib;
+    $dio->check_multiple_root;
     $dio->examine_pms; # will switch user
 
     $dio->mail_summary;
@@ -938,6 +940,38 @@ sub as_ds {
     return($suffix,$skip);
   }
 
+
+
+=pod
+
+No packages have been found in the distro, nothing indexed.
+
+||
+
+The following packages have been found in the distro:
+
+Test::Builder
+  version: 0.17
+  in file: CPAN-1.65/BUNDLE/Test/Builder.pm
+   status: Not indexed because permissions missing. Visit PAUSE and click
+           "View Permissions" to find the legitimate maintainer(s).
+
+MARC::Batch
+  version: undef
+  in file: MARC-Record-1.10/lib/MARC/Batch.pm
+   status: Not indexed because MARC-Record-1.00/lib/MARC/Batch.pm in
+           P/PE/PETDANCE/MARC-Record-1.00.tar.gz has a higher version
+           number (1.00)
+
+CPAN::Complete
+  version: 1.65
+  in file: CPAN-1.65/lib/CPAN.pm
+   status: indexed
+
+=cut
+
+
+
   # package PAUSE::dist;
   sub mail_summary {
     my($self) = @_;
@@ -962,11 +996,35 @@ Timestamp of file: $mtime UTC
  Time of this run: $time UTC\n\n};
     if ($self->{HAS_BLIB}) {
       print $fh qq{The distribution contains a blib/ directory and is therefore not being indexed.\n};
+    } elsif ($self->{HAS_MULTIPLE_ROOT}) {
+      print $fh qq{The distribution does not unpack into a single directory and is therefore not being indexed.\n};
     } else {
-      print $fh "XXX TBD\n";
+      my $st = $self->{INDEX_STATUS};
+      if ($st && ref $st && %$st) {
+        for my $p (sort { $st->{$a}{status} <=> $st->{$b}{status} } keys %$st) {
+          my $tf = Text::Format->new( bodyIndent => 11, firstIndent => 0);
+          my $verb_status = $tf->format($st->{$p}{verb_status});
+          printf $fh "%s\n  version: %s\n  in file: %s\n   status: %s\n\n",
+              $p, $st->{$p}{version}, $st->{$p}{infile}, $st->{$p}{verb_status};
+        }
+      } else {
+        print $fh qq{No packages could be identified in the distro. Nothing done.\n};
+      }
     }
+    print $fh qq{__END__\n};
     $fh->close;
     warn "Sent mail about $distro";
+  }
+
+  # package PAUSE::dist;
+  sub index_status {
+    my($self,$pack,$version,$infile,$status,$verb_status) = @_;
+    $self->{INDEX_STATUS}{$pack} = {
+                                    version => $version,
+                                    infile => $infile,
+                                    status => $status,
+                                    verb_status => $verb_status,
+                                   };
   }
 
   # package PAUSE::dist;
@@ -978,9 +1036,20 @@ Timestamp of file: $mtime UTC
   }
 
   # package PAUSE::dist;
+  sub check_multiple_root {
+    my($self) = @_;
+    my %seen;
+    my @top = grep { s|/.*||; !$seen{$_}++ } @{$self->{MANIFOUND}};
+    if (@top > 1) {
+      $self->{HAS_MULTIPLE_ROOT}++;
+    }
+  }
+
+  # package PAUSE::dist;
   sub examine_pms {
     my $self = shift;
     return if $self->{HAS_BLIB};
+    return if $self->{HAS_MULTIPLE_ROOT};
     my $dist = $self->{DIST};
 
     my $binary_dist;
@@ -1575,6 +1644,13 @@ package in packages  package in primeur
         # seems ok: perl is always right
       } elsif (! grep { $_ eq $userid } @owner) {
         # we must not index this and we have to inform somebody
+        $self->index_status($package,
+                            $pp->{version},
+                            $pp->{infile},
+                            1,
+                            qq{Not indexed because permissions missing.
+Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
+                           );
         $self->alert(qq{not owner:
   package[$package]version[$pp->{version}]
   file[$pp->{infile}]dist[$dist]
@@ -1724,6 +1800,13 @@ package in packages  package in primeur
       $ok++;
     } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
       # lower VERSION number here
+      $self->index_status($package,
+                          $pp->{version},
+                          $pmfile,
+                          2,
+                          qq{Not indexed because $ofile in $odist
+has a higher version number ($oldversion)},
+                         );
       $self->alert(qq{falling VERSION number [$pp->{version}]
  in package[$package]
  dist[$dist]
@@ -1809,9 +1892,22 @@ WHERE package = '$package'
 };
       print "Q: [$query]\n";
       $dbh->do($query);
+      $self->index_status($package,
+                          $pp->{version},
+                          $pp->{infile},
+                          3,
+                          "indexed",
+                         );
 
     }
 
+  }
+
+  sub index_status {
+    my($self) = shift;
+    my $fio = $self->{FIO};
+    my $dio = $fio->{DIO};
+    $dio->index_status(@_);
   }
 
   sub insert_into_package {
@@ -1834,6 +1930,12 @@ VALUES (
 };
     print "Q: [$query]\n";
     $dbh->do($query);
+    $self->index_status($package,
+                        $pp->{version},
+                        $pp->{infile},
+                        3,
+                        "indexed",
+                       );
   }
 
   # returns always the return value of print, so basically always 1
