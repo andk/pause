@@ -2,7 +2,7 @@ package PAUSE::MailAddress;
 use PAUSE ();
 use strict;
 
-# use fields ADDRESS, IS_SECRET
+# use fields qw(address is_secret)
 
 sub new {
   my($class,$hashref) = @_;
@@ -41,7 +41,7 @@ sub new_from_userid {
   bless $me, $class;
 }
 
-sub address { shift->{ADDRESS} }
-sub is_secret { shift->{IS_SECRET} }
+sub address { shift->{address} }
+sub is_secret { shift->{is_secret} }
 
 1;
