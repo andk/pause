@@ -7,6 +7,8 @@ Check current version out in a temporary directory, make a tarball.
 
 And make an svn dump as a backup while we are at it.
 
+Remove oldest files from the target directory at the end.
+
 =cut
 
 use strict;
