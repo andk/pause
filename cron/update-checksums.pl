@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use CPAN::Checksums;
+use CPAN::Checksums 1.16;
 use File::Find;
 use strict;
 use vars qw($DEBUG);
@@ -12,7 +12,13 @@ my $root = $PAUSE::Config->{MLROOT};
 
 my $max = 15;
 my $cnt = 0;
+
 $CPAN::Checksums::CAUTION = 1;
+$CPAN::Checksums::SIGNING_PROGRAM =
+    $PAUSE::Config->{CHECKSUMS_SIGNING_PROGRAM};
+$CPAN::Checksums::SIGNING_KEY =
+    $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
+
 find(sub {
        return if $cnt>=$max;
        return unless $File::Find::name =~ m|id/.|;
@@ -24,5 +30,5 @@ find(sub {
        return if $ret == 1;
        warn "name[$File::Find::name]\n" if $DEBUG;
        $cnt++;
-}, $root);
+     }, $root);
 

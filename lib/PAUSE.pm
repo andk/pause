@@ -36,11 +36,14 @@ for (@pauselib) {
   s|/lib|/privatelib|;
 }
 push @INC, @pauselib;
-$PAUSE::Config ||= {
-                    ADMIN => qq{andreas.koenig\@anima.de}, # previously also used for ftp password:
-                    ADMINS => [qq(modules\@perl.org)],
-                    ANON_FTP_PASS => qq{andreas.koenig\@dubravka.kbx.de}, # only dubravka.kbx.de is reverse mapped
-                    AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
+$PAUSE::Config ||=
+    {
+     # previously also used for ftp password:
+     ADMIN => qq{andreas.koenig\@anima.de},
+     ADMINS => [qq(modules\@perl.org)],
+     # only dubravka.kbx.de is reverse mapped:
+     ANON_FTP_PASS => qq{andreas.koenig\@dubravka.kbx.de},
+     AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
                     AUTHEN_PASSWORD_FLD => "password",
                     AUTHEN_USER_FLD => "user",
                     AUTHEN_USER_TABLE => "usertable",
@@ -71,7 +74,12 @@ $PAUSE::Config ||= {
                     TIMEOUT => 60*60,
                     TMP => '/home/ftp/tmp/',
                     UPLOAD => 'upload@pause.perl.org',
-};
+     # sign the auto-generated CHECKSUM files with:
+     CHECKSUMS_SIGNING_PROGRAM => ('gpg --homedir /home/k/PAUSE/111_sensi'.
+                                   'tive/gnupg-pause-batch-signing-home  '.
+                                   '--clearsign --default-key '),
+     CHECKSUMS_SIGNING_KEY => '450F89EC',
+    };
 
 
 require PrivatePAUSE;
