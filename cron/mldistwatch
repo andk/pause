@@ -409,14 +409,17 @@ sub do_rewrite01 {
 	warn "Coudn't open $repfile $!";
     }
     my(%firstlevel,%achapter);
-    my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods order by chapterid");
+    my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
     $sth->execute;
     while (my($modid,$chapterid) = $sth->fetchrow_array) {
 	my($root,$colo) = $modid =~ /^([^:]+)(::)?/;
 	$firstlevel{$root}++;
         # the determination of %achapter was introduced with rev 211.
         # Alternatives were tried in 212 and 214, but they had
-        # uncountable misfits.
+        # uncountable misfits. 215 then was very similar to 211 but we
+        # did sort above query by chapterid and got tons of misfits.
+        # So we do not really have a solution. Every solution is
+        # wrong, even the pre-211 solution.
         if ($colo) {
             if (! exists $achapter{$root}) {
                 $achapter{"$root\::"} ||= $chapterid;
