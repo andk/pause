@@ -409,19 +409,21 @@ sub do_rewrite01 {
 	warn "Coudn't open $repfile $!";
     }
     my(%firstlevel,%achapter);
-    my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
+    my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods order by chapterid");
     $sth->execute;
     while (my($modid,$chapterid) = $sth->fetchrow_array) {
-	my(@r) = split /(::)/, $modid;
-	$firstlevel{$r[0]}++;
-        local $" = "";
-        if (@r==1) {
-            $achapter{"@r"} = $chapterid;
-        } else {
-            while (@r) {
-                $achapter{"@r"} ||= $chapterid;
-                pop @r;
+	my($root,$colo) = $modid =~ /^([^:]+)(::)?/;
+	$firstlevel{$root}++;
+        # the determination of %achapter was introduced with rev 211.
+        # Alternatives were tried in 212 and 214, but they had
+        # uncountable misfits.
+        if ($colo) {
+            if (! exists $achapter{$root}) {
+                $achapter{"$root\::"} ||= $chapterid;
             }
+        } else {
+            delete $achapter{"$root\::"};
+            $achapter{$root} ||= $chapterid;
         }
     }
     my(%c_fn,$chapterid,$shorttitle,@chaptitle);
@@ -441,7 +443,7 @@ sub do_rewrite01 {
 
     my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
-        my %pkg = (rootpack => $pkg, fullpack => $pkg, dist => $pkgdist);
+        my %pkg = (rootpack => $pkg, dist => $pkgdist);
         $pkg{rootpack} =~ s/:.*//;
         # We don't want to list perl distribution
         next if $pkg{dist} =~ m|/perl-?5|;
@@ -509,22 +511,10 @@ sub do_rewrite01 {
             $sth2->execute;
             ($pkg{chapterid}) = $sth2->fetchrow_array;
         }
-        my $cheap_chapterid;
-        {
-            my @r = split /(::)/, $pkg{fullpack};
-            local $" = "";
-            while (@r) {
-                if (my $ch = $achapter{"@r"}) {
-                    $cheap_chapterid = $ch;
-                    last;
-                }
-                pop @r;
-            }
-            unless ($pkg{chapterid} && $cheap_chapterid
-                    &&
-                    $pkg{chapterid} eq $cheap_chapterid) {
-                warn "WARNING: fullpack[$pkg{fullpack}] rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
-            }
+        my $cheap_chapterid = $achapter{$pkg{rootpack}}
+            || $achapter{"$pkg{rootpack}\::"};
+        unless ($pkg{chapterid} eq $cheap_chapterid) {
+            warn "WARNING: rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
         }
         if (defined $pkg{chapterid}) {
             if (defined $chaptitle[$pkg{chapterid}]) {
