@@ -120,6 +120,20 @@ anything that looks suspicious to you.</p>};
 
   }
 
+  if (time <   1069941600) {
+    push @l, qq{<div align="center">};
+
+    push @l, qq{<p class="motd"><b>Scheduled Downtime/New IP
+address</b><br/> On Thursday, Nov 27, about 14:00 UTC, there will be a
+downtime due to the relocation of the PAUSE box to a new sponsor. The
+new IP address will be 195.149.117.110. I'd recommend you take note of
+this address in case the DNS service does not propagate this address
+fast enough.</p>};
+
+    push @l, qq{</div>};
+
+  }
+
   push @l, $mgr->instance_of("pause_1999::message");
   if ($mgr->{ERROR} && @{$mgr->{ERROR}}) {
     push @l, qq{<h1>Error</h1><p>\n}, @{$mgr->{ERROR}},
