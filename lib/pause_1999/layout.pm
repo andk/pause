@@ -95,40 +95,13 @@ Expect failures everywhere.</p> </div>};
 
   }
 
-  if (time < 1058515976) {
-    push @l, qq{<div align="center">};
-
-    push @l, qq{<p class="motd"><b>Certificate News</b><br/>PAUSE's old SSL certificate was about
-    to expire on 2003-05-20, so I had to issue a new one. This is why
-    your browser was asking you to confirm the new certificate. The
-    fingerprint of this certificate is <code>MD5 Fingerprint=83:E9:A6:4C:EC:CC:60:A8:A1:6C:5F:30:11:53:41:06</code>
-    and it expires on 2009-01-07.</p>};
-
-    push @l, qq{</div>};
-
-  }
-
-  if (time < 1059688800) {
-    push @l, qq{<div align="center">};
-
-    push @l, qq{<p class="motd"><b>Maintainance finished</b><br/>The
-Maintainance work (switch to Debian) on PAUSE seems to be finished.
-Everything should now be working as it did before. Please report
-anything that looks suspicious to you.</p>};
-
-    push @l, qq{</div>};
-
-  }
-
   if (time <   1069941600) {
     push @l, qq{<div align="center">};
 
-    push @l, qq{<p class="motd"><b>Scheduled Downtime/New IP
-address</b><br/> On Thursday, Nov 27, about 14:00 UTC, there will be a
-downtime due to the relocation of the PAUSE box to a new sponsor. The
-new IP address will be 195.149.117.110. I'd recommend you take note of
-this address in case the DNS service does not propagate this address
-fast enough.</p>};
+    push @l, qq{<p class="motd"><b>New IP address</b><br/> On
+Thursday, Nov 27, the PAUSE box got a new home and IP address
+(195.149.117.110). Currently only http and rsync work, ftp and mail
+are broken and will be fixed Friday morning. Sorry.</p>};
 
     push @l, qq{</div>};
 
