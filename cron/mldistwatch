@@ -2084,6 +2084,11 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         # AND we need to accept falling version numbers if old dist is a
         # perl
 
+        # relevant postings/threads:
+        # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-07/msg01579.html
+        # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-08/msg00062.html
+
+
         if (! $distorperlok) {
         } elsif ($isaperl) {
             if ($oisaperl) {
@@ -2100,25 +2105,24 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                     $self->index_status($package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        20,
+                                        50,
 
                                         qq{Not indexed because $ofile
- has a dual life in $odist. Although the other package is at
- $oldversion, the indexer lets the standalone version continue to be the
- reference version, shadowing the version in the core. Please resolve
- the issue by talking the package maintainer into releasing a new
- version or find some other appropriate solution.},
+ seems to have a dual life in $odist. Although the other package is at
+ version [$oldversion], the indexer lets the other dist continue to be
+ the reference version, shadowing the one in the core. We trust you
+ know what you're doing.},
 
                                    );
                 } else {
                     $self->index_status($package,
                                         $pp->{version},
                                         $pp->{infile},
-                                        50,
+                                        20,
 
                                         qq{Not indexed because $ofile
  has a dual life in $odist. The other version is at $oldversion, so
- it seems healthy not to index this version in the core.},
+ not indexing seems okay.},
 
                                    );
                 }
