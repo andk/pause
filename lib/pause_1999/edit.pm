@@ -1626,6 +1626,7 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
     my $mailblurb = $self->wrap(qq{$mgr->{User}{userid}
 ($mgr->{User}{fullname}) visited the PAUSE and requested an upload
 into $her directory. The request used the following parameters:});
+    $mailblurb .= "\n";
 
     for my $param ($req->param) {
       next if $param eq "HIDDENNAME";
@@ -1636,7 +1637,7 @@ into $her directory. The request used the following parameters:});
       next unless length $v;
       $mailblurb .= sprintf qq{  %-26s [%s]\n}, $param, $v;
     }
-    # $mailblurb .= "\n";
+    $mailblurb .= "\n";
     $mailblurb .= $self->wrap($success);
 #    my $header = {
 #		  To => qq{$PAUSE::Config->{ADMIN}, $u->{email}, $mgr->{User}{email}},
