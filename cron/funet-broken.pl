@@ -1,3 +1,7 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
 
 my @time = gmtime;
 die "Old cronjob" unless $time[5] eq "103";
