@@ -3266,8 +3266,10 @@ sub edit_mod {
 			   headline => "CPAN User-ID",
 
 			   note => "If you change the userid, you will
-        			   lose control over the module.
-        			   That's a one way move. Take care!",
+        			   lose control over the module and
+        			   the other userid will become the
+        			   owner. That's a one way move, take
+        			   care!",
 
 			   args => {
 				    size => 12,
