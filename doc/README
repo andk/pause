@@ -1,8 +1,13 @@
 =head1 PAUSE repository
 
-This repository is considered to contain all relevant programs and
-configuration data for running pause.perl.org except for the SSL key
-and certificate and files containing passwords or other sensible data.
+This repository lives at
+
+    http://pause.perl.org:5459/svn/pause/trunk
+
+and is considered to contain all relevant programs and configuration
+data for running pause.perl.org except for the SSL key and certificate
+and files containing passwords or other sensible data. To access the
+repository you need a subversion client (subversion.tigris.org).
 
 =head2 Excluded files
 
@@ -43,10 +48,6 @@ make sure that installed programs find their configuration:
   /home/k/PAUSE/apache-conf/67ff2224.0 -> pause.pem
   /usr/local/apache/conf -> ../../../home/k/PAUSE/apache-conf
   /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
-  /usr/local/apache/lib/Bundle -> ../../../../home/k/PAUSE/lib/Bundle
-  /usr/local/apache/lib/PAUSE -> ../../../../home/k/PAUSE/lib/PAUSE
-  /usr/local/apache/lib/pause_1999 -> ../../../../home/k/PAUSE/lib/pause_1999
-  /usr/local/apache/libold -> ../../../home/k/PAUSE/lib
   /usr/local/apache/logs -> ../../../var/log/apache/logs
   /usr/local/apache/perl -> ../../../home/k/PAUSE/apache-perl
   /usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults

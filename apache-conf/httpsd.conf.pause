@@ -168,7 +168,7 @@ I don't understand those indents, but they do no harm anyway...
 #!perl
 
     BEGIN {
-      push @INC, "/usr/local/apache/lib", "/home/k/PAUSE/lib";
+      push @INC, "/home/k/PAUSE/lib";
     }
 
 use Apache::httpd_conf;
