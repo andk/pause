@@ -124,7 +124,7 @@ sub work2 {
         or die "Couldn't chdir to $MLROOT: $!";
     $self->rewrite01();
     $self->rewrite03();
-    $self->verbose(2, sprintf(
+    $self->verbose(1, sprintf(
                               "Finished rewrite03 and everything at %s",
                               scalar localtime
                              ));
