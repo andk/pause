@@ -674,7 +674,7 @@ sub write_01sorted {
     }
     $list .= q{</PRE></BODY>};
     my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/01modules.mtime.html";
-    $self->verbose(1,"Writing $repfile\n");
+    # $self->verbose(1,"Writing $repfile\n");
     if (open F, ">$repfile") {
         print F $list;
         close F;
