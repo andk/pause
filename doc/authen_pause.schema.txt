@@ -1,0 +1,62 @@
+-- MySQL dump 8.21
+--
+-- Host: localhost    Database: authen_pause
+---------------------------------------------------------
+-- Server version	3.23.49-log
+
+--
+-- Table structure for table 'abrakadabra'
+--
+
+CREATE TABLE abrakadabra (
+  user char(16) NOT NULL default '',
+  chpasswd char(32) NOT NULL default '',
+  expires datetime default NULL,
+  PRIMARY KEY  (user)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'abrakadabra'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'grouptable'
+--
+
+CREATE TABLE grouptable (
+  user char(12) binary NOT NULL default '',
+  ugroup char(8) binary NOT NULL default '',
+  UNIQUE KEY user_ugroup (user,ugroup)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'grouptable'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'usertable'
+--
+
+CREATE TABLE usertable (
+  user char(12) binary NOT NULL default '',
+  password char(13) default NULL,
+  secretemail char(255) default NULL,
+  forcechange tinyint(4) default '0',
+  changed int(11) default NULL,
+  changedby char(10) default NULL,
+  PRIMARY KEY  (user)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'usertable'
+--
+-- WHERE:  1=0
+
+
+

@@ -1,0 +1,307 @@
+-- MySQL dump 8.21
+--
+-- Host: localhost    Database: mod
+---------------------------------------------------------
+-- Server version	3.23.49-log
+
+--
+-- Table structure for table 'applymod'
+--
+
+CREATE TABLE applymod (
+  modid varchar(64) binary NOT NULL default '',
+  statd char(1) binary NOT NULL default '',
+  stats char(1) binary NOT NULL default '',
+  statl char(1) binary NOT NULL default '',
+  stati char(1) binary NOT NULL default '',
+  statp char(1) binary NOT NULL default '',
+  chapterid char(2) binary NOT NULL default '',
+  description varchar(88) binary NOT NULL default '',
+  userid varchar(10) NOT NULL default '',
+  communities varchar(120) binary NOT NULL default '',
+  similar varchar(120) binary NOT NULL default '',
+  rationale text,
+  PRIMARY KEY  (modid)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'applymod'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'chapters'
+--
+
+CREATE TABLE chapters (
+  chapternr char(2) binary NOT NULL default '0',
+  chapterid char(80) default NULL,
+  shorttitle char(40) default NULL
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'chapters'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'deletes'
+--
+
+CREATE TABLE deletes (
+  deleteid char(255) binary NOT NULL default '',
+  changed char(10) default NULL,
+  changedby char(10) default NULL,
+  PRIMARY KEY  (deleteid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'deletes'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'distmtimes'
+--
+
+CREATE TABLE distmtimes (
+  dist char(128) binary NOT NULL default '',
+  distmtime char(10) default NULL,
+  PRIMARY KEY  (dist)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'distmtimes'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'list2user'
+--
+
+CREATE TABLE list2user (
+  maillistid char(10) NOT NULL default '',
+  userid char(10) NOT NULL default '',
+  KEY userid (userid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'list2user'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'maillists'
+--
+
+CREATE TABLE maillists (
+  maillistid char(10) binary NOT NULL default '',
+  maillistname char(64) default NULL,
+  address char(64) default NULL,
+  subscribe char(255) default NULL,
+  changed char(10) default NULL,
+  changedby char(10) default NULL,
+  PRIMARY KEY  (maillistid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'maillists'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'mirrorit'
+--
+
+CREATE TABLE mirrorit (
+  mpackage char(20) binary NOT NULL default '',
+  lasttime char(10) default NULL,
+  urgencycall char(10) default NULL,
+  entered char(10) default NULL,
+  enteredby char(10) default NULL,
+  PRIMARY KEY  (mpackage)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'mirrorit'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'mlas'
+--
+
+CREATE TABLE mlas (
+  mlaid char(64) binary NOT NULL default '',
+  userid char(10) default NULL,
+  admin char(64) default NULL,
+  comment char(255) default NULL,
+  changed char(10) default NULL,
+  changedby char(10) default NULL,
+  PRIMARY KEY  (mlaid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'mlas'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'mods'
+--
+
+CREATE TABLE mods (
+  modid char(64) binary NOT NULL default '',
+  mlstatus enum('list','hide','delete') NOT NULL default 'list',
+  statd char(1) binary NOT NULL default '',
+  stats char(1) binary NOT NULL default '',
+  statl char(1) binary NOT NULL default '',
+  stati char(1) binary NOT NULL default '',
+  statp char(1) binary NOT NULL default '',
+  description char(88) binary NOT NULL default '',
+  userid char(10) NOT NULL default '',
+  chapterid char(2) binary NOT NULL default '',
+  introduced char(10) default NULL,
+  changed char(10) default NULL,
+  changedby char(10) default NULL,
+  PRIMARY KEY  (modid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'mods'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'packages'
+--
+
+CREATE TABLE packages (
+  package varchar(100) binary NOT NULL default '',
+  version varchar(16) default NULL,
+  dist varchar(128) default NULL,
+  file varchar(128) default NULL,
+  filemtime varchar(10) default NULL,
+  pause_reg varchar(10) default NULL,
+  comment varchar(255) NOT NULL default '',
+  PRIMARY KEY  (package)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'packages'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'perms'
+--
+
+CREATE TABLE perms (
+  c int(10) unsigned NOT NULL auto_increment,
+  package char(245) binary NOT NULL default '',
+  userid char(10) NOT NULL default '',
+  PRIMARY KEY  (c),
+  UNIQUE KEY pack_user (package,userid),
+  KEY package (package),
+  KEY userid (userid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'perms'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'primeur'
+--
+
+CREATE TABLE primeur (
+  package char(245) binary NOT NULL default '',
+  userid char(10) NOT NULL default '',
+  PRIMARY KEY  (package)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'primeur'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'uris'
+--
+
+CREATE TABLE uris (
+  uriid char(255) binary NOT NULL default '',
+  userid char(10) NOT NULL default '',
+  basename char(245) binary NOT NULL default '',
+  uri char(255) NOT NULL default '',
+  mirrorit char(10) NOT NULL default '',
+  dscheduled char(10) NOT NULL default '',
+  dgot char(10) NOT NULL default '',
+  dverified char(10) NOT NULL default '',
+  nosuccesstime char(10) NOT NULL default '',
+  nosuccesscount char(4) NOT NULL default '',
+  mailto_p5p char(1) NOT NULL default '',
+  changed char(10) NOT NULL default '',
+  changedby char(10) NOT NULL default '',
+  PRIMARY KEY  (uriid),
+  UNIQUE KEY useridbase (userid,basename),
+  KEY uri (uri)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'uris'
+--
+-- WHERE:  1=0
+
+
+
+--
+-- Table structure for table 'users'
+--
+
+CREATE TABLE users (
+  userid char(10) binary NOT NULL default '',
+  email char(255) NOT NULL default '',
+  cpan_mail_alias enum('none','publ','secr') NOT NULL default 'publ',
+  homepage char(255) NOT NULL default '',
+  fullname char(255) binary default NULL,
+  asciiname char(255) binary default NULL,
+  isa_list char(1) NOT NULL default '',
+  introduced char(10) NOT NULL default '',
+  changed char(10) NOT NULL default '',
+  changedby char(10) NOT NULL default '',
+  PRIMARY KEY  (userid)
+) TYPE=ISAM PACK_KEYS=1;
+
+--
+-- Dumping data for table 'users'
+--
+-- WHERE:  1=0
+
+
+
