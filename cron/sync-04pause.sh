@@ -4,4 +4,4 @@ set -e
 
 # set -x
 
-rsync -a ~k/PAUSE/htdocs/04pause.html ~ftp/pub/PAUSE/modules/
+rsync -a ~k/PAUSE/htdocs/0*.html ~ftp/pub/PAUSE/modules/
