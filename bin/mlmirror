@@ -1,0 +1,72 @@
+#!/usr/bin/perl -w
+
+use lib "/home/k/PAUSE/lib";
+use PAUSE ();
+
+use DBI;
+use strict;
+use Proc::Simple ();
+use vars qw( $Procs $Refusetime);
+$Refusetime = 900;
+
+$|=1;
+
+sub do_log;
+do_log q{Running $Id: mlmirror,v 1.19 1999/10/09 20:31:04 k Exp k $};
+
+while () {
+  my $time = time;
+  my $db = DBI->connect(
+			$PAUSE::Config->{MOD_DATA_SOURCE_NAME},
+			$PAUSE::Config->{MOD_DATA_SOURCE_USER},
+			$PAUSE::Config->{MOD_DATA_SOURCE_PW},
+			{ RaiseError => 1 }
+		       );
+  my $query = qq{SELECT * FROM mirrorit};
+  my $sth = $db->prepare($query) or warn $DBI::errstr;
+  $sth->execute;
+  my($hash);
+  while ($hash = $sth->fetchrow_hashref) {
+    $hash->{lasttime} ||= 0;
+    if ($hash->{lasttime} < $hash->{urgencycall}
+	&&
+	$time - $hash->{lasttime} > $Refusetime){
+      my($proc,@p);
+      for $proc (0..$#$Procs) {
+	do_log "Checking status of proc $proc ($Procs->[$proc])";
+	push @p, $proc if ref($Procs->[$proc]) && $Procs->[$proc]->poll;
+      }
+      @$Procs = @p;
+      do_log qq{\$Procs == }, scalar @$Procs;
+      if (@$Procs < 3) {
+	my $mirrordir = File::Basename::dirname($PAUSE::Config->{MIRRORCONFIG});
+	my $mlmlog = "/home/k/PAUSE/log/mlmlog.$hash->{mpackage}";
+	my $shell = qq{/usr/bin/perl $mirrordir/mirror -d -d -p $hash->{mpackage} $mirrordir/mymirror.config > $mlmlog 2>&1};
+	do_log "Going to run $shell...";
+	open FH, ">$mlmlog" or die "Couldn't open >$mlmlog: $!";
+	print FH "[", scalar(localtime), "] Going to run $shell...\n";
+	close FH;
+	push @$Procs, Proc::Simple->new();
+	$Procs->[-1]->start($shell);
+	do_log "Done";
+	my $q = qq{UPDATE mirrorit
+                   SET lasttime='$time'
+                   WHERE mpackage='$hash->{mpackage}'};
+	do_log "Going to do $q...";
+	$db->do($q) or warn $DBI::errstr;
+      }
+    }
+  }
+} continue {
+  do_log "Express mirror daemon process[$$] alive";
+  sleep 300;
+}
+
+sub do_log {
+  local $" = " ";
+  my $logfile = $PAUSE::Config->{PAUSE_LOG};
+  open LOG, ">>$logfile" or die "open $logfile: $!";
+  print LOG "[", scalar(localtime), "] @_\n";
+  close LOG;
+}
+

@@ -1,0 +1,554 @@
+#!/usr/bin/perl -- -*- mode: cperl -*-
+
+my $VERSION = substr q$Revision: 1.81 $, 10; # $Date: 2002/08/02 11:34:24 $
+my $Id = q$Id: paused,v 1.81 2002/08/02 11:34:24 k Exp k $;
+
+use lib "/home/k/PAUSE/lib";
+
+use File::Path ();
+use HTTP::Date ();
+use HTTP::Status ();
+use IO::File ();
+use LWP ();
+use MD5 ();
+use Mail::Send ();
+use DBI ();
+use PAUSE ();
+use URI::URL ();
+
+use strict;
+use vars qw($Signal $last_str $last_time);
+
+package my_pause_send_mail;
+sub send {
+  my($self,$header,$blurb) = @_;
+  my(%tosubj);
+  for my $h (qw(To Subject)) {
+    $tosubj{$h} = delete $header->{$h};
+  }
+  my $msg = Mail::Send->new(%tosubj);
+  if (%$header) {
+    $msg->add(%$header);
+  }
+  $msg->add("From" => "PAUSE <$PAUSE::Config->{UPLOAD}>") unless exists $header->{From};
+  $msg->add("Content-Type" => "Text/Plain; Charset=UTF-8");
+  $msg->add("MIME-Version" => "1.0");
+  $msg->add("Content-Transfer-Encoding" => "8bit");
+  my $fh = $msg->open('sendmail');
+  print $fh $blurb;
+  close $fh;
+}
+
+package main;
+
+my $zcat = "/bin/zcat";
+die "no executable zcat" unless -x $zcat;
+my $gzip = "/bin/gzip";
+die "no executable gzip" unless -x $gzip;
+
+$SIG{HUP} = \&sighup;
+
+sub sighup {
+  $Signal++;
+}
+
+sub restart {
+  exec '/usr/bin/perl', '/home/k/bin/paused';
+}
+
+umask 0002;
+
+my $UA =  LWP::UserAgent->new;
+$UA->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
+
+do_log("Starting in a new process");
+
+while () {
+  do_loop();
+  sleep $PAUSE::Config->{SLEEP};
+}
+
+sub do_loop {
+  my($hash,$hash_orig,$dbh,$sth,$sth2,$query);
+
+  my $now    = time ;
+  my $old = $now - 86400*60;
+  unless ( $dbh = DBI->connect(
+			       $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
+			       $PAUSE::Config->{MOD_DATA_SOURCE_USER},
+			       $PAUSE::Config->{MOD_DATA_SOURCE_PW},
+			       { RaiseError => 0 }
+			      ) ) {
+    do_log($DBI::errstr);
+    return; # let them sleep or whatever
+  }
+
+  # Not yet known is how it could happen that 5 uploads came without a
+  # userid. We didn;t catch it:-(
+  $query = qq{SELECT *
+              FROM uris
+	      WHERE length(userid) > 1
+                AND ( dverified=''
+                      OR
+                      dverified > '$old'
+                    ) };
+
+  $sth = $dbh->prepare($query);
+  unless ( $sth->execute ) {
+    do_log($DBI::errstr);
+    return;
+  }
+  my $sql = qq{SELECT fullname, asciiname
+               FROM users
+               WHERE userid=?};
+  $sth2 = $dbh->prepare($sql);
+
+  my ($shall_verify, %hash, $fetchhash);
+
+  while ( $fetchhash  = $sth->fetchrow_hashref ) {
+    $hash = $fetchhash;
+    %hash = %$hash;
+    $hash_orig = {%hash};
+
+    if ( $hash->{uriid} =~ s/ (.*) \.Z$ /$1.gz/x ) {
+      $query = "DELETE FROM uris WHERE uriid = '$1.Z'";
+      do_log("Will try to get rid of the .Z file. Will not try [$query]");
+    }
+    my $lpath  = $PAUSE::Config->{MLROOT} . $hash->{uriid};
+
+    #
+    # For already verified files. Maybe they are to be
+    # mirrored. Attn: many "next"s leaving the loop
+    #
+
+    if ($hash->{dverified}){
+      next unless $hash->{mirrorit};
+      next unless $now > $hash->{dverified} + $hash->{mirrorit}*86400;
+
+      if (-e $lpath) {
+
+	my $request = HTTP::Request->new('HEAD', $hash->{uri});
+	my($mtime) = HTTP::Date::time2str((stat($lpath))[9]);
+	do_log("Is $hash->{uri} newer than $mtime?");
+	$request->header('If-Modified-Since' => $mtime);
+
+	my($response,$success);
+
+	$response = $UA->request($request);
+	$success = $response->is_success;
+	do_log("UA [$UA] response [$response] success [$success]");
+
+	if ( $success ){
+	  do_log("Yes");
+	} else {
+	  # They didn't send success, so they have nothing new
+	  do_log("No: response [$response] success [$success]");
+	  $hash->{dverified} = $now;
+	  next;
+	}
+      }
+      $hash->{dverified} = 0;
+
+#      if (
+
+      do_getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})
+
+#	 ) {
+	  ;
+      $hash->{dverified} = $now;
+      next;
+
+#      }
+
+    }
+
+    # too soon: do_log("lpath [$lpath] uriid [$hash->{uriid}]");
+
+    if (! $hash->{dverified} && $lpath =~ m,/$,) { # directory
+
+      my $mirror = IO::File->new(">>$PAUSE::Config->{MIRRORCONFIG}")
+	  or do_log("Couldn't open $PAUSE::Config->{MIRRORCONFIG}");
+      my($package) = PAUSE::dir2user($hash->{uriid});
+      my($uri) =  URI::URL->new($hash->{uri});
+      my($host) = $uri->host;
+      my($path) = $uri->path;
+      $mirror->print(qq{
+package     =$package
+site        =$host
+remote_dir  =$path
+local_dir   +pub/authors/id/$package
+get_patt    =.
+max_days    =22
+recursive   =false
+skip        =not yet verified
+});
+      $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
+      do_log("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
+      $mirror->close;
+      next;
+    }
+
+    if (
+	$hash->{nosuccesstime}+$PAUSE::Config->{NO_SUCCESS_BREAK} > $now ||
+	$hash->{nosuccesscount} > $PAUSE::Config->{MAXRETRIES}
+       ) {
+      next;
+    }
+
+    do_log("lpath[$lpath] uriid[$hash->{uriid}]");
+
+    if ( -d $lpath ) {
+      next;
+    } elsif ( -s _ ) {
+      # we have the file. If the database also thinks so, OK.
+      # otherwise this is a RE-upload of something README-ish
+      if ($hash->{dgot}) {
+	$hash->{dverified} = $now;
+	do_log("$hash->{uriid} verified");
+	next;
+      } else {
+	unlink $lpath;
+      }
+    }
+    if ($hash->{dgot}) {
+      do_log("dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath] but why is it not on disk?");
+    }
+
+    my $size;
+    if ($size = do_getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
+      $hash->{dgot} = $now;
+      do_log("Got $hash->{uri} to $hash->{uriid} (size $size)");
+      my $md5 = MD5->new;
+      my $handle = IO::File->new;
+      unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
+	die "open $PAUSE::Config->{MLROOT}$hash->{uriid}: $!";
+      }
+      $md5->addfile($handle);
+      $handle->close;
+      my $hexdigest = $md5->hexdigest;
+      my($userid) = PAUSE::dir2user($hash->{uriid});
+      $sth2->execute($userid) or warn;
+      my($fullname, $asciiname) = $sth2->fetchrow_array;
+      $asciiname ||= $fullname;
+      my @To = qq{"$asciiname" <$userid\@cpan.org>};
+      push @To, $PAUSE::Config->{CPAN_TESTERS};
+      push @To, $PAUSE::Config->{'P5P'} if
+	  $hash->{'mailto_p5p'}==1;
+
+      my $blurb = "The URL";
+      $blurb = "The uploaded file" if $hash->{uri} !~ m,/,;
+      $blurb .= qq{
+
+    $hash->{uri}
+
+has entered CPAN as
+
+  file: \$CPAN/authors/id/$hash->{uriid}
+  size: $size bytes
+   md5: $hexdigest
+
+No action is required on your part
+};
+
+      $userid = PAUSE::dir2user($hash->{uriid});
+      $sth2->execute($hash->{changedby});
+      ($fullname, $asciiname) = $sth2->fetchrow_array;
+      $asciiname ||= $fullname;
+      $blurb .= join("",
+                     "Request entered by: $hash->{changedby} ($fullname)\n",
+                     "Request entered on: ",
+                     HTTP::Date::time2str($hash->{changed}),
+                     "\n",
+                     "Request completed:  ",
+                     HTTP::Date::time2str(time),
+                     "\n\n",
+                     "\tVirtually Yours,\n\t$Id"
+                    );
+
+      my $fh = my_pause_send_mail->send({
+                                         To => join(",",@To),
+                                         Subject => "CPAN Upload: $hash->{uriid}",
+                                         "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
+                                        },
+                                        $blurb
+                                       );
+      do_log("Sent email about uriid[$hash->{uriid}]");
+      sleep 15;
+
+    } else {
+      $hash->{nosuccesstime} = $now;
+      $hash->{nosuccesscount}++;
+      my $retries = 8;
+      if ($hash->{nosuccesscount} == $retries) {
+	my $userid = PAUSE::dir2user($hash->{uriid});
+	$sth2->execute($userid);
+	my($fullname, $asciiname) = $sth2->fetchrow_array;
+        # fullname just to reuse sth2
+        $asciiname ||= $fullname;
+	my @To;
+	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$userid\@cpan.org>};
+
+	my $blurb = "The URL $hash->{uri},
+requested for upload as $hash->{uriid} has problems
+I have retried to fetch it $retries times to no avail.
+I'll continue to try until the maximum of $PAUSE::Config->{MAXRETRIES}
+retries is reached. Then I'll give up to give room for a
+new trial.
+
+Virtually,
+$Id\n";
+
+        my $fh = my_pause_send_mail->send({
+                                           To => join(",",@To),
+                                           Subject => "Upload problem $hash->{uriid}"
+                                          },
+                                          $blurb
+                                         );
+
+      } elsif ($hash->{nosuccesscount} == $PAUSE::Config->{MAXRETRIES}) {
+        my $cleanup = "";
+	my $extinguished = "";
+        # Gotta cleanup first
+        my $quote = $dbh->quote($hash->{uriid});
+	my $query = "DELETE FROM uris WHERE uriid=$quote";
+        my $ret = $dbh->do($query);
+	if ($ret) {
+	  $cleanup .= "I have extinguished $hash->{uriid} from the database,
+so we can pretend it has never existed.\n\n";
+	  $extinguished=1;
+	} else {
+	  $cleanup .= "I have tried to extinguish
+  $hash->{uriid}
+from the database, but couldn't (Query[$query]erro[$DBI::errstr]).
+Seems as if the admin has to intervene\n\n";
+	}
+
+        # make sure it ends with a slash
+        $PAUSE::Config->{INCOMING_LOC} =~ s|(?<!/)$|/|;
+	my $incoming_file = $PAUSE::Config->{INCOMING_LOC} . $hash->{uri};
+	if (-f $incoming_file) {
+	  my $i = 1;
+	  while (-f "$incoming_file~$i~") {
+	    $i++;
+	  }
+	  if (rename $incoming_file, "$incoming_file~$i~") {
+	    $cleanup .= "I have renamed the local file
+  $incoming_file
+to
+  $incoming_file~$i~\n\n";
+	  } else {
+	    $cleanup .= "I have tried to rename the file
+  $incoming_file
+to
+  $incoming_file~$i~
+but I couldn't ($!). Seems as if the admin has to do something\n\n";
+	  }
+	}
+
+	my $userid = PAUSE::dir2user($hash->{uriid});
+	$sth2->execute($userid);
+	my($fullname, $asciiname) = $sth2->fetchrow_array;
+        $asciiname ||= $fullname;
+	my @To;
+	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$userid\@cpan.org>};
+
+	my $blurb = "PAUSE has not succeeded to get the URL
+  $hash->{uri},
+requested for upload as
+  $hash->{uriid}
+after the maximum of $PAUSE::Config->{MAXRETRIES} retries.
+I give up now.
+
+$cleanup
+Virtually,
+$Id\n";
+
+        my $fh = my_pause_send_mail->send({
+                                           To => join(",",@To),
+                                           Subject => "Upload problem $hash->{uriid}"
+                                          },
+                                          $blurb
+                                         );
+
+        # don't writeback, it would defeat removing it.
+        undef $hash if $extinguished;
+      }
+    }
+  } continue {
+    writeback($hash,$hash_orig,$dbh) if $hash;
+    restart if $Signal;
+  }
+
+      $sth->finish;
+  $sth2->finish;
+  $dbh->disconnect;
+}
+
+sub is_valid {
+  my($uriid) = shift;
+  $uriid =~ s|.*/||;
+  if ($uriid =~ m![^A-Za-z0-9_\-\.\@\+]!) {
+    do_log("basename of uriid[$uriid] seems to contain illegal characters");
+    return;
+  }
+  return 1;
+}
+
+sub do_getit {
+  my($uri,$uriid,$nosuccesscount) = @_;
+
+  return unless is_valid($uriid);
+
+  my $lpath  = $PAUSE::Config->{MLROOT} . $uriid;
+  my $tpath  = $PAUSE::Config->{TMP} . $uriid;
+  die "Panic" if $tpath =~ s/[\'\"\;\s]//g;
+  if ($uri =~ /\.Z$/) {
+    $tpath =~ s/\.gz$/.Z/;
+  }
+  {
+    my $tmp;
+    ($tmp) = $tpath =~ m,(.*)/,;
+    File::Path::mkpath($tmp);
+    ($tmp) = $lpath =~ m,(.*)/,;
+    File::Path::mkpath($tmp);
+  }
+  do_log("do_getit is going to fetch uri[$uri] uriid[$uriid] tpath[$tpath] lpath[$lpath]");
+  my $uri_obj;
+  eval {
+    $uri_obj =  URI::URL->new($uri, $PAUSE::Config->{INCOMING})
+  };
+
+  if ($@ || ! $uri_obj) {
+    do_log("Bad URL: $uri");
+    return;
+  }
+
+  if ($uri_obj->scheme !~ /^(http|ftp|https)?$/ ) { # Cave canem, e.g. file:
+    do_log(sprintf "Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
+    return;
+  }
+
+  if ($uri_obj->scheme eq 'ftp') {
+    $uri_obj->user('ftp');
+    $uri_obj->password($PAUSE::Config->{ANON_FTP_PASS});
+  }
+
+  do_log(sprintf "requesting a GET on uri [%s]", $uri_obj->abs);
+  my $request = HTTP::Request->new('GET', $uri_obj->abs);
+  if ($uri_obj->scheme eq "http") {
+    $request->header("Accept","*"); # Microsoft Personal Web Server
+                                    # needs this, says Dan Sugalski in
+                                    # 1997
+  }
+
+  my $response = $UA->request($request,$tpath);
+
+  if ($response->code == &HTTP::Status::RC_NOT_MODIFIED) {
+    do_log("no mirror: RC_NOT_MODIFIED for $tpath");
+    return;
+  } elsif ($response->is_success) {
+    if ($tpath =~ /\.(Z|gz)$/){
+      my($stat) = 0;
+      my $ret = `$zcat -t $tpath 2>&1`;
+      if ($stat = $?) {
+	if ($ret =~ /decompression OK, trailing garbage ignored/) {
+	  rename $tpath, "$tpath.crcgarbage";
+	  my $system = "$zcat $tpath.crcgarbage | $gzip -9c > $tpath";
+	  system($system);
+	  $ret = `$zcat -t $tpath 2>&1`;
+	  $stat = $?;
+	}
+      }
+      if ($stat) {
+	do_log($ret);
+	my @To;
+	push @To, $PAUSE::Config->{ADMIN};
+
+	my $blurb = "For the resource [$uri]
+the command [zcat -t $tpath]
+returned status [$stat]
+and output [$ret].
+nosuccesscount is now at [$nosuccesscount].
+The command [ls -l $tpath]
+gives [";
+	$blurb .= `ls -l $tpath`;
+	$blurb .= "]\n\n";
+
+        my $fh = my_pause_send_mail->send({
+                                           To => join(",",@To),
+                                           Subject => "Upload problem $uri"
+                                          },
+                                          $blurb
+                                         );
+	return;
+      }
+    }
+    if (
+	$tpath =~ m/\.Z$/
+       ) {
+      if (-e $lpath) {
+	do_log("Seem to have both a .Z and a .gz");
+      } else {
+	my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
+	my $ret = system($system);
+	do_log("Ran $system with return [$ret]");
+      }
+    } else {
+      rename($tpath,$lpath);
+    }
+    return -s $lpath;
+  } else {
+    my $logresponse = $response->error_as_HTML;
+    $logresponse =~ s/\n//gs ;
+    do_log($logresponse);
+    return;
+  }
+}
+
+sub do_log {
+  my($arg) = @_;
+  my $stamp = &timestamp."-$$ $VERSION: ";
+  my $from = join ":", caller;
+  # open the log file
+  my $logfile = $PAUSE::Config->{PAUSE_LOG};
+  open LOG, ">>$logfile" or die "open $logfile: $!";
+  # LOG->autoflush;
+
+  print LOG $stamp, $arg, " ($from)\n";
+  close LOG;
+}
+
+sub timestamp { # Efficiently generate a time stamp for log files
+  my $time = time;	# optimise for many calls in same second
+  return $last_str if $last_time and $time == $last_time;
+  my($sec,$min,$hour,$mday,$mon,$year)
+      = localtime($last_time = $time);
+  $last_str = sprintf("%04d%02d%02d %02u:%02u:%02u",
+		      $year+1900,$mon+1,$mday, $hour,$min,$sec);
+}
+
+sub writeback {
+  my($hash,$hash_orig,$dbh) = @_;
+  my(@v,$v);
+  for (qw[dgot dverified ddeleted uriid
+	  nosuccesstime nosuccesscount]) {
+    push @v, "$_='$hash->{$_}'" if $hash->{$_} ne $hash_orig->{$_};
+  }
+  return 0 unless @v;
+  my $query = "UPDATE uris SET ";
+  $query .= join ", ", @v;
+  ($v = $hash_orig->{uriid}) =~ s/'/\\'/g;
+  my $whereclause .= " WHERE uriid='$v'";
+  $query .= $whereclause;
+  do_log("Going to: $query");
+  $dbh->do($query) or do_log("$DBI::errstr: $query");
+  if ($DBI::errstr =~ /Non unique key|Duplicate/i) {
+    my $dquery = "DELETE FROM uris $whereclause";
+    do_log("Non-uniq-Error; trying: $dquery");
+    $dbh->do($dquery) or do_log("$DBI::errstr: $dquery");
+    do_log("retry now: $query");
+    $dbh->do($query) or do_log("$DBI::errstr: $query");
+  }
+  return 1;
+}
+
