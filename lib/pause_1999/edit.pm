@@ -934,7 +934,7 @@ sub show_document {
 sub tail_logfile {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
-  my $tail = 3000;
+  my $tail = 6000;
   my($file) = $PAUSE::Config->{PAUSE_LOG};
   if ($PAUSE::Config->{TESTHOST}) {
     $file = "/usr/local/apache/logs/error_log"; # for testing
