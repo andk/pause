@@ -1000,10 +1000,12 @@ Please contact modules\@perl.org if there are any open questions.
         my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
         my $nfiles = scalar @{$self->{MANIFOUND}};
         my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
+        my $substrdistro = substr $distro, 5;
+        my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
         $self->{README} ||= "No README found";
         push @m, qq{
             CPAN ID: $author
-  Distribution file: $distro
+  Distribution file: $distrobasename
     Number of files: $nfiles
          *.pm files: $pmfiles
              README: $self->{README}
@@ -1015,7 +1017,7 @@ Please contact modules\@perl.org if there are any open questions.
                 qq{and is therefore not being indexed.\n\n};
         } elsif ($self->{HAS_BLIB}) {
             push @m, qq{The distribution contains a blib/ directory and is }.
-                qq{therefore not being indexed.\n\n};
+                qq{therefore not being indexed. Hint: try 'make dist'\n\n};
         } else {
             my $st = $self->{INDEX_STATUS};
             if ($st && ref $st && %$st) {
@@ -1052,13 +1054,13 @@ Please contact modules\@perl.org if there are any open questions.
                                               "$author\@cpan.org",
                                               $PAUSE::Config->{ADMIN},
                                              ),
-                                   Subject => "PAUSE Indexer report $distro"
+                                   Subject => "PAUSE Indexer report $substrdistro",
                                   );
         $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
         my $fh  = $msg->open('sendmail');
         print $fh @m;
         $fh->close;
-        $self->verbose(1,"-->> Sent mail about $distro\n");
+        $self->verbose(1,"-->> Sent mail about $substrdistro\n");
     }
 
     # package PAUSE::dist;
