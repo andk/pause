@@ -2096,7 +2096,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                     $ok++;
                 }
             } else {
-                if (CPAN::Version->vgt($pp->{version},$oversion)) {
+                if (CPAN::Version->vgt($pp->{version},$oldversion)) {
                     $self->index_status($package,
                                         $pp->{version},
                                         $pp->{infile},
