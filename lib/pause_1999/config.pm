@@ -25,8 +25,8 @@ pause_1999::usermenu
 
 sub handler {
   my($r) = shift;
-  my $downtime = 1059121800;
-  my $willlast = 1800;
+  my $downtime = 1059137000;
+  my $willlast = 900;
   my $user = $r->connection->user;
   if (time >= $downtime && time < $downtime + $willlast && $user ne "ANDK") {
     $r->content_type("text/html");
