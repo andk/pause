@@ -17,9 +17,16 @@ use DBI ();
 use PAUSE ();
 use PAUSE::MailAddress ();
 use URI::URL ();
+use Getopt::Long;
 
 use strict;
-use vars qw($Signal $last_str $last_time);
+use vars qw($Signal $last_str $last_time %Opt);
+
+GetOptions(\%Opt,qw(pidfile=s)) or die;
+
+open my $fh, ">", $Opt{pidfile} or die;
+print $fh $$;
+close $fh;
 
 package my_pause_send_mail;
 sub send {
@@ -49,6 +56,12 @@ my $gzip = "/bin/gzip";
 die "no executable gzip" unless -x $gzip;
 
 $SIG{HUP} = \&sighup;
+$SIG{TERM} = $SIG{INT} = \&sigkill;
+
+sub sigkill {
+  logge("Stopping");
+  die;
+}
 
 sub sighup {
   $Signal++;
