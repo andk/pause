@@ -208,9 +208,11 @@ sub checkfornew {
             next BIGLOOP;
         }
         $self->verbose(1,"\n    Examining $dist ...\n");
-        print "\n\n\nSHALL I???\n\n\n";
-        $_ = <>;
-        /^y/i or die;
+        # while debugging
+        for (my $i=10; $i; $i--) {
+            print "Waiting $i\n";
+            sleep 1;
+        }
         sleep 1;   # I think this might help us against wild processes
 
         my $userid = PAUSE::dir2user($dist);
