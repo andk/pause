@@ -1323,6 +1323,12 @@ Please contact modules\@perl.org if there are any open questions.
         $dio->alert($what);
     }
 
+    sub connect {
+        my($self) = @_;
+        my $dio = $self->{DIO};
+        $dio->connect;
+    }
+
     # package PAUSE::pmfile;
     sub examine_fio {
         # fio: file object
