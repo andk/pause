@@ -1071,10 +1071,31 @@ or documentation distribution?)\n\n};
 
   # package PAUSE::dist;
   sub check_blib {
-    my($self) = @_;
-    if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}){
-      $self->{HAS_BLIB}++;
-    }
+      my($self) = @_;
+      if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}){
+          $self->{HAS_BLIB}++;
+          return;
+      }
+      # sometimes they package their stuff deep inside a hierarchy
+      my @found = @{$self->{MANIFOUND}};
+      my $endless = 0;
+      while (){
+          my %seen;
+          my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @found;
+          if (@top == 1){
+              print $top[0];
+              s|\Q$top[0]\E/|| for @found;
+              if (++$endless > 10){
+                  $self->alert("ENDLESS LOOP detected in $self->{DIST}!");
+                  last;
+              }
+              next;
+          }
+          if (grep m|^blib/|, @found) {
+              $self->{HAS_BLIB}++;
+          }
+          last;
+      }
   }
 
   # package PAUSE::dist;
