@@ -1890,7 +1890,7 @@ sub delete_files {
   }
   if ($blurb) {
     my $tf = Text::Format->new("firstIndent"=>0,);
-    my @blurb = $tf->format(sprintf(
+    my @blurb = scalar $tf->format(sprintf(
                                     qq{According to a request entered by %s the
 following files and the symlinks pointing to them have been scheduled
 for deletion. They will expire after 72 hours and then be deleted by a
@@ -1902,7 +1902,7 @@ http://%s/pause/authenquery?ACTION=delete_files
                                     $server,
                                     $server));
     push @blurb, $blurb;
-    push @blurb, $tf->format(qq{Note: to encourage deletions, all of past CPAN
+    push @blurb, scalar $tf->format(qq{Note: to encourage deletions, all of past CPAN
 glory is collected on http://history.perl.org/backpan/});
     push @blurb, qq{The Pause};
     # $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
