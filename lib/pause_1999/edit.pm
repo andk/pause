@@ -4789,12 +4789,11 @@ sub stat_meta {
                     headline => "Support Level",
 
                     note => qq{The module list says about the flags
-                      <i>n</i> and <i>a</i>:
-
-<pre>
-n  - None known, try comp.lang.perl.modules
-a  - abandoned; volunteers welcome to take over maintainance
-</pre>},
+                      <i>n</i> and <i>a</i>:<br/>
+<br/>
+n  - None known, try comp.lang.perl.modules<br/>
+a  - abandoned; volunteers welcome to take over maintainance<br/>
+},
 
                     args => {
                              values => \@stats,
