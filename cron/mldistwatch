@@ -417,6 +417,7 @@ sub do_rewrite01 {
         local $" = "";
         while (@r) {
             $achapter{"@r"} ||= $chapterid;
+            pop @r;
         }
     }
     my(%c_fn,$chapterid,$shorttitle,@chaptitle);
@@ -513,6 +514,7 @@ sub do_rewrite01 {
                     $cheap_chapterid = $ch;
                     last;
                 }
+                pop @r;
             }
             unless ($pkg{chapterid} && $cheap_chapterid
                     &&
