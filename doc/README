@@ -50,6 +50,7 @@ make sure that installed programs find their configuration:
   /etc/mon/mon.cf                   -> /home/k/PAUSE/etc/mon/mon.cf
   /etc/mysql/my.cnf                 -> /home/k/PAUSE/etc/my.cnf
   /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
+  /usr/lib/mon/mon.d/sm-mta.monitor -> /home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
 
 [ MISSING documentation:
 
