@@ -174,6 +174,20 @@ I don't understand those indents, but they do no harm anyway...
       push @INC, "/home/k/PAUSE/lib";
     }
 
+# $debugging
+my $debugging;
+if (Apache->define("PERL_DEBUG")) {
+  $debugging = 1;
+  require Apache::DB;
+  require 'Apache/perl5db.pl'; # this seems to be needed with
+                               # 5.7.2@@14159, otherwise we get "No
+                               # DB::DB routine defined at
+                               # /usr/local/apache/lib/map_box/registry.pm
+                               # line 3."
+  Apache::DB->init;
+}
+
+
 use Apache::httpd_conf;
 use Apache::Status;
 # use Apache::DBI;
@@ -257,6 +271,10 @@ for my $loc (qw( /perl-status )){
   $Location{$loc}{PerlHandler} = "Apache::Status";
 }
 
+#      if ($debugging) {
+#        $Location{$loc}{PerlFixupHandler} = "Apache::DB";
+#      }
+
 my $pause = "/pause";
 if (1) { # /pause/ directory
   require pause_1999::main;
@@ -274,6 +292,9 @@ if (1) { # /pause/ directory
     $Location{"/"}{PerlFixupHandler} = "pause_1999::index";
     for my $loc ("$pause/query", "$pause/authenquery", "$pause/mimequery"){
       # note: mimequery is experimental and will go away again
+      if ($debugging) {
+        $Location{$loc}{PerlFixupHandler} = "Apache::DB";
+      }
       require pause_1999::config;
       $Location{$loc}{SetHandler} = "perl-script";
       $Location{$loc}{PerlHandler} = "pause_1999::config";

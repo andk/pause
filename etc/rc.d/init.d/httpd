@@ -40,18 +40,23 @@ case "$1" in
 	echo
         touch /var/lock/subsys/httpd8000
 	;;
-  Xstart)
+  Xstartgdb)
 	echo -n "Starting httpd under gdb ($HTTPD): "
         echo -e "set args -f /usr/local/apache/conf/httpsd.conf.pause -X -DONE_PROCESS\nhandle SIGPIPE pass\nhandle SIGPIPE nostop\nrun" > xstart.$$.args
 	gdb $HTTPD -x xstart.$$.args
         rm xstart.$$.args
 	echo
 	;;
-  Xstart8000)
+  Xstartgdb8000)
 	echo -n "Starting httpd8000 under gdb ($HTTPD8000): "
         echo -e "set args -f /usr/local/apache/conf/httpsd.conf.pause -DSWITCH8000 -X -DONE_PROCESS\nhandle SIGPIPE pass\nhandle SIGPIPE nostop\nrun" > xstart8000.$$.args
 	gdb $HTTPD8000 -x xstart8000.$$.args
         rm xstart8000.$$.args
+	echo
+	;;
+  XstartperlDB8000)
+	echo -n "Starting httpd8000 with perl's own -d ($HTTPD8000): "
+	$HTTPD8000 -f /usr/local/apache/conf/httpsd.conf.pause -DSWITCH8000 -DPERL_DEBUG -X -DONE_PROCESS
 	echo
 	;;
   stop)
@@ -94,7 +99,7 @@ case "$1" in
 	echo
 	;;
   *)
-	echo "Usage: $0 {start|stop|restart|reload|status|start8000|stop8000|Xstart8000}"
+	echo "Usage: $0 {start|stop|restart|reload|status|start8000|stop8000|Xstartgdb|Xstartgdb8000}"
 	exit 1
 esac
 
