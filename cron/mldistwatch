@@ -16,14 +16,14 @@ use HTTP::Date ();
 use Mail::Send ();
 use DBI;
 use PAUSE ();
-our $MLROOT = $PAUSE::Config->{MLROOT};
-$MLROOT =~ s|/+$||; # I found the trailing slash annoying
 use PAUSE::MailAddress ();
 use CPAN; # only for CPAN::Version
 use Text::Format;
 use YAML ();
 use Getopt::Long;
 $Data::Dumper::Indent = 1;
+
+# "MAIN" at the end of file to guarantee all packages are inintialized
 
 {
     package PAUSE::mldistwatch;
@@ -76,6 +76,7 @@ sub verbose {
 sub work {
     my $self = shift;
     my $startdir = Cwd::cwd();
+    my $MLROOT = $self->mlroot;
     chdir $MLROOT
 	or die "Couldn't chdir to $MLROOT";
     $self->init_all();
@@ -99,6 +100,7 @@ sub work {
 sub work2 {
     my $self = shift;
     $self->rewrite02();
+    my $MLROOT = $self->mlroot;
     chdir $MLROOT
         or die "Couldn't chdir to $MLROOT: $!";
     $self->rewrite01();
@@ -260,6 +262,7 @@ sub rewrite02 {
     $self->verbose(2,"\n\nEntering rewrite02\n");
 
     my $dbh = $self->connect;
+    my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/02packages.details.txt";
     my $list = "";
     my $olist = "";
@@ -330,6 +333,7 @@ sub rewrite01 {
     $self->verbose(2, "\nEntering rewrite01\n");
     my $dbh = $self->connect;
 
+    my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/01modules.index.html";
     my $list = "";
     my $olist = "";
@@ -626,6 +630,7 @@ sub write_01sorted {
         last unless --$n;
     }
     $list .= q{</PRE></BODY>};
+    my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/01modules.mtime.html";
     # $self->verbose(1,"Writing $repfile\n");
     if (open F, ">$repfile") {
@@ -643,6 +648,7 @@ sub rewrite03 {
     #
     $self->verbose(2,"\nEntering rewrite03\n");
 
+    my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/03modlist.data";
     my $list = "";
     my $olist = "";
@@ -785,6 +791,13 @@ sub as_ds {
     $result;
 }
 
+sub mlroot {
+    my $self = shift;
+    return $self->{MLROOT} if defined $self->{MLROOT};
+    my $mlroot = $PAUSE::Config->{MLROOT};
+    $mlroot =~ s|/+$||; # I found the trailing slash annoying
+    $self->{MLROOT} = $mlroot;
+}
 
 #####################################################################
 ######################### start of packages #########################
@@ -849,6 +862,7 @@ sub as_ds {
             $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
             $dbh->do("INSERT INTO distmtimes (dist) VALUES ('$dist')");
         }
+        my $MLROOT = $self->mlroot;
         my $mtime = (stat "$MLROOT/$dist")[9];
         my $dirname = File::Basename::dirname("$MLROOT/$dist");
         my $checksumtime = (stat "$dirname/CHECKSUMS")[9] || 0;
@@ -884,6 +898,7 @@ sub as_ds {
         my $dist = $self->{DIST};
         local *TARTEST;
         my $tarbin = $self->{TARBIN};
+        my $MLROOT = $self->mlroot;
         open TARTEST, "$tarbin tzf $MLROOT/$dist |";
         while (<TARTEST>) {
             if (m:^\.\./: || m:/\.\./: ) {
@@ -913,6 +928,7 @@ sub as_ds {
     sub examine_dist {
         my($self) = @_;
         my $dist = $self->{DIST};
+        my $MLROOT = $self->mlroot;
         my($suffix,$skip);
         $suffix = $skip = "";
         if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/ox) {
@@ -1001,6 +1017,12 @@ sub as_ds {
         $main->disconnect;
     }
 
+    sub mlroot {
+        my($self) = @_;
+        my $main = $self->{MAIN};
+        $main->mlroot;
+    }
+
     # package PAUSE::dist;
     sub mail_summary {
         my($self) = @_;
@@ -1012,6 +1034,7 @@ sub as_ds {
 Please contact modules\@perl.org if there are any open questions.
   $PAUSE::mldistwatch::Id\n";
         my $time = gmtime;
+        my $MLROOT = $self->mlroot;
         my $mtime = gmtime((stat "$MLROOT/$distro")[9]);
         my $nfiles = scalar @{$self->{MANIFOUND}};
         my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
@@ -1312,6 +1335,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($suffix) = $self->{SUFFIX};
         return unless $suffix;
         my $dist = $self->{DIST};
+        my $MLROOT = $self->mlroot;
         my @manifind = @{$self->{MANIFOUND}};
         my(@readme) = grep /(^|\/)readme/i, @manifind;
         my($sans) = $dist =~ /(.*)\.\Q$suffix\E$/;
@@ -1461,6 +1485,12 @@ Please contact modules\@perl.org if there are any open questions.
         my($self) = @_;
         my $dio = $self->{DIO};
         $dio->disconnect;
+    }
+
+    sub mlroot {
+        my($self) = @_;
+        my $dio = $self->{DIO};
+        $dio->mlroot;
     }
 
     # package PAUSE::pmfile;
@@ -2010,6 +2040,11 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         $fio->disconnect;
     }
 
+    sub mlroot {
+        my($self) = @_;
+        my $fio = $self->{FIO};
+        $fio->mlroot;
+    }
 
     # package PAUSE::package;
     sub examine_pkg {
@@ -2065,6 +2100,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my($opack,$oldversion,$odist,$ofilemtime,$ofile) = $sth_pack->fetchrow_array;
         $self->verbose(1,"opack[$opack]oldversion[$oldversion]".
                        "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]\n");
+        my $MLROOT = $self->mlroot;
         my $odistmtime = (stat "$MLROOT/$odist")[9];
         my $tdistmtime = (stat "$MLROOT/$dist")[9] ;
         # decrementing Version numbers are quite common :-(
