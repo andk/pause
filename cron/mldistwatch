@@ -2110,8 +2110,8 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                                         qq{Not indexed because $ofile
  seems to have a dual life in $odist. Although the other package is at
  version [$oldversion], the indexer lets the other dist continue to be
- the reference version, shadowing the one in the core. We trust you
- know what you're doing.},
+ the reference version, shadowing the one in the core. Maybe harmless,
+ maybe needs resolving.},
 
                                    );
                 } else {
