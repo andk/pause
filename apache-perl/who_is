@@ -1,4 +1,7 @@
-#!/usr/bin/perl -w
+# -*- mode: cperl -*-
+
+use strict;
+use warnings;
 
 use Apache::Constants ();
 use Apache::Request;

@@ -231,6 +231,7 @@ sub do_loop {
       $sth2->execute($userid) or warn;
       my($fullname, $asciiname) = $sth2->fetchrow_array;
       $asciiname ||= $fullname;
+      $asciiname =~ s/[^\0-\177]/?/g;
       my @To = qq{"$asciiname" <$userid\@cpan.org>};
       push @To, $PAUSE::Config->{CPAN_TESTERS};
       push @To, $PAUSE::Config->{'P5P'} if
@@ -255,6 +256,7 @@ No action is required on your part
       $sth2->execute($hash->{changedby});
       ($fullname, $asciiname) = $sth2->fetchrow_array;
       $asciiname ||= $fullname;
+      $asciiname =~ s/[^\0-\177]/?/g;
       $blurb .= join("",
                      "Request entered by: $hash->{changedby} ($fullname)\n",
                      "Request entered on: ",
@@ -286,6 +288,7 @@ No action is required on your part
 	my($fullname, $asciiname) = $sth2->fetchrow_array;
         # fullname just to reuse sth2
         $asciiname ||= $fullname;
+        $asciiname =~ s/[^\0-\177]/?/g;
 	my @To;
 	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$userid\@cpan.org>};
 
@@ -325,7 +328,8 @@ Seems as if the admin has to intervene\n\n";
 	}
 
         # make sure it ends with a slash
-        $PAUSE::Config->{INCOMING_LOC} =~ s|(?<!/)$|/|;
+        # $PAUSE::Config->{INCOMING_LOC} =~ s|(?<!/)$|/|; # overly clever!
+        $PAUSE::Config->{INCOMING_LOC} =~ s|(/*$|/|;
 	my $incoming_file = $PAUSE::Config->{INCOMING_LOC} . $hash->{uri};
 	if (-f $incoming_file) {
 	  my $i = 1;
@@ -350,6 +354,7 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
 	$sth2->execute($userid);
 	my($fullname, $asciiname) = $sth2->fetchrow_array;
         $asciiname ||= $fullname;
+        $asciiname =~ s/[^\0-\177]/?/g;
 	my @To;
 	push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$userid\@cpan.org>};
 

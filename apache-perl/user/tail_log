@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+# -*- mode: cperl -*-
 
 use strict;
 use lib "/home/k/PAUSE/lib";

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl-5.8 -w
 
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
@@ -58,7 +58,9 @@ for my $line (split /\n/, $stdin) {
 		$sth->execute($userid);
 		if ( $sth->rows > 0 ) {
 		    my($hash) = $sth->fetchrow_hashref;
-		    push @recipients, qq{"$hash->{fullname}" <$hash->{email}>};
+                    my $fullname = $hash->{asciiname} || $hash->{fullname};
+                    $fullname =~ s/[^\0-\177]/?/g;
+		    push @recipients, qq{"$fullname" <$hash->{email}>};
 		} else {
 		    $report .= "\nWarning: No records found for query [$query] and placeholder-userid[$userid]";
 		}

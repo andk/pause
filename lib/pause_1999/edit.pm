@@ -556,6 +556,22 @@ sub edit_cred {
     } else {
       $consistentsubmit = 1;
     }
+    if ($consistentsubmit) {
+      # more testing: make sure that we have in asciiname only ascii
+      if (my $wantasciiname = $req->param("pause99_edit_cred_asciiname")) {
+        if ($wantasciiname =~ /[^\040-\177]/) {
+          push @m, qq{<b>ERROR</b>: Your asciiname seems to contain non-ascii characters.};
+          $consistentsubmit = 0;
+        } else {
+          # set asciiname to empty if it equals fullname
+          my $wantfullname = $req->param("pause99_edit_cred_fullname");
+          if ($wantfullname eq $wantasciiname) {
+            $req->param("pause99_edit_cred_asciiname", "");
+          }
+        }
+      }
+    }
+
   }
   if ($consistentsubmit) {
     my($mailsprintf1,$mailsprintf2,$saw_a_change);
