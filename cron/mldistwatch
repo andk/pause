@@ -983,17 +983,21 @@ CPAN::Complete
     $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
     my $fh  = $msg->open('sendmail');
     print $fh "The following report has been written by the PAUSE indexer.
-  $PAUSE::mldistwatch::Id\n\n";
+
+Please report to modules\@perl.org if there are any open questions.
+Thanks!
+
+  $PAUSE::mldistwatch::Id\n";
     my $author = PAUSE::dir2user($distro);
     my $time = gmtime;
     my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
     my $nfiles = scalar @{$self->{MANIFOUND}};
     print $fh qq{
-      CPAN author: $author
-Distribution file: $distro
-  Number of files: $nfiles
-Timestamp of file: $mtime UTC
- Time of this run: $time UTC\n\n};
+            CPAN ID: $author
+  Distribution file: $distro
+    Number of files: $nfiles
+  Timestamp of file: $mtime UTC
+   Time of this run: $time UTC\n\n};
     if ($self->{HAS_BLIB}) {
       print $fh qq{The distribution contains a blib/ directory and is therefore not being indexed.\n};
     } elsif ($self->{HAS_MULTIPLE_ROOT}) {
@@ -1011,7 +1015,7 @@ Timestamp of file: $mtime UTC
           my $tf = Text::Format->new( bodyIndent => 11, firstIndent => 11);
           my $verb_status = $tf->format($st->{$p}{verb_status});
 	  $verb_status =~ s/^\s+//; # otherwise this line is too long
-          printf $fh "%s\n  version: %s\n  in file: %s\n   status: %s\n",
+          printf $fh "%s\n    version: %s\n    in file: %s\n     status: %s\n",
               $p, $st->{$p}{version}, $st->{$p}{infile}, $verb_status;
         }
       } else {
