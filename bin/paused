@@ -621,7 +621,9 @@ sub hp_tag {
 
 sub hp_text {
   return if $hp_inside{script} || $hp_inside{style};
-  $hp_text .= $_[0];
+  my $text = $_[0];
+  $text =~ s/\n//gs;
+  $hp_text .= $text;
 }
 
 # often called as a class method!
