@@ -108,7 +108,19 @@ Expect failures everywhere.</p> </div>};
 
   }
 
-    push @l, $mgr->instance_of("pause_1999::message");
+  if (time < 1059343200) {
+    push @l, qq{<div align="center">};
+
+    push @l, qq{<p class="motd"><b>Maintainance 2003-07-24/27</b><br/>Maintainance
+work is going on on PAUSE while you read this. Lots of internals have
+changed and not everything is working as it should. I hope to finish
+the work during the weekend.</p>};
+
+    push @l, qq{</div>};
+
+  }
+
+  push @l, $mgr->instance_of("pause_1999::message");
   if ($mgr->{ERROR} && @{$mgr->{ERROR}}) {
     push @l, qq{<h1>Error</h1><p>\n}, @{$mgr->{ERROR}},
 	qq{</p><p>Please try again, probably by using the Back button of
