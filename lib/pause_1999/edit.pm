@@ -2356,9 +2356,9 @@ sub request_id {
       push @m, $mgr->textfield( name => $pair->[1], size => 32 );
       push @m, "\t</td>\n</tr>\n\n";
     }
-    push @m, qq{<tr><td colspan="2">I want to be registered because:</td></tr><tr><td colspan="2">};
+    push @m, qq{<tr><td colspan="2">A short description of what you're planning to contribute:</td></tr><tr><td colspan="2">};
     push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
-                            rows=>6,
+                            rows=>8,
                             cols=>60);
     push @m, qq{</td></tr>};
     push @m, "</table>\n";
