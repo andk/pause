@@ -1000,11 +1000,13 @@ Please contact modules\@perl.org if there are any open questions.
         my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
         my $nfiles = scalar @{$self->{MANIFOUND}};
         my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
+        $self->{README} ||= "No README found";
         push @m, qq{
             CPAN ID: $author
   Distribution file: $distro
     Number of files: $nfiles
          *.pm files: $pmfiles
+             README: $self->{README}
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
         if (0) {
@@ -1193,9 +1195,11 @@ Please contact modules\@perl.org if there are any open questions.
             for (1..$#readme) {
                 $readme = $readme[$_] if length($readme[$_]) < length($readme);
             }
+            $self->{README} = $readme;
             File::Copy::copy $readme, "$PAUSE::Config->{MLROOT}/$sans.readme";
             utime((stat $readme)[8,9], "$PAUSE::Config->{MLROOT}/$sans.readme");
         } else {
+            $self->{README} = "";
             $self->verbose(1,"No readme in $dist\n");
         }
     }
