@@ -143,6 +143,7 @@ sub connect {
 sub DESTROY {
     my $self = shift;
     return unless $self->{DBH};
+    warn "DISCONNECTING from the database";
     $self->{DBH}->disconnect;
     delete $self->{DBH};
 }
