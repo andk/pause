@@ -4866,11 +4866,6 @@ sub chap_meta {
   my(%chap);
   $sth3->execute;
   while (my($chapternr, $chapterid) = $mgr->fetchrow($sth3, "fetchrow_array")) {
-    last unless $chapterid;
-    die "illegal chapterid or nr" if $strict_chapterid &&
-        ($chapternr !~ /^\d*$/ || $chapterid !~ /^\d*$/);
-    $chapternr =~ s/^\s/_/; # I think, I mixed chapternr and chapterid several times!
-    $chapterid =~ s/^\s/_/;
     $chap{$chapternr} = $chapterid;
   }
   my @sorted;
