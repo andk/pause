@@ -28,3 +28,8 @@ package=defaults
 	remote_password=k@pause.perl.org
 	update_log=
 	user=0
+#	passive_ftp=true
+# trying with squid...NOPE
+#	proxy=true
+#	proxy_ftp_port=3128
+#	proxy_gateway=localhost
