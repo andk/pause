@@ -4866,8 +4866,8 @@ sub check_xhtml {
     local $/;
     my $html = <F>;
     # as it is "bad xhtml", we should not try to use XML tools.
-    $html =~ s/^.*<body>//s;
-    $html =~ s|</body>.*||s;
+    $html =~ s/^.*<body.*?>//s;
+    $html =~ s|</body\s*>.*||s;
     push @m, $html;
     close F;
   } else {

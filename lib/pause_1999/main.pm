@@ -382,8 +382,8 @@ sub finish {
   my $p1 = XML::Parser->new;
   eval { $p1->parse($self->{CONTENT}); };
   if ($@) {
-    warn "XML::Parser error[$@]";
     my $rand = String::Random::random_string("cn");
+    warn "XML::Parser error. rand[$rand]\$\@[$@]";
     my $deadmeat = "/var/run/httpd/deadmeat/$rand.xhtml";
     require IO::Handle;
     my $fh = IO::Handle->new;
