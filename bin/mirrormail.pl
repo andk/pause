@@ -1,4 +1,4 @@
-#!/usr/bin/perl-5.8 -w
+#!/usr/local/perl-5.8/bin/perl -w
 
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
