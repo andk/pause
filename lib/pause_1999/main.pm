@@ -438,23 +438,30 @@ sub text_pw_field {
       }
     } else {
       $val = $req->param($name);
-        if ($] > 5.007) { require Encode; $val = Encode::decode_utf8($val); }
+      if ($] > 5.007) { require Encode; $val = Encode::decode_utf8($val); }
     }
   } else {
     $val = $req->param($name);
-        if ($] > 5.007) { require Encode; $val = Encode::decode_utf8($val); }
+    $val = "" unless defined $val;
+    warn "name[$name]val[$val]";
+    if ($] > 5.007) {
+      require Encode;
+      $val = Encode::decode_utf8($val,
+                                 Encode::FB_WARN());
+    }
+    warn "name[$name]val[$val]";
   }
   defined $val or
       defined($val = $arg{value}) or
 	  defined($val = $arg{default}) or
 	      ($val = "");
 
-  sprintf qq{<input type="$fieldtype"
- name="%s" value="%s"%s%s />},
-      $self->escapeHTML($name),
-	   $self->escapeHTML($val),
-	       exists $arg{size} ? " size=\"$arg{size}\"" : "",
-		   exists $arg{maxlength} ? " maxlength=\"$arg{maxlength}\"" : "";
+  sprintf(qq{<input type="$fieldtype" name="%s" value="%s"%s%s />\n},
+          $self->escapeHTML($name),
+          $self->escapeHTML($val),
+          exists $arg{size} ? " size=\"$arg{size}\"" : "",
+          exists $arg{maxlength} ? " maxlength=\"$arg{maxlength}\"" : ""
+         );
 }
 
 sub textfield {
@@ -653,7 +660,7 @@ sub any2utf8 {
     local($SIG{__WARN__}) = sub { $warn = $_[0]; warn "warn[$warn]" };
     my($us) = Unicode::String::utf8($s);
     if ($warn and $warn =~ /utf8|can't/i) {
-      warn "DEBUG: Es war nicht UTF 8, also kann's nur latin1 sein: s[$s]";
+      warn "DEBUG: was not UTF8, we suppose latin1 (apologies to shift-jis et al): s[$s]";
       $s = Unicode::String::latin1($s)->utf8;
       warn "DEBUG: Now converted to: s[$s]";
     } else {

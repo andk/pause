@@ -2079,7 +2079,7 @@ sub add_user {
     my $s = $session->{APPLY};
     for my $a (keys %$s) {
       $req->param("pause99_add_user_$a", $s->{$a});
-      # warn "retrieving from session a[$a]s(a)[$s->{$a}]";
+      warn "retrieving from session a[$a]s(a)[$s->{$a}]";
     }
   }
 
@@ -2091,7 +2091,10 @@ sub add_user {
     my @error;
     if ( $userid !~ $Valid_Userid ) {
       my $euserid = $mgr->escapeHTML($userid);
-      push @error, qq{<b>userid[$euserid]</b> does not match <b>$Valid_Userid</b>.};
+
+      push @error, qq{<b>userid[$euserid]</b> does not match
+          <b>$Valid_Userid</b>.};
+
     }
 
     $req->param("pause99_add_user_userid", $userid) if $userid;
@@ -2100,10 +2103,14 @@ sub add_user {
     my $fullname_raw = $req->param('pause99_add_user_fullname');
     my($fullname);
     $fullname = $mgr->any2utf8($fullname_raw);
+    warn "fullname[$fullname]fullname_raw[$fullname_raw]";
     if ($fullname ne $fullname_raw) {
       $req->param("pause99_add_user_fullname",$fullname);
+      my $debug = $req->param("pause99_add_user_fullname");
+      warn "debug[$debug]fullname[$fullname]";
     }
     unless ($fullname) {
+      warn "no fullname";
       push @error, qq{No fullname, nothing done.};
     }
     unless (@error) {
@@ -2441,18 +2448,42 @@ Subject: $subject\n};
   push(@m,
        qq{<h3>Add a user or mailinglist</h3>},
        $submit_butts,
-       "<br />userid (entering lowercase is OK, but it will be uppercased by the server):<br />",
+
+       "<br />userid (entering lowercase is OK, but it will be
+       uppercased by the server):<br />",
+
        $mgr->textfield(name=>"pause99_add_user_userid", size=>9, maxlength=>9),
+
        qq{<br />full name (mailinglist name):<br />},
-       $mgr->textfield(name=>"pause99_add_user_fullname", size=>50, maxlength=>50),
-       qq{<br />email address (for mailing lists this is the real address):<br />},
-       $mgr->textfield(name=>"pause99_add_user_email", size=>50, maxlength=>50),
+
+       $mgr->textfield(name=>"pause99_add_user_fullname",
+                       size=>50,
+                       maxlength=>50),
+
+       qq{<br />email address (for mailing lists this is the real
+       address):<br />},
+
+       $mgr->textfield(name=>"pause99_add_user_email",
+                       size=>50,
+                       maxlength=>50),
+
        qq{<br />homepage url (ignored for mailing lists):<br />},
-       $mgr->textfield(name=>"pause99_add_user_homepage", size=>50, maxlength=>256),
-       qq{<br />subscribe information if this user is a mailing list (leave blank for ordinary users):<br />},
-       $mgr->textfield(name=>"pause99_add_user_subscribe", size=>50, maxlength=>256),
+
+       $mgr->textfield(name=>"pause99_add_user_homepage",
+                       size=>50,
+                       maxlength=>256),
+
+       qq{<br />subscribe information if this user is a mailing list
+       (leave blank for ordinary users):<br />},
+
+       $mgr->textfield(name=>"pause99_add_user_subscribe",
+                       size=>50,
+                       maxlength=>256),
        qq{<br />},
-       qq{<br />If you want to send a message to new author, please enter it here:<br />},
+
+       qq{<br />If you want to send a message to new author, please
+       enter it here:<br />},
+
        $mgr->textarea(name=>"pause99_add_user_memo",
                       rows=>6,
                       cols=>60),
@@ -2523,7 +2554,7 @@ sub request_id {
                "userid[%s]Valid_Userid[%s]args[%s]",
                $userid,
                $Valid_Userid,
-               scalar $r->args,
+               scalar($r->args)||"",
               );
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
@@ -2542,7 +2573,11 @@ sub request_id {
       my $db = $mgr->connect;
       my $sth = $db->prepare("SELECT userid FROM users WHERE userid=?");
       $sth->execute($userid);
-      warn sprintf "userid[%s]Valid_Userid[%s]matches[%s]", $userid, $Valid_Userid, $userid =~ $Valid_Userid;
+      warn sprintf("userid[%s]Valid_Userid[%s]matches[%s]",
+                   $userid,
+                   $Valid_Userid,
+                   $userid =~ $Valid_Userid || "",
+                  );
       if ($sth->rows > 0) {
         my $euserid = $mgr->escapeHTML($userid);
         push @errors, "The userid $euserid is already taken.";
@@ -2643,6 +2678,7 @@ sub request_id {
                          userid => $userid,
                          rationale => $rationale,
                         };
+    require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$session->{APPLY}],[qw(APPLY)])->Indent(1)->Useqq(1)->Dump; # XXX
     my $sessionID = $mgr->userid;
     my $host = "https://pause.perl.org";
     # $host = "http://k242.linux.bogus" if $PAUSE::Config->{TESTHOST};
@@ -5213,7 +5249,8 @@ TODO XXX
         $where = qq{WHERE perms.package=? ORDER BY perms.userid};
       } else {
         $where = qq{WHERE perms.package LIKE ? ORDER BY perms.userid LIMIT 1000};
-        # I saw 5.7.3 die with Out Of Memory on the query "%" when no Limit was applied
+        # I saw 5.7.3 die with Out Of Memory on the query "%" when no
+        # Limit was applied
       }
     } elsif ($by eq "a") {
       $where = qq{WHERE perms.userid=? ORDER BY perms.package};
