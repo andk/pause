@@ -45,7 +45,8 @@ String::Random
 CPAN
 XML::Parser
 Class::Singleton -- lexikon
-Unicode::String -- Apache::HEavyCGI
+Unicode::String -- Apache::HeavyCGI
+YAML
 
 Text::Unidecode
 

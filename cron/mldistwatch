@@ -21,6 +21,7 @@ $MLROOT =~ s|/+$||; # I found the trailing slash annoying
 use PAUSE::MailAddress ();
 use CPAN; # only for CPAN::Version
 use Text::Format;
+use YAML ();
 $Data::Dumper::Indent = 1;
 umask 0002;
 $|=1;
@@ -35,7 +36,7 @@ $|=1;
 }
 
 my $mldw = PAUSE::mldistwatch->new;
-$mldw->do_work;
+$mldw->work;
 exit;
 
 
@@ -75,7 +76,7 @@ sub verbose {
     print @what;
 }
 
-sub do_work {
+sub work {
     my $self = shift;
     my $startdir = Cwd::cwd();
     chdir $MLROOT
@@ -94,16 +95,16 @@ sub do_work {
     }
     chdir $startdir;
     rmtree $testdir;
-    $self->do_work2;
+    $self->work2;
 }
 
-sub do_work2 {
+sub work2 {
     my $self = shift;
-    $self->do_rewrite02();
+    $self->rewrite02();
     chdir $MLROOT
         or die "Couldn't chdir to $MLROOT: $!";
-    $self->do_rewrite01();
-    $self->do_rewrite03();
+    $self->rewrite01();
+    $self->rewrite03();
 }
 
 sub set_active_status {
@@ -253,12 +254,12 @@ sub checkfornew {
 
 }
 
-sub do_rewrite02 {
+sub rewrite02 {
     my $self = shift;
     #
     # Rewriting 02packages.details.txt
     #
-    $self->verbose(2,"\n\nEntering do_rewrite02\n");
+    $self->verbose(2,"\n\nEntering rewrite02\n");
 
     my $dbh = $self->connect;
     my $repfile = "$MLROOT/../../modules/02packages.details.txt";
@@ -323,12 +324,12 @@ Last-Updated: $date\n\n};
     }
 }
 
-sub do_rewrite01 {
+sub rewrite01 {
     my($self) = shift;
     #
     # Rewriting 01modules.index.html
     #
-    $self->verbose(2, "\nEntering do_rewrite01\n");
+    $self->verbose(2, "\nEntering rewrite01\n");
     my $dbh = $self->connect;
 
     my $repfile = "$MLROOT/../../modules/01modules.index.html";
@@ -637,12 +638,12 @@ sub write_01sorted {
     }
 }
 
-sub do_rewrite03 {
+sub rewrite03 {
     my($self) = shift;
     #
     # Rewriting 03modlist.data
     #
-    $self->verbose(2,"\nEntering do_rewrite03\n");
+    $self->verbose(2,"\nEntering rewrite03\n");
 
     my $repfile = "$MLROOT/../../modules/03modlist.data";
     my $list = "";
