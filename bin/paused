@@ -404,7 +404,7 @@ sub is_valid {
     do_log("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
-  if ($dir =~ m![^A-Z/\-]!) {
+  if ($dir =~ m![^A-Za-z0-9_\-\@\+/]!) { # we allow user subdirectories, see edit.pm
     do_log("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
