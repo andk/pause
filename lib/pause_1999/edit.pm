@@ -5216,7 +5216,9 @@ sub peek_perms {
             module. Select the option and fill in a module name or
             user ID as appropriate. The answer is all modules that an
             user ID is registered for or all user IDs registered for a
-            module, as appropriate.</p><p>Registration comes in one of
+            module, as appropriate.</p>
+
+            <p>Registration comes in one of
             three types: type <b>modulelist</b> is the registration in
             the module list (as "blessed" by the module list
             maintainers; often months behind). Type <b>first-come</b>
@@ -5232,7 +5234,9 @@ sub peek_perms {
             the categories means that a user is able not only to
             upload a module in that namespace but also be accepted by
             the indexer. In other words, the indexer will not ignore
-            uploads for that namespace by that person.</p><p>The
+            uploads for that namespace by that person.</p>
+
+            <p>The
             contents of the tables presented on this page are mostly
             generated automatically, so please report any errors you
             observe to @{$PAUSE::Config->{ADMINS}} so that the tables
@@ -5259,51 +5263,61 @@ sub peek_perms {
                            size => 44,
                            maxlength => 112,
                           );
-  push @m, qq{<input type="submit" name="pause99_peek_perms_sub" value="Submit" /></p>};
+  push @m, qq{<input type="submit" name="pause99_peek_perms_sub" value="Submit" />
+              </p>};
 
 =pod
 
 Bugreport 2002-04-29:
 
 1. module list says JSTOWE is owner of XML::XSLT
-2. View Perms auf JSTOWE erwaehnt XML::XSLT nicht
-3. View perms auf XML::XSLT sagt, BRONG und JOSTEN seien co-maint, sonst nix
+2. View Perms on JSTOWE does not mention XML::XSLT
+3. View perms on XML::XSLT says, BRONG and JOSTEN be co-maint, nobody else
 
-Das heist, wir haben einen owner in mods, der weder in primeur noch in
-perms aufscheint. Ein reindex auf JSTOWE/XML-XSLT-0.40.tar.gz hat das
-gefixt. Aber, wenn JSTOWE jetzt keine dist von XML::XSLT in seinem
-Directory gehabt haette, haette ich es nicht ueber reindex fixen
-koennen. Wir haben also offensichtlich Module, die die INNER JOIN
-Bedingung nicht erfuellen. Wir erlauben den Autoren, die
-Co-Maintainership aufzugeben, auch wenn sie Primary Maintainer sind
-oder in der Module List stehen? Das sieht nach Bug aus. Wer in der
-Modulelist steht, muss auch Primary sein und muss auch in perms stehen
-und das muss auch so bleiben, sonst sind wir inkonsistent und finden
-gar nicht heraus, wer hauptzustaendig fuer ein Modul ist.
+This means, we have a owner in mods, who is neither in primeur nor in
+perms.
+
+A reindex on JSTOWE/XML-XSLT-0.40.tar.gz has
+fixed that. But, if JSTOWE now had not had a dist of XML::XSLT in his
+directory, I would not have been able to reindex it.
+We apparently have modules, that do not satisfy the INNER JOIN
+condition.
+
+We allow autors, to give up
+co-maintainership, even when they are Primary Maintainer
+or are in the Module List? Looks like a Bug. Who is in the
+Module List, must also be Primary and must also be in perms
+and that must remain that way, otherwise we are inconsistent and do not find
+out, who is responsible for a modul.
 
 TODO XXX
 
 =cut
 
 
-  if (my $q = $cgi->param("pause99_peek_perms_query")) {
+  if (my $qterm = $cgi->param("pause99_peek_perms_query")) {
     my $by = $cgi->param("pause99_peek_perms_by");
     my @query       = (
                 qq{SELECT perms.package,
                           perms.userid,
-                          "modulelist" FROM perms
- INNER JOIN mods
- ON mods.modid=perms.package AND mods.userid=perms.userid
+                          "modulelist"
+                   FROM perms
+                        INNER JOIN mods
+                        ON mods.modid=perms.package
+                        AND mods.userid=perms.userid
 },
                 qq{SELECT perms.package,
                           perms.userid,
-                          "first-come" FROM perms
- INNER JOIN primeur
- ON primeur.package=perms.package AND primeur.userid=perms.userid
+                          "first-come"
+                   FROM perms
+                        INNER JOIN primeur
+                        ON primeur.package=perms.package
+                        AND primeur.userid=perms.userid
 },
                 qq{SELECT perms.package,
                           perms.userid,
-                          "co-maint" FROM perms
+                          "co-maint"
+                   FROM perms
 },
                );
 
@@ -5328,8 +5342,9 @@ TODO XXX
     for my $query (@query) {
       $query .= $where;
       my $sth = $db->prepare($query);
-      $sth->execute($q);
+      $sth->execute($qterm);
       if ($sth->rows > 0) {
+        # warn sprintf "query[%s]qterm[%s]rows[%d]", $query, $qterm, $sth->rows;
         while (my @row = $mgr->fetchrow($sth, "fetchrow_array")) {
           if ($seen{join "|", @row[0,1]}++){
             # warn "Ignoring row[$row[0]][$row[1]]";
@@ -5582,6 +5597,7 @@ sub share_perms {
     }
   }
   my $u = $self->active_user_record($mgr);
+  # warn sprintf "subaction[%s] u->userid[%s]", $subaction||"", $u->{userid}||"";
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
 
   unless ($subaction) {
@@ -5664,6 +5680,7 @@ sub share_perms {
   }
 
   my $method = "share_perms_$subaction";
+  # warn "method[$method]";
   push @m, $self->$method($mgr);
   @m;
 }
@@ -5867,11 +5884,14 @@ sub share_perms_makeco {
   my $req = $mgr->{CGI};
 
   my $u = $self->active_user_record($mgr);
+  # warn "u->userid[%s]", $u->{userid};
 
   my $db = $mgr->connect;
 
   my $all_mmods = $self->all_mmods($mgr,$u);
+  # warn sprintf "all_mmods[%s]", join("|", keys %$all_mmods);
   my $all_pmods = $self->all_pmods($mgr,$u);
+  # warn sprintf "all_pmods[%s]", join("|", keys %$all_pmods);
   my $all_mods = {%$all_mmods, %$all_pmods};
 
   if (
