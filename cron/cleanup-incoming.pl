@@ -27,7 +27,7 @@ for my $dirent (readdir DIR) {
   $sth->execute($dirent);
   next if $sth->rows > 0;
   my $size = -s $absdirent;
-  if ($dirent =~ /^(\d+)\.(\d+)$/) { # these come too often
+  if (0 && $dirent =~ /^(\d+)\.(\d+)$/) { # these come often, but I could not decipher
     open my $fh, $absdirent or die "Could not open $absdirent: $!";
     local $/;
     my $str = <$fh>;
