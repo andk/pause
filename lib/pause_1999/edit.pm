@@ -5333,7 +5333,8 @@ sub share_perms_remocos {
             ->new(ERROR => "You do not seem to be owner of $selmod")
                   unless exists $all_mods->{$selmod};
         unless (exists $all_comaints->{$sel}) {
-          push @m, "Cannot handle tuple <i>$sel</i>. If you believe, this is a bug, please complain.<br />";
+          push @m, "<p>Cannot handle tuple <i>$sel</i>. If you
+              believe, this is a bug, please complain.</p>";
           next;
         }
         my $ret = $sth1->execute($selmod,$otheruser);
@@ -5342,15 +5343,15 @@ sub share_perms_remocos {
         $ret ||= "";
         warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
         if ($ret) {
-          push @m, "Removed $otheruser from co-maintainers of $selmod.<br />\n";
+          push @m, "<p>Removed $otheruser from co-maintainers of $selmod.</p>\n";
         } else {
-          push @m, "Error trying to remove $otheruser from co-maintainers of
-                    $selmod: $err<br />\n";
+          push @m, "<p>Error trying to remove $otheruser from co-maintainers of
+                    $selmod: $err</p>\n";
         }
       }
     };
     if ($@) {
-      push @m, $@->{ERROR}, "<br />";
+      push @m, "<p>", $@->{ERROR}, "</p>";
     }
     push @m, "<hr />\n";
   }
@@ -5442,17 +5443,17 @@ sub share_perms_remome {
           $ret ||= "";
           warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
           if ($ret) {
-            push @m, "Removed $u->{userid} from co-maintainers of $selmod.<br />\n";
+            push @m, "<p>Removed $u->{userid} from co-maintainers of $selmod.</p>\n";
             delete $all_mods->{$selmod};
           } else {
-            push @m, "Error trying to remove $u->{userid} from co-maintainers of
-                    $selmod: $err<br />\n";
+            push @m, "<p>Error trying to remove $u->{userid} from co-maintainers of
+                    $selmod: $err</p>\n";
           }
         }
       }
     };
     if ($@) {
-      push @m, $@->{ERROR}, "<br />";
+      push @m, "<p>", $@->{ERROR}, "</p>";
     }
     push @m, "<hr />\n";
   }
@@ -5533,16 +5534,16 @@ sub share_perms_makeco {
           $ret ||= "";
           warn "DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]";
           if ($ret) {
-            push @m, "Added $other_user to co-maintainers of $selmod.<br />\n";
+            push @m, "<p>Added $other_user to co-maintainers of $selmod.</p>\n";
           } else {
-            push @m, "Error trying to add $other_user to co-maintainers of
-                    $selmod: $err<br />\n";
+            push @m, "<p>Error trying to add $other_user to co-maintainers of
+                    $selmod: $err</p>\n";
           }
         }
       }
     };
     if ($@) {
-      push @m, $@->{ERROR}, "<br />";
+      push @m, "<p>", $@->{ERROR}, "</p>";
     }
     push @m, "<hr />\n";
   }
@@ -5614,16 +5615,16 @@ sub share_perms_remopr {
           $ret ||= "";
           warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
           if ($ret) {
-            push @m, "Removed primary maintainership of $u->{userid} from $selmod.<br />\n";
+            push @m, "<p>Removed primary maintainership of $u->{userid} from $selmod.</p>\n";
           } else {
-            push @m, "Error trying to remove primary maintainership of $u->{userid}
-                    from $selmod: $err<br />\n";
+            push @m, "<p>Error trying to remove primary maintainership of $u->{userid}
+                    from $selmod: $err</p>\n";
           }
         }
       }
     };
     if ($@) {
-      push @m, $@->{ERROR}, "<br />";
+      push @m, "<p>", $@->{ERROR}, "</p>";
     }
     push @m, "<hr />\n";
   }
@@ -5705,16 +5706,16 @@ sub share_perms_movepr {
           $ret ||= "";
           warn "DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]";
           if ($ret) {
-            push @m, "Made $other_user primary maintainer of $selmod.<br />\n";
+            push @m, "<p>Made $other_user primary maintainer of $selmod.</p>\n";
           } else {
-            push @m, "Error trying to make $other_user primary maintainer of
-                    $selmod: $err<br />\n";
+            push @m, "<p>Error trying to make $other_user primary maintainer of
+                    $selmod: $err</p>\n";
           }
         }
       }
     };
     if ($@) {
-      push @m, $@->{ERROR}, "<br />";
+      push @m, "<p>", $@->{ERROR}, "</p>";
     }
     push @m, "<hr />\n";
   }
