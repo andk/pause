@@ -20,12 +20,13 @@
 +---------------------------------------------------------------+
 
 So we have distfilechecks, directorychecks and contentfilechecks.
-Contentchecks have two parts, files and namspaces (packages). And we
+Contentchecks have two parts, files and namespaces (packages). And we
 have some sort of a scheduler that keeps track of what we have to do.
 
 4 levels of classes:
 
-PAUSE::mldistwatch       we could call it main. One object does all
+PAUSE::mldistwatch       we could call it main. One object does all the
+                         work
 
 PAUSE::dist              each distro we find is an object of this class
 
@@ -136,7 +137,6 @@ sub do_work {
     chdir $testdir
 	or die("Couldn't change to $testdir: $!");
     {
-        local $/ = "";
         $self->checkfornew();
     }
     chdir $startdir;
@@ -190,6 +190,7 @@ sub init_all {
 
 sub checkfornew {
     my $self = shift;
+    local $/ = "";
     my $dbh = $self->connect;
     my(@goners);
     my $time = time;
@@ -237,17 +238,12 @@ sub checkfornew {
         my $userid = PAUSE::dir2user($dist);
         $dio->{USERID} = $userid;
 
-        my $suffix = "";
-        my $skip = 0;
-
-
-        # You smell the rotten roots of this program...
-        ($suffix,$skip) = $dio->examine_dist; # checks for perl, developer
-        # version, etc. and untars
+        $dio->examine_dist; # checks for perl, developer, version, etc. and untars
+        my $skip = $dio->skip;
         next BIGLOOP if $skip;
 
         $dio->read_dist;
-        $dio->extract_readme($suffix) if $suffix;
+        $dio->extract_readme;
         $dio->check_blib;
         $dio->check_multiple_root;
         $dio->examine_pms;      # will switch user
@@ -792,8 +788,7 @@ sub as_ds {
     # would be represented as a hash, we would produce 250k instead of
     # 60. After compression the ratio is still 2:1.
     $result = [];
-    while () {
-        my @row = $sth->fetchrow_array or last;
+    while (my @row = $sth->fetchrow_array) {
         if ($] > 5.007) {
             require Encode;
             for (@row) {
@@ -921,6 +916,8 @@ sub as_ds {
         return 1;
     }
 
+    sub skip { shift->{SKIP} }
+
     # package PAUSE::dist;
     sub examine_dist {
         my($self) = @_;
@@ -984,7 +981,8 @@ sub as_ds {
                 $skip = 1;
             }
         }
-        return($suffix,$skip);
+        $self->{SUFFIX} = $suffix;
+        $self->{SKIP}   = $skip;
     }
 
     sub connect {
@@ -1203,7 +1201,8 @@ Please contact modules\@perl.org if there are any open questions.
     # package PAUSE::dist;
     sub extract_readme {
         my $self = shift;
-        my($suffix) = shift;
+        my($suffix) = $self->{SUFFIX};
+        return unless $suffix;
         my $dist = $self->{DIST};
         my @manifind = @{$self->{MANIFOUND}};
         my(@readme) = grep /(^|\/)readme/i, @manifind;
