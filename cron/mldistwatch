@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
+#!/usr/local/perl-5.8/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
 
 =pod
 
@@ -644,6 +644,10 @@ sub do_rewrite03 {
       -f "$repfile.gz" and
       open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
      ) {
+    if ($] > 5.007) {
+      require Encode;
+      binmode F, ":utf8";
+    }
     while (<F>) {
       next if 1../^\s*$/;
       $olist .= $_;
@@ -693,7 +697,7 @@ Date:        %s
 
   $list .= Data::Dumper->new([
 			      $sth->{NAME},
-			      as_ds($sth,"modid")
+			      as_ds($sth)
 			     ],
 			     ["cols","data"]
 			    )->Dump;
@@ -701,6 +705,10 @@ Date:        %s
   if ($list ne $olist) {
     print "Have to rewrite\n";
     if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
+      if ($] > 5.007) {
+        require Encode;
+        binmode F, ":utf8";
+      }
       print F $header;
       print F $list;
     } else {
@@ -750,7 +758,7 @@ sub chdir_ln_chdir {
 }
 
 sub as_ds {
-  my($sth,$primary) = @_;
+  my($sth) = @_;
   my $result;
   # If we produce the datastructure as it would seem natural,
   # i.e. each primary key became key in a hash, and each table row
@@ -759,6 +767,12 @@ sub as_ds {
   $result = [];
   while () {
     my @row = $sth->fetchrow_array or last;
+    if ($] > 5.007) {
+        require Encode;
+        for (@row) {
+            defined && /[^\000-\177]/ && Encode::_utf8_on($_);
+        }
+    }
     push @$result, \@row;
   }
   $result;
