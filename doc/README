@@ -11,7 +11,7 @@ and files containing passwords or other sensible data. To access the
 repository you need a subversion client (subversion.tigris.org).
 
 If you do not have a subversion client, a tarball of the repository is
-produced by a cronjob and accessible as in the directory
+produced by a cronjob and accessible in the directory
 
     ftp://pause.perl.org/pub/PAUSE/PAUSE-code/
 
@@ -58,11 +58,9 @@ make sure that installed programs find their configuration:
 
 ]
 
-(XXX reduce the number of necessary symlink)
-
 (XXX integrate indexscripts.pl with the help of kstar)
 
-=head2 External programs to run PAUSE
+=head2 External programs needed to run PAUSE
 
   apache with mod_perl and Apache-SSL
   perl
@@ -132,6 +130,6 @@ repository because they are so basic stuff for any UNIX machine:
   sendmail
 
 and probably more. If you discover pieces that are important but
-missing in the repository, please let us know.
+missing in the repository or documentation, please let us know.
 
 =cut
