@@ -254,7 +254,7 @@ sub as_string {
     push @m, sprintf(
                      qq{<h2 class="firstheader">%slease choose an action from the menu.</h2>},
                      $mgr->{User}{fullname} ?
-                     "Hi $mgr->{User}{fullname},<br />p" :
+                     sprintf("Hi %s,<br />p",$mgr->escapeHTML($mgr->{User}{fullname})) :
                      "P"
                     );
 
