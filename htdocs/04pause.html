@@ -8,7 +8,7 @@
 <!-- hhmts start -->
 Last modified: Sun Apr 14 11:44:04 CEST 2002
 <!-- hhmts end -->
-$Revision: 1.65 $
+$Rev$
 </i></p>
 
 <h3>Contents</h3>
@@ -217,7 +217,9 @@ case by running</p>
 'print MM->parse_version(shift)' 'file'</code></blockquote>
 
 <p>on the filenames in question. The CPAN indexer will run this code
-within a Safe compartement.</p>
+within a Safe compartement, so maybe even if the above command
+succeeds, PAUSE may fail if you're doing file IO or other potentially
+dangerous things within that line.</p>
 
 <p>The automatic integration of your work into several <b>indexes</b> and
 directory trees is not always in accordance with what you desire. If

@@ -64,3 +64,5 @@ perl
 mirror (the good old)
 mon
 proftpd
+mysql
+rsync (runs as daemon)

@@ -2,6 +2,16 @@
 
 =pod
 
+Open Bugs:
+
+If a package has no primeur but a co-maintainer X, the uploading user
+Y will be blocked: he will not become primeur, not become co-maint,
+not be indexed. This is a bug, because user X "gave up primary
+maintainership".
+
+
+History:
+
 This started as a script that had to watch the files coming in on
 PAUSE. It created symlink trees and a few html documents. It untarred
 the distributions and checksummed them. It sent alerts. It had to
@@ -136,17 +146,14 @@ use Mail::Send ();
 use DBI;
 use PAUSE ();
 use Net::Domain ();
-use vars qw($Id $RCS_REV $reportstring
+use vars qw($Id $reportstring
 	    %ALLfound %ALLlasttime %ALL
 	   );
 use CPAN;
 
-$Id = q$Id: mldistwatch,v 2.343 2002/08/01 19:23:29 k Exp k $;
+$Id = q$Rev$;
 
-$RCS_REV = substr(q$Revision: 2.343 $, 10);
-$RCS_REV =~ s/\s+//g;
-
-print "Running $0, v$RCS_REV\n";
+print "Running $0, $Id\n";
 
 $Data::Dumper::Indent = 1;
 umask 0002;
@@ -321,7 +328,7 @@ sub checkfornew {
   }
 
   $dbh->disconnect;
-  if (@goners) {
+  if (0 && @goners) {
     my($msg) = Mail::Send->new(
                                To => join(", ",
                                           $PAUSE::Config->{GONERS_NOTIFY},
@@ -395,7 +402,7 @@ URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
 Description:  Package names found in directory \$CPAN/authors/id/
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
-Written-By:   mldistwatch (v $RCS_REV) by Andreas.Koenig\@anima.de
+Written-By:   mldistwatch ($Id) by Andreas.Koenig\@anima.de
 Line-Count:   $numlines
 Last-Updated: $date\n\n};
 
@@ -733,7 +740,7 @@ Modcount:    %d
 Written-By:  mldistwatch (v %s) by Andreas.Koenig\@anima.de
 Date:        %s
 
-}, $sth->rows, $RCS_REV, $date;
+}, $sth->rows, $Id, $date;
 
   $list = qq{
     package CPAN::Modulelist;
@@ -1388,7 +1395,8 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
   }
 
   # package PAUSE::package;
-  sub give_regowner_perms {
+  # return value nonsensical
+  sub give_regdowner_perms {
     my $self = shift;
     my $dbh = $self->{DBH};
     my $package = $self->{PACKAGE};
@@ -1411,6 +1419,14 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
   }
 
   # package PAUSE::package;
+  # returns 1 if user is owner; makes him co-maintainer at the same time
+
+  # otherwise returns false if the package is already known in perms
+  # table AND the user is not among the co-maintainers
+
+  # but if the package is not yet known in the perms table this makes
+  # him co-maintainer AND returns 1
+
   sub is_primeur_has_perms {
     my $self = shift;
     my $dist = $self->{DIST};
@@ -1510,7 +1526,7 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
 
     # set perms for registered owner in any case
 
-    $self->give_regowner_perms; # (1)
+    $self->give_regdowner_perms; # (1)
 
     # Query all users with perms for this package
 
@@ -1725,6 +1741,7 @@ VALUES (
     $dbh->do($query);
   }
 
+  # returns always the return value of print, so basically always 1
   sub checkin_into_primeur {
     my $self = shift;
     my $dbh = $self->{DBH};
@@ -1738,7 +1755,7 @@ VALUES (
 
     # We come here, no matter if this package is in primeur or not. We
     # know, it must get in there if it isn't yet. No update, just an
-    # insert, please. Should be similar to give_regowner_perms(), but
+    # insert, please. Should be similar to give_regdowner_perms(), but
     # this time with this user.
 
     # print ">>>>>>>>checkin_into_primeur not yet implemented<<<<<<<<\n";
@@ -1763,7 +1780,7 @@ VALUES (
     my $pp = $self->{PP};
     my $pmfile = $self->{PMFILE};
 
-    $self->checkin_into_primeur;
+    $self->checkin_into_primeur; # called in void context!
 
     my $sth_pack = $dbh->prepare(qq{SELECT package, version, dist,
 			                  filemtime, file

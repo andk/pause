@@ -9,7 +9,7 @@ use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
 
 use vars qw($VERSION);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.281 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub parameter {
   my pause_1999::edit $self = shift;
@@ -588,15 +588,11 @@ sub edit_cred {
         my $s_raw = $req->param($form_field) || "";
         # we're in edit_cred
         my $s;
-        if ($pause_1999::main::DO_UTF8) {
-          $s = $mgr->any2utf8($s_raw);
-          $s =~ s/^\s+//;
-          $s =~ s/\s+\z//;
-          if ($s ne $s_raw) {
-            $req->param($form_field,$s);
-          }
-        } else {
-          $s = $s_raw;
+        $s = $mgr->any2utf8($s_raw);
+        $s =~ s/^\s+//;
+        $s =~ s/\s+\z//;
+        if ($s ne $s_raw) {
+          $req->param($form_field,$s);
         }
 	$nu->{$field} = $s;
         $u->{$field} = "" unless defined $u->{$field};
@@ -1900,13 +1896,9 @@ sub add_user {
     my $dont_clear;
     my $fullname_raw = $req->param('pause99_add_user_fullname');
     my($fullname);
-    if ($pause_1999::main::DO_UTF8) {
-      $fullname = $mgr->any2utf8($fullname_raw);
-      if ($fullname ne $fullname_raw) {
-        $req->param("pause99_add_user_fullname",$fullname);
-      }
-    } else {
-      $fullname = $fullname_raw;
+    $fullname = $mgr->any2utf8($fullname_raw);
+    if ($fullname ne $fullname_raw) {
+      $req->param("pause99_add_user_fullname",$fullname);
     }
     if ($fullname) {
       if ($req->param('SUBMIT_pause99_add_user_Definitely')) {
@@ -4131,10 +4123,11 @@ $blurbcopy
               searchability of the CPAN and to avoid namespace
               clashes. You will be notified when the registration is
               approved but you can upload immediately, there's no need
-              to wait for an approval.</p><p>If you are facing any
-              problems with this form, please report to
-              modules\@perl.org.<br />Thank you for registering.</p><hr
-              noshade="noshade" />};
+              to wait for an approval. <b>On the contrary, you are
+              encouraged to upload immediately.</b></p><p>If you are
+              facing any problems with this form, please report to
+              modules\@perl.org.<br />Thank you for
+              registering.</p><hr noshade="noshade" />};
 
 
  FORMULAR2:
