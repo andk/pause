@@ -55,6 +55,7 @@ sub sighup {
 }
 
 sub restart {
+  logge("Going to exec $^X $0");
   exec $^X, $0;
 }
 
@@ -63,14 +64,14 @@ umask 0002;
 my $UA =  LWP::UserAgent->new;
 $UA->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
 
-do_log("Starting in a new process");
+logge("Starting in a new process");
 
 while () {
-  do_loop();
+  loop();
   sleep $PAUSE::Config->{SLEEP};
 }
 
-sub do_loop {
+sub loop {
   my($dbh,$sth,$sth2,$query);
 
   my $now    = time ;
@@ -81,7 +82,7 @@ sub do_loop {
 			       $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 			       { RaiseError => 0 }
 			      ) ) {
-    do_log($DBI::errstr);
+    logge($DBI::errstr);
     return; # let them sleep or whatever
   }
 
@@ -97,7 +98,7 @@ sub do_loop {
 
   $sth = $dbh->prepare($query);
   unless ( $sth->execute ) {
-    do_log($DBI::errstr);
+    logge($DBI::errstr);
     return;
   }
   my $sql = qq{SELECT fullname, asciiname
@@ -118,7 +119,7 @@ sub do_loop {
 
     if ( $hash->{uriid} =~ s/ (.*) \.Z$ /$1.gz/x ) {
       $query = "DELETE FROM uris WHERE uriid = '$1.Z'";
-      do_log("Will try to get rid of the .Z file. Will not try [$query]");
+      logge("Will try to get rid of the .Z file. Will not try [$query]");
     }
     my $lpath  = $PAUSE::Config->{MLROOT} . $hash->{uriid};
 
@@ -135,45 +136,39 @@ sub do_loop {
 
 	my $request = HTTP::Request->new('HEAD', $hash->{uri});
 	my($mtime) = HTTP::Date::time2str((stat($lpath))[9]);
-	do_log("Is $hash->{uri} newer than $mtime?");
+	logge("Is $hash->{uri} newer than $mtime?");
 	$request->header('If-Modified-Since' => $mtime);
 
 	my($response,$success);
 
 	$response = $UA->request($request);
 	$success = $response->is_success;
-	do_log("UA [$UA] response [$response] success [$success]");
+	# logge("UA [$UA] response [$response] success [$success]");
 
 	if ( $success ){
-	  do_log("Yes");
+	  logge("Yes");
 	} else {
 	  # They didn't send success, so they have nothing new
-	  do_log("No: response [$response] success [$success]");
+	  logge("No");
 	  $hash->{dverified} = $now;
 	  next;
 	}
       }
       $hash->{dverified} = 0;
+      logge("(Re)set dverified to 0 for uriid[$hash->{uriid}]");
 
-#      if (
-
-      do_getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})
-
-#	 ) {
-	  ;
+      getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount});
       $hash->{dverified} = $now;
       next;
 
-#      }
-
     }
 
-    # too soon: do_log("lpath [$lpath] uriid [$hash->{uriid}]");
+    # too soon: logge("lpath [$lpath] uriid [$hash->{uriid}]");
 
     if (! $hash->{dverified} && $lpath =~ m,/$,) { # directory
 
       my $mirror = IO::File->new(">>$PAUSE::Config->{MIRRORCONFIG}")
-	  or do_log("Couldn't open $PAUSE::Config->{MIRRORCONFIG}");
+	  or logge("Couldn't open $PAUSE::Config->{MIRRORCONFIG}");
       my($package) = PAUSE::dir2user($hash->{uriid});
       my($uri) =  URI::URL->new($hash->{uri});
       my($host) = $uri->host;
@@ -192,7 +187,7 @@ sub do_loop {
 # skip        =not yet verified
 });
       $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
-      do_log("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
+      logge("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
       $mirror->close;
       next;
     }
@@ -204,7 +199,7 @@ sub do_loop {
       next;
     }
 
-    # do_log("lpath[$lpath] uriid[$hash->{uriid}]");
+    # logge("lpath[$lpath] uriid[$hash->{uriid}]");
 
     if ( -d $lpath ) {
       next;
@@ -213,20 +208,20 @@ sub do_loop {
       # otherwise this is a RE-upload of something README-ish
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
-	do_log("Verified $hash->{uriid}");
+	logge("Verified $hash->{uriid}");
 	next;
       } else {
 	unlink $lpath;
       }
     }
     if ($hash->{dgot}) {
-      do_log("dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath] but why is it not on disk?");
+      logge("dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath] but why is it not on disk?");
     }
 
     my $size;
-    if ($size = do_getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
+    if ($size = getit($hash->{uri},$hash->{uriid},$hash->{nosuccesscount})) {
       $hash->{dgot} = $now;
-      do_log("Got $hash->{uri} to $hash->{uriid} (size $size)");
+      logge("Got $hash->{uri} to $hash->{uriid} (size $size)");
       my $md5 = MD5->new;
       my $handle = IO::File->new;
       unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
@@ -287,7 +282,7 @@ No action is required on your part
                                  $blurb
                                 );
       }
-      do_log("Sent email(s) about uriid[$hash->{uriid}]");
+      logge("Sent email(s) about uriid[$hash->{uriid}]");
       sleep 15;
 
     } else {
@@ -414,17 +409,17 @@ sub is_valid {
   my($uriid) = shift;
   my($dir,$basename) = $uriid =~ m| \A (.*) / ([^/]+) \z |x;
   if ($basename =~ m![^A-Za-z0-9_\-\.\@\+]!) {
-    do_log("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
+    logge("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   if ($dir =~ m![^A-Za-z0-9_\-\@\+/]!) { # we allow user subdirectories, see edit.pm
-    do_log("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
+    logge("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   return 1;
 }
 
-sub do_getit {
+sub getit {
   my($uri,$uriid,$nosuccesscount) = @_;
 
   return unless is_valid($uriid);
@@ -442,19 +437,19 @@ sub do_getit {
     ($tmp) = $lpath =~ m,(.*)/,;
     File::Path::mkpath($tmp);
   }
-  do_log("Going to fetch uri[$uri] uriid[$uriid] tpath[$tpath] lpath[$lpath]");
+  logge("Going to fetch uri[$uri] uriid[$uriid] tpath[$tpath] lpath[$lpath]");
   my $uri_obj;
   eval {
     $uri_obj =  URI::URL->new($uri, $PAUSE::Config->{INCOMING})
   };
 
   if ($@ || ! $uri_obj) {
-    do_log("Bad URL: $uri");
+    logge("Bad URL: $uri");
     return;
   }
 
   if ($uri_obj->scheme !~ /^(http|ftp|https)?$/ ) { # Cave canem, e.g. file:
-    do_log(sprintf "Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
+    logge(sprintf "Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
     return;
   }
 
@@ -463,7 +458,7 @@ sub do_getit {
     $uri_obj->password($PAUSE::Config->{ANON_FTP_PASS});
   }
 
-  do_log(sprintf "Requesting a GET on uri [%s]", $uri_obj->abs);
+  logge(sprintf "Requesting a GET on uri [%s]", $uri_obj->abs);
   my $request = HTTP::Request->new('GET', $uri_obj->abs);
   if ($uri_obj->scheme eq "http") {
     $request->header("Accept","*"); # Microsoft Personal Web Server
@@ -474,7 +469,7 @@ sub do_getit {
   my $response = $UA->request($request,$tpath);
 
   if ($response->code == &HTTP::Status::RC_NOT_MODIFIED) {
-    do_log("no mirror: RC_NOT_MODIFIED for $tpath");
+    logge("no mirror: RC_NOT_MODIFIED for $tpath");
     return;
   } elsif ($response->is_success) {
     if ($tpath =~ /\.(Z|gz)$/){
@@ -490,7 +485,7 @@ sub do_getit {
 	}
       }
       if ($stat) {
-	do_log($ret);
+	logge($ret);
 	my @To;
 	push @To, $PAUSE::Config->{ADMIN};
 
@@ -519,11 +514,11 @@ gives [";
 	$tpath =~ m/\.Z$/
        ) {
       if (-e $lpath) {
-	do_log("Seem to have both a .Z and a .gz");
+	logge("Seem to have both a .Z and a .gz");
       } else {
 	my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
 	my $ret = system($system);
-	do_log("Ran $system with return [$ret]");
+	logge("Ran $system with return [$ret]");
       }
     } else {
       rename($tpath,$lpath);
@@ -532,12 +527,12 @@ gives [";
   } else {
     my $logresponse = $response->error_as_HTML;
     $logresponse =~ s/\n//gs ;
-    do_log($logresponse);
+    logge($logresponse);
     return;
   }
 }
 
-sub do_log {
+sub logge {
   my($arg) = @_;
   my $stamp = &timestamp." \$\$$$ v$VERSION: ";
   my $from = join ":", caller;
@@ -572,14 +567,14 @@ sub writeback {
   ($v = $hash_orig->{uriid}) =~ s/'/\\'/g;
   my $whereclause .= " WHERE uriid='$v'";
   $query .= $whereclause;
-  do_log("Going to $query");
-  $dbh->do($query) or do_log("$DBI::errstr: $query");
+  logge("Going to $query");
+  $dbh->do($query) or logge("$DBI::errstr: $query");
   if ($DBI::errstr =~ /Non unique key|Duplicate/i) {
     my $dquery = "DELETE FROM uris $whereclause";
-    do_log("Non-uniq-Error; trying: $dquery");
-    $dbh->do($dquery) or do_log("$DBI::errstr: $dquery");
-    do_log("retry now: $query");
-    $dbh->do($query) or do_log("$DBI::errstr: $query");
+    logge("Non-uniq-Error; trying: $dquery");
+    $dbh->do($dquery) or logge("$DBI::errstr: $dquery");
+    logge("retry now: $query");
+    $dbh->do($query) or logge("$DBI::errstr: $query");
   }
   return 1;
 }
