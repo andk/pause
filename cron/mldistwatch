@@ -85,7 +85,8 @@ sub verbose {
     }
     return if $level > $self->{VERBOSE};
     unless (exists $self->{INTRODUCED}) {
-        unshift @what, "Running $0, $Id\n";
+        my $now = scalar localtime;
+        unshift @what, "Running $0, $Id, $now\n";
         $self->{INTRODUCED} = undef;
     }
     print @what;
@@ -123,6 +124,10 @@ sub work2 {
         or die "Couldn't chdir to $MLROOT: $!";
     $self->rewrite01();
     $self->rewrite03();
+    $self->verbose(2, sprintf(
+                              "Finished rewrite03 and everything at %s",
+                              scalar localtime
+                             ));
 }
 
 sub set_user_active_status {
