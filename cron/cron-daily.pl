@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/local/perl-5.8/bin/perl -w
 
-my $Id = q$Id: cron-daily.pl,v 1.31 2002/04/29 09:41:52 k Exp k $;
+my $Id = q$Id$;
 
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
@@ -208,28 +208,7 @@ sub ls {
 #
 
 sub watch_files {
-    report "\nYoungsters\n----------\n";
     @listing = (); #global variable
-    File::Find::find(
-		     sub {
-			 stat;
-			 -f _ or return;
-			 -M _ > 2 && return;
-			 push(@listing,
-			      sprintf "%-60s %8d %6.2f\n",
-			      substr($File::Find::name,
-				     length($PAUSE::Config->{MLROOT})
-				    ),
-			      -s _,
-			      -M _
-			     );
-		       }, $PAUSE::Config->{MLROOT});
-    report(map { $_->[0] }
-	   sort {$a->[1] <=> $b->[1]}
-	   map { my $mod; (undef,undef,$mod) = split; [ $_, $mod ] }
-	   @listing
-	  );
-
 
     mkdir qq{$PAUSE::Config->{INCOMING_LOC}/old}, 0755; # may fail
     File::Find::find(
@@ -302,6 +281,7 @@ sub delete_scheduled_files {
     %fields = ();
     report "\n\nDeleting files scheduled for deletion\n";
     while (@fields{'deleteid','changed'} = $sth->fetchrow_array) {
+      # UTF-ON intentionally not applied
       my $d = $fields{deleteid};
       my $delete = "$PAUSE::Config->{MLROOT}$d";
       report "Scheduled is: $d\n";
@@ -381,6 +361,12 @@ sub whois {
 };
 
     while (@row = $stu->fetchrow_array) {
+        if ($] > 5.007) {
+          require Encode;
+          for (@row) {
+            defined && /[^\000-\177]/ && Encode::_utf8_on($_);
+          }
+        }
 	my $address;
 #0=userid, 1=fullname, 2=email, 3=isa_list, 4=homepage, 5=asciiname
 	my $name = $row[0];
@@ -431,6 +417,12 @@ sub whois {
 };
 
     while (@row = $stm->fetchrow_array){
+        if ($] > 5.007) {
+          require Encode;
+          for (@row) {
+            defined && /[^\000-\177]/ && Encode::_utf8_on($_);
+          }
+        }
 	print FH qq{<dt><a id="$row[0]" name="$row[0]">$row[0]</a></dt><dd>$row[1]};
 	print FH " &lt;$row[2]&gt;" if $row[2];
 	print FH "<br />";
@@ -452,6 +444,12 @@ sub whois {
     };
     my($hash);
     while ($hash = $stm->fetchrow_hashref) {
+        if ($] > 5.007) {
+          require Encode;
+          for my $k (keys %$hash) {
+            defined && /[^\000-\177]/ && Encode::_utf8_on($_) for $hash->{$k};
+          }
+        }
 	for (keys %$hash) {
 	    HTML::Entities::encode($hash->{$_},'<>&');
 	}
@@ -488,6 +486,12 @@ sub mailrc {
     $stu->execute;
     my(@r);
     while (@r = $stu->fetchrow_array){
+      if ($] > 5.007) {
+        require Encode;
+        for (@r) {
+          defined && /[^\000-\177]/ && Encode::_utf8_on($_);
+        }
+      }
       $r[2] ||= sprintf q{%s@cpan.org}, lc($r[0]);
       my $state = 0;
       $r[1] = $r[3] if $r[3];
@@ -501,6 +505,12 @@ sub mailrc {
                           FROM maillists");
     $stu->execute;
     while (@r = $stu->fetchrow_array){
+        if ($] > 5.007) {
+          require Encode;
+          for (@r) {
+            defined && /[^\000-\177]/ && Encode::_utf8_on($_);
+          }
+        }
 	next unless $r[2];
 	$list .= sprintf qq{alias %-6s "%s <%s>"\n}, @r[0..2];
     }

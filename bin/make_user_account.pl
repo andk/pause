@@ -23,7 +23,7 @@ my($passwd) = $sth->fetchrow_array;
 $sth->finish;
 $db->disconnect;
 
-my $system = sprintf "adduser -p '%s' '%s'", $passwd, lc $user;
-$ret = system $system;
+my @system = ("adduser", "-p", $passwd, lc $user);
+$ret = system @system;
 
 die "adduser returned bad status: '$ret'" if $ret;
