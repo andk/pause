@@ -16,6 +16,8 @@ use HTTP::Date ();
 use Mail::Send ();
 use DBI;
 use PAUSE ();
+our $MLROOT = $PAUSE::Config->{MLROOT};
+$MLROOT =~ s|/+$||; # I found the trailing slash annoying
 use PAUSE::MailAddress ();
 use CPAN; # only for CPAN::Version
 use Text::Format;
@@ -76,8 +78,8 @@ sub verbose {
 sub do_work {
     my $self = shift;
     my $startdir = Cwd::cwd();
-    chdir($PAUSE::Config->{MLROOT})
-	or die "Couldn't chdir to $PAUSE::Config->{MLROOT}";
+    chdir $MLROOT
+	or die "Couldn't chdir to $MLROOT";
     $self->init_all();
     my $testdir = "/tmp/test" . $$; # XXX File::Temp!
     rmtree $testdir if -e $testdir;
@@ -97,8 +99,8 @@ sub do_work {
 sub do_work2 {
     my $self = shift;
     $self->do_rewrite02();
-    chdir "$PAUSE::Config->{MLROOT}"
-        or die "Couldn't chdir to $PAUSE::Config->{MLROOT}: $!";
+    chdir $MLROOT
+        or die "Couldn't chdir to $MLROOT: $!";
     $self->do_rewrite01();
     $self->do_rewrite03();
 }
@@ -232,7 +234,7 @@ sub do_rewrite02 {
     $self->verbose(2,"\n\nEntering do_rewrite02\n");
 
     my $dbh = $self->connect;
-    my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/02packages.details.txt";
+    my $repfile = "$MLROOT/../../modules/02packages.details.txt";
     my $list = "";
     my $olist = "";
     local($/) = "\n";
@@ -302,7 +304,7 @@ sub do_rewrite01 {
     $self->verbose(2, "\nEntering do_rewrite01\n");
     my $dbh = $self->connect;
 
-    my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/01modules.index.html";
+    my $repfile = "$MLROOT/../../modules/01modules.index.html";
     my $list = "";
     my $olist = "";
     local $/;
@@ -371,7 +373,7 @@ sub do_rewrite01 {
 
         $i++;
         @pkg{qw/size mtime/} =
-            (stat "$PAUSE::Config->{MLROOT}/$pkg{dist}")[7,9];
+            (stat "$MLROOT/$pkg{dist}")[7,9];
         $count++ unless $count{$pkg{dist}}++;
         $pkg{size} =
             $pkg{size} > 700000 ?
@@ -462,34 +464,34 @@ sub do_rewrite01 {
 
 
         $self->verbose(2,".") if !($i % 16);
-        my $bymod = "$PAUSE::Config->{MLROOT}/../../modules/".
+        my $bymod = "$MLROOT/../../modules/".
             "by-module/$pkg{rootpack}/$pkg{filenameonly}";
-        my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/".
+        my $bycat = "$MLROOT/../../modules/".
             "by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
         next if -e $bymod and -e $bycat;
 
-        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($MLROOT,
                               "../../../authors/id/$pkg{dist}",
                               "../../modules/by-module/$pkg{rootpack}".
                               "/$pkg{filenameonly}");
-        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($MLROOT,
                               "../../../authors/id/$pkg{readme}",
                               "../../modules/by-module/$pkg{rootpack}".
                               "/$pkg{readmefn}")
             if -f $pkg{readme};
-        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($MLROOT,
                               "../../../authors/id/$userdir",
                               "../../modules/by-module/$pkg{rootpack}/$pkg{userid}");
-        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($MLROOT,
                               "../../../../authors/id/$pkg{dist}",
                               "../../modules/by-category/$pkg{chapter}".
                               "/$pkg{rootpack}/$pkg{filenameonly}");
-        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($MLROOT,
                               "../../../../authors/id/$pkg{readme}",
                               "../../modules/by-category/$pkg{chapter}".
                               "/$pkg{rootpack}/$pkg{readmefn}")
             if -f $pkg{readme};
-        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($MLROOT,
                               "../../../../authors/id/$userdir",
                               "../../modules/by-category/$pkg{chapter}".
                               "/$pkg{rootpack}/$pkg{userid}");
@@ -598,7 +600,7 @@ sub write_01sorted {
         last unless --$n;
     }
     $list .= q{</PRE></BODY>};
-    my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/01modules.mtime.html";
+    my $repfile = "$MLROOT/../../modules/01modules.mtime.html";
     # $self->verbose(1,"Writing $repfile\n");
     if (open F, ">$repfile") {
         print F $list;
@@ -615,7 +617,7 @@ sub do_rewrite03 {
     #
     $self->verbose(2,"\nEntering do_rewrite03\n");
 
-    my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/03modlist.data";
+    my $repfile = "$MLROOT/../../modules/03modlist.data";
     my $list = "";
     my $olist = "";
     local($/) = "\n";
@@ -814,8 +816,8 @@ sub as_ds {
             $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
             $dbh->do("INSERT INTO distmtimes (dist) VALUES ('$dist')");
         }
-        my $mtime = (stat "$PAUSE::Config->{MLROOT}/$dist")[9];
-        my $dirname = File::Basename::dirname("$PAUSE::Config->{MLROOT}$dist");
+        my $mtime = (stat "$MLROOT/$dist")[9];
+        my $dirname = File::Basename::dirname("$MLROOT/$dist");
         my $checksumtime = (stat "$dirname/CHECKSUMS")[9] || 0;
 
         if ($mtime > $checksumtime - 86400) {
@@ -849,19 +851,25 @@ sub as_ds {
         my $dist = $self->{DIST};
         local *TARTEST;
         my $tarbin = $self->{TARBIN};
-        open TARTEST, "$tarbin tzf $PAUSE::Config->{MLROOT}/$dist |";
+        open TARTEST, "$tarbin tzf $MLROOT/$dist |";
         while (<TARTEST>) {
             if (m:^\.\./: || m:/\.\./: ) {
                 $self->verbose(1,"\n\n    ALERT: Updir detected in $dist!\n\n");
                 $self->alert("ALERT: Updir detected in $dist!");
+                $self->{COULD_NOT_UNTAR}++;
                 return;
             }
         }
-        close TARTEST;
-        $self->verbose(1,"Going to untar $PAUSE::Config->{MLROOT}/$dist\n");
-        unless (system($tarbin,'xzf',"$PAUSE::Config->{MLROOT}/$dist")==0) {
+        unless (close TARTEST) {
+            $self->verbose(1,"\nCould not untar $dist!\n");
+            $self->alert("\nCould not untar $dist!\n");
+            $self->{COULD_NOT_UNTAR}++;
+            return;
+        }
+        $self->verbose(1,"Going to untar $MLROOT/$dist\n");
+        unless (system($tarbin,'xzf',"$MLROOT/$dist")==0) {
             print "Some error occurred during unzippping. Let's retry:\n";
-            system("$tarbin xvzf $PAUSE::Config->{MLROOT}/$dist")==0 or return;
+            system("$tarbin xvzf $MLROOT/$dist")==0 or return;
         }
         return 1;
     }
@@ -912,7 +920,7 @@ sub as_ds {
             } elsif ($dist =~ /\.pm\.(Z|gz)$/) {
                 # By not setting suffix we prohibit extracting README
                 my $file = File::Basename::basename($dist);
-                File::Copy::copy "$PAUSE::Config->{MLROOT}/$dist", $file;
+                File::Copy::copy "$MLROOT/$dist", $file;
                 my $willunzip = $file;
                 $willunzip =~ s/\.(Z|gz)$//;
                 unless (PAUSE::gunzip($file,$willunzip)) {
@@ -921,12 +929,12 @@ sub as_ds {
             } elsif ($dist =~ /\.zip$/) {
                 $suffix = "zip";
                 my $unzipbin = $self->{UNZIPBIN};
-                my $system = "$unzipbin $PAUSE::Config->{MLROOT}/$dist > /dev/null 2>&1";
+                my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
                 unless (system($system)==0) {
                     $self->verbose(1,
                                    "Some error occurred during unzippping. ".
                                    "Let's read unzip -t:\n");
-                    system("$unzipbin -t $PAUSE::Config->{MLROOT}/$dist");
+                    system("$unzipbin -t $MLROOT/$dist");
                 }
             } else {
                 $self->verbose(1,"  no dist\n");
@@ -954,7 +962,7 @@ sub as_ds {
 Please contact modules\@perl.org if there are any open questions.
   $PAUSE::mldistwatch::Id\n";
         my $time = gmtime;
-        my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
+        my $mtime = gmtime((stat "$MLROOT/$distro")[9]);
         my $nfiles = scalar @{$self->{MANIFOUND}};
         my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
         my $dbh = $self->connect;
@@ -1096,6 +1104,12 @@ Please contact modules\@perl.org if there are any open questions.
         my $self = shift;
         return if $self->{HAS_BLIB};
         return if $self->{HAS_MULTIPLE_ROOT};
+        return if $self->{COULD_NOT_UNTAR}; # XXX not yet reached, we
+                                            # need to re-examine what
+                                            # happens without SKIP.
+                                            # Currently SKIP shadows
+                                            # the event of
+                                            # could_not_untar
         my $dist = $self->{DIST};
 
         my $binary_dist;
@@ -1181,8 +1195,8 @@ Please contact modules\@perl.org if there are any open questions.
                 $readme = $readme[$_] if length($readme[$_]) < length($readme);
             }
             $self->{README} = $readme;
-            File::Copy::copy $readme, "$PAUSE::Config->{MLROOT}/$sans.readme";
-            utime((stat $readme)[8,9], "$PAUSE::Config->{MLROOT}/$sans.readme");
+            File::Copy::copy $readme, "$MLROOT/$sans.readme";
+            utime((stat $readme)[8,9], "$MLROOT/$sans.readme");
         } else {
             $self->{README} = "No README found";
             $self->verbose(1,"No readme in $dist\n");
@@ -1191,8 +1205,8 @@ Please contact modules\@perl.org if there are any open questions.
         if (@yaml) {
             if (@yaml == 1) {
                 $self->{YAML} = $yaml[0];
-                File::Copy::copy $yaml[0], "$PAUSE::Config->{MLROOT}/$sans.meta";
-                utime((stat $yaml[0])[8,9], "$PAUSE::Config->{MLROOT}/$sans.meta");
+                File::Copy::copy $yaml[0], "$MLROOT/$sans.meta";
+                utime((stat $yaml[0])[8,9], "$MLROOT/$sans.meta");
             } else {
                 $self->{YAML} = sprintf "%d META.yml found, ignoring", scalar @yaml;
             }
@@ -1782,8 +1796,8 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my($opack,$oldversion,$odist,$ofilemtime,$ofile) = $sth_pack->fetchrow_array;
         $self->verbose(1,"opack[$opack]oldversion[$oldversion]".
                        "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]\n");
-        my $odistmtime = (stat "$PAUSE::Config->{MLROOT}/$odist")[9];
-        my $tdistmtime = (stat "$PAUSE::Config->{MLROOT}/$dist")[9] ;
+        my $odistmtime = (stat "$MLROOT/$odist")[9];
+        my $tdistmtime = (stat "$MLROOT/$dist")[9] ;
         # decrementing Version numbers are quite common :-(
         my $ok = 0;
 

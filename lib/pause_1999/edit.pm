@@ -1868,9 +1868,9 @@ http://%s/pause/authenquery?ACTION=delete_files
                       $mgr->{User}{fullname},
                       $server,
                       $server);
+    push @blurb, $blurb;
     push @blurb, qq{Note: to encourage deletions, all of past CPAN
 glory is collected on http://history.perl.org/backpan/};
-    push @blurb, $blurb;
     push @blurb, qq{The Pause};
     $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
 
