@@ -415,9 +415,13 @@ sub do_rewrite01 {
 	my(@r) = split /(::)/, $modid;
 	$firstlevel{$r[0]}++;
         local $" = "";
-        while (@r) {
-            $achapter{"@r"} ||= $chapterid;
-            pop @r;
+        if (@r==1) {
+            $achapter{"@r"} = $chapterid;
+        } else {
+            while (@r) {
+                $achapter{"@r"} ||= $chapterid;
+                pop @r;
+            }
         }
     }
     my(%c_fn,$chapterid,$shorttitle,@chaptitle);
