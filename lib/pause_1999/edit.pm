@@ -5026,6 +5026,7 @@ sub peek_perms {
                            maxlength => 112,
                           );
   push @m, qq{<input type="submit" name="pause99_peek_perms_sub" value="Submit" /></p>};
+
 =pod
 
 Bugreport 2002-04-29:
