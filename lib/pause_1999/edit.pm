@@ -991,7 +991,7 @@ sub tail_logfile {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
   my $cgi = $mgr->{CGI};
-  my $tail = $cgi->param("pause99_tail_logfile_n") || 5000;
+  my $tail = $cgi->param("pause99_tail_logfile_1") || 5000;
   my($file) = $PAUSE::Config->{PAUSE_LOG};
   if ($PAUSE::Config->{TESTHOST}) {
     $file = "/usr/local/apache/logs/error_log"; # for testing
@@ -1002,9 +1002,16 @@ sub tail_logfile {
   $/ = "\n";
   <$fh>;
   $/ = undef;
-  my $ret = "<pre>".$mgr->escapeHTML(<$fh>)."</pre>";
-  # warn "ret[$ret]";
-  $ret;
+  my @m;
+  push @m, $mgr->scrolling_list(
+				name => "pause99_tail_logfile_1",
+				size => 1,
+				values => [qw( 5000 10000 20000 40000) ],
+			       );
+  push @m, qq{<input type="submit"
+               name="pause99_tail_logfile_sub" value="Tail characters" />};
+  push @m, "<pre>", $mgr->escapeHTML(<$fh>), "</pre>";
+  join "", @m;
 }
 
 sub who_is {
