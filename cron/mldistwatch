@@ -1083,21 +1083,38 @@ Please contact modules\@perl.org if there are any open questions.
         } else {
             my $st = $self->{INDEX_STATUS};
             if ($st && ref $st && %$st) {
-                push @m, qq{The following packages have been found in the distro:\n\n};
+                push @m, qq{The following packages (grouped by status) have been found in the distro:\n\n};
+                my $Lstatus = 0;
 
                 for my $p (sort {
                     $st->{$b}{status} <=> $st->{$a}{status}
                         or
                             $a cmp $b
                         } keys %$st) {
-                    my $tf13 = Text::Format->new( bodyIndent => 13, firstIndent => 13);
+                    my $status = $st->{$p}{status};
+                    if ($status != $Lstatus) {
+                        my $heading =
+                            PAUSE::mldistwatch::Constants::heading($status) ||
+                                  "UNKNOWN (status=$status)";
+                        push @m, sprintf "Status: %s
+%s\n\n", $heading, "="x(length($heading)+8);
+                    }
+                    my $tf13 = Text::Format->new(
+                                                 bodyIndent => 13,
+                                                 firstIndent => 13,
+                                                );
                     my $verb_status = $tf13->format($st->{$p}{verb_status});
                     $verb_status =~ s/^\s+//; # otherwise this line is too long
-                    push @m, sprintf "%s
+                    push @m, sprintf("     module: %s
     version: %s
     in file: %s
      status: %s\n",
-                        $p, $st->{$p}{version}, $st->{$p}{infile}, $verb_status;
+                                     $p,
+                                     $st->{$p}{version},
+                                     $st->{$p}{infile},
+                                     $verb_status,
+                                    );
+                    $Lstatus = $status;
                 }
             } else {
                 if ($pmfiles > 0) {
@@ -1387,12 +1404,12 @@ Please contact modules\@perl.org if there are any open questions.
 {
     package PAUSE::mldistwatch::Constants;
     # constants used for index_status:
+    use constant EDUALOLDER => 50; # pumpkings only
+    use constant EDUALYOUNGER => 30; # pumpkings only
     use constant EMISSPERM => 20;
-    use constant EDUALOLDER => 50;
-    use constant EDUALYOUNGER => 30;
-    use constant EVERFALLING => 2;
-    use constant EMTIMEFALLING => 3;
     use constant EOLDRELEASE => 4;
+    use constant EMTIMEFALLING => 3;
+    use constant EVERFALLING => 2;
     use constant OK => 1;
     our $heading =
         {
@@ -1402,6 +1419,7 @@ Please contact modules\@perl.org if there are any open questions.
          EVERFALLING() => "Falling version number",
          EMTIMEFALLING() => "Falling mtime on a file (category to be deprecated)",
          EOLDRELEASE() => "Release seems outdated",
+         OK() => "Successfully indexed",
         };
 
     sub heading {
@@ -2264,6 +2282,7 @@ WHERE package = '$package'
 
     }
 
+    # package PAUSE::package;
     sub index_status {
         my($self) = shift;
         my $fio = $self->{FIO};
@@ -2271,6 +2290,7 @@ WHERE package = '$package'
         $dio->index_status(@_);
     }
 
+    # package PAUSE::package;
     sub insert_into_package {
         my $self = shift;
         my $dbh = $self->connect;
@@ -2300,6 +2320,7 @@ VALUES (
                            );
     }
 
+    # package PAUSE::package;
     # returns always the return value of print, so basically always 1
     sub checkin_into_primeur {
         my $self = shift;
@@ -2333,6 +2354,7 @@ VALUES (
                        "err[$err]\n");
     }
 
+    # package PAUSE::package;
     sub checkin {
         my $self = shift;
         my $dbh = $self->connect;
