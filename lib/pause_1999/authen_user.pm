@@ -20,7 +20,6 @@ sub header {
   my pause_1999::authen_user $self = shift;
   my pause_1999::main $mgr = shift;
   my $r = $mgr->{R};
-  # warn "PAUSE.pm[$INC{'PAUSE.pm'}]\$PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME}[$PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME}]";
   if (my $u = $r->connection->user) {
 
     #This is a database application with nearly all users having write access
@@ -31,9 +30,6 @@ sub header {
     # This is annoying when we ask for the who-is-who list and it
     # hasn't changed since the last time, but for most cases it's
     # safer to expire
-
-    # $mgr->last_modified($mgr->time);
-    # $mgr->expires($mgr->time+5);
 
     my($userhash);
 
@@ -48,17 +44,20 @@ sub header {
     $sth = $dbh->prepare($sql);
     if ($sth->execute($u)) {
       $mgr->{User} = $mgr->fetchrow($sth, "fetchrow_hashref");
-      # warn "HERE2";
     } else {
       die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
-      # warn "HERE3";
     }
     $sth->finish;
 
-    my $dbh2 = DBI->connect($PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
-			$PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
-			$PAUSE::Config->{AUTHEN_DATA_SOURCE_PW})
-	or die $DBI::errstr;
+    my $dbh2 = $mgr->authen_connect;
+    $sth = $dbh2->prepare("SELECT secretemail
+                           FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
+                           WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
+    $sth->execute($u);
+    my($secretemail) = $sth->fetchrow_array;
+    $mgr->{User}{secretemail} = $secretemail;
+    $sth->finish;
+
     $sql = qq{SELECT *
               FROM grouptable
               WHERE user=?};
@@ -68,23 +67,16 @@ sub header {
       while (my $rec = $mgr->fetchrow($sth, "fetchrow_hashref")) {
 	$mgr->{UserGroups}{$rec->{ugroup}} = undef;
       }
-      # warn "HERE2";
     } else {
       die Apache::HeavyCGI::Exception->new(ERROR => $dbh2->errstr);
-      # warn "HERE3";
     }
     $sth->finish;
-    $dbh2->disconnect;
 
     if (exists $mgr->{UserGroups}{mlrepr}) {
-      $dbh2 = DBI->connect($PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			  $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			  $PAUSE::Config->{MOD_DATA_SOURCE_PW})
-	  or die $DBI::errstr;
       $sql = qq{SELECT *
                 FROM list2user
                 WHERE userid=?};
-      $sth = $dbh2->prepare($sql);
+      $sth = $dbh->prepare($sql);
       if ($sth->execute($u)) {
 	warn "Database inconsistent: $u is group mlrepr but not in list2user"
 	    unless $sth->rows > 0;
@@ -94,10 +86,8 @@ sub header {
 	}
 	# warn "HERE4";
       } else {
-        $dbh2->disconnect;
-	die Apache::HeavyCGI::Exception->new(ERROR => $dbh2->errstr);
+	die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
       }
-      $dbh2->disconnect;
     }
 
     $mgr->{UserSecrets} = $r->pnotes("usersecrets");

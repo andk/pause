@@ -16,46 +16,7 @@ sub as_string {
   my @m;
   push @m, qq{<table width="155" cellspacing="1" cellpadding="0">};
   my $activecolor = $mgr->{ActiveColor};
-  if ($user) {
-    my($encr,$class);
-    if ($mgr->myurl->scheme eq "https") {
-      $encr = 1;
-      $class = "statusencr";
-    } else {
-      $encr = 0;
-      $class = "statusunencr";
-    }
-
-    push @m, sprintf(
-                     qq{<tr><td class="%s"><b>%s<br />%s session</b></td></tr>},
-                     $class,
-                     $user,
-                     $encr ? "encrypted" : "unencrypted",
-                     );
-
-    unless ($encr) {
-      my $loc = $mgr->myurl->path;
-      push @m, qq{<tr><td class="menuitem">};
-      push @m, qq{<a class="menuitem" href="https://$server$loc">Switch to SSL</a>};
-      push @m, qq{</td></tr>};
-    }
-
-    if (0) {
-    push @m, qq{<tr><td class="menuitem">};
-    push @m, qq{<a class="menuitem" href="authenquery?ACTION=pause_logout">About Logging Out</a>};
-    push @m, qq{</td></tr>\n};
-
-    push @m, qq{<tr><td class="menuitem">};
-    push @m, qq{<a class="menuitem" href="authenquery?please_renegotiate_username">Login as sb. else</a>};
-    push @m, qq{</td></tr>\n};
-
-    push @m, qq{<tr><td class="menuitem">};
-    push @m, qq{<a class="menuitem" href="query">Unauthenticate ("Logout")</a>};
-    push @m, qq{</td></tr>\n};
-    }
-
-  } else {
-
+  unless ($user) {
     push @m, qq{<tr><td class="menuitem">};
     if ($mgr->{R}->server->port == 8000) {
       $server =~ s/:8000/:8443/ or $server .= ":8443";

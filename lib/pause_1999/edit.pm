@@ -1067,10 +1067,14 @@ sub change_passwd {
             next if $anon->{fullname};
             $r->log_error("Unknown fullname for $anon->{userid}!");
           }
-	  push @m, "New password stored and enabled.
- Be prepared that you will be asked for a new authentication on the next request.
- If this doesn't work out, it may be that you have to restart the browser.";
-	  my $mailblurb = sprintf qq{Password update on PAUSE:
+
+	  push @m, "New password stored and enabled. Be prepared that
+ you will be asked for a new authentication on the next request. If
+ this doesn't work out, it may be that you have to restart the
+ browser.";
+
+	  my $mailblurb = sprintf(
+                                  qq{Password update on PAUSE:
 
 %s (%s) visited the
 password changer on PAUSE at %s GMT
@@ -1082,8 +1086,11 @@ would check the correctness of the new password.
 Thanks,
 The Pause
 },
-    $mgr->{User}->{userid}, $mgr->{User}->{fullname}||"fullname N/A", scalar gmtime,
-        $u->{userid}, $u->{fullname}||"fullname N/A";
+                                  $mgr->{User}->{userid},
+                                  $mgr->{User}{fullname}||"fullname N/A",
+                                  scalar gmtime,
+                                  $u->{userid},
+                                  $u->{fullname}||"fullname N/A");
 	  my %umailset;
           my $name = $u->{asciiname} || $u->{fullname} || "";
           my $Uname = $mgr->{User}{asciiname} || $mgr->{User}{fullname} || "";
@@ -1092,11 +1099,13 @@ The Pause
 	  } elsif ($u->{email}) {
 	    $umailset{qq{"$name" <$u->{email}>}} = 1;
 	  }
-	  if ($mgr->{User}{secretemail}) {
-	    $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
-	  }elsif ($mgr->{User}{email}) {
-	    $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
-	  }
+          if ($u->{userid} ne $mgr->{User}{userid}) {
+            if ($mgr->{User}{secretemail}) {
+              $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
+            }elsif ($mgr->{User}{email}) {
+              $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
+            }
+          }
 	  my $header = {
 			To => join(",",keys %umailset),
 			Subject => "Password Update",
@@ -1864,10 +1873,12 @@ The Pause
     } elsif ($u->{email}) {
       $umailset{qq{"$name" <$u->{email}>}} = 1;
     }
-    if ($mgr->{User}{secretemail}) {
-      $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
-    }elsif ($mgr->{User}{email}) {
-      $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
+    if ($u->{userid} ne $mgr->{User}{userid}) {
+      if ($mgr->{User}{secretemail}) {
+        $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
+      }elsif ($mgr->{User}{email}) {
+        $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
+      }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
     my $header = {
@@ -5230,13 +5241,13 @@ The Pause
     my %umailset;
     my $name = $u->{asciiname} || $u->{fullname} || "";
     my $Uname = $mgr->{User}{asciiname} || $mgr->{User}{fullname} || "";
-    if (1) { # debugging
+    if (0) { # debugging
       require Data::Dumper;
       my $dd = Data::Dumper::Dumper({ u => $u, mgrUser => $mgr->{User} });
       warn "email debugging: dd[$dd]";
 
-      # By debugging this, I found out, that $u has a secret email but
-      # $mgr->{User} doesn't. At least at the time of rev. 208.
+      # By debugging this, I found out, that $u always had a
+      # secretemail but $mgr->{User} didn't (upto rev 230).
 
     }
     if ($u->{secretemail}) {

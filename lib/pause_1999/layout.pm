@@ -55,8 +55,14 @@ Netscape 479 liest kommentare?
 .activemenu { background: #bfb; font-size: small; line-height: 1.5; }
 .menupointer { color: green; }
 td.activemenu { border: green solid 1px; }
-.statusencr { background: #fff; text-align: center; border: green solid 2px; }
-.statusunencr { background: #fbb; text-align: center; border: red solid 2px; }
+.statusencr { background: #bfb;
+              text-align: center;
+                  border: green solid 2px;
+               font-size: small; }
+.statusunencr { background: #fbb;
+                text-align: center;
+                    border: red solid 2px;
+                 font-size: small; }
 a.menuitem { text-decoration: none; }
 a.activemenu { text-decoration: none; }
 a.menuitem:hover { text-decoration: underline; }
@@ -70,16 +76,15 @@ p.motd { margin: 12px 1in; padding: 6px; color: black; background: yellow; font-
 $h2special
 </style>
 </head><body bgcolor="white" link="#0000CC" vlink="#0000BB"
-alink="#FF0000" text="#000000"><table width="100%" border="0" cellpadding="0" cellspacing="0"
+ alink="#FF0000" text="#000000"><table width="100%" border="0"
+ cellpadding="0" cellspacing="0"
 ><tr><td valign="middle">}; #};
   push @l, $mgr->instance_of("pause_1999::pausegif");
-  # my $gif = $mgr->can_png ? "png" : "jpg";
-  # my $url = qq{/pause/pause2.$gif};
-  # push @l, qq{</td><td style="width: 100%; background-image: url($url);">};
-
-  push @l, qq{</td><td align="left" style="width: 75%;"><h2
-  style="margin: 0 0 0 0; padding: 0 0 0 1em;">The Perl Authors Upload
-  Server</h2></td></tr></table><br />};
+  push @l, qq{</td><td nowrap="nowrap"><h4
+  style="margin: 0 0 0 0; padding: 0 1em;">The Perl Authors Upload
+  Server</h4></td><td align="right" style="width: 100%;">};
+  push @l, $mgr->instance_of("pause_1999::userstatus");
+  push @l, qq{</td></tr></table><br />};
 
   #
   # MOTD
