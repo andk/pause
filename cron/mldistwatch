@@ -31,7 +31,16 @@ $Data::Dumper::Indent = 1;
     use File::Path qw(rmtree mkpath);
     use vars qw($Id $ISAPERL);
     $Id = q$Id$;
-    $ISAPERL = q{ /perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
+    $ISAPERL = qr{
+                   /
+                   (
+                    perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[24680]\.\d+)
+                    |
+                    ponie-[\d.\-]
+                   )
+                   \.tar[._-]gz
+                   \z
+                 }x;
 }
 
 
@@ -1045,7 +1054,7 @@ sub mlroot {
         my $MLROOT = $self->mlroot;
         my($suffix,$skip);
         $suffix = $skip = "";
-        if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/ox) {
+        if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
             $self->verbose(1,"perl dist $dist from $u. Is he a trusted guy?\n");
             use DBI;
@@ -2101,7 +2110,7 @@ package in packages  package in primeur
             while (($p,$owner) = $sth_perms->fetchrow_array) {
                 push @owner, $owner; # array for debugging statement
             }
-            if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/ox) {
+            if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/) {
                 # seems ok: perl is always right
             } elsif (! grep { $_ eq $userid } @owner) {
                 # we must not index this and we have to inform somebody
@@ -2226,7 +2235,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my $distorperlok = $dist !~ m|/perl|;
         # this dist is not named perl-something (lex ILYAZ)
 
-        my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISAPERL/ox;
+        my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISAPERL/;
 
         $distorperlok ||= $isaperl;
         # or it is THE perl dist
@@ -2235,7 +2244,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         # or it is called perl-something (e.g. perl-ldap) AND...
         my($something2) = $odist =~ m|/perl(.....)|;
         # and we compare against another perl-something AND...
-        my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISAPERL/ox;
+        my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISAPERL/;
         # the file we're comparing with is not the perl dist
 
         $distorperlok ||= $something1 && $something2 &&
