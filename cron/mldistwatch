@@ -819,7 +819,7 @@ sub as_ds {
     sub delete_goner {
         my $self = shift;
         my $dist = $self->{DIST};
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         $dbh->do("DELETE FROM packages WHERE dist='$dist'");
         $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
     }
@@ -841,7 +841,7 @@ sub as_ds {
         my $self = shift;
         my $otherts = shift || 0;
         my $dist = $self->{DIST};
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         unless ($otherts){ # positive $otherts means it was alive last time
             $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
             $dbh->do("INSERT INTO distmtimes (dist) VALUES ('$dist')");
@@ -1328,7 +1328,7 @@ Please contact modules\@perl.org if there are any open questions.
         # fio: file object
         my $self = shift;
         my $dist = $self->{DIO}{DIST};
-        my $dbh = $self->{DIO}{DBH};
+        my $dbh = $self->connect;
         my $pmfile = $self->{PMFILE};
 
 
@@ -1656,7 +1656,7 @@ package in packages  package in primeur
     # return value nonsensical
     sub give_regdowner_perms {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         # local($dbh->{RaiseError}) = 0;
         my $sth_mods = $dbh->prepare("SELECT userid
@@ -1695,7 +1695,7 @@ package in packages  package in primeur
         my $dist = $self->{DIST};
         my $package = $self->{PACKAGE};
         my $pp = $self->{PP};
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
 
         my($userid) = $self->{USERID};
 
@@ -1806,7 +1806,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
     sub examine_pkg {
         my $self = shift;
 
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -1845,7 +1845,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my $self = shift;
         my $sth_pack = shift;
 
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -2027,7 +2027,7 @@ WHERE package = '$package'
 
     sub insert_into_package {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -2057,7 +2057,7 @@ VALUES (
     # returns always the return value of print, so basically always 1
     sub checkin_into_primeur {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
@@ -2089,7 +2089,7 @@ VALUES (
 
     sub checkin {
         my $self = shift;
-        my $dbh = $self->{DBH};
+        my $dbh = $self->connect;
         my $package = $self->{PACKAGE};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
