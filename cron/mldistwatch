@@ -987,6 +987,12 @@ sub as_ds {
         return($suffix,$skip);
     }
 
+    sub connect {
+        my($self) = @_;
+        my $main = $self->{MAIN};
+        $main->connect;
+    }
+
     # package PAUSE::dist;
     sub mail_summary {
         my($self) = @_;
@@ -1001,11 +1007,18 @@ Please contact modules\@perl.org if there are any open questions.
         my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
         my $nfiles = scalar @{$self->{MANIFOUND}};
         my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
+        my $dbh = $self->connect;
+        my $sth = $dbh->prepare("SELECT asciiname, fullname
+                                 FROM   users
+                                 WHERE userid=?");
+        $sth->execute($author);
+        my($u) = $sth->fetchrow_hashref;
+        my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
         my $substrdistro = substr $distro, 5;
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
         $self->{README} ||= "No README found";
         push @m, qq{
-            CPAN ID: $author
+               User: $author ($asciiname)
   Distribution file: $distrobasename
     Number of files: $nfiles
          *.pm files: $pmfiles
