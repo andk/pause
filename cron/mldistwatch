@@ -118,7 +118,7 @@ use File::Path qw(rmtree mkpath);
 use vars qw($Id $ISAPERL
 	    %ALLfound %ALLlasttime %ALL
 	   );
-$Id = q$Rev$;
+$Id = q$Id$;
 
 print "Running $0, $Id\n";
 
@@ -986,7 +986,7 @@ CPAN::Complete
   $PAUSE::mldistwatch::Id\n\n";
     my $author = PAUSE::dir2user($distro);
     my $time = gmtime;
-    my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]) . " UTC";
+    my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
     my $nfiles = scalar @{$self->{MANIFOUND}};
     print $fh qq{
       CPAN author: $author
@@ -1001,11 +1001,14 @@ Timestamp of file: $mtime UTC
     } else {
       my $st = $self->{INDEX_STATUS};
       if ($st && ref $st && %$st) {
+	print $fh qq{The following packages have been found in the distro:\n\n};
+
         for my $p (sort { $st->{$a}{status} <=> $st->{$b}{status} } keys %$st) {
-          my $tf = Text::Format->new( bodyIndent => 11, firstIndent => 0);
+          my $tf = Text::Format->new( bodyIndent => 11, firstIndent => 11);
           my $verb_status = $tf->format($st->{$p}{verb_status});
-          printf $fh "%s\n  version: %s\n  in file: %s\n   status: %s\n\n",
-              $p, $st->{$p}{version}, $st->{$p}{infile}, $st->{$p}{verb_status};
+	  $verb_status =~ s/^\s+//; # otherwise this line is too long
+          printf $fh "%s\n  version: %s\n  in file: %s\n   status: %s\n",
+              $p, $st->{$p}{version}, $st->{$p}{infile}, $verb_status;
         }
       } else {
         print $fh qq{No packages could be identified in the distro. Nothing done.\n};
@@ -1039,7 +1042,7 @@ Timestamp of file: $mtime UTC
   sub check_multiple_root {
     my($self) = @_;
     my %seen;
-    my @top = grep { s|/.*||; !$seen{$_}++ } @{$self->{MANIFOUND}};
+    my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
     if (@top > 1) {
       $self->{HAS_MULTIPLE_ROOT}++;
     }
