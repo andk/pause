@@ -2166,7 +2166,7 @@ in the PAUSE database.
 This is what we have stored in the database now:
 
   Name:      $fullname
-  email:     $email
+  email:     CENSORED
   homepage:  $homepage
   enteredby: $mgr->{User}{fullname}
 
@@ -2211,7 +2211,9 @@ Subject: $subject\n};
 			Subject => $subject
 		       };
 	  # warn "header[$header]blurb[$blurb]";
-	  $mgr->send_mail($header,$blurb);
+          my $b = $blurb;
+          $b =~ s/\bCENSORED\b/$email/ if $to eq $email;
+	  $mgr->send_mail($header,$b);
 	}
 
 	# As we have had so much success, there is no point in leaving the
