@@ -2780,7 +2780,7 @@ sub mailpw {
  is not allowed, please retry with a valid userid. Nothing done.});
     }
 
-    # TUT: The object $mgr is our know-/be-/can-everything object. Here
+    # TUT: The object $mgr is our knows/is/can-everything object. Here
     # it connects us to the authenticating database
     my $authen_dbh = $mgr->authen_connect;
     my $sql = qq{SELECT *
@@ -2788,26 +2788,35 @@ sub mailpw {
                  WHERE user = ? };
     my $sth = $authen_dbh->prepare($sql);
     $sth->execute($param);
-    unless ($sth->rows == 1) {
-      die Apache::HeavyCGI::Exception->new(ERROR =>
-                                         qq{A userid of <i>$param</i>
- is not known, please retry with a valid userid. Nothing done.});
-    }
     my $rec = {};
-    $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
+    if ($sth->rows == 1) {
+      $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
+    } else {
+      my $u = $self->active_user_record($mgr,$param);
+      if ($u->{userid} && $u->{email}) {
+        # this is one of the 94 users (counted on 2005-01-05) that has
+        # a users record but no usertable record
+        $sql = qq{INSERT INTO usertable (user,secretemail,forcechange,changed)
+                                 VALUES (?,   ?,          1,          ?)};
+
+        $authen_dbh->do($sql,{},$u->{userid},$u->{email},time)
+            or die Apache::HeavyCGI::Exception->new(ERROR =>
+                                                    qq{The userid of <i>$param</i>
+ is too old for this interface. Please get in touch with administration.});
+
+        $rec->{secretemail} = $u->{email};
+      } else {
+        die Apache::HeavyCGI::Exception->new(ERROR =>
+                                             qq{A userid of <i>$param</i>
+ is not known, please retry with a valid userid.});
+      }
+    }
 
     # TUT: all users may have a secret and a public email. We pick what
     # we have.
     unless ($email = $rec->{secretemail}) {
-      my $mod_dbh = $mgr->connect;
-      $sql = qq{SELECT *
-                FROM users
-                WHERE userid = ? };
-      $sth = $mod_dbh->prepare($sql);
-      $sth->execute($param);
-      my $rec = {};
-      $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
-      $email = $rec->{email};
+      my $u = $self->active_user_record($mgr,$param);
+      $email = $u->{email};
     }
     if ($email) {
 
