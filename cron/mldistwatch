@@ -419,7 +419,9 @@ sub do_rewrite01 {
         # uncountable misfits. 215 then was very similar to 211 but we
         # did sort above query by chapterid and got tons of misfits.
         # So we do not really have a solution. Every solution is
-        # wrong, even the pre-211 solution.
+        # wrong, even the pre-211 solution. OK, I've taken out the
+        # order by clause and retested, cheap_chapter deviates from
+        # old chapter for Exception, Sort, and User, that's all.
         if ($colo) {
             if (! exists $achapter{$root}) {
                 $achapter{"$root\::"} ||= $chapterid;
@@ -500,25 +502,41 @@ sub do_rewrite01 {
         ($pkg{readme} = $pkg{dist}) =~
             s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
-        my $sth2 = $dbh->prepare(qq{SELECT chapterid
+
+        if (0) { # old method before cheap_chapterid, it is buggy in
+                 # that it has only one chapter per root namespace
+            my $sth2 = $dbh->prepare(qq{SELECT chapterid
                                   FROM mods
                                   WHERE modid='$pkg{rootpack}'});
-        $sth2->execute;
-        if ($sth2->rows == 1) {
-            ($pkg{chapterid}) = $sth2->fetchrow_array;
-        } else {
-            $sth2 = $dbh->prepare(qq{SELECT chapterid
+            $sth2->execute;
+            if ($sth2->rows == 1) {
+                ($pkg{chapterid}) = $sth2->fetchrow_array;
+            } else {
+                $sth2 = $dbh->prepare(qq{SELECT chapterid
                                  FROM mods
                                  WHERE modid
                                   LIKE '$pkg{rootpack}\::%'});
-            $sth2->execute;
-            ($pkg{chapterid}) = $sth2->fetchrow_array;
+                $sth2->execute;
+                ($pkg{chapterid}) = $sth2->fetchrow_array;
+            }
         }
-        my $cheap_chapterid = $achapter{$pkg{rootpack}}
-            || $achapter{"$pkg{rootpack}\::"};
-        unless ($pkg{chapterid} eq $cheap_chapterid) {
-            warn "WARNING: rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
+
+        my $cheap_chapterid;
+        if (1) { # new method rev 216, same bug: only one chap-per-nmspace
+            $cheap_chapterid = $achapter{$pkg{rootpack}}
+                || $achapter{"$pkg{rootpack}\::"};
         }
+
+        if (0) { # compares the old and the new, so both above must be on
+            unless ($pkg{chapterid} eq $cheap_chapterid) {
+                warn "WARNING: rootpack[$pkg{rootpack}] old chapterid[$pkg{chapterid}] cheap chapterid[$cheap_chapterid]\n";
+            }
+        }
+
+        if (1) { # finally assign the new solution
+            $pkg{chapterid} = $cheap_chapterid;
+        }
+
         if (defined $pkg{chapterid}) {
             if (defined $chaptitle[$pkg{chapterid}]) {
                 $pkg{chapter} = $chaptitle[$pkg{chapterid}]
@@ -530,6 +548,8 @@ sub do_rewrite01 {
             $pkg{chapter} = "99_Not_In_Modulelist";
             warn "found no chapter for $pkg{rootpack}";
         }
+
+
         print "." if $stdout_is_terminal && !($i % 16);
         my $bymod = "$PAUSE::Config->{MLROOT}/../../modules/by-module/$pkg{rootpack}/$pkg{filenameonly}";
         my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
