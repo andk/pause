@@ -1,3 +1,13 @@
+2005-03-28  Andreas Koenig  <andk@cpan.org>
+
+	* Yesterday the schema change that shall put an end to confusion:
+
+	alter table chapters change chapterid longtitle char(80) not null default "";
+
+	Now I must find out how we're going to unify longtitle and
+	shorttitle, but I can already start reorganizing chapters as Tim
+	suggested.
+
 2005-03-21  Andreas Koenig  <andk@cpan.org>
 
 	* The "first round" of changes was done last Monday (2005-03-14)
