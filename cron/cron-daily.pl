@@ -476,8 +476,11 @@ sub mailrc {
     my $olist = "";
     local($/) = undef;
     if (open F, "$zcat $repfile|") {
-	$olist = <F>;
-	close F;
+      if ($] > 5.007) {
+        binmode F, ":utf8";
+      }
+      $olist = <F>;
+      close F;
     }
     my $stu = $Dbh->prepare("SELECT userid, fullname, email, asciiname
                              FROM users
@@ -494,11 +497,17 @@ sub mailrc {
       }
       $r[2] ||= sprintf q{%s@cpan.org}, lc($r[0]);
       my $state = 0;
-      $r[1] = $r[3] if $r[3];
-      while ( $r[1] =~ m/\"/g) {
-        $state ^= 1;
-        $state ? $r[1] =~ s/\"/\'/ : $r[1] =~ s/\"/\'/;
+      # replace fullname with asciiname if we have one
+      if ($r[3]){
+        $r[1] = $r[3];
+      } elsif ($r[1] =~ /[^\040-\177]/) {
+        eval {
+          require Text::Unidecode;
+          $r[1] = Text::Unidecode::unidecode($r[1]);
+        };
+        warn $@ if $@;
       }
+      $r[1] =~ s/"/'/g;
       $list .= sprintf qq{alias %-10s "%s <%s>"\n}, @r[0..2];
     }
     $stu = $Dbh->prepare("SELECT maillistid, maillistname, address
@@ -516,8 +525,11 @@ sub mailrc {
     }
     if ($list ne $olist) {
 	if (open F, "| $gzip -9c > $repfile") {
-	    print F $list;
-	    close F;
+          if ($] > 5.007){
+            binmode F, ":utf8";
+          }
+          print F $list;
+          close F;
 	} else {
 	    return("ERROR: Couldn't open 01mailrc...");
 	}

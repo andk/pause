@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w -- -*- mode: cperl -*-
 
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
@@ -6,7 +6,7 @@ use PAUSE ();
 use strict;
 use vars qw($Id $Have_warned);
 
-$Id = q$Id: rm_stale_links,v 1.10 2002/03/01 20:08:45 k Exp k $;
+$Id = q$Id$;
 
 use File::Find;
 chdir "$PAUSE::Config->{MLROOT}../..";
