@@ -24,18 +24,6 @@ use Text::Format;
 use YAML ();
 use Getopt::Long;
 $Data::Dumper::Indent = 1;
-umask 0002;
-$|=1;
-
-our %Opt;
-GetOptions(
-           \%Opt,
-           "pick=s@", # the idea is to NOT run find if they tell us
-                      # one distro, but this needs careful thinking to
-                      # not delete the whole database at some point.
-                      # So currently all that "pick" does is, it
-                      # suppresses writing of 0[123]* files.
-          );
 
 {
     package PAUSE::mldistwatch;
@@ -45,10 +33,6 @@ GetOptions(
     $Id = q$Id$;
     $ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
 }
-
-my $mldw = PAUSE::mldistwatch->new(\%Opt);
-$mldw->work;
-exit;
 
 
 package PAUSE::mldistwatch;
@@ -2389,6 +2373,25 @@ VALUES (
 
     }
 }
+
+MAIN: {
+    umask 0002;
+    $|=1;
+
+    my %Opt;
+    GetOptions(
+               \%Opt,
+               "pick=s@", # the idea is to NOT run find if they tell us
+                      # one distro, but this needs careful thinking to
+                      # not delete the whole database at some point.
+                      # So currently all that "pick" does is, it
+                      # suppresses writing of 0[123]* files.
+              );
+    my $mldw = PAUSE::mldistwatch->new(\%Opt);
+    $mldw->work;
+}
+
+exit;
 
 
 __END__
