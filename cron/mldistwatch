@@ -247,7 +247,10 @@ sub checkfornew {
 
     $dio->read_dist;
     $dio->extract_readme($suffix) if $suffix;
-    next BIGLOOP if grep m|\bblib/|, @{$dio->{MANIFOUND}};
+    if (grep m|\bblib/|, @{$dio->{MANIFOUND}}){
+      print "Found blib directory, skipping\n";
+      next BIGLOOP;
+    }
     $dio->examine_pms; # will switch user
 
     $alert .= $dio->alert; # now $dio can go out of scope
