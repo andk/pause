@@ -1,0 +1,179 @@
+=head1 NAME
+
+PAUSE - Perl Authors Upload Server
+
+=head1 SYNOPSIS
+
+This module is the code that runs L<http://pause.cpan.org/>, a server dedicated
+to collect the work of perl authors worldwide.  It provides personal directories
+and enables their owners to upload their work into that directory themselves.
+
+=head1 DESCRIPTION
+
+Here is an overview of PAUSE's structure:
+
+    apache-conf/       Apache Configuration
+    apache-perl/
+        user/          User CGI scripts (mod_perl to be precise)
+        admin/         Admin CGI scripts (mod_perl to be precise)
+    authen/            User Password
+    bin/               scripts, mainly paused, the pause daemon
+    cron/              cronjobs, mostly symlinked into /etc/cron.jobs
+    doc/               :-/
+    htdocs/            symlinked to Apache's document root
+    lib/               PAUSE.pm and such
+    log/               paused.log, the rather verbose output of paused
+    man/               empty
+    mirror/            mirror configuration, symlinked to /usr/local/mirror
+    rc/                boot script
+    src/               empty 
+
+The two core scripts are F<bin/paused> and F<cron/mldistwatch>. Both would
+need to be broken down into reusable and maintainable code.
+
+PAUSE.pm was originally the pure configuration file, but now also
+contains some frequently used routines.
+
+=head2 Excluded files
+
+The following file has been excluded from the repository for obvious
+reasons:
+
+    privatelib/PrivatePAUSE.pm
+
+PrivatePAUSE.pm contains only the usernames and passwords of the mysql
+users that own the two databases. See below for "Database schema".
+
+Other sensitive files, like the SSL key of the server, password files
+need to be maintained separately from the repository. See below the
+section about user management.
+
+=head2 File system layout
+
+On PAUSE the files live in /home/k/PAUSE and the following symlinks
+make sure that installed programs find their configuration:
+
+(last time updated: 2003-08-03)
+
+  /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf
+  /usr/local/apache/htdocs          -> ../../../home/k/PAUSE/htdocs/
+  /usr/local/apache/perl            -> ../../../home/k/PAUSE/apache-perl
+  /etc/apache2/apache2.conf         -> /home/k/PAUSE/apache-svn-conf/httpd.conf
+  /etc/apache2/mods-available/ssl.conf -> /home/k/PAUSE/apache-svn-conf/ssl.conf
+  /etc/rsyncd.conf                  -> /home/k/PAUSE/etc/rsyncd.conf
+  /etc/proftpd.conf                 -> /home/k/PAUSE/etc/proftpd.conf
+  /etc/mon/mon.cf                   -> /home/k/PAUSE/etc/mon/mon.cf
+  /etc/mysql/my.cnf                 -> /home/k/PAUSE/etc/my.cnf
+  /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
+  /usr/lib/mon/mon.d/sm-mta.monitor -> /home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
+
+[ MISSING documentation:
+
+  /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
+  /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
+
+]
+
+(XXX integrate indexscripts.pl with the help of kstar)
+
+=head2 Cronjob table for PAUSE
+
+  02 02 * * 7 /etc/cron.jobs/restart-httpd
+  03 03,15 * * * /etc/cron.jobs/msql-dump.sh
+  17 4 * * * /etc/cron.jobs/cron-daily.pl
+  22 1,5,9,13,17,21 * * * /etc/cron.jobs/mldistwatch
+  30 * * * * /etc/cron.jobs/rm_stale_links
+  31 * * * * /etc/cron.jobs/gmls-lR.pl
+  37 * * * * /etc/cron.jobs/sync-franz-put.sh
+  0-59/3 * * * * /etc/cron.jobs/diskwatch -m k / 75000 /M 150000
+  53 0,6,12,18 * * * /etc/cron.jobs/run_mirrors.sh
+  48 * * * * /usr/bin/perl /usr/local/mirror/mirror -p MICB /usr/local/mirror/mymirror.config > /dev/null
+
+=head2 External programs needed to run PAUSE
+
+  apache with mod_perl and Apache-SSL
+  perl
+  mirror (the good old one)
+  mon
+  proftpd
+  mysqld
+  rsync (runs as daemon)
+  subversion (optional)
+  gpg
+  unzip
+
+At the time of this writing (2003-07-25), all perl scripts were
+running under 5.8.0.
+
+=head2 Database schema
+
+See F<doc/mod.schema.txt> and F<doc/authen_pause.schema.txt> for schema
+of PAUSE's two databases.
+
+A dump of the mod database is produced every few hours and available for
+download in the ftp area. A dump of the authen_pause database is -- of
+course -- not available.
+
+=head2 User management
+
+This section is about the fun of making mysql safe based on UNIX user
+and group permissions. This is dangerous stuff. Be careful here and
+follow the advice in the mysql manual about how to secure mysql in
+general. E.g. C<--skip-networking> and root user password are a must,
+etc.
+
+PAUSE is running processes as user root, nobody, SVN, ftp, and UNSAFE.
+The user "k" in the group "k" owns the working copy of the repository
+and all the sensitive files. Group "k" must contain all users who
+should be able to read sensitive data. So at least "nobody" (who runs
+the webserver) must be in that group. Sensitive directories and files
+must be group-readable and must not be world readable. The SSL data
+for the webservers should not even be readable by that group, only by
+root who starts the webservers.
+
+This setup must ensure that the user UNSAFE cannot read the database
+account informations. On the database side this is achieved by
+granting delete,index,insert,select,update privileges on the two
+tables, nothing else, to one user. This is the user whose access codes
+are stored in PrivatePAUSE.pm. The root password to mysql is not
+needed by any script, so can be stored offline.
+
+=head2 Other security considerations
+
+We practice security by visibility by giving the users as much
+information as possible about the status of their requests. This is
+mostly done by sending them mail about every action they take.
+
+Another important axiom is that we disallow overwriting of files
+except for pure documentation files. That way the whole CPAN cannot
+fall out of sync and inconsistencies can be tracked easily. It opens
+us the possibility to maintain a I<backpan>, a backup of all relevant
+files of all times. Any attempt to upload malicious code can thus be
+tracked much better.
+
+=head2 Missing pieces
+
+As always, there are things we didn't bother to integrate into the
+repository because they are so basic stuff for any UNIX machine:
+
+  logrotate
+  xntpd
+  sendmail
+
+and probably more. If you discover pieces that are important but
+missing in the repository or documentation, please let us know.
+
+=head1 AUTHOR
+
+Andreas Koenig E<lt>andreas.koenig@anima.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 1995 - 2004 by Andreas Koenig E<lt>andreas.koenig@anima.deE<gt>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut
