@@ -1,3 +1,3 @@
 #!/bin/sh
 
-perl /usr/local/mirror/mirror /usr/local/mirror/mymirror.config
+perl /usr/bin/mirror -C /home/k/PAUSE/mirror/mirror.defaults /home/k/PAUSE/mirror/mymirror.config

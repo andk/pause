@@ -108,13 +108,13 @@ Expect failures everywhere.</p> </div>};
 
   }
 
-  if (time < 1059343200) {
+  if (time < 1059688800) {
     push @l, qq{<div align="center">};
 
-    push @l, qq{<p class="motd"><b>Maintainance 2003-07-24/27</b><br/>Maintainance
-work is going on on PAUSE while you read this. Lots of internals have
-changed and not everything is working as it should. I hope to finish
-the work during the weekend.</p>};
+    push @l, qq{<p class="motd"><b>Maintainance finished</b><br/>The
+Maintainance work (switch to Debian) on PAUSE seems to be finished.
+Everything should now be working as it did before. Please report
+anything that looks suspicious to you.</p>};
 
     push @l, qq{</div>};
 
