@@ -221,11 +221,16 @@ sub checkfornew {
             keys %{$self->{ALLfound}},
                 keys %{$self->{ALLlasttime}};
     }
-    $self->verbose(2, "Starting BIGLOOP\n");
+    my $all = @all;
+    $self->verbose(2, "Starting BIGLOOP over $all\n");
+    my $i = 0;
  BIGLOOP: for my $dist (@all) {
     #
     # Examine all distribution files
     #
+
+        $i++;
+        $self->verbose(2,".$dist.") unless $i%256;
 
     my $dio = PAUSE::dist->new(
                                MAIN   => $self,
