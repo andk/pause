@@ -252,13 +252,10 @@ sub checkfornew {
       next BIGLOOP;
     }
     $self->verbose(1,"\n    Examining $dist ...");
-    sleep 1;
+    sleep 1; # I think this might help us against wild processes
 
-    my $userid = PAUSE::dir2user($dist); # we produce it even if we
-                                         # don't need it. With better
-                                         # OO design we would have
-                                         # produced it on demand
-    $dio->{USERID} = $userid; # GRRR
+    my $userid = PAUSE::dir2user($dist);
+        $dio->{USERID} = $userid;
 
     my $suffix = "";
     my $skip = 0;
@@ -1096,7 +1093,7 @@ or documentation distribution?)\n\n};
     my $fh  = $msg->open('sendmail');
     print $fh @m;
     $fh->close;
-    $self->verbose(1,"-->> Sent mail about $distro");
+    $self->verbose(1,"-->> Sent mail about $distro\n");
   }
 
   # package PAUSE::dist;
@@ -1240,13 +1237,6 @@ or documentation distribution?)\n\n};
     }
   }
 
-  # package PAUSE::dist;
-  sub report {
-      my($self,$rep) = @_;
-      warn "report still used";
-      $self->verbose(1,$rep);
-  }
-
   sub verbose {
       my($self,$level,@what) = @_;
       my $main = $self->{MAIN};
@@ -1285,14 +1275,6 @@ or documentation distribution?)\n\n};
       $ret ||= 0;
       $self->verbose(1,"simile: file[$file] package[$package] ret[$ret]");
       $ret;
-  }
-
-  # package PAUSE::pmfile;
-  sub report {
-    my $self = shift;
-    my $what = shift;
-    my $dio = $self->{DIO};
-    $dio->report($what);
   }
 
   # package PAUSE::pmfile;
@@ -1632,14 +1614,6 @@ package in packages  package in primeur
   sub new {
     my($me) = shift;
     bless { @_ }, ref($me) || $me;
-  }
-
-  # package PAUSE::package;
-  sub report {
-    my $self = shift;
-    my $what = shift;
-    my $fio = $self->{FIO};
-    $fio->report($what);
   }
 
   # package PAUSE::package;
