@@ -63,6 +63,11 @@ sub handler {
                                priv => "public",
                                cat => "01self/04b",
                             },
+           pause_logout => {
+                            verb => "About Logging Out",
+                            priv => "user",
+                            cat => "06usr/04",
+                            },
 
            pause_05news => {
                             verb => "PAUSE News",

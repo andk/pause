@@ -21,6 +21,7 @@ sub parameter {
 
   # What is allowed here is allowed to anybody
   @allow_action{"who_is",
+                "pause_logout",
                 "pause_04about",
                 "pause_04imprint",
                 "pause_06history",
@@ -856,6 +857,12 @@ sub pause_04about {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
   $self->show_document($mgr,"04pause.html");
+}
+
+sub pause_logout {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr = shift;
+  $self->show_document($mgr,"logout.html");
 }
 
 sub pause_04imprint {

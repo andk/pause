@@ -40,6 +40,11 @@ sub as_string {
       push @m, qq{</td></tr>};
     }
 
+    if (0) {
+    push @m, qq{<tr><td class="menuitem">};
+    push @m, qq{<a class="menuitem" href="authenquery?ACTION=pause_logout">About Logging Out</a>};
+    push @m, qq{</td></tr>\n};
+
     push @m, qq{<tr><td class="menuitem">};
     push @m, qq{<a class="menuitem" href="authenquery?please_renegotiate_username">Login as sb. else</a>};
     push @m, qq{</td></tr>\n};
@@ -47,6 +52,7 @@ sub as_string {
     push @m, qq{<tr><td class="menuitem">};
     push @m, qq{<a class="menuitem" href="query">Unauthenticate ("Logout")</a>};
     push @m, qq{</td></tr>\n};
+    }
 
   } else {
 
