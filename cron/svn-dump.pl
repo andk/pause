@@ -52,9 +52,11 @@ system($system)==0 or die "Could not svn co";
 $system = "bzip2 -9 $dout";
 system($system)==0 or die "Could not bzip2";
 
+warn "$dout.bz2 -> $DIR/pause-svndump-$revision.bz2";
 copy "$dout.bz2", "$DIR/pause-svndump-$revision.bz2"
     unless -e "$DIR/pause-svndump-$revision.bz2";
 
+warn "pause-wc-$revision.tar.bz2 -> $DIR/pause-wc-$revision.tar.bz2";
 copy "pause-wc-$revision.tar.bz2", "$DIR/pause-wc-$revision.tar.bz2"
     unless -e "$DIR/pause-wc-$revision.tar.bz2";
 
