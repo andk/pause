@@ -33,9 +33,9 @@ for my $struct (@$Struct) {
   for my $var ($db,$user,$password) {
     die "illegal variable value[$var]" if $var =~ /['";]/;
   }
-  system "/usr/local/bin/mysqldump --lock-tables --add-drop-table --user='$user' --password='$password' '$db' > $backup_dir/.moddump.current";
-  rename "$backup_dir/.moddump.current", "$backup_dir/moddump.current";
-  unlink "$backup_dir/moddump.current.bz2";
-  system "$BZIP -9 --keep --small $backup_dir/moddump.current";
-  system "/bin/cp $backup_dir/moddump.current.bz2 $backup_dir/moddump.$D.bz2";
+  system "/usr/local/bin/mysqldump --lock-tables --add-drop-table --user='$user' --password='$password' '$db' > $backup_dir/.${db}dump.current";
+  rename "$backup_dir/.${db}dump.current", "$backup_dir/${db}dump.current";
+  unlink "$backup_dir/${db}dump.current.bz2";
+  system "$BZIP -9 --keep --small $backup_dir/${db}dump.current";
+  system "/bin/cp $backup_dir/${db}dump.current.bz2 $backup_dir/${db}dump.$D.bz2";
 }
