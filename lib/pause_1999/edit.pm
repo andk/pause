@@ -3137,6 +3137,7 @@ sub edit_mod {
     my $now = time;
     $mailblurb .= sprintf($mailsprintf1, "modid", $selectedrec->{modid}, "\n");
 
+    my $alter = 0;
     for my $field (qw(
 statd
 stats
@@ -3150,7 +3151,9 @@ mlstatus
 )) {
       my $headline = $meta{$field}{headline} || $field;
       my $note = $meta{$field}{note} || "";
-      push @m_modrec, qq{<b>$headline</b><br />};
+      $alter ^= 1;
+      my $alterclass = $alter ? "alternate1" : "alternate2";
+      push @m_modrec, qq{\n<div class="$alterclass"><h4>$headline</h4>};
       push @m_modrec, qq{<small>$note</small><br />} if $note;
       my $fieldtype = $meta{$field}{type};
       my $fieldname = "pause99_edit_mod_$field";
@@ -3258,7 +3261,7 @@ mlstatus
 				       'value' => $selectedrec->{$field},
 				       %{$meta{$field}{args} || {}}
 				      );
-      push @m_modrec, qq{<br />\n};
+      push @m_modrec, qq{</div>\n};
     }
     push @m_modrec, qq{<input type="submit" name="pause99_edit_mod_4"
  value="Update" /><br />};
@@ -4512,8 +4515,8 @@ sub stat_meta {
   my(%statd,%stats,%statl,%stati,%statp,@statd,@stats,@statl,@stati,@statp);
   @statd{@statd = qw(i c a b R M S ?)} = qw( idea pre-alpha
         alpha beta released mature standard unknown);
-  @stats{@stats = qw(n d m u ?)}       = qw( none
-	developer mailing-list comp.lang.perl.* unknown);
+  @stats{@stats = qw(d m u n a ?)}       = qw(
+	developer mailing-list comp.lang.perl.* none abandoned unknown);
   @statl{@statl = qw(p c + o h ?)}       = qw( perl C C++ other hybrid unknown);
   @stati{@stati = qw(f r O p h n ?)}         = qw( functions
 	references+ties object-oriented pragma hybrid none unknown );
@@ -4542,6 +4545,15 @@ sub stat_meta {
           stats => {
                     type => $deftype,
                     headline => "Support Level",
+
+                    note => qq{The module list says about the flags
+                      <i>n</i> and <i>a</i>:
+
+<pre>
+n  - None known, try comp.lang.perl.modules
+a  - abandoned; volunteers welcome to take over maintainance
+</pre>},
+
                     args => {
                              values => \@stats,
                              labels => \%stats,
