@@ -4914,15 +4914,21 @@ decision.</li>
           last;
         }
         require Set::Crontab;
-        my $sc = Set::Crontab->new($minute,[0..59]);
-        my $now = time;
-        $now -= $now%60;
-        for (my $i = 1; $i<=60; $i++) {
-          my $fut = $now + $i * 60;
-          my $fum = int $fut % 3600 / 60;
-          next unless $sc->contains($fum);
-          $eta = gmtime($fut+600) . " GMT";
-          last;
+        my $sc;
+        eval { $sc = Set::Crontab->new($minute,[0..59]); };
+        if ($@) {
+          warn "Could not create a Crontab object: $@ (minute[$minute])";
+          $eta = "N/A";
+        } else {
+          my $now = time;
+          $now -= $now%60;
+          for (my $i = 1; $i<=60; $i++) {
+            my $fut = $now + $i * 60;
+            my $fum = int $fut % 3600 / 60;
+            next unless $sc->contains($fum);
+            $eta = gmtime($fut+600) . " GMT";
+            last;
+          }
         }
       } else {
         $eta = "N/A";

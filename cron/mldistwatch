@@ -1295,7 +1295,23 @@ sub as_ds {
     }
     my($v);
     {
-      package main;
+
+      my($pid,$kid);
+      die "Can't fork: $!" unless defined($pid = open($kid, "-|"));
+      if ($pid) {           # parent
+        $v = <$kid>;
+        close $kid;
+      } else {
+        my($gnam,$gpw,$gid,$gmem) = getgrnam("UNSAFE"); 
+        die "Could not determine GID of UNSAFE" unless $gid;
+        my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) = getpwnam("UNSAFE");
+        die "Could not determine UID of UNSAFE" unless $uid;
+        $( = $gid; $) = "$gid $gid";
+        $< = $> = $uid;
+
+        # XXX Limit Resources too
+
+        package main;
 
 =pod
 
@@ -1309,21 +1325,23 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
 
 =cut
 
-      my($comp) = Safe->new("_pause::mldistwatch");
-      my $eval = qq{
+        my($comp) = Safe->new("_pause::mldistwatch");
+        my $eval = qq{
                   local(\$^W) = 0;
                   ExtUtils::MM_Unix::parse_version("","$pmcp");
                  };
-      ExtUtils::MM_Unix::parse_version("","/dev/null"); #make sure
+        ExtUtils::MM_Unix::parse_version("","/dev/null"); #make sure
                                                         #it's
                                                         #selfloaded
 
-      $comp->share("*ExtUtils::MM_Unix::parse_version", "*strict::unimport");
-      $comp->permit("require"); # no strict!
-      $v = $comp->reval($eval);
-      warn "reval failed: $@ for eval[$eval]" if $@;
+        $comp->share("*ExtUtils::MM_Unix::parse_version", "*strict::unimport");
+        $comp->permit("require"); # no strict!
+        $v = $comp->reval($eval);
+        warn "reval failed: $@ for eval[$eval]" if $@;
+        print $v;
+        exit;
+      }
     }
-
     $v = "undef" unless defined $v;
 
     warn "pmfile[$pmfile] mm_parsed_version[$v]";

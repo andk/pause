@@ -84,4 +84,8 @@ dump of the mod database is produced every few hours and available for
 download in the ftp area. A dump of the authen_pause database is -- of
 course -- not available.
 
+=head2 User management
+
+PAUSE is running processes as user root, nobody, SVN, and UNSAFE.
+
 =cut
