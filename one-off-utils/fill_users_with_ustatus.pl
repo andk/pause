@@ -23,7 +23,7 @@ use DBI;
 my $Rev = q$Rev$;
 print "$Rev\n";
 
-my $sharp = 0;
+my $sharp = 1;
 
 my $db = DBI->connect(
                       $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
@@ -47,7 +47,9 @@ for my $de1 (readdir $dh) {
     opendir my $dh3, "$backpan/$de1/$de2" or die $!;
     for my $de3 (readdir $dh3) {
       next if $de3 =~ /^\.\.?$/;
-      die "Illegal directory $backpan/$de1/$de2/$de3" unless $de3=~/^[A-Z][-A-Z]*[A-Z0-9]+$/;
+      # we *have* accepted NI-S and IBMTORDB2:
+      die "Illegal directory $backpan/$de1/$de2/$de3"
+          unless $de3=~/^[A-Z][-A-Z]*[A-Z0-9]+$/;
       die "Illegal userdirectory $de3" unless $U->{$de3};
       die "Deleted userdirectory $de3" if $U->{$de3}{ustatus} eq 'delete';
       next if $U->{$de3}{ustatus} eq 'active';

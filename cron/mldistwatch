@@ -81,6 +81,7 @@ sub do_work {
     chdir $MLROOT
 	or die "Couldn't chdir to $MLROOT";
     $self->init_all();
+    $self->set_active_status();
     my $testdir = "/tmp/test" . $$; # XXX File::Temp!
     rmtree $testdir if -e $testdir;
     unless (mkpath $testdir) {
@@ -103,6 +104,19 @@ sub do_work2 {
         or die "Couldn't chdir to $MLROOT: $!";
     $self->do_rewrite01();
     $self->do_rewrite03();
+}
+
+sub set_active_status {
+    my $self = shift;
+    my $db = $self->connect;
+    my $active = $db->selectall_hashref("SELECT userid
+                                         FROM users
+                                         WHERE ustatus='active'",
+                                        "userid");
+    my %seen;
+    my @new_active_users = grep { !$active->{$_} && !$seen{$_}++ }
+        map { m|./../([^/]+)/| } keys %{$self->{ALLfound}};
+    $self->verbose(2,"XXX new_active_users[@new_active_users]") if @new_active_users;
 }
 
 sub connect {
