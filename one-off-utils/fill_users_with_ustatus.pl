@@ -38,13 +38,16 @@ my $sth = $db->prepare("UPDATE users SET ustatus='active', ustatus_ch=NOW() WHER
 my $backpan = "/home/ftp/pub/backpan/authors/id";
 opendir my $dh, $backpan or die $!;
 for my $de1 (readdir $dh) {
-  next unless $de1=~/^[A-Z]$/;
+  next if $de1 =~ /^\.\.?$/;
+  die "Illegal directory $backpan/$de1" unless $de1=~/^[A-Z]$/;
   opendir my $dh2, "$backpan/$de1" or die $!;
   for my $de2 (readdir $dh2) {
-    next unless $de2=~/^[A-Z]\w$/;
+    next if $de2 =~ /^\.\.?$/;
+    die "Illegal directory $backpan/$de1/$de2" unless $de2=~/^[A-Z][-A-Z]$/;
     opendir my $dh3, "$backpan/$de1/$de2" or die $!;
     for my $de3 (readdir $dh3) {
-      next unless $de3=~/^[A-Z]\w$/;
+      next if $de3 =~ /^\.\.?$/;
+      die "Illegal directory $backpan/$de1/$de2/$de3" unless $de3=~/^[A-Z][-A-Z]*[A-Z]$/;
       die "Illegal userdirectory $de3" unless $U->{$de3};
       die "Deleted userdirectory $de3" if $U->{$de3}{ustatus} eq 'delete';
       next if $U->{$de3}{ustatus} eq 'active';
