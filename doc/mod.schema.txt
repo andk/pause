@@ -288,6 +288,8 @@ CREATE TABLE uris (
 
 CREATE TABLE users (
   userid char(10) binary NOT NULL default '',
+  ustatus enum('unused','active','delete') NOT NULL default 'unused',
+  ustatus_ch datetime NOT NULL default '0000-00-00 00:00:00',
   email char(255) NOT NULL default '',
   cpan_mail_alias enum('none','publ','secr') NOT NULL default 'publ',
   homepage char(255) NOT NULL default '',
