@@ -49,12 +49,22 @@ Netscape 479 liest kommentare?
   push @l, qq{</title>
 <link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg" />
 <style type="text/css">
+.activemenu { background: #bfb; font-size: small; line-height: 1.5; }
+.alternate1 {
+  background: #f8f8f8;
+  padding-bottom: 12px;
+  }
+.alternate2 {
+  background: #ddd;
+  padding-bottom: 12px;
+  }
+.explain { font-size: small; }
+.firstheader { margin: 0 0 5%; }
 .menuheading { background: white;
                font-size: small; }
 .menuitem { background: #ddf; font-size: small; line-height: 1.5; }
-.activemenu { background: #bfb; font-size: small; line-height: 1.5; }
 .menupointer { color: green; }
-td.activemenu { border: green solid 1px; }
+.messages { text-align: left; border: 2px dashed red; padding: 2ex; }
 .statusencr { background: #bfb;
               text-align: center;
                   border: green solid 2px;
@@ -63,17 +73,14 @@ td.activemenu { border: green solid 1px; }
                 text-align: center;
                     border: red solid 2px;
                  font-size: small; }
-a.menuitem { text-decoration: none; }
-a.activemenu { text-decoration: none; }
-a.menuitem:hover { text-decoration: underline; }
-a.activemenu:hover { text-decoration: underline; }
-.alternate1 { background: #f8f8f8; }
-.alternate2 { background: #ddd; }
-.explain { font-size: small; }
 .xexplain { font-size: x-small; }
-.firstheader { margin: 0 0 5%; }
+a.activemenu { text-decoration: none; }
+a.activemenu:hover { text-decoration: underline; }
+a.menuitem { text-decoration: none; }
+a.menuitem:hover { text-decoration: underline; }
+h4.altering { margin: 0 0 12px; }
 p.motd { margin: 12px 1in; padding: 6px; color: black; background: yellow; font-size: small; }
-.messages { text-align: left; border: 2px dashed red; padding: 2ex; }
+td.activemenu { border: green solid 1px; }
 $hspecial
 </style>
 </head><body bgcolor="white" link="#0000CC" vlink="#0000BB"

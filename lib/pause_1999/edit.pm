@@ -763,7 +763,7 @@ The Pause
       push @m, qq{No change seen, nothing done.<hr />};
     }
   }
-  push @m, qq{<br /><table cellspacing="2" cellpadding="2">};
+  push @m, qq{<br /><table cellspacing="2" cellpadding="8">};
   my $alter = 1;
   for my $field (@allmeta) {
     unless ($meta{$field}){
@@ -777,7 +777,7 @@ The Pause
     }
     $alter ^= 1;
     my $alterclass = $alter ? "alternate1" : "alternate2";
-    push @m, qq{<tr><td class="$alterclass"><h4>$meta{$field}{short}</h4>};
+    push @m, qq{<tr><td class="$alterclass"><h4 class="altering">$meta{$field}{short}</h4>};
     push @m, qq{
 <p class="explain">$meta{$field}{long}</p>
 } if $meta{$field}{long};
@@ -2564,6 +2564,7 @@ sub request_id {
     $showform = 1;
   }
   if ($showform) {
+    my $alt = 0;
     # push @m, "<table>\n";
     foreach my $arr (
                      [
@@ -2589,12 +2590,14 @@ sub request_id {
 
                      ],
                     ) {
-      push @m, "<p><b>$arr->[0]</b></p><p>";
+      $alt ^= 1;
+      my $altname = $alt ? "alternate1" : "alternate2";
+      push @m, qq{<div class="$altname"><p><b>$arr->[0]</b></p><p>};
       if (my $note = $arr->[2]) {
         push @m, qq{<small>$note</small></p><p>};
       }
       push @m, $mgr->textfield( name => $arr->[1], size => 32 );
-      push @m, "</p>";
+      push @m, "</p></div>";
     }
 
     push @m, qq{<p><b>A short description of what you're planning to
