@@ -766,12 +766,14 @@ sub select_user {
 				default  => [$mgr->{User}{userid}],
                                 %{$user_meta{userid}{args}},
 			       );
+  push @m, qq{\n<br />\n};
   push @m, $mgr->scrolling_list(
 				'name' => 'ACTIONREQ',
 				values => $mgr->{AllowAdminTakeover},
 				default => ['edit_cred'],
 				size => 10,
 			       );
+  push @m, qq{\n<br />\n};
   push @m, qq{<input type="submit" name="pause99_select_user_sub" value="Submit" />};
   @m;
 }
