@@ -1846,7 +1846,7 @@ sub delete_files {
 
 
   my $time = time;
-  my $blurb;
+  my $blurb = "";
   # my $myurl = $mgr->myurl;
   my $server = $r->server->server_hostname;
   if ($req->param('SUBMIT_pause99_delete_files_delete')) {
@@ -1889,22 +1889,24 @@ sub delete_files {
     }
   }
   if ($blurb) {
-    my @blurb = sprintf(
-                        qq{According to a request entered by %s the
+    my $tf = Text::Format->new("firstIndent"=>0,);
+    my @blurb = $tf->format(sprintf(
+                                    qq{According to a request entered by %s the
 following files and the symlinks pointing to them have been scheduled
 for deletion. They will expire after 72 hours and then be deleted by a
 cronjob. Until then you can undelete them via
 https://%s/pause/authenquery?ACTION=delete_files or
 http://%s/pause/authenquery?ACTION=delete_files
 },
-                      $mgr->{User}{fullname},
-                      $server,
-                      $server);
+                                    $mgr->{User}{fullname},
+                                    $server,
+                                    $server));
     push @blurb, $blurb;
-    push @blurb, qq{Note: to encourage deletions, all of past CPAN
-glory is collected on http://history.perl.org/backpan/};
+    push @blurb, $tf->format(qq{Note: to encourage deletions, all of past CPAN
+glory is collected on http://history.perl.org/backpan/});
     push @blurb, qq{The Pause};
-    $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
+    # $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
+    $blurb = join "\n\n", @blurb;
 
     my %umailset;
     my $name = $u->{asciiname} || $u->{fullname} || "";
