@@ -730,7 +730,7 @@ maintainer
         last unless --$n;
 
     }
-    $html .= q{</pre>\n\n</body></html>\n};
+    $html .= qq{</pre></body></html>\n};
     $rss .= "\n</channel></rss>\n";
 
     my $MLROOT = $self->mlroot;
