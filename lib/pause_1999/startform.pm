@@ -26,7 +26,7 @@ sub as_string {
     $enctype = "application/x-www-form-urlencoded";
     $method = "get";
   }
-  warn "me[$me]enctype[$enctype]method[$method]";
+  # warn "me[$me]enctype[$enctype]method[$method]";
   push @m, qq{<form
  action="$me"
  enctype="$enctype"

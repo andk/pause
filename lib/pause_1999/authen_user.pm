@@ -105,7 +105,7 @@ sub handler {
   my $cookie;
   my $args;
   my $uri = $r->uri;
-  warn "Watch: uri[$uri]";
+  # warn "Watch: uri[$uri]";
   if ($cookie = $r->header_in("Cookie")) {
     # since we have bugzilla, we send a different cookie all the time
     # warn "cookie[$cookie]";
@@ -116,7 +116,7 @@ sub handler {
     }
   }
   if ($args = $r->args) {
-    warn "Watch: args[$args]";
+    # warn "Watch: args[$args]";
     if ( $args =~ s/please_renegotiate_username// ) {
       $r->err_header_out("Set-Cookie","please_renegotiate_username; path=$uri; expires=Sat, 01-Oct-2027 00:00:00 GMT");
       $args = "?$args" if $args;

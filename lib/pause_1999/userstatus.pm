@@ -12,7 +12,7 @@ sub as_string {
   my $r = $mgr->{R};
   my $user = $r->connection->user;
   my $server = $mgr->myurl->can("host") ? $mgr->myurl->host : $mgr->myurl->hostname;
-  $r->log_error(sprintf "Watch: server[%s]at[%s]line[%d]", $server, __FILE__, __LINE__);
+  # $r->log_error(sprintf "Watch: server[%s]at[%s]line[%d]", $server, __FILE__, __LINE__);
   my $activecolor = $mgr->{ActiveColor};
   return unless $user && $user ne "-";
   my @m;

@@ -300,7 +300,7 @@ sub myurl {
 
   my $Hhostname = $r->headers_in->get('Host');
   my $hostname = $uri->hostname();
-  warn "hostname[$hostname]Hhostname[$Hhostname]";
+  # warn "hostname[$hostname]Hhostname[$Hhostname]";
   # $uri->hostname($Hhostname); # contains :8443!!!!!
 
   my $rpath = $uri->rpath;

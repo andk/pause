@@ -164,7 +164,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
       if (
 	  $param = $req->param("pause99_$action\_sub")
 	 ) {
-	warn "action[$action]";
+	# warn "action[$action]";
 	$mgr->{Action} = $action;
 	last ACTION;
       }
@@ -314,11 +314,12 @@ sub active_user_record {
     }
   }
   my $u = {};
-  $r->log_error(sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]",
+  $r->log_error(sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]where[%s]",
                         $mgr->{User}{userid},
                         $hidden_user,
                         join(":", keys %{$mgr->{UserGroups}}),
                         join(":", caller),
+                        __FILE__.":".__LINE__,
                        )
                );
   if (
@@ -2964,7 +2965,7 @@ sub edit_mod {
       time - ($u->{introduced}||0) > 86400
      ) {
     $to[0] .= sprintf ",%s\@cpan.org", lc $u->{userid};
-    warn qq{Prepared to send mail to: @to};
+    # warn qq{Prepared to send mail to: @to};
   } else {
     # we have nothing else, so we must send separate mail
     my $user_email = $u->{secretemail};
@@ -2995,13 +2996,15 @@ sub edit_mod {
 };
 
   my $dbh = $mgr->connect;
-  warn sprintf(
-	       "selectedid[%s]IsMailinglistRepr[%s]",
-	       $selectedid,
-	       join(":",
-		    keys(%{$mgr->{IsMailinglistRepresentative}})
-		   )
-	      );
+  if (0) {
+    warn sprintf(
+                 "selectedid[%s]IsMailinglistRepr[%s]",
+                 $selectedid,
+                 join(":",
+                      keys(%{$mgr->{IsMailinglistRepresentative}})
+                     )
+                );
+  }
   my($sql,@bind);
   if (exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
     $sql = qq{SELECT modid
@@ -3168,6 +3171,14 @@ mlstatus
       my $fieldname = "pause99_edit_mod_$field";
       if ($field =~ /^stat/) { # there are many blanks instead of
                                # question marks, I believe
+        if (0) {
+          warn sprintf(
+                       "field[%s]value[%s]mfals[%s]",
+                       $field,
+                       $selectedrec->{$field},
+                       $meta{$field}{args}{labels}{$selectedrec->{$field}},
+                      );
+        }
         $selectedrec->{$field} = "?" unless exists
             $meta{$field}{args}{labels}{$selectedrec->{$field}};
       } elsif ($field eq "chapterid") {
@@ -3242,7 +3253,7 @@ mlstatus
 	  my $usth = $dbh->prepare($sql);
 	  my $ret = $usth->execute($param,
 				   $now,
-				   $u->{userid},
+				   $mgr->{User}{userid},
 				   $selectedrec->{modid});
 
 	  $saw_a_change = 1 if $ret > 0;
@@ -3292,7 +3303,7 @@ The Pause
 		      To => "$to",
 		      Subject => "Module update for $selectedrec->{modid}"
 		     };
-	$mgr->send_mail($header,$mailblurb);
+	$mgr->send_mail($header,$mailblurb) unless $PAUSE::Config->{TESTHOST};
       }
     } elsif ($update_sel) {	# it should have been updated but wasn't?
 
