@@ -1,4 +1,4 @@
-#!/usr/bin/perl -- -*- mode: cperl -*-
+#!/usr/bin/perl-5.8/bin/perl -- -*- mode: cperl -*-
 
 my $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 # $Date$
@@ -70,7 +70,7 @@ while () {
 }
 
 sub do_loop {
-  my($hash,$hash_orig,$dbh,$sth,$sth2,$query);
+  my($dbh,$sth,$sth2,$query);
 
   my $now    = time ;
   my $old = $now - 86400*60;
@@ -104,12 +104,16 @@ sub do_loop {
                WHERE userid=?};
   $sth2 = $dbh->prepare($sql);
 
-  my ($shall_verify, %hash, $fetchhash);
-
-  while ( $fetchhash  = $sth->fetchrow_hashref ) {
-    $hash = $fetchhash;
-    %hash = %$hash;
-    $hash_orig = {%hash};
+  # we have a continue block, so be careful with the scope
+  my($hash, $hash_orig);
+  while ( $hash  = $sth->fetchrow_hashref ) {
+    if ($] > 5.007) {
+      require Encode;
+      for my $k (keys %$hash) {
+        defined && /[^\000-\177]/ && Encode::_utf8_on($_) for $hash->{$k};
+      }
+    }
+    $hash_orig = {%$hash};
 
     if ( $hash->{uriid} =~ s/ (.*) \.Z$ /$1.gz/x ) {
       $query = "DELETE FROM uris WHERE uriid = '$1.Z'";
