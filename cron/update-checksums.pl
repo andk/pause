@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use CPAN::Checksums 1.16;
+use CPAN::Checksums 1.016;
 use File::Find;
 use strict;
 use vars qw($DEBUG);

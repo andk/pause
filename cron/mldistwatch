@@ -84,7 +84,7 @@ mess.
 
 use strict;
 use lib "/home/k/PAUSE/lib";
-use CPAN::Checksums 1.16;
+use CPAN::Checksums 1.016;
 use Cwd ();
 use Compress::Zlib;
 use Data::Dumper ();
