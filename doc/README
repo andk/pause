@@ -17,7 +17,7 @@ produced by a cronjob and accessible as in the directory
 The filenames match C< /^pause-wc-(\d+)\.tar\.gz$/ > where C< $1 > is
 the revision number of the repository.
 
-=head2 Excluded file
+=head2 Excluded files
 
 The following file has been excluded from the repository for obvious
 reasons:
@@ -29,7 +29,8 @@ users that own the two databases. See lib/PAUSE.pm for the structure
 of the data.
 
 Other sensitive files, like the SSL key of the server, password files
-and the mon.cf file need to be maintained separately.
+and the mon.cf file need to be maintained separately from the
+repository. See below the section about user management.
 
 =head2 File system layout
 
