@@ -113,8 +113,8 @@ $Data::Dumper::Indent = 1;
 umask 0002;
 $|=1;
 
-my $tar = "/usr/local/bin/tar";
-$tar = "/bin/tar" unless -x $tar;
+my $tarbin = "/usr/local/bin/tar";
+$tarbin = "/bin/tar" unless -x $tarbin;
 my $unzip = "/usr/local/bin/unzip";
 $unzip = "/usr/bin/unzip" unless -x $unzip;
 my $rsync = "/usr/local/bin/rsync";
@@ -248,7 +248,7 @@ sub checkfornew {
     $dio->read_dist;
     $dio->extract_readme($suffix) if $suffix;
     next BIGLOOP if grep m|\bblib/|, @{$dio->{MANIFOUND}};
-    $dio->examine_pms;
+    $dio->examine_pms; # will switch user
 
     $alert .= $dio->alert; # now $dio can go out of scope
 
@@ -881,7 +881,7 @@ sub as_ds {
     my $self = shift;
     my $dist = $self->{DIST};
     local *TARTEST;
-    open TARTEST, "$tar tzf $PAUSE::Config->{MLROOT}/$dist |";
+    open TARTEST, "$tarbin tzf $PAUSE::Config->{MLROOT}/$dist |";
     while (<TARTEST>) {
       if (m:^\.\./: || m:/\.\./: ) {
         print "\n\n    ALERT: Updir detected in $dist!\n\n";
@@ -891,9 +891,9 @@ sub as_ds {
     }
     close TARTEST;
     print "Going to untar $PAUSE::Config->{MLROOT}/$dist\n";
-    unless (system($tar,'xzf',"$PAUSE::Config->{MLROOT}/$dist")==0){
+    unless (system($tarbin,'xzf',"$PAUSE::Config->{MLROOT}/$dist")==0){
       print "Some error occurred during unzippping. Let's retry:\n";
-      system("$tar xvzf $PAUSE::Config->{MLROOT}/$dist")==0 or return;
+      system("$tarbin xvzf $PAUSE::Config->{MLROOT}/$dist")==0 or return;
     }
     return 1;
   }
@@ -983,6 +983,8 @@ sub as_ds {
 	next;
       }
 
+      $self->chown_unsafe;
+
       my $fio = PAUSE::pmfile->new(
                                    DIO => $self,
                                    PMFILE => $pmfile,
@@ -991,6 +993,19 @@ sub as_ds {
                                   );
       $fio->examine_fio;
     }
+  }
+
+  sub chown_unsafe {
+    my($self) = @_;
+    return if $self->{CHOWN_UNSAFE_DONE};
+    use File::Find;
+    my(undef,undef,$uid,$gid) = getpwnam("UNSAFE");
+    find(sub {
+           chown $uid, $gid, $_;
+         },
+         "."
+        );
+    $self->{CHOWN_UNSAFE_DONE}++;
   }
 
   # package PAUSE::dist;
