@@ -1,56 +1,11 @@
 #!/usr/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
 
-=pod
-
-+---------------------------------------------------------------+
-| We run through the whole filesystem and check for new files   |
-| and for goners.                                               |
-+---------------------------------------------------------------+
-| We compare them with the database of distribution files and   |
-| decide if we have to examine them closer. We also create a    |
-| trivial "database" of CHECKSUMS in the same directory as a    |
-| distro resides.                                               |
-+---------------------------------------------------------------+
-| We unzip new files into a tree and examine files in that tree |
-| and compare these with data about packages in the database.   |
-+---------------------------------------------------------------+
-| During the course we write mails.			        |
-+---------------------------------------------------------------+
-| When we are done, we create summaries from the database.      |
-+---------------------------------------------------------------+
-
-So we have distfilechecks, directorychecks and contentfilechecks.
-Contentchecks have two parts, files and namespaces (packages). And we
-have some sort of a scheduler that keeps track of what we have to do.
-
-4 levels of classes:
-
-PAUSE::mldistwatch       we could call it main. One object does all the
-                         work
-
-PAUSE::dist              each distro we find is an object of this class
-
-PAUSE::pmfile            each *.pm file in each distro is one object of
-                         this class
-
-PAUSE::package           each package statement per pm-file is an object
-                         of this class
-
-
-The methods alert() and verbose() exist in all classes. Only the two
-in PAUSE::mldistwatch do something for real, the others just pass
-their arguments up in the "stack" of objects. Similarly index_status
-passes arguments up till they reach the PAUSE::dist object. From there
-they are harvested in the mail_summary() method that sends a report to
-the owner of the package
-
-=cut
+# Some POD is after __END__
 
 use strict;
 use lib "/home/k/PAUSE/lib";
 use CPAN::Checksums 1.016;
 use Cwd ();
-use Compress::Zlib;
 use Data::Dumper ();
 use DirHandle ();
 use ExtUtils::MakeMaker;
@@ -58,24 +13,19 @@ use ExtUtils::Manifest;
 use File::Basename ();
 use File::Copy ();
 use HTTP::Date ();
-use IO::File ();
 use Mail::Send ();
 use DBI;
 use PAUSE ();
 use PAUSE::MailAddress ();
-use Net::Domain ();
-use CPAN;
+use CPAN; # only for CPAN::Version
 use Text::Format;
-
 $Data::Dumper::Indent = 1;
 umask 0002;
 $|=1;
 
 {
     package PAUSE::mldistwatch;
-
     ###### data initialization ######
-
     use File::Path qw(rmtree mkpath);
     use vars qw($Id $ISAPERL);
     $Id = q$Id$;
@@ -1347,8 +1297,7 @@ Please contact modules\@perl.org if there are any open questions.
         my $filemtime = $self->{MTIME};
         my $version = $self->{VERSION};
 
-        my $fh = IO::File->new;
-        $fh->open("$pmfile\0") or die("Couldn't open $pmfile for read: $!");
+        open my $fh, "<", "$pmfile" or die("Couldn't open $pmfile for read: $!");
 
         local $/ = "\n";
         my $inpod = 0;
@@ -1954,7 +1903,6 @@ has the same version number and the distro has a more recent modification time.}
                 $self->verbose(1,
                                "Warning: we are not simile AND we have been ".
                                "simile some time earlier:\n");
-                require Data::Dumper;
                 $self->verbose(1,Data::Dumper::Dumper($pp), "\n");
                 $ok = 0;
             }
@@ -2088,3 +2036,50 @@ VALUES (
 }
 
 
+__END__
+
+=pod
+
++---------------------------------------------------------------+
+| We run through the whole filesystem and check for new files   |
+| and for goners.                                               |
++---------------------------------------------------------------+
+| We compare them with the database of distribution files and   |
+| decide if we have to examine them closer. We also create a    |
+| trivial "database" of CHECKSUMS in the same directory as a    |
+| distro resides.                                               |
++---------------------------------------------------------------+
+| We unzip new files into a tree and examine files in that tree |
+| and compare these with data about packages in the database.   |
++---------------------------------------------------------------+
+| During the course we write mails.			        |
++---------------------------------------------------------------+
+| When we are done, we create summaries from the database.      |
++---------------------------------------------------------------+
+
+So we have distfilechecks, directorychecks and contentfilechecks.
+Contentchecks have two parts, files and namespaces (packages). And we
+have some sort of a scheduler that keeps track of what we have to do.
+
+4 levels of classes:
+
+PAUSE::mldistwatch       we could call it main. One object does all the
+                         work
+
+PAUSE::dist              each distro we find is an object of this class
+
+PAUSE::pmfile            each *.pm file in each distro is one object of
+                         this class
+
+PAUSE::package           each package statement per pm-file is an object
+                         of this class
+
+
+The methods alert() and verbose() exist in all classes. Only the two
+in PAUSE::mldistwatch do something for real, the others just pass
+their arguments up in the "stack" of objects. Similarly index_status
+passes arguments up till they reach the PAUSE::dist object. From there
+they are harvested in the mail_summary() method that sends a report to
+the owner of the package
+
+=cut
