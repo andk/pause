@@ -27,12 +27,14 @@ sub new_from_userid {
   my $me = {};
   if ($sth->rows > 0) {
     ($me->{address}) = $sth->fetchrow_array;
+  }
+  if ($me->{address}) {
     $me->{is_secret} = 1;
   } else {
     $sth = $dbh->prepare("SELECT email FROM users WHERE userid=?");
     $sth->execute($userid);
     return if $sth->rows == 0;
-    ($me->{address}) = $sth->fetchrow_array;
+    ($me->{address}) = $sth->fetchrow_array or return;
   }
   bless $me, $class;
 }
