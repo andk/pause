@@ -25,11 +25,11 @@ pause_1999::usermenu
 
 sub handler {
   my($r) = shift;
-  if (time >= 1057579200 && time < 1057582800) {
+  if (time >= 1057651200 && time < 1057658400) {
     $r->content_type("text/html");
     $r->send_http_header;
     use Time::Duration;
-    my $delta = 1057582800 - time;
+    my $delta = 1057658400 - time;
     my $expr = Time::Duration::duration($delta);
 
     $r->print(qq{<html> <head><title>PAUSE CLOSED</title></head><body>

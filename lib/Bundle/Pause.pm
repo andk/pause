@@ -31,6 +31,7 @@ Time::Period
 Encode::MIME::Header
 
 Time::HiRes
+Time::Duration
 BSD::Resource
 
 Set::Crontab

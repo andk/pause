@@ -110,16 +110,16 @@ $hspecial
 
   }
 
-  if (time < 1057579200) {
+  if (time < 1057651200) {
     push @l, qq{<div align="center">};
     use Time::Duration;
-    my $delta = 1057579200 - time;
+    my $delta = 1057658400 - time;
     my $expr = Time::Duration::duration($delta);
 
-    push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />Today
-at 12 GMT (that is in $expr) we'll have to close PAUSE for
-maintainance work. The estimated downtime is 2 hours. Sorry for the
-inconvenience.</p>};
+    push @l, qq{<p class="motd"><b>Scheduled downtime</b><br />On
+2003-07-08 at 8 GMT (that is in $expr) we'll have to close PAUSE for
+maintainance work (again). The estimated downtime is 2 hours. Thank
+you for your patience and sorry for the inconvenience.</p>};
 
     push @l, qq{</div>};
 
