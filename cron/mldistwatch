@@ -77,8 +77,17 @@ Fealing better.
 Removing support for the packages.file_md5 field in PAUSE::pmfile. One
 day we must remove the field from the table too. (DONE 2002-08-01)
 
-BTW, the combination of print, report, alert and warn is a complete
-mess.
+2003-02-10:
+
+Long time we know that the combination of print, report, alert and
+warn is a complete mess.
+
+The best way out of that seems to be that we start to write a prette
+report on every distro we touch. We send this report to an admin,
+later to the author as well. Once we have managed to have that look
+good, we can remove all of print, report, alert and warn.
+
+What is the method name? summary.
 
 =cut
 
@@ -100,11 +109,13 @@ use Mail::Send ();
 use DBI;
 use PAUSE ();
 use Net::Domain ();
-use vars qw($Id $reportstring
-	    %ALLfound %ALLlasttime %ALL
-	   );
 use CPAN;
 
+package PAUSE::mldistwatch;
+
+use vars qw($Id $ISAPERL
+	    %ALLfound %ALLlasttime %ALL
+	   );
 $Id = q$Rev$;
 
 print "Running $0, $Id\n";
@@ -121,37 +132,14 @@ my $rsync = "/usr/local/bin/rsync";
 $rsync = "/usr/bin/rsync" unless -x $rsync;
 die "No rsync found" unless -x $rsync;
 
-$::ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
+$ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
 
-my $postprocess;
 {
     my $startdir = Cwd::cwd();
     chdir($PAUSE::Config->{MLROOT})
 	or die "Couldn't chdir to $PAUSE::Config->{MLROOT}";
-
-    # April 2000: We want to move ANDK to A/AN/ANDK, but we want only
-    # one directory moved per hour.
-    opendir DIR, "." or die;
-    for (sort readdir DIR){
-      next if /^\./ or length($_)==1 or -l $_;
-      # next unless $_ eq "ANDK"; # testing with my own
-      my $targ = substr($_,0,1) . "/" . substr($_,0,2);
-      next if -e "$targ/$_"; # we have created it an hour ago, I suppose
-      mkpath $targ;
-      # Naive version would just rename, but Kurt pointed out, it
-      # might cause unwanted results for mirroring processes.
-      # rename $_, "$targ/$_";
-      system $rsync, "-a", $_, "$targ/";
-
-      $postprocess = $_;
-      # symlink not yet possible, old directory still exists
-      # symlink "$targ/$_", $_;
-
-      last;
-    }
-    closedir DIR;
     init_all();
-    my $testdir = "/tmp/test" . $$;
+    my $testdir = "/tmp/test" . $$; # XXX File::Temp!
     rmtree $testdir if -e $testdir;
     unless (mkpath $testdir) {
       die("Couldn't make directory $testdir: $!");
@@ -168,15 +156,6 @@ chdir "$PAUSE::Config->{MLROOT}"
     or die "Couldn't chdir to $PAUSE::Config->{MLROOT}: $!";
 do_rewrite01();
 do_rewrite03();
-if ($postprocess) {
-  sleep 3600;
-  chdir "$PAUSE::Config->{MLROOT}"
-      or die "Couldn't chdir to $PAUSE::Config->{MLROOT}: $!";
-  warn "removing tree $PAUSE::Config->{MLROOT}/$postprocess";
-  rmtree $postprocess;
-  my $targ = substr($postprocess,0,1) . "/" . substr($postprocess,0,2);
-  symlink "$targ/$postprocess", $postprocess;
-}
 print "Goodbye\n";
 exit;
 
@@ -247,11 +226,10 @@ sub checkfornew {
 
     $dio->read_dist;
     $dio->extract_readme($suffix) if $suffix;
-    if (grep m|\bblib/|, @{$dio->{MANIFOUND}}){
-      print "Found blib directory, skipping\n";
-      next BIGLOOP;
-    }
+    $dio->check_blib;
     $dio->examine_pms; # will switch user
+
+    $dio->mail_summary;
 
     $alert .= $dio->alert; # now $dio can go out of scope
 
@@ -264,9 +242,9 @@ sub checkfornew {
     $dh->close;
   }
   if ($alert) {
-    print $alert; #just in case
+    print $alert; # summary
     my($msg) = Mail::Send->new(
-			       To => join(", ",$PAUSE::Config->{ADMIN}),
+			       To => $PAUSE::Config->{ADMIN},
 			       Subject => "Upload Permission or Version mismatch"
 			      );
     $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
@@ -781,10 +759,6 @@ sub as_ds {
 
 
 #####################################################################
-############################ end of main ############################
-#####################################################################
-
-#####################################################################
 ######################### start of packages #########################
 #####################################################################
 
@@ -907,7 +881,7 @@ sub as_ds {
     my $dist = $self->{DIST};
     my($suffix,$skip);
     $suffix = $skip = "";
-    if ($dist =~ /$::ISAPERL/ox) {
+    if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/ox) {
       my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
       print "perl dist $dist from $u. Is he a trusted guy?\n";
       use DBI;
@@ -964,8 +938,48 @@ sub as_ds {
   }
 
   # package PAUSE::dist;
+  sub mail_summary {
+    my($self) = @_;
+    my $distro = $self->{DIST};
+    my($msg) = Mail::Send->new(
+			       To => join(", ",$PAUSE::Config->{ADMIN}),
+			       Subject => "PAUSE Indexer report $distro"
+			      );
+    $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
+    my $fh  = $msg->open('sendmail');
+    print $fh "The following report has been written by the PAUSE indexer.
+  $PAUSE::mldistwatch::Id\n\n";
+    my $author = PAUSE::dir2user($distro);
+    my $time = gmtime;
+    my $mtime = gmtime((stat $distro)[9]) . " UTC";
+    my $nfiles = scalar @{$self->{MANIFOUND}};
+    print $fh qq{
+      CPAN author: $author
+Distribution file: $distro
+   Number of file: $nfiles
+Timestamp of file: $mtime UTC
+ Time of this run: $time UTC\n\n};
+    if ($self->{HAS_BLIB}) {
+      print $fh qq{The distribution contains a blib/ directory and is therefore not being indexed.\n};
+    } else {
+      print $fh "XXX TBD\n";
+    }
+    $fh->close;
+    warn "Sent mail about $distro";
+  }
+
+  # package PAUSE::dist;
+  sub check_blib {
+    my($self) = @_;
+    if (grep m|\bblib/|, @{$self->{MANIFOUND}}){
+      $self->{HAS_BLIB}++;
+    }
+  }
+
+  # package PAUSE::dist;
   sub examine_pms {
     my $self = shift;
+    return if $self->{HAS_BLIB};
     my $dist = $self->{DIST};
 
     my $binary_dist;
@@ -1058,14 +1072,7 @@ sub as_ds {
       my($self,$rep) = @_;
       $rep ||= join ":", caller;
       warn "$rep\n";
-  #    $reportstring .= "$rep\n";
-  #    if ($reportrecorder++ > 23) {
-  #	print $reportstring;
-  #	$reportrecorder = 0;
-  #	sleep 2;
-  #    }
   }
-
 
 }
 
@@ -1159,6 +1166,9 @@ sub as_ds {
       $pio->examine_pkg;
 
     } # end foreach package
+
+    delete $self->{DIO}; # circular reference
+
   }
 
   # package PAUSE::pmfile;
@@ -1560,7 +1570,7 @@ package in packages  package in primeur
       while (($p,$owner) = $sth_perms->fetchrow_array) {
         push @owner, $owner; # array for debugging statement
       }
-      if ($dist =~ /$::ISAPERL/ox) {
+      if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/ox) {
         # seems ok: perl is always right
       } elsif (! grep { $_ eq $userid } @owner) {
         # we must not index this and we have to inform somebody
@@ -1595,7 +1605,6 @@ package in packages  package in primeur
     return 1;
   }
 
-
   sub examine_pkg {
     my $self = shift;
 
@@ -1629,7 +1638,7 @@ package in packages  package in primeur
     }
 
     $self->checkin;
-
+    delete $self->{FIO}; # circular reference
   }
 
   sub update_package {
@@ -1657,7 +1666,7 @@ package in packages  package in primeur
     my $distorperlok = $dist !~ m|/perl|;
     # this dist is not named perl-something (lex ILYAZ)
 
-    my $isaperl = $dist =~ /$::ISAPERL/ox;
+    my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISAPERL/ox;
 
     $distorperlok ||= $isaperl;
     # or it is THE perl dist
@@ -1666,7 +1675,7 @@ package in packages  package in primeur
     # or it is called perl-something (e.g. perl-ldap) AND...
     my($something2) = $odist =~ m|/perl(.....)|;
     # and we compare against another perl-something AND...
-    my($oisaperl) = $odist =~ /$::ISAPERL/ox;
+    my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISAPERL/ox;
     # the file we're comparing with is not the perl dist
 
     $distorperlok ||= $something1 && $something2 &&
