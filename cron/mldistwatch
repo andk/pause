@@ -1278,7 +1278,7 @@ sub as_ds {
   }
 
   # package PAUSE::pmfile;
-  sub mm_unix_parse_version {
+  { no strict; sub mm_unix_parse_version {
       my($parsefile) = @_;
       my $result;
       local *FH;
@@ -1308,7 +1308,7 @@ sub as_ds {
 
       $result = "undef" unless defined $result;
       return $result;
-  }
+  }}
 
   # package PAUSE::pmfile;
   sub parse_version {
