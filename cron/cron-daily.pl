@@ -77,17 +77,13 @@ sub read_errorlog {
 
 sub for_authors {
   my($error);
+  use File::Compare qw(compare);
+  use File::Copy qw(copy);
   if ($error = whois()){
     report $error;
-  } elsif (system('/usr/local/bin/cmp',
-		  '-s',
-		  '00whois.new',
-		  "$PAUSE::Config->{MLROOT}/../00whois.html"
-		 )!=0) {
-    report qq{Running: /bin/cp 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
-    system('/bin/cp',
-	   '00whois.new',
-	   "$PAUSE::Config->{MLROOT}/../00whois.html");
+  } elsif (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
+    report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
+    copy '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html";
   }
   if ($error = mailrc()) {
     report $error;
@@ -350,6 +346,10 @@ sub whois {
 	isa_list, homepage, asciiname FROM users ORDER BY fullname");
     $stu->execute;
     open FH, ">00whois.new" or return "Error: Can't open 00whois.new: $!";
+    if ($] > 5.007) {
+      require Encode;
+      binmode FH, ":utf8";
+    }
     my $now = gmtime;
     print FH qq{<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd"><html><!-- -*- coding: utf-8 -*- --><head>
 <title>who is who on the perl module list</title></head>
