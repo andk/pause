@@ -1,3 +1,7 @@
+=head1 CONSTRUCTION WORKS 2003-07-24 and following
+
+The README is partially outdated while work is going on on PAUSE.
+
 =head1 PAUSE repository
 
 This repository lives at
@@ -27,8 +31,8 @@ reasons:
     privatelib/PrivatePAUSE.pm
 
 PrivatePAUSE.pm contains only the usernames and passwords of the mysql
-users that own the two databases. See lib/PAUSE.pm for the structure
-of the data.
+users that own the two databases. See the files doc/*.schema.txt for
+the structure of the data.
 
 Other sensitive files, like the SSL key of the server, password files
 and the mon.cf file need to be maintained separately from the
@@ -39,7 +43,15 @@ repository. See below the section about user management.
 On PAUSE the files live in /home/k/PAUSE and the following symlinks
 make sure that installed programs find their configuration:
 
-(last time updated: 2002-12-25)
+(last time updated: 2003-07-24)
+
+  /usr/local/apache/conf   -> ../../../home/k/PAUSE/apache-conf
+  /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
+  /usr/local/apache/perl   -> ../../../home/k/PAUSE/apache-perl
+  /etc/rsyncd.conf         -> /home/k/PAUSE/etc/rsyncd.conf
+
+
+[ (last time updated: 2002-12-25)
 
   /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
   /etc/mon/mon.cf -> ../../home/k/PAUSE/111_sensitive/etc/mon/mon.cf
@@ -55,6 +67,7 @@ make sure that installed programs find their configuration:
   /usr/local/etc/proftpd.conf -> /home/k/PAUSE/ftpd/conf/proftpd.conf
   /usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults
   /usr/local/mirror/mymirror.config -> ../../../home/k/PAUSE/mirror/mymirror.config
+]
 
 (XXX reduce the number of necessary symlink)
 
