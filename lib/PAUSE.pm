@@ -68,7 +68,8 @@ $PAUSE::Config ||=
      PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
      PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
      RUNDATA => "/usr/local/apache/rundata/pause_1999",
-     RUNTIME_MLDISTWATCH => 720, # the longest of four runs today (2003-08-10)
+     RUNTIME_MLDISTWATCH => 1800, # 720 was the longest of on 2003-08-10,
+                                  # 2004-12-xx we frequently see >20 minutes
      SLEEP => 90,
      # path to repository without "/trunk"
      SVNPATH => "/home/SVN/repos/pause",
