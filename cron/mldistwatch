@@ -12,6 +12,7 @@ use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
 use File::Basename ();
 use File::Copy ();
+use File::Temp ();
 use HTTP::Date ();
 use Mail::Send ();
 use DBI;
@@ -29,9 +30,8 @@ $Data::Dumper::Indent = 1;
     package PAUSE::mldistwatch;
     ###### data initialization ######
     use File::Path qw(rmtree mkpath);
-    use vars qw($Id $ISAPERL);
-    $Id = q$Id$;
-    $ISAPERL = qr{
+    our $Id = q$Id$;
+    our $ISAPERL = qr{
                    /
                    (
                     perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[24680]\.\d+)
@@ -65,11 +65,17 @@ sub new {
                       OPT => $opt,
                      }, $class;
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
+    if ($opt->{pick}) {
+        for my $pick (@{$opt->{pick}}) {
+            $self->{PICK}{$pick} = 1;
+        }
+    }
     $self;
 }
 
 sub verbose {
     my($self,$level,@what) = @_;
+    our $Id;
     unless (@what) {
         @what = ("warning: verbose called without \@what: ", $level);
         $level = 1;
@@ -89,12 +95,12 @@ sub work {
     chdir $MLROOT
 	or die "Couldn't chdir to $MLROOT";
     $self->init_all();
-    $self->set_active_status();
-    my $testdir = "/tmp/test" . $$; # XXX File::Temp!
-    rmtree $testdir if -e $testdir;
-    unless (mkpath $testdir) {
-        die("Couldn't make directory $testdir: $!");
-    }
+    $self->set_user_active_status();
+    my $testdir = File::Temp::tempdir(
+                                      "test_XXXX",
+                                      DIR => "/tmp",
+                                      CLEANUP => 0,
+                                     ) or die "Could not make a tmp directory";
     chdir $testdir
 	or die("Couldn't change to $testdir: $!");
     {
@@ -116,7 +122,7 @@ sub work2 {
     $self->rewrite03();
 }
 
-sub set_active_status {
+sub set_user_active_status {
     my $self = shift;
     my $db = $self->connect;
     my $active = $db->selectall_hashref("SELECT userid
@@ -181,7 +187,6 @@ sub checkfornew {
     my $self = shift;
     local $/ = "";
     my $dbh = $self->connect;
-    my(@goners);
     my $time = time;
     my $alert;
     my @all;
@@ -193,14 +198,13 @@ sub checkfornew {
     }
     my $all = @all;
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
-    my $i = 0;
-  BIGLOOP: for my $dist (@all) {
+  BIGLOOP: for (my $i=0;@all;$self->empty_curdir) {
+        my $dist = shift @all;
         #
         # Examine all files, even CHECKSUMS and READMEs
         #
-
         $i++;
-        $self->verbose(2,".$dist.") unless $i%256;
+        $self->verbose(2,". $dist ..") unless $i%256;
 
         my $dio = PAUSE::dist->new(
                                    MAIN   => $self,
@@ -210,6 +214,7 @@ sub checkfornew {
                                    TIME   => $time,
                                    TARBIN => $self->{TARBIN},
                                    UNZIPBIN  => $self->{UNZIPBIN},
+                                   PICK   => $self->{PICK},
                                   );
 
         next BIGLOOP if $dio->ignoredist;
@@ -218,7 +223,6 @@ sub checkfornew {
             next BIGLOOP unless $dio->mtime_ok($self->{ALLlasttime}{$dist});
         } else {
             $dio->delete_goner;
-            push @goners, $dist;
             next BIGLOOP;
         }
         $self->verbose(1,"\n    Examining $dist ...\n");
@@ -240,17 +244,11 @@ sub checkfornew {
         $dio->mail_summary;
 
         $alert .= $dio->alert;  # now $dio can go out of scope
-
-    } continue {                # BIGLOOP
-        my($dh) = DirHandle->new(".");
-        for my $dirent ($dh->read) {
-            next if $dirent eq "." || $dirent eq "..";
-            rmtree $dirent;
-        }
-        $dh->close;
     }
-        if ($alert && ! $PAUSE::Config->{TESTHOST}) {
-            print $alert;       # summary
+    if ($alert) {
+        print $alert;       # summary
+        unless ($PAUSE::Config->{TESTHOST}) {
+            our $Id;
             my($msg) = Mail::Send->new(
                                        To => $PAUSE::Config->{ADMIN},
                                        Subject => "Upload Permission or Version mismatch"
@@ -260,11 +258,22 @@ sub checkfornew {
             print $fh "Not indexed.\n\t$Id\n\n", $alert;
             $fh->close;
         }
+    }
+}
 
+sub empty_curdir {
+    my($self) = @_;
+    my($dh) = DirHandle->new(".");
+    for my $dirent ($dh->read) {
+        next if $dirent eq "." || $dirent eq "..";
+        rmtree $dirent;
+    }
+    $dh->close;
 }
 
 sub rewrite02 {
     my $self = shift;
+    our $Id;
     #
     # Rewriting 02packages.details.txt
     #
@@ -601,7 +610,7 @@ category    maintainer
     $list .= q{</pre></body></html>};
 
     my($comparelist) = $list;
-    $comparelist =~ s/.+?<hr\b//s; # delete the intro (date!) 
+    $comparelist =~ s/.+?<hr\b//s; # delete the intro (date!)
         $olist       =~ s/.+?<hr\b//s;
 
     if ($comparelist ne $olist) {
@@ -640,7 +649,7 @@ sub write_01sorted {
 <body>
 <h1>CPAN\'s $n most recent uploads</h1>
 <h3>ordered by timestamp of the distributions</h3>
-A description of the list can be found in 
+A description of the list can be found in
 <a href="01modules.index.html">01modules.index.html</a>.
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -654,7 +663,7 @@ A description of the list can be found in
  margin: 0;
  padding: 0 3px;
  font: bold .7em verdana, sans-serif;
- text-decoration: none !important; 
+ text-decoration: none !important;
 "
 >RSS</a>
 
@@ -766,6 +775,7 @@ maintainer
 
 sub rewrite03 {
     my($self) = shift;
+    our $Id;
     #
     # Rewriting 03modlist.data
     #
@@ -951,6 +961,9 @@ sub mlroot {
         # Stupid to have code that needs to be maintained in two places,
         # here and in edit.pm:
         return 1 if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
+        if ($self->{PICK}) {
+            return 1 unless $self->{PICK}{$dist};
+        }
         return;
     }
 
@@ -958,6 +971,10 @@ sub mlroot {
     sub delete_goner {
         my $self = shift;
         my $dist = $self->{DIST};
+        if ($self->{PICK} && $self->{PICK}{$dist}) {
+            $self->verbose(1,"Warning: parameter pick '$dist' refers to a goner, ignoring");
+            return;
+        }
         my $dbh = $self->connect;
         $dbh->do("DELETE FROM packages WHERE dist='$dist'");
         $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
@@ -1268,6 +1285,11 @@ Please contact modules\@perl.org if there are any open questions.
                                    Subject => "PAUSE indexer report $substrdistro",
                                   );
         $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
+        if ($PAUSE::Config->{TESTHOST}) {
+            require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$msg,\@m],[qw(msg m)])->Indent(1)->Useqq(1)->Dump; # XXX
+            print "Press RET to send, ^C to cancel";
+            <>;
+        }
         my $fh  = $msg->open('sendmail');
         print $fh @m;
         $fh->close;
@@ -1863,7 +1885,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $v = <$kid>;
                 close $kid;
             } else {
-                my($gnam,$gpw,$gid,$gmem) = getgrnam("UNSAFE"); 
+                my($gnam,$gpw,$gid,$gmem) = getgrnam("UNSAFE");
                 die "Could not determine GID of UNSAFE" unless $gid;
                 my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) =
                     getpwnam("UNSAFE");
@@ -2542,16 +2564,8 @@ MAIN: {
     my %Opt;
     Getopt::Long::GetOptions(
                              \%Opt,
-                             "pick=s@", # the idea is to NOT run find
-                                        # if they tell us one distro,
-                                        # but this needs careful
-                                        # thinking to not delete the
-                                        # whole database at some
-                                        # point. So currently all that
-                                        # "pick" does is, it
-                                        # suppresses writing of
-                                        # 0[123]* files.
-              );
+                             "pick=s@",
+                            );
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     $mldw->work;
 }
@@ -2560,44 +2574,57 @@ exit;
 
 __END__
 
-=pod
+=head1 NAME
 
-+---------------------------------------------------------------+
-| We run through the whole filesystem and check for new files   |
-| and for goners.                                               |
-+---------------------------------------------------------------+
-| We compare them with the database of distribution files and   |
-| decide if we have to examine them closer. We also create a    |
-| trivial "database" of CHECKSUMS in the same directory as a    |
-| distro resides.                                               |
-+---------------------------------------------------------------+
-| We unzip new files into a tree and examine files in that tree |
-| and compare these with data about packages in the database.   |
-+---------------------------------------------------------------+
-| During the course we write mails.			        |
-+---------------------------------------------------------------+
-| When we are done, we create summaries from the database.      |
-+---------------------------------------------------------------+
+mldistwatch - The infamous PAUSE indexer
+
+=head1 SYNOPSIS
+
+ mldistwatch [--pick=distro]...
+
+=head1 DESCRIPTION
+
+We run through the whole filesystem and check for new files
+and for goners.
+
+We compare them with the database of distribution files and
+decide if we have to examine them closer. We also create a
+trivial "database" of CHECKSUMS in the same directory as a
+distro resides.
+
+We unzip new files into a tree and examine files in that tree
+and compare these with data about packages in the database.
+
+During the course we write mails.
+
+When we are done, we create summaries from the database.
+
+The purpose of the C<--pick> parameter is to focus on the indexing of
+one or more distros. When the C<--pick=distro> parameter is given
+(which may be given multiple times), writing of the C<0*> files is
+skipped. Not existing distros are not removed from the database.
+
+=head1 OVERVIEW
 
 So we have distfilechecks, directorychecks and contentfilechecks.
 Contentchecks have two parts, files and namespaces (packages). And we
 have some sort of a scheduler that keeps track of what we have to do.
 
-4 levels of classes:
+Classes contained in the script:
 
-PAUSE::mldistwatch       we could call it main. One object does all the
-                         work
+ PAUSE::mldistwatch       we could call it main. One object does all the
+                          work
 
-PAUSE::mldistwatch::Constants
-                         constants used for PAUSE::dist::index_status()
+ PAUSE::mldistwatch::Constants
+                          constants used for PAUSE::dist::index_status()
 
-PAUSE::dist              each distro we find is an object of this class
+ PAUSE::dist              each distro we find is an object of this class
 
-PAUSE::pmfile            each *.pm file in each distro is one object of
-                         this class
+ PAUSE::pmfile            each *.pm file in each distro is one object of
+                          this class
 
-PAUSE::package           each package statement per pm-file is an object
-                         of this class
+ PAUSE::package           each package statement per pm-file is an object
+                          of this class
 
 
 The methods alert() and verbose() exist in all classes. Only the two
@@ -2607,4 +2634,7 @@ passes arguments up till they reach the PAUSE::dist object. From there
 they are harvested in the mail_summary() method that sends a report to
 the owner of the package
 
+
+
 =cut
+
