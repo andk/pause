@@ -249,15 +249,6 @@ sub checkfornew {
     next BIGLOOP if grep m|\bblib/|, @{$dio->{MANIFOUND}};
     $dio->examine_pms;
 
-    if (0) {
-      # I believe code previous to 2.306 did call this only redundantly
-      # If this ever gets activated again, specify thee need explicitly
-      # Note that $ALLlasttime is not anymore set by mtime_ok()
-      $dbh->do(qq{UPDATE distmtimes
-                SET distmtime='$ALLlasttime{$dist}'
-                WHERE dist='$dist'});
-    }
-
     $alert .= $dio->alert; # now $dio can go out of scope
 
   } continue { # BIGLOOP
@@ -861,7 +852,7 @@ sub as_ds {
     }
     if ($mtime > $otherts) {
       $dbh->do(qq{UPDATE distmtimes
-                     SET distmtime='$mtime'
+                     SET distmtime='$mtime', distmdatetime=from_unixtime('$mtime')
                    WHERE dist='$dist'});
       print "DEBUG5: mtime assigned [$mtime] to dist[$dist]\n";
       return 1;
