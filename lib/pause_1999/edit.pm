@@ -5487,6 +5487,11 @@ sub share_perms_remocos {
             maintainers besides yourself. Every line denotes a tuple
             of a namespace and a userid. Select those that you want to
             remove and press <i>Remove</i></p><p>};
+  if (@all == 1) {
+    # selectboxes with only ine option to select look confusing and
+    # better be preselected:
+    $req->param("pause99_share_perms_remocos_tuples",$all[0]);
+  }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_remocos_tuples",
                                 'multiple' => 1,
@@ -5589,6 +5594,9 @@ sub share_perms_remome {
            the co-maintainer table and press <i>Give Up</i></p>};
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
+  if (@all_mods == 1) {
+    $req->param("pause99_share_perms_remome_m",$all_mods[0]);
+  }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_remome_m",
                                 'multiple' => 1,
@@ -5684,6 +5692,9 @@ sub share_perms_makeco {
            into the text field and press <i>Make Co-Maintainer</i></p>};
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
+  if (@all_mods == 1) {
+    $req->param("pause99_share_perms_makeco_m",$all_mods[0]);
+  }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_makeco_m",
                                 'multiple' => 1,
@@ -5770,6 +5781,9 @@ sub share_perms_remopr {
       co-maintainership status</a> next.</p>};
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
+  if (@all_mods == 1) {
+    $req->param("pause99_share_perms_remopr_m",$all_mods[0]);
+  }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_remopr_m",
                                 'multiple' => 1,
@@ -5867,6 +5881,9 @@ sub share_perms_movepr {
       co-maintainership status</a> next.</p>};
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
+  if (@all_mods == 1) {
+    $req->param("pause99_share_perms_movepr_m",$all_mods[0]);
+  }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_movepr_m",
                                 'multiple' => 1,
