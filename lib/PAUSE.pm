@@ -83,7 +83,7 @@ $PAUSE::Config ||=
                                    'tive/gnupg-pause-batch-signing-home  '.
                                    '--clearsign --default-key '),
      CHECKSUMS_SIGNING_KEY => '450F89EC',
-     MIN_MTIME_CHECKSUMS => 1105307220, # Jan  9 22:47 local time, when the signature was renewed
+     MIN_MTIME_CHECKSUMS => (time - 60*60*24*365.25), # max one year old
     };
 
 

@@ -10,7 +10,10 @@ use PAUSE ();
 
 my $root = $PAUSE::Config->{MLROOT};
 
-my $max = 1000; # 15 was really slow, 100 is fine, 1000 is necessary now because of expiration on 2005-02-02
+# $max: 15 was really slow, 100 is fine, 1000 was necessary recently
+# because of key-expiration on 2005-02-02
+my $max = 100;
+
 my $cnt = 0;
 
 $CPAN::Checksums::CAUTION = 1;
