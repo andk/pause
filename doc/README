@@ -3,6 +3,7 @@
 This repository lives at
 
     http://pause.perl.org:5459/svn/pause/trunk
+    (for writers: https://pause.perl.org:5460/svn/pause/trunk)
 
 and is considered to contain all relevant programs and configuration
 data for running pause.perl.org except for the SSL key and certificate
