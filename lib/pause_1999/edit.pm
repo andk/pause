@@ -2203,20 +2203,18 @@ As already described in a separate message, you\'re a registered Perl
 Author with the userid $userid. For the sake of approval I have
 assigned to you a change-password-only-password that enables
 you to pick your own password. This password is \"$onetime\"
-(without the enclosing quotes). Please visit either
+(without the enclosing quotes). Please visit
 
   https://pause.perl.org/pause/authenquery?ACTION=change_passwd
-or
-  http://pause.perl.org/pause/authenquery?ACTION=change_passwd
 
-and use this password to initialize yourself in the ordinary
-authentication database. Once you have entered your password there,
-your one-time password is expired automatically.
+and use this password to initialize your account in the authentication
+database. Once you have entered your password there, your one-time
+password is expired automatically. If you cannot connect to the above
+URL, you can replace 'https' with 'http', but then you are not using
+SSL encryption. Be careful to always use an SSL connection if
+possible, otherwise your password can be intercepted by third parties.
 
-If for whatever reason the procedure doesn\'t work the first time you
-try, please visit http://pause.perl.org/password.html and send me a
-password of your choice according to these guidelines. Thanks.
-
+Thanks & Regards,
 --
 $PAUSE::Config->{ADMIN}
 };
