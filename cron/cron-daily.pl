@@ -288,10 +288,16 @@ sub delete_scheduled_files {
       $Dbh->do("DELETE FROM deletes WHERE deleteid='$d'");
       next if $d =~ /\.readme$/;
       my $readme = $delete;
-      $readme =~ s/(\.tar.gz|\.zip)$/.readme/;
+      $readme =~ s/(\.tar.gz|\.tgz|\.zip)$/.readme/;
       if (-f $readme) {
 	report "     Deletin $readme\n";
 	unlink $readme;
+      }
+      my $yaml = $readme;
+      $yaml =~ s/readme$/meta/;
+      if (-f $yaml) {
+	report "     Deletin $yaml\n";
+	unlink $yaml;
       }
     }
 }
