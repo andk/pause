@@ -13,8 +13,8 @@ my $db = DBI->connect(
 		      $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
 		      {RaiseError => 1}
 		     );
-my $sth = $db->prepare(qq{SELECT password FROM usertable WHERE user='$user'});
-my $ret = $sth->execute;
+my $sth = $db->prepare(qq{SELECT password FROM usertable WHERE user=?});
+my $ret = $sth->execute(uc $user);
 
 die "User '$user' not found" unless $sth->rows > 0;
 die "Panic: more than one user '$user'" if $sth->rows > 1;
