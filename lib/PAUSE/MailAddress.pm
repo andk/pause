@@ -36,7 +36,7 @@ sub new_from_userid {
     $sth = $dbh->prepare("SELECT email FROM users WHERE userid=?");
     $sth->execute($userid);
     return if $sth->rows == 0;
-    ($me->{address}) = $sth->fetchrow_array or return;
+    ($me->{address}) = $sth->fetchrow_array;
   }
   bless $me, $class;
 }
