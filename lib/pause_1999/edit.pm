@@ -1541,7 +1541,7 @@ During upload you can watch the logfile in $tailurl.
 
 You'll be notified as soon as the upload has succeeded, and if the
 uploaded package contains modules, you'll get another notification
-from the indexer a little later (usually after 1/2 hour).
+from the indexer a little later (usually within 1 hour).
 
 };
 
@@ -5330,7 +5330,7 @@ decision.</li>
   if ($blurb) {
     my $eta;
     {
-      my $ctf = "/home/k/PAUSE/cron/crontab.root"; # crontabfile
+      my $ctf = "/home/k/PAUSE/cron/CRONTAB.ROOT"; # crontabfile
       unless (-f $ctf) {
         $ctf = "/tmp/crontab.root";
       }
@@ -5362,6 +5362,7 @@ decision.</li>
           }
         }
       } else {
+        warn "Not found: $ctf";
         $eta = "N/A";
       }
     }
