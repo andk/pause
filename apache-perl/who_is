@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+use Apache::Constants ();
+use Apache::Request;
+
+my $r = shift;
+my $req = Apache::Request->new($r);
+my $proto = $r->server->port == 443 ? "https" : "http";
+my @query = "ACTION=who_is";
+local $" = ";";
+$r->header_out("Location","$proto://pause.kbx.de/pause/query?@query");;
+$r->status(Apache::Constants::MOVED());
+$r->send_http_header;
+return Apache::Constants::MOVED();
