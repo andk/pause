@@ -7,7 +7,7 @@ use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
 use Text::Format;
 
-our $Valid_Userid = qr/^[A-Z]{4,9}$/;
+our $Valid_Userid = qr/^[A-Z]{3,9}$/;
 our $Yours = "Thanks,\n-- \nThe PAUSE\n";
 
 use utf8; # must be after the qr// for perl-5.6.1
@@ -2553,7 +2553,7 @@ sub request_id {
                       'Desired ID',
                       'pause99_request_id_userid',
 
-                      "4-9 characters matching [A-Z], please",
+                      "3-9 characters matching [A-Z], please",
 
                      ],
                     ) {
