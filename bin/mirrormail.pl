@@ -21,7 +21,7 @@ use Mail::Send;
 use DBI;
 use vars qw($Id);
 
-$Id = q$Id:$;
+$Id = q$Id$;
 
 my $subject;
 my $do_send         = 0; # not for symlinks only
@@ -38,7 +38,7 @@ my @argv = @ARGV;
 
 @ARGV = ();
 
-my($stdin,$report,@recipients,$targetdir,$send_hash);
+my($stdin,$report,@recipients,$sourcedir,$targetdir,$send_hash);
 { local $/; $stdin = <STDIN>; }
 $send_hash = 1;
 $report = "The mirror program running on PAUSE triggered this email.
@@ -51,12 +51,13 @@ for my $line (split /\n/, $stdin) {
   if ( $line =~ m{
                   ^Mirrored\s
                   (\S+)\s                 # userid
-                  \(\S+?:\S+\s->\s
+                  \((\S+?:\S+)\s->\s      # sourcedir
                   (\S+)                   # targetdir
                   \)
                 }x ) {
     my($userid) = $1;
-    $targetdir = $2;
+    $sourcedir = $2;
+    $targetdir = $3;
     $subject .= " $userid";
     $userid =~ s/[a-z]+//g; # throw away lowercase (TOMC_scripts, cpanhtml)
     $userid =~ s/_.*//;     # away underscore and more (TIMB_DBI)
@@ -75,12 +76,32 @@ for my $line (split /\n/, $stdin) {
     $report .= PAUSE::filehash("$targetdir/$file");
     $do_send++;
     $cc_cpan_testers++;
-  } elsif ($line =~ /^Failure/) {
-    $subject .= " ALERT";
-    $report .= "$line\n";
+  } elsif ($line =~ /^Failed/) {
+    # $subject .= " ALERT";
+    my($src_path) = $line =~ /src_path\[(.+?)\]/;
     $to_cpan_admin++;
     $do_send++;
     $cc_cpan_testers = 0;
+    my($host,$lower_path) = $sourcedir =~ /^(.+?):(.+)$/;
+    my($local_abs) = "$targetdir/$src_path";
+    require File::Basename;
+    my($local_dir) = File::Basename::dirname($local_abs);
+    require File::Path;
+    File::Path::mkpath($local_dir);
+    my($remote_abs) = "$lower_path$src_path";
+    warn "src_path[$src_path]
+sourcedir[$sourcedir]
+targetdir[$targetdir]
+stdin[$stdin]
+local_dir[$local_dir]
+local_abs[$local_abs]
+remote_abs[$remote_abs]\n\n";
+    require Net::FTP;
+    my $ftp = Net::FTP->new($host);
+    $ftp->login("ftp","k\@");
+    $ftp->get($remote_abs, $local_abs);
+    # $report .= sprintf "Local file size now: %d\n\n", -s $local_abs;
+    $report .= PAUSE::filehash($local_abs);
   }
 }
 
@@ -98,11 +119,12 @@ if ($do_send) {
 			    Subject => "CPAN mirror: $subject"
 			   );
   $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-  $msg->add("Reply-To", $PAUSE::Config->{CPAN_TESTERS});
+  $msg->add("Reply-To", $PAUSE::Config->{CPAN_TESTERS})
+      if $cc_cpan_testers;
   warn "opening sendmail for $msg\n";
   my $fh  = $msg->open('sendmail');
   print $fh $report, $stdin;
   $fh->close;
 } else {
-  warn "\nMirror message seems to be boring [$report]";
+  warn "\nMirror message seems to be boring report[$report]stdin[$stdin]";
 }
