@@ -1,0 +1,363 @@
+# -*- Mode: Cperl; -*-
+
+CoreDumpDirectory /usr/local/apache/cores
+
+<IfModule noexist.c>
+
+
+=pod
+
+CPerl-mode now sees POD sections till the first =cut.
+
+</IfModule>
+
+# $Id: httpsd.conf.pause,v 1.40 2002/07/18 21:42:39 k Exp k $
+
+ServerName pause.perl.org
+HostnameLookups Off
+User nobody
+Group nobody
+BrowserMatch Mozilla/2 nokeepalive
+
+#ErrorLog logs/error_log
+#TransferLog logs/access_log
+# LogFormat "%h %l %u %t \"%r\" %s %b %P %T"
+
+#PidFile logs/httpd.pid
+#ScoreBoardFile logs/apache_status
+Timeout 240
+KeepAlive On
+MaxKeepAliveRequests 100
+KeepAliveTimeout 2
+
+AddType httpd/send-as-is asis
+AddType text/html .shtml
+AddHandler server-parsed .shtml
+
+UserDir disabled
+UserDir enabled jwied
+
+<IfModule apache_ssl.c>
+
+  <IfDefine SWITCH8000>
+    Port 8443
+    Listen 8443
+    SSLCacheServerPort 8112
+  </IfDefine>
+  <IfDefine !SWITCH8000>
+    Port 443
+    Listen 443
+    SSLCacheServerPort 8111
+  </IfDefine>
+
+  # next two lines may point to nonexisting files, it seems, but must be there
+  # SSLCACertificatePath /usr/local/ssl/demoCA/
+  # SSLCACertificateFile /usr/local/ssl/demoCA/ttt.pem
+
+  SSLCertificateFile  /usr/local/apache/conf/pause.pem
+  SSLCertificateKeyFile /usr/local/apache/conf/pause.pem
+  SSLVerifyClient 0
+  SSLVerifyDepth 10
+  SSLFakeBasicAuth
+  # SSLLogFile /tmp/ssl.log
+  CustomLog logs/ssl_log "%t %{version}c %{cipher}c %{clientcert}c"
+
+  SSLCacheServerPath /usr/local/apache/bin/gcache
+  <IfDefine SWITCH8000>
+    SSLCacheServerPort 8112
+    <VirtualHost _default_:8000>
+      SSLDisable
+    </VirtualHost>
+  </IfDefine>
+  <IfDefine !SWITCH8000>
+    SSLCacheServerPort 8111
+    <VirtualHost _default_:80>
+      SSLDisable
+      <Location /ssl-only>
+        deny from all
+      </Location>
+    </VirtualHost>
+  </IfDefine>
+  SSLSessionCacheTimeout 360
+
+
+  <IfDefine SWITCH8000>
+    <VirtualHost _default_:8443>
+      SSLEnable
+    </VirtualHost>
+  </IfDefine>
+  <IfDefine !SWITCH8000>
+    <VirtualHost _default_:443>
+      SSLEnable
+    </VirtualHost>
+  </IfDefine>
+
+</IfModule>
+
+#/dev/null !!!
+
+# access.conf
+AccessConfig /dev/null
+
+# srm.conf
+ResourceConfig /dev/null
+
+DefaultType text/plain
+
+ExtendedStatus On
+
+##############################################
+# For all Apache::Registry stuff a common root
+##############################################
+Alias /perl/ /usr/local/apache/perl/
+##############################################
+
+##############################################
+# For bugzilla
+##############################################
+AddHandler cgi-script .cgi
+Alias /bugzilla/ /home/ldachary/webspace/
+<Location /bugzilla>
+  DirectoryIndex index.html
+  Options Indexes Includes ExecCGI
+</Location>
+# ScriptAlias /loicdemo/ /home/ldachary/webspace/
+#<Location /loicdemo>
+#  Options +ExecCGI
+#</Location>
+##############################################
+
+
+<IfModule mod_perl.c>
+
+
+  # I believe, this is only for the hardly needed Apache::AuthzDBI in /perl/admin
+  PerlSetVar Auth_DBI_data_source dbi:mysql:authen_pause
+  PerlSetVar Auth_DBI_username    root
+  # PerlSetVar Auth_DBI_password
+  PerlSetVar Auth_DBI_pwd_table   usertable
+  PerlSetVar Auth_DBI_grp_table   grouptable
+  PerlSetVar Auth_DBI_uid_field   user
+  PerlSetVar Auth_DBI_grp_field   ugroup
+  PerlSetVar Auth_DBI_pwd_field   password
+
+  PerlSetVar StatINCDebug On
+
+  PerlSetupEnv Off
+
+
+
+<Perl>
+
+
+
+=head2 SEE ME
+
+A lone cut _starts_ pod
+
+CPerl-mode sees perl code after this =cut.
+
+I don't understand those indents, but they do no harm anyway...
+
+=cut
+
+
+
+#!perl
+
+    BEGIN {
+      push @INC, "/usr/local/apache/lib", "/home/k/PAUSE/lib";
+    }
+
+use Apache::httpd_conf;
+use Apache::Status;
+# use Apache::DBI;
+use strict;
+use vars qw(
+ $AccessConfig
+ $BindAddress
+ $DefaultType
+ $DocumentRoot
+ $ErrorLog
+ $KeepAlive
+ $LanguagePriority
+ $Listen
+ $LogFormat
+ $MaxClients
+ $MaxRequestsPerChild
+ $MaxSpareServers
+ $MinSpareServers
+ $PassEnv
+ $PerlChildInitHandler
+ $PerlPostReadRequestHandler
+ $PerlSetEnv
+ $PerlWarn
+ $PidFile
+ $Port
+ $ResourceConfig
+ $ScoreBoardFile
+ $ServerAdmin
+ $ServerRoot
+ $ServerType
+ $StartServers
+ $TransferLog
+ %Directory
+ %Location
+ @Alias
+ @ScriptAlias
+ @PerlSetEnv
+);
+
+# $Location{"/"}{PerlSetupEnv} = "On";
+
+$ServerRoot = "/usr/local/apache";
+$DocumentRoot = "/usr/local/apache/htdocs";
+$LogFormat = ('"%h %l %u %t \\"%r\\" %s %b %P %p %T \\"%{Referer}i\\" \\"%{User-Agent}i\\""');
+$ServerType = "standalone";
+$PerlWarn = "On";
+
+my $SWITCH8000 = Apache->define("SWITCH8000");
+
+my $ext = $SWITCH8000 ? ".8000" : "";
+$ErrorLog = "logs/error_log$ext";
+$TransferLog = "logs/access_log$ext";
+$PidFile = "logs/httpd.pid$ext";
+$ScoreBoardFile = "logs/apache_status$ext";
+
+my $ord_port = $SWITCH8000 ? 8000 : 80;
+$Port   =  $ord_port;
+$Listen =  $ord_port;
+$BindAddress = undef;
+
+# require CGI;
+
+use BSD::Resource ();
+Apache->push_handlers(PerlChildInitHandler => sub {
+                        #BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CPU(),
+                        #                         60*10, 60*10);
+                        #BSD::Resource::setrlimit(BSD::Resource::RLIMIT_DATA(),
+                        #                         40*1024*1024, 40*1024*1024);
+                        BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CORE(),
+                                                 40*1024*1024, 40*1024*1024);
+                      });
+
+for my $loc (qw( /status )){
+  $Location{$loc}{SetHandler} = "server-status";
+}
+for my $loc (qw( /server-info )){
+  $Location{$loc}{SetHandler} = "server-info";
+}
+for my $loc (qw( /perl-status )){
+  $Location{$loc}{SetHandler} = "perl-script";
+  $Location{$loc}{PerlHandler} = "Apache::Status";
+}
+
+my $pause = "/pause";
+if (1) { # /pause/ directory
+  require pause_1999::main;
+
+  for my $loc ($pause){
+    require pause_1999::fixup;
+    $Location{$loc}{PerlFixupHandler} = "pause_1999::fixup";
+  }
+  if (-f "/etc/PAUSE.CLOSED") {
+    $Location{"/"}{PerlHandler} = "perl_pause::disabled2";
+  } else {
+    $Location{"/"}{PerlFixupHandler} = "pause_1999::index";
+    for my $loc ("$pause/query", "$pause/authenquery", "$pause/mimequery"){
+      # note: mimequery is experimental and will go away again
+      require pause_1999::config;
+      $Location{$loc}{SetHandler} = "perl-script";
+      $Location{$loc}{PerlHandler} = "pause_1999::config";
+    }
+    for my $loc (
+		 "$pause/authenquery",
+		 "$pause/mimequery",
+		 "/perl/user",
+		 "/perl/admin",
+		 "/pub",
+		){
+      $Location{$loc}{PerlAuthenHandler} = "pause_1999::authen_user";
+      $Location{$loc}{AuthName} = "PAUSE";
+      $Location{$loc}{AuthType} = "Basic";
+      $Location{$loc}{require} = "valid-user";
+    }
+    $Location{"/perl/admin"}{PerlAuthzHandler} = "Apache::AuthzDBI";
+    $Location{"/perl/admin"}{require} = ["group", "admin"];
+  }
+}
+
+for my $loc ( "/perl" ){
+  $Location{$loc}{SetHandler} = "perl-script";
+  $Location{$loc}{Options} = "ExecCGI";
+  if (-f "/etc/PAUSE.CLOSED") {
+    $Location{$loc}{PerlHandler} = "perl_pause::disabled2";
+  } else {
+    $Location{$loc}{PerlHandler} = "Apache::Registry";
+  }
+}
+## unless (-f "/etc/PAUSE.CLOSED") {
+##   for my $loc (qw( /perl/user /perl/admin /pub )){
+##     require Apache::AuthenDBI;
+##     require PAUSE::Authen;
+##     $Location{$loc}{PerlAuthenHandler} = "PAUSE::Authen";
+##     $Location{$loc}{AuthName} = "PAUSE";
+##     $Location{$loc}{AuthType} = "Basic";
+##   }
+##   $Location{"/perl/user"}{require} = "valid-user";
+##   $Location{"/perl/admin"}{PerlAuthzHandler} = "Apache::AuthzDBI";
+##   $Location{"/perl/admin"}{require} = ["group", "admin"];
+## }
+
+for my $loc (qw(/pub /incoming)){
+  $Location{$loc}{IndexOptions} = "FancyIndexing NameWidth=* SuppressDescription";
+}
+## for my $dir (qw(/usr/local/apache/htdocs/pub /usr/local/apache/htdocs/incoming)){
+##   require Apache::AuthenDBI;
+##   require PAUSE::Authen;
+##   $Directory{$dir}{PerlAuthenHandler} = "PAUSE::Authen";
+##   $Directory{$dir}{AuthName} = "PAUSE";
+##   $Directory{$dir}{AuthType} = "Basic";
+##   $Directory{$dir}{require} = "valid-user";
+##   $Directory{$dir}{IndexOptions} = "FancyIndexing";
+## }
+$MinSpareServers = 2;
+$MaxSpareServers = 2;
+$StartServers = 2;
+$MaxClients = 3;
+if (Apache->define("ONE_PROCESS")) {
+  $MaxRequestsPerChild = 1; # 1: I want to see the SEGV
+} else {
+  $MaxRequestsPerChild = 6; # set to 0 as long as it turns off the SEGV
+}
+if ($SWITCH8000) {
+  $MinSpareServers =
+      $MaxSpareServers =
+	  $StartServers =
+	      $MaxClients = 2;
+  $KeepAlive = "Off";
+  $MaxRequestsPerChild = 0;
+}
+$ServerAdmin = 'andreas.koenig@anima.de';
+
+if (0){
+
+  for my $loc (qw( /pause )){
+    $Location{$loc}{PerlInitHandler} = "Apache::StatINC";
+  }
+
+}
+
+
+__END__
+
+</Perl>
+
+</IfModule>
+
+<IfModule noexist.c>
+
+=cut
+
+</IfModule>
+
