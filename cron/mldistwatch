@@ -195,23 +195,25 @@ sub DESTROY {
 
 sub init_all {
     my $self = shift;
+    $self->verbose(2,"Running manifind\n");
     $self->{ALLfound} = ExtUtils::Manifest::manifind();
+    $self->verbose(2,"Collecting distmtimes from DB\n");
     my $dbh = $self->connect;
-  my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
-  $sth->execute;
-  my($dist,$distmtime);
-  while (($dist,$distmtime) = $sth->fetchrow_array) {
-    $self->{ALLlasttime}{$dist} = $distmtime;
-  }
-  $sth->finish;
+    my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
+    $sth->execute;
+    my($dist,$distmtime);
+    while (($dist,$distmtime) = $sth->fetchrow_array) {
+        $self->{ALLlasttime}{$dist} = $distmtime;
+    }
+    $sth->finish;
 }
 
 sub checkfornew {
     my $self = shift;
-  my $dbh = $self->connect;
-  my(@goners);
-  my $time = time;
-  my $alert;
+    my $dbh = $self->connect;
+    my(@goners);
+    my $time = time;
+    my $alert;
     my @all;
     {
         my %seen;
@@ -219,6 +221,7 @@ sub checkfornew {
             keys %{$self->{ALLfound}},
                 keys %{$self->{ALLlasttime}};
     }
+    $self->verbose(2, "Starting BIGLOOP\n");
  BIGLOOP: for my $dist (@all) {
     #
     # Examine all distribution files
