@@ -1628,11 +1628,10 @@ and requested an upload into $her directory.});
     for my $param ($req->param) {
       next if $param eq "HIDDENNAME";
       next if $param eq "CAN_MULTIPART";
+      next if $param eq "pause99_add_uri_sub"; # we're not interested
       my $v = $req->param($param);
       next unless defined $v;
       next unless length $v;
-      next if $param eq "pause99_add_uri_sub" and
-          $v eq "pause99_add_uri_subdirtext";
       $mailblurb .= sprintf qq{  %-26s [%s]\n}, $param, $v;
     }
     # $mailblurb .= "\n";
