@@ -459,42 +459,8 @@ sub rewrite01 {
             s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
 
-        if (0) {   # old method before cheap_chapterid, it is buggy in
-                   # that it has only one chapter per root namespace
-            my $sth2 = $dbh->prepare(qq{SELECT chapterid
-                                  FROM mods
-                                  WHERE modid=?});
-            $sth2->execute($pkg{rootpack});
-            if ($sth2->rows == 1) {
-                ($pkg{chapterid}) = $sth2->fetchrow_array;
-            } else {
-                my $sth3 = $dbh->prepare(qq{SELECT chapterid
-                                 FROM mods
-                                 WHERE modid
-                                  LIKE ?});
-                $sth3->execute("$pkg{rootpack}::%");
-                ($pkg{chapterid}) = $sth3->fetchrow_array;
-            }
-        }
-
-        my $cheap_chapterid;
-        if (1) { # new method rev 216, same bug: only one chap-per-nmspace
-            $cheap_chapterid = $achapter{$pkg{rootpack}}
-                || $achapter{"$pkg{rootpack}\::"};
-        }
-
-        if (0) { # compares the old and the new, so both above must be on
-            unless ($pkg{chapterid} eq $cheap_chapterid) {
-                $self->verbose(1,
-                               "WARNING: rootpack[$pkg{rootpack}] ".
-                               "old chapterid[$pkg{chapterid}] cheap ".
-                               "chapterid[$cheap_chapterid]\n");
-            }
-        }
-
-        if (1) {                # finally assign the new solution
-            $pkg{chapterid} = $cheap_chapterid;
-        }
+        $pkg{chapterid} = $achapter{$pkg{rootpack}}
+            || $achapter{"$pkg{rootpack}\::"};
 
         if (defined $pkg{chapterid}) {
             if (defined $chaptitle[$pkg{chapterid}]) {
