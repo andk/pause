@@ -279,7 +279,8 @@ sub rewrite02 {
     }
     my $date = HTTP::Date::time2str();
     my $sth = $dbh->prepare(qq{SELECT package, version, dist, file
-                               FROM packages});
+                               FROM packages
+                               WHERE status='index'});
     $sth->execute;
     my(@row,@listing02);
     my $numrows = $sth->rows;
