@@ -10,7 +10,7 @@ sub as_string {
   my pause_1999::message $self = shift;
   my pause_1999::main $mgr = shift;
   my $r = $mgr->{R};
-  my $user = $mgr->{HiddenUser}{userid} || $mgr->{User}{userid};
+  my $user = $mgr->{HiddenUser}{userid} || $mgr->{User}{userid} or return;
   my @m;
   my $dbh = $mgr->connect;
   my $sth = $dbh->prepare("select * from messages where mto=?");

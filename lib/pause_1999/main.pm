@@ -220,10 +220,27 @@ sub connect {
 				     $self->{ModDsnPasswd},
 				    { RaiseError => 1 })};
   return $self->{DbHandle} if $self->{DbHandle};
-  warn $@ if $@;
+  $self->database_alert;
+}
+
+sub database_alert {
+  my($self) = @_;
+  require Carp;
+  my $mess = Carp::longmess($@);
+  my $tsf = "$PAUSE::Config->{RUNDATA}/alert.db.not.available.ts";
+  if (! -f $tsf or (time - (stat _)[9]) > 6*60*60) {
+    my $server = $self->myurl->can("host") ? $self->myurl->host : $self->myurl->hostname;
+    my $header = {
+                  From => "database_alert",
+                  To => $PAUSE::Config->{ADMIN},
+                  Subject => "PAUSE Database Alert $server",
+                 };
+    $self->send_mail($header,$mess);
+    open my $fh, ">", $tsf or warn "Could not open $tsf: $!";
+  }
   die Apache::HeavyCGI::Exception->new(ERROR => qq{
-Sorry, the PAUSE Database isn't available.<br />
-Reason: $DBI::errstr.<br />
+Sorry, the PAUSE Database currently seems unavailable.<br />
+Administration has been notified.<br />
 Please try again later.
 });
 }
@@ -236,12 +253,7 @@ sub authen_connect {
 				     $self->{AuthenDsnPasswd},
 				    { RaiseError => 1 })};
   return $self->{DbHandle4Authen} if $self->{DbHandle4Authen};
-  warn $@ if $@;
-  die Apache::HeavyCGI::Exception->new(ERROR => qq{
-Sorry, the PAUSE Database isn't available.<br />
-Reason: $DBI::errstr.<br />
-Please try again later.
-});
+  $self->database_alert;
 }
 
 # 2000-04-02: Apache::URI does not satisfy me. It does not include

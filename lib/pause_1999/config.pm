@@ -318,8 +318,8 @@ sub handler {
 	    ModDsnUser   => $PAUSE::Config->{MOD_DATA_SOURCE_USER},
 	    R       => $r,
 	    RootURL => "/pause",
-            SessionDataDir => "/usr/local/apache/rundata/pause_1999/session/sdata",
-            SessionCounterDir => "/usr/local/apache/rundata/pause_1999/session/cnt",
+            SessionDataDir => "$PAUSE::Config->{RUNDATA}/session/sdata",
+            SessionCounterDir => "$PAUSE::Config->{RUNDATA}/session/cnt",
 	    # add more instance variables here. Make sure, they are
 	    # declared in main.pm
 
@@ -367,7 +367,7 @@ sub handler {
   my $quartal = int($time[4]/3) + 1; # 1..4
   $self->{SessionCounterFile} = "$self->{SessionCounterDir}/Q$quartal";
 
-  $self->{WaitDir} = "/usr/local/apache/rundata/pause_1999/wait";
+  $self->{WaitDir} = "$PAUSE::Config->{RUNDATA}/wait";
   $self->{WaitUserDb} = "users";
 
   $self->dispatch;

@@ -1,5 +1,6 @@
 package pause_1999::authen_user;
 use pause_1999::main;
+use Apache ();
 use Apache::Constants qw( AUTH_REQUIRED MOVED OK SERVER_ERROR );
 use base 'Class::Singleton';
 use PAUSE ();
@@ -98,11 +99,6 @@ sub header {
   }
 }
 
-use Apache ();
-use Apache::Constants qw(OK AUTH_REQUIRED DECLINED SERVER_ERROR);
-
-# $Id: authen_user.pm,v 1.16 2001/05/13 06:03:05 k Exp k $
-
 sub handler {
   my($r) = @_;
 
@@ -153,6 +149,10 @@ sub handler {
 			      $attr->{password})) {
     $r->log_reason(" db connect error with $attr->{data_source}",
 		   $r->uri);
+    my $redir = $r->uri;
+    $redir =~ s/authen//;
+    $r->connection->user("-");
+    $r->custom_response(SERVER_ERROR, $redir);
     return SERVER_ERROR;
   }
 

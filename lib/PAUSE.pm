@@ -66,6 +66,7 @@ $PAUSE::Config ||=
                     PAUSE_LOG_DIR => "/home/k/PAUSE/log/",
                     PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
                     PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
+                    RUNDATA => "/usr/local/apache/rundata/pause_1999",
                     SLEEP => 90,
                     # path to repository without "/trunk"
                     SVNPATH => "/home/SVN/repos/pause",

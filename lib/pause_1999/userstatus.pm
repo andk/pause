@@ -13,50 +13,49 @@ sub as_string {
   my $user = $r->connection->user;
   my $server = $mgr->myurl->can("host") ? $mgr->myurl->host : $mgr->myurl->hostname;
   $r->log_error(sprintf "Watch: server[%s]at[%s]line[%d]", $server, __FILE__, __LINE__);
+  my $activecolor = $mgr->{ActiveColor};
+  return unless $user && $user ne "-";
   my @m;
   push @m, qq{<table  cellpadding="3" cellspacing="0">};
-  my $activecolor = $mgr->{ActiveColor};
-  if ($user) {
-    my($encr,$class);
-    if ($mgr->myurl->scheme eq "https") {
-      $encr = 1;
-      $class = "statusencr";
-    } else {
-      $encr = 0;
-      $class = "statusunencr";
-    }
-
-    my $hu = "";
-    if ($mgr->{HiddenUser}{userid}
-        &&
-        $mgr->{HiddenUser}{userid} ne $mgr->{User}{userid}
-       ) {
-      $hu = sprintf qq{%s &lt;%s&gt;<br />},
-                     $mgr->{HiddenUser}{userid},
-                     $mgr->escapeHTML(
-                                      $mgr->{HiddenUser}{secretemail}
-                                      ||
-                                      $mgr->{HiddenUser}{email}
-                                      ||
-                                      "No email???"
-                                     );
-    }
-    push @m, sprintf(
-                     qq{<tr><td class="%s" nowrap="nowrap">%s &lt;%s&gt;<br />%s%s</td></tr>},
-                     $class,
-                     $user,
-                     $mgr->escapeHTML(
-                                      $mgr->{User}{secretemail}
-                                      ||
-                                      $mgr->{User}{email}
-                                      ||
-                                      "No email???"
-                                     ),
-                     $hu,
-                     $encr ? "encrypted session" : "<b>unencrypted session</b>",
-                     );
-
+  my($encr,$class);
+  if ($mgr->myurl->scheme eq "https") {
+    $encr = 1;
+    $class = "statusencr";
+  } else {
+    $encr = 0;
+    $class = "statusunencr";
   }
+
+  my $hu = "";
+  if ($mgr->{HiddenUser}{userid}
+      &&
+      $mgr->{HiddenUser}{userid} ne $mgr->{User}{userid}
+     ) {
+    $hu = sprintf qq{%s &lt;%s&gt;<br />},
+        $mgr->{HiddenUser}{userid},
+            $mgr->escapeHTML(
+                             $mgr->{HiddenUser}{secretemail}
+                             ||
+                             $mgr->{HiddenUser}{email}
+                             ||
+                             "No email???"
+                            );
+  }
+  push @m, sprintf(
+                   qq{<tr><td class="%s" nowrap="nowrap">%s &lt;%s&gt;<br />%s%s</td></tr>},
+                   $class,
+                   $user,
+                   $mgr->escapeHTML(
+                                    $mgr->{User}{secretemail}
+                                    ||
+                                    $mgr->{User}{email}
+                                    ||
+                                    "No email???"
+                                   ),
+                   $hu,
+                   $encr ? "encrypted session" : "<b>unencrypted session</b>",
+                  );
+
   push @m, qq{</table>\n};
   @m;
 }
