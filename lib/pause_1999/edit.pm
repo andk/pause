@@ -149,7 +149,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
     $mgr->{Action} = $param;
   } else {
     # ...they might ask for it in a submit button
-    for my $action (@allow_submit) {
+  ACTION: for my $action (@allow_submit) {
 
       # warn "DEBUG: action[$action]";
 
@@ -159,7 +159,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
 	 ) {
 	warn "action[$action]";
 	$mgr->{Action} = $action;
-	last;
+	last ACTION;
       }
 
       # Also inherited: One submitbutton but also only one textfield,
@@ -169,14 +169,18 @@ parameter ABRA=$param, but the database doesn't know about this token.");
 	 ) {
 	$req->param("pause99_$action\_sub", $param); # why?
 	$mgr->{Action} = $action;
-	last;
+	last ACTION;
       }
 
+      # I had intended that parameters matching /_sub.*/ are only used
+      # in cases where RETURN might be used instead of SUBMIT. Then I
+      # erroneously used "pause99_add_uri_subdirtext"
+
       my(@partial) = grep /^pause99_\Q$action\E_/, $req->param;
-      for my $partial (@partial) {
-	$req->param("pause99_$action\_sub", $partial); # why?
+    PART: for my $partial (@partial) {
+	$req->param("pause99_$action\_sub", $partial); # why not $mgr->{ActionComment}?
 	$mgr->{Action} = $action;
-	last;
+	last PART;
       }
     }
   }
@@ -1622,8 +1626,13 @@ $mgr->{User}{userid} ($mgr->{User}{fullname}) visited the PAUSE
 and requested an upload into $her directory.});
     $mailblurb .= "\nThe request used the following parameters\n\n";
     for my $param ($req->param) {
+      next if $param eq "HIDDENNAME";
+      next if $param eq "CAN_MULTIPART";
       my $v = $req->param($param);
       next unless defined $v;
+      next unless length $v;
+      next if $param eq "pause99_add_uri_sub" and
+          $v eq "pause99_add_uri_subdirtext";
       $mailblurb .= sprintf qq{  %-26s [%s]\n}, $param, $v;
     }
     # $mailblurb .= "\n";
