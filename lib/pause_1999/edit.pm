@@ -1622,10 +1622,11 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
   if ($didit) {
     my $her = $mgr->{User}{userid} eq $u->{userid} ? "his/her" :
 	"$u->{userid}'s";
-    my $mailblurb = $self->wrap(qq{
-$mgr->{User}{userid} ($mgr->{User}{fullname}) visited the PAUSE
-and requested an upload into $her directory.});
-    $mailblurb .= "\nThe request used the following parameters\n\n";
+
+    my $mailblurb = $self->wrap(qq{$mgr->{User}{userid}
+($mgr->{User}{fullname}) visited the PAUSE and requested an upload
+into $her directory. The request used the following parameters:});
+
     for my $param ($req->param) {
       next if $param eq "HIDDENNAME";
       next if $param eq "CAN_MULTIPART";
