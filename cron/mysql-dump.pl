@@ -13,7 +13,7 @@ my $D = sprintf "%04d%02d%02d%02d%02dGMT",@m[5,4,3,2,1];
 my($dbi,$dbengine,$db) = split /:/, $PAUSE::Config->{MOD_DATA_SOURCE_NAME};
 die "Script would not work for $dbengine" unless $dbengine =~ /mysql/i;
 
-system "/usr/local/bin/mysqldump --lock-tables --add-drop-table -u '$PAUSE::Config->{MOD_DATA_SOURCE_USER}' -P '$PAUSE::Config->{MOD_DATA_SOURCE_PW}' '$db' > $DIR/.moddump.current";
+system "/usr/local/bin/mysqldump --lock-tables --add-drop-table --user='$PAUSE::Config->{MOD_DATA_SOURCE_USER}' --password='$PAUSE::Config->{MOD_DATA_SOURCE_PW}' '$db' > $DIR/.moddump.current";
 
 my $BZIP = "/usr/local/bin/bzip2";
 $BZIP = "/usr/bin/bzip2" unless -x $BZIP;
