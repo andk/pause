@@ -2,6 +2,8 @@
 
 CoreDumpDirectory /usr/local/apache/cores
 
+ServerTokens ProductOnly
+
 <IfModule noexist.c>
 
 
@@ -282,6 +284,9 @@ if (1) { # /pause/ directory
 		 "/perl/user",
 		 "/perl/admin",
 		 "/pub",
+                 "/status",
+                 "/server-info",
+                 "/perl-status"
 		){
       $Location{$loc}{PerlAuthenHandler} = "pause_1999::authen_user";
       $Location{$loc}{AuthName} = "PAUSE";
