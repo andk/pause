@@ -4,7 +4,7 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 04 * * * *            cleanup-incoming.pl
 04 01,13 * * *        cron-daily.pl
 05 * * * *            gmls-lR.pl
-36 * * * *            mldistwatch
+13 * * * *            mldistwatch
 18 04,10,16,22 * * *  mysql-dump.pl
 19,49 * * * *         publish-crontab.sh
 20 01 * * 7           restart-httpd
