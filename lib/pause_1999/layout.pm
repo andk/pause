@@ -90,7 +90,7 @@ alink="#FF0000" text="#000000"><table width="100%" border="0" cellpadding="0" ce
 
     push @l, qq{<p class="motd">FUNET, the CPAN master site is <a
     href="http://use.perl.org/articles/03/02/16/1416231.shtml?tid=32">currently
-    broken</a>. This means that your upload will not be propageted to
+    broken</a>. This means that your upload will not be propagated to
     the CPAN until this problem is fixed. Sorry <code>:-(</code> </p>};
 
     push @l, qq{</div>};
