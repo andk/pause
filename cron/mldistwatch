@@ -1277,14 +1277,43 @@ sub as_ds {
     $ppp;
   }
 
+  sub mm_unix_parse_version {
+      my($parsefile) = @_;
+      my $result;
+      local *FH;
+      local $/ = "\n";
+      open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+      my $inpod = 0;
+      while (<FH>) {
+          $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+          next if $inpod || /^\s*#/;
+          chop;
+          # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
+          next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+          my $eval = qq{
+              package ExtUtils::MakeMaker::_version;
+
+              local $1$2;
+              \$$2=undef; do {
+                  $_
+              }; \$$2
+          };
+          local $^W = 0;
+          $result = eval($eval);
+          die "Could not eval '$eval' in $parsefile: $@" if $@;
+          last;
+      }
+      close FH;
+
+      $result = "undef" unless defined $result;
+      return $result;
+  }
+
   # package PAUSE::pmfile;
   sub parse_version {
     my $self = shift;
 
     use Safe;
-    use ExtUtils::MakeMaker;
-    require SelfLoader;
-    use ExtUtils::MM_Unix;
     use strict;
 
     my $pmfile = $self->{PMFILE};
@@ -1310,10 +1339,6 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
 
 =cut
 
-      ExtUtils::MM_Unix::parse_version("","/dev/null"); #make sure
-                                                        #it's
-                                                        #selfloaded
-
       my($pid,$kid);
       die "Can't fork: $!" unless defined($pid = open($kid, "-|"));
       if ($pid) {           # parent
@@ -1332,10 +1357,12 @@ reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_vers
         my($comp) = Safe->new("_pause::mldistwatch");
         my $eval = qq{
                   local(\$^W) = 0;
-                  ExtUtils::MM_Unix::parse_version("","$pmcp");
+                  mm_unix_parse_version("$pmcp");
                  };
-        $comp->share("*ExtUtils::MM_Unix::parse_version", "*strict::unimport");
-        $comp->permit("require"); # no strict!
+        # $comp->share("*ExtUtils::MM_Unix::parse_version", "*strict::unimport");
+        # $comp->permit("require"); # no strict!
+        no strict;
+        local $PAUSE::Config;
         $v = $comp->reval($eval);
         warn "reval failed: $@ for eval[$eval]" if $@;
         print $v;
