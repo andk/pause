@@ -1288,19 +1288,18 @@ Please contact modules\@perl.org if there are any open questions.
         }
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
-        my $to = $PAUSE::Config->{TESTHOST} ? "" : $pma->address;
-        my($msg) = Mail::Send->new(
-                                   To => join(", ",
-                                              $to,
-                                              $PAUSE::Config->{ADMIN}, # no sec breach
-                                             ),
-                                   Subject => "PAUSE indexer report $substrdistro",
-                                  );
-        $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-        my $fh  = $msg->open('sendmail');
-        print $fh @m;
-        $fh->close;
-        $self->verbose(1,"-->> Sent mail about $substrdistro\n");
+        unless ($PAUSE::Config->{TESTHOST}) {
+            my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
+            my($msg) = Mail::Send->new(
+                                       To      => $to,
+                                       Subject => "PAUSE indexer report $substrdistro",
+                                      );
+            $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
+            my $fh  = $msg->open('sendmail');
+            print $fh @m;
+            $fh->close;
+            $self->verbose(1,"-->> Sent mail about $substrdistro\n");
+        }
     }
 
     # package PAUSE::dist;
