@@ -1070,22 +1070,28 @@ Please contact modules\@perl.org if there are any open questions.
         # sometimes they package their stuff deep inside a hierarchy
         my @found = @{$self->{MANIFOUND}};
         my $endless = 0;
-        while () {
+      DIRDOWN: while () {
+            # step down directories as long as possible
             my %seen;
             my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @found;
             if (@top == 1) {
                 # print $top[0];
-                s|\Q$top[0]\E/|| for @found;
+                my $success = 0;
+                for (@found){ # note, we modify found, not top!
+                    s|\Q$top[0]\E/|| && $success++;
+                }
+                last DIRDOWN unless $success; # no directory to step down anymore
                 if (++$endless > 10) {
                     $self->alert("ENDLESS LOOP detected in $self->{DIST}!");
-                    last;
+                    last DIRDOWN;
                 }
-                next;
+                next DIRDOWN;
             }
+            # more than one entry in this directory means final check
             if (grep m|^blib/|, @found) {
                 $self->{HAS_BLIB}++;
             }
-            last;
+            last DIRDOWN;
         }
     }
 
