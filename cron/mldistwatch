@@ -93,7 +93,7 @@ sub work {
     my $startdir = Cwd::cwd();
     my $MLROOT = $self->mlroot;
     chdir $MLROOT
-	or die "Couldn't chdir to $MLROOT";
+        or die "Couldn't chdir to $MLROOT";
     $self->init_all();
     $self->set_user_active_status();
     my $testdir = File::Temp::tempdir(
@@ -102,7 +102,7 @@ sub work {
                                       CLEANUP => 0,
                                      ) or die "Could not make a tmp directory";
     chdir $testdir
-	or die("Couldn't change to $testdir: $!");
+        or die("Couldn't change to $testdir: $!");
     {
         $self->checkfornew();
     }
@@ -286,14 +286,14 @@ sub rewrite02 {
     my $olist = "";
     local($/) = "\n";
     if (
-	-f "$repfile.gz" and
-	open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+        -f "$repfile.gz" and
+        open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
        ) {
-	while (<F>) {
-	    next if 1../^$/;
-	    $olist .= $_;
-	}
-	close F;
+        while (<F>) {
+            next if 1../^$/;
+            $olist .= $_;
+        }
+        close F;
     }
     my $date = HTTP::Date::time2str();
     my $sth = $dbh->prepare(qq{SELECT package, version, dist, file
@@ -304,21 +304,21 @@ sub rewrite02 {
     my $numrows = $sth->rows;
     $self->verbose(2,"numrows[$numrows]\n");
     while (@row = $sth->fetchrow_array) {
-	my($one,$two);
-	my $infile = $row[0];
-	$infile =~ s/^.+:://;
-	next unless $row[3];
-	next unless index($row[3],"$infile.pm")>=0 or
+        my($one,$two);
+        my $infile = $row[0];
+        $infile =~ s/^.+:://;
+        next unless $row[3];
+        next unless index($row[3],"$infile.pm")>=0 or
             $row[3]=~/VERSION/i; # VERSION is Russ Allbery's idea to
                                  # force inclusion
-	$row[1] =~ s/^\+//;
-	$one=30;
+        $row[1] =~ s/^\+//;
+        $one=30;
         $two=8;
-	if (length($row[0])>$one) {
-	    $one += 8 - length($row[1]);
-	    $two = length($row[1]);
-	}
-	push @listing02, sprintf "%-${one}s %${two}s  %s\n", @row;
+        if (length($row[0])>$one) {
+            $one += 8 - length($row[1]);
+            $two = length($row[1]);
+        }
+        push @listing02, sprintf "%-${one}s %${two}s  %s\n", @row;
     }
     my $numlines = @listing02;
     die "Absurd small number of lines" unless $numlines > 1000;
@@ -333,14 +333,14 @@ Last-Updated: $date\n\n};
 
     $list .= join "", sort {lc $a cmp lc $b} @listing02;
     if ($list ne $olist) {
-	if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
-	    print F $header;
-	    print F $list;
-	} else {
-	    $self->verbose(1,"Couldn't open 02packages...gz\n");
-	    $self->alert("Couldn't open 02packages...gz");
-	}
-	close F or die "Couldn't close: $!";
+        if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
+            print F $header;
+            print F $list;
+        } else {
+            $self->verbose(1,"Couldn't open 02packages...gz\n");
+            $self->alert("Couldn't open 02packages...gz");
+        }
+        close F or die "Couldn't close: $!";
     }
 }
 
@@ -359,20 +359,20 @@ sub rewrite01 {
     local $/;
     local *F;
     if (open F, $repfile) {
-	while (<F>) {
-	    $olist .= $_;
-	}
-	close F;
+        while (<F>) {
+            $olist .= $_;
+        }
+        close F;
     } else {
-	$self->verbose(1,"Couldn't open $repfile $!\n");
-	$self->alert("Couldn't open $repfile $!");
+        $self->verbose(1,"Couldn't open $repfile $!\n");
+        $self->alert("Couldn't open $repfile $!");
     }
     my(%firstlevel,%achapter);
     my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
     $sth->execute;
     while (my($modid,$chapterid) = $sth->fetchrow_array) {
-	my($root,$colo) = $modid =~ /^([^:]+)(::)?/;
-	$firstlevel{$root}++;
+        my($root,$colo) = $modid =~ /^([^:]+)(::)?/;
+        $firstlevel{$root}++;
         # the determination of %achapter was introduced with rev 211.
         # Alternatives were tried in 212 and 214, but they had
         # uncountable misfits. 215 then was very similar to 211 but we
@@ -394,7 +394,7 @@ sub rewrite01 {
     $sth = $dbh->prepare("SELECT chapternr, shorttitle FROM chapters");
     $sth->execute;
     while (my($chapternr, $shorttitle) = $sth->fetchrow_array) {
-	$chaptitle[$chapternr] = sprintf "%02d_%s", $chapternr, $shorttitle;
+        $chaptitle[$chapternr] = sprintf "%02d_%s", $chapternr, $shorttitle;
     }
 
     $sth = $dbh->prepare("SELECT package, dist FROM packages");
@@ -514,7 +514,7 @@ sub rewrite01 {
 <h3>in alphabetical order by modules contained in the distributions</h3>
 <i>} .
     scalar gmtime() .
-	qq{ GMT</i>
+        qq{ GMT</i>
 
 <p>The list contains modules distribution files on CPAN for modules that
 are <b>not</b> included in the perl standard distribution but
@@ -557,18 +557,18 @@ category    maintainer
 };
 
     $list .= join("",
-		  map {sprintf(
-			       qq{%-12s<a href="../authors/id/%s">%s</a>%s<a
+                  map {sprintf(
+                               qq{%-12s<a href="../authors/id/%s">%s</a>%s<a
  href="../authors/id/%s">%s</a> %s %s  %s%s\n},
-			       @$_
-			      )}
-		  sort {lc $a->[0] cmp lc $b->[0] # package(root)
-			    or
-				$a->[2] cmp $b->[2] # userid
-				    or
-					lc $a->[5] cmp lc $b->[5] # filename
+                               @$_
+                              )}
+                  sort {lc $a->[0] cmp lc $b->[0] # package(root)
+                            or
+                                $a->[2] cmp $b->[2] # userid
+                                    or
+                                        lc $a->[5] cmp lc $b->[5] # filename
                                     } @listing01
-		 );
+                 );
     $list .= q{</pre></body></html>};
 
     my($comparelist) = $list;
@@ -576,14 +576,14 @@ category    maintainer
         $olist       =~ s/.+?<hr\b//s;
 
     if ($comparelist ne $olist) {
-	if (open F, ">$repfile") {
-	    print F $list;
-	    close F;
-	    $self->write_01sorted(\@listing01);
-	} else {
-	    $self->verbose(1,"Couldn't open 01modules...\n");
-	    $self->alert("Couldn't open 01modules...");
-	}
+        if (open F, ">$repfile") {
+            print F $list;
+            close F;
+            $self->write_01sorted(\@listing01);
+        } else {
+            $self->verbose(1,"Couldn't open 01modules...\n");
+            $self->alert("Couldn't open 01modules...");
+        }
     }
 }
 
@@ -654,7 +654,7 @@ maintainer
     my(%seen);
     for my $l (
                sort {$b->[10] <=> lc $a->[10] # mtime
-		 } @$listing
+                 } @$listing
               ) {
         next if $seen{$l->[4]}++; # dist
         my %package;
@@ -678,7 +678,7 @@ maintainer
 ##    'young' => '  +'
 
         $package{filenamefiller} =
-	    " "x(40-length($package{filenameonly})-length($package{size}));
+            " "x(40-length($package{filenameonly})-length($package{size}));
         $package{'useridpretty'} = ucfirst(
           $package{'useridlc'}   = lc $package{'userid'}
         );
@@ -692,7 +692,7 @@ maintainer
                                      filenamefiller size mtimestr}}
                         );
 
-	$rss .= sprintf qq{
+        $rss .= sprintf qq{
 <item>
   <title>%s : %s</title>
   <link>http://www.cpan.org/modules/by-authors/id/%s/%s</link>
@@ -773,10 +773,10 @@ sub rewrite03 {
     $sth->execute;
     my $header = sprintf qq{File:        03modlist.data
 Description: These are the data that are published in the module
-	list, but they may be more recent than the latest posted
-	modulelist. Over time we\'ll make sure that these data
-	can be used to print the whole part two of the
-	modulelist. Currently this is not the case.
+        list, but they may be more recent than the latest posted
+        modulelist. Over time we\'ll make sure that these data
+        can be used to print the whole part two of the
+        modulelist. Currently this is not the case.
 Modcount:    %d
 Written-By:  %s
 Date:        %s
@@ -793,9 +793,9 @@ Date:        %s
       my \$result = {};
       my \$primary = "modid";
       for (\@\$CPAN::Modulelist::data){
-	my %hash;
-	\@hash{\@\$CPAN::Modulelist::cols} = \@\$_;
-	\$result->{\$hash{\$primary}} = \\%hash;
+        my %hash;
+        \@hash{\@\$CPAN::Modulelist::cols} = \@\$_;
+        \$result->{\$hash{\$primary}} = \\%hash;
       }
       \$result;
 
@@ -846,21 +846,21 @@ sub chdir_ln_chdir {
     }
     $to = File::Basename::basename($to);
     if (-l $to) {
-	my($foundlink) = readlink $to or die "Couldn't read link $to in $dir";
-	if ($foundlink eq $from) {
+        my($foundlink) = readlink $to or die "Couldn't read link $to in $dir";
+        if ($foundlink eq $from) {
             # $self->verbose(2,"Keeping old symlink $from in dir $dir file $to\n");
-	    return;
-	}
+            return;
+        }
     }
     if (-l $to) {
-	$self->verbose(1, qq{unlinking symlink $to in $dir\n});
-	unlink $to or die qq{Couldn\'t unlink $to $!};
+        $self->verbose(1, qq{unlinking symlink $to in $dir\n});
+        unlink $to or die qq{Couldn\'t unlink $to $!};
     } elsif (-f $to) {
-	$self->verbose(1, "unlinking file $to in dir $dir\n");
-	unlink $to or die qq{Couldn\'t unlink $to $!};
+        $self->verbose(1, "unlinking file $to in dir $dir\n");
+        unlink $to or die qq{Couldn\'t unlink $to $!};
     } elsif (-d $to) {
-	$self->verbose(1,"ALERT: Have to rmtree $to in dir $dir\n");
-	rmtree $to;
+        $self->verbose(1,"ALERT: Have to rmtree $to in dir $dir\n");
+        rmtree $to;
     }
     symlink $from, $to or die "Couldn't symlink $from, $to $!";
     chdir $postdir or die "Couldn't chdir to $postdir $!"
@@ -1733,12 +1733,12 @@ Please contact modules\@perl.org if there are any open questions.
 
             if (
                 $pline =~ m{
-			 (.*)
-			 \bpackage\s+
-			 ([\w\:\']+)
-			 \s*
-			 ( $ | [\}\;] )
-			}x) {
+                         (.*)
+                         \bpackage\s+
+                         ([\w\:\']+)
+                         \s*
+                         ( $ | [\}\;] )
+                        }x) {
                 $pkg = $2;
 
             }
@@ -2035,7 +2035,7 @@ package in packages  package in primeur
 
         my($is_primeur) = $dbh->prepare(qq{SELECT package, userid
                                          FROM   primeur
- 					 WHERE  package = ? AND userid = ?}
+                                         WHERE  package = ? AND userid = ?}
                                        );
         $is_primeur->execute($package,$userid);
         if ($is_primeur->rows) {
@@ -2074,7 +2074,7 @@ package in packages  package in primeur
 
         my($sth_perms) = $dbh->prepare(qq{SELECT package, userid
                                          FROM   perms
- 					 WHERE  package = ?}
+                                         WHERE  package = ?}
                                       );
         $sth_perms->execute($package);
 
@@ -2428,12 +2428,12 @@ WHERE package = '$package'
         my $query = qq{INSERT INTO packages
  (package, version, dist, file, filemtime, pause_reg)
 VALUES (
-	'$package',
-	'$pp->{version}',
-	'$dist',
-	'$pp->{infile}',
-	'$pp->{filemtime}',
-	'$self->{TIME}'
+        '$package',
+        '$pp->{version}',
+        '$dist',
+        '$pp->{infile}',
+        '$pp->{filemtime}',
+        '$self->{TIME}'
        )
 };
         $self->verbose(1,"Q: [$query]\n");
@@ -2492,7 +2492,7 @@ VALUES (
         $self->checkin_into_primeur; # called in void context!
 
         my $sth_pack = $dbh->prepare(qq{SELECT package, version, dist,
-			                  filemtime, file
+                                          filemtime, file
                                    FROM packages
                                    WHERE package = ?});
 
