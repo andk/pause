@@ -298,31 +298,10 @@ for my $loc ( "/perl" ){
     $Location{$loc}{PerlHandler} = "Apache::Registry";
   }
 }
-## unless (-f "/etc/PAUSE.CLOSED") {
-##   for my $loc (qw( /perl/user /perl/admin /pub )){
-##     require Apache::AuthenDBI;
-##     require PAUSE::Authen;
-##     $Location{$loc}{PerlAuthenHandler} = "PAUSE::Authen";
-##     $Location{$loc}{AuthName} = "PAUSE";
-##     $Location{$loc}{AuthType} = "Basic";
-##   }
-##   $Location{"/perl/user"}{require} = "valid-user";
-##   $Location{"/perl/admin"}{PerlAuthzHandler} = "Apache::AuthzDBI";
-##   $Location{"/perl/admin"}{require} = ["group", "admin"];
-## }
 
 for my $loc (qw(/pub /incoming)){
   $Location{$loc}{IndexOptions} = "FancyIndexing NameWidth=* SuppressDescription";
 }
-## for my $dir (qw(/usr/local/apache/htdocs/pub /usr/local/apache/htdocs/incoming)){
-##   require Apache::AuthenDBI;
-##   require PAUSE::Authen;
-##   $Directory{$dir}{PerlAuthenHandler} = "PAUSE::Authen";
-##   $Directory{$dir}{AuthName} = "PAUSE";
-##   $Directory{$dir}{AuthType} = "Basic";
-##   $Directory{$dir}{require} = "valid-user";
-##   $Directory{$dir}{IndexOptions} = "FancyIndexing";
-## }
 $MinSpareServers = 2;
 $MaxSpareServers = 2;
 $StartServers = 2;
