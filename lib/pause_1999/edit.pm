@@ -4831,7 +4831,7 @@ sub chap_meta {
   }
   my @sorted;
   if (grep /^[\s_]/, keys %chap) {
-    my @sorted = map { s/^\s/_/; $_ } sort map { s/_/ /; $_} keys %chap; # ARGH!
+    @sorted = map { s/^\s/_/; $_ } sort map { s/_/ /; $_} keys %chap; # ARGH!
   } else {
     @sorted = sort { $a <=> $b } keys %chap;
   }
