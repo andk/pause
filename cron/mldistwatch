@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
+#!/usr/local/bin/perl -w -- -*- mode: cperl; cperl-indent-level: 4 -*-
 
 # Some POD is after __END__
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -- -*- mode: cperl -*-
+#!/usr/local/bin/perl -w -- -*- mode: cperl -*-
 
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
