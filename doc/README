@@ -1,7 +1,3 @@
-=head1 CONSTRUCTION WORKS 2003-07-24 and following
-
-The README is partially outdated while work is going on on PAUSE.
-
 =head1 PAUSE repository
 
 This repository lives at
@@ -42,26 +38,24 @@ section about user management.
 On PAUSE the files live in /home/k/PAUSE and the following symlinks
 make sure that installed programs find their configuration:
 
-(last time updated: 2003-07-25)
+(last time updated: 2003-08-03)
 
-  /usr/local/apache/conf          -> ../../../home/k/PAUSE/apache-conf
-  /usr/local/apache/htdocs        -> ../../../home/k/PAUSE/htdocs/
-  /usr/local/apache/perl          -> ../../../home/k/PAUSE/apache-perl
-  /etc/apache2/apache2.conf       -> /home/k/PAUSE/apache-svn-conf/httpd.conf
+  /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf
+  /usr/local/apache/htdocs          -> ../../../home/k/PAUSE/htdocs/
+  /usr/local/apache/perl            -> ../../../home/k/PAUSE/apache-perl
+  /etc/apache2/apache2.conf         -> /home/k/PAUSE/apache-svn-conf/httpd.conf
   /etc/apache2/mods-available/ssl.conf -> /home/k/PAUSE/apache-svn-conf/ssl.conf
-  /etc/rsyncd.conf                -> /home/k/PAUSE/etc/rsyncd.conf
-  /etc/proftpd.conf               -> /home/k/PAUSE/etc/proftpd.conf
-  /etc/mon/mon.cf                 -> /home/k/PAUSE/etc/mon/mon.cf
+  /etc/rsyncd.conf                  -> /home/k/PAUSE/etc/rsyncd.conf
+  /etc/proftpd.conf                 -> /home/k/PAUSE/etc/proftpd.conf
+  /etc/mon/mon.cf                   -> /home/k/PAUSE/etc/mon/mon.cf
+  /etc/mysql/my.cnf                 -> /home/k/PAUSE/etc/my.cnf
   /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
 
-[ (last time updated: 2002-12-25)
+[ MISSING documentation:
 
   /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
-  /etc/rc.d/init.d/httpd -> /home/k/PAUSE/etc/rc.d/init.d/httpd
-  /etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
   /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
-  /usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults
-  /usr/local/mirror/mymirror.config -> ../../../home/k/PAUSE/mirror/mymirror.config
+
 ]
 
 (XXX reduce the number of necessary symlink)
