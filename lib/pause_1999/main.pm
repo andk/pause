@@ -114,6 +114,7 @@ CanMultipart
 DbHandle4Authen
 DbHandle
 DocumentRoot
+DownTime
 EditOutput
 HiddenUser
 IsMailinglistRepresentative
@@ -140,6 +141,7 @@ UserSecrets
 VERSION
 WaitDir
 WaitUserDb
+WillLast
 
 );
 

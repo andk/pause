@@ -68,8 +68,8 @@ $hspecial
   # MOTD
   #
 
-  my $downtime = 1058947200;1058428800;
-  my $willlast = 7200;
+  my $downtime = $mgr->{DownTime};
+  my $willlast = $mgr->{WillLast};
   if (time < $downtime) {
     push @l, qq{<div align="center">};
     use HTTP::Date;

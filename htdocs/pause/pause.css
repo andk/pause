@@ -28,5 +28,5 @@ a.activemenu:hover { text-decoration: underline; }
 a.menuitem { text-decoration: none; }
 a.menuitem:hover { text-decoration: underline; }
 h4.altering { margin: 0 0 12px; }
-p.motd { margin: 12px 1in; padding: 6px; color: black; background: orange; font-size: small; }
+p.motd { margin: 10px 1in; padding: 5px; color: black; background: yellow; font-size: small; }
 td.activemenu { border: green solid 1px; }
