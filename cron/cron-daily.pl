@@ -349,7 +349,7 @@ sub whois {
     $stu->execute;
     # Thanks to Robin Berjon for the namespace:
     my $xml = sprintf(
-                      qq{
+                      qq{<?xml version="1.0" encoding="UTF-8"?>
 <cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
             last-generated='%s GMT'
             generated-by='%s'>
@@ -427,10 +427,10 @@ sub whois {
 
             $xml .= qq{ <cpan-id>\n};
             $xml .= qq{  <id>$row[2]</id>\n};
-            $xml .= qq{  <fullname>} . escapeHTML($row[1]) . qq{</fullname>};
-            $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>}
+            $xml .= qq{  <fullname>} . escapeHTML($row[1]) . qq{</fullname>\n};
+            $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>\n}
                 if $row[5];
-            $xml .= qq{  <url>} . escapeHTML($row[4]) . qq{</url>}
+            $xml .= qq{  <url>} . escapeHTML($row[4]) . qq{</url>\n}
                 if $row[4];
             
             $xml .= $xml_has_cpandir;
