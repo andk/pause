@@ -425,16 +425,19 @@ sub whois {
 
             # and now for XML
 
-            $xml .= qq{ <cpan-id>\n};
+            $xml .= qq{ <cpanid>\n};
             $xml .= qq{  <id>$row[2]</id>\n};
+            $xml .= qq{  <type>author</type>\n};
             $xml .= qq{  <fullname>} . escapeHTML($row[1]) . qq{</fullname>\n};
             $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>\n}
                 if $row[5];
-            $xml .= qq{  <url>} . escapeHTML($row[4]) . qq{</url>\n}
+            $xml .= qq{  <email>} . escapeHTML($row[2]) . qq{</email>\n}
+                if $row[2];
+            $xml .= qq{  <homepage>} . escapeHTML($row[4]) . qq{</homepage>\n}
                 if $row[4];
             
             $xml .= $xml_has_cpandir;
-            $xml .= qq{ </cpan-id>\n};
+            $xml .= qq{ </cpanid>\n};
 	}
     }
 
@@ -462,11 +465,23 @@ sub whois {
 	HTML::Entities::encode($subscribe);
 	print FH $subscribe, "<p> </p></dd>\n";
 
-        $xml .= " <cpan-id>\n";
+        my $userhome = PAUSE::user2dir($row[0]);
+        my $xml_has_cpandir = "";
+        if (-d "$PAUSE::Config->{MLROOT}/$userhome") {
+          $xml_has_cpandir = "  <has_cpandir>1</has_cpandir>\n";
+        } else {
+          $xml_has_cpandir = "  <has_cpandir>0</has_cpandir>\n";
+        }
+
+
+        $xml .= " <cpanid>\n";
         $xml .= qq{  <id>$row[0]</id>\n};
-        $xml .= qq{  <mlname>} . escapeHTML($row[1]) . qq{</mlname>\n};
-        $xml .= qq{  <info>} . escapeHTML($row[2]) . qq{</info>\n} if $row[2];
-        $xml .= " </cpan-id>\n";
+        $xml .= qq{  <type>list</type>\n};
+        $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>\n};
+        $xml .= qq{  <email>} . escapeHTML($row[2]) . qq{</email>\n} if $row[2];
+        $xml .= qq{  <info>} . escapeHTML($row[3]) . qq{</info>\n} if $row[3];
+        $xml .= $xml_has_cpandir;
+        $xml .= " </cpanid>\n";
 
     }
 
