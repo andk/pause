@@ -208,8 +208,6 @@ sub loop () { # we're NOT called as a method
 
     if (! $hash->{dverified} && $lpath =~ m,/$,) { # directory
 
-      my $mirror = IO::File->new(">>$PAUSE::Config->{MIRRORCONFIG}")
-	  or $self->logge("Couldn't open $PAUSE::Config->{MIRRORCONFIG}");
       my($package) = PAUSE::dir2user($hash->{uriid});
       my($uri) =  URI::URL->new($hash->{uri});
       my($host) = $uri->host;
@@ -217,19 +215,30 @@ sub loop () { # we're NOT called as a method
       for ($package,$host,$path) {
         s/[\0-\037]/?/g;
       }
-      $mirror->print(qq{
-# package     =$package
-# site        =$host
-# remote_dir  =$path
-# local_dir   +pub/authors/id/$package
-# get_patt    =.
-# max_days    =22
-# recursive   =false
-# skip        =not yet verified
-});
+      my $blurb = qq{
+It seems that user '$package' would like this entry in
+$PAUSE::Config->{MIRRORCONFIG}.
+
+package     =$package
+site        =$host
+remote_dir  =$path
+local_dir   +pub/authors/id/$package
+get_patt    =.
+max_days    =22
+recursive   =false
+skip        =not yet verified
+};
+
+
+
+      mypause_send_mail->send({
+                               To => $PAUSE::Config->{ADMIN},
+                               Subject => "Mirror request from $package"
+                              },
+                              $blurb
+                             );
       $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
-      $self->logge("package $package added to $PAUSE::Config->{MIRRORCONFIG}");
-      $mirror->close;
+      $self->logge("sent mail about package $package");
       next URIRECORD;
     }
 
