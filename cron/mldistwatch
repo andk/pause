@@ -331,7 +331,7 @@ URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
 Description:  Package names found in directory \$CPAN/authors/id/
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
-Written-By:   mldistwatch ($Id) by Andreas.Koenig\@anima.de
+Written-By:   $Id
 Line-Count:   $numlines
 Last-Updated: $date\n\n};
 
@@ -666,7 +666,7 @@ Description: These are the data that are published in the module
 	can be used to print the whole part two of the
 	modulelist. Currently this is not the case.
 Modcount:    %d
-Written-By:  mldistwatch (v %s) by Andreas.Koenig\@anima.de
+Written-By:  %s
 Date:        %s
 
 }, $sth->rows, $Id, $date;
