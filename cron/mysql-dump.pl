@@ -19,6 +19,10 @@ my $Struct = [
                cfg_dsn => "MOD_DATA_SOURCE_NAME",
                cfg_user => "MOD_DATA_SOURCE_USER",
                cfg_pw => "MOD_DATA_SOURCE_PW"},
+              {backupdir => "/home/k/PAUSE/111_sensitive/backup",
+               cfg_dsn => "AUTHEN_DATA_SOURCE_NAME",
+               cfg_user => "AUTHEN_DATA_SOURCE_USER",
+               cfg_pw => "AUTHEN_DATA_SOURCE_PW"},
 ];
 for my $struct (@$Struct) {
   my $backup_dir = $struct->{backupdir};
