@@ -429,7 +429,7 @@ sub whois {
             $xml .= qq{  <id>} . escapeHTML($row[0]) . qq{</id>\n};
             $xml .= qq{  <type>author</type>\n};
             $xml .= qq{  <fullname>} . escapeHTML($row[1]) . qq{</fullname>\n};
-            $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>\n}
+            $xml .= qq{  <asciiname>} . escapeHTML($row[5]) . qq{</asciiname>\n}
                 if $row[5];
             $xml .= qq{  <email>} . escapeHTML($row[2]) . qq{</email>\n}
                 if $row[2];
