@@ -1,6 +1,6 @@
 #!/usr/bin/perl -- -*- mode: cperl -*-
 
-my $VERSION = substr q$Rev: 85$, 5; # $Date$
+my $VERSION = substr q$Rev$, 5; # $Date$
 my $Id = qq!paused, v$VERSION!;
 
 use lib "/home/k/PAUSE/lib";
