@@ -1430,8 +1430,10 @@ Please contact modules\@perl.org if there are any open questions.
          OK() => "Successfully indexed",
         };
 
-    sub heading {
-        $heading->{shift};
+    sub heading ($) {
+        my($status) = shift;
+        # warn "status[$status]";
+        $heading->{$status};
     }
 }
 
