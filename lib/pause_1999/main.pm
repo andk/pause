@@ -488,10 +488,12 @@ sub checkbox {
   } else {
     $checked = $arg{checked};
   }
-  sprintf(qq{<input type="checkbox" name="%s" value="%s"%s />},
+  $arg{label} = "" unless defined $arg{"label"};
+  sprintf(qq{<input type="checkbox" name="%s" value="%s"%s />%s},
 	  $self->escapeHTML($name),
 	  $self->escapeHTML($value),
-	  $checked ? qq{ checked="checked"} : ""
+	  $checked ? qq{ checked="checked"} : "",
+          $arg{label},
 	 );
 }
 

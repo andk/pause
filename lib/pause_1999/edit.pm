@@ -441,9 +441,9 @@ sub edit_cred {
   push @m, qq{<h3>Editing $u->{userid}</h3>};
 
   # @allmeta *must* be the union of meta and secmeta
-  my @meta = qw( fullname asciiname email homepage cpan_mail_alias );
+  my @meta = qw( fullname asciiname email homepage cpan_mail_alias ustatus);
   my @secmeta = qw(secretemail);
-  my @allmeta = qw( fullname asciiname email secretemail homepage cpan_mail_alias );
+  my @allmeta = qw( fullname asciiname email secretemail homepage cpan_mail_alias ustatus);
 
   my $cpan_alias = lc($u->{userid}) . '@cpan.org';
   my $fullnamecomment = "PAUSE supports names containing UTF-8 characters. ";
@@ -463,6 +463,25 @@ sub edit_cred {
   below.";
 
   my %meta = (
+              ustatus => {
+                          type => "checkbox",
+                          args => {
+                                   name => "pause99_edit_cred_ustatus",
+                                   value => "delete",
+                                   label => "Account can be removed",
+                                  },
+                          short => "Remove account?",
+
+                          long => "You have not yet uploaded any files
+                            to the CPAN, so your account can still be
+                            cancelled. If you want to retire your
+                            account, please click here. If you click
+                            this field, your account will not be
+                            removed immediately but instead be removed
+                            manually by the database maintainer at a
+                            later date.",
+
+                         },
 	      email => {
 			type => "textfield",
 			args => {
@@ -633,6 +652,13 @@ sub edit_cred {
 	}
 	# find out the form field name
 	my $form_field = "pause99_edit_cred_$field";
+        if ( $field eq "ustatus" ) {
+          if ( $u->{"ustatus"} eq "active" ) {
+            next;
+          } elsif (!$req->param($form_field)) {
+            $req->param($form_field,"unused");
+          }
+        }
 	# $s is the value they entered
         my $s_raw = $req->param($form_field) || "";
         # we're in edit_cred
@@ -663,6 +689,9 @@ sub edit_cred {
                         $s,
                         sprintf($mailsprintf2,$u->{$field})
                        );
+          if ($field eq "ustatus") {
+            push @set, "ustatus_ch = NOW()";
+          }
 	} else {
 	  $mb = sprintf(
                         $mailsprintf1,
@@ -740,6 +769,11 @@ The Pause
     unless ($meta{$field}){
       warn "Someone tried strange field[$field], ignored";
       next;
+    }
+    if ( $field eq "ustatus" ) {
+      if ( $u->{"ustatus"} eq "active" ) {
+        next;
+      }
     }
     $alter ^= 1;
     my $alterclass = $alter ? "alternate1" : "alternate2";
