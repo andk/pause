@@ -72,7 +72,7 @@ $PAUSE::Config ||=
                     # path to repository without "/trunk"
                     SVNPATH => "/home/SVN/repos/pause",
                     # path to where we find the svn binaries
-                    SVNBIN => "/home/SVN/local/subversion/bin",
+                    SVNBIN => "/usr/bin",
                     TIMEOUT => 60*60,
                     TMP => '/home/ftp/tmp/',
                     UPLOAD => 'upload@pause.perl.org',
