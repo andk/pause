@@ -30,7 +30,13 @@ sub as_string {
                      qq{<tr><td class="%s" nowrap="nowrap">%s &lt;%s&gt;<br />%s</td></tr>},
                      $class,
                      $user,
-                     $mgr->escapeHTML($mgr->{User}{secretemail}),
+                     $mgr->escapeHTML(
+                                      $mgr->{User}{secretemail}
+                                      ||
+                                      $mgr->{User}{email}
+                                      ||
+                                      "No email???"
+                                     )
                      $encr ? "encrypted session" : "<b>unencrypted session</b>",
                      );
 
