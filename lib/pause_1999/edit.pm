@@ -1979,10 +1979,10 @@ glory is collected on http://history.perl.org/backpan/});
     $mgr->send_mail($header,$blurb);
   }
 
-  push @m, qq{<input type="submit"
- name="SUBMIT_pause99_delete_files_delete" value="Delete" />};
-  push @m, qq{<input type="submit"
+  my $submit_butts = qq{<input type="submit"
+ name="SUBMIT_pause99_delete_files_delete" value="Delete" /><input type="submit"
  name="SUBMIT_pause99_delete_files_undelete" value="Undelete" />};
+  push @m, $submit_butts;
   push @m, "<pre>";
 
   my %files = $self->manifind;
@@ -2030,6 +2030,7 @@ glory is collected on http://history.perl.org/backpan/});
 
   push @m, $field;
   push @m, "</pre>";
+  push @m, $submit_butts;
 
   @m;
 }
