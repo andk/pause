@@ -442,7 +442,7 @@ sub text_pw_field {
     }
   } else {
     $val = $req->param($name);
-    warn "name[$name]val[$val]";
+    warn sprintf "name[%s]val[%s]", $name, $val||"UNDEF";
     if ($] > 5.007) {
       require Encode;
       # Warning: adding second parameter changes behavior (eats characters or so?)
@@ -450,7 +450,7 @@ sub text_pw_field {
                                  # , Encode::FB_WARN()
                                 );
     }
-    warn "name[$name]val[$val]";
+    warn sprintf "name[%s]val[%s]", $name, $val||"UNDEF";
   }
   defined $val or
       defined($val = $arg{value}) or
