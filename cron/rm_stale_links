@@ -4,19 +4,27 @@ use lib "/home/k/PAUSE/lib";
 use PAUSE ();
 
 use strict;
-use vars qw($Id $Have_warned);
+use vars qw($Id);
 
-$Id = q$Id$;
+$Id = q$Id: rm_stale_links 385 2003-07-25 19:50:38Z k $;
 
 use File::Find;
 chdir "$PAUSE::Config->{MLROOT}../..";
+
+$SIG{__WARN__} = sub {
+  my $err = shift;
+  require Cwd;
+  my $cwd = Cwd::cwd();
+  require Carp;
+  Carp::cluck(sprintf "%s (cwd[%s])", $err, $cwd);
+};
+
 find(
      sub {
        return if /^\.\.?$/;
        my($dev,$ino,$mode,$nlink,$uid,$gid) = lstat($_);
        if (-l $_ && ! -e $_){
 	 warn "unlinking stale $File::Find::name\n";
-	 $Have_warned=1;
 	 unlink $_;
        }
        if ($_ eq "CHECKSUMS") {
@@ -25,7 +33,6 @@ find(
 	 closedir DIR;
 	 if (@readdir == 3) {
 	   warn "unlinking orphaned $File::Find::name\n";
-	   $Have_warned=1;
 	   unlink $_ or die "Could not unlink $_: $!";
 	 }
        }
@@ -36,9 +43,7 @@ find(
 	 my @readdir = readdir DIR;
 	 closedir DIR;
 	 if (@readdir == 2) {
-	   # Don't warn if we have nothing else to report. Rmdirring
-	   # occurs too often because we mirror empty dirs
-	   warn "rmdirring empty $File::Find::name\n" if $Have_warned;
+	   warn "rmdirring empty $File::Find::name\n";
 	   rmdir $_ or die "Could not rmdir $_: $!";
 	 }
        }
