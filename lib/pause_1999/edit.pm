@@ -2346,6 +2346,11 @@ sub request_id {
   my $regOK = 0;
 
   my $fullname  = $req->param( 'pause99_request_id_fullname'   );
+  my $ufullname = $mgr->any2utf8($fullname);
+  if ($ufullname ne $fullname) {
+    $req->param("pause99_request_id_fullname", $ufullname);
+    $fullname = $ufullname;
+  }
   my $email     = $req->param( 'pause99_request_id_email'  );
   my $homepage   = $req->param( 'pause99_request_id_homepage'    );
   my $userid    = $req->param( 'pause99_request_id_userid' );

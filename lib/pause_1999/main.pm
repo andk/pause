@@ -330,6 +330,15 @@ sub send_mail {
   $header->{From}                        ||= $self->{OurEmailFrom};
   $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
 
+  if ($] > 5.007) {
+    require Encode;
+    for my $k (keys %$header) {
+      if ( grep { ord($_)>127 } $header->{$k} =~ /(.)/g ) {
+        $header->{$k} = Encode::encode("MIME-Q",$header->{$k});
+      }
+    }
+  }
+
   my $u = Unicode::String::utf8($blurb);
   my $binmode;
   if (grep { $_>255 } $u->unpack) {
