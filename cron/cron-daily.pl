@@ -81,9 +81,6 @@ sub for_authors {
   use File::Copy qw(copy);
   if ($error = whois()){
     report $error;
-  } elsif (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
-    report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
-    copy '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html";
   }
   if ($error = mailrc()) {
     report $error;
@@ -350,6 +347,17 @@ sub whois {
     my $stu = $Dbh->prepare("SELECT userid, fullname, email,
 	isa_list, homepage, asciiname FROM users ORDER BY fullname");
     $stu->execute;
+    # Thanks to Robin Berjon for the namespace:
+    my $xml = sprintf(
+                      qq{
+<cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
+            last-generated='%s GMT'
+            generated-by='%s'>
+   <!-- experimental version, do not use fur further processing yet -->
+},
+                      scalar(gmtime),
+                      $PAUSE::Config->{ADMIN},
+                      );
     open FH, ">00whois.new" or return "Error: Can't open 00whois.new: $!";
     if ($] > 5.007) {
       require Encode;
@@ -386,8 +394,13 @@ sub whois {
 	    my $userhome = PAUSE::user2dir($row[0]);
 
 	    my $fill = " " x (9 - length($row[0]));
-	    $address[0] = -d "$PAUSE::Config->{MLROOT}/$userhome" ?
-		qq{<a href="id/$userhome/">$row[0]</a>$fill} : "$row[0]$fill";
+            my $xml_has_cpandir = "";
+            if (-d "$PAUSE::Config->{MLROOT}/$userhome") {
+              $address[0] = qq{<a href="id/$userhome/">$row[0]</a>$fill};
+              $xml_has_cpandir = "  <has_cpandir>1</has_cpandir>\n";
+            } else {
+              $address[0] = "$row[0]$fill";
+            }
 
 	    # address[1]: fullname link to homepage
 
@@ -407,8 +420,21 @@ sub whois {
 	    # address[2]: mailto
 	    # $address[2] = qq{<a href="mailto:$row[2]">&lt;$row[2]&gt;</a>};
 	    # now without mailto
-	    $address[2] = qq{&lt;$row[2]&gt;};
+	    $address[2] = qq{&lt;} . escapeHTML($row[2]) . qq{&gt;};
 	    print FH qq{<a id="$name" name="$name"></a>}, join(" ", @address), "\n";
+
+            # and now for XML
+
+            $xml .= qq{ <cpan-id>\n};
+            $xml .= qq{  <id>$row[2]</id>\n};
+            $xml .= qq{  <fullname>} . escapeHTML($row[1]) . qq{</fullname>};
+            $xml .= qq{  <asciiname>} . escapeHTML($row[1]) . qq{</asciiname>}
+                if $row[5];
+            $xml .= qq{  <url>} . escapeHTML($row[4]) . qq{</url>}
+                if $row[4];
+            
+            $xml .= $xml_has_cpandir;
+            $xml .= qq{ </cpan-id>\n};
 	}
     }
 
@@ -435,7 +461,16 @@ sub whois {
 	$subscribe =~ s/\s+/ /gs;
 	HTML::Entities::encode($subscribe);
 	print FH $subscribe, "<p> </p></dd>\n";
+
+        $xml .= " <cpan-id>\n";
+        $xml .= qq{  <id>$row[0]</id>\n};
+        $xml .= qq{  <mlname>} . escapeHTML($row[1]) . qq{</mlname>\n};
+        $xml .= qq{  <info>} . escapeHTML($row[2]) . qq{</info>\n} if $row[2];
+        $xml .= " </cpan-id>\n";
+
     }
+
+    $xml .= "</cpan-whois>\n";
 
     print FH q{
 	</dl>
@@ -468,6 +503,13 @@ sub whois {
         </dl></body></html>
     };
     close FH;
+    if (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
+      report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
+      copy '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html";
+      open my $xmlfh, ">", "$PAUSE::Config->{MLROOT}/../00whois.xml";
+      print $xmlfh $xml;
+      close $xmlfh;
+    }
     return;
 }
 
