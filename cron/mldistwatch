@@ -1179,24 +1179,36 @@ Please contact modules\@perl.org if there are any open questions.
             next unless $mf =~ /\.pm$/i;
             my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
             next if $inmf =~ m!^(?:t|inc)/!;
-            if ($self->{YAML_CONTENT} && $self->{YAML_CONTENT}{private}) {
-                my %map = (
-                           file => qr{\z},
-                           directory => qr{/},
-                          );
-                for my $k (qw(file directory)) {
-                    next unless my $v = $self->{YAML_CONTENT}{private}{$k};
-                    my $rest = $map{$k};
-                    if (ref $v eq "ARRAY") {
-                        for my $ve (@$v) {
-                            $ve =~ s|/+$||;
-                            next MANI if $inmf =~ /^$ve$rest/;
+            if ($self->{YAML_CONTENT}){
+                if ($self->{YAML_CONTENT}{private}) {
+                    my %map = (
+                               file => qr{\z},
+                               directory => qr{/},
+                              );
+                    for my $k (qw(file directory)) {
+                        next unless my $v = $self->{YAML_CONTENT}{private}{$k};
+                        my $rest = $map{$k};
+                        if (ref $v eq "ARRAY") {
+                            for my $ve (@$v) {
+                                $ve =~ s|/+$||;
+                                if ($inmf =~ /^$ve$rest/){
+                                    $self->verbose(1,"skipping inmf[$inmf] due to ve[$ve]");
+                                    next MANI;
+                                }
+                            }
+                        } else {
+                            $v =~ s|/+$||;
+                            if ($inmf =~ /^$v$rest/){
+                                $self->verbose(1,"skipping inmf[$inmf] due to v[$v]");
+                                next MANI;
+                            }
                         }
-                    } else {
-                        $v =~ s|/+$||;
-                        next MANI if $inmf =~ /^$v$rest/;
                     }
+                } else {
+                    $self->verbose(1,"no keyword 'private' in YAML_CONTENT");
                 }
+            } else {
+                $self->verbose(1,"no YAML_CONTENT");
             }
             push @pmfile, $mf;
         }
