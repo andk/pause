@@ -31,8 +31,7 @@ reasons:
     privatelib/PrivatePAUSE.pm
 
 PrivatePAUSE.pm contains only the usernames and passwords of the mysql
-users that own the two databases. See the files doc/*.schema.txt for
-the structure of the data.
+users that own the two databases. See below for "Database schema".
 
 Other sensitive files, like the SSL key of the server, password files
 and the mon.cf file need to be maintained separately from the
@@ -49,22 +48,15 @@ make sure that installed programs find their configuration:
   /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
   /usr/local/apache/perl   -> ../../../home/k/PAUSE/apache-perl
   /etc/rsyncd.conf         -> /home/k/PAUSE/etc/rsyncd.conf
-
+  /etc/proftpd.conf        -> /home/k/PAUSE/etc/proftpd.conf
 
 [ (last time updated: 2002-12-25)
 
-  /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
   /etc/mon/mon.cf -> ../../home/k/PAUSE/111_sensitive/etc/mon/mon.cf
+  /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
   /etc/rc.d/init.d/httpd -> /home/k/PAUSE/etc/rc.d/init.d/httpd
   /etc/rc.d/init.d/httpd-svn -> /home/k/PAUSE/etc/rc.d/init.d/httpd-svn
-  /etc/rsyncd.conf -> /home/k/PAUSE/etc/rsyncd.conf
   /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
-  /home/SVN/local/subversion -> subversion-2002-12-24
-  /home/SVN/local/subversion-2002-12-24/conf -> /home/k/PAUSE/apache-svn-conf
-  /usr/local/apache/conf -> ../../../home/k/PAUSE/apache-conf
-  /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
-  /usr/local/apache/perl -> ../../../home/k/PAUSE/apache-perl
-  /usr/local/etc/proftpd.conf -> /home/k/PAUSE/ftpd/conf/proftpd.conf
   /usr/local/mirror/mirror.defaults -> ../../../home/k/PAUSE/mirror/mirror.defaults
   /usr/local/mirror/mymirror.config -> ../../../home/k/PAUSE/mirror/mymirror.config
 ]
@@ -77,15 +69,17 @@ make sure that installed programs find their configuration:
 
   apache with mod_perl and Apache-SSL
   perl
-  mirror (the good old)
+  mirror (the good old one)
   mon
   proftpd
-  mysql
+  mysqld
   rsync (runs as daemon)
   subversion (optional)
+  gpg
+  unzip
 
-At the time of this writing (2002-12-27), all perl scripts were
-running under 5.6.1, but mod_perl is built with 5.8.0.
+At the time of this writing (2003-07-25), all perl scripts were
+running under 5.8.0.
 
 =head2 Database schema
 
@@ -99,8 +93,8 @@ course -- not available.
 This section is about the fun of makeing mysql safe based on UNIX user
 and group permissions. This is dangerous stuff. Be careful here and
 follow the advice in the mysql manual about how to secure mysql in
-general. E.g. --skip-networking is highly recommended, root user
-password is a must, etc.
+general. E.g. --skip-networking and root user password are a must,
+etc.
 
 PAUSE is running processes as user root, nobody, SVN, ftp, and UNSAFE.
 The user "k" in the group "k" owns the working copy of the repository
@@ -140,6 +134,7 @@ repository because they are so basic stuff for any UNIX machine:
   xntpd
   sendmail
 
-and probably more...
+and probably more. If you discover pieces that are important but
+missing in the repository, please let us know.
 
 =cut
