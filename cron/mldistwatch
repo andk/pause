@@ -230,7 +230,7 @@ sub checkfornew {
             push @goners, $dist;
             next BIGLOOP;
         }
-        $self->verbose(1,"\n    Examining $dist ...");
+        $self->verbose(1,"\n    Examining $dist ...\n");
         sleep 1;   # I think this might help us against wild processes
 
         my $userid = PAUSE::dir2user($dist);
@@ -305,7 +305,7 @@ sub do_rewrite02 {
     $sth->execute;
     my(@row,@listing02);
     my $numrows = $sth->rows;
-    $self->verbose(2,"numrows[$numrows]");
+    $self->verbose(2,"numrows[$numrows]\n");
     while (@row = $sth->fetchrow_array) {
 	my($one,$two);
 	my $infile = $row[0];
@@ -340,7 +340,7 @@ Last-Updated: $date\n\n};
 	    print F $header;
 	    print F $list;
 	} else {
-	    $self->verbose(1,"Couldn't open 02packages...gz");
+	    $self->verbose(1,"Couldn't open 02packages...gz\n");
 	    $self->alert("Couldn't open 02packages...gz");
 	}
 	close F or die "Couldn't close: $!";
@@ -366,7 +366,7 @@ sub do_rewrite01 {
 	}
 	close F;
     } else {
-	$self->verbose(1,"Couldn't open $repfile $!");
+	$self->verbose(1,"Couldn't open $repfile $!\n");
 	$self->alert("Couldn't open $repfile $!");
     }
     my(%firstlevel,%achapter);
@@ -506,11 +506,11 @@ sub do_rewrite01 {
                 $pkg{chapter} = $chaptitle[$pkg{chapterid}]
             } else {
                 $pkg{chapter} = "99_Not_In_Modulelist";
-                $self->verbose(1,"\nfound no chapterid for $pkg{rootpack}");
+                $self->verbose(1,"\nfound no chapterid for $pkg{rootpack}\n");
             }
         } else {
             $pkg{chapter} = "99_Not_In_Modulelist";
-            $self->verbose(1,"found no chapter for $pkg{rootpack}");
+            $self->verbose(1,"found no chapter for $pkg{rootpack}\n");
         }
 
 
@@ -620,7 +620,7 @@ category    maintainer
 	    close F;
 	    $self->write_01sorted(\@listing01);
 	} else {
-	    $self->verbose(1,"Couldn't open 01modules...");
+	    $self->verbose(1,"Couldn't open 01modules...\n");
 	    $self->alert("Couldn't open 01modules...");
 	}
     }
@@ -686,7 +686,7 @@ sub do_rewrite03 {
         }
         close F;
     } else {
-        $self->verbose(1,"Couldn't open $repfile $!");
+        $self->verbose(1,"Couldn't open $repfile $!\n");
         $self->alert("Couldn't open $repfile $!");
     }
     my $date = HTTP::Date::time2str();
@@ -773,10 +773,10 @@ sub chdir_ln_chdir {
 	$self->verbose(1, qq{unlinking symlink $to in $dir\n});
 	unlink $to or die qq{Couldn\'t unlink $to $!};
     } elsif (-f $to) {
-	$self->verbose(1, "unlinking file $to in dir $dir");
+	$self->verbose(1, "unlinking file $to in dir $dir\n");
 	unlink $to or die qq{Couldn\'t unlink $to $!};
     } elsif (-d $to) {
-	$self->verbose(1,"ALERT: Have to rmtree $to in dir $dir");
+	$self->verbose(1,"ALERT: Have to rmtree $to in dir $dir\n");
 	rmtree $to;
     }
     symlink $from, $to or die "Couldn't symlink $from, $to $!";
@@ -941,7 +941,7 @@ sub as_ds {
             my $sth = $adbh->prepare($query);
             $sth->execute;
             $skip = 1 unless $sth->rows > 0;
-            $self->verbose(1,"Skip set to [$skip]");
+            $self->verbose(1,"Skip set to [$skip]\n");
             $sth->finish;
             $adbh->disconnect;
             unless ($skip) {
@@ -966,7 +966,7 @@ sub as_ds {
                 my $willunzip = $file;
                 $willunzip =~ s/\.(Z|gz)$//;
                 unless (PAUSE::gunzip($file,$willunzip)) {
-                    $self->verbose(1,"    no gunzip on $file");
+                    $self->verbose(1,"    no gunzip on $file\n");
                 }
             } elsif ($dist =~ /\.zip$/) {
                 $suffix = "zip";
@@ -1022,7 +1022,7 @@ Please contact modules\@perl.org if there are any open questions.
                 push @m, qq{The following packages have been found in the distro:\n\n};
 
                 for my $p (sort {
-                    $st->{$a}{status} <=> $st->{$b}{status}
+                    $st->{$b}{status} <=> $st->{$a}{status}
                         or
                             $a cmp $b
                         } keys %$st) {
@@ -1240,7 +1240,7 @@ Please contact modules\@perl.org if there are any open questions.
         $file =~ s|\.pm||;
         my $ret = $package =~ m/\b\Q$file\E$/;
         $ret ||= 0;
-        $self->verbose(1,"simile: file[$file] package[$package] ret[$ret]");
+        $self->verbose(1,"simile: file[$file] package[$package] ret[$ret]\n");
         $ret;
     }
 
@@ -1273,7 +1273,7 @@ Please contact modules\@perl.org if there are any open questions.
 
         my($ppp) = $self->ppp;  # packages-per-pmfile
         my @keys_ppp = keys %$ppp;
-        $self->verbose(1,"will check keys_ppp[@keys_ppp]");
+        $self->verbose(1,"will check keys_ppp[@keys_ppp]\n");
 
         #
         # Immediately after each package (pmfile) examined contact
@@ -1470,7 +1470,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
         $v = "undef" unless defined $v;
 
-        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$v]");
+        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$v]\n");
         $v =~ s/^\s+//;
         $v =~ s/\s+$//;
 
@@ -1603,7 +1603,7 @@ package in packages  package in primeur
             $err = $dbh->errstr unless defined $ret;
             $ret ||= "";
             $self->verbose(1,"into perms package[$package]mods_userid".
-                           "[$mods_userid]ret[$ret]err[$err]");
+                           "[$mods_userid]ret[$ret]err[$err]\n");
         }
     }
 
@@ -1697,7 +1697,7 @@ package in packages  package in primeur
                 $self->index_status($package,
                                     $pp->{version},
                                     $pp->{infile},
-                                    1,
+                                    20,
                                     qq{Not indexed because permissions missing.
 Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                                    );
@@ -1784,7 +1784,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 
         my($opack,$oldversion,$odist,$ofilemtime,$ofile) = $sth_pack->fetchrow_array;
         $self->verbose(1,"opack[$opack]oldversion[$oldversion]".
-                       "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]");
+                       "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]\n");
         my $odistmtime = (stat "$PAUSE::Config->{MLROOT}/$odist")[9];
         my $tdistmtime = (stat "$PAUSE::Config->{MLROOT}/$dist")[9] ;
         # decrementing Version numbers are quite common :-(
@@ -1810,7 +1810,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 
         $self->verbose(1, "package[$package]infile[$pp->{infile}]".
                        "distorperlok[$distorperlok]oldversion[$oldversion]".
-                       "odist[$odist]");
+                       "odist[$odist]\n");
 
         # Until 2002-08-01 we always had
         # if >ver                                                 OK
@@ -1846,7 +1846,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
             # higher VERSION here
             $self->verbose(1, "$package version better ".
-                           "[$pp->{version} > $oldversion] $dist wins");
+                           "[$pp->{version} > $oldversion] $dist wins\n");
             $ok++;
         } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
             # lower VERSION number here
@@ -1875,13 +1875,13 @@ has a higher version number ($oldversion)},
                 if (            # but younger or same-age file
                     $pp->{filemtime} >= $ofilemtime
                    ) {
-                    $self->verbose(1, "$package noversion comp $dist vs $odist: >=");
+                    $self->verbose(1, "$package noversion comp $dist vs $odist: >=\n");
                     $ok++;
                 } else {
 
                     $self->verbose(1, "ALERT: Not updating! $package noversion ".
                                    "falling mtime
-filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]");
+filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]\n");
 
                     # no version and strange timestamps.
 
@@ -1890,13 +1890,22 @@ filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]");
             } elsif (
                      # equal version here
                      CPAN::Version->vcmp($pp->{version},$oldversion)==0
-                     &&
-                     $tdistmtime >= $odistmtime
                     ) {
-                $self->verbose(1, "$package version eq comp $dist vs $odist");
-                $ok++;
+                $self->verbose(1, "$package version eq comp $dist vs $odist\n");
+                if ($tdistmtime >= $odistmtime) {
+                    $ok++;
+                } else {
+                    $self->index_status(
+                                        $package,
+                                        $pp->{version},
+                                        $pp->{infile},
+                                        4,
+                                        qq{Not indexed because $ofile in $odist
+has the same version number and the distro has a more recent modification time.}
+                                       );
+                }
             } else {
-                $self->verbose(1, "Nothing interesting in dist[$dist]package[$package]");
+                $self->verbose(1, "Nothing interesting in dist[$dist]package[$package]\n");
             }
         }
 
@@ -1911,7 +1920,7 @@ filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]");
                                "Warning: we are not simile AND we have been ".
                                "simile some time earlier:\n");
                 require Data::Dumper;
-                $self->verbose(1,Data::Dumper::Dumper($pp));
+                $self->verbose(1,Data::Dumper::Dumper($pp), "\n");
                 $ok = 0;
             }
         }
@@ -1931,7 +1940,7 @@ WHERE package = '$package'
             $self->index_status($package,
                                 $pp->{version},
                                 $pp->{infile},
-                                3,
+                                1,
                                 "indexed",
                                );
 
@@ -1970,7 +1979,7 @@ VALUES (
         $self->index_status($package,
                             $pp->{version},
                             $pp->{infile},
-                            3,
+                            1,
                             "indexed",
                            );
     }
