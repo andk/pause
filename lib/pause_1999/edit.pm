@@ -5942,7 +5942,7 @@ sub share_perms_movepr {
         }
       } else {
         push @m, qq{<p>You need to select one or more packages and enter a userid.
- Nothing done.<p>};
+ Nothing done.</p>};
       }
     };
     if ($@) {
