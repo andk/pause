@@ -3030,18 +3030,38 @@ Excerpt from a mail:<pre>
     my $update_sel = $req->param('pause99_edit_ml_4');
     my %meta = (
 		maillistname => {
+                                 headline => "The name of the mailing list",
+                                 note => "The name appears in the CPAN authors list, so it is good if the name contains the term <i>mailing list</i> or something equivalent",
 				 type => "textfield",
 				 args => {
 					  size => 50,
+                                          maxsize => 64,
 					 }
 				},
 		address      => {
+
+                                 headline => "The address of the
+                                     mailing list",
+
+                                 note => "This is the address where
+                                     people post to (where all members
+                                     of the group can be contacted)",
+
 				 type => "textfield",
 				 args => {
 					  size => 50,
 					 }
 				},
 		subscribe    => {
+                                 headline => "How to subscribe",
+
+                                 note => "This is a text that
+                                     describes how to join the group
+                                     as a member. E.g. about the
+                                     mailing list <i>subscribe</i>
+                                     address or about a webpage
+                                     where they find more info.",
+
 				 type => "textarea",
 				 args => {
 					  rows => 5,
@@ -3060,7 +3080,10 @@ Excerpt from a mail:<pre>
     $mailblurb .= sprintf($mailsprintf1, "userid", $selectedrec->{maillistid}, "\n");
 
     for my $field (qw(maillistname address subscribe)) {
-      push @m_mlrec, qq{$field<br />};
+      my $headline = $meta{$field}{headline} || $field;
+      my $note     = $meta{$field}{note};
+      push @m_mlrec, sprintf qq{<p><b>%s</b></p>}, $headline;
+      push @m_mlrec, sprintf qq{<p><small>%s</small></p>}, $note if $note;
       my $fieldtype = $meta{$field}{type};
       my $fieldname = "pause99_edit_ml_$field";
       if ($force_sel){
