@@ -5203,9 +5203,17 @@ The Pause
 
   my %files = %{ExtUtils::Manifest::manifind()};
 
-  warn sprintf "Debug: manifind found %d Files in %s", scalar(keys %files), Cwd::cwd();
-  
+  warn sprintf "Debug: manifind found %d Files in %s",
+      scalar(keys %files), Cwd::cwd();
+
   require Data::Dumper; warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%files],["files"])->Indent(1)->Useqq(1)->Dump; # XXX
+
+  if (keys %files == 1 && exists $files{""} && $files{""} eq "") {
+    warn "ALERT: BUG !!!";
+    open my $ls, "zsh -c 'ls **/*(.)' |" or die;
+    %files = map { chomp; $_ => undef } <$ls>;
+    close $ls;
+  }
 
   foreach my $f (keys %files) {
     if (
