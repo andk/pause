@@ -84,8 +84,7 @@ alink="#FF0000" text="#000000"><table width="100%" border="0" cellpadding="0" ce
   # MOTD
   #
 
-  if (1) {
-    use Config;
+  if (0) {
     push @l, qq{<div align="center">};
 
     push @l, qq{<p class="motd">2002-12-25/26: I have been shuffling

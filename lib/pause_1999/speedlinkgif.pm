@@ -1,4 +1,16 @@
 #!/usr/bin/perl -- -*- Mode: cperl; coding: unicode-utf8; VAR: VALUE; ... -*-
+
+
+
+=pod
+
+From 1997 or 1998 till 2002-12-31, Speed-Link was our sponsor, hence
+the filename.
+
+From 2003-01-01, Loomes is taking over.
+
+=cut
+
 package pause_1999::speedlinkgif;
 use base 'Class::Singleton';
 use pause_1999::main;
@@ -20,9 +32,9 @@ sub as_string {
       <tr>
        <td rowspan="2">
         <div class="xexplain">The PAUSE is sponsored by</div><br />
-        <a href="http://www.speed-link.de">
-         <img src="/pause/logo9a-sm.$pngjpg" border="0" alt="SPEEDLINK Logo"
-              width="121" height="47" align="left" />
+        <a href="http://www.loomes.de">
+         <img src="/pause/logol1.$pngjpg" border="0" alt="Loomes Logo"
+              width="273" height="78" align="left" />
         </a>
        </td>
        <td width="100%"></td>
