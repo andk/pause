@@ -123,6 +123,26 @@ CREATE TABLE maillists (
 
 
 --
+-- Table structure for table 'messages'
+--
+
+CREATE TABLE messages (
+  c int(10) unsigned NOT NULL auto_increment,
+  mfrom varchar(10) default NULL,
+  mto varchar(10) default NULL,
+  created datetime default NULL,
+  message text,
+  PRIMARY KEY  (c)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'messages'
+--
+-- WHERE:  1=0
+
+
+
+--
 -- Table structure for table 'mlas'
 --
 
