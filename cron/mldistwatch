@@ -116,7 +116,15 @@ sub set_active_status {
     my %seen;
     my @new_active_users = grep { !$active->{$_} && !$seen{$_}++ }
         map { m|./../([^/]+)/| } keys %{$self->{ALLfound}};
-    $self->verbose(2,"XXX new_active_users[@new_active_users]") if @new_active_users;
+    return unless @new_active_users;
+    $self->verbose(2,"Info: new_active_users[@new_active_users]");
+    my $sth = $db->prepare("UPDATE users
+                            SET ustatus='active', ustatus_ch=NOW()
+                             WHERE userid=?");
+    for my $user (@new_active_users) {
+        $sth->execute($user);
+    }
+    $sth->finish;
 }
 
 sub connect {
@@ -169,11 +177,11 @@ sub checkfornew {
                 keys %{$self->{ALLlasttime}};
     }
     my $all = @all;
-    $self->verbose(2, "Starting BIGLOOP over $all\n");
+    $self->verbose(2, "Starting BIGLOOP over $all files\n");
     my $i = 0;
   BIGLOOP: for my $dist (@all) {
         #
-        # Examine all distribution files
+        # Examine all files, even CHECKSUMS and READMEs
         #
 
         $i++;
