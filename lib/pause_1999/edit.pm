@@ -2774,10 +2774,14 @@ sub mailpw {
   $param = $req->param("pause99_mailpw_1");
   if ( $param ) {
     $param = uc($param);
-    unless ($param =~ /^[A-Z\-]+/) {
+    unless ($param =~ /^[A-Z\-]+$/) {
+      if ($param =~ /@/) {
+        die Apache::HeavyCGI::Exception->new(ERROR =>
+                                             qq{Please supply a userid, not an email address. You can find valid userids in <a href="/pause/query?ACTION=who_is">/pause/query?ACTION=who_is</a>});
+      }
       die Apache::HeavyCGI::Exception->new(ERROR =>
-                                         qq{A userid of <i>$param</i>
- is not allowed, please retry with a valid userid. Nothing done.});
+                                           sprintf qq{A userid of <i>%s</i>
+ is not allowed, please retry with a valid userid. Nothing done.}, $mgr->escapeHTML($param));
     }
 
     # TUT: The object $mgr is our knows/is/can-everything object. Here
@@ -2792,8 +2796,16 @@ sub mailpw {
     if ($sth->rows == 1) {
       $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
     } else {
-      my $u = $self->active_user_record($mgr,$param);
-      if ($u->{userid} && $u->{email}) {
+      my $u;
+      eval { $u = $self->active_user_record($mgr,$param); };
+      if ($@) {
+        die Apache::HeavyCGI::Exception->new(ERROR =>
+                                             qq{Cannot find a userid
+                                             of <i>$param</i>, please
+                                             retry with a valid
+                                             userid.});
+
+      } elsif ($u->{userid} && $u->{email}) {
         # this is one of the 94 users (counted on 2005-01-05) that has
         # a users record but no usertable record
         $sql = qq{INSERT INTO usertable (user,secretemail,forcechange,changed)
@@ -3512,7 +3524,7 @@ $Yours};
 		      To => "$to",
 		      Subject => "Module update for $selectedrec->{modid}"
 		     };
-	$mgr->send_mail($header,$mailblurb) unless $PAUSE::Config->{TESTHOST};
+	$mgr->send_mail($header,$mailblurb);
       }
     } elsif ($update_sel) {	# it should have been updated but wasn't?
 

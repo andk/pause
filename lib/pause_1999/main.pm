@@ -146,6 +146,38 @@ WillLast
 
 );
 
+sub dispatch {
+  my $self = shift;
+  $self->init;
+  eval { $self->prepare; };
+  if ($@) {
+    if (UNIVERSAL::isa($@,"Apache::HeavyCGI::Exception")) {
+      if ($@->{ERROR}) {
+        require Carp;
+	Carp::cluck("\$\@ ERROR[$@->{ERROR}]");
+	$@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR};
+	warn "\$\@ ERROR[$@->{ERROR}]";
+	push @{$self->{ERROR}}, @{$@->{ERROR}};
+	warn "self ERROR[$self->{ERROR}]";
+      } elsif ($@->{HTTP_STATUS}) {
+	return $@->{HTTP_STATUS};
+      }
+    } else {
+      # this is NOT a known error type, we need to handle it anon
+      if ($self->{ERRORS_TO_BROWSER}) {
+	push @{$self->{ERROR}}, " ", $@;
+      } else {
+	$self->{R}->log_error($@);
+	return Apache::Constants::SERVER_ERROR;
+      }
+    }
+  }
+  return $self->{DONE} if $self->{DONE}; # backwards comp now, will go away
+  $self->{CONTENT} = $self->layout->as_string($self);
+  $self->finish;
+  $self->deliver;
+}
+
 sub layout {
   my pause_1999::main $self = shift;
   $self->instance_of("pause_1999::layout")->layout($self);
@@ -369,17 +401,25 @@ sub send_mail {
     $blurb = $u->latin1;
   }
 
-  warn "opening mailer";
-  $mailer->open($header);
-  warn "opened mailer";
-  if ($binmode && $] > 5.007) {
-    my $ret = binmode $mailer, ":$binmode";
-    warn "set binmode of mailer[$mailer] to :utf8? ret[$ret]";
+  if ($PAUSE::Config->{TESTHOST}){
+    warn "TESTHOST is NOT sending mail";
+    require Data::Dumper;
+    warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" .
+        Data::Dumper->new([$header,$blurb],[qw(header blurb)])
+              ->Indent(1)->Useqq(1)->Dump;
+  } else {
+    warn "opening mailer";
+    $mailer->open($header);
+    warn "opened mailer";
+    if ($binmode && $] > 5.007) {
+      my $ret = binmode $mailer, ":$binmode";
+      warn "set binmode of mailer[$mailer] to :utf8? ret[$ret]";
+    }
+    $mailer->print($blurb);
+    warn "printed blurb[$blurb]";
+    $mailer->close;
+    warn "closed mailer";
   }
-  $mailer->print($blurb);
-  warn "printed blurb[$blurb]";
-  $mailer->close;
-  warn "closed mailer";
   1;
 }
 
