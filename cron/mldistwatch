@@ -1296,6 +1296,24 @@ sub as_ds {
     my($v);
     {
 
+      package main;
+
+=pod
+
+Without the package main we get:
+
+reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_version called at (eval 206) line 2.
+ for eval[
+                  ExtUtils::MM_Unix::parse_version("","Mail-Graph-0.03/lib/Mail/Graph.pm");
+                 ] at /etc/cron.jobs/mldistwatch line 917.
+
+
+=cut
+
+      ExtUtils::MM_Unix::parse_version("","/dev/null"); #make sure
+                                                        #it's
+                                                        #selfloaded
+
       my($pid,$kid);
       die "Can't fork: $!" unless defined($pid = open($kid, "-|"));
       if ($pid) {           # parent
@@ -1311,29 +1329,11 @@ sub as_ds {
 
         # XXX Limit Resources too
 
-        package main;
-
-=pod
-
-Without the package main we get:
-
-reval failed: Undefined subroutine &PAUSE::pmfile::ExtUtils::MM_Unix::parse_version called at (eval 206) line 2.
- for eval[
-                  ExtUtils::MM_Unix::parse_version("","Mail-Graph-0.03/lib/Mail/Graph.pm");
-                 ] at /etc/cron.jobs/mldistwatch line 917.
-
-
-=cut
-
         my($comp) = Safe->new("_pause::mldistwatch");
         my $eval = qq{
                   local(\$^W) = 0;
                   ExtUtils::MM_Unix::parse_version("","$pmcp");
                  };
-        ExtUtils::MM_Unix::parse_version("","/dev/null"); #make sure
-                                                        #it's
-                                                        #selfloaded
-
         $comp->share("*ExtUtils::MM_Unix::parse_version", "*strict::unimport");
         $comp->permit("require"); # no strict!
         $v = $comp->reval($eval);
