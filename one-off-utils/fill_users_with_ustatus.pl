@@ -33,7 +33,7 @@ my $db = DBI->connect(
                       {RaiseError => 0}
                      );
 
-my $U = $db->selectall_hashref("SELECT userid FROM users WHERE ustatus='unused'","userid");
+my $U = $db->selectall_hashref("SELECT userid,ustatus FROM users","userid");
 my $sth = $db->prepare("UPDATE users SET ustatus='active', ustatus_ch=NOW() WHERE userid=?");
 
 my $backpan = "/home/ftp/pub/backpan/authors/id";
@@ -46,6 +46,10 @@ for my $de1 (readdir $dh) {
     opendir my $dh3, "$backpan/$de1/$de2" or die $!;
     for my $de3 (readdir $dh3) {
       next unless $de3=~/^[A-Z]\w$/;
+      die "Illegal userdirectory $de3" unless $U->{$de3};
+      die "Deleted userdirectory $de3" if $U->{$de3}{ustatus} eq 'delete';
+      next if $U->{$de3}{ustatus} eq 'active';
+      print "Setting $de3 to active\n";
       $sth->execute($de3);
     }
   }
