@@ -264,7 +264,7 @@ if (1) { # /pause/ directory
     $Location{$loc}{PerlFixupHandler} = "pause_1999::fixup";
   }
   if (-f "/etc/PAUSE.CLOSED") {
-    $Location{"/"}{PerlHandler} = "perl_pause::disabled2";
+    $LocationMatch{"."}{PerlHandler} = "perl_pause::disabled2";
   } else {
     $Location{"/"}{PerlFixupHandler} = "pause_1999::index";
     for my $loc ("$pause/query", "$pause/authenquery", "$pause/mimequery"){
