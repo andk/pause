@@ -121,7 +121,7 @@ $|=1;
     ###### data initialization ######
 
     use File::Path qw(rmtree mkpath);
-    use vars qw($Id $ISAPERL %ALLfound %ALLlasttime %ALL);
+    use vars qw($Id $ISAPERL);
     $Id = q$Id$;
     $ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
 }
@@ -205,16 +205,15 @@ sub DESTROY {
 
 sub init_all {
     my $self = shift;
-  %ALLfound = %{ExtUtils::Manifest::manifind()};
+    $self->{ALLfound} = ExtUtils::Manifest::manifind();
     my $dbh = $self->connect;
   my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
   $sth->execute;
   my($dist,$distmtime);
   while (($dist,$distmtime) = $sth->fetchrow_array) {
-    $ALLlasttime{$dist} = $distmtime;
+    $self->{ALLlasttime}{$dist} = $distmtime;
   }
   $sth->finish;
-  %ALL = (%ALLfound,%ALLlasttime);
 }
 
 sub checkfornew {
@@ -223,7 +222,14 @@ sub checkfornew {
   my(@goners);
   my $time = time;
   my $alert;
- BIGLOOP: for my $dist (sort keys %ALL) {
+    my @all;
+    {
+        my %seen;
+        @all = sort grep { !$seen{$_}++ }
+            keys %{$self->{ALLfound}},
+                keys %{$self->{ALLlasttime}};
+    }
+ BIGLOOP: for my $dist (@all) {
     #
     # Examine all distribution files
     #
@@ -239,8 +245,8 @@ sub checkfornew {
 
     next BIGLOOP if $dio->ignoredist;
 
-    if (exists $ALLfound{$dist}){
-      next BIGLOOP unless $dio->mtime_ok($ALLlasttime{$dist});
+    if (exists $self->{ALLfound}{$dist}){
+      next BIGLOOP unless $dio->mtime_ok($self->{ALLlasttime}{$dist});
     } else {
       $dio->delete_goner;
       push @goners, $dist;
@@ -385,7 +391,8 @@ sub do_rewrite01 {
     #
     # Rewriting 01modules.index.html
     #
-    print "\nEntering do_rewrite01\n" if -t STDOUT;
+    my $stdout_is_terminal =  -t STDOUT;
+    print "\nEntering do_rewrite01\n" if $stdout_is_terminal;
     my $dbh = $self->connect;
 
     my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/01modules.index.html";
@@ -421,27 +428,17 @@ sub do_rewrite01 {
     $sth = $dbh->prepare("SELECT package, dist FROM packages");
     $sth->execute;
     my(@listing01,%count,$count);
-    my(%seen,%listit);
 
     my(%usercache,%userdircache,$i);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
         my %pkg = (package => $pkg, dist => $pkgdist);
         $pkg{'package'} =~ s/:.*//;
         # We don't want to list perl distribution
-        next if $pkg{dist} =~ m,/perl5,;
-        if ($seen{$pkg{dist},$pkg{'package'}}++){
-            # write it in blockform for easier debugging
-            next;
-        }
+        next if $pkg{dist} =~ m|/perl-?5|;
         if ($firstlevel{$pkg{'package'}}){
             #print "01 will have: $pkg{'package'}/$pkg{dist}\n";
         } else {
-            if ($listit{$pkg{'package'}}){
-                $seen{$pkg{dist},$pkg{'package'}}++;
-                $pkg{'package'} = "$pkg{'package'}*";
-            } else {
-                next;
-            }
+            next;
         }
 
         $i++;
@@ -467,7 +464,7 @@ sub do_rewrite01 {
         $pkg{useridfiller} = " "x(10-length($user));
         $pkg{filenameonly} = $f;
         $pkg{filenamefiller} =
-            " "x(34-length($f)-length($pkg{size}));
+            " "x(38-length($f)-length($pkg{size}));
         $pkg{mtimestr} =
             substr(HTTP::Date::time2str($pkg{mtime}),5,11);
         $pkg{young} =
@@ -510,9 +507,7 @@ sub do_rewrite01 {
             $pkg{chapter} = "99_Not_In_Modulelist";
             warn "found no chapter for $pkg{'package'}";
         }
-        if (-t STDOUT) {
-            print "." unless $i % 16;
-        }
+        print "." if $stdout_is_terminal && !($i % 16);
         my $bymod = "$PAUSE::Config->{MLROOT}/../../modules/by-module/$pkg{'package'}/$pkg{filenameonly}";
         my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/by-category/$pkg{chapter}/$pkg{'package'}/$pkg{filenameonly}";
         next if -e $bymod and -e $bycat;
