@@ -18,9 +18,17 @@ sub parameter {
   my($param,@allow_submit,%allow_action);
 
   # What is allowed here is allowed to anybody
-  @allow_action{qw(who_is pause_04about pause_04imprint pause_06history pause_05news)} = ();
+  @allow_action{"who_is",
+                "pause_04about",
+                "pause_04imprint",
+                "pause_06history",
+#                "request_id",
+                "pause_05news",
+              } = ();
 
-  @allow_submit = qw();
+  @allow_submit = (
+#                   "request_id",
+                  );
 
   if ($mgr->{User} && $mgr->{User}{userid}) {
 
@@ -2278,13 +2286,97 @@ sub usertable {
   join "", @m;
 }
 
+sub request_id {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr  = shift;
+
+  my( @m, $param, $email );
+
+  my $req = $mgr->{CGI};
+
+  my $param_count = @{ [ $req->param ] };
+
+  # generate the form if no parameters (not counting ACTION)
+  unless( $param_count > 1 ) {
+
+    push @m, "<table>\n";
+    foreach my $pair (
+                      [ 'Full name',  'pause99_request_id_name'   ],
+                      [ 'Email',      'pause99_request_id_email'  ],
+                      [ 'Web site',   'pause99_request_id_web'    ],
+                      [ 'Desired ID', 'pause99_request_id_userid' ],
+                     ) {
+      push @m, "<tr>\n\t<td>$pair->[0]</td>\n<td>";
+      push @m, $mgr->textfield( name => $pair->[1], size => 32 );
+      push @m, "\t</td>\n</tr>\n\n";
+    }
+    push @m, "</table>\n";
+
+    push @m, qq{<input type="submit" name="pause99_request_id_sub"
+  	  value="Request Account" />};
+
+    return @m;
+  }
+
+  # check for errors
+  my $name  = $req->param( 'pause99_request_id_name'   );
+  my $email = $req->param( 'pause99_request_id_email'  );
+  my $web   = $req->param( 'pause99_request_id_web'    );
+  my $id    = $req->param( 'pause99_request_id_userid' );
+
+  my @errors = ();
+
+  unless( $name ) {
+    push @errors, "You must supply a name\n";
+  }
+
+  unless( $email ) {
+    push @errors, "You must supply an email address\n";
+  }
+
+  unless( $id ) {
+    push @errors, "You must supply a desired user name\n";
+  }
+
+  if( @errors ) {
+    die Apache::HeavyCGI::Exception->new(ERROR =>
+                                         join "\n", "<ul>",
+                                         map( { "\t<li>$_</li>" }
+                                              @errors ), "</ul>" );
+  }
+
+=comment
+
+  # send mail to modules@perl.org
+  my @to = $mgr->{MailtoAdmins};
+  push @to, $email;
+
+  my $mailblurb = <<"MAIL";
+
+MAIL
+
+  my $header = {
+  	To      => $email,
+  	Subject => 'PAUSE ID request',
+  	};
+
+  $mgr->send_mail( $header, $mailblurb );
+
+=cut
+
+  # generate page to show user
+  push @m, 'this is the success page';
+
+  return @m;
+}
+
 sub mailpw {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
   my(@m,$param,$email);
   my $req = $mgr->{CGI};
   #TUT: We reach this point in the code only if the Querystring
-  #specified ACTION=pailpw or something equivalent. The parameter ABRA
+  #specified ACTION=mailpw or something equivalent. The parameter ABRA
   #is used to denote the token that we might have sent them.
   my $abra = $req->param("ABRA") || "";
   push @m, qq{<input type="hidden" name="ABRA" value="$abra" />};

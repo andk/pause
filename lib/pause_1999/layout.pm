@@ -30,7 +30,7 @@ sub layout {
                  "DTD/xhtml1-transitional.dtd">};
   }
   push @l, qq{<html><head><title>};
-  push @l, qq{PAUSE: };
+  push @l, $PAUSE::Config->{TESTHOST} ? qq{pause\@home: } : qq{PAUSE: };
   push @l, $mgr->{Action} || "The CPAN back stage entrance";
   my $h2special = $PAUSE::Config->{TESTHOST} ? "h2,b { color: #f0f; }" : "";
 
@@ -86,7 +86,7 @@ alink="#FF0000" text="#000000"><table width="100%" border="0" cellpadding="0" ce
 
   if (1) {
     use Config;
-    push @l, qq{<div align="center"><table><tr><td align="center">};
+    push @l, qq{<div align="center">};
 
     push @l, qq{<p class="motd">2002-12-25: I'm shuffling files around
         on PAUSE. Please pay increased attention and if you encounter

@@ -7,7 +7,7 @@ use strict;
 use PAUSE ();
 use vars qw( $Exeplan );
 use vars qw($VERSION);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.38 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d", q$Rev:$ =~ /(\d+)/;
 
 # Tell the system which packages want to see the headers or the
 # parameters.
@@ -32,6 +32,15 @@ sub handler {
           {
 
            # PUBLIC
+
+#            request_id => {
+#                       verb => "Request PAUSE account",
+#                       priv => "public",
+#                       cat => "00reg/01",
+
+#                       desc => "Apply for a PAUSE account.",
+
+#                      },
 
            mailpw => {
                       verb => "Forgot Password?",
