@@ -1,5 +1,7 @@
-MAILTO = k
-PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
+* * * * * root echo helloworld > /root/hello.txt
+# MAILTO=k
+# PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
+
 
 04 * * * *            root cleanup-incoming.pl
 04 01,13 * * *        root cron-daily.pl
