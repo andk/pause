@@ -1,0 +1,7 @@
+Brian's code to ease registering of users
+
+Eliminate cron jobs and symlinks in /etc/cron.jobs and integrate into
+repository
+
+User- and Group-ID switch in mldistwatch
+
