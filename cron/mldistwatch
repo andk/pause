@@ -111,36 +111,54 @@ use Net::Domain ();
 use CPAN;
 use Text::Format;
 
-package PAUSE::mldistwatch;
-
-use File::Path qw(rmtree mkpath);
-
-use vars qw($Id $ISAPERL
-	    %ALLfound %ALLlasttime %ALL
-	   );
-$Id = q$Id$;
-
-print "Running $0, $Id\n" if -t STDOUT;
-
 $Data::Dumper::Indent = 1;
 umask 0002;
 $|=1;
 
-my $tarbin = "/usr/local/bin/tar";
-$tarbin = "/bin/tar" unless -x $tarbin;
-my $unzip = "/usr/local/bin/unzip";
-$unzip = "/usr/bin/unzip" unless -x $unzip;
-my $rsync = "/usr/local/bin/rsync";
-$rsync = "/usr/bin/rsync" unless -x $rsync;
-die "No rsync found" unless -x $rsync;
-
-$ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
-
 {
+    package PAUSE::mldistwatch;
+
+    ###### data initialization ######
+
+    use File::Path qw(rmtree mkpath);
+    use vars qw($Id $ISAPERL %ALLfound %ALLlasttime %ALL);
+    $Id = q$Id$;
+    $ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
+}
+
+my $mldw = PAUSE::mldistwatch->new;
+$mldw->do_work;
+exit;
+
+
+package PAUSE::mldistwatch;
+# this class shows that it was born as spaghetticode
+
+sub new {
+    my $class = shift;
+
+    print "Running $0, $Id\n" if -t STDOUT;
+
+    my $tarbin = "/usr/local/bin/tar";
+    $tarbin = "/bin/tar" unless -x $tarbin;
+    die "No tarbin found" unless -x $tarbin;
+
+    my $unzipbin = "/usr/local/bin/unzip";
+    $unzipbin = "/usr/bin/unzip" unless -x $unzipbin;
+    die "No unzip found" unless -x $unzipbin;
+
+    bless {
+           TARBIN => $tarbin,
+           UNZIPBIN  => $unzipbin,
+          }, $class;
+}
+
+sub do_work {
+    my $self = shift;
     my $startdir = Cwd::cwd();
     chdir($PAUSE::Config->{MLROOT})
 	or die "Couldn't chdir to $PAUSE::Config->{MLROOT}";
-    init_all();
+    $self->init_all();
     my $testdir = "/tmp/test" . $$; # XXX File::Temp!
     rmtree $testdir if -e $testdir;
     unless (mkpath $testdir) {
@@ -148,28 +166,47 @@ $ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz
     }
     chdir $testdir
 	or die("Couldn't change to $testdir: $!");
-    local $/ = "";
-    checkfornew();
+    {
+        local $/ = "";
+        $self->checkfornew();
+    }
     chdir $startdir;
     rmtree $testdir;
+    $self->do_work2;
 }
-do_rewrite02();
-chdir "$PAUSE::Config->{MLROOT}"
-    or die "Couldn't chdir to $PAUSE::Config->{MLROOT}: $!";
-do_rewrite01();
-do_rewrite03();
-exit;
 
+sub do_work2 {
+    my $self = shift;
+    $self->do_rewrite02();
+    chdir "$PAUSE::Config->{MLROOT}"
+        or die "Couldn't chdir to $PAUSE::Config->{MLROOT}: $!";
+    $self->do_rewrite01();
+    $self->do_rewrite03();
+}
+
+sub connect {
+    my $self = shift;
+    return $self->{DBH} if $self->{DBH};
+    my $dbh = DBI->connect(
+                           $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
+                           $PAUSE::Config->{MOD_DATA_SOURCE_USER},
+                           $PAUSE::Config->{MOD_DATA_SOURCE_PW},
+                           { RaiseError => 1 }
+                          ) or die $DBI::errstr;
+    $self->{DBH} = $dbh;
+}
+
+sub DESTROY {
+    my $self = shift;
+    return unless $self->{DBH};
+    $self->{DBH}->disconnect;
+    delete $self->{DBH};
+}
 
 sub init_all {
+    my $self = shift;
   %ALLfound = %{ExtUtils::Manifest::manifind()};
-  my $dbh = DBI->connect(
-			 $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			 $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			 $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-			 { RaiseError => 1 }
-			) or die $DBI::errstr;
-
+    my $dbh = $self->connect;
   my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
   $sth->execute;
   my($dist,$distmtime);
@@ -178,16 +215,11 @@ sub init_all {
   }
   $sth->finish;
   %ALL = (%ALLfound,%ALLlasttime);
-  $dbh->disconnect;
 }
 
 sub checkfornew {
-  my $dbh = DBI->connect(
-			 $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			 $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			 $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-			 { RaiseError => 1 }
-			) or die $DBI::errstr;
+    my $self = shift;
+  my $dbh = $self->connect;
   my(@goners);
   my $time = time;
   my $alert;
@@ -196,7 +228,14 @@ sub checkfornew {
     # Examine all distribution files
     #
 
-    my $dio = PAUSE::dist->new(DIST=>$dist, DBH=>$dbh, ALERT => "", TIME => $time);
+    my $dio = PAUSE::dist->new(
+                               DIST   => $dist,
+                               DBH    => $dbh,
+                               ALERT  => "",
+                               TIME   => $time,
+                               TARBIN => $self->{TARBIN},
+                               UNZIPBIN  => $self->{UNZIPBIN},
+                              );
 
     next BIGLOOP if $dio->ignoredist;
 
@@ -255,7 +294,6 @@ sub checkfornew {
     $fh->close;
   }
 
-  $dbh->disconnect;
   if (0 && @goners) {
     my($msg) = Mail::Send->new(
                                To => join(", ",
@@ -274,17 +312,13 @@ sub checkfornew {
 }
 
 sub do_rewrite02 {
+    my $self = shift;
     #
     # Rewriting 02packages.details.txt
     #
     print "\n\nEntering do_rewrite02\n" if -t STDOUT;
 
-    my $dbh = DBI->connect(
-			   $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			   $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			   $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-			   { RaiseError => 1 }
-			  ) or die $DBI::errstr;
+    my $dbh = $self->connect;
     my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/02packages.details.txt";
     my $list = "";
     my $olist = "";
@@ -336,7 +370,6 @@ Last-Updated: $date\n\n};
 
     $list .= join "", sort {lc $a cmp lc $b} @listing02;
     if ($list ne $olist) {
-	print "Have to rewrite\n";
 	if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
 	    print F $header;
 	    print F $list;
@@ -345,20 +378,15 @@ Last-Updated: $date\n\n};
 	}
 	close F or die "Couldn't close: $!";
     }
-  $dbh->disconnect;
 }
 
 sub do_rewrite01 {
+    my($self) = shift;
     #
     # Rewriting 01modules.index.html
     #
     print "\nEntering do_rewrite01\n" if -t STDOUT;
-    my $dbh = DBI->connect(
-			   $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			   $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			   $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-			   { RaiseError => 1 }
-			  ) or die $DBI::errstr;
+    my $dbh = $self->connect;
 
     my $repfile = "$PAUSE::Config->{MLROOT}/../../modules/01modules.index.html";
     my $list = "";
@@ -514,7 +542,6 @@ sub do_rewrite01 {
                        "../../../../authors/id/$userdir",
                        "../../modules/by-category/$pkg{chapter}".
                        "/$pkg{'package'}/$pkg{userid}");
-        print "-";
     }
     $list = qq{
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title>Modules on CPAN alphabetically</title></head><body>
@@ -583,7 +610,6 @@ category    maintainer
     $olist       =~ s/.+?<hr\b//s;
 
     if ($comparelist ne $olist) {
-	print "Have to rewrite\n";
 	if (open F, ">$repfile") {
 	    print F $list;
 	    close F;
@@ -592,7 +618,6 @@ category    maintainer
 	    warn "Couldn't open 01modules...";
 	}
     }
-  $dbh->disconnect;
 }
 
 sub write_01sorted {
@@ -628,6 +653,7 @@ sub write_01sorted {
 }
 
 sub do_rewrite03 {
+    my($self) = shift;
   #
   # Rewriting 03modlist.data
   #
@@ -654,12 +680,7 @@ sub do_rewrite03 {
     warn "Coudn't open $repfile $!";
   }
   my $date = HTTP::Date::time2str();
-  my $dbh = DBI->connect(
-			 $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			 $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			 $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-			 { RaiseError => 1 }
-			) or die $DBI::errstr;
+  my $dbh = $self->connect;
   my $sth = $dbh->prepare(qq{SELECT modid, statd, stats, statl,
                                     stati, statp, description, userid, chapterid
                              FROM mods WHERE mlstatus = "list"});
@@ -700,7 +721,6 @@ Date:        %s
 			    )->Dump;
 
   if ($list ne $olist) {
-    print "Have to rewrite\n";
     if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
       if ($] > 5.007) {
         require Encode;
@@ -713,7 +733,6 @@ Date:        %s
     }
     close F or die "Couldn't close: $!";
   }
-  $dbh->disconnect;
 }
 
 sub chdir_ln_chdir {
@@ -876,6 +895,7 @@ sub as_ds {
     my $self = shift;
     my $dist = $self->{DIST};
     local *TARTEST;
+    my $tarbin = $self->{TARBIN};
     open TARTEST, "$tarbin tzf $PAUSE::Config->{MLROOT}/$dist |";
     while (<TARTEST>) {
       if (m:^\.\./: || m:/\.\./: ) {
@@ -903,7 +923,7 @@ sub as_ds {
       my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
       print "perl dist $dist from $u. Is he a trusted guy?\n";
       use DBI;
-      my $dbh = DBI->connect(
+      my $adbh = DBI->connect(
                              $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
                              $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
                              $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
@@ -911,12 +931,12 @@ sub as_ds {
       my $query = "SELECT * FROM grouptable
                    WHERE user='$u'
                      AND ugroup='pumpking'";
-      my $sth = $dbh->prepare($query);
+      my $sth = $adbh->prepare($query);
       $sth->execute;
       $skip = 1 unless $sth->rows > 0;
       print "Skip set to [$skip]";
       $sth->finish;
-      $dbh->disconnect;
+      $adbh->disconnect;
       unless ($skip) {
         $skip = 1 unless $self->untar;
       }
@@ -936,16 +956,17 @@ sub as_ds {
         # By not setting suffix we prohibit extracting README
         my $file = File::Basename::basename($dist);
         File::Copy::copy "$PAUSE::Config->{MLROOT}/$dist", $file;
-        my $unzip = $file;
-        $unzip =~ s/\.(Z|gz)$//;
-        unless (PAUSE::gunzip($file,$unzip)) {
+        my $willunzip = $file;
+        $willunzip =~ s/\.(Z|gz)$//;
+        unless (PAUSE::gunzip($file,$willunzip)) {
           warn "    no gunzip on $file";
         }
       } elsif ($dist =~ /\.zip$/) {
         $suffix = "zip";
-        unless (system("$unzip $PAUSE::Config->{MLROOT}/$dist > /dev/null 2>&1")==0){
+        my $unzipbin = $self->{UNZIPBIN};
+        unless (system("$unzipbin $PAUSE::Config->{MLROOT}/$dist > /dev/null 2>&1")==0){
           print "Some error occurred during unzippping. Let's read unzip -t:\n";
-          system("$unzip -t $PAUSE::Config->{MLROOT}/$dist");
+          system("$unzipbin -t $PAUSE::Config->{MLROOT}/$dist");
         }
       } else {
         print "  no dist\n";
@@ -1935,7 +1956,7 @@ filemtime[$pp->{filemtime}]ofilemtime[$ofilemtime]");
           $fio->simile($ofile,$package)
          ) {
         print "Warning: we are not simile AND we have been simile some time earlier:\n";
-        use Data::Dumper;
+        require Data::Dumper;
         print Data::Dumper::Dumper($pp);
         $ok = 0;
       }
