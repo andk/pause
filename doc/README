@@ -22,10 +22,6 @@ the revision number of the repository.
 The following files have been excluded from the repository for obvious
 reasons:
 
-    apache-conf/pause.pem
-    apache-conf/pause.pem3
-    apache-conf/pause.pkey
-    apache-svn-conf/passwd.pause
     etc/mon.cf
     privatelib/PrivatePAUSE.pm
 
@@ -48,9 +44,6 @@ make sure that installed programs find their configuration:
   /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
   /home/SVN/local/subversion -> subversion-2002-12-24
   /home/SVN/local/subversion-2002-12-24/conf -> /home/k/PAUSE/apache-svn-conf
-  /home/k/PAUSE/apache-conf/156e8318.0 -> pause.pem
-  /home/k/PAUSE/apache-conf/18065281.0 -> pause.pem
-  /home/k/PAUSE/apache-conf/67ff2224.0 -> pause.pem
   /usr/local/apache/conf -> ../../../home/k/PAUSE/apache-conf
   /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
   /usr/local/apache/perl -> ../../../home/k/PAUSE/apache-perl

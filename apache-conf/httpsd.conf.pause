@@ -54,8 +54,9 @@ UserDir enabled jwied
   # SSLCACertificatePath /usr/local/ssl/demoCA/
   # SSLCACertificateFile /usr/local/ssl/demoCA/ttt.pem
 
-  SSLCertificateFile  /usr/local/apache/conf/pause.pem
-  SSLCertificateKeyFile /usr/local/apache/conf/pause.pem
+  SSLCertificateFile  /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
+  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
+
   SSLVerifyClient 0
   SSLVerifyDepth 10
   SSLFakeBasicAuth
