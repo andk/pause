@@ -1259,7 +1259,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
-        my $to = $pma->address;
+        my $to = $PAUSE::Config->{TESTHOST} ? "" : $pma->address;
         my($msg) = Mail::Send->new(
                                    To => join(", ",
                                               $to,
