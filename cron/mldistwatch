@@ -1026,7 +1026,7 @@ Please contact modules\@perl.org if there are any open questions.
         my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
         my $substrdistro = substr $distro, 5;
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-        my $show_meta_yml = 0;
+        my $show_meta_yml = 1;
         if ($show_meta_yml) {
             push @m, qq{
                User: $author ($asciiname)
@@ -1170,6 +1170,41 @@ Please contact modules\@perl.org if there are any open questions.
     }
 
     # package PAUSE::dist;
+    sub filter_pms {
+        my($self) = @_;
+        my @pmfile;
+
+        # very similar code is in PAUSE::package::examine_pkg
+      MANI: for my $mf ( @{$self->{MANIFOUND}} ) {
+            next unless $mf =~ /\.pm$/i;
+            my($inmf) = $pmfile =~ m!^[^/]+/(.+)!; # go one directory down
+            next if $inmf =~ m!^(?:t|inc)/!;
+            if ($self->{YAML_CONTENT} && $self->{YAML_CONTENT}{private}) {
+                my %map = (
+                           file => qr{\z},
+                           directory => qr{/},
+                          );
+                for my $k (qw(file directory)) {
+                    next unless my $v = $self->{YAML_CONTENT}{private}{$k};
+                    my $rest = $map{$k};
+                    if (ref $v eq "ARRAY") {
+                        for my $ve (@$v) {
+                            $ve =~ s|/+$||;
+                            next MANI if $inmf =~ /^$ve$rest/;
+                        }
+                    } else {
+                        $v =~ s|/+$||;
+                        next MANI if $inmf =~ /^$v$rest/;
+                    }
+                }
+            }
+            push @pmfile, $mf;
+        }
+        $self->verbose(1,"pmfile[@pmfile]");
+        @pmfile;
+    }
+
+    # package PAUSE::dist;
     sub examine_pms {
         my $self = shift;
         return if $self->{HAS_BLIB};
@@ -1185,9 +1220,8 @@ Please contact modules\@perl.org if there are any open questions.
         my $binary_dist;
         $binary_dist = 1 if $dist =~ /-bin-/i;
 
-        my @pmfile = grep /\.pm$/i, @{$self->{MANIFOUND}};
+        my @pmfile = $self->filter_pms;
         for my $pmfile (@pmfile) {
-            next if $pmfile =~ m!^[^/]+/(?:t|inc)/!;
             if ($binary_dist) {
                 next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
                 # package would be
@@ -1274,9 +1308,11 @@ Please contact modules\@perl.org if there are any open questions.
         my(@yaml) = grep !m|/t/|, grep m|/META\.yml$|, @manifind;
         if (@yaml) {
             if (@yaml == 1) {
-                $self->{YAML} = $yaml[0];
-                File::Copy::copy $yaml[0], "$MLROOT/$sans.meta";
-                utime((stat $yaml[0])[8,9], "$MLROOT/$sans.meta");
+                my $yaml = $yaml[0];
+                $self->{YAML} = $yaml;
+                File::Copy::copy $yaml, "$MLROOT/$sans.meta";
+                utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
+                $self->{YAML_CONTENT} = YAML::LoadFile($yaml);
             } else {
                 $self->{YAML} = sprintf "%d META.yml found, ignoring\n", scalar @yaml;
             }
@@ -1828,18 +1864,22 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         return 1;
     }
 
+    # package PAUSE::package;
     sub connect {
         my($self) = @_;
         my $fio = $self->{FIO};
         $fio->connect;
     }
 
+    # package PAUSE::package;
     sub disconnect {
         my($self) = @_;
         my $fio = $self->{FIO};
         $fio->disconnect;
     }
 
+
+    # package PAUSE::package;
     sub examine_pkg {
         my $self = shift;
 
@@ -1852,6 +1892,28 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         # should they be cought earlier? Maybe.
         return unless $package =~ /\w/;
         return if $package =~ /:/ && $package !~ /::/;
+
+        # very similar code is in PAUSE::dist::filter_pms
+        if ($self->{YAML_CONTENT} && $self->{YAML_CONTENT}{private}) {
+            my %map = (
+                       package => qr{\z},
+                       namespace => qr{::},
+                      );
+            for my $k (qw(package namespace)) {
+                    next unless my $v = $self->{YAML_CONTENT}{private}{$k};
+                    my $rest = $map{$k};
+                    if (ref $v eq "ARRAY") {
+                        for my $ve (@$v) {
+                            $ve =~ s|/+$||;
+                            return if $package =~ /^$ve$rest/;
+                        }
+                    } else {
+                        $v =~ s|/+$||;
+                        return if $package =~ /^$v$rest/;
+                    }
+            }
+        }
+
 
         # set perms for registered owner in any case
 
