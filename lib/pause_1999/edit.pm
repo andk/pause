@@ -1906,7 +1906,7 @@ http://%s/pause/authenquery?ACTION=delete_files
 glory is collected on http://history.perl.org/backpan/});
     push @blurb, qq{The Pause};
     # $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
-    $blurb = join "\n\n", @blurb;
+    $blurb = join "\n", @blurb;
 
     my %umailset;
     my $name = $u->{asciiname} || $u->{fullname} || "";
