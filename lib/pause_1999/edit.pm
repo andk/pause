@@ -2370,23 +2370,48 @@ sub request_id {
     $showform = 1;
   }
   if ($showform) {
-    push @m, "<table>\n";
-    foreach my $pair (
-                      [ 'Full name',  'pause99_request_id_fullname'   ],
-                      [ 'Email',      'pause99_request_id_email'  ],
-                      [ 'Web site',   'pause99_request_id_homepage'    ],
-                      [ 'Desired ID', 'pause99_request_id_userid' ],
-                     ) {
-      push @m, "<tr>\n\t<td>$pair->[0]</td>\n<td>";
-      push @m, $mgr->textfield( name => $pair->[1], size => 32 );
-      push @m, "\t</td>\n</tr>\n\n";
+    # push @m, "<table>\n";
+    foreach my $arr (
+                     [
+                      'Full name',
+                      'pause99_request_id_fullname',
+                      "Unicode Characters OK"
+                     ],
+                     [
+                      'Email',
+                      'pause99_request_id_email',
+                      'required, otherwise we cannot send you the password'
+                     ],
+                     [
+                      'Web site',
+                      'pause99_request_id_homepage',
+                      'optional'
+                     ],
+                     [
+                      'Desired ID',
+                      'pause99_request_id_userid',
+
+                      "4-9 characters matching [A-Z], please",
+
+                     ],
+                    ) {
+      push @m, "<p><b>$arr->[0]</b></p><p>";
+      if (my $note = $arr->[2]) {
+        push @m, qq{<small>$note</small></p><p>};
+      }
+      push @m, $mgr->textfield( name => $arr->[1], size => 32 );
+      push @m, "</p>";
     }
-    push @m, qq{<tr><td colspan="2">A short description of what you're planning to contribute:</td></tr><tr><td colspan="2">};
+
+    push @m, qq{<p><b>A short description of what you're planning to
+        contribute:</b></p><p><small>If we know you, you can leave
+        this out. Otherwise required.</small></p><p>};
+
     push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
                             rows=>8,
                             cols=>60);
-    push @m, qq{</td></tr>};
-    push @m, "</table>\n";
+    push @m, qq{</p>};
+    # push @m, "</table>\n";
 
     push @m, qq{<input type="submit" name="SUBMIT_pause99_request_id_sub"
   	  value="Request Account" />};
