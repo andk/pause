@@ -369,7 +369,7 @@ sub active_user_record {
 	# if this action makes sense because we fear for the integrity
 	# of the database, no matter if you are user or admin.
 	if (
-	    $mgr->{Action} =~ /^(edit_mod|edit_ml|share_perms)$/
+	    grep { $_ eq $mgr->{Action} } @{$mgr->{AllowMlreprTakeover}}
 	   ) {
 	  $u = $h1; # no secrets for a mailinglist
 	} else {
@@ -845,7 +845,7 @@ sub select_ml_action {
     if (
 	$self->can($action)
 	&&
-	$action =~ m/^(edit_mod|edit_ml|share_perms)$/
+        grep { $_ eq $action } @{$mgr->{AllowMlreprTakeover}}
        ) {
       $req->param("ACTION",$action);
       $mgr->{Action} = $action;
@@ -900,7 +900,7 @@ sub select_ml_action {
 			       );
   push @m, $mgr->scrolling_list(
 				'name' => 'ACTIONREQ',
-				values => [qw(edit_mod edit_ml share_perms)],
+				values => $mgr->{AllowMlreprTakeover},
 				default => ['edit_ml'],
 				size => 3,
 			       );
@@ -2946,10 +2946,8 @@ Excerpt from a mail:<pre>
    address and comment. The table list2user does not have a web
    interface because we are not really established as the primary
    source for mailing list information and so it has not been used
-   much. But I'm open to offer one if you believe it's useful. Until
-   such an interface is there, it must be kept in mind that users who
-   own a mailing list need to be added to the group "mlrepr". (Sigh,
-   isn't computing a bit like beaurocracy?)
+   much. But I'm open to offer one if you believe it's useful.
+   [...]
 </pre>
 };
 
@@ -3723,30 +3721,21 @@ sub show_ml_repr {
   my(@m);
   my $dbh = $mgr->connect;
   my $sth = $dbh->prepare("SELECT * FROM list2user");
-  my $dbh2 = $mgr->authen_connect;
-  my $sth2 = $dbh2->prepare("SELECT *
-                             FROM grouptable
-                             WHERE user=?
-                               AND ugroup='mlrepr'");
   $sth->execute;
 
   push @m, qq{<p>These are the contents of the table <b>list2user</b>.
               There\'s currently no way to edit the table except
               direct SQL. The table says who is representative of a
-              mailing list. We must add representatives of mailing
-              lists to the group \'mlrepr\'.</p>};
+              mailing list.</p>};
 
   push @m, qq{<table border="1"><tr><th>Mailing list</th>
 <th>User-ID</th>
-<th>Group mlrepr?</th></tr>\n};
+</tr>\n};
   while (my $rec = $mgr->fetchrow($sth, "fetchrow_hashref")) {
-    $sth2->execute($rec->{userid});
-    my $gok = $sth2->rows>0 ? "Yes" : "No";
     push @m, sprintf(
-                     qq{<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n},
+                     qq{<tr><td>%s</td><td>%s</td></tr>\n},
                      $rec->{maillistid},
                      $rec->{userid},
-                     $gok,
                     );
   }
   $sth->finish;

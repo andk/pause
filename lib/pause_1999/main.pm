@@ -67,9 +67,9 @@ converted *all* form widgets for HeavyCGI in one or the other project.
  decide if the action should be allowed to the admin with "HIDDENNAME"
  and if so, add it to AllowAdminTakeover attribute.
 
- if a mailing list is to be involved, there are three more places to
- check: search for /edit_mod.edit_ml.share_perms/, that is one list
- and two identical regexps.
+ if a mailing list is to be involved, decide if the action should be
+ allowed to the mailinglist-representative and if so, add it to
+ AllowMlreprTakeover
 
 That is it.
 
@@ -107,6 +107,7 @@ ActionTuning
 ActiveColor
 AllowAction
 AllowAdminTakeover
+AllowMlreprTakeover
 AuthenDsn
 AuthenDsnPasswd
 AuthenDsnUser

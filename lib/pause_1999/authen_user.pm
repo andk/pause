@@ -73,21 +73,17 @@ sub header {
     }
     $sth->finish;
 
-    if (exists $mgr->{UserGroups}{mlrepr}) {
-      $sql = qq{SELECT *
-                FROM list2user
-                WHERE userid=?};
-      $sth = $dbh->prepare($sql);
-      if ($sth->execute($u)) {
-	warn "Database inconsistent: $u is group mlrepr but not in list2user"
-	    unless $sth->rows > 0;
-	$mgr->{IsMailinglistRepresentative} = {};
-	while (my $rec = $mgr->fetchrow($sth, "fetchrow_hashref")) {
-	  $mgr->{IsMailinglistRepresentative}{$rec->{maillistid}} = undef;
-	}
-	# warn "HERE4";
-      } else {
-	die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
+    delete $mgr->{UserGroups}{mlrepr}; # virtual group, disallow in the table
+    $sql = qq{SELECT *
+              FROM list2user
+              WHERE userid=?};
+    $sth = $dbh->prepare($sql);
+    $sth->execute($u) or die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
+    if ($sth->rows > 0) {
+      $mgr->{UserGroups}{mlrepr} = undef; # is a virtual group
+      $mgr->{IsMailinglistRepresentative} = {};
+      while (my $rec = $mgr->fetchrow($sth, "fetchrow_hashref")) {
+        $mgr->{IsMailinglistRepresentative}{$rec->{maillistid}} = undef;
       }
     }
 

@@ -343,7 +343,11 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
  share_perms
  dele_message
  )],
-
+          AllowMlreprTakeover => [qw(
+edit_mod
+edit_ml
+share_perms
+)],
 	    AuthenDsn       => $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
 	    AuthenDsnPasswd => $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
 	    AuthenDsnUser   => $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
