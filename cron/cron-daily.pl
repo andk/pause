@@ -256,15 +256,14 @@ sub watch_files {
 			      -M _ > 4 && unlink($_) && return;
 			      push(
 				   @listing,
-				   sprintf("%-60s %8d %6.2f\n",
-					   $File::Find::name,
-					   -s _,
-					   -M _
-					  )
+                                   [$File::Find::name,
+                                    -s _,
+                                    -M _]
 				  );
 			  }, $PAUSE::Config->{TMP});
 
-    report sort {substr($a,70) <=> substr($b,70)} @listing;
+    report map { sprintf("%-60s %8d %6.2f\n", @$_) }
+    sort {$a->[2] <=> $b->[2]} @listing;
 }
 
 #
