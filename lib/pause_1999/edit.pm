@@ -5362,7 +5362,7 @@ decision.</li>
             my $fut = $now + $i * 60;
             my $fum = int $fut % 3600 / 60;
             next unless $sc->contains($fum);
-            $eta = gmtime($fut+600) . " GMT";
+            $eta = gmtime( $fut + $PAUSE::Config->{RUNTIME_MLDISTWATCH} ) . " GMT";
             last;
           }
         }
