@@ -1907,7 +1907,12 @@ sub add_user {
 
     $userid = uc($userid);
     $userid ||= "";
-    $userid =~ s/[^A-Z]+//g;
+    my @error;
+    if ( $userid =~ m/[^A-Z]/ or length($userid)>9 ) {
+      my $euserid = $mgr->escapeHTML($userid);
+      push @error, qq{<b>userid[$euserid]</b> not a legal username.};
+    }
+
     $req->param("pause99_add_user_userid", $userid) if $userid;
     my $doit = 0;
     my $dont_clear;
@@ -1917,7 +1922,10 @@ sub add_user {
     if ($fullname ne $fullname_raw) {
       $req->param("pause99_add_user_fullname",$fullname);
     }
-    if ($fullname) {
+    unless ($fullname) {
+      push @error, qq{No fullname, nothing done.};
+    }
+    unless (@error) {
       if ($req->param('SUBMIT_pause99_add_user_Definitely')) {
 	$doit = 1;
       } elsif (
@@ -2001,8 +2009,6 @@ sub add_user {
 	# END OF SOUNDEX/METAPHONE check
 
       }
-    } else {
-      push @m, qq{<p>No fullname, nothing done.</p>};
     }
     my $T = time;
     if ($doit) {
@@ -2235,6 +2241,12 @@ Subject: $subject\n};
       push @m, "Content of user record in table <i>users</i>:<br />";
       my $usertable = $self->usertable($mgr,$userid);
       push @m, $usertable;
+    } elsif (@error) {
+      push @m, qq{<h3>Error processing form</h3>};
+      for (@error) {
+        push @m, "<ul>", "<li>$_</li>", "</ul>";
+      }
+      push @m, qq{<p>Please retry.</p>};
     } else {
       warn "T[$T]doit[$doit]userid[$userid]";
     }
