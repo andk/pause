@@ -1661,7 +1661,8 @@ package in packages  package in primeur
         my $sth_mods = $dbh->prepare("SELECT userid
                                       FROM   mods
                                       WHERE  modid = ?");
-        $sth_mods->execute($package);
+        warn "Going to execute 'SELECT userid FROM mods WHERE modid = '$package'";
+        $sth_mods->execute($package) or die "FAILED";
         if ($sth_mods->rows>0) { # make sure we regard the owner as the owner
             my($mods_userid) = $sth_mods->fetchrow_array;
             local($dbh->{RaiseError}) = 0;
