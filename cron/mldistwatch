@@ -1013,7 +1013,7 @@ Please contact modules\@perl.org if there are any open questions.
               or
                   $a cmp $b
                 } keys %$st) {
-          my $tf = Text::Format->new( bodyIndent => 11, firstIndent => 11);
+          my $tf = Text::Format->new( bodyIndent => 13, firstIndent => 13);
           my $verb_status = $tf->format($st->{$p}{verb_status});
 	  $verb_status =~ s/^\s+//; # otherwise this line is too long
           printf $fh "%s\n    version: %s\n    in file: %s\n     status: %s\n",
