@@ -43,7 +43,7 @@ while (<$fh>) {
   $revision = $1 if /Dumped revision (\d+)/;
 }
 
-$system = "$PAUSE::Config->{SVNBIN}/svn co file://$repopath pause-wc-$revision";
+$system = "$PAUSE::Config->{SVNBIN}/svn co -r $revision file://$repopath pause-wc-$revision";
 system($system)==0 or die "Could not svn co";
 
 $system = "tar cjf pause-wc-$revision.tar.bz2 pause-wc-$revision";
