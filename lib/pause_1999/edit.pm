@@ -2110,8 +2110,6 @@ Userid:      $userid
 Name:        $maillistname
 Description: };
 	  push @blurb, $self->wrap($subscribe);
-	  #$maillistname =~ s/\'/\\\'/g;
-	  #$subscribe =~ s/\'/\\\'/g;
 	  $query = qq{INSERT INTO maillists (
                         maillistid, maillistname,
                         subscribe,  changed,  changedby,            address)
@@ -2167,7 +2165,7 @@ Server on behalf of the admin $PAUSE::Config->{ADMIN})
 As already described in a separate message, you\'re a registered Perl
 Author with the userid $userid. For the sake of approval I have
 assigned to you a change-password-only-password that enables
-you to pick your own password. This password is \`\`$onetime\'\'
+you to pick your own password. This password is \"$onetime\"
 (without the enclosing quotes). Please visit either
 
   https://pause.perl.org/pause/authenquery?ACTION=change_passwd
