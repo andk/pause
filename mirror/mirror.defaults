@@ -5,6 +5,7 @@ package=defaults
 	compress_patt=.
 	compress_prog=gzip
 	delete_excl=(^|/)\.(mirror|notar)$
+        mode_copy=false
 	dir_mode=0755
 	do_deletes=true
 	exclude_patt=(^|/)(\.mirror|core$|\.cap|\.in\..*\.$|MIRROR.LOG|#.*#|\.FSP|\.cache|\.zipped|\.notar|\.message|lost+found/|\ )

@@ -3580,9 +3580,6 @@ sub add_mod {
     }
   }
 
-#  use Data::Dumper;
-#  warn Data::Dumper::Dumper(\%meta);
-
   my @errors = ();
   my @hints = ();
   my($guessing,$modid);
@@ -5226,6 +5223,11 @@ The Pause
     my %umailset;
     my $name = $u->{asciiname} || $u->{fullname} || "";
     my $Uname = $mgr->{User}{asciiname} || $mgr->{User}{fullname} || "";
+    if (1) { # debugging
+      require Data::Dumper;
+      my $dd = Data::Dumper::Dumper({ u => $u, mgrUser => $mgr->{User} });
+      warn "email debugging: dd[$dd]";
+    }
     if ($u->{secretemail}) {
       $umailset{qq{"$name" <$u->{secretemail}>}} = 1;
     } elsif ($u->{email}) {
