@@ -22,9 +22,16 @@ use PAUSE::MailAddress ();
 use CPAN; # only for CPAN::Version
 use Text::Format;
 use YAML ();
+use Getopt::Long;
 $Data::Dumper::Indent = 1;
 umask 0002;
 $|=1;
+
+our %Opt;
+GetOptions(
+           \%Opt,
+           "pick=s@",
+          );
 
 {
     package PAUSE::mldistwatch;
@@ -35,7 +42,7 @@ $|=1;
     $ISAPERL = q{ perl-?5[._-](\\d{3}(_[0-4][0-9])?|\\d*[24680]\\.\\d+)\\.tar[._-]gz\\z };
 }
 
-my $mldw = PAUSE::mldistwatch->new;
+my $mldw = PAUSE::mldistwatch->new(\%Opt);
 $mldw->work;
 exit;
 
@@ -45,6 +52,7 @@ package PAUSE::mldistwatch;
 
 sub new {
     my $class = shift;
+    my $opt = shift;
 
     my $tarbin = "/usr/local/bin/tar";
     $tarbin = "/bin/tar" unless -x $tarbin;
@@ -57,6 +65,7 @@ sub new {
     my $self = bless {
                       TARBIN => $tarbin,
                       UNZIPBIN  => $unzipbin,
+                      OPT => $opt,
                      }, $class;
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
     $self;
