@@ -475,9 +475,9 @@ sub edit_cred {
                           long => "You have not yet uploaded any files
                             to the CPAN, so your account can still be
                             cancelled. If you want to retire your
-                            account, please click here. If you click
-                            this field, your account will not be
-                            removed immediately but instead be removed
+                            account, please click here. If you do
+                            this, your account will not be removed
+                            immediately but instead be removed
                             manually by the database maintainer at a
                             later date.",
 
