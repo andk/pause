@@ -1575,8 +1575,6 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
   my %incom = ();
   my $sth = $dbh->prepare("SELECT userid, uri, dgot FROM uris WHERE uri=?");
   for ($dh->read) {
-    # 5.8.0 has a bug here (probably the same that beats us in manifind)
-    warn "DEBUG: _[$_]";
     next if /^\./;
     next if /[^\w\-\.\@\+]/; # filter illegal filenames, they might
                              # disturb the XHTML (and do worse anyway)
@@ -1666,6 +1664,12 @@ sub manifind {
   my %files = %{ExtUtils::Manifest::manifind()};
   if (keys %files == 1 && exists $files{""} && $files{""} eq "") {
     warn "ALERT: BUG !!!";
+
+    # This bug was caused by libc upgrade: perl and apache were
+    # compiled with 2.1.3; upgrading to 2.2.5 and/or later
+    # recompilation of apache has caused readdir() to return a list of
+    # empty strings.
+
     open my $ls, "zsh -c 'ls **/*(.)' |" or die;
     %files = map { chomp; $_ => "" } <$ls>;
     close $ls;
