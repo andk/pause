@@ -981,36 +981,30 @@ CPAN::Complete
     my($self) = @_;
     my $distro = $self->{DIST};
     my $author = PAUSE::dir2user($distro);
-    my($msg) = Mail::Send->new(
-			       To => join(", ",
-                                          "$author\@cpan.org",
-                                          $PAUSE::Config->{ADMIN},
-                                         ),
-			       Subject => "PAUSE Indexer report $distro"
-			      );
-    $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-    my $fh  = $msg->open('sendmail');
-    print $fh "The following report has been written by the PAUSE indexer.
-Please contact modules\@perl.org if there are any open questions.
+    my @m;
 
+    push @m, "The following report has been written by the PAUSE namespace indexer.
+Please contact modules\@perl.org if there are any open questions.
   $PAUSE::mldistwatch::Id\n";
     my $time = gmtime;
     my $mtime = gmtime((stat "$PAUSE::Config->{MLROOT}/$distro")[9]);
     my $nfiles = scalar @{$self->{MANIFOUND}};
-    print $fh qq{
+    my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
+    push @m, qq{
             CPAN ID: $author
   Distribution file: $distro
     Number of files: $nfiles
+         *.pm files: $pmfiles
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
     if ($self->{HAS_BLIB}) {
-      print $fh qq{The distribution contains a blib/ directory and is therefore not being indexed.\n};
+      push @m, qq{The distribution contains a blib/ directory and is therefore not being indexed.\n};
     } elsif ($self->{HAS_MULTIPLE_ROOT}) {
-      print $fh qq{The distribution does not unpack into a single directory and is therefore not being indexed.\n};
+      push @m, qq{The distribution does not unpack into a single directory and is therefore not being indexed.\n};
     } else {
       my $st = $self->{INDEX_STATUS};
       if ($st && ref $st && %$st) {
-	print $fh qq{The following packages have been found in the distro:\n\n};
+	push @m, qq{The following packages have been found in the distro:\n\n};
 
         for my $p (sort {
           $st->{$a}{status} <=> $st->{$b}{status}
@@ -1020,14 +1014,31 @@ Please contact modules\@perl.org if there are any open questions.
           my $tf = Text::Format->new( bodyIndent => 13, firstIndent => 13);
           my $verb_status = $tf->format($st->{$p}{verb_status});
 	  $verb_status =~ s/^\s+//; # otherwise this line is too long
-          printf $fh "%s\n    version: %s\n    in file: %s\n     status: %s\n",
+          push @m, sprintf "%s\n    version: %s\n    in file: %s\n     status: %s\n",
               $p, $st->{$p}{version}, $st->{$p}{infile}, $verb_status;
         }
       } else {
-        print $fh qq{No packages could be identified in the distro. Nothing done.\n};
+        if ($pmfiles > 0) {
+          push @m, qq{No package statements could be found in the distro (maybe a script
+or documentation distribution?)\n};
+        } else {
+          # no need to write a report at all
+          return;
+        }
+
       }
     }
-    print $fh qq{__END__\n};
+    push @m, qq{__END__\n};
+    my($msg) = Mail::Send->new(
+			       To => join(", ",
+                                          "$author\@cpan.org",
+                                          $PAUSE::Config->{ADMIN},
+                                         ),
+			       Subject => "PAUSE Indexer report $distro"
+			      );
+    $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
+    my $fh  = $msg->open('sendmail');
+    print $fh @m;
     $fh->close;
     warn "Sent mail about $distro";
   }
