@@ -9,6 +9,7 @@ directory, make a tarball of that.
 =cut
 
 use strict;
+use lib "/home/k/PAUSE/lib";
 use PAUSE;
 use File::Temp;
 use File::Copy qw(copy);
