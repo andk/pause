@@ -39,7 +39,7 @@ push @INC, @pauselib;
 $PAUSE::Config ||=
     {
      # previously also used for ftp password:
-     ADMIN => qq{andreas.koenig\@anima.de},
+     ADMIN => qq{k@localhost},
      ADMINS => [qq(modules\@perl.org)],
      # only dubravka.kbx.de is reverse mapped:
      ANON_FTP_PASS => qq{andreas.koenig\@dubravka.kbx.de},
