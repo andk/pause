@@ -104,6 +104,7 @@ sub work {
     }
     chdir $startdir;
     rmtree $testdir;
+    return if $self->{OPT}{pick};
     $self->work2;
 }
 
