@@ -2665,7 +2665,7 @@ MAIL
   	};
 
     require HTML::Entities;
-    my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
+    my($blurbcopy) = HTML::Entities::encode($blurb,qq{<>&"});
     $blurbcopy =~ s|(https?://\S+)|<a href=\"$1\">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
     push @m, qq{<pre>
