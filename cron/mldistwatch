@@ -73,6 +73,7 @@ sub new {
             $self->{PICK}{$pick} = 1;
         }
     }
+    $self->verbose(1,"Hello world,");
     $self;
 }
 
