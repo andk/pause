@@ -446,8 +446,10 @@ sub text_pw_field {
     warn "name[$name]val[$val]";
     if ($] > 5.007) {
       require Encode;
+      # Warning: adding second parameter changes behavior (eats characters or so?)
       $val = Encode::decode_utf8($val,
-                                 Encode::FB_WARN());
+                                 # Encode::FB_WARN()
+                                );
     }
     warn "name[$name]val[$val]";
   }
