@@ -5203,6 +5203,8 @@ The Pause
 
   my %files = %{ExtUtils::Manifest::manifind()};
 
+  warn sprintf "Debug: manifind found %d Files in %s", scalar(keys %files), Cwd::cwd();
+
   foreach my $f (keys %files) {
     if (
         $f =~ /readme$/ ||
