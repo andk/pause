@@ -1,8 +1,8 @@
--- MySQL dump 9.09
+-- MySQL dump 9.11
 --
 -- Host: localhost    Database: mod
 -- ------------------------------------------------------
--- Server version	4.0.16-log
+-- Server version	4.0.24_Debian-2-log
 
 --
 -- Table structure for table `applymod`
@@ -15,7 +15,7 @@ CREATE TABLE applymod (
   statl char(1) binary NOT NULL default '',
   stati char(1) binary NOT NULL default '',
   statp char(1) binary NOT NULL default '',
-  chapterid char(2) binary NOT NULL default '',
+  chapterid int(10) unsigned NOT NULL default '0',
   description varchar(88) binary NOT NULL default '',
   userid varchar(10) NOT NULL default '',
   communities varchar(120) binary NOT NULL default '',
@@ -35,7 +35,7 @@ CREATE TABLE applymod (
 --
 
 CREATE TABLE chapters (
-  chapternr char(2) binary NOT NULL default '0',
+  chapternr int(10) unsigned NOT NULL default '0',
   chapterid char(80) default NULL,
   shorttitle char(40) default NULL
 ) TYPE=ISAM PACK_KEYS=1;
@@ -170,7 +170,7 @@ CREATE TABLE mods (
   statp char(1) binary NOT NULL default '',
   description char(88) binary NOT NULL default '',
   userid char(10) NOT NULL default '',
-  chapterid char(2) binary NOT NULL default '',
+  chapterid int(10) unsigned NOT NULL default '0',
   introduced char(10) default NULL,
   changed char(10) default NULL,
   changedby char(10) default NULL,
@@ -195,6 +195,7 @@ CREATE TABLE packages (
   filemtime varchar(10) NOT NULL default '',
   pause_reg varchar(10) NOT NULL default '',
   comment varchar(255) NOT NULL default '',
+  status enum('index','noindex') NOT NULL default 'index',
   PRIMARY KEY  (package)
 ) TYPE=ISAM PACK_KEYS=1;
 
