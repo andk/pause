@@ -195,29 +195,55 @@ sub handler {
 
 
            add_user => {
-			  verb => "Add a User or Mailinglist",
-			  priv => "admin",
-                          cat => "01usr/01add",
+                        verb => "Add a User or Mailinglist",
+                        priv => "admin",
+                        cat => "01usr/01add",
 
-			  desc => "Admins can add users or
+                        desc => "Admins can add users or
 				  mailinglists.",
 
-			 },
-	     edit_ml => {
-			 verb => "Edit a Mailinglist",
-			 priv => "admin",
-                              cat => "01usr/02",
+                       },
+           edit_ml => {
+                       verb => "Edit a Mailinglist",
+                       priv => "admin",
+                       cat => "01usr/02",
 
-			 desc => "Admins and mailing list
+                       desc => "Admins and mailing list
 				 representatives can change the name,
 				 address and description of a mailing
 				 list.",
 
-			},
-	     show_ml_repr => {
-			      verb => "Show Mailinglist Reps",
-			      priv => "admin",
-                              cat => "09root/04",
+                      },
+	     select_user => {
+			     verb => "Select User/Action",
+			     priv => "admin",
+                              cat => "01usr/03",
+
+			     desc => "Admins can access PAUSE as-if
+				     they were somebody else. Here
+				     they select a user/action pair.",
+
+			    },
+           post_message => {
+			     verb => "Post a message",
+			     priv => "admin",
+                              cat => "01usr/04",
+
+			     desc => "Post a message to a specific user.",
+
+			    },
+           dele_message => {
+			     verb => "Delete a message",
+			     priv => "admin",
+                              cat => "01usr/05",
+
+			     desc => "Delete your messages from the message board.",
+
+			    },
+           show_ml_repr => {
+                            verb => "Show Mailinglist Reps",
+                            priv => "admin",
+                            cat => "09root/04",
 
 			      desc => "Admins can lookup who is
 				      elected to be representative of
@@ -230,16 +256,6 @@ sub handler {
                              desc => "Batch-index all users.",
                               cat => "09root/05",
                             },
-	     select_user => {
-			     verb => "Select User/Action",
-			     priv => "admin",
-                              cat => "01usr/03",
-
-			     desc => "Admins can access PAUSE as-if
-				     they were somebody else. Here
-				     they select a user/action pair.",
-
-			    },
 	     select_ml_action => {
 
 				  verb => "Select Mailinglist/Action",
@@ -287,6 +303,7 @@ sub handler {
  edit_uris
  reindex
  share_perms
+ dele_message
  )],
 
 	    AuthenDsn       => $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},

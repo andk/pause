@@ -90,6 +90,8 @@ sub parameter {
 		       "select_user",
                        "check_xhtml",
                        "index_users",
+                       "dele_message",
+                       "post_message",
                        # "test_session",
 		      ) {
 	$allow_action{$command} = undef;
@@ -417,6 +419,7 @@ sub active_user_record {
     }
     %$u = (%{$mgr->{User}||{}}, %{$mgr->{UserSecrets}||{}});
   }
+  $mgr->{HiddenUser} = $u;
   $u;
 }
 
@@ -1535,7 +1538,7 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
       href="ftp://ftp.cpan.org/pub/CPAN/authors/id/N/NE/NEILB/scripts/">Neil
       Bowers' directory</a>.</p>
 
-};
+}; #};
 
 
 
@@ -2396,22 +2399,21 @@ sub request_id {
   my $showform = 0;
   my $regOK = 0;
 
-  my $fullname  = $req->param( 'pause99_request_id_fullname'   );
+  my $fullname  = $req->param( 'pause99_request_id_fullname');
   my $ufullname = $mgr->any2utf8($fullname);
   if ($ufullname ne $fullname) {
     $req->param("pause99_request_id_fullname", $ufullname);
     $fullname = $ufullname;
   }
-  my $email     = $req->param( 'pause99_request_id_email'  );
-  my $homepage   = $req->param( 'pause99_request_id_homepage'    );
-  my $userid    = $req->param( 'pause99_request_id_userid' );
+  my $email     = $req->param( 'pause99_request_id_email');
+  my $homepage   = $req->param( 'pause99_request_id_homepage');
+  my $userid    = $req->param( 'pause99_request_id_userid');
   my $rationale = $req->param("pause99_request_id_rationale") || "";
   warn "userid[$userid]Valid_Userid[$Valid_Userid]";
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
     # check for errors
 
-    warn "HERE";
     my @errors = ();
     unless( $fullname ) {
       push @errors, "You must supply a name\n";
@@ -2551,7 +2553,7 @@ MAIL
 
     require HTML::Entities;
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
-    $blurbcopy =~ s|(https?://\S+)|<a href="$1">$1</a>|g;
+    $blurbcopy =~ s|(https?://\S+)|<a href=\"$1\">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
     push @m, qq{<pre>
 From: $PAUSE::Config->{UPLOAD}
@@ -2560,7 +2562,7 @@ Subject: $subject
 $blurbcopy
 </pre>
 <hr noshade="noshade" />
-};
+}; #};
     for my $to (@to) {
       my $header = {
                     To => "$to",
@@ -5963,6 +5965,141 @@ sub coredump {
   my($nowsoft,$nowhard) = BSD::Resource::getrlimit(BSD::Resource::RLIMIT_CORE());
   $r->log_error("UID[$<]EUID[$>]cwd[$cwd]nowsoft[$nowsoft]nowhard[$nowhard]");
   CORE::dump;
+}
+
+sub dele_message {
+  my($self,$mgr) = @_;
+
+  my @m = qq{<p>Admins can add and delete messages to a message board.
+  When a user visits PAUSE they see the pending messages for them and
+  are requested to answer to the admin who placed the message. Usage
+  scenario: email bounces, google doesn't get us closer to the user,
+  that kind of thing. When the cause is settled the admin should
+  delete the message to not any longer annoy the user with it. The
+  user cannot delete the message.</p>
+
+  <p>To delete messages, click on the radio buttons and then press
+  <i>Delete</i>.</p>};
+
+  my $dbh = $mgr->connect;
+  my $req = $mgr->{CGI};
+  my $sth = $dbh->prepare("SELECT * FROM messages where mfrom=? ORDER BY mto, c");
+  $sth->execute($mgr->{User}{userid});
+  if ($sth->rows) {
+    if ($req->param('SUBMIT_pause99_dele_message_sub')) {
+      # get another handle
+      my $sth2 = $dbh->prepare("DELETE FROM messages WHERE mfrom=? AND c=?");
+      for my $m ($req->param('pause99_dele_message_m')) {
+        $sth2->execute($mgr->{User}{userid}, $m);
+      }
+      $sth->execute($mgr->{User}{userid});
+    }
+  }
+  if ($sth->rows) {
+    push @m, qq{<input type="submit"
+ name="SUBMIT_pause99_dele_message_sub" value="Delete" /><pre>};
+    my(@v,%l);
+    while (my $rec = $sth->fetchrow_hashref) {
+      push @v, $rec->{c};
+      $l{$rec->{c}} = sprintf(qq{<a href="?ACTION=edit_cred&amp;HIDDENNAME=%s">%*s</a>%*s %s | %s},
+                              $rec->{mto},
+                              length($rec->{mto}),
+                              $rec->{mto},
+                              10-length($rec->{mto}),
+                              "",
+                              $rec->{created},
+                              $rec->{message},
+                             );
+    }
+    my $field = $mgr->checkbox_group(
+                                      name      => 'pause99_dele_message_m',
+                                      'values'  => \@v,
+                                      linebreak => 'true',
+                                      labels    => \%l
+                                     );
+    $field =~ s!<br />\s*!\n!gs;
+
+    push @m, $field;
+    push @m, qq{</pre>};
+  } else {
+    push @m, qq{<p>No messages found.</p>};
+  }
+  @m;
+}
+
+sub post_message {
+  my($self,$mgr) = @_;
+
+  my @m = qq{<p>Admins can add and delete messages to a message board.
+  When a user visits PAUSE they see the pending messages for them and
+  are requested to answer to the admin who placed the message. Usage
+  scenario: email bounces, google doesn't get us closer to the user,
+  that kind of thing. When the cause is settled the admin should
+  delete the message to not any longer annoy the user with it. The
+  user cannot delete the message.</p>
+
+  <p>To post a message, fill in the form and press
+  <i>Submit</i>.</p><hr />};
+
+  my $dbh = $mgr->connect;
+  my $req = $mgr->{CGI};
+
+  my $mto = $req->param('pause99_post_message_mto');
+  $mto = uc $mto;
+  my $mess = $req->param('pause99_post_message_mess');
+  warn "mto[$mto]mess[$mess]";
+
+  my $showform = 0;
+  my $regOK = 0;
+
+  if ($req->param('SUBMIT_pause99_post_message_sub')) {
+    my @errors = ();
+    unless ($mto) {
+      push @errors, "You must supply a message";
+    }
+    if ($mto) {
+      my $sth = $dbh->prepare("SELECT userid FROM users where userid=?");
+      $sth->execute($mto);
+      unless ($sth->rows) {
+        push @errors, sprintf "Userid %s is not known", $mgr->escapeHTML($mto);
+      }
+      $sth->finish;
+    } else {
+      push @errors, "You must supply a userid";
+    }
+    if( @errors ) {
+      push @m, qq{<h3>Error processing form</h3>};
+      for (@errors) {
+        push @m, "<ul>", "<li>$_</li>", "</ul>";
+      }
+      push @m, qq{<p>Please retry.</p>};
+    } else {
+      my $sth = $dbh->prepare("INSERT INTO messages VALUES (NULL,?,?,NOW(),?)");
+      $sth->execute($mgr->{User}{userid},$mto,$mess);
+      push @m, sprintf qq{Message to <a href="?ACTION=edit_cred&amp;HIDDENNAME=%s">%s</a> posted.},
+          ($mgr->escapeHTML($mto))x2;
+      for my $f (qw(mto mess)) {
+        $req->param("pause99_post_message_$f","");
+      }
+    }
+  }
+  for my $arr (
+               ['Userid','mto',10,10],
+               ['Message','mess',60,255],
+              ) {
+    push @m, qq{<p><b>$arr->[0]</b></p><p>};
+    push @m, $mgr->textfield(
+                             name => "pause99_post_message_$arr->[1]",
+                             size => $arr->[2],
+                             maxsize => $arr->[3]
+                            );
+    push @m, "</p>";
+  }
+  push @m, qq{<input type="submit" name="SUBMIT_pause99_post_message_sub"
+  	  value="Submit" />};
+
+
+  @m;
 }
 
 1;

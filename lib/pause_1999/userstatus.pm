@@ -26,8 +26,20 @@ sub as_string {
       $class = "statusunencr";
     }
 
+    my $hu = "";
+    if ($mgr->{HiddenUser}{userid}) {
+      $hu = sprintf qq{%s &lt;%s&gt;<br />},
+                     $mgr->{HiddenUser}{userid},
+                     $mgr->escapeHTML(
+                                      $mgr->{HiddenUser}{secretemail}
+                                      ||
+                                      $mgr->{HiddenUser}{email}
+                                      ||
+                                      "No email???"
+                                     );
+    }
     push @m, sprintf(
-                     qq{<tr><td class="%s" nowrap="nowrap">%s &lt;%s&gt;<br />%s</td></tr>},
+                     qq{<tr><td class="%s" nowrap="nowrap">%s &lt;%s&gt;<br />%s%s</td></tr>},
                      $class,
                      $user,
                      $mgr->escapeHTML(
@@ -37,6 +49,7 @@ sub as_string {
                                       ||
                                       "No email???"
                                      ),
+                     $hu,
                      $encr ? "encrypted session" : "<b>unencrypted session</b>",
                      );
 

@@ -115,6 +115,7 @@ DbHandle4Authen
 DbHandle
 DocumentRoot
 EditOutput
+HiddenUser
 IsMailinglistRepresentative
 MailMailerConstructorArgs
 MailtoAdmins
