@@ -910,7 +910,7 @@ sub select_ml_action {
 sub pause_04about {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
-  $self->show_document($mgr,"04pause.html");
+  $self->show_document($mgr,"04pause.html",1);
 }
 
 sub pause_logout {
@@ -941,6 +941,7 @@ sub show_document {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
   my $doc = shift || "04pause.html";
+  my $rewrite = shift || 0;
   my $r = $mgr->{R};
   my $dir = $r->document_root;
   my @m;
@@ -957,19 +958,26 @@ sub show_document {
     my $html_in = <$fh>;
     close $fh;
 
-    use XML::SAX::ParserFactory;
-    use XML::SAX::Writer;
-    use pause_1999::saxfilter01;
-    use XML::LibXML::SAX;
-    $XML::SAX::ParserPackage = "XML::LibXML::SAX";
+    if ($rewrite) {
+      use XML::SAX::ParserFactory;
+      use XML::SAX::Writer;
+      use pause_1999::saxfilter01;
+      use XML::LibXML::SAX;
+      $XML::SAX::ParserPackage = "XML::LibXML::SAX";
 
-    my @html_out;
-    my $w = XML::SAX::Writer->new(Output => \@html_out);
-    my $f = pause_1999::saxfilter01->new(Handler => $w);
-    my $p = XML::SAX::ParserFactory->parser(Handler => $f);
-    $p->parse_string($html_in);
-    shift @html_out if $html_out[0] =~ /^<\?/; # remove the XML Declaration
-    push @m, join "", @html_out;
+      my @html_out;
+      my $w = XML::SAX::Writer->new(Output => \@html_out);
+      my $f = pause_1999::saxfilter01->new(Handler => $w);
+      my $p = XML::SAX::ParserFactory->parser(Handler => $f);
+      $p->parse_string($html_in);
+      shift @html_out if $html_out[0] =~ /^<\?/; # remove the XML Declaration
+      push @m, join "", @html_out;
+    } else {
+      my $html = $html_in;
+      $html =~ s/^.*?<body[^>]*>//si;
+      $html =~ s|</body>.*$||si;
+      push @m, $html;
+    }
 
     last;
   }
