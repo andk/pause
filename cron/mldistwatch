@@ -29,6 +29,7 @@ $Data::Dumper::Indent = 1;
 {
     package PAUSE::mldistwatch;
     ###### data initialization ######
+    use File::Find;
     use File::Path qw(rmtree mkpath);
     our $Id = q$Id$;
     our $ISAPERL = qr{
@@ -171,16 +172,46 @@ sub DESTROY {
 sub init_all {
     my $self = shift;
     $self->verbose(2,"Running manifind\n");
-    $self->{ALLfound} = ExtUtils::Manifest::manifind();
+    $self->{ALLfound} = $self->manifind;
     $self->verbose(2,"Collecting distmtimes from DB\n");
+    $self->{ALLlasttime} = $self->dbfind;
+}
+
+sub dbfind {
+    my($self) = @_;
+    my %found;
     my $dbh = $self->connect;
     my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
     $sth->execute;
     my($dist,$distmtime);
     while (($dist,$distmtime) = $sth->fetchrow_array) {
-        $self->{ALLlasttime}{$dist} = $distmtime;
+        $found{$dist} = $distmtime;
     }
     $sth->finish;
+    \%found;
+}
+
+sub clean_up_filename {
+    my($self,$filename) = @_;
+    $filename =~ s|^\./||;
+    return $filename;
+}
+
+sub manifind {
+    my($self) = @_;
+    my %found;
+
+    my $wanted = sub {
+        my $name = $self->clean_up_filename($File::Find::name);
+        return if -d $_;
+        $found{$name} = "";
+    };
+    find(
+         {wanted => $wanted},
+         "."
+        );
+
+    return \%found;
 }
 
 sub checkfornew {
