@@ -8,8 +8,7 @@ use Fcntl qw(O_RDWR O_RDONLY);
 
 use URI::Escape;
 
-use vars qw($VERSION);
-$VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub parameter {
   my pause_1999::edit $self = shift;
