@@ -23,7 +23,7 @@ use DBI;
 my $Rev = q$Rev$;
 print "$Rev\n";
 
-my $sharp = 1;
+my $sharp = 0;
 
 my $db = DBI->connect(
                       $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
@@ -52,6 +52,7 @@ for my $de1 (readdir $dh) {
       die "Deleted userdirectory $de3" if $U->{$de3}{ustatus} eq 'delete';
       next if $U->{$de3}{ustatus} eq 'active';
       print "Setting $de3 to active\n";
+      next unless $sharp;
       $sth->execute($de3);
     }
   }
