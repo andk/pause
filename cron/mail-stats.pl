@@ -1,19 +1,6 @@
 #!/usr/bin/perl
 #
 
-# On Debian the permissions for mail.log are root.adm and 640, so we
-# would have to add mon to the adm group. I don't want this, so I let
-# a cronjob cron/mail-stats.pl do the analysis.
-
-
-=pod
-
-    D E A D    C O D E   !!!
-
-    should work as cron/mail-stats.pl
-
-=cut
-
 use strict;
 use Date::Parse;
 
@@ -22,7 +9,7 @@ use constant BYTE_LIMIT_PER_HOUR => 20_000_000;
 my(%S,%N,$danger);
 my $report = "";
 
-open P, "<", "/var/log/mail/mail.log" or die;
+open P, "<", "/var/log/mail/mail.log" or die "Could not open mail.log: $!";
 while (<P>){
   my($t,$s) = /^(\S+\s+\S+\s+\S+)\s+\S+\s+sm-mta\[\d+\]:.*size=(\d+)/ or next;
   my $tep = Date::Parse::str2time($t);
@@ -39,9 +26,12 @@ for my $t (sort { $a <=> $b } keys %S){
   }
   $report .= "\n";
 }
+my $statsfile = "/var/run/mail-stats-log/alert.txt";
+open P, ">", $statsfile or die "Could not open $statsfile: $!";
+print P $report;
+close P or die "Could not close $statsfile: $!\n\nThe report:\n\n$report";
 if ($danger){
-  print $report;
-  exit 1;
+  die $report;
 }
 
 
