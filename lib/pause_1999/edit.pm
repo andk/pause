@@ -22,12 +22,12 @@ sub parameter {
                 "pause_04about",
                 "pause_04imprint",
                 "pause_06history",
-#                "request_id",
+                "request_id",
                 "pause_05news",
               } = ();
 
   @allow_submit = (
-#                   "request_id",
+                   "request_id",
                   );
 
   if ($mgr->{User} && $mgr->{User}{userid}) {
@@ -1893,6 +1893,15 @@ sub add_user {
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
 
+  if ($req->param("USERID")) {
+    my $session = $mgr->session;
+    my $s = $session->{APPLY};
+    for my $a (keys %$s) {
+      $req->param("pause99_add_user_$a", $s->{$a});
+      # warn "retrieving from session a[$a]s(a)[$s->{$a}]";
+    }
+  }
+
   my $userid;
   if ( $userid = $req->param("pause99_add_user_userid") ) {
 
@@ -1945,7 +1954,8 @@ sub add_user {
 	   $sintroduced, $schangedby, $schanged);
 	my @rows;
 	while (($suserid, $sfullname, $semail, $shomepage,
-		$sintroduced, $schangedby, $schanged) = $mgr->fetchrow($sth, "fetchrow_array")) {
+		$sintroduced, $schangedby, $schanged) =
+               $mgr->fetchrow($sth, "fetchrow_array")) {
 	  (my $dbsurname = $sfullname) =~ s/.*\s//;
 	  next unless &$s_func($dbsurname) eq $s_code;
 	  push @rows, "<tr>",
@@ -2294,78 +2304,142 @@ sub request_id {
 
   my $req = $mgr->{CGI};
 
-  my $param_count = @{ [ $req->param ] };
+  # first time: form
+  # second time with error: error message + form
+  # second time without error: OK message
 
-  # generate the form if no parameters (not counting ACTION)
-  unless( $param_count > 1 ) {
+  my $showform = 0;
+  my $regOK = 0;
 
+  my $fullname  = $req->param( 'pause99_request_id_fullname'   );
+  my $email     = $req->param( 'pause99_request_id_email'  );
+  my $homepage   = $req->param( 'pause99_request_id_homepage'    );
+  my $userid    = $req->param( 'pause99_request_id_userid' );
+  my $rationale = $req->param("pause99_request_id_rationale") || "";
+
+  if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
+    # check for errors
+
+    my @errors = ();
+    unless( $fullname ) {
+      push @errors, "You must supply a name\n";
+    }
+    unless( $email ) {
+      push @errors, "You must supply an email address\n";
+    }
+    unless( $userid ) {
+      push @errors, "You must supply a desired user name\n";
+    }
+
+    if( @errors ) {
+      push @m, qq{<h3>Error processing form</h3>};
+      for (@errors) {
+        push @m, "<ul>", "<li>$_</li>", "</ul>";
+      }
+      push @m, qq{<p>Please retry.</p>};
+      $showform = 1;
+    } else {
+      $regOK = 1;
+    }
+  } else {
+    $showform = 1;
+  }
+  if ($showform) {
     push @m, "<table>\n";
     foreach my $pair (
-                      [ 'Full name',  'pause99_request_id_name'   ],
+                      [ 'Full name',  'pause99_request_id_fullname'   ],
                       [ 'Email',      'pause99_request_id_email'  ],
-                      [ 'Web site',   'pause99_request_id_web'    ],
+                      [ 'Web site',   'pause99_request_id_homepage'    ],
                       [ 'Desired ID', 'pause99_request_id_userid' ],
                      ) {
       push @m, "<tr>\n\t<td>$pair->[0]</td>\n<td>";
       push @m, $mgr->textfield( name => $pair->[1], size => 32 );
       push @m, "\t</td>\n</tr>\n\n";
     }
+    push @m, qq{<tr><td colspan="2">I want to be registered because:</td></tr><tr><td colspan="2">};
+    push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
+                            rows=>6,
+                            cols=>60);
+    push @m, qq{</td></tr>};
     push @m, "</table>\n";
 
-    push @m, qq{<input type="submit" name="pause99_request_id_sub"
+    push @m, qq{<input type="submit" name="SUBMIT_pause99_request_id_sub"
   	  value="Request Account" />};
 
-    return @m;
   }
+  if ($regOK) {
 
-  # check for errors
-  my $name  = $req->param( 'pause99_request_id_name'   );
-  my $email = $req->param( 'pause99_request_id_email'  );
-  my $web   = $req->param( 'pause99_request_id_web'    );
-  my $id    = $req->param( 'pause99_request_id_userid' );
+    my @to = $mgr->{MailtoAdmins};
+    push @to, $email;
+    my $time = time;
+    push @m, qq{ Sending mail to: @to};
+    if ($rationale) {
+      # wrap it
+      require Text::Format;
+      $rationale =~ s/\r\n/\n/g;
+      $rationale =~ s/\r/\n/g;
+      my @rat = split /\n\n/, $rationale;
+      my $tf = Text::Format->new( bodyIndent => 4, firstIndent => 5);
+      $rationale = $tf->paragraphs(@rat);
+      $rationale =~ s/^\s{5}/\n    /gm;
+    }
 
-  my @errors = ();
+    my $session = $mgr->session;
+    $session->{APPLY} = {
+                         fullname => $fullname,
+                         email => $email,
+                         homepage => $homepage,
+                         userid => $userid,
+                         rationale => $rationale,
+                        };
+    my $sessionID = $mgr->userid;
+    my $host = "https://pause.perl.org";
+    # $host = "http://k242.linux.bogus" if $PAUSE::Config->{TESTHOST};
+    my $blurb = <<"MAIL";
+Request to register new user
 
-  unless( $name ) {
-    push @errors, "You must supply a name\n";
-  }
+fullname: $fullname
+  userid: $userid
+    mail: CENSORED
+homepage: $homepage
+     why:
+$rationale
 
-  unless( $email ) {
-    push @errors, "You must supply an email address\n";
-  }
+The following links are only valid for PAUSE maintainers:
 
-  unless( $id ) {
-    push @errors, "You must supply a desired user name\n";
-  }
-
-  if( @errors ) {
-    die Apache::HeavyCGI::Exception->new(ERROR =>
-                                         join "\n", "<ul>",
-                                         map( { "\t<li>$_</li>" }
-                                              @errors ), "</ul>" );
-  }
-
-=comment
-
-  # send mail to modules@perl.org
-  my @to = $mgr->{MailtoAdmins};
-  push @to, $email;
-
-  my $mailblurb = <<"MAIL";
-
+Registration form with editing capabilities:
+  $host/pause/authenquery?ACTION=add_user&USERID=$sessionID&SUBMIT_pause99_add_user_sub=1
+Immediate (one click) registration:
+  $host/pause/authenquery?ACTION=add_user&USERID=$sessionID&SUBMIT_pause99_add_user_Definitely=1
 MAIL
-
-  my $header = {
+    my $subject = 'PAUSE ID request';
+    my $header = {
   	To      => $email,
-  	Subject => 'PAUSE ID request',
+  	Subject => $subject,
   	};
 
-  $mgr->send_mail( $header, $mailblurb );
+    require HTML::Entities;
+    my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
+    $blurbcopy =~ s|(https?://\S+)|<a href="$1">$1</a>|g;
+    $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
+    push @m, qq{<pre>
+From: $PAUSE::Config->{UPLOAD}
+Subject: $subject
 
-=cut
+$blurbcopy
+</pre>
+<hr noshade="noshade" />
+};
+    for my $to (@to) {
+      my $header = {
+                    To => "$to",
+                    Subject => $subject
+                   };
+      warn "To[$header->{To}]Subject[$header->{Subject}]";
+      $mgr->send_mail($header,$blurb);
+    }
 
-  # generate page to show user
-  push @m, 'this is the success page';
+  }
 
   return @m;
 }
@@ -3859,7 +3933,7 @@ sub apply_mod {
               $self->desc_meta);
 
   $meta{modid}{note} = "Please try to suggest a nested namespace that
-                        are based on an existing root namespace. New
+                        is based on an existing root namespace. New
                         entries to the root namespace are less likely
                         to be approved.";
 
@@ -4181,9 +4255,9 @@ Immediate (one click) registration:
     my($blurb) = join "", @blurb;
     require HTML::Entities;
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
-    $blurbcopy =~ s|(http://\S+)|<a href="$1">$1</a>|g;
+    $blurbcopy =~ s|(https?://\S+)|<a href="$1">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    # warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
     push @m, qq{<pre>
 From: $PAUSE::Config->{UPLOAD}
 Subject: $subject

@@ -33,14 +33,14 @@ sub handler {
 
            # PUBLIC
 
-#            request_id => {
-#                       verb => "Request PAUSE account",
-#                       priv => "public",
-#                       cat => "00reg/01",
+           request_id => {
+                      verb => "Request PAUSE account",
+                      priv => "public",
+                      cat => "00reg/01",
 
-#                       desc => "Apply for a PAUSE account.",
+                      desc => "Apply for a PAUSE account.",
 
-#                      },
+                     },
 
            mailpw => {
                       verb => "Forgot Password?",

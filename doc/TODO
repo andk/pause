@@ -17,5 +17,4 @@ Document/verify the status of crontab.root.
 
 Document needed aliases and modules@ mailing list.
 
-
-
+mldistwatch: determine symlinks more efficiently
