@@ -126,6 +126,7 @@ sub new {
                       UNZIPBIN  => $unzipbin,
                      }, $class;
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
+    $self;
 }
 
 sub verbose {
