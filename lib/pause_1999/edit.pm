@@ -1984,7 +1984,7 @@ glory is collected on http://history.perl.org/backpan/});
     for my $to (keys %umailset) {
       my $header = {
                     To => $to,
-                    Subject => "Scheduled for deletion $u->{userid}"
+                    Subject => "Files of $u->{userid} scheduled for deletion"
                    };
       $mgr->send_mail($header,$blurb);
     }

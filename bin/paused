@@ -272,7 +272,7 @@ No action is required on your part
                      "Request completed:  ",
                      HTTP::Date::time2str(time),
                      "\n\n",
-                     "\tVirtually Yours,\n$Id"
+                     "Thanks,\n-- \n$Id"
                     );
 
       for my $to (@To) {
