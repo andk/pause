@@ -198,11 +198,11 @@ CREATE TABLE mods (
 
 CREATE TABLE packages (
   package varchar(100) binary NOT NULL default '',
-  version varchar(16) default NULL,
-  dist varchar(128) default NULL,
-  file varchar(128) default NULL,
-  filemtime varchar(10) default NULL,
-  pause_reg varchar(10) default NULL,
+  version varchar(16) NOT NULL default '',
+  dist varchar(128) NOT NULL default '',
+  file varchar(128) NOT NULL default '',
+  filemtime varchar(10) NOT NULL default '',
+  pause_reg varchar(10) NOT NULL default '',
   comment varchar(255) NOT NULL default '',
   PRIMARY KEY  (package)
 ) TYPE=ISAM PACK_KEYS=1;
