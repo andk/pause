@@ -35,7 +35,7 @@ sub as_string {
        <td rowspan="2" valign="top">
         <div class="xexplain">The PAUSE is sponsored by</div><br />
         <a href="http://www.loomes.de">
-         <img src="/pause/logol1.$pngjpg" border="0" alt="Loomes Logo"
+         <img src="/pause/logol1.$pnggif" border="0" alt="Loomes Logo"
               width="273" height="78" align="left" />
         </a>
        </td>
