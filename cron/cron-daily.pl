@@ -521,7 +521,7 @@ sub whois {
     if (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
       report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
       copy '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html";
-      open my $xmlfh, ">", "$PAUSE::Config->{MLROOT}/../00whois.xml";
+      open my $xmlfh, ">:utf8", "$PAUSE::Config->{MLROOT}/../00whois.xml";
       print $xmlfh $xml;
       close $xmlfh;
     }
