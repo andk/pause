@@ -1,5 +1,15 @@
 2005-03-28  Andreas Koenig  <andk@cpan.org>
 
+	* we still have the column chapternr in chapters and chapterid
+	everywhere else. So lets do
+
+	alter table chapters add chapterid int(10) unsigned not null after chapternr;
+	update chapters set chapterid=chapternr;
+
+	Then we can remove all references to chapternr;
+
+	DONE.
+
 	* This is what Tim suggests:
 
 	1. Add three new chapters: "Documentation", "Pragma", "Perl6".
