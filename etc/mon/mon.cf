@@ -19,7 +19,7 @@ hostgroup paused localhost
 watch pause
     service freespace
 	interval 1m
-	monitor freespace.monitor /:200000 /home:1000000 /tmp:500000 /home/ftp:4000000
+	monitor freespace.monitor /:150000 /home:900000 /tmp:500000 /home/ftp:4000000
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
 	    alertevery 1h
