@@ -1517,7 +1517,7 @@ to upload further files.</p>
 
 	my $tmpdir = "ftp://$server/tmp/$userhome";
 	my $usrdir = "https://$server/pub/PAUSE/authors/id/$userhome";
-	my $tailurl = "https://$server/pause/authenquery?ACTION=tail_log" .
+	my $tailurl = "https://$server/pause/authenquery?ACTION=tail_logfile" .
             "&pause99_tail_logfile_n=6000";
 	my $etailurl = $mgr->escapeHTML($tailurl);
 	push @m, (qq{
