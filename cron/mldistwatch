@@ -1012,13 +1012,25 @@ Please contact modules\@perl.org if there are any open questions.
              README: $self->{README}
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
+        my $tf = Text::Format->new(firstIndent=>0);
+
         if (0) {
         } elsif ($self->{HAS_MULTIPLE_ROOT}) {
-            push @m, qq{The distribution does not unpack into a single directory }.
-                qq{and is therefore not being indexed.\n\n};
+
+            push @m, $tf->format(qq{The distribution does not unpack
+                into a single directory and is therefore not being
+                indexed. Hint: try 'make dist'.});
+
+            push @m, qq{\n\n};
+
         } elsif ($self->{HAS_BLIB}) {
-            push @m, qq{The distribution contains a blib/ directory and is }.
-                qq{therefore not being indexed. Hint: try 'make dist'\n\n};
+
+            push @m, $tf->format(qq{The distribution contains a blib/
+                directory and is therefore not being indexed. Hint:
+                try 'make dist'.});
+
+            push @m, qq{\n\n};
+
         } else {
             my $st = $self->{INDEX_STATUS};
             if ($st && ref $st && %$st) {
@@ -1029,8 +1041,8 @@ Please contact modules\@perl.org if there are any open questions.
                         or
                             $a cmp $b
                         } keys %$st) {
-                    my $tf = Text::Format->new( bodyIndent => 13, firstIndent => 13);
-                    my $verb_status = $tf->format($st->{$p}{verb_status});
+                    my $tf13 = Text::Format->new( bodyIndent => 13, firstIndent => 13);
+                    my $verb_status = $tf13->format($st->{$p}{verb_status});
                     $verb_status =~ s/^\s+//; # otherwise this line is too long
                     push @m, sprintf "%s
     version: %s
