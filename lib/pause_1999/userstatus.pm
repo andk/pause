@@ -36,7 +36,7 @@ sub as_string {
                                       $mgr->{User}{email}
                                       ||
                                       "No email???"
-                                     )
+                                     ),
                      $encr ? "encrypted session" : "<b>unencrypted session</b>",
                      );
 
