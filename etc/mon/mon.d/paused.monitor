@@ -4,7 +4,7 @@ use strict;
 open P, "ps auxww |";
 my $running;
 while (<P>){
-  next unless /^root.*perl.*paused$/;
+  next unless m{ ^ root .* perl .* /bin/paused \s }x;
   $running++;
 }
 close P or die "Could not close P";
