@@ -2464,6 +2464,8 @@ sub request_id {
   my(@m);
 
   my $req = $mgr->{CGI};
+  my $r = $mgr->{R};
+  $mgr->prefer_post(1);
 
   # first time: form
   # second time with error: error message + form
@@ -2487,7 +2489,12 @@ sub request_id {
     $req->param("pause99_request_id_rationale", $urat);
     $rationale = $urat;
   }
-  warn "userid[$userid]Valid_Userid[$Valid_Userid]";
+  warn sprintf(
+               "userid[%s]Valid_Userid[%s]args[%s]",
+               $userid,
+               $Valid_Userid,
+               scalar $r->args,
+              );
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
     # check for errors
@@ -2515,7 +2522,7 @@ sub request_id {
       }
       $sth->finish;
     } else {
-      push @errors, "You must supply a desired user name\n";
+      push @errors, "You must supply a desired user-ID\n";
     }
 
     if( @errors ) {
