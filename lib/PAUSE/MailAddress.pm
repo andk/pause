@@ -39,7 +39,7 @@ sub new_from_userid {
     if ($sth->rows >= 0){
       ($me->{address}) = $sth->fetchrow_array;
     }
-    $me->address ||= "$userid\@cpan.org";
+    $me->{address} ||= "$userid\@cpan.org";
   }
   bless $me, $class;
 }
