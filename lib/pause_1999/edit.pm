@@ -4073,7 +4073,7 @@ sub add_mod {
     my $chap_shorttitle = "???";
     $sth = $dbh->prepare("SELECT shorttitle
                           FROM chapters
-                          WHERE chapternr=?");
+                          WHERE chapterid=?");
     warn "chapterid[$chapterid]";
     $sth->execute($chapterid);
     warn "chapterid[$chapterid]";
@@ -4522,7 +4522,7 @@ sub apply_mod {
     my $chap_shorttitle = "???";
     $sth = $dbh->prepare("SELECT shorttitle
                           FROM chapters
-                          WHERE chapternr=?");
+                          WHERE chapterid=?");
     $sth->execute($chapterid);
     if ($sth->rows == 1) {
       $chap_shorttitle = $mgr->fetchrow($sth, "fetchrow_array");
@@ -4848,12 +4848,12 @@ sub chap_meta {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
   my $dbh = $mgr->connect;
-  my $sth3  = $dbh->prepare("SELECT chapternr, shorttitle
+  my $sth3  = $dbh->prepare("SELECT chapterid, shorttitle
                              FROM   chapters");
   my(%chap);
   $sth3->execute;
-  while (my($chapternr, $shorttitle) = $mgr->fetchrow($sth3, "fetchrow_array")) {
-    $chap{$chapternr} = sprintf "%03d %s", $chapternr, $shorttitle;
+  while (my($chapterid, $shorttitle) = $mgr->fetchrow($sth3, "fetchrow_array")) {
+    $chap{$chapterid} = sprintf "%03d %s", $chapterid, $shorttitle;
   }
   my @sorted = sort { $a <=> $b } keys %chap;
   unshift @sorted, "";
