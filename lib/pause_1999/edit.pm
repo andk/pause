@@ -1575,6 +1575,8 @@ try again, because PAUSE doesn\'t let you upload a file twice.</p>
   my %incom = ();
   my $sth = $dbh->prepare("SELECT userid, uri, dgot FROM uris WHERE uri=?");
   for ($dh->read) {
+    # 5.8.0 has a bug here (probably the same that beats us in manifind)
+    warn "DEBUG: _[$_]";
     next if /^\./;
     next if /[^\w\-\.\@\+]/; # filter illegal filenames, they might
                              # disturb the XHTML (and do worse anyway)
