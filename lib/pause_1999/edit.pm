@@ -1436,10 +1436,8 @@ href="mailto:},
                 255 characters.");
       }
 
-      # Stupid to have code that is maintained in two places,
-      # here and in mldistwatch:
       if (
-	  $filename =~ /(README|readme|\.html|\.txt)$/
+	  $filename =~ /(README|readme|\.html|\.txt|\.[xy]ml)(\.gz|\.bz2)?$/
           ||
           $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!
 	 ) {
