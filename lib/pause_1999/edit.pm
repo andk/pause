@@ -1201,12 +1201,13 @@ The Pause
               $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
             }
           }
-	  my $header = {
-			To => join(",",keys %umailset),
-			Subject => "Password Update",
-		       };
-
-	  $mgr->send_mail($header, $mailblurb);
+          for my $to (keys %umailset) {
+            my $header = {
+                          To      => $to,
+                          Subject => "Password Update",
+                         };
+            $mgr->send_mail($header, $mailblurb);
+          }
 	} else {
 	  die Apache::HeavyCGI::Exception
               ->new(ERROR => "The two passwords didn't match.");
@@ -1797,12 +1798,13 @@ into $her directory. The request used the following parameters:});
       }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    my $header = {
-		  To => join(",",keys %umailset),
-		  Subject => "Notification from PAUSE",
-		 };
-    warn sprintf "to[%s]process[%s]", $header->{To}, $$;
-    $mgr->send_mail($header, $mailblurb);
+    for my $to (keys %umailset) {
+      my $header = {
+                    To => $to,
+                    Subject => "Notification from PAUSE",
+                   };
+      $mgr->send_mail($header, $mailblurb);
+    }
   }
 
   @m;
@@ -1979,11 +1981,13 @@ glory is collected on http://history.perl.org/backpan/});
       }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    my $header = {
-		  To => join(",",keys %umailset),
-		  Subject => "Scheduled for deletion $u->{userid}"
-		 };
-    $mgr->send_mail($header,$blurb);
+    for my $to (keys %umailset) {
+      my $header = {
+                    To => $to,
+                    Subject => "Scheduled for deletion $u->{userid}"
+                   };
+      $mgr->send_mail($header,$blurb);
+    }
   }
 
   my $submit_butts = qq{<input type="submit"
@@ -5394,11 +5398,13 @@ $Yours},
       }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    my $header = {
-		  To => join(",",keys %umailset),
-		  Subject => "Scheduled for reindexing $u->{userid}"
-		 };
-    $mgr->send_mail($header,$blurb);
+    for my $to (keys %umailset) {
+      my $header = {
+                    To      => $to,
+                    Subject => "Scheduled for reindexing $u->{userid}"
+                   };
+      $mgr->send_mail($header,$blurb);
+    }
 
     push @m, qq{<hr /><pre>$blurb</pre><hr />};
 
