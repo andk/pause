@@ -33,7 +33,7 @@ sub layout {
   push @l, qq{<html><head><title>};
   push @l, $PAUSE::Config->{TESTHOST} ? qq{pause\@home: } : qq{PAUSE: };
   push @l, $mgr->{Action} || "The CPAN back stage entrance";
-  my $h2special = $PAUSE::Config->{TESTHOST} ? "h2,b { color: #f0f; }" : "";
+  my $hspecial = $PAUSE::Config->{TESTHOST} ? "h2,h4,b { color: #f0f; }" : "";
 
 
 =pod
@@ -74,7 +74,7 @@ a.activemenu:hover { text-decoration: underline; }
 .firstheader { margin: 0 0 5%; }
 p.motd { margin: 12px 1in; padding: 6px; color: black; background: yellow; font-size: small; }
 .messages { text-align: left; border: 2px dashed red; padding: 2ex; }
-$h2special
+$hspecial
 </style>
 </head><body bgcolor="white" link="#0000CC" vlink="#0000BB"
  alink="#FF0000" text="#000000"><table width="100%" border="0"

@@ -5997,8 +5997,11 @@ sub dele_message {
     push @m, qq{<input type="submit"
  name="SUBMIT_pause99_dele_message_sub" value="Delete" /><pre>};
     my(@v,%l);
+    my $tf = Text::Format->new(firstIndent => 36, bodyIndent => 36, columns => 90);
     while (my $rec = $sth->fetchrow_hashref) {
       push @v, $rec->{c};
+      my $fmessage = $tf->format($rec->{message});
+      $fmessage =~ s/^\s+//;
       $l{$rec->{c}} = sprintf(qq{<a href="?ACTION=edit_cred&amp;HIDDENNAME=%s">%*s</a>%*s %s | %s},
                               $rec->{mto},
                               length($rec->{mto}),
@@ -6006,7 +6009,7 @@ sub dele_message {
                               10-length($rec->{mto}),
                               "",
                               $rec->{created},
-                              $rec->{message},
+                              $fmessage,
                              );
     }
     my $field = $mgr->checkbox_group(
