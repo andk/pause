@@ -864,7 +864,7 @@ sub version {
     $m =~ s|/|::|g;
     $m =~ s|\.pm$||;
     my $v = $m->VERSION;
-    warn "m[$m]v[$v]" if $v < 10;
+    warn "Warning: Old style versioning in m[$m]v[$v]" if $v < 10;
     $version = $v if $v > $version;
   }
   $version;
