@@ -44,12 +44,14 @@ make sure that installed programs find their configuration:
 
 (last time updated: 2003-07-25)
 
-  /usr/local/apache/conf   -> ../../../home/k/PAUSE/apache-conf
-  /usr/local/apache/htdocs -> ../../../home/k/PAUSE/htdocs/
-  /usr/local/apache/perl   -> ../../../home/k/PAUSE/apache-perl
-  /etc/rsyncd.conf         -> /home/k/PAUSE/etc/rsyncd.conf
-  /etc/proftpd.conf        -> /home/k/PAUSE/etc/proftpd.conf
-  /etc/mon/mon.cf          -> /home/k/PAUSE/etc/mon/mon.cf
+  /usr/local/apache/conf          -> ../../../home/k/PAUSE/apache-conf
+  /usr/local/apache/htdocs        -> ../../../home/k/PAUSE/htdocs/
+  /usr/local/apache/perl          -> ../../../home/k/PAUSE/apache-perl
+  /etc/apache2/apache2.conf       -> /home/k/PAUSE/apache-svn-conf/httpd.conf
+  /etc/apache2/mods-available/ssl.conf -> /home/k/PAUSE/apache-svn-conf/ssl.conf
+  /etc/rsyncd.conf                -> /home/k/PAUSE/etc/rsyncd.conf
+  /etc/proftpd.conf               -> /home/k/PAUSE/etc/proftpd.conf
+  /etc/mon/mon.cf                 -> /home/k/PAUSE/etc/mon/mon.cf
   /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
 
 [ (last time updated: 2002-12-25)
