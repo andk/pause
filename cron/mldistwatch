@@ -531,28 +531,28 @@ sub do_rewrite01 {
         my $bycat = "$PAUSE::Config->{MLROOT}/../../modules/by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
         next if -e $bymod and -e $bycat;
 
-        chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../authors/id/$pkg{dist}",
                        "../../modules/by-module/$pkg{rootpack}".
                        "/$pkg{filenameonly}");
-        chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../authors/id/$pkg{readme}",
                        "../../modules/by-module/$pkg{rootpack}".
                        "/$pkg{readmefn}")
             if -f $pkg{readme};
-        chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../authors/id/$userdir",
                        "../../modules/by-module/$pkg{rootpack}/$pkg{userid}");
-        chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../../authors/id/$pkg{dist}",
                        "../../modules/by-category/$pkg{chapter}".
                        "/$pkg{rootpack}/$pkg{filenameonly}");
-        chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../../authors/id/$pkg{readme}",
                        "../../modules/by-category/$pkg{chapter}".
                        "/$pkg{rootpack}/$pkg{readmefn}")
             if -f $pkg{readme};
-        chdir_ln_chdir($PAUSE::Config->{MLROOT},
+        $self->chdir_ln_chdir($PAUSE::Config->{MLROOT},
                        "../../../../authors/id/$userdir",
                        "../../modules/by-category/$pkg{chapter}".
                        "/$pkg{rootpack}/$pkg{userid}");
@@ -627,7 +627,7 @@ category    maintainer
 	if (open F, ">$repfile") {
 	    print F $list;
 	    close F;
-	    write_01sorted(\@listing01);
+	    $self->write_01sorted(\@listing01);
 	} else {
 	    $self->verbose(1,"Couldn't open 01modules...");
 	    $self->alert("Couldn't open 01modules...");
@@ -636,7 +636,7 @@ category    maintainer
 }
 
 sub write_01sorted {
-  my($listing) = @_;
+  my($self, $listing) = @_;
   my($n) = 150;
   my $list = qq{\n<HEAD><TITLE>Modules on CPAN sorted by upload date</TITLE></HEAD><BODY>\n<H1>CPAN\'s $n most recent uploads</H1>\n<H3>ordered by timestamp of the distributions</H3>\n\nA description of the list can be found in <A HREF="01modules.index.html">01modules.index.html</A>.\n<HR>\n<PRE>\nauthor/   distribution file                     size   uploaded\nmaintainer\n\n};
 
@@ -731,7 +731,7 @@ Date:        %s
 
   $list .= Data::Dumper->new([
 			      $sth->{NAME},
-			      as_ds($sth)
+			      $self->as_ds($sth)
 			     ],
 			     ["cols","data"]
 			    )->Dump;
@@ -752,7 +752,7 @@ Date:        %s
 }
 
 sub chdir_ln_chdir {
-    my($postdir,$from,$to) = @_;
+    my($self,$postdir,$from,$to) = @_;
     chdir $postdir or die "Couln't chdir to $postdir";
     my($dir) = File::Basename::dirname($to);
     mkpath $dir;
@@ -790,7 +790,7 @@ sub chdir_ln_chdir {
 }
 
 sub as_ds {
-  my($sth) = @_;
+  my($self,$sth) = @_;
   my $result;
   # If we produce the datastructure as it would seem natural,
   # i.e. each primary key became key in a hash, and each table row
