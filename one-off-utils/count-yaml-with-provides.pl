@@ -145,87 +145,104 @@ warn "outer HERE about to leave";
 
 Differences between the indexer and the "provides" fields by Module::Build:
 
-1. M:B does not list namespaces with a $VERSION of undef
 
-2. M:B cuts off trailing zeroes
-
-3. M:B leaves underscores in numbers
-
-4. Bug in M:B, it lists
-
-  'Acme::MetaSyntactic::':
-    file: lib/Acme/MetaSyntactic.pm
-    version: 0.16
-
-   see the trailing "::"
-
-5. Bug in M:B, it lists
-
-  HTTP::Proxy::FilterStack:
-    file: lib/HTTP/Proxy.pm
-    version: 0.15
-
-   The namespace is correct, but it has no $VERSION assigned. Unsure
-   if this is a good solution or a bad one.
-
-6. Has M:B issues with YAML 0.38? No, but apparently one must
-   re-install M:B in order to get YAML support
-
-7. this script (count-yaml-....pl) is confused with
-   BULB/Config-Maker-0.001.tar.gz vs BULB/Config-Maker-0.006.tar.gz:
-   The former use M:B, the latter not, so although everything was ok
-   in 0.006, this script complained about 0.001.
-
-8. CDAWSON/Smil-0.898.tar.gz distributes an old META.yml.
-
-9. M:B seems to support unlimited depth whereas the indexer stops at 4
-   levels (I think)
-
-10. M:B doesn't see the eg/ Directory of
-    CWINTERS/Workflow-0.15.tar.gz, I cannot recognize why, but it
-    seems OK.
-
-11. M:B lists
-
-  text:
-    file: lib/Module/CPANTS/Generator/Unpack.pm
-    version: 0.26
-
-    because somewhere down in the code appears a text snippet "package
-    text" on one line.
-
-12. M:B discoveres that
-
-  super:
-    file: lib/Class/ClassDecorator.pm
-    version: 0.02
-
-  Here it is correctly finding a package name that is provided near
-  the end of the file and may lead to a namespace clash
-
-13. M:B lists main!
-
-  main:
-    file: lib/Apache/SSI.pm
-    version: 2.19
-
-14. M:B lists
-
-  filename:
-    file: lib/Devel/ebug.pm
-    version: 0.37
-
-   just because of this line in a string:
-
-   package filename line codeline finished));
-
-
-15. Sometimes the difference between the indexer and M:B may is due to
-    permissions in the database.
-
-16. In P/PT/PTANDLER/PBib/Bundle-PBib-2.08 Module::Build lists a long
-    list of nonsense that the indexer doesn't have because he has the
-    principle of "simile". bp_output cannot become a package with the
-    indexer when it is in a file "lib/Biblio/bp/lib/bp-output.pl".
+1. M:B lists namespaces with a $VERSION of       | Reasonable
+   undef without a version at all                |
+                                                 |
+2. M:B cuts off trailing zeroes                  | Harmless
+                                                 |
+3. M:B leaves underscores in numbers             | I will remove
+                                                 |
+4. Bug in M:B, it lists                          | I will clean up trailing "::"
+                                                 |
+  'Acme::MetaSyntactic::':                       |
+    file: lib/Acme/MetaSyntactic.pm              |
+    version: 0.16                                |
+                                                 |
+   see the trailing "::"                         |
+                                                 |
+5. Bug in M:B, it lists                          | Discuss on mailing list?
+                                                 |
+  HTTP::Proxy::FilterStack:                      |
+    file: lib/HTTP/Proxy.pm                      |
+    version: 0.15                                |
+                                                 |
+   The namespace is correct, but it has no       |
+   $VERSION assigned. Unsure if this is a        |
+   good solution or a bad one.                   |
+                                                 |
+6. Has M:B issues with YAML 0.38? No, but        | Bugreport sent
+   apparently one must re-install M:B in         |
+   order to get YAML support                     |
+                                                 |
+7. this script (count-yaml-....pl) is            | Nothing to do
+   confused with                                 |
+   BULB/Config-Maker-0.001.tar.gz vs             |
+   BULB/Config-Maker-0.006.tar.gz: The           |
+   former use M:B, the latter not, so            |
+   although everything was ok in 0.006,          |
+   this script complained about 0.001.           |
+                                                 |
+8. CDAWSON/Smil-0.898.tar.gz distributes         | Bugreport sent
+   an old META.yml.                              |
+                                                 |
+9. M:B seems to support unlimited depth          | OK
+   whereas the indexer stops at 4 levels         |
+   (I think)                                     |
+                                                 |
+10. M:B doesn't see the eg/ Directory of         | OK
+    CWINTERS/Workflow-0.15.tar.gz, I             |
+    cannot recognize why, but it seems OK.       |
+                                                 |
+11. M:B lists                                    | 11-14 are all the same problem:
+                                                 | Do we want to have Module names
+  text:                                          | mentioned that are not matching
+    file: lib/Module/CPANTS/Generator/Unpack.pm  | the filename?
+    version: 0.26                                |
+                                                 | pro: good against namespace
+    because somewhere down in the code           |      clashes
+    appears a text snippet "package text"        |
+    on one line.                                 | con: these namespaces cannot be
+                                                 |      accessed with "require"
+12. M:B discoveres that                          |
+                                                 | con: authors can easily add name
+  super:                                         |      spaces automatically, but
+    file: lib/Class/ClassDecorator.pm            |      they cannot as easily remove
+    version: 0.02                                |      them
+                                                 |
+  Here it is correctly finding a package         |
+  name that is provided near the end of          |
+  the file and may lead to a namespace           |
+  clash                                          |
+                                                 |
+13. M:B lists main!                              |
+                                                 |
+  main:                                          |
+    file: lib/Apache/SSI.pm                      |
+    version: 2.19                                |
+                                                 |
+14. M:B lists                                    |
+                                                 |
+  filename:                                      |
+    file: lib/Devel/ebug.pm                      |
+    version: 0.37                                |
+                                                 |
+   just because of this line in a string:        |
+                                                 |
+   package filename line codeline ...            |
+                                                 |
+                                                 |
+15. Sometimes the difference between the         |
+    indexer and M:B may is due to                |
+    permissions in the database.                 |
+                                                 |
+16. In P/PT/PTANDLER/PBib/Bundle-PBib-2.08       |
+    Module::Build lists a long list of           |
+    nonsense that the indexer doesn't have       |
+    because he has the principle of              |
+    "simile". bp_output cannot become a          |
+    package with the indexer when it is in       |
+    a file                                       |
+    "lib/Biblio/bp/lib/bp-output.pl".            |
 
 =cut
