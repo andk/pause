@@ -233,10 +233,10 @@ Differences between the indexer and the "provides" fields by Module::Build:
                                                  |
                                                  |
 15. Sometimes the difference between the         |
-    indexer and M:B may is due to                |
+    indexer and M:B is due to                    |
     permissions in the database.                 |
                                                  |
-16. In P/PT/PTANDLER/PBib/Bundle-PBib-2.08       |
+16. In P/PT/PTANDLER/PBib/Bundle-PBib-2.08       | I will only accept *.pm
     Module::Build lists a long list of           |
     nonsense that the indexer doesn't have       |
     because he has the principle of              |
