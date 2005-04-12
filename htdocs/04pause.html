@@ -221,15 +221,12 @@ within a Safe compartement, so maybe even if the above command
 succeeds, PAUSE may fail if you're doing file IO or other potentially
 dangerous things within that line.</p>
 
-<p>The automatic integration of your work into several <b>indexes</b> and
-directory trees is not always in accordance with what you desire. If
-you want to <b>prevent propagation</b> to places outside of your
-directory, simply choose a filename that matches
-<b><code>/\d\.\d+_\d/</code></b>, i.e. something that looks like
-derived from a perl subversion number (maybe because it <i>is</i> a
-perl subversion). PAUSE will leave such distributions untouched: no
-readme will be extracted, no index will be updated, no symlinks will
-be created.</p>
+<p>The automatic integration of your work into several <b>indexes</b>
+and directory trees is not always what you desire. If you want to
+<b>prevent propagation</b> to places outside of your directory, simply
+choose a filename that matches <b><code>/\d\.\d+_\d/</code></b>. PAUSE
+will leave such distributions alone: no readme will be extracted, no
+index will be updated, no symlinks will be created.</p>
 
 <p>Any distribution that arrives at PAUSE is checked for <b>package names</b>
 contained in the distribution. A package name that arrives for the
