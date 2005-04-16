@@ -4616,7 +4616,7 @@ Immediate (one click) registration:
     my($blurb) = join "", @blurb;
     require HTML::Entities;
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
-    $blurbcopy =~ s|(https?://\S+)|<a href="$1">$1</a>|g;
+    $blurbcopy =~ s|(https?://[^\s\"]+)|<a href="$1">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
     # warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
     push @m, qq{<pre>

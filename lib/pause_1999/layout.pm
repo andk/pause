@@ -30,7 +30,7 @@ sub layout {
                  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
                  "DTD/xhtml1-transitional.dtd">};
   }
-  push @l, qq{<html><head><title>};
+  push @l, qq{<html xmlns="http://www.w3.org/1999/xhtml"><head><title>};
   push @l, $PAUSE::Config->{TESTHOST} ? qq{pause\@home: } : qq{PAUSE: };
   push @l, $mgr->{Action} || "The CPAN back stage entrance";
   my $hspecial = $PAUSE::Config->{TESTHOST} ? "h2,h4,b { color: #f0f; }" : "";
@@ -38,7 +38,7 @@ sub layout {
 
 =pod
 
-Netscape 479 liest kommentare?
+Netscape 479 was reading comments
 
 // body { font-family: Helvetica, Arial, sans-serif; }
 // h2,h3,h4 { margin: 1% 8% 5% 3%; padding-left: 3em; background-color: silver; border: black; border-style: solid dotted none; }
