@@ -5086,18 +5086,13 @@ sub check_xhtml {
   my @m;
   my $dir = "/var/run/httpd/deadmeat";
   if (my $file = $req->param("pause99_check_xhtml_look")) {
-    local *F;
-    open F, "$dir/$file" or die "Couldn't open $file: $!";
+    open my $fh, "$dir/$file" or die "Couldn't open $file: $!";
     if ($] > 5.007) {
-      binmode F, ":utf8";
+      binmode $fh, ":utf8";
     }
     local $/;
-    my $html = <F>;
-    # as it is "bad xhtml", we should not try to use XML tools.
-    $html =~ s/^.*<body.*?>//s;
-    $html =~ s|</body\s*>.*||s;
-    push @m, $html;
-    close F;
+    my $html = <$fh>;
+    push @m, $mgr->escapehtml($html);
   } else {
     require DirHandle;
     my $dh = DirHandle->new($dir) or die "Couldn't open: $!";
