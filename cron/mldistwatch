@@ -1554,6 +1554,28 @@ Please contact modules\@perl.org if there are any open questions.
         }
     }
 
+    # package PAUSE::dist
+    sub version_from_yaml_ok {
+        my($self) = @_;
+        return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
+        my $ok = 0;
+        my $c = $self->{YAML_CONTENT};
+        if (exists $c->{provides}) {
+          if (exists $c->{generated_by}) {
+            if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {
+              if ($v eq "0.250.0") {
+                $ok++;
+              } elsif ($v >= 0.19) {
+                $ok++;
+              }
+            }
+          } else {
+            $ok++;
+          }
+        }
+        return $self->{VERSION_FROM_YAML_OK} = $ok;
+    }
+
     sub verbose {
         my($self,$level,@what) = @_;
         my $main = $self->{MAIN};
@@ -1710,14 +1732,15 @@ Please contact modules\@perl.org if there are any open questions.
         my($filemtime) = (stat $pmfile)[9];
         $self->{MTIME} = $filemtime;
 
-        my($mm_parsed_version) = $self->parse_version;
-        $self->{VERSION} = $mm_parsed_version;
+        unless ($self->version_from_yaml_ok) {
+            $self->{VERSION} = $self->parse_version;
+            if ($self->{VERSION} =~ /[_\s]/){   # ignore developer releases and "You suck!"
+                delete $self->{DIO};    # circular reference
+                return;
+            }
+        }
 
-        return if $mm_parsed_version =~ /_/;
-
-        return if $mm_parsed_version =~ m/\s/; # ignore "You suck!"
-
-        my($ppp) = $self->ppp;  # packages-per-pmfile
+        my($ppp) = $self->packages_per_pmfile;
         my @keys_ppp = $self->filter_ppps(keys %$ppp);
         $self->verbose(1,"will check keys_ppp[@keys_ppp]\n");
 
@@ -1730,17 +1753,19 @@ Please contact modules\@perl.org if there are any open questions.
       DBPACK: foreach $package (@keys_ppp) {
 
             # What do we need? dio, fio, pmfile, time, dist, dbh, alert?
-            my $pio = PAUSE::package->new(
-                                          PACKAGE => $package,
-                                          DBH => $dbh,
-                                          DIST => $dist,
-                                          PP => $ppp->{$package},
-                                          TIME => $self->{TIME},
-                                          PMFILE => $pmfile,
-                                          FIO => $self,
-                                          USERID => $self->{USERID},
-                                          YAML_CONTENT => $self->{YAML_CONTENT},
-                                         );
+            my $pio = PAUSE::package
+                ->new(
+                      PACKAGE => $package,
+                      DBH => $dbh,
+                      DIST => $dist,
+                      PP => $ppp->{$package}, # hash containing
+                                              # version
+                      TIME => $self->{TIME},
+                      PMFILE => $pmfile,
+                      FIO => $self,
+                      USERID => $self->{USERID},
+                      YAML_CONTENT => $self->{YAML_CONTENT},
+                     );
 
             $pio->examine_pkg;
 
@@ -1750,8 +1775,15 @@ Please contact modules\@perl.org if there are any open questions.
 
     }
 
+    # package PAUSE::pmfile
+    sub version_from_yaml_ok {
+        my($self) = @_;
+        return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
+        $self->{VERSION_FROM_YAML_OK} = $self->{DIO}->version_from_yaml_ok;
+    }
+
     # package PAUSE::pmfile;
-    sub ppp {
+    sub packages_per_pmfile {
         my $self = shift;
 
         my $ppp;
@@ -1804,15 +1836,31 @@ Please contact modules\@perl.org if there are any open questions.
                 $ppp->{$pkg}{infile} = $pmfile;
                 if ($self->simile($pmfile,$pkg)) {
                     $ppp->{$pkg}{simile} = $pmfile;
-                    $ppp->{$pkg}{version} ||= "";
-                    $ppp->{$pkg}{version} ||= $version;
-                    local($^W)=0;
-                    $ppp->{$pkg}{version} =
-                        $version
-                            if $version
-                                > $ppp->{$pkg}{version} ||
-                                    $version
-                                        gt $ppp->{$pkg}{version};
+                    if ($self->version_from_yaml_ok) {
+                        my $provides = $self->{DIO}{YAML_CONTENT}{provides};
+                        if (exists $provides->{$pkg}) {
+                            if (exists $provides->{$pkg}{version}) {
+                                my $v = $provides->{$pkg}{version};
+                                if ($v =~ /[_\s]/){   # ignore developer releases and "You suck!"
+                                    next PLINE;
+                                } else {
+                                    $ppp->{$pkg}{version} = $self->force_numeric($v);
+                                }
+                            } else {
+                                $ppp->{$pkg}{version} = "undef";
+                            }
+                        }
+                    } else {
+                        $ppp->{$pkg}{version} ||= "";
+                        $ppp->{$pkg}{version} ||= $version;
+                        local($^W)=0;
+                        $ppp->{$pkg}{version} =
+                            $version
+                                if $version
+                                    > $ppp->{$pkg}{version} ||
+                                        $version
+                                            gt $ppp->{$pkg}{version};
+                    }
                 } else {        # not simile
                     #### it comes later, it would be nonsense
                     #### to set to "undef". MM_Unix gives us
@@ -1832,20 +1880,22 @@ Please contact modules\@perl.org if there are any open questions.
     }
 
     # package PAUSE::pmfile;
-    { no strict; sub mm_unix_parse_version {
-        my($parsefile) = @_;
-        my $result;
-        local *FH;
-        local $/ = "\n";
-        open(FH,$parsefile) or die "Could not open '$parsefile': $!";
-        my $inpod = 0;
-        while (<FH>) {
-            $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
-            next if $inpod || /^\s*#/;
-            chop;
-            # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
-            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
-            my $eval = qq{
+    {
+        no strict;
+        sub mm_unix_parse_version {
+            my($parsefile) = @_;
+            my $result;
+            local *FH;
+            local $/ = "\n";
+            open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+            my $inpod = 0;
+            while (<FH>) {
+                $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+                next if $inpod || /^\s*#/;
+                chop;
+                # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
+                next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+                my $eval = qq{
               package ExtUtils::MakeMaker::_version;
 
               local $1$2;
@@ -1853,17 +1903,17 @@ Please contact modules\@perl.org if there are any open questions.
                   $_
               }; \$$2
           };
-            local $^W = 0;
-            $result = eval($eval);
-            die "Could not eval '$eval' in $parsefile: $@" if $@;
-            last;
-        }
-        close FH;
+                local $^W = 0;
+                $result = eval($eval);
+                die "Could not eval '$eval' in $parsefile: $@" if $@;
+                last;
+            } #;
+            close FH;
 
-        $result = "undef" unless defined $result;
-        return $result;
+            $result = "undef" unless defined $result;
+            return $result;
+        }
     }
-  }
 
     # package PAUSE::pmfile;
     sub parse_version {
@@ -1873,6 +1923,7 @@ Please contact modules\@perl.org if there are any open questions.
         use strict;
 
         my $pmfile = $self->{PMFILE};
+
         my $pmcp = $pmfile;
         for ($pmcp) {
             s/([^\\](\\\\)*)@/$1\\@/g; # thanks to Raphael Manfredi for the
@@ -1932,7 +1983,12 @@ Please contact modules\@perl.org if there are any open questions.
         # and the new code is
 
         return $v if $v =~ /_/;
+        return $self->force_numeric($v);
+    }
 
+    # package PAUSE::pmfile;
+    sub force_numeric {
+        my($self,$v) = @_;
         $v = CPAN::Version->readable($v);
 
         if (
@@ -1949,13 +2005,10 @@ Please contact modules\@perl.org if there are any open questions.
             my $three = defined $3 ? $3 : "";
             $v = "$two$three";
         }
-        return $v if $v =~ m/\s/; # ignore "You suck!"
-
         $v;
     }
 
 }
-
 
 =comment
 
@@ -2212,8 +2265,12 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my $pmfile = $self->{PMFILE};
 
         # should they be cought earlier? Maybe.
-        return unless $package =~ /\w/;
-        return if $package =~ /:/ && $package !~ /::/;
+        if ($package !~ /\w/
+            ||
+            $package =~ /:/ && $package !~ /::/){
+            delete $self->{FIO};    # circular reference
+            return;
+        }
 
         # set perms for registered owner in any case
 
@@ -2221,7 +2278,10 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 
         # Query all users with perms for this package
 
-        return unless $self->perm_check; # (P2.0&P3.0)
+        unless ($self->perm_check){ # (P2.0&P3.0)
+            delete $self->{FIO};    # circular reference
+            return;
+        }
 
         # Sanity checks
 
@@ -2230,8 +2290,10 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
              $pp->{version},
              $dist
             ) {
-            return if /^\s*$/;  # for whatever reason I come here
-            return if /\s/;     # don't screw up 02packages
+            if (/^\s*$/ || /\s/){  # for whatever reason I come here
+                delete $self->{FIO};    # circular reference
+                return;            # don't screw up 02packages
+            }
         }
 
         $self->checkin;

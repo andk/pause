@@ -151,7 +151,7 @@ Differences between the indexer and the "provides" fields by Module::Build:
                                                  |
 2. M:B cuts off trailing zeroes                  | Harmless
                                                  |
-3. M:B leaves underscores in numbers             | I will remove
+3. M:B leaves underscores in numbers             | I will remove; no, I will treat as dev
                                                  |
 4. Bug in M:B, it lists                          | I will clean up trailing "::"
                                                  |
@@ -244,5 +244,42 @@ Differences between the indexer and the "provides" fields by Module::Build:
     package with the indexer when it is in       |
     a file                                       |
     "lib/Biblio/bp/lib/bp-output.pl".            |
+                                                 |
+17. POE::Kernel is listed by M:B as              | I will have to adjust manually
+                                                 | and write a bugreport
+  POE::Kernel:                                   |
+    file: lib/POE/Resource/Signals.pm            |
+    version: 1.0013                              |
+                                                 |
+    As there is a file POE/Kernel.pm that has    |
+    a version of 1.0314, the PAUSE indexer       |
+    decides that this is what we accept as a     |
+    version. As the M:B version is lower, the    |
+    indexer cannot accept it                     |
+                                                 |
+18. M:B accepts 0.2.0 as a version               | I don't.
+
+
+===========================================================================================
+
+Implementation plan in mldistwatch:
+
+The YAML_CONTENT key is attached to the PAUSE::dist object. When we
+reach the file object with examine_fio, this object lives in
+FIO->{DIO}, the dist object.
+
+examine_fio checks a single pmfile and contains the parse_version call
+that we are happy to skip, when we have the version from YAML. This
+always gave us one version per file.
+
+   examine_fio then parses the file for package statements,
+   filter_ppps filters the packages (e.g. the quite important "simile"
+   operation and the no_index stuff from the META.yml) and examines
+   the found packages in examine_pkg. This part mainly deals with the
+   database and permissions and needs to stay intact.
+
+   I'd like to keep as much as possible of this valuable code, because
+   I have to control what the YAML provides as much as I can to
+   protect against SPAM, violations and mistakes in the YAML file.
 
 =cut
