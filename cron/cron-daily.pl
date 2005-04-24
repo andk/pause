@@ -353,7 +353,6 @@ sub whois {
 <cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
             last-generated='%s GMT'
             generated-by='%s'>
-   <!-- experimental version, do not use fur further processing yet -->
 },
                       scalar(gmtime),
                       $Id,
