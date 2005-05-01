@@ -4,8 +4,11 @@
 
 use strict;
 use lib "/home/k/PAUSE/lib";
+
+use CPAN (); # only for CPAN::Version
 use CPAN::Checksums 1.016;
 use Cwd ();
+use DBI;
 use Data::Dumper ();
 use DirHandle ();
 use ExtUtils::MakeMaker ();
@@ -13,15 +16,15 @@ use ExtUtils::Manifest;
 use File::Basename ();
 use File::Copy ();
 use File::Temp 0.14 (); # begin of OO interface
+use Getopt::Long ();
 use HTTP::Date ();
+use List::Util ();
 use Mail::Send ();
-use DBI;
 use PAUSE ();
 use PAUSE::MailAddress ();
-use CPAN (); # only for CPAN::Version
 use Text::Format;
 use YAML ();
-use Getopt::Long ();
+
 $Data::Dumper::Indent = 1;
 
 # "MAIN" at the end of file to guarantee all packages are inintialized
@@ -187,8 +190,12 @@ sub init_all {
 
 sub dbfind {
     my($self) = @_;
+    return $self->{PICK} if $self->{PICK};
     my %found;
-    my($fh) = File::Temp->new(TEMPLATE => "mldistwatch_dbfind_XXXX");
+    my($fh) = File::Temp->new(
+                              DIR => "/tmp",
+                              TEMPLATE => "mldistwatch_dbfind_XXXX",
+                             );
     tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
     my $dbh = $self->connect;
     my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
@@ -210,13 +217,17 @@ sub clean_up_filename {
 sub manifind {
     my($self) = @_;
     my %found;
-    my($fh) = File::Temp->new(TEMPLATE => "mldistwatch_manifind_XXXX");
+    return $self->{PICK} if $self->{PICK};
+    my($fh) = File::Temp->new(
+                              DIR => "/tmp",
+                              TEMPLATE => "mldistwatch_manifind_XXXX",
+                             );
     tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
 
     my $wanted = sub {
         my $name = $self->clean_up_filename($File::Find::name);
         return if -d $_;
-        $found{$name} = "";
+        $found{$name} = undef;
     };
     find(
          {wanted => $wanted},
@@ -233,7 +244,11 @@ sub checkfornew {
     my $time = time;
     my $alert;
     my @all;
-    my($fh) = File::Temp->new(TEMPLATE => "mldistwatch_all_XXXX", UNLINK=>0);
+    my($fh) = File::Temp->new(
+                              DIR => "/tmp",
+                              TEMPLATE => "mldistwatch_all_XXXX",
+                              UNLINK=>0,
+                             );
     tie @all, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_RECNO or die;
     {
         my %seen;
@@ -1029,6 +1044,9 @@ sub mlroot {
                 return 1;
             }
         }
+        if ($self->{PICK}{$dist}) {
+            return 1;
+        }
         return;
     }
 
@@ -1227,7 +1245,8 @@ Please contact modules\@perl.org if there are any open questions.
 
             push @m, $tf->format(qq{The distribution does not unpack
                 into a single directory and is therefore not being
-                indexed. Hint: try 'make dist'.});
+                indexed. Hint: try 'make dist'. (The directories found
+                were: @{$self->{HAS_MULTIPLE_ROOT}})});
 
             push @m, qq{\n\n};
 
@@ -1288,7 +1307,9 @@ Please contact modules\@perl.org if there are any open questions.
         }
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
-        unless ($PAUSE::Config->{TESTHOST}) {
+        if ($PAUSE::Config->{TESTHOST}) {
+            warn "Unsent Report [@m]";
+        } else {
             my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
             my($msg) = Mail::Send->new(
                                        To      => $to,
@@ -1354,7 +1375,8 @@ Please contact modules\@perl.org if there are any open questions.
         my %seen;
         my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
         if (@top > 1) {
-            $self->{HAS_MULTIPLE_ROOT}++;
+            $self->verbose(1,"HAS_MULTIPLE_ROOT: top[@top]");
+            $self->{HAS_MULTIPLE_ROOT} = \@top;
         }
     }
 
@@ -1516,37 +1538,36 @@ Please contact modules\@perl.org if there are any open questions.
             $self->{README} = "No README found";
             $self->verbose(1,"No readme in $dist\n");
         }
-        my(@yaml) = grep !m|/t/|, grep m|/META\.yml$|, @manifind;
+        my(@yaml) = List::Util::reduce { length $a < length $b ? $a : $b }
+            grep !m|/t/|, grep m|/META\.yml$|, @manifind;
         if (@yaml) {
-            if (@yaml == 1) {
-                my $yaml = $yaml[0];
-                $self->{YAML} = $yaml;
-                File::Copy::copy $yaml, "$MLROOT/$sans.meta";
-                utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
-                eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
-                if ($@) {
-                    if ($@ =~ /msg: Unrecognized implicit value/) {
-                        # let's retry, but let's not expect that this
-                        # will work. MakeMaker 6.16 had a bug that
-                        # could be fixed like this, at least for
-                        # Pod::Simple
+            my $yaml = $yaml[0];
+            $self->{YAML} = $yaml;
+            File::Copy::copy $yaml, "$MLROOT/$sans.meta";
+            utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
+            eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
+            if ($@) {
+                $self->verbose(1,"Error while parsing YAML: $@");
+                if ($@ =~ /msg: Unrecognized implicit value/) {
+                    # let's retry, but let's not expect that this
+                    # will work. MakeMaker 6.16 had a bug that
+                    # could be fixed like this, at least for
+                    # Pod::Simple
 
-                        my $cat = do { open my($f), $yaml or die; local $/; <$f> };
-                        $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
-                        eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
-                        if ($@) {
-                            $self->{YAML_CONTENT} = {};
-                            $self->{YAML} = "META.yml found but error encountered while loading: $@";
-                        }
-
-                    } else {
+                    my $cat = do { open my($f), $yaml or die; local $/; <$f> };
+                    $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
+                    eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
+                    if ($@) {
                         $self->{YAML_CONTENT} = {};
-                        $self->{YAML} = "META.yml found but error encountered while loading: $@";
+                        $self->{YAML} = "META.yml found but error ".
+                            "encountered while loading: $@";
                     }
+
+                } else {
+                    $self->{YAML_CONTENT} = {};
+                    $self->{YAML} = "META.yml found but error ".
+                        "encountered while loading: $@";
                 }
-            } else {
-                # Reminder: perl itself comes with a couple of META.yml
-                $self->{YAML} = sprintf "%d META.yml found, ignoring\n", scalar @yaml;
             }
         } else {
             $self->{YAML} = "No META.yml found\n";
@@ -1561,17 +1582,19 @@ Please contact modules\@perl.org if there are any open questions.
         my $ok = 0;
         my $c = $self->{YAML_CONTENT};
         if (exists $c->{provides}) {
-          if (exists $c->{generated_by}) {
-            if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {
-              if ($v eq "0.250.0") {
+            if (exists $c->{generated_by}) {
+                if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {
+                    if ($v eq "0.250.0") {
+                        $ok++;
+                    } elsif ($v >= 0.19) {
+                        $ok++;
+                    }
+                } else {
+                    $ok++;
+                }
+            } else {
                 $ok++;
-              } elsif ($v >= 0.19) {
-                $ok++;
-              }
             }
-          } else {
-            $ok++;
-          }
         }
         return $self->{VERSION_FROM_YAML_OK} = $ok;
     }
