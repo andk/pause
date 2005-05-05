@@ -333,9 +333,9 @@ for my $loc (qw(/pub /incoming)){
   $Location{$loc}{IndexOptions} = "FancyIndexing NameWidth=* SuppressDescription";
 }
 $MinSpareServers = 1;
-$MaxSpareServers = 3;
+$MaxSpareServers = 2;
 $StartServers = 1;
-$MaxClients = 3;
+$MaxClients = 2;
 if (Apache->define("ONE_PROCESS")) {
   $MaxRequestsPerChild = 1; # 1: I want to see the SEGV
 } else {
