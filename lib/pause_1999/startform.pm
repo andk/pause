@@ -16,6 +16,7 @@ sub as_string {
   my $enctype;
   my $method;
 
+  # 2005 I decided to prefer post *always*
   if ($mgr->can_multipart && $mgr->need_multipart) {
     $enctype = "multipart/form-data";
     $method = "post";
@@ -24,7 +25,7 @@ sub as_string {
     $method = "post";
   } else {
     $enctype = "application/x-www-form-urlencoded";
-    $method = "get";
+    $method = "post";
   }
   # warn "me[$me]enctype[$enctype]method[$method]";
   push @m, qq{<form

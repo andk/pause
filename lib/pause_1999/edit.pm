@@ -748,13 +748,8 @@ The Pause
 	  }
 	  push @to, join ", ", keys %umailset;
 	  push @to, $mgr->{MailtoAdmins} if $mailto_admins; ####
-	  for my $to (@to) {
-	    my $header = {
-			  To => "$to",
-			  Subject => "User update for $u->{userid}"
-			 };
-	    $mgr->send_mail($header, $mailblurb);
-	  }
+          my $header = {Subject => "User update for $u->{userid}"};
+          $mgr->send_mail_multi(\@to,$header, $mailblurb);
 	} else {
 	  push @{$mgr->{ERROR}}, sprintf(qq{Could not enter the data
         into the database: <i>%s</i>.},$dbh->errstr);
@@ -1211,13 +1206,9 @@ The Pause
               $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
             }
           }
-          for my $to (keys %umailset) {
-            my $header = {
-                          To      => $to,
-                          Subject => "Password Update",
-                         };
-            $mgr->send_mail($header, $mailblurb);
-          }
+          my @to = keys %umailset;
+          my $header = {Subject => "Password Update"};
+          $mgr->send_mail_multi(\@to, $header, $mailblurb);
 	} else {
 	  die Apache::HeavyCGI::Exception
               ->new(ERROR => "The two passwords didn't match.");
@@ -1826,13 +1817,11 @@ into $her directory. The request used the following parameters:});
       }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    for my $to (keys %umailset) {
-      my $header = {
-                    To => $to,
-                    Subject => "Notification from PAUSE",
-                   };
-      $mgr->send_mail($header, $mailblurb);
-    }
+    my @to = keys %umailset;
+    my $header = {
+                  Subject => "Notification from PAUSE",
+                 };
+    $mgr->send_mail_multi(\@to, $header, $mailblurb);
   }
 
   @m;
@@ -2009,13 +1998,11 @@ glory is collected on http://history.perl.org/backpan/});
       }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    for my $to (keys %umailset) {
-      my $header = {
-                    To => $to,
-                    Subject => "Files of $u->{userid} scheduled for deletion"
-                   };
-      $mgr->send_mail($header,$blurb);
-    }
+    my @to = keys %umailset;
+    my $header = {
+                  Subject => "Files of $u->{userid} scheduled for deletion"
+                 };
+    $mgr->send_mail_multi(\@to,$header,$blurb);
   }
 
   my $submit_butts = qq{<input type="submit"
@@ -2260,7 +2247,6 @@ sub add_user {
                         );
 
 	my(@blurb);
-	my(@to) = @{$PAUSE::Config->{ADMINS}};
 	my($subject);
 	my $need_onetime = 0;
 	if ( $req->param('pause99_add_user_subscribe') gt '' ) {
@@ -2354,12 +2340,11 @@ Thanks & Regards,
 $PAUSE::Config->{ADMIN}
 };
 
+            my @to = "$email,$PAUSE::Config->{ADMIN}";
             my $header = {
-                          To => "$email,$PAUSE::Config->{ADMIN}",
                           Subject => $subject,
                          };
-            warn "header[$header]otblurb[$otblurb]";
-            $mgr->send_mail($header,$otblurb);
+            $mgr->send_mail_multi(\@to,$header,$otblurb);
 
           }
 
@@ -5512,8 +5497,9 @@ $Yours},
 
   push @m, qq{<h3>Files in directory authors/id/$userhome</h3>};
 
-  push @m, qq{<input type="submit"
+  my $submitbutton = qq{<input type="submit"
  name="SUBMIT_pause99_reindex_delete" value="Reindex" />};
+  push @m, $submitbutton;
   push @m, "<pre>";
 
   my %files = $self->manifind;
@@ -5541,6 +5527,7 @@ $Yours},
 
   push @m, $field;
   push @m, "</pre>";
+  push @m, $submitbutton;
 
   @m;
 }

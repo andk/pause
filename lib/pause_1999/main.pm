@@ -1,3 +1,64 @@
+=head1 NAME
+
+main - 
+
+=head1 SYNOPSIS
+
+
+
+=head1 DESCRIPTION
+
+=head2 About how to add an action item to the usermenu
+
+Add a subroutine that implements it in edit.pm,
+
+add a security policy for the item in edit::parameter method,
+
+(optionally) add a verbose name to attribute ActionTuning in
+config.pm,
+
+decide if the action should be allowed to the admin with "HIDDENNAME"
+and if so, add it to AllowAdminTakeover attribute.
+
+if a mailing list is to be involved, decide if the action should be
+allowed to the mailinglist-representative and if so, add it to
+AllowMlreprTakeover
+
+That is it.
+
+In the menu, entries are being sorted by method name. If we have too
+many menu entries, we need to think about grouping and different
+sorting.
+
+=head2 about testing the whole thing
+
+query must offer "Forgot password", "About PAUSE", "PAUSE News",
+"PAUSE History", and "Who is Who".
+
+Who is Who must display a list of > 1400 users and Szabo Balazs must
+have an accent on the o and the last a. At the end of the list we find
+KUJUN and KENSHAN in Japanese letters. Currently we have lowercase
+people after uppercase people, but this ought to change.
+
+authenquery must display several menus. Edit account info should be
+tested for Andreas Koenig with and without Umlaut. The mails that get
+sent out should be reviewed if they have correct charset.
+
+A new perl installation will not only have impact on the Web
+application but also on the cronjobs and other scripts on PAUSE and
+possibly in the modulelist/ directory. So we should not replace the
+perl at the same time as the application. We should rather leave the
+default perl be the old perl and port one script after the other to
+the new perl.
+
+=head2 Methods
+
+=over
+
+=cut
+
+
+
 package pause_1999::main;
 use Apache::HeavyCGI; # This is much better than only second line
                       # alone. If Apache::HeavyCGI is not available,
@@ -39,66 +100,6 @@ use Time::HiRes ();
     }
   }
 }
-
-=comment about CGI.pm usage here
-
-You will probably note that most of the fine form functions of CGI.pm
-are duplicated here. The reason is that I have not figured out how
-well all this would work if we tried to use CGI.pm directly B<without>
-using its param method. We can use the methods here even if we create
-a CGI object, but I haven't tried the other way round. If you want to
-try it out with CGI directly and can shed some light on the impact,
-say, performancewise, please let me know. BTW, I think, I have already
-converted *all* form widgets for HeavyCGI in one or the other project.
-
-=cut
-
-
-
-=comment about HOWTO add an Action Item to the usermenu
-
- Add a subroutine that implements it in edit.pm,
-
- add a security policy for the item in edit::parameter method,
-
- (optionally) add a verbose name to attribute ActionTuning in
- config.pm,
-
- decide if the action should be allowed to the admin with "HIDDENNAME"
- and if so, add it to AllowAdminTakeover attribute.
-
- if a mailing list is to be involved, decide if the action should be
- allowed to the mailinglist-representative and if so, add it to
- AllowMlreprTakeover
-
-That is it.
-
-In the menu, entries are being sorted by method name. If we have too
-many menu entries, we need to think about grouping and different
-sorting.
-
-=comment about testing the whole thing
-
-query must offer "Forgot password", "About PAUSE", "PAUSE News",
-"PAUSE History", and "Who is Who".
-
-Who is Who must display a list of > 1400 users and Szabo Balazs must
-have an accent on the o and the last a. At the end of the list we find
-KUJUN and KENSHAN in Japanese letters. Currently we have lowercase
-people after uppercase people, but this ought to change.
-
-authenquery must display several menus. Edit account info should be
-tested for Andreas Koenig with and without Umlaut. The mails that get
-sent out should be reviewed if they have correct charset.
-
-A new perl installation will not only have impact on the Web
-application but also on the cronjobs and other scripts on PAUSE and
-possibly in the modulelist/ directory. So we should not replace the
-perl at the same time as the application. We should rather leave the
-default perl be the old perl and port one script after the other to
-the new perl.
-
-=cut
 
 use fields qw(
 
@@ -364,6 +365,14 @@ sub file_to_user {
   $ret;
 }
 
+sub send_mail_multi {
+  my($self,$to,$header,$blurb) = @_;
+  for my $to2 (@$to) {
+    $header->{To} = $to2;
+    $self->send_mail($header,$blurb);
+  }
+}
+
 sub send_mail {
   my($self, $header, $blurb) = @_;
   require Mail::Mailer;
@@ -612,10 +621,10 @@ sub checkbox_group {
     push(@m,
 	 sprintf(
 		 qq{<span class="%s"><input type="checkbox" name="%s" value="%s"%s />%s</span>%s},
-		 
+
 		 "line" . (1 + (scalar(@m) % 3)),
 		  # toggle through "line1", "line2", "line3",  "line1", ...
-		 
+
 		 $name,
 		 $self->escapeHTML($v),
 		 exists $sel{$v} ? qq{ checked="checked"} : "",
@@ -929,3 +938,6 @@ sub version {
 
 1;
 
+=back
+
+=cut
