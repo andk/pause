@@ -332,7 +332,7 @@ for my $loc ( "/perl" ){
 for my $loc (qw(/pub /incoming)){
   $Location{$loc}{IndexOptions} = "FancyIndexing NameWidth=* SuppressDescription";
 }
-$MinSpareServers = 0;
+$MinSpareServers = 1;
 $MaxSpareServers = 3;
 $StartServers = 1;
 $MaxClients = 3;
