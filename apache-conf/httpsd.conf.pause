@@ -332,14 +332,14 @@ for my $loc ( "/perl" ){
 for my $loc (qw(/pub /incoming)){
   $Location{$loc}{IndexOptions} = "FancyIndexing NameWidth=* SuppressDescription";
 }
-$MinSpareServers = 2;
-$MaxSpareServers = 2;
-$StartServers = 2;
+$MinSpareServers = 0;
+$MaxSpareServers = 3;
+$StartServers = 1;
 $MaxClients = 3;
 if (Apache->define("ONE_PROCESS")) {
   $MaxRequestsPerChild = 1; # 1: I want to see the SEGV
 } else {
-  $MaxRequestsPerChild = 6; # set to 0 as long as it turns off the SEGV
+  $MaxRequestsPerChild = 100; # set to 0 as long as it turns off the SEGV
 }
 if ($SWITCH8000) {
   $MinSpareServers =
