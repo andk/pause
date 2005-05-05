@@ -2246,9 +2246,10 @@ sub add_user {
                          $userid,
                         );
 
-	my(@blurb);
-	my($subject);
-	my $need_onetime = 0;
+        my(@blurb);
+        my(@to) = @{$PAUSE::Config->{ADMINS}};
+        my($subject);
+        my $need_onetime = 0;
 	if ( $req->param('pause99_add_user_subscribe') gt '' ) {
 
 	  # Add a mailinglist: INSERT INTO maillists
@@ -2340,11 +2341,12 @@ Thanks & Regards,
 $PAUSE::Config->{ADMIN}
 };
 
-            my @to = "$email,$PAUSE::Config->{ADMIN}";
             my $header = {
+                          To => "$email,$PAUSE::Config->{ADMIN}",
                           Subject => $subject,
                          };
-            $mgr->send_mail_multi(\@to,$header,$otblurb);
+            warn "header[$header]otblurb[$otblurb]";
+            $mgr->send_mail($header,$otblurb);
 
           }
 
