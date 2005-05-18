@@ -1540,7 +1540,9 @@ Please contact modules\@perl.org if there are any open questions.
         }
         my(@yaml) = List::Util::reduce { length $a < length $b ? $a : $b }
             grep !m|/t/|, grep m|/META\.yml$|, @manifind;
-        if (@yaml) {
+        if (@yaml
+            && defined $yaml[0]
+           ) {
             my $yaml = $yaml[0];
             $self->{YAML} = $yaml;
             File::Copy::copy $yaml, "$MLROOT/$sans.meta";
