@@ -1538,12 +1538,9 @@ Please contact modules\@perl.org if there are any open questions.
             $self->{README} = "No README found";
             $self->verbose(1,"No readme in $dist\n");
         }
-        my(@yaml) = List::Util::reduce { length $a < length $b ? $a : $b }
+        my $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
             grep !m|/t/|, grep m|/META\.yml$|, @manifind;
-        if (@yaml
-            && defined $yaml[0]
-           ) {
-            my $yaml = $yaml[0];
+        if (defined $yaml) {
             $self->{YAML} = $yaml;
             File::Copy::copy $yaml, "$MLROOT/$sans.meta";
             utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
