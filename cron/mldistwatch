@@ -103,6 +103,7 @@ sub work {
     chdir $MLROOT
         or die "Couldn't chdir to $MLROOT";
     $self->init_all();
+    $self->verbose(2,"Registering new users\n");
     $self->set_user_active_status();
     my $testdir = File::Temp::tempdir(
                                       "mldistwatch_work_XXXX",
