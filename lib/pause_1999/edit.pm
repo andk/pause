@@ -1934,8 +1934,7 @@ sub delete_files {
 	$blurb .= "WARNING: file not found: $userhome/$f\n";
 	next;
       }
-      if ($f =~ m{ (^|/) CHECKSUMS }x  #}; # cperl_mode problem
-	 ) {
+      if ($f =~ m{ (^|/) CHECKSUMS }x) {
 	$blurb .= "WARNING: CHECKSUMS not erasable: $userhome/$f\n";
 	next;
       }
@@ -3884,7 +3883,7 @@ sub add_mod {
     } else {
       $sth = $dbh->prepare(qq{SELECT chapterid
                               FROM   mods
-                              WHERE  modid LIKE '$root\::%'}); #}); # cperl-mode
+                              WHERE  modid LIKE '$root\::%'});
 
       $sth->execute;
       $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
@@ -5399,8 +5398,7 @@ decision.</li>
 	$blurb .= "WARNING: file not found: $userhome/$f\n";
 	next;
       }
-      if ($f =~ m{ (^|/) CHECKSUMS }x  #}; # cperl_mode problem
-	 ) {
+      if ($f =~ m{ (^|/) CHECKSUMS }x) {
 	$blurb .= "WARNING: indexing CHECKSUMS considered unnecessary: $userhome/$f\n";
 	next;
       }
