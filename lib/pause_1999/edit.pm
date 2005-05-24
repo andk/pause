@@ -2080,91 +2080,91 @@ sub add_user_doit {
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
   my @m;
-      my($query,$sth,@qbind);
-      my($email) = $req->param('pause99_add_user_email');
-      my($homepage) = $req->param('pause99_add_user_homepage');
-      if ( $req->param('pause99_add_user_subscribe') gt '' ) {
-	$query = qq{INSERT INTO users (
+  my($query,$sth,@qbind);
+  my($email) = $req->param('pause99_add_user_email');
+  my($homepage) = $req->param('pause99_add_user_homepage');
+  if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+    $query = qq{INSERT INTO users (
                       userid,          isa_list,             introduced,
                       changed,         changedby)
                     VALUES (
                       ?,               ?,                    ?,
                       ?,               ?)};
-	@qbind = ($userid,1,$T,$T,$mgr->{User}{userid});
-      } else {
-	$query = qq{INSERT INTO users (
+    @qbind = ($userid,1,$T,$T,$mgr->{User}{userid});
+  } else {
+    $query = qq{INSERT INTO users (
                	     userid,     email,    homepage,  fullname,
                      isa_list, introduced, changed,  changedby)
                     VALUES (
                      ?,          ?,        ?,         ?,
                      ?,        ?,          ?,        ?)};
-	@qbind = ($userid,$email,$homepage,$fullname,"",$T,$T,$mgr->{User}{userid});
-      }
+    @qbind = ($userid,$email,$homepage,$fullname,"",$T,$T,$mgr->{User}{userid});
+  }
 
-      # We have a query for INSERT INTO users
+  # We have a query for INSERT INTO users
 
-      push @m, qq{<h3>Submitting query</h3>};
-#      push @m, sprintf "Query<br />%s<br />with params<br />%s<br />",
-#	  $mgr->escapeHTML($query), join("<br />", map {$mgr->escapeHTML($_)} @qbind);
-      if ($dbh->do($query,undef,@qbind)) {
+  push @m, qq{<h3>Submitting query</h3>};
+  #      push @m, sprintf "Query<br />%s<br />with params<br />%s<br />",
+  #	  $mgr->escapeHTML($query), join("<br />", map {$mgr->escapeHTML($_)} @qbind);
+  if ($dbh->do($query,undef,@qbind)) {
 
-	push @m, sprintf(qq{<p>Query succeeded.</p>
+    push @m, sprintf(qq{<p>Query succeeded.</p>
 
 <p>Do you want to <a href="/pause/authenquery?pause99_add_mod_userid=%s;SUBMIT_pause99_add_mod_preview=preview">register a module for %s?</a></p>
 },
-                         $userid,
-                         $userid,
-                        );
+                     $userid,
+                     $userid,
+                    );
 
-        my(@blurb);
-        my(@to) = @{$PAUSE::Config->{ADMINS}};
-        my($subject);
-        my $need_onetime = 0;
-	if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+    my(@blurb);
+    my(@to) = @{$PAUSE::Config->{ADMINS}};
+    my($subject);
+    my $need_onetime = 0;
+    if ( $req->param('pause99_add_user_subscribe') gt '' ) {
 
-	  # Add a mailinglist: INSERT INTO maillists
+      # Add a mailinglist: INSERT INTO maillists
 
-	  $need_onetime = 0;
-	  $subject = "Mailing list added to PAUSE database";
-	  my($maillistid) = $userid;
-	  my($maillistname) = $fullname;
-	  my($subscribe) = $req->param('pause99_add_user_subscribe');
-	  my($changed) = $T;
-	  push @blurb, qq{
+      $need_onetime = 0;
+      $subject = "Mailing list added to PAUSE database";
+      my($maillistid) = $userid;
+      my($maillistname) = $fullname;
+      my($subscribe) = $req->param('pause99_add_user_subscribe');
+      my($changed) = $T;
+      push @blurb, qq{
 Mailing list entered by };
-	  push @blurb, $mgr->{User}{fullname};
-	  push @blurb, qq{:
+      push @blurb, $mgr->{User}{fullname};
+      push @blurb, qq{:
 
 Userid:      $userid
 Name:        $maillistname
 Description: };
-	  push @blurb, $self->wrap($subscribe);
-	  $query = qq{INSERT INTO maillists (
+      push @blurb, $self->wrap($subscribe);
+      $query = qq{INSERT INTO maillists (
                         maillistid, maillistname,
                         subscribe,  changed,  changedby,            address)
                       VALUES (
                         ?,          ?,
                         ?,          ?,        ?,                    ?)};
-	  my @qbind2 = ($maillistid,    $maillistname,
-                        $subscribe,     $changed, $mgr->{User}{userid}, $email);
-	  unless ($dbh->do($query,undef,@qbind2)) {
-	    die Apache::HeavyCGI::Exception
-		->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
+      my @qbind2 = ($maillistid,    $maillistname,
+                    $subscribe,     $changed, $mgr->{User}{userid}, $email);
+      unless ($dbh->do($query,undef,@qbind2)) {
+        die Apache::HeavyCGI::Exception
+            ->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
  Reason:</b></p><p>$DBI::errstr</p>}]);
-	  }
+      }
 
-	} else {
+    } else {
 
-	  # Not a mailinglist: Compose Welcome
+      # Not a mailinglist: Compose Welcome
 
-	  $subject = qq{Welcome new user $userid};
-	  $need_onetime = 1;
-          # not for mailing lists
-          if ($need_onetime) {
+      $subject = qq{Welcome new user $userid};
+      $need_onetime = 1;
+      # not for mailing lists
+      if ($need_onetime) {
 
-            my $onetime = sprintf "%08x", rand(0xffffffff);
+        my $onetime = sprintf "%08x", rand(0xffffffff);
 
-            my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
+        my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
                        $PAUSE::Config->{AUTHEN_USER_FLD},
                         $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
                          forcechange,
@@ -2173,20 +2173,20 @@ Description: };
                        ) VALUES (
                        ?,?,?,?,?
                        )};
-            my $pwenc = crypt($onetime,salt());
-            my $dbh = $mgr->authen_connect;
-            local($dbh->{RaiseError}) = 0;
-            my $rc = $dbh->do($sql,undef,$userid,$pwenc,1,time,$mgr->{User}{userid});
-            die Apache::HeavyCGI::Exception
-                ->new(ERROR =>
-                      [qq{<p><b>Query [$sql] failed. Reason:</b></p>
+        my $pwenc = crypt($onetime,salt());
+        my $dbh = $mgr->authen_connect;
+        local($dbh->{RaiseError}) = 0;
+        my $rc = $dbh->do($sql,undef,$userid,$pwenc,1,time,$mgr->{User}{userid});
+        die Apache::HeavyCGI::Exception
+            ->new(ERROR =>
+                  [qq{<p><b>Query [$sql] failed. Reason:</b></p>
 <p>$DBI::errstr</p>
 <p>This is very unfortunate as we have no option to rollback. The user is
 now registered in mod.users and could not be registered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>
 }]
-                     ) unless $rc;
-            $dbh->disconnect;
-            my $otblurb = qq{
+                 ) unless $rc;
+        $dbh->disconnect;
+        my $otblurb = qq{
 
 (This mail has been generated automatically by the Perl Authors Upload
 Server on behalf of the admin $PAUSE::Config->{ADMIN})
@@ -2211,17 +2211,17 @@ Thanks & Regards,
 $PAUSE::Config->{ADMIN}
 };
 
-            my $header = {
-                          To => "$email,$PAUSE::Config->{ADMIN}",
-                          Subject => $subject,
-                         };
-            warn "header[$header]otblurb[$otblurb]";
-            $mgr->send_mail($header,$otblurb);
+        my $header = {
+                      To => "$email,$PAUSE::Config->{ADMIN}",
+                      Subject => $subject,
+                     };
+        warn "header[$header]otblurb[$otblurb]";
+        $mgr->send_mail($header,$otblurb);
 
-          }
+      }
 
-	  push @to, $email;
-	  @blurb = qq{
+      push @to, $email;
+      @blurb = qq{
 Welcome $fullname,
 
 PAUSE, the Perl Authors Upload Server, has a userid for you:
@@ -2256,54 +2256,54 @@ Thank you for your prospective contributions,
 The Pause Team
 };
 
-	  my($memo) = $req->param('pause99_add_user_memo');
-	  push @blurb, "\nNote from $mgr->{User}{fullname}:\n$memo\n\n"
-	      if length $memo;
-	}
+      my($memo) = $req->param('pause99_add_user_memo');
+      push @blurb, "\nNote from $mgr->{User}{fullname}:\n$memo\n\n"
+          if length $memo;
+    }
 
-	# both users and mailing lists run this code
+    # both users and mailing lists run this code
 
-        warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
-	push @m, qq{ Sending separate mails to:
+    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    push @m, qq{ Sending separate mails to:
 }, join(" AND ", @to), qq{
 <pre>
 From: $PAUSE::Config->{UPLOAD}
 Subject: $subject\n};
 
-	my($blurb) = join "", @blurb;
-	require HTML::Entities;
-	my($blurbcopy) = HTML::Entities::encode($blurb,"<>");
-	push @m, $blurbcopy, "</pre>\n";
+    my($blurb) = join "", @blurb;
+    require HTML::Entities;
+    my($blurbcopy) = HTML::Entities::encode($blurb,"<>");
+    push @m, $blurbcopy, "</pre>\n";
 
-	for my $to (@to) {
-	  my $header = {
-			To => "$to",
-			Subject => $subject
-		       };
-	  # warn "header[$header]blurb[$blurb]";
-          my $b = $blurb;
-          $b =~ s/\bCENSORED\b/$email/ if $to eq $email;
-	  $mgr->send_mail($header,$b);
-	}
+    for my $to (@to) {
+      my $header = {
+                    To => "$to",
+                    Subject => $subject
+                   };
+      # warn "header[$header]blurb[$blurb]";
+      my $b = $blurb;
+      $b =~ s/\bCENSORED\b/$email/ if $to eq $email;
+      $mgr->send_mail($header,$b);
+    }
 
-	# As we have had so much success, there is no point in leaving the
-	# form filled
+    # As we have had so much success, there is no point in leaving the
+    # form filled
 
-	unless ($dont_clear) {
-	  warn "clearing all fields";
-	  for my $field (qw(userid fullname email homepage subscribe memo)) {
-	    my $param = "pause99_add_user_$field";
-	    $req->param($param,"");
-	  }
-	}
-
-      } else {
-	push @m, sprintf(qq{<p><b>Query [$query] failed. Reason:</b></p><p>%s</p>\n},
-                         $dbh->errstr);
+    unless ($dont_clear) {
+      warn "clearing all fields";
+      for my $field (qw(userid fullname email homepage subscribe memo)) {
+        my $param = "pause99_add_user_$field";
+        $req->param($param,"");
       }
-      push @m, "Content of user record in table <i>users</i>:<br />";
-      my $usertable = $self->usertable($mgr,$userid);
-      push @m, $usertable;
+    }
+
+  } else {
+    push @m, sprintf(qq{<p><b>Query [$query] failed. Reason:</b></p><p>%s</p>\n},
+                     $dbh->errstr);
+  }
+  push @m, "Content of user record in table <i>users</i>:<br />";
+  my $usertable = $self->usertable($mgr,$userid);
+  push @m, $usertable;
   @m;
 }
 
