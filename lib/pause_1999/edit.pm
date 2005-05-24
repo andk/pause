@@ -2073,142 +2073,13 @@ sub scheduled {
   $return;
 }
 
-sub add_user {
-  my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+sub add_user_doit {
+  my($self,$mgr,$userid,$fullname,$dont_clear) = @_;
   my $req = $mgr->{CGI};
-  my $r = $mgr->{R};
-  my @m;
-
+  my $T = time;
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
-
-  if ($req->param("USERID")) {
-    my $session = $mgr->session;
-    my $s = $session->{APPLY};
-    for my $a (keys %$s) {
-      $req->param("pause99_add_user_$a", $s->{$a});
-      warn "retrieving from session a[$a]s(a)[$s->{$a}]";
-    }
-  }
-
-  my $userid;
-  if ( $userid = $req->param("pause99_add_user_userid") ) {
-
-    $userid = uc($userid);
-    $userid ||= "";
-    my @error;
-    if ( $userid !~ $Valid_Userid ) {
-      my $euserid = $mgr->escapeHTML($userid);
-
-      push @error, qq{<b>userid[$euserid]</b> does not match
-          <b>$Valid_Userid</b>.};
-
-    }
-
-    $req->param("pause99_add_user_userid", $userid) if $userid;
-    my $doit = 0;
-    my $dont_clear;
-    my $fullname_raw = $req->param('pause99_add_user_fullname');
-    my($fullname);
-    $fullname = $mgr->any2utf8($fullname_raw);
-    warn "fullname[$fullname]fullname_raw[$fullname_raw]";
-    if ($fullname ne $fullname_raw) {
-      $req->param("pause99_add_user_fullname",$fullname);
-      my $debug = $req->param("pause99_add_user_fullname");
-      warn "debug[$debug]fullname[$fullname]";
-    }
-    unless ($fullname) {
-      warn "no fullname";
-      push @error, qq{No fullname, nothing done.};
-    }
-    unless (@error) {
-      if ($req->param('SUBMIT_pause99_add_user_Definitely')) {
-	$doit = 1;
-      } elsif (
-	       $req->param('SUBMIT_pause99_add_user_Soundex')
-	       ||
-	       $req->param('SUBMIT_pause99_add_user_Metaphone')
-	      ) {
-
-	# START OF SOUNDEX/METAPHONE check
-
-	my ($surname);
-	my($s_package) = $req->param('SUBMIT_pause99_add_user_Soundex') ?
-	    'Text::Soundex' : 'Text::Metaphone';
-
-	($surname = $fullname) =~ s/.*\s//;
-	my $query = qq{SELECT userid, fullname, email, homepage,
-			      introduced, changedby, changed
-		       FROM   users
-		       WHERE  isa_list=''
-};
-	my $sth = $dbh->prepare($query);
-	$sth->execute;
-	my $s_func;
-	if ($s_package eq "Text::Soundex") {
-	  require Text::Soundex;
-	  $s_func = \&Text::Soundex::soundex;
-	} elsif ($s_package eq "Text::Metaphone") {
-	  require Text::Metaphone;
-	  $s_func = \&Text::Metaphone::Metaphone;
-	}
-	my $s_code = $s_func->($surname);
-	warn "s_code[$s_code]";
-	my($suserid,$sfullname, $semail, $shomepage,
-	   $sintroduced, $schangedby, $schanged);
-	my @rows;
-	while (($suserid, $sfullname, $semail, $shomepage,
-		$sintroduced, $schangedby, $schanged) =
-               $mgr->fetchrow($sth, "fetchrow_array")) {
-	  (my $dbsurname = $sfullname) =~ s/.*\s//;
-	  next unless &$s_func($dbsurname) eq $s_code;
-	  push @rows, "<tr>",
-	      map(
-		  "<td>".(
-                          defined($_)&&length($_) ?
-                          $mgr->escapeHTML($_) :
-                          "&nbsp;"
-                         )."</td>",
-                  $suserid,
-                  $sfullname,
-		  $semail,
-		  $shomepage,
-		  $sintroduced ? scalar(gmtime($sintroduced)) : "?",
-		  $schangedby,
-		  $schanged ? scalar(gmtime($schanged)) : "?",
-		 ),
-		      "</tr>\n";
-	}
-	if (@rows) {
-	  $doit = 0;
-	  $dont_clear = 1;
-	  unshift @rows, qq{
- <h3>Not submitting, maybe we have a duplicate here</h3>
- <p>$s_package converted the last name to [$s_code]</p>
- <p>$query</p>
- <table border="1">
- <tr><td>userid</td>
- <td>fullname</td>
- <td>email</td>
- <td>homepage</td>
- <td>introduced</td>
- <td>changedby</td>
- <td>changed</td>
- </tr>
-};
-	  push @rows, qq{</table>\n};
-	  push @m, @rows;
-	} else {
-	  $doit = 1;
-	}
-
-	# END OF SOUNDEX/METAPHONE check
-
-      }
-    }
-    my $T = time;
-    if ($doit) {
+  my @m;
       my($query,$sth,@qbind);
       my($email) = $req->param('pause99_add_user_email');
       my($homepage) = $req->param('pause99_add_user_homepage');
@@ -2427,13 +2298,152 @@ Subject: $subject\n};
 	}
 
       } else {
-	$dont_clear = 1;
-	push @m, sprintf(qq{<p><b>Query [] failed. Reason:</b></p><p>%s</p>\n},
+	push @m, sprintf(qq{<p><b>Query [$query] failed. Reason:</b></p><p>%s</p>\n},
                          $dbh->errstr);
       }
       push @m, "Content of user record in table <i>users</i>:<br />";
       my $usertable = $self->usertable($mgr,$userid);
       push @m, $usertable;
+  @m;
+}
+
+sub add_user {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr = shift;
+  my $req = $mgr->{CGI};
+  my $r = $mgr->{R};
+  my @m;
+
+  my $dbh = $mgr->connect;
+  local($dbh->{RaiseError}) = 0;
+
+  if ($req->param("USERID")) {
+    my $session = $mgr->session;
+    my $s = $session->{APPLY};
+    for my $a (keys %$s) {
+      $req->param("pause99_add_user_$a", $s->{$a});
+      warn "retrieving from session a[$a]s(a)[$s->{$a}]";
+    }
+  }
+
+  my $userid;
+  if ( $userid = $req->param("pause99_add_user_userid") ) {
+
+    $userid = uc($userid);
+    $userid ||= "";
+    my @error;
+    if ( $userid !~ $Valid_Userid ) {
+      my $euserid = $mgr->escapeHTML($userid);
+
+      push @error, qq{<b>userid[$euserid]</b> does not match
+          <b>$Valid_Userid</b>.};
+
+    }
+
+    $req->param("pause99_add_user_userid", $userid) if $userid;
+    my $doit = 0;
+    my $dont_clear;
+    my $fullname_raw = $req->param('pause99_add_user_fullname');
+    my($fullname);
+    $fullname = $mgr->any2utf8($fullname_raw);
+    warn "fullname[$fullname]fullname_raw[$fullname_raw]";
+    if ($fullname ne $fullname_raw) {
+      $req->param("pause99_add_user_fullname",$fullname);
+      my $debug = $req->param("pause99_add_user_fullname");
+      warn "debug[$debug]fullname[$fullname]";
+    }
+    unless ($fullname) {
+      warn "no fullname";
+      push @error, qq{No fullname, nothing done.};
+    }
+    unless (@error) {
+      if ($req->param('SUBMIT_pause99_add_user_Definitely')) {
+	$doit = 1;
+      } elsif (
+	       $req->param('SUBMIT_pause99_add_user_Soundex')
+	       ||
+	       $req->param('SUBMIT_pause99_add_user_Metaphone')
+	      ) {
+
+	# START OF SOUNDEX/METAPHONE check
+
+	my ($surname);
+	my($s_package) = $req->param('SUBMIT_pause99_add_user_Soundex') ?
+	    'Text::Soundex' : 'Text::Metaphone';
+
+	($surname = $fullname) =~ s/.*\s//;
+	my $query = qq{SELECT userid, fullname, email, homepage,
+			      introduced, changedby, changed
+		       FROM   users
+		       WHERE  isa_list=''
+};
+	my $sth = $dbh->prepare($query);
+	$sth->execute;
+	my $s_func;
+	if ($s_package eq "Text::Soundex") {
+	  require Text::Soundex;
+	  $s_func = \&Text::Soundex::soundex;
+	} elsif ($s_package eq "Text::Metaphone") {
+	  require Text::Metaphone;
+	  $s_func = \&Text::Metaphone::Metaphone;
+	}
+	my $s_code = $s_func->($surname);
+	warn "s_code[$s_code]";
+	my($suserid,$sfullname, $semail, $shomepage,
+	   $sintroduced, $schangedby, $schanged);
+	my @rows;
+	while (($suserid, $sfullname, $semail, $shomepage,
+		$sintroduced, $schangedby, $schanged) =
+               $mgr->fetchrow($sth, "fetchrow_array")) {
+	  (my $dbsurname = $sfullname) =~ s/.*\s//;
+	  next unless &$s_func($dbsurname) eq $s_code;
+	  push @rows, "<tr>",
+	      map(
+		  "<td>".(
+                          defined($_)&&length($_) ?
+                          $mgr->escapeHTML($_) :
+                          "&nbsp;"
+                         )."</td>",
+                  $suserid,
+                  $sfullname,
+		  $semail,
+		  $shomepage,
+		  $sintroduced ? scalar(gmtime($sintroduced)) : "?",
+		  $schangedby,
+		  $schanged ? scalar(gmtime($schanged)) : "?",
+		 ),
+		      "</tr>\n";
+	}
+	if (@rows) {
+	  $doit = 0;
+	  $dont_clear = 1;
+	  unshift @rows, qq{
+ <h3>Not submitting, maybe we have a duplicate here</h3>
+ <p>$s_package converted the last name to [$s_code]</p>
+ <p>$query</p>
+ <table border="1">
+ <tr><td>userid</td>
+ <td>fullname</td>
+ <td>email</td>
+ <td>homepage</td>
+ <td>introduced</td>
+ <td>changedby</td>
+ <td>changed</td>
+ </tr>
+};
+	  push @rows, qq{</table>\n};
+	  push @m, @rows;
+	} else {
+	  $doit = 1;
+	}
+
+	# END OF SOUNDEX/METAPHONE check
+
+      }
+    }
+    my $T = time;
+    if ($doit) {
+      push @m, $self->add_user_doit($mgr,$userid,$fullname,$dont_clear);
     } elsif (@error) {
       push @m, qq{<h3>Error processing form</h3>};
       for (@error) {
