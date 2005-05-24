@@ -2104,18 +2104,14 @@ sub add_user_doit {
   # We have a query for INSERT INTO users
 
   push @m, qq{<h3>Submitting query</h3>};
-  #      push @m, sprintf "Query<br />%s<br />with params<br />%s<br />",
-  #	  $mgr->escapeHTML($query), join("<br />", map {$mgr->escapeHTML($_)} @qbind);
   if ($dbh->do($query,undef,@qbind)) {
-
-    push @m, sprintf(qq{<p>Query succeeded.</p>
-
-<p>Do you want to <a href="/pause/authenquery?pause99_add_mod_userid=%s;SUBMIT_pause99_add_mod_preview=preview">register a module for %s?</a></p>
-},
+    push @m, sprintf(qq{<p>Query succeeded.</p><p>Do you want to }.
+                     qq{<a href="/pause/authenquery?pause99_add_m}.
+                     qq{od_userid=%s;SUBMIT_pause99_add_mod_previ}.
+                     qq{ew=preview">register a module for %s?</a></p>},
                      $userid,
                      $userid,
                     );
-
     my(@blurb);
     my(@to) = @{$PAUSE::Config->{ADMINS}};
     my($subject);
@@ -2179,11 +2175,10 @@ Description: };
         my $rc = $dbh->do($sql,undef,$userid,$pwenc,1,time,$mgr->{User}{userid});
         die Apache::HeavyCGI::Exception
             ->new(ERROR =>
-                  [qq{<p><b>Query [$sql] failed. Reason:</b></p>
-<p>$DBI::errstr</p>
-<p>This is very unfortunate as we have no option to rollback. The user is
-now registered in mod.users and could not be registered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>
-}]
+                  [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
+                   qq{<p>This is very unfortunate as we have no option to rollback.}.
+                   qq{The user is now registered in mod.users and could not be regi}.
+                   qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
                  ) unless $rc;
         $dbh->disconnect;
         my $otblurb = qq{
