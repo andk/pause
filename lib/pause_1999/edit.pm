@@ -2113,7 +2113,6 @@ sub add_user_doit {
                      $userid,
                     );
     my(@blurb);
-    my(@to) = @{$PAUSE::Config->{ADMINS}};
     my($subject);
     my $need_onetime = 0;
     if ( $req->param('pause99_add_user_subscribe') gt '' ) {
@@ -2181,7 +2180,7 @@ Description: };
                    qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
                  ) unless $rc;
         $dbh->disconnect;
-        my $otblurb = qq{
+        my $otpwblurb = qq{
 
 (This mail has been generated automatically by the Perl Authors Upload
 Server on behalf of the admin $PAUSE::Config->{ADMIN})
@@ -2207,15 +2206,15 @@ $PAUSE::Config->{ADMIN}
 };
 
         my $header = {
-                      To => "$email,$PAUSE::Config->{ADMIN}",
                       Subject => $subject,
                      };
-        warn "header[$header]otblurb[$otblurb]";
-        $mgr->send_mail($header,$otblurb);
+        warn "header[$header]otpwblurb[$otpwblurb]";
+        $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
+                              $header,
+                              $otpwblurb);
 
       }
 
-      push @to, $email;
       @blurb = qq{
 Welcome $fullname,
 
@@ -2259,8 +2258,9 @@ The Pause Team
     # both users and mailing lists run this code
 
     warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    my(@to) = @{$PAUSE::Config->{ADMINS}};
     push @m, qq{ Sending separate mails to:
-}, join(" AND ", @to), qq{
+}, join(" AND ", @to, $email), qq{
 <pre>
 From: $PAUSE::Config->{UPLOAD}
 Subject: $subject\n};
@@ -2270,22 +2270,15 @@ Subject: $subject\n};
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>");
     push @m, $blurbcopy, "</pre>\n";
 
-    for my $to (@to) {
-      my $header = {
-                    To => "$to",
-                    Subject => $subject
-                   };
-      # warn "header[$header]blurb[$blurb]";
-      my $b = $blurb;
-      $b =~ s/\bCENSORED\b/$email/ if $to eq $email;
-      $mgr->send_mail($header,$b);
-    }
-
-    # As we have had so much success, there is no point in leaving the
-    # form filled
+    my $header = {
+                  Subject => $subject
+                 };
+    $mgr->send_mail_multi(\@to,$header,$blurb);
+    $blurb =~ s/\bCENSORED\b/$email/;
+    $mgr->send_mail_multi([$email],$header,$blurb);
 
     unless ($dont_clear) {
-      warn "clearing all fields";
+      warn "Info: clearing all fields";
       for my $field (qw(userid fullname email homepage subscribe memo)) {
         my $param = "pause99_add_user_$field";
         $req->param($param,"");
