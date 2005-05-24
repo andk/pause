@@ -2274,11 +2274,11 @@ Description: };
                       VALUES (
                         ?,          ?,
                         ?,          ?,        ?,                    ?)};
-	  @qbind = ($maillistid,    $maillistname,
-		    $subscribe,     $changed, $mgr->{User}{userid}, $email);
-	  unless ($dbh->do($query,undef,@qbind)) {
+	  my @qbind2 = ($maillistid,    $maillistname,
+                        $subscribe,     $changed, $mgr->{User}{userid}, $email);
+	  unless ($dbh->do($query,undef,@qbind2)) {
 	    die Apache::HeavyCGI::Exception
-		->new(ERROR => [qq{<p><b>Query[$query]with qbind[@qbind] failed.
+		->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
  Reason:</b></p><p>$DBI::errstr</p>}]);
 	  }
 
