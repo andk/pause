@@ -2730,15 +2730,11 @@ $blurbcopy
 </pre>
 <hr noshade="noshade" />
 }; #};
-    for my $to (@to) {
-      my $header = {
-                    To => "$to",
-                    Subject => $subject
-                   };
-      warn "To[$header->{To}]Subject[$header->{Subject}]";
-      $mgr->send_mail($header,$blurb);
-    }
-
+    my $header = {
+                  Subject => $subject
+                 };
+    warn "To[@to]Subject[$header->{Subject}]";
+    $mgr->send_mail_multi(\@to,$header,$blurb);
   }
 
   return @m;
@@ -2883,12 +2879,9 @@ will expire within a few hours. If you don't need it, do nothing. By
 the way, your old password is still valid.
 
 $Yours};
-      my $header = {
-		    To => $email,
-		    Subject => "Your visit at $me"
-		   };
-      warn "mailto[$header->{To}]mailblurb[$mailblurb]";
-      $mgr->send_mail($header, $mailblurb);
+      my $header = { Subject => "Your visit at $me" };
+      warn "mailto[$email]mailblurb[$mailblurb]";
+      $mgr->send_mail_multi([$email], $header, $mailblurb);
 
       push @m, qq{
 
@@ -3138,13 +3131,10 @@ $Yours};
       my @to = ($u->{secretemail}||$u->{email}, $mgr->{MailtoAdmins});
       warn "sending to[@to]";
       warn "mailblurb[$mailblurb]";
-      for my $to (@to){
-	my $header = {
-		      To => "$to",
-		      Subject => "Mailinglist update for $selectedrec->{maillistid}"
-		     };
-	$mgr->send_mail($header,$mailblurb);
-      }
+      my $header = {
+                    Subject => "Mailinglist update for $selectedrec->{maillistid}"
+                   };
+      $mgr->send_mail_multi(\@to, $header, $mailblurb);
     } elsif ($update_sel) { # it should have been updated but wasn't?
 
       push @m, "<p>It seems to me the record was NOT updated. Maybe
@@ -3507,13 +3497,10 @@ $Yours};
 	  unless $mgr->{User}{userid} eq $u->{userid};
       warn sprintf "sending to[%s]", join(" AND ",@to);
       warn "mailblurb[$mailblurb]";
-      for my $to (@to){
-	my $header = {
-		      To => "$to",
-		      Subject => "Module update for $selectedrec->{modid}"
-		     };
-	$mgr->send_mail($header,$mailblurb);
-      }
+      my $header = {
+                    Subject => "Module update for $selectedrec->{modid}"
+                   };
+      $mgr->send_mail_multi(\@to, $header, $mailblurb);
     } elsif ($update_sel) {	# it should have been updated but wasn't?
 
       push @m, "It seems to me the record was NOT updated. Maybe
@@ -3736,13 +3723,10 @@ $Yours};
       push @to, $mgr->{User}{secretemail}||$mgr->{User}{email};
       warn "sending to[@to]";
       warn "mailblurb[$mailblurb]";
-      for my $to (@to){
-	my $header = {
-		      To => "$to",
-		      Subject => "Uri update for $selectedrec->{uriid}"
-		     };
-	$mgr->send_mail($header,$mailblurb);
-      }
+      my $header = {
+                    Subject => "Uri update for $selectedrec->{uriid}"
+                   };
+      $mgr->send_mail_multi(\@to,$header,$mailblurb);
     } elsif ($update_sel) {	# it should have been updated but wasn't?
       push @m, "It seems to me the record was NOT updated. Maybe nothing has changed?
  Please take a closer look and
@@ -4133,14 +4117,11 @@ $blurbcopy
 };
     warn "blurb[$blurb]";
 
-    for my $to (@to) {
-      my $header = {
-                    To => "$to",
-                    Subject => $subject
-                   };
-      warn "To[$header->{To}]Subject[$header->{Subject}]";
-      $mgr->send_mail($header,$blurb);
-    }
+    my $header = {
+                  Subject => $subject
+                 };
+    warn "To[@to]Subject[$header->{Subject}]";
+    $mgr->send_mail_multi(\@to, $header, $blurb);
   } else {
     $modid = $req->param('pause99_add_mod_modid')||"";
   }
@@ -4614,14 +4595,11 @@ $blurbcopy
 };
     warn "blurb[$blurb]";
 
-    for my $to (@to) {
-      my $header = {
-                    To => "$to",
-                    Subject => $subject
-                   };
-      warn "To[$header->{To}]Subject[$header->{Subject}]";
-      $mgr->send_mail($header,$blurb);
-    }
+    my $header = {
+                  Subject => $subject
+                 };
+    warn "To[@to]Subject[$header->{Subject}]";
+    $mgr->send_mail_multi(\@to, $header, $blurb);
   } else {
     $modid = $req->param('pause99_apply_mod_modid')||"";
   }
@@ -5482,13 +5460,10 @@ $Yours},
       }
     }
     $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    for my $to (keys %umailset) {
-      my $header = {
-                    To      => $to,
-                    Subject => "Scheduled for reindexing $u->{userid}"
-                   };
-      $mgr->send_mail($header,$blurb);
-    }
+    my $header = {
+                  Subject => "Scheduled for reindexing $u->{userid}"
+                 };
+    $mgr->send_mail_multi([keys %umailset], $header, $blurb);
 
     push @m, qq{<hr /><pre>$blurb</pre><hr />};
 
