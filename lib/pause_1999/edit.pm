@@ -5560,11 +5560,13 @@ sub share_perms {
 
     push @m, qq{<p>Permissions on PAUSE come in three flavors:</p>
 
-           <ul>
-           <li>registered in <i>modulelist</i>,</li> <li>primary
+           <ul> <li> only one user per module can be either <br/> <ul>
+           <li> registered in <i>modulelist</i> or </li> <li> primary
            maintainer, mostly on a <i>first-come-first-serve</i>
-           basis</li> <li>granted permissions as
-           <i>co-maintainer</i>.</li></ul>
+           basis;</li> </ul> </li> <li> many users can get granted
+           permissions as <i>co-maintainers</i>, which means their
+           uploads for the given module are honoured by the
+           indexer.</li> </ul>
 
            <p>You can <i>view</i> your current set of permissions on
            the <a href="authenquery?ACTION=peek_perms">View
@@ -5581,14 +5583,14 @@ sub share_perms {
 
            <tbody><tr>
 
-           <td colspan="2">1. registered in modulelist</td>
+           <td colspan="2">1. You are registered in modulelist</td>
 
            </tr> <tr><td>&nbsp;</td> <td>To enter a new
            owner or a new module status, please visit the <a
            href="authenquery?ACTION=edit_mod">Edit Module Metadata</a>
            page.<sup>*</sup></td></tr> <tr>
 
-           <td colspan="2">2. primary maintainer:</td>
+           <td colspan="2">2. You are primary maintainer:</td>
 
            </tr> <tr><td align="right"><input type="submit"
            name="pause99_share_perms_movepr" value="Select" /></td>
@@ -5600,7 +5602,8 @@ sub share_perms {
            type="submit" name="pause99_share_perms_remopr"
            value="Select" /></td>
 
-           <td>2.2 Give up primary maintainership status (without transfering it)<sup>*</sup></td>
+           <td>2.2 Give up primary maintainership status (without
+           transfering it)<sup>*</sup></td>
 
            </tr> <tr>
 
