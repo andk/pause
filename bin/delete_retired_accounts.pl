@@ -18,7 +18,7 @@ my $dbm = DBI->connect(
 		       {RaiseError => 1}
 		      );
 
-my $sth1 = $dbm->prepare(qq{SELECT userid FORM users WHERE ustatus='delete'});
+my $sth1 = $dbm->prepare(qq{SELECT userid FROM users WHERE ustatus='delete'});
 $sth1->execute;
 while (my($id) = $sth1->fetchrow_array) {
   warn "XXX not yet implemented: delete $id";
@@ -26,4 +26,5 @@ while (my($id) = $sth1->fetchrow_array) {
   # check if the user is in both users and usertable
   # delete from usertable
   # delete from users
+  # remove the userdirectory from PAUSE and backpan
 }
