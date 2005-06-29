@@ -73,6 +73,7 @@ sub new {
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
     if ($opt->{pick}) {
         for my $pick (@{$opt->{pick}}) {
+            $pick =~ s|^.*authors/id/|| if $pick =~ m|authors/id/./../|;
             $self->{PICK}{$pick} = 1;
         }
     }
@@ -1542,32 +1543,36 @@ Please contact modules\@perl.org if there are any open questions.
         my $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
             grep !m|/t/|, grep m|/META\.yml$|, @manifind;
         if (defined $yaml) {
-            $self->{YAML} = $yaml;
-            File::Copy::copy $yaml, "$MLROOT/$sans.meta";
-            utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
-            eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
-            if ($@) {
-                $self->verbose(1,"Error while parsing YAML: $@");
-                if ($@ =~ /msg: Unrecognized implicit value/) {
-                    # let's retry, but let's not expect that this
-                    # will work. MakeMaker 6.16 had a bug that
-                    # could be fixed like this, at least for
-                    # Pod::Simple
+            if (-s $yaml) {
+                $self->{YAML} = $yaml;
+                File::Copy::copy $yaml, "$MLROOT/$sans.meta";
+                utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
+                eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
+                if ($@) {
+                    $self->verbose(1,"Error while parsing YAML: $@");
+                    if ($@ =~ /msg: Unrecognized implicit value/) {
+                        # let's retry, but let's not expect that this
+                        # will work. MakeMaker 6.16 had a bug that
+                        # could be fixed like this, at least for
+                        # Pod::Simple
 
-                    my $cat = do { open my($f), $yaml or die; local $/; <$f> };
-                    $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
-                    eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
-                    if ($@) {
+                        my $cat = do { open my($f), $yaml or die; local $/; <$f> };
+                        $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
+                        eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
+                        if ($@) {
+                            $self->{YAML_CONTENT} = {};
+                            $self->{YAML} = "META.yml found but error ".
+                                "encountered while loading: $@";
+                        }
+
+                    } else {
                         $self->{YAML_CONTENT} = {};
                         $self->{YAML} = "META.yml found but error ".
                             "encountered while loading: $@";
                     }
-
-                } else {
-                    $self->{YAML_CONTENT} = {};
-                    $self->{YAML} = "META.yml found but error ".
-                        "encountered while loading: $@";
                 }
+            } else {
+                $self->{YAML} = "Empty META.yml found, ignoring\n";
             }
         } else {
             $self->{YAML} = "No META.yml found\n";
