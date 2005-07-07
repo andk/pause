@@ -179,8 +179,14 @@ sub set_user_active_status {
                                         "userid");
     my %seen;
     $self->debug_mem;
-    my @new_active_users = grep { !$active->{$_} }
-        map { m|./../([^/]+)/| } keys %{$self->{ALLfound}};
+    my @new_active_users;
+    while (my $file = each %{$self->{ALLfound}}) {
+        my($user) = $file =~ m|./../([^/]+)/|;
+        $self->verbose("Warning: user not defined for file[$file]\n")
+            unless defined $user;
+        next if exists $active->{$user};
+        push @new_active_users, $user;
+    }
     $self->filter_dups(\@new_active_users);
     $self->debug_mem;
     return unless @new_active_users;
@@ -264,7 +270,7 @@ sub manifind {
     tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
 
     my $wanted = sub {
-        return if m|/CHECKSUMS$|;
+        return if m|CHECKSUMS$|;
         return if -d $_;
         my $name = $self->clean_up_filename($File::Find::name);
         $found{$name} = undef;
