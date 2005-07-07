@@ -136,6 +136,40 @@ sub work2 {
                              ));
 }
 
+sub debug_mem {
+    my($self) = @_;
+    return unless $self->{OPT}{debug_mem};
+    my @caller = caller;
+    open my $ps, "ps -o pid,vsize -p $$ |";
+    open my $log, ">>", "/tmp/debug_mem.log" or die;
+    print $log scalar localtime, "\n";
+    print $log $caller[2], "\n";
+    print $log +<$ps>;
+    close $log or die;
+}
+
+sub filter_dups {
+    my($self,$array) = @_;
+    my($fh) = File::Temp->new(
+                              DIR => "/tmp",
+                              TEMPLATE => "mldistwatch_filterdups_XXXX",
+                             );
+    print $fh map {"$_\n"} @$array;
+    close $fh;
+    my $filename = $fh->filename;
+    #system "wc -l $filename";
+    system "sort --output=$filename --unique $filename";
+    #system "wc -l $filename";
+    open $fh, $filename;
+    local $/ = "\n";
+    @$array = <$fh>;
+    #warn sprintf "scalar \@\$array: %d", scalar @$array;
+    #warn "Press RET to continue";
+    #<>;
+    chomp @$array;
+    return;
+}
+
 sub set_user_active_status {
     my $self = shift;
     my $db = $self->connect;
@@ -144,8 +178,11 @@ sub set_user_active_status {
                                          WHERE ustatus='active'",
                                         "userid");
     my %seen;
-    my @new_active_users = grep { !$active->{$_} && !$seen{$_}++ }
+    $self->debug_mem;
+    my @new_active_users = grep { !$active->{$_} }
         map { m|./../([^/]+)/| } keys %{$self->{ALLfound}};
+    $self->filter_dups(\@new_active_users);
+    $self->debug_mem;
     return unless @new_active_users;
     $self->verbose(2,"Info: new_active_users[@new_active_users]");
     my $sth = $db->prepare("UPDATE users
@@ -227,8 +264,9 @@ sub manifind {
     tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
 
     my $wanted = sub {
-        my $name = $self->clean_up_filename($File::Find::name);
+        return if m|/CHECKSUMS$|;
         return if -d $_;
+        my $name = $self->clean_up_filename($File::Find::name);
         $found{$name} = undef;
     };
     find(
@@ -253,12 +291,15 @@ sub checkfornew {
                              );
     tie @all, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_RECNO or die;
     {
+        $self->debug_mem;
         my %seen;
-        @all = sort grep { !$seen{$_}++ }
-            keys %{$self->{ALLfound}},
-                keys %{$self->{ALLlasttime}};
+        @all = keys %{$self->{ALLfound}},
+            keys %{$self->{ALLlasttime}};
+        $self->filter_dups(\@all);
+        $self->debug_mem;
     }
     my $all = scalar @all;
+    die "Panic: unusual small number of files involved ($all)" if $all < 20000;
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
   BIGLOOP: for (my $i=0;scalar @all;$self->empty_curdir) {
         my $dist = shift @all;
@@ -2661,6 +2702,7 @@ MAIN: {
     Getopt::Long::GetOptions(
                              \%Opt,
                              "pick=s@",
+                             "debug_mem!",
                             );
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     $mldw->work;
