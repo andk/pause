@@ -305,7 +305,8 @@ sub checkfornew {
         $self->debug_mem;
     }
     my $all = scalar @all;
-    die "Panic: unusual small number of files involved ($all)" if $all < 20000;
+    die "Panic: unusual small number of files involved ($all)"
+        if !$self->{PICK} && $all < 20000;
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
   BIGLOOP: for (my $i=0;scalar @all;$self->empty_curdir) {
         my $dist = shift @all;
