@@ -18,8 +18,6 @@ perl -MCPAN -e 'install Bundle::Snapshot_1996_09_29_00'
 
 Convert::BER
 
-Mon
-
 XML::SAX::Expat
 
 XML::SAX::Writer
@@ -63,8 +61,6 @@ ExtUtils::MakeMaker 5.38
 ExtUtils::Manifest 1.27
 
 File::CounterFile 0.08
-
-Filesys::DiskSpace
 
 HTML::HeadParser
 
