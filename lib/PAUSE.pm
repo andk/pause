@@ -31,7 +31,7 @@ $VERSION = substr q$Revision: 1.60 $, 10;
 # really variables we cannot publish. Will separate harmless variables
 # from the secret ones and put them here in the future.
 
-my(@pauselib) = grep m!(/PAUSE|\.\.)/lib!, @INC;
+my(@pauselib) = grep m!(/PAUSE|\.\.|/SVN)/lib!, @INC;
 for (@pauselib) {
   s|/lib|/privatelib|;
 }
