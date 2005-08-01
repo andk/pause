@@ -1,9 +1,106 @@
 <!DOCTYPE html
  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
  "DTD/xhtml1-transitional.dtd">
-<html><head><title>PAUSE history</title></head>
-<body>
-<dl>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><title>PAUSE history</title></head>
+  <body>
+    <dl>
+
+      <dt><b>2001-10-10</b></dt>
+      <dd><ul><li>
+            mldistwatch (the indexer) now parses $VERSION with the help of CPAN::Version which is included in CPAN.pm. The effect is that modules that use v-strings for $VERSION get indexed better, e.g. diagnostics.pm now is indexed with version <b><code>v1.0</code></b> instead of <b><code>undef</code></b>.
+          </li></ul></dd>
+      <dt><b>2001-05-20</b></dt>
+      <dd><ul><li>
+            New SSL certificate for PAUSE. Official hostname for PAUSE now
+            is pause.perl.org. Expiration of the self-signed certificate is
+            2003-05-20, Fingerprint is 0E:E2:E9:AC:81:D0:DC:80:81:25:E5:BA:66:32:33:E5<br />
+            Revised 04pause.html to reflect the new procedure for
+            namespace registration.<br />
+            Upgrade perl to 5.6.1, apache to 1.3.19.
+          </li></ul></dd>
+
+      <dt><b>2001-05-10</b></dt>
+      <dd><ul><li>Form to apply for namespace registration declared stable.</li></ul></dd>
+
+      <dt><b>2001-04-19</b></dt>
+      <dd><ul><li>New form to apply for namespace registration goes into beta
+            test.</li></ul></dd>
+
+      <dt><b>2000-10-27</b></dt>
+      <dd><ul><li>The whole memory of the PAUSE has been exchanged after some
+            weird system failures.</li></ul></dd>
+      
+      <dt><b>2000-10-26</b></dt>
+      <dd><ul><li>Database converted to UTF-8. Revisited Todo List:<ul>
+              <li> add pages to apply for registration of both developers and
+                modules <b>DONE for modules 2001-04</b>,</li>
+              <li> improve security of the whole CPAN,</li>
+              <li> slurp the Tk, Apache, and XML module lists <b>DONE 2000-11</b>,</li>
+              <li> parse vX.X.X style numbering correctly <b>DONE 2001-10-10</b>,</li>
+              <li> per-author inventory page,</li>
+              <li> trigram search for authors and modules which directs to a
+                page with item-related menues,</li>
+              <li> fix false positives in mldistwatch and mail the reports to
+                the authors <b>DONE 2003-02-10</b>,</li>
+              <li> open perms table <b>DONE 2002-04</b>,</li>
+              <li> arbitrary voting ala Slashdot <b>Disapproved on later reconsideration</b>,</li>
+              <li> make more error conditions visible via web interface, <b>DONE (by indexer emails) 2003-02-10</b></li>
+              <li> Date/Time chapter and flexibility to add more chapters,</li>
+              <li> symlink tree washer</li>
+            </ul></li></ul></dd>
+
+      <dt><b>2000-10-15</b></dt>
+      <dd><ul><li>PAUSE gets new hardware: Athlon 700 and 2x20 GB IDE disks,
+            mostly RAID1 mirrored. Linux kernel is 2.2.18pre15 and distribution is
+            RedHat 6.2. Installed software has hardly changed to make transition
+            more secure.</li></ul></dd>
+
+      <dt><b>2000-10-13</b></dt>
+      <dd><ul><li>As our sponsor Speedlink is moving, PAUSE is relocated too from
+            Dircksenstrasse to Hardenbergplatz. Thanks to the whole team that made
+            the move in just a few hours with not a single incident.</li></ul></dd>
+
+      <dt><b>2000-06-23</b></dt>
+      <dd><ul><li>After reading on bugtraq about yet another root compromise of
+            wuftpd, I killed it and replaced it with proftpd version 1.2.0pre10.</li></ul></dd>
+
+      <dt><b>2000-05-23</b></dt>
+      <dd><ul><li>During the last two weeks the whole directory tree below
+            authors/id/ has got a cosmetic operation. All directories are now
+            living in depth 2, i.e. ANDK/ has now been moved to A/AN/ANDK/ and the
+            old directories are now symlinks to the new ones. The reasons for this
+            were: Doing it this way opens at least the option to deprecate the
+            symlinks in the future. And by deprecating them we can some day really
+            get rid of them. And anyway, if we make the canonical name the same as
+            the real filename we avoid confusion for future implementors (i.e. for
+            anybody who does some programming related to the CPAN). And there is
+            the effect of generating a two class community: I have been asked
+            already if I could "pretty please" assign such a "real" CPAN ID to a
+            new user instead of a second class one:-/</li></ul></dd>
+
+
+      <dt><b>2000-04-02</b></dt>
+      <dd><ul><li>Added the action <a href="/pause/authenquery?ACTION=add_mod"
+              >add_mod</a> to the admin menu. It's a page that speeds up registering
+            a new module considerably and what is more important, makes more
+            teamwork possible.<br />The Todo list is untouched since December and
+            new demands pop up: Change the site/URL layout to be more natural, add
+        pages to apply for registration of both developers and modules,
+        improve security of the whole CPAN, invent something to slurp the Tk,
+        Apache, and XML module lists, prepare yourself for the first module
+        with vX.X.X style numbering, balanced directory structure in the
+        authors/id directory, etc, etc. But above all this is the desire to
+        catch up with tons of messages that have remained unanswered.</li></ul></dd>
+
+      <dt><b>2000-02-04</b></dt>
+      <dd><ul><li>Creation of the backpan (not even a working title). It's the
+            seed for a project of the history of the PAUSE where all uploads of
+            all times are kept. See ftp://p11.speed-link.de/pub/backpan/README</li></ul></dd>
+
+
+      <dt><b>2000-01-06</b></dt>
+      <dd><ul><li>Upgrade to linux-2.2.14, wu-ftpd-2.6.0.</li></ul></dd>
 
   <dt><b>1999-12-09</b></dt>
   <dd><ul><li>My current Todo list is mostly unchanged since October:
@@ -239,7 +336,7 @@ Megabytes.<br />
 
 
 <hr />
-$Id:$
+$Id: history.html 327 2003-03-26 15:08:24Z k $
 
 </body>
 </html>
