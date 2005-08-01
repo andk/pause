@@ -29,9 +29,9 @@ reasons:
 PrivatePAUSE.pm contains only the usernames and passwords of the mysql
 users that own the two databases. See below for "Database schema".
 
-Other sensitive files, like the SSL key of the server, password files
-need to be maintained separately from the repository. See below the
-section about user management.
+Other sensitive files, like the SSL key of the server and password
+files need to be maintained separately from the repository. See below
+the section about user management.
 
 =head2 File system layout
 
@@ -43,19 +43,23 @@ make sure that installed programs find their configuration:
   /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf
   /usr/local/apache/htdocs          -> ../../../home/k/PAUSE/htdocs/
   /usr/local/apache/perl            -> ../../../home/k/PAUSE/apache-perl
-  /etc/apache2/apache2.conf         -> /home/k/PAUSE/apache-svn-conf/httpd.conf
-  /etc/apache2/mods-available/ssl.conf -> /home/k/PAUSE/apache-svn-conf/ssl.conf
-  /etc/rsyncd.conf                  -> /home/k/PAUSE/etc/rsyncd.conf
-  /etc/proftpd.conf                 -> /home/k/PAUSE/etc/proftpd.conf
-  /etc/mon/mon.cf                   -> /home/k/PAUSE/etc/mon/mon.cf
-  /etc/mysql/my.cnf                 -> /home/k/PAUSE/etc/my.cnf
-  /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
-  /usr/lib/mon/mon.d/sm-mta.monitor -> /home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
+  /etc/init.d/PAUSE-httpd           -> ../../home/k/PAUSE/etc/init.d/PAUSE-httpd
+  /etc/init.d/PAUSE-paused          -> ../../home/k/PAUSE/etc/init.d/PAUSE-paused
+  /etc/init.d/PAUSE-rsyncd          -> ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
+  /etc/apache2/apache2.conf         -> ../../home/k/PAUSE/apache-svn-conf/httpd.conf
+  /etc/apache2/mods-available/ssl.conf
+                                    -> ../../../home/k/PAUSE/apache-svn-conf/ssl.conf
+  /etc/rsyncd.conf                  -> ../home/k/PAUSE/etc/rsyncd.conf
+  /etc/proftpd.conf                 -> ../home/k/PAUSE/etc/proftpd.conf
+  /etc/mon/mon.cf                   -> ../../home/k/PAUSE/etc/mon/mon.cf
+  /etc/mysql/my.cnf                 -> ../../home/k/PAUSE/etc/my.cnf
+  /usr/lib/mon/mon.d/paused.monitor -> ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
+  /usr/lib/mon/mon.d/sm-mta.monitor -> ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
 
 [ MISSING documentation:
 
-  /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
-  /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
+  /etc/cron.jobs/indexscripts.pl    -> ../../home/kstar/cron/indexscripts.pl
+  /etc/security/limits.conf         -> ../../home/k/PAUSE/etc/security/limits.conf
 
 ]
 
@@ -91,6 +95,8 @@ and group permissions. This is dangerous stuff. Be careful here and
 follow the advice in the mysql manual about how to secure mysql in
 general. E.g. --skip-networking and root user password are a must,
 etc.
+
+User "nobody" runs the web server.
 
 PAUSE is running processes as user root, nobody, SVN, ftp, and UNSAFE.
 The user "k" in the group "k" owns the working copy of the repository
