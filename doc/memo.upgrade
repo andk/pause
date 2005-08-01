@@ -1,0 +1,60 @@
+1. PREPARE
+
+Compile and test perl and apache somewhere. Make it so that the two
+packages have their own subdirectory under /usr/local/.
+
+Today: apache-1.3.33/ and perl-5.8.7/
+
+transfer them to pause to be in the same place.
+
+It's very likely that the test machine had something different and
+that there are some symlinks within the apache-x.x.x/ directory.
+
+Find the symlinks in the old and the new tree and adjust the new tree
+to the old tree:
+
+find apache-1.3.27 -type l -ls
+find apache-1.3.33 -type l -ls
+
+This time we forgot the rundata directory! With the effect that
+"Request PAUSE account" and "Register namespace" stopped working. Next
+time we must move the rundata themselves somewehere else and have a
+symlink for them as for all the other directories that need to survive
+an update.
+
+
+2. NOW SWITCH THE SERVER:
+
+  /etc/init.d/PAUSE-httpd stop
+  cd /usr/local/
+  rm apache
+  ln -s apache-1.3.33 apache
+  rm perl
+  ln -s perl-5.8.7 perl
+  sleep 12
+  /etc/init.d/PAUSE-httpd start
+
+2.BACKOUT:
+
+  cd /usr/local/
+  /etc/init.d/PAUSE-httpd stop
+  rm apache
+  ln -s apache-1.3.27 apache
+  rm perl
+  ln -s perl-5.8.0 perl
+  sleep 12
+  /etc/init.d/PAUSE-httpd start
+
+
+
+3. RESTART PAUSED
+
+  /etc/init.d/PAUSE-paused restart
+
+3.BACKOUT
+
+  cd /usr/local
+  rm perl
+  ln -s perl-5.8.0 perl
+  /etc/init.d/PAUSE-paused start
+
