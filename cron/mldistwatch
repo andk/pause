@@ -2338,6 +2338,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         $fio->disconnect;
     }
 
+    # package PAUSE::package;
     sub mlroot {
         my($self) = @_;
         my $fio = $self->{FIO};
@@ -2390,6 +2391,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         delete $self->{FIO};    # circular reference
     }
 
+    # package PAUSE::package;
     sub update_package {
         # we come here only for packages that have opack and package
 
