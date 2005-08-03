@@ -1959,7 +1959,7 @@ Please contact modules\@perl.org if there are any open questions.
     # package PAUSE::pmfile;
     {
         no strict;
-        sub mm_unix_parse_version {
+        sub parse_version_safely {
             my($parsefile) = @_;
             my $result;
             local *FH;
@@ -2032,9 +2032,9 @@ Please contact modules\@perl.org if there are any open questions.
                 my($comp) = Safe->new("_pause::mldistwatch");
                 my $eval = qq{
                   local(\$^W) = 0;
-                  PAUSE::pmfile::mm_unix_parse_version("$pmcp");
+                  PAUSE::pmfile::parse_version_safely("$pmcp");
                  };
-                $comp->share("*PAUSE::pmfile::mm_unix_parse_version");
+                $comp->share("*PAUSE::pmfile::parse_version_safely");
                 # $comp->permit("require"); # no strict!
                 no strict;
                 local $PAUSE::Config;
@@ -2520,6 +2520,10 @@ has a higher version number ($oldversion)},
 }); # });
             } elsif ($oisaperl) {
                 $ok++;          # new on 2002-08-01
+            } else {
+                # we get a different result now than we got in a previous run
+                $self->alert("Taking back previous version calculation. odist[$odist]oversion[$oldversion]dist[$dist]version[$pp->{version}].");
+                $ok++;
             }
         } else {
 
