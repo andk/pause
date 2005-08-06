@@ -1,3 +1,4 @@
 This directory contains scripts that have/had a short lifespan. They
-did some job some day and aren't needed again, so need no
-maintainance.
+did some job some day and aren't needed again, so usually need no
+maintainance. They still might be helpful as building blocks or for
+the comments they produced.

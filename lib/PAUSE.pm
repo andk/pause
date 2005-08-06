@@ -132,16 +132,21 @@ sub filehash {
   return $ret;
 }
 
+sub dbh {
+  my($db) = shift || "mod";
+  DBI->connect(
+               $PAUSE::Config->{uc($db)."_DATA_SOURCE_NAME"},
+               $PAUSE::Config->{uc($db)."_DATA_SOURCE_USER"},
+               $PAUSE::Config->{uc($db)."_DATA_SOURCE_PW"},
+               { RaiseError => 1 }
+              )
+      or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
+}
+
 sub urecord {
   my($ruser) = @_;
   return unless $ruser;
-  my $db = DBI->connect(
-			$PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-			$PAUSE::Config->{MOD_DATA_SOURCE_USER},
-			$PAUSE::Config->{MOD_DATA_SOURCE_PW},
-			{ RaiseError => 1 }
-		       )
-      or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
+  my $db = dbh("mod");
   my $query = qq{SELECT *
                  FROM users
                  WHERE userid=?};
@@ -183,11 +188,7 @@ sub dir2user {
 
 sub user_is {
   my($class,$user,$group) = @_;
-  my $db = DBI->connect(
-			$PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
-			$PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
-			$PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
-		       );
+  my $db = dbh("authen");
   my $ret;
   my $sth = $db->prepare(qq{
     SELECT ugroup FROM grouptable WHERE user='$user' AND ugroup='$group'
