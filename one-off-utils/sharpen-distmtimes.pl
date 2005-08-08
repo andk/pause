@@ -18,7 +18,7 @@ use Parse::CPAN::Packages;
 my $dbh = PAUSE::dbh;
 my $sth = $dbh->prepare("delete from distmtimes where dist=?");
 my $p = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt.gz") or die;
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-20050804.gz") or die;
 for my $d ($p->latest_distributions){
   $sth->execute($d->prefix);
 }
