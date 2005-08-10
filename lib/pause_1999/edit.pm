@@ -2550,7 +2550,7 @@ sub request_id {
     $fullname = $ufullname;
   }
   my $email     = $req->param( 'pause99_request_id_email') || "";
-  my $homepage   = $req->param( 'pause99_request_id_homepage') || "";
+  my $homepage  = $req->param( 'pause99_request_id_homepage') || "";
   my $userid    = $req->param( 'pause99_request_id_userid') || "";
   my $rationale = $req->param("pause99_request_id_rationale") || "";
   my $urat = $mgr->any2utf8($rationale);
@@ -2574,6 +2574,21 @@ sub request_id {
     }
     unless( $email ) {
       push @errors, "You must supply an email address\n";
+    }
+    if ( $rationale ) {
+
+      $rationale =~ s/^\s+//;
+      $rationale =~ s/\s+$//;
+      $rationale =~ s/\s+/ /;
+      push @errors, "Thank you for giving us a short description of
+        what you're planning to contribute, but frankly, this looks a
+        bit too short" if length($rationale)<10;
+
+    } else {
+
+      push @errors, "You must supply a short description of what
+        you're planning to contribute\n";
+
     }
     if ( $userid ) {
       $userid = uc $userid;
@@ -2649,8 +2664,7 @@ sub request_id {
     }
 
     push @m, qq{<p><b>A short description of what you're planning to
-        contribute:</b></p><p><small>If we know you, you can leave
-        this out. Otherwise required.</small></p><p>};
+        contribute:</b></p><p><small>required.</small></p><p>};
 
     push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
                             rows=>8,
