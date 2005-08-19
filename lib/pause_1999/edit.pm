@@ -5253,7 +5253,7 @@ sub peek_perms {
                );
 
     my $db = $mgr->connect;
-    my @m1;
+    my @res;
     my %seen;
     for my $query (@query) {
       my %fields = (
@@ -5275,14 +5275,14 @@ sub peek_perms {
       my $where;
       if ($by =~ /^m/) {
         if ($by eq "me") {
-          $where = qq{WHERE $fmap->{package}=? ORDER BY $fmap->{userid}};
+          $where = qq{WHERE $fmap->{package}=?};
         } else {
-          $where = qq{WHERE $fmap->{package} LIKE ? ORDER BY $fmap->{userid} LIMIT 1000};
+          $where = qq{WHERE $fmap->{package} LIKE ? LIMIT 1000};
           # I saw 5.7.3 die with Out Of Memory on the query "%" when no
           # Limit was applied
         }
       } elsif ($by eq "a") {
-        $where = qq{WHERE $fmap->{userid}=? ORDER BY $fmap->{package}};
+        $where = qq{WHERE $fmap->{userid}=?};
       } else {
         die Apache::HeavyCGI::Exception
             ->new(ERROR => "Illegal parameter for pause99_peek_perms_by");
@@ -5297,29 +5297,38 @@ sub peek_perms {
             # warn "Ignoring row[$row[0]][$row[1]]";
             next;
           }
-          push @m1, qq{<tr>};
-          # pause99_peek_perms_by=m&pause99_peek_perms_query=PerlIO&pause99_peek_perms_sub=+Submit+
-          push @m1, sprintf(
-                            qq{<td><a href="authenquery?pause99_peek_perms_by=me&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
-                               <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
-                               <td>%s</td>},
-                            $row[0],
-                            $row[0],
-                            $row[1],
-                            $row[1],
-                            $row[2],
-                           );
-          push @m1, qq{</tr>};
+          push @res, \@row;
         }
       }
       $sth->finish;
     }
-    if (@m1) {
+    if (@res) {
       push @m, qq{<table border="1" cellspacing="1" cellpadding="4">}; #};
       push @m, qq{<tr>};
       push @m, map { "<td><b>" . $mgr->escapeHTML($_) . "</b></td>"} qw(module who type);
       push @m, qq{</tr>};
-      push @m, @m1;
+      for my $row (sort {
+        $a->[0] cmp $b->[0]
+            ||
+        $a->[1] cmp $b->[1]
+            ||
+        $a->[2] cmp $b->[2]
+      } @res) {
+          push @m, qq{<tr>};
+          # pause99_peek_perms_by=m&pause99_peek_perms_query=PerlIO&pause99_peek_perms_sub=+Submit+
+
+          push @m, sprintf(
+                           qq{<td><a href="authenquery?pause99_peek_perms_by=me&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
+                               <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
+                               <td>%s</td>},
+                           $row->[0],
+                           $row->[0],
+                           $row->[1],
+                           $row->[1],
+                           $row->[2],
+                           );
+          push @m, qq{</tr>};
+      }
       push @m, qq{</table>};
     } else {
       push @m, qq{No records found.};
