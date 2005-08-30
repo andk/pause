@@ -4,7 +4,7 @@
 
 use strict;
 use lib "/home/k/PAUSE/lib";
-use version 0.45; # 0.44 had trailing zero problems
+use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
 use CPAN::Checksums 1.016;
@@ -1990,9 +1990,7 @@ Please contact modules\@perl.org if there are any open questions.
             close FH;
 
             return "undef" unless defined $result;
-            $result > 0; # use once in numerical context workaround for bug in 0.45
             my $vv = version->new($result)->numify;
-            # return $vv==0 && $result > 0 ? $result : $vv;
             return $vv;
         }
     }
