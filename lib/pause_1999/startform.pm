@@ -16,16 +16,18 @@ sub as_string {
   my $enctype;
   my $method;
 
-  # 2005 I decided to prefer post *always*
+  # 2005 I decided to prefer post *always*, but then for example links
+  # to peek_perms stopped to work, so we should really decide
+  # case-by-case if we want get or post
   if ($mgr->can_multipart && $mgr->need_multipart) {
     $enctype = "multipart/form-data";
     $method = "post";
-  } elsif ($mgr->prefer_post) {
+  } elsif (defined $mgr->prefer_post and $mgr->prefer_post) {
     $enctype = "application/x-www-form-urlencoded";
     $method = "post";
   } else {
     $enctype = "application/x-www-form-urlencoded";
-    $method = "post";
+    $method = "get";
   }
   # warn "me[$me]enctype[$enctype]method[$method]";
   push @m, qq{<form
