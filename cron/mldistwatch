@@ -1863,12 +1863,12 @@ Please contact modules\@perl.org if there are any open questions.
     sub packages_per_pmfile {
         my $self = shift;
 
-        my $ppp;
+        my $ppp = {};
         my $pmfile = $self->{PMFILE};
         my $filemtime = $self->{MTIME};
         my $version = $self->{VERSION};
 
-        open my $fh, "<", "$pmfile" or die("Couldn't open $pmfile for read: $!");
+        open my $fh, "<", "$pmfile" or return $ppp;
 
         local $/ = "\n";
         my $inpod = 0;
@@ -2048,7 +2048,10 @@ Please contact modules\@perl.org if there are any open questions.
                     # which had absurd permissions but it did not work
                     # out well, the consequence was "No package
                     # statements could be found...". I think we need a
-                    # sanity check on permissions beforehand.
+                    # sanity check on permissions beforehand. Another
+                    # case was MACGYVER/SMTP-Server-1.1 which had a
+                    # dangling symlink which, of course, could not be
+                    # opened which caused a die()!
 
                     #$err =~ s/\s+/_/g;
                     #$v = "undef($err)";
@@ -2058,7 +2061,6 @@ Please contact modules\@perl.org if there are any open questions.
             }
         }
         $v = "undef" unless defined $v;
-
         $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$v]\n");
         $v =~ s/^\s+//;
         $v =~ s/\s+$//;

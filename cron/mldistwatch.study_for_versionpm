@@ -1989,9 +1989,8 @@ Please contact modules\@perl.org if there are any open questions.
             } #;
             close FH;
 
-            return "undef" unless defined $result;
-            my $vv = version->new($result)->numify;
-            return $vv;
+            $result = "undef" unless defined $result;
+            return $result;
         }
     }
 
@@ -2061,14 +2060,25 @@ Please contact modules\@perl.org if there are any open questions.
                     #$err =~ s/\s+/_/g;
                     #$v = "undef($err)";
                 }
+                $v = "" unless defined $v;
                 print $v;       # child process!!
                 exit;
             }
         }
         $v = "undef" unless defined $v;
-
         $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$v]\n");
-        return $v;
+        return $v if $v eq "undef";
+        return $v if $v =~ /_/;
+        my $vv = version->new($v)->numify;
+        if ($vv eq $v) {
+            # the boring 3.14
+        } else {
+            my $forced = $self->force_numeric($v);
+            if ($forced == $vv) {
+                $vv = $forced;
+            }
+        }
+        return $vv;
     }
 
     # package PAUSE::pmfile;
@@ -2333,6 +2343,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         $fio->disconnect;
     }
 
+    # package PAUSE::package;
     sub mlroot {
         my($self) = @_;
         my $fio = $self->{FIO};
@@ -2375,7 +2386,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
              $pp->{version},
              $dist
             ) {
-            if (/^\s*$/ || /\s/){  # for whatever reason I come here
+            if (!defined || /^\s*$/ || /\s/){  # for whatever reason I come here
                 delete $self->{FIO};    # circular reference
                 return;            # don't screw up 02packages
             }
@@ -2385,6 +2396,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         delete $self->{FIO};    # circular reference
     }
 
+    # package PAUSE::package;
     sub update_package {
         # we come here only for packages that have opack and package
 
