@@ -12,6 +12,7 @@ use Cwd ();
 use DBI;
 use Data::Dumper ();
 use DirHandle ();
+use Dumpvalue ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
 use File::Basename ();
@@ -2061,12 +2062,14 @@ Please contact modules\@perl.org if there are any open questions.
                     #$v = "undef($err)";
                 }
                 $v = "" unless defined $v;
-                print $v;       # child process!!
+                print ref $v && $v->can("numify") ? $v->numify : $v;
                 exit;
             }
         }
         $v = "undef" unless defined $v;
-        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$v]\n");
+        my $dv = Dumpvalue->new;
+        my $sdv = $dv->stringify($v);
+        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$sdv]\n");
         return $v if $v eq "undef";
         return $v if $v =~ /_/;
         my $vv = version->new($v)->numify;
@@ -2074,8 +2077,12 @@ Please contact modules\@perl.org if there are any open questions.
             # the boring 3.14
         } else {
             my $forced = $self->force_numeric($v);
-            if ($forced == $vv) {
-                $vv = $forced;
+            if ($forced eq $vv) {
+            } else {
+                warn "Unequal forced[$forced] and vv[$vv]";
+                if ($forced == $vv) {
+                    $vv = $forced;
+                }
             }
         }
         return $vv;
@@ -2545,7 +2552,7 @@ has a higher version number ($oldversion)},
 
             # so after rev. 478 we deprecate the EMTIMEFALLING constant
 
-            if ($pp->{version} == 0) {            # no version here,
+            if ($pp->{version} eq "undef"||$pp->{version} == 0) { # no version here,
                 if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
                     $self->verbose(1, "$package noversion comp $dist vs $odist: >=\n");
                     $ok++;
