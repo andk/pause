@@ -2383,7 +2383,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
              $pp->{version},
              $dist
             ) {
-            if (/^\s*$/ || /\s/){  # for whatever reason I come here
+            if (!defined || /^\s*$/ || /\s/){  # for whatever reason I come here
                 delete $self->{FIO};    # circular reference
                 return;            # don't screw up 02packages
             }
@@ -2542,7 +2542,7 @@ has a higher version number ($oldversion)},
 
             # so after rev. 478 we deprecate the EMTIMEFALLING constant
 
-            if ($pp->{version} == 0) {            # no version here,
+            if ($pp->{version} eq "undef"||$pp->{version} == 0) { # no version here,
                 if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
                     $self->verbose(1, "$package noversion comp $dist vs $odist: >=\n");
                     $ok++;
