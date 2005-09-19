@@ -11,6 +11,7 @@ use Cwd ();
 use DBI;
 use Data::Dumper ();
 use DirHandle ();
+use Dumpvalue ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
 use File::Basename ();
@@ -1818,7 +1819,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
 
         my($ppp) = $self->packages_per_pmfile;
-        my @keys_ppp = $self->filter_ppps(keys %$ppp);
+        my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
         $self->verbose(1,"will check keys_ppp[@keys_ppp]\n");
 
         #
@@ -2056,12 +2057,16 @@ Please contact modules\@perl.org if there are any open questions.
                     #$err =~ s/\s+/_/g;
                     #$v = "undef($err)";
                 }
-                print $v;       # child process!!
+                $v = "" unless defined $v;
+                print $v;
                 exit;
             }
         }
         $v = "undef" unless defined $v;
-        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$v]\n");
+        my $dv = Dumpvalue->new;
+        my $sdv = $dv->stringify($v);
+        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$sdv]\n");
+
         $v =~ s/^\s+//;
         $v =~ s/\s+$//;
 
@@ -2730,11 +2735,16 @@ MAIN: {
     my %Opt;
     Getopt::Long::GetOptions(
                              \%Opt,
-                             "pick=s@",
                              "debug_mem!",
+                             "pick=s@",
+                             "rewrite!",
                             );
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
-    $mldw->work;
+    if ($Opt{rewrite}) {
+        $mldw->work2;
+    } else {
+        $mldw->work;
+    }
 }
 
 exit;

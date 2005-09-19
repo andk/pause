@@ -1820,7 +1820,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
 
         my($ppp) = $self->packages_per_pmfile;
-        my @keys_ppp = $self->filter_ppps(keys %$ppp);
+        my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
         $self->verbose(1,"will check keys_ppp[@keys_ppp]\n");
 
         #
@@ -1923,7 +1923,7 @@ Please contact modules\@perl.org if there are any open questions.
                                 if ($v =~ /[_\s]/){   # ignore developer releases and "You suck!"
                                     next PLINE;
                                 } else {
-                                    $ppp->{$pkg}{version} = $self->force_numeric($v);
+                                    $ppp->{$pkg}{version} = $self->normalize_version($v);
                                 }
                             } else {
                                 $ppp->{$pkg}{version} = "undef";
@@ -2062,17 +2062,26 @@ Please contact modules\@perl.org if there are any open questions.
                     #$v = "undef($err)";
                 }
                 $v = "" unless defined $v;
-                print ref $v && $v->can("numify") ? $v->numify : $v;
+                print $v;
                 exit;
             }
         }
+
+        return $self->normalize_version($v);
+    }
+
+    # package PAUSE::pmfile
+    sub normalize_version {
+        my($self,$v) = @_;
         $v = "undef" unless defined $v;
         my $dv = Dumpvalue->new;
         my $sdv = $dv->stringify($v);
-        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$sdv]\n");
+        $self->verbose(1,"sdv[$sdv]\n");
+
         return $v if $v eq "undef";
+        $v =~ s/^\s+//;
+        $v =~ s/\s+\z//;
         return $v if $v =~ /_/;
-        $v =~ s/ //g;
         my $vv = version->new($v)->numify;
         if ($vv eq $v) {
             # the boring 3.14
@@ -2741,11 +2750,16 @@ MAIN: {
     my %Opt;
     Getopt::Long::GetOptions(
                              \%Opt,
-                             "pick=s@",
                              "debug_mem!",
+                             "pick=s@",
+                             "rewrite!",
                             );
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
-    $mldw->work;
+    if ($Opt{rewrite}) {
+        $mldw->work2;
+    } else {
+        $mldw->work;
+    }
 }
 
 exit;
