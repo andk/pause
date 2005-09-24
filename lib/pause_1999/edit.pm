@@ -914,7 +914,12 @@ sub pause_04about {
 sub pause_logout {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
-  $self->show_document($mgr,"logout.html");
+  my $x = $self->show_document($mgr,"logout.html");
+  my $rand = rand 1;
+  # the redirect solutions fail miserably the second time when tried
+  # with the exact same querystring again.
+  $x =~ s/__RANDOMSTRING__/$rand/g;
+  $x;
 }
 
 sub pause_04imprint {
@@ -982,7 +987,7 @@ sub show_document {
   unless (@m) {
     push @m, "document '$doc' not found on the server";
   }
-  @m;
+  join "", @m;
 }
 
 sub tail_logfile {

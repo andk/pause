@@ -1,59 +1,91 @@
 <!DOCTYPE html
  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
  "DTD/xhtml1-transitional.dtd">
-<html>
-<head><title></title></head><body>
-<p>
-PAUSE currently uses the <i>Basic Authentication Scheme</i> according
-to the HTTP specification. This means that your browser sends your
-username and password with every request to the server. In that sense
-you are never logged into the server as in telnet or ftp connections.
-Every request is made independently from all previous requests and in
-that sense there is no concept of logging out. However, the user
-usually <i>perceives</i> the dialog as a session that is equivalent to
-a telnet or ftp session. But PAUSE does nothing to support this
-concept.
-</p>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head><title></title></head>
+  <body>
 
-<p>
-As a matter of fact, as long as your browser remembers your userid and
-password, it will send the associated HTTP header to PAUSE and PAUSE
-will answer the request. Browsers handle the cache of authentification
-data differently. If you want your browser to forget them, most
-browsers require you to shut the browser down.
-</p>
+  <h3>Short version</h3>
 
-<p>
-However, Netscape 4 had the convenient behaviour that if the server
-sent a status code of 401 (HTTP_UNAUTHORIZED), it presented the user
-with a new login dialog. This dialog could be used to login with a
-different name and different password. If the different name and
-password were bogus, this method allowed you to effectively <i>log
-out</i>, in the sense that a new authentication was required to talk
-to PAUSE. If you want to get such a <i>401</i> status code once,
-please <a class="menuitem"
-href="authenquery?please_renegotiate_username">click here</a>.
-Internet Explorer and Mozilla do not behave like Netscape 4, at least
-not on the versions I have tried. They will just show a <i>401</i>
-page ("Authorization required" or some such) and no new
-authentification dialog box. As a consequence you can still visit
-PAUSE after that without having to type in username and password, so
-these browsers can not be tricked into forgetting the credentials. You
-have been warned.
-</p>
+  <p>
+    Over the years I have found the following methods of logging out.
+    None of them is guaranteed to work. Different browsers fail in
+    different ways at different versions. <b>Please verify that you
+    are effectively logged out by your browser.</b>
+  </p>
+  <p>
+    You may need to click on <i>Cancel</i> when your browser asks you
+    to login.
+  </p>
+  <ul>
+    <li>
+      <a class="menuitem" href="authenquery?logout=1__RANDOMSTRING__">
+        Redirect with Cookie
+      </a>
+    </li>
+    <li>
+      <a class="menuitem" href="authenquery?logout=2__RANDOMSTRING__">
+        Redirect to Badname:Badpass@Server URL
+      </a>
+    </li>
+    <li>
+      <a class="menuitem" href="authenquery?logout=3">
+        Quick direct 401
+      </a>
+    </li>
+  </ul>
 
-<p>If, on the other hand, you're just interested to see how PAUSE
-looks like for not authenticated users, please <a class="menuitem"
-href="query">click here</a>. This brings you to a different
-<i>realm</i> on PAUSE that doesn't need authentication. If you go
-there, your browser will not forget your username and password.
-</p>
+  <h3>Long version</h3>
 
-<p><i>
-$Id$
-</i></p>
-<p>
-Thanks to Gabor Szabo for suggesting this page.
-</p>
-</body>
+  <p>
+    PAUSE currently uses the <i>Basic Authentication Scheme</i>
+    according to the HTTP specification. This means that your browser
+    sends your username and password with every request to the server.
+    In that sense you are never logged into the server as in telnet or
+    ftp connections. Every request is made independently from all
+    previous requests and in that sense there is no concept of logging
+    out. However, the user usually <i>perceives</i> the dialog as a
+    session that is equivalent to a telnet or ftp session. But PAUSE
+    does nothing to support this concept.
+  </p>
+
+  <p>
+    As a matter of fact, as long as your browser remembers your userid
+    and password, it will send the associated HTTP header to PAUSE and
+    PAUSE will answer the request. Browsers handle the cache of
+    authentification data differently. If you want your browser to
+    forget them, most browsers require you to shut the browser down.
+  </p>
+
+  <p>
+    However, Netscape 4 had the convenient behaviour that if the
+    server sent a status code of 401 (HTTP_UNAUTHORIZED), it presented
+    the user with a new login dialog. This dialog could be used to
+    login with a different name and different password. If the
+    different name and password were bogus, this method allowed you to
+    effectively <i>log out</i>, in the sense that a new authentication
+    was required to talk to PAUSE. Other browsers behave differently.
+    As a consequence you can still visit PAUSE after that without
+    having to type in username and password, so these browsers can not
+    be tricked into forgetting the credentials. You have been warned.
+    Please try the above three methods and see what happens. Please
+    verify that your browser behaves as you want it to.
+  </p>
+
+  <p>
+    If, on the other hand, you're just interested to see how PAUSE
+    looks like for not authenticated users, please <a class="menuitem"
+    href="query">click here</a>. This brings you to a different
+    <i>realm</i> on PAUSE that doesn't need authentication. If you go
+    there, your browser will not forget your username and password.
+  </p>
+
+  <p><i>
+    $Id$
+  </i></p>
+  <p>
+    Thanks to Gabor Szabo and Moritz Sinn for their contributions to
+    this page.
+  </p>
+  </body>
 </html>
