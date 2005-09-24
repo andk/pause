@@ -16,9 +16,9 @@ use Parse::CPAN::Packages;
 #-rw-r--r--  1 root root 390964 Sep 15 04:48 /home/ftp/pub/PAUSE/modules/02packages.details.txt-200509150120.gz
 
 my $p1 = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200509150913.gz") or die;
-my $p2 = Parse::CPAN::Packages->
     new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200509180900.gz") or die;
+my $p2 = Parse::CPAN::Packages->
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200509210138.gz") or die;
 
 for my $d1 ($p1->latest_distributions){
   # printf "%s\n", $d1->dist;
