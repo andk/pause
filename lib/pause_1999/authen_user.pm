@@ -99,9 +99,9 @@ sub handler {
   my($r) = @_;
 
   my $cookie;
-  my $uri = $r->uri;
-  my $args = $r->args;
-  warn "Watch: uri[$uri]args[$args]";
+  my $uri = $r->uri || "";
+  my $args = $r->args || "";
+  warn "WATCH: uri[$uri]args[$args]";
   if ($cookie = $r->header_in("Cookie")) {
     if ( $cookie =~ /logout/ ) {
       warn "WATCH: cookie[$cookie]";
