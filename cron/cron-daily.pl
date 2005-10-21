@@ -382,7 +382,7 @@ sub whois {
 	my $address;
 #0=userid, 1=fullname, 2=email, 3=isa_list, 4=homepage, 5=asciiname
 	my $name = $row[0];
-        ##### 
+        #####
 	$name =~ s/\s//g;
 	if ($row[3]) {
 	    # printf FH "  <A NAME=\"%s\"></A>%-10s%s\n", $name, $row[0], qq{<A HREF="#mailinglists">See below</A>};
@@ -434,7 +434,7 @@ sub whois {
                 if $row[2];
             $xml .= qq{  <homepage>} . escapeHTML($row[4]) . qq{</homepage>\n}
                 if $row[4];
-            
+
             $xml .= $xml_has_cpandir;
             $xml .= qq{ </cpanid>\n};
 	}
