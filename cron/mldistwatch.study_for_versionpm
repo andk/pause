@@ -1651,6 +1651,13 @@ Please contact modules\@perl.org if there are any open questions.
             } else {
                 $ok++;
             }
+            # RSAVAGE/Javascript-SHA1-1.01.tgz had an empty provides
+            # hash. If Ron finds the reason why this happened, we will
+            # probably activate the following code:
+
+            # unless (keys %{$c->{provides}}) {
+            #     $ok = 0;
+            # }
         }
         return $self->{VERSION_FROM_YAML_OK} = $ok;
     }
