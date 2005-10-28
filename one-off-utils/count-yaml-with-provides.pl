@@ -1,5 +1,18 @@
 #!/usr/bin/perl
 
+=pod
+
+This program was used to investigate differences between decisions
+taken by the indexer and the provides hashref in the accompanying
+META.yml files. The investigation took place before the indexer itself
+looked into the provides hashref. At the bottom of the program is a
+pod section that talks about findings and consequences
+
+I do not remember how this program was called and how the output
+looked like.
+
+=cut
+
 use strict;
 use warnings;
 

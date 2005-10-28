@@ -1350,6 +1350,15 @@ Please contact modules\@perl.org if there are any open questions.
                 if ($pmfiles > 0) {
                     push @m, qq{No package statements could be found in the }.
                         qq{distro (maybe a script\nor documentation distribution?)\n\n};
+                    #### XXX
+
+                    # sometimes this error message would fit better
+                    # (courtesy Ron Savage):
+
+                    #    Nothing in this distro has been indexed,
+                    #    because according to META.yml this package
+                    #    does not provide any modules/scripts/etc.
+
                 } else {
                     # no need to write a report at all
                     return;
@@ -1643,7 +1652,24 @@ Please contact modules\@perl.org if there are any open questions.
                     if ($v eq "0.250.0") {
                         $ok++;
                     } elsif ($v >= 0.19) {
-                        $ok++;
+                        if ($v < 0.26) {
+                            # RSAVAGE/Javascript-SHA1-1.01.tgz had an
+                            # empty provides hash. Ron did not find
+                            # the reason why this happened, but let's
+                            # not go overboard, 0.26 seems a good
+                            # threshold from the statistics: there
+                            # are not many empty provides hashes from
+                            # 0.26 up.
+                            if (keys %{$c->{provides}}) {
+                                $ok++;
+                            } else {
+                                $ok = 0;
+                            }
+                        } else {
+                            $ok++;
+                        }
+                    } else {
+                        $ok = 0;
                     }
                 } else {
                     $ok++;
@@ -1651,13 +1677,6 @@ Please contact modules\@perl.org if there are any open questions.
             } else {
                 $ok++;
             }
-            # RSAVAGE/Javascript-SHA1-1.01.tgz had an empty provides
-            # hash. If Ron finds the reason why this happened, we will
-            # probably activate the following code:
-
-            # unless (keys %{$c->{provides}}) {
-            #     $ok = 0;
-            # }
         }
         return $self->{VERSION_FROM_YAML_OK} = $ok;
     }
