@@ -294,7 +294,7 @@ sub checkfornew {
     my($fh) = File::Temp->new(
                               DIR => "/tmp",
                               TEMPLATE => "mldistwatch_all_XXXX",
-                              UNLINK=>0,
+                              UNLINK=>1,
                              );
     tie @all, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_RECNO or die;
     {
@@ -356,6 +356,8 @@ sub checkfornew {
 
         $alert .= $dio->alert;  # now $dio can go out of scope
     }
+    untie @all;
+    undef $fh;
     if ($alert) {
         print $alert;       # summary
         unless ($PAUSE::Config->{TESTHOST}) {
