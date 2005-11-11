@@ -15,6 +15,9 @@ GetOptions(\%Opt,
            "debug!",
           ) or die;
 $Opt{debug} ||= 0;
+if ($Opt{debug}) {
+  warn "Debugging on. CPAN::Checksums::VERSION[$CPAN::Checksums::VERSION]";
+}
 my $root = $PAUSE::Config->{MLROOT};
 our $TESTDIR;
 
@@ -33,7 +36,7 @@ $CPAN::Checksums::MIN_MTIME_CHECKSUMS =
     $PAUSE::Config->{MIN_MTIME_CHECKSUMS} || 0;
 
 find(sub {
-       return if $cnt>=$Opt{max};
+       exit if $cnt>=$Opt{max};
        return unless $File::Find::name =~ m|id/.|;
        return if -l;
        return unless -d;
