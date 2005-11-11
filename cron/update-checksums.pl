@@ -21,9 +21,11 @@ if ($Opt{debug}) {
 my $root = $PAUSE::Config->{MLROOT};
 our $TESTDIR;
 
-# max: 15 was really slow, 100 is fine, 1000 was necessary recently
-# because of key-expiration on 2005-02-02
-$Opt{max} ||= 10;
+# max: 15 was really slow, 100 is fine, 1000 was temporarily used
+# because of key-expiration on 2005-02-02; 1000 also seems appropriate
+# now that we know that the process is not faster when we write less
+# (2005-11-11)
+$Opt{max} ||= 1000;
 
 my $cnt = 0;
 
