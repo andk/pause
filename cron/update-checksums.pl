@@ -62,11 +62,19 @@ find(sub {
                                         substr($File::Find::name,
                                                length($root)));
          File::Path::mkpath($debugdir);
-         cp "CHECKSUMS", File::Spec->catfile($debugdir,"CHECKSUMS.old") or die $!;
+         cp File::Spec->catfile(
+                                $File::Find::name,
+                                "CHECKSUMS"
+                               ), File::Spec->catfile($debugdir,
+                                                      "CHECKSUMS.old") or die $!;
        }
        my $ret = CPAN::Checksums::updatedir($File::Find::name);
        if ($Opt{debug}) {
-         cp "CHECKSUMS", File::Spec->catfile($debugdir,"CHECKSUMS.new") or die $!;
+         cp File::Spec->catfile(
+                                $File::Find::name,
+                                "CHECKSUMS"
+                               ), File::Spec->catfile($debugdir,
+                                                      "CHECKSUMS.old") or die $!;
          warn "debugdir[$debugdir]ret[$ret]cnt[$cnt]\n"
        }
        return if $ret == 1;
