@@ -16,10 +16,11 @@ GetOptions(\%Opt,
           ) or die;
 $Opt{debug} ||= 0;
 my $root = $PAUSE::Config->{MLROOT};
+our $TESTDIR;
 
 # max: 15 was really slow, 100 is fine, 1000 was necessary recently
 # because of key-expiration on 2005-02-02
-$Opt{max} ||= 100;
+$Opt{max} ||= 10;
 
 my $cnt = 0;
 
@@ -44,10 +45,28 @@ find(sub {
        # which reason this will be, but it may happen. Something like
        # $CPAN::Checksums::FORCE_UPDATE?
 
-       cp "$File::Find::name/CHECKSUMS", "$File::Find::name/CHECKSUMS.bak" or die $! if $Opt{debug};
+       my $debugdir;
+       if ( $Opt{debug} ) {
+         require File::Temp;
+         require File::Path;
+         require File::Spec;
+         $TESTDIR ||= File::Temp::tempdir(
+                                          "update-checksums-XXXX",
+                                          DIR => "/tmp",
+                                          CLEANUP => 0,
+                                         ) or die "Could not make a tmp directory";
+         my $debugdir = File::Spec->catdir($TESTDIR,
+                                           substr($File::Find::name,
+                                                  length($root)));
+         File::Path::mkpath($debugdir);
+         cp "CHECKSUMS", File::Spec->catfile($debugdir,"CHECKSUMS.old") or die $!;
+       }
        my $ret = CPAN::Checksums::updatedir($File::Find::name);
+       if ($Opt{debug}) {
+         cp "CHECKSUMS", File::Spec->catfile($debugdir,"CHECKSUMS.new") or die $!;
+         warn "debugdir[$debugdir]ret[$ret]cnt[$cnt]\n"
+       }
        return if $ret == 1;
-       warn "name[$File::Find::name]\n" if $Opt{debug};
        $cnt++;
      }, $root);
 
