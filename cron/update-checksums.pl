@@ -77,7 +77,7 @@ find(sub {
                                 "CHECKSUMS"
                                ),
             File::Spec->catfile($debugdir,
-                                "CHECKSUMS.old")
+                                "CHECKSUMS.new")
            ) or die $!;
          warn "debugdir[$debugdir]ret[$ret]cnt[$cnt]\n"
        }
