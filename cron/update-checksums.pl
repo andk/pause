@@ -55,9 +55,9 @@ find(sub {
                                           DIR => "/tmp",
                                           CLEANUP => 0,
                                          ) or die "Could not make a tmp directory";
-         my $debugdir = File::Spec->catdir($TESTDIR,
-                                           substr($File::Find::name,
-                                                  length($root)));
+         $debugdir = File::Spec->catdir($TESTDIR,
+                                        substr($File::Find::name,
+                                               length($root)));
          File::Path::mkpath($debugdir);
          cp "CHECKSUMS", File::Spec->catfile($debugdir,"CHECKSUMS.old") or die $!;
        }
