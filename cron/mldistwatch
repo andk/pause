@@ -4,6 +4,7 @@
 
 use strict;
 use lib "/home/k/PAUSE/lib";
+use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
 use CPAN::Checksums 1.016;
@@ -1950,7 +1951,7 @@ Please contact modules\@perl.org if there are any open questions.
                                 if ($v =~ /[_\s]/){   # ignore developer releases and "You suck!"
                                     next PLINE;
                                 } else {
-                                    $ppp->{$pkg}{version} = $self->force_numeric($v);
+                                    $ppp->{$pkg}{version} = $self->normalize_version($v);
                                 }
                             } else {
                                 $ppp->{$pkg}{version} = "undef";
@@ -2064,6 +2065,8 @@ Please contact modules\@perl.org if there are any open questions.
                   PAUSE::pmfile::parse_version_safely("$pmcp");
                  };
                 $comp->share("*PAUSE::pmfile::parse_version_safely");
+                $comp->share("*version::new");
+                $comp->share("*version::numify");
                 # $comp->permit("require"); # no strict!
                 no strict;
                 local $PAUSE::Config;
@@ -2090,25 +2093,36 @@ Please contact modules\@perl.org if there are any open questions.
                 exit;
             }
         }
+
+        return $self->normalize_version($v);
+    }
+
+    # package PAUSE::pmfile
+    sub normalize_version {
+        my($self,$v) = @_;
         $v = "undef" unless defined $v;
         my $dv = Dumpvalue->new;
         my $sdv = $dv->stringify($v);
-        $self->verbose(1,"pmfile[$pmfile] mm_parsed_version[$sdv]\n");
+        $self->verbose(1,"sdv[$sdv]\n");
 
+        return $v if $v eq "undef";
         $v =~ s/^\s+//;
-        $v =~ s/\s+$//;
-
-        # Until 2000-01-21 (rev. 2.269) we accepted underscores in
-        # $VERSION, but Ilya had the idea that the underscore signals a
-        # developer version. I believe this might be what people expect.
-        # So the old code was:
-
-        # $v =~ s/_//g; # respect 0.05_01
-
-        # and the new code is
-
+        $v =~ s/\s+\z//;
         return $v if $v =~ /_/;
-        return $self->force_numeric($v);
+        my $vv = version->new($v)->numify;
+        if ($vv eq $v) {
+            # the boring 3.14
+        } else {
+            my $forced = $self->force_numeric($v);
+            if ($forced eq $vv) {
+            } else {
+                warn "Unequal forced[$forced] and vv[$vv]";
+                if ($forced == $vv) {
+                    $vv = $forced;
+                }
+            }
+        }
+        return $vv;
     }
 
     # package PAUSE::pmfile;
@@ -2130,6 +2144,7 @@ Please contact modules\@perl.org if there are any open questions.
             my $three = defined $3 ? $3 : "";
             $v = "$two$three";
         }
+        # no else branch! We simply say, everything else is a string.
         $v;
     }
 
