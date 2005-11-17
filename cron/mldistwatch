@@ -2068,6 +2068,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $comp->share("*PAUSE::pmfile::parse_version_safely");
                 $comp->share("*version::new");
                 $comp->share("*version::numify");
+                $comp->share("*version::qv");
                 # $comp->permit("require"); # no strict!
                 no strict;
                 local $PAUSE::Config;
