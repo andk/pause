@@ -1988,6 +1988,10 @@ Please contact modules\@perl.org if there are any open questions.
 
     # package PAUSE::pmfile;
     {
+        {
+            package ExtUtils::MakeMaker::_version;
+            use version;
+        }
         no strict;
         sub parse_version_safely {
             my($parsefile) = @_;
@@ -2010,7 +2014,6 @@ Please contact modules\@perl.org if there are any open questions.
                   $_
               }; \$$2
           };
-                *ExtUtils::MakeMaker::_version::qv = \&version::qv;
                 $eval =~ s/use version;//; # traps require
                 local $^W = 0;
                 $result = eval($eval);
