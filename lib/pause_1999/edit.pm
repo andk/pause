@@ -2417,7 +2417,7 @@ sub add_user {
  <table border="1">
  <tr><td>userid</td>
  <td>fullname</td>
- <td>email</td>
+ <td>(public) email</td>
  <td>homepage</td>
  <td>introduced</td>
  <td>changedby</td>
