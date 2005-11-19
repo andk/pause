@@ -22,8 +22,10 @@ use Getopt::Long ();
 use HTTP::Date ();
 use List::Util ();
 use Mail::Send ();
+use Opcode ();
 use PAUSE ();
 use PAUSE::MailAddress ();
+use Safe;
 use Text::Format;
 use YAML ();
 
@@ -1988,10 +1990,6 @@ Please contact modules\@perl.org if there are any open questions.
 
     # package PAUSE::pmfile;
     {
-        {
-            package ExtUtils::MakeMaker::_version;
-            use version;
-        }
         no strict;
         sub parse_version_safely {
             my($parsefile) = @_;
@@ -2007,17 +2005,18 @@ Please contact modules\@perl.org if there are any open questions.
                 # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
                 next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
                 my $eval = qq{
-              package ExtUtils::MakeMaker::_version;
+              package _pause::mldistwatch;
 
               local $1$2;
               \$$2=undef; do {
                   $_
               }; \$$2
           };
-                $eval =~ s/use version;//; # traps require
+                # $eval =~ s/use version;//; # require is prohibited
                 local $^W = 0;
                 $result = eval($eval);
-                die "Could not eval '$eval' in $parsefile: $@" if $@;
+                die "Could not eval '$eval' in $parsefile: \$\@[$@]" if $@;
+                warn "eval[$eval]";
                 last;
             } #;
             close FH;
@@ -2031,7 +2030,6 @@ Please contact modules\@perl.org if there are any open questions.
     sub parse_version {
         my $self = shift;
 
-        use Safe;
         use strict;
 
         my $pmfile = $self->{PMFILE};
@@ -2070,10 +2068,23 @@ Please contact modules\@perl.org if there are any open questions.
                   PAUSE::pmfile::parse_version_safely("$pmcp");
                  };
                 $comp->share("*PAUSE::pmfile::parse_version_safely");
-                $comp->share("*version::new");
-                $comp->share("*version::numify");
-                $comp->share("*version::qv");
+
+                # $comp->share_from("version",[qw(*new *numify *qv)]);
+                # $comp->share("*version::qv");
+
                 # $comp->permit("require"); # no strict!
+                # $comp->permit("caller");
+                # $comp->permit('entereval');
+                # $comp->reval("package _pause::mldistwatch; use version; no strict");
+                # if ($@) {
+                #     die $@;
+                # }
+
+                # $comp->deny("require"); # no strict!
+
+                my $opset = Opcode::full_opset;
+                $comp->permit($opset);
+
                 no strict;
                 local $PAUSE::Config;
                 $v = $comp->reval($eval);
