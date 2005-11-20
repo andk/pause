@@ -2003,6 +2003,7 @@ Please contact modules\@perl.org if there are any open questions.
                 chop;
                 # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
                 next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+                my $current_parsed_line = $_;
                 my $eval = qq{
               package ExtUtils::MakeMaker::_version;
 
@@ -2013,7 +2014,16 @@ Please contact modules\@perl.org if there are any open questions.
           };
                 local $^W = 0;
                 $result = eval($eval);
-                die "Could not eval '$eval' in $parsefile: \$\@[$@]" if $@;
+                if ($@){
+                    # try to make a strict regex that matches many
+                    # Damian lines and filters the version string
+
+                    die(
+                        "Could not eval[$eval] based on line".
+                        "[$current_parsed_line] in parsefile".
+                        "[$parsefile]: \$\@[$@]"
+                       ) if $@;
+                }
                 last;
             } #;
             close FH;
@@ -2073,7 +2083,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $v = $comp->reval($eval);
                 if ($@){ # child process!!
                     my $err = $@;
-                    warn "reval failed: $err for eval[$eval]";
+                    warn "reval failed: err[$err] for eval[$eval]";
 
                     # the following was tested for
                     # J/JO/JONATHAN/Math-Calculus-Expression-0.2.2.tar.gz
