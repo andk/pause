@@ -18,7 +18,13 @@ use Parse::CPAN::Packages;
 my $dbh = PAUSE::dbh;
 my $sth = $dbh->prepare("delete from distmtimes where dist=?");
 my $p = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-20050911.gz") or die;
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200511.gz") or die;
+$| = 1;
+my $i;
 for my $d ($p->latest_distributions){
-  $sth->execute($d->prefix);
+  my $prefix = $d->prefix;
+  # warn "sharpening prefix[$prefix]\n";
+  print "." unless ++$i % 32;
+  $sth->execute($prefix);
 }
+print "\n";

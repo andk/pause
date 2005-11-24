@@ -13,6 +13,8 @@ use DBI;
 use Data::Dumper ();
 use DirHandle ();
 use Dumpvalue ();
+use DynaLoader ();
+use Exporter ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
 use File::Basename ();
@@ -20,6 +22,7 @@ use File::Copy ();
 use File::Temp 0.14 (); # begin of OO interface
 use Getopt::Long ();
 use HTTP::Date ();
+use JSON ();
 use List::Util ();
 use Mail::Send ();
 use PAUSE ();
@@ -1350,18 +1353,21 @@ Please contact modules\@perl.org if there are any open questions.
                     $Lstatus = $status;
                 }
             } else {
+                warn sprintf "st[%s]", Data::Dumper::Dumper($st);
                 if ($pmfiles > 0) {
-                    push @m, qq{No package statements could be found in the }.
-                        qq{distro (maybe a script\nor documentation distribution?)\n\n};
-                    #### XXX
+                    if ($self->version_from_yaml_ok) {
 
-                    # sometimes this error message would fit better
-                    # (courtesy Ron Savage):
+                        push @m, qq{Nothing in this distro has been
+                     indexed, because according to META.yml this
+                     package does not provide any modules.\n\n};
 
-                    #    Nothing in this distro has been indexed,
-                    #    because according to META.yml this package
-                    #    does not provide any modules/scripts/etc.
+                    } else {
 
+                        push @m, qq{No package statements could be
+                     found in the distro (maybe a script or
+                     documentation distribution?)\n\n};
+
+                    }
                 } else {
                     # no need to write a report at all
                     return;
@@ -1698,6 +1704,7 @@ Please contact modules\@perl.org if there are any open questions.
     use constant EDUALOLDER => 50; # pumpkings only
     use constant EDUALYOUNGER => 30; # pumpkings only
     use constant EMISSPERM => 20;
+    use constant EPARSEVERSION => 10;
     use constant EOLDRELEASE => 4;
     use constant EMTIMEFALLING => 3; # deprecated after rev 478
     use constant EVERFALLING => 2;
@@ -1710,6 +1717,7 @@ Please contact modules\@perl.org if there are any open questions.
          EVERFALLING() => "Falling version number",
          EMTIMEFALLING() => "Falling mtime on a file (category to be deprecated)",
          EOLDRELEASE() => "Release seems outdated",
+         EPARSEVERSION() => "Version parsing problem",
          OK() => "Successfully indexed",
         };
 
@@ -1748,6 +1756,10 @@ Please contact modules\@perl.org if there are any open questions.
         $file =~ s|\.pm||;
         my $ret = $package =~ m/\b\Q$file\E$/;
         $ret ||= 0;
+        unless ($ret) {
+            # Apache::mod_perl_guide stuffs it into Version.pm
+            $ret = 1 if lc $file eq 'version';
+        }
         $self->verbose(1,"simile: file[$file] package[$package] ret[$ret]\n");
         $ret;
     }
@@ -1842,7 +1854,9 @@ Please contact modules\@perl.org if there are any open questions.
 
         unless ($self->version_from_yaml_ok) {
             $self->{VERSION} = $self->parse_version;
-            if ($self->{VERSION} =~ /[_\s]/){   # ignore developer releases and "You suck!"
+            if ($self->{VERSION} =~ /^\{.*\}$/) {
+                # JSON error message
+            } elsif ($self->{VERSION} =~ /[_\s]/){   # ignore developer releases and "You suck!"
                 delete $self->{DIO};    # circular reference
                 return;
             }
@@ -2014,15 +2028,14 @@ Please contact modules\@perl.org if there are any open questions.
           };
                 local $^W = 0;
                 $result = eval($eval);
+                warn "current_parsed_line[$current_parsed_line]\$\@[$@]";
                 if ($@){
-                    # try to make a strict regex that matches many
-                    # Damian lines and filters the version string
-
-                    die(
-                        "Could not eval[$eval] based on line".
-                        "[$current_parsed_line] in parsefile".
-                        "[$parsefile]: \$\@[$@]"
-                       ) if $@;
+                    die +{
+                          eval => $eval,
+                          line => $current_parsed_line,
+                          file => $parsefile,
+                          err => $@,
+                         } if $@;
                 }
                 last;
             } #;
@@ -2126,28 +2139,47 @@ Please contact modules\@perl.org if there are any open questions.
                 $comp->share("*PAUSE::pmfile::parse_version_safely");
                 $comp->share("*version::new");
                 $comp->share("*version::numify");
+                $comp->share_from('main', ['*version::',
+                                           '*Exporter::',
+                                           '*DynaLoader::']);
+                $comp->share_from('version', ['&qv']);
                 # $comp->permit("require"); # no strict!
                 no strict;
                 local $PAUSE::Config;
                 $v = $comp->reval($eval);
-                if ($@){ # child process!!
+                if ($@){ # still in the child process, out of Safe::reval
                     my $err = $@;
-                    warn "reval failed: err[$err] for eval[$eval]";
+
+                    if ($err->{line} =~ /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
+                        $v = $comp->reval($2);
+                    }
+                    if ($@) {
+                        warn sprintf("reval failed: err[%s] for eval[%s]",
+                                     JSON::objToJson($err,{pretty => 1}),
+                                     $eval,
+                                    );
+                        $v = JSON::objToJson($err);
+                    }
 
                     # the following was tested for
                     # J/JO/JONATHAN/Math-Calculus-Expression-0.2.2.tar.gz
-                    # which had absurd permissions but it did not work
-                    # out well, the consequence was "No package
-                    # statements could be found...". I think we need a
-                    # sanity check on permissions beforehand. Another
-                    # case was MACGYVER/SMTP-Server-1.1 which had a
+                    # long before the JSON stuff existed. MCE-0.2.2
+                    # had absurd permissions but it did not work out
+                    # well, the consequence was "No package statements
+                    # could be found...". I think we need a sanity
+                    # check on permissions beforehand. Another case
+                    # was MACGYVER/SMTP-Server-1.1 which had a
                     # dangling symlink which, of course, could not be
                     # opened which caused a die()!
 
                     #$err =~ s/\s+/_/g;
                     #$v = "undef($err)";
                 }
-                $v = "" unless defined $v;
+                if (defined $v) {
+                    $v = $v->numify if ref($version) eq 'version';
+                } else {
+                    $v = "";
+                }
                 print $v;
                 exit;
             }
@@ -2174,9 +2206,13 @@ Please contact modules\@perl.org if there are any open questions.
         } else {
             my $forced = $self->force_numeric($v);
             if ($forced eq $vv) {
+            } elsif ($forced =~ /^v(.+)/) {
+                # rare case where a v1.0.23 slipped in (JANL/w3mir-1.0.10.tar.gz)
+                $vv = version->new($1)->numify;
             } else {
                 warn "Unequal forced[$forced] and vv[$vv]";
                 if ($forced == $vv) {
+                    # the trailing zeroes would cause unnecessary havoc
                     $vv = $forced;
                 }
             }
@@ -2483,6 +2519,32 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
             return;
         }
 
+        # Parser problem
+
+        if ($pp->{version} =~ /^\{.*\}$/) { # JSON parser error
+            my $err = JSON::jsonToObj($pp->{version});
+            $self->index_status($package,
+                                "undef",
+                                $pp->{infile},
+                                PAUSE::mldistwatch::Constants::EPARSEVERSION,
+
+                                qq{The PAUSE indexer was not able to
+            parse the following line in that file: C< $err->{line} >
+
+            Note: the indexer is running in a Safe compartement and
+            cannot provide the full functionality of perl in the
+            VERSION line. It is trying hard, but sometime it fails. As
+            a workaround, please consider writing a proper META.yml
+            that contains a 'provides' attribute (currently only
+            supported by Module::Build) or contact the CPAN admins to
+            investigate (yet another) workaround against "Safe"
+            limitations.)},
+
+                               );
+            delete $self->{FIO};    # circular reference
+            return;
+        }
+
         # Sanity checks
 
         for (
@@ -2692,7 +2754,7 @@ has the same version number and the distro has a more recent modification time.}
                 $fio->simile($ofile,$package)
                ) {
                 $self->verbose(1,
-                               "Warning: we are not simile AND we have been ".
+                               "Warning: we ARE NOT simile BUT WE HAVE BEEN ".
                                "simile some time earlier:\n");
                 $self->verbose(1,Data::Dumper::Dumper($pp), "\n");
                 $ok = 0;

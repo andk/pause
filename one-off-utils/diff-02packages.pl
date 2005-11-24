@@ -2,6 +2,15 @@
 
 =pod
 
+Some of these need a wide screen (ws)
+
+  perl one-off-utils/diff-02packages.pl |awk '{print $1}'|sort|uniq -c|sort -n|perl -nale 'printf "%5d %12s %12s\n", @F'|less
+
+  perl one-off-utils/diff-02packages.pl |awk '{print $3,$4}'|sort|uniq -c|sort -n|perl -nale 'printf "%5d %12s %12s\n", @F'
+
+  perl one-off-utils/diff-02packages.pl |awk '{print $3,$4}'|sort|uniq -c|sort -n|perl -nale 'printf "%5d %12s %12s\n", @F'|less
+
+ (ws) perl one-off-utils/diff-02packages.pl |sort -n -k 3 -k 4 | less
 
 =cut
 
@@ -16,9 +25,9 @@ use Parse::CPAN::Packages;
 #-rw-r--r--  1 root root 390964 Sep 15 04:48 /home/ftp/pub/PAUSE/modules/02packages.details.txt-200509150120.gz
 
 my $p1 = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200509180900.gz") or die;
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200511.gz") or die;
 my $p2 = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200509210138.gz") or die;
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-2005120305.gz") or die;
 
 for my $d1 ($p1->latest_distributions){
   # printf "%s\n", $d1->dist;
@@ -38,7 +47,7 @@ for my $d1 ($p1->latest_distributions){
     next if $pkg1->version eq $pkg2->version;
     # no warnings "numeric";
     next if $pkg1->version eq $pkg2->version;
-    printf "%-60s %-60s %14s %14s\n",
+    printf "%-66s %-66s %14s %14s\n",
         $d1->prefix,
             $pkg1->package,
                 $pkg1->version,
