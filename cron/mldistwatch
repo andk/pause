@@ -1379,7 +1379,7 @@ Please contact modules\@perl.org if there are any open questions.
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
         if ($PAUSE::Config->{TESTHOST}) {
             local $"="";
-            warn "Unsent Report [@m]";
+            # warn "Unsent Report [@m]";
         } else {
             my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
             my($msg) = Mail::Send->new(
@@ -1703,6 +1703,7 @@ Please contact modules\@perl.org if there are any open questions.
     # constants used for index_status:
     use constant EDUALOLDER => 50; # pumpkings only
     use constant EDUALYOUNGER => 30; # pumpkings only
+    use constant EOPENFILE => 21;
     use constant EMISSPERM => 20;
     use constant EPARSEVERSION => 10;
     use constant EOLDRELEASE => 4;
@@ -1718,6 +1719,7 @@ Please contact modules\@perl.org if there are any open questions.
          EMTIMEFALLING() => "Falling mtime on a file (category to be deprecated)",
          EOLDRELEASE() => "Release seems outdated",
          EPARSEVERSION() => "Version parsing problem",
+         EOPENFILE() => "Problem while reading the distribtion",
          OK() => "Successfully indexed",
         };
 
@@ -2028,7 +2030,7 @@ Please contact modules\@perl.org if there are any open questions.
           };
                 local $^W = 0;
                 $result = eval($eval);
-                warn "current_parsed_line[$current_parsed_line]\$\@[$@]";
+                # warn "current_parsed_line[$current_parsed_line]\$\@[$@]";
                 if ($@){
                     die +{
                           eval => $eval,
@@ -2119,6 +2121,7 @@ Please contact modules\@perl.org if there are any open questions.
             die "Can't fork: $!" unless defined($pid = open($kid, "-|"));
             if ($pid) {         # parent
                 $v = <$kid>;
+                # warn ">>>>>>>>read v[$v]<<<<<<<<";
                 close $kid;
             } else {
                 my($gnam,$gpw,$gid,$gmem) = getgrnam("UNSAFE");
@@ -2149,31 +2152,21 @@ Please contact modules\@perl.org if there are any open questions.
                 $v = $comp->reval($eval);
                 if ($@){ # still in the child process, out of Safe::reval
                     my $err = $@;
-
-                    if ($err->{line} =~ /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
-                        $v = $comp->reval($2);
+                    # warn ">>>>>>>err[$err]<<<<<<<<";
+                    if (ref $err) {
+                        if ($err->{line} =~ /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
+                            $v = $comp->reval($2);
+                        }
+                        if ($@) {
+                            warn sprintf("reval failed: err[%s] for eval[%s]",
+                                         JSON::objToJson($err,{pretty => 1}),
+                                         $eval,
+                                        );
+                            $v = JSON::objToJson($err);
+                        }
+                    } else {
+                        $v = JSON::objToJson({ openerr => $err });
                     }
-                    if ($@) {
-                        warn sprintf("reval failed: err[%s] for eval[%s]",
-                                     JSON::objToJson($err,{pretty => 1}),
-                                     $eval,
-                                    );
-                        $v = JSON::objToJson($err);
-                    }
-
-                    # the following was tested for
-                    # J/JO/JONATHAN/Math-Calculus-Expression-0.2.2.tar.gz
-                    # long before the JSON stuff existed. MCE-0.2.2
-                    # had absurd permissions but it did not work out
-                    # well, the consequence was "No package statements
-                    # could be found...". I think we need a sanity
-                    # check on permissions beforehand. Another case
-                    # was MACGYVER/SMTP-Server-1.1 which had a
-                    # dangling symlink which, of course, could not be
-                    # opened which caused a die()!
-
-                    #$err =~ s/\s+/_/g;
-                    #$v = "undef($err)";
                 }
                 if (defined $v) {
                     $v = $v->numify if ref($version) eq 'version';
@@ -2197,6 +2190,7 @@ Please contact modules\@perl.org if there are any open questions.
         $self->verbose(1,"sdv[$sdv]\n");
 
         return $v if $v eq "undef";
+        return $v if $v =~ /^\{.*\}$/; # JSON object
         $v =~ s/^\s+//;
         $v =~ s/\s+\z//;
         return $v if $v =~ /_/;
@@ -2210,7 +2204,7 @@ Please contact modules\@perl.org if there are any open questions.
                 # rare case where a v1.0.23 slipped in (JANL/w3mir-1.0.10.tar.gz)
                 $vv = version->new($1)->numify;
             } else {
-                warn "Unequal forced[$forced] and vv[$vv]";
+                # warn "Unequal forced[$forced] and vv[$vv]";
                 if ($forced == $vv) {
                     # the trailing zeroes would cause unnecessary havoc
                     $vv = $forced;
@@ -2328,7 +2322,7 @@ package in packages  package in primeur
         my $sth_mods = $dbh->prepare("SELECT userid
                                       FROM   mods
                                       WHERE  modid = ?");
-        warn "Going to execute [SELECT userid FROM mods WHERE modid = '$package']";
+        # warn "Going to execute [SELECT userid FROM mods WHERE modid = '$package']";
         $sth_mods->execute($package) or die "FAILED";
         if ($sth_mods->rows>0) { # make sure we regard the owner as the owner
             my($mods_userid) = $sth_mods->fetchrow_array;
@@ -2523,24 +2517,36 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 
         if ($pp->{version} =~ /^\{.*\}$/) { # JSON parser error
             my $err = JSON::jsonToObj($pp->{version});
-            $self->index_status($package,
-                                "undef",
-                                $pp->{infile},
-                                PAUSE::mldistwatch::Constants::EPARSEVERSION,
+            if ($err->{openerr}) {
+                $self->index_status($package,
+                                    "undef",
+                                    $pp->{infile},
+                                    PAUSE::mldistwatch::Constants::EOPENFILE,
 
-                                qq{The PAUSE indexer was not able to
-            parse the following line in that file: C< $err->{line} >
+                                    qq{The PAUSE indexer was not able to
+             read the file. It issued the following error: C< $err->{openerr} >},
+                                   );
 
-            Note: the indexer is running in a Safe compartement and
-            cannot provide the full functionality of perl in the
-            VERSION line. It is trying hard, but sometime it fails. As
-            a workaround, please consider writing a proper META.yml
-            that contains a 'provides' attribute (currently only
-            supported by Module::Build) or contact the CPAN admins to
-            investigate (yet another) workaround against "Safe"
-            limitations.)},
+            } else {
+                $self->index_status($package,
+                                    "undef",
+                                    $pp->{infile},
+                                    PAUSE::mldistwatch::Constants::EPARSEVERSION,
 
-                               );
+                                    qq{The PAUSE indexer was not able to
+             parse the following line in that file: C< $err->{line} >
+
+             Note: the indexer is running in a Safe compartement and
+             cannot provide the full functionality of perl in the
+             VERSION line. It is trying hard, but sometime it fails.
+             As a workaround, please consider writing a proper
+             META.yml that contains a 'provides' attribute (currently
+             only supported by Module::Build) or contact the CPAN
+             admins to investigate (yet another) workaround against
+             "Safe" limitations.)},
+
+                                   );
+            }
             delete $self->{FIO};    # circular reference
             return;
         }
