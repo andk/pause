@@ -200,6 +200,18 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
                          (e.g. after a change in the perms table)",
 
                         },
+
+           reset_version => {
+                       verb => "Reset Version",
+                       priv => "user",
+                       cat => "User/05Utils/02",
+
+                       desc => "Overrule the record of the current
+                           version number of a module that the indexer
+                           uses and set it to 'undef'",
+
+                            },
+
            # User/Account
 
            change_passwd => {
@@ -340,12 +352,14 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
  edit_mod
  edit_uris
  reindex
+ reset_version
  share_perms
  dele_message
  )],
           AllowMlreprTakeover => [qw(
 edit_mod
 edit_ml
+reset_version
 share_perms
 )],
 	    AuthenDsn       => $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},

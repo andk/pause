@@ -52,6 +52,7 @@ sub parameter {
                      "pause_logout",
                      "peek_perms",
                      "reindex",
+                     "reset_version",
                      "share_perms",
                      "tail_logfile",
 		    ) {
@@ -65,6 +66,7 @@ sub parameter {
 		       "select_ml_action",
 		       "edit_ml",
 		       "edit_mod",
+                       "reset_version"
 		      ) {
 	$allow_action{$command} = undef;
 	push @allow_submit, $command;
@@ -5458,10 +5460,11 @@ following files have been scheduled for reindexing.
 %s
 Estimated time, when the job will be done: %s
 
-$Yours},
+%s},
                       $mgr->{User}{fullname},
                       $blurb,
                       $eta,
+                      $Yours,
                      );
     my %umailset;
     my $name = $u->{asciiname} || $u->{fullname} || "";
@@ -6417,6 +6420,143 @@ sub post_message {
   	  value="Submit" />};
 
 
+  @m;
+}
+
+sub reset_version {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr = shift;
+  my $req = $mgr->{CGI};
+  my $r = $mgr->{R};
+  my @m;
+  my $u = $self->active_user_record($mgr);
+  push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
+  my $dbh = $mgr->connect;
+  local($dbh->{RaiseError}) = 0;
+
+  push @m, qq{<p>Note: resetting versions is a major inconvenience for
+    module users. This page will probably be withdrawn from PAUSE if
+    the perl community does not want to allow falling version numbers
+    on the CPAN. For now: use with care. Thanks.</p>
+
+
+    <p>Below you see the packages and version numbers that
+    the indexer considers the current and highest version number that
+    he has seen so far. By selecting an item in the list and clicking
+    <i>Forget</i>, this value is set to <i>undef</i>. This opens the
+    way for a <i>Force Reindexing</i> run in which the version of the
+    package in the reindexed distribution can become the current.</p>
+
+<p>Did I say, this operation should not be done lightly? Because users
+of the module out there may still have that higher version installed
+and so will not notice the newer but lower-numbered release. Let me
+repeat: please make responsible use of this feature.</p>
+
+};
+  my $blurb = "";
+  my($usersubstr) = sprintf("%s/%s/%s",
+                            substr($u->{userid},0,1),
+                            substr($u->{userid},0,2),
+                            $u->{userid},
+                           );
+  my($usersubstrlen) = length $usersubstr;
+  my $sqls = "SELECT package, version, dist FROM packages
+             WHERE substring(dist,1,$usersubstrlen) = ?";
+  my $sths = $dbh->prepare($sqls);
+  if ($req->param('SUBMIT_pause99_reset_version_forget')) {
+    my $sqls2 = "SELECT version FROM packages
+             WHERE package = ? AND substring(dist,1,$usersubstrlen) = ?";
+    my $sths2 = $dbh->prepare($sqls2);
+    my $sqlu = "UPDATE packages
+               SET version='undef'
+               WHERE package = ? AND substring(dist,1,$usersubstrlen) = ?";
+    my $sthu = $dbh->prepare($sqlu);
+  PKG: foreach my $f ($req->param('pause99_reset_version_PKG')) {
+      $sths2->execute($f,$usersubstr);
+      my($version) = $sths2->fetchrow_array;
+      next PKG if $version eq 'undef';
+      my $ret = $sthu->execute($f,$usersubstr);
+      $blurb .= sprintf(
+                        "%s: %s '%s' => 'undef'\n",
+                        $ret==0 ? "Not reset" : "Reset",
+                        $f,
+                        $version,
+                       );
+    }
+  }
+  if ($blurb) {
+
+    $blurb = sprintf(qq{According to a request by %s the following
+packages have their recorded version set to 'undef'.
+
+%s
+
+%s},
+                     $mgr->{User}{fullname},
+                     $blurb,
+                     $Yours,
+                    );
+    my %umailset;
+    my $name = $u->{asciiname} || $u->{fullname} || "";
+    my $Uname = $mgr->{User}{asciiname} || $mgr->{User}{fullname} || "";
+
+    if ($u->{secretemail}) {
+      $umailset{qq{"$name" <$u->{secretemail}>}} = 1;
+    } elsif ($u->{email}) {
+      $umailset{qq{"$name" <$u->{email}>}} = 1;
+    }
+    if ($mgr->{User}{userid} ne $u->{userid}) {
+      if ($mgr->{User}{secretemail}) {
+        $umailset{qq{"$Uname" <$mgr->{User}{secretemail}>}} = 1;
+      }elsif ($mgr->{User}{email}) {
+        $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
+      }
+    }
+    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    my $header = {
+                  Subject => "Version reset for $u->{userid}"
+                 };
+    $mgr->send_mail_multi([keys %umailset], $header, $blurb);
+
+    push @m, qq{<hr /><pre>$blurb</pre><hr />};
+
+  }
+  $sths->execute($usersubstr);
+  if ($sths->rows == 0) {
+    push @m, qq{<h3>No packages associated with $u->{userid}</h3>};
+    return @m;
+  }
+
+  push @m, sprintf qq{<h3>%d Packages associated with $u->{userid}</h3>}, $sths->rows;
+  my(@maxl,%p);
+  while (my(@row) = $sths->fetchrow_array) {
+    for my $i (0..$#row) {
+      if (!$maxl[$i] or $maxl[$i]<length($row[$i])) {
+        $maxl[$i] = length($row[$i]);
+      }
+    }
+    $p{$row[0]} = \@row;
+  }
+  my $sprintf = join " | ", map { "%-$_"."s" } @maxl;
+  while (my($k,$v) = each %p) {
+    $p{$k} = sprintf $sprintf, @$v;
+  }
+  
+  my $submitbutton = qq{<input type="submit"
+ name="SUBMIT_pause99_reset_version_forget" value="Forget" />};
+  push @m, $submitbutton;
+  push @m, "<pre>";
+  my $field = $mgr->checkbox_group(
+                                   name      => 'pause99_reset_version_PKG',
+                                   'values'  => [sort keys %p],
+                                   linebreak => 'true',
+                                   labels    => \%p
+                                  );
+  $field =~ s!<br />\s*!\n!gs;
+
+  push @m, $field;
+  push @m, "</pre>";
+  push @m, $submitbutton;
   @m;
 }
 
