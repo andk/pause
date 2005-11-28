@@ -6450,7 +6450,7 @@ sub reset_version {
 <p>Did I say, this operation should not be done lightly? Because users
 of the module out there may still have that higher version installed
 and so will not notice the newer but lower-numbered release. Let me
-repeat: please make responsible use of this feature.</p>
+repeat: please make responsible use of this page.</p>
 
 };
   my $blurb = "";
