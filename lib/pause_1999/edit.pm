@@ -339,7 +339,6 @@ sub active_user_record {
     # Imagine, MSERGEANT wants to pass Win32::ASP to WNODOM
 
     my $dbh1 = $mgr->connect;
-    # we select * so to have all future fields whenever we come here
     my $sth1 = $dbh1->prepare("SELECT * FROM users WHERE userid=?");
     $sth1->execute($hidden_user);
     die Apache::HeavyCGI::Exception
@@ -395,7 +394,7 @@ sub active_user_record {
       # This isn't the MSERGEANT case either, must be admin
 
       my $dbh2 = $mgr->authen_connect;
-      my $sth2 = $dbh2->prepare("SELECT secretemail
+      my $sth2 = $dbh2->prepare("SELECT secretemail, lastvisit
                                  FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
                                  WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
       $sth2->execute($hidden_user);
@@ -443,7 +442,11 @@ sub edit_cred {
   my @m = "\n";
   $u = $self->active_user_record($mgr);
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
-  push @m, qq{<h3>Editing $u->{userid}</h3>};
+  push @m, qq{<h3>Editing $u->{userid}};
+  if (exists $mgr->{UserGroups}{admin}) {
+    push @m, sprintf " (lastvisit %s)", $u->{lastvisit}||"before 2005-12-02";
+  }
+  push @m, qq{</h3>};
 
   # @allmeta *must* be the union of meta and secmeta
   my @meta = qw( fullname asciiname email homepage cpan_mail_alias ustatus);

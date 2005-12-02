@@ -197,13 +197,16 @@ sub handler {
     }
   }
   $sth->finish;
-  $dbh->disconnect;
 
   my $crypt_pw  = $user_record->{$attr->{pwd_field}};
   if ($crypt_pw) {
     my($crypt_got) = crypt($sent_pw,$crypt_pw);
     if ($crypt_got eq $crypt_pw){
       $r->pnotes("usersecrets", $user_record);
+      $dbh->do("UPDATE usertable SET lastvisit=NOW() where user=?",
+               +{},
+               $user_record->{user});
+      $dbh->disconnect;
       return OK;
     } else {
       warn sprintf "crypt_pw[%s]crypt_got[%s]uri[%s]auth_required[%d]",
@@ -211,6 +214,7 @@ sub handler {
     }
   }
 
+  $dbh->disconnect;
   $r->note_basic_auth_failure;
   return AUTH_REQUIRED;
 }
