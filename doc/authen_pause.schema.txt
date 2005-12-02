@@ -1,11 +1,11 @@
--- MySQL dump 8.21
+-- MySQL dump 9.11
 --
 -- Host: localhost    Database: authen_pause
----------------------------------------------------------
--- Server version	3.23.49-log
+-- ------------------------------------------------------
+-- Server version	4.0.24_Debian-10sarge1-log
 
 --
--- Table structure for table 'abrakadabra'
+-- Table structure for table `abrakadabra`
 --
 
 CREATE TABLE abrakadabra (
@@ -16,14 +16,13 @@ CREATE TABLE abrakadabra (
 ) TYPE=ISAM PACK_KEYS=1;
 
 --
--- Dumping data for table 'abrakadabra'
+-- Dumping data for table `abrakadabra`
 --
 -- WHERE:  1=0
 
 
-
 --
--- Table structure for table 'grouptable'
+-- Table structure for table `grouptable`
 --
 
 CREATE TABLE grouptable (
@@ -33,14 +32,13 @@ CREATE TABLE grouptable (
 ) TYPE=ISAM PACK_KEYS=1;
 
 --
--- Dumping data for table 'grouptable'
+-- Dumping data for table `grouptable`
 --
 -- WHERE:  1=0
 
 
-
 --
--- Table structure for table 'usertable'
+-- Table structure for table `usertable`
 --
 
 CREATE TABLE usertable (
@@ -50,13 +48,13 @@ CREATE TABLE usertable (
   forcechange tinyint(4) default '0',
   changed int(11) default NULL,
   changedby char(10) default NULL,
+  lastvisit datetime default NULL,
   PRIMARY KEY  (user)
 ) TYPE=ISAM PACK_KEYS=1;
 
 --
--- Dumping data for table 'usertable'
+-- Dumping data for table `usertable`
 --
 -- WHERE:  1=0
-
 
 
