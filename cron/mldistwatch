@@ -63,6 +63,23 @@ sub new {
     my $class = shift;
     my $opt = shift;
 
+    my $pidfile = "/var/run/mldistwatch.pid";
+    if (open my $fh, "<", $pidfile) {
+        my($otherpid) = <$fh>;
+        chomp $otherpid;
+        if (kill 0, $otherpid) {
+            die "other mlistwatch job[$otherpid] running, ".
+                "will not run at the same time";
+        }
+    }
+    if (open my $fh, ">", $pidfile) {
+        print $fh $$, "\n";
+        close $fh;
+    } else {
+        # normal user
+        $pidfile = undef;
+    }
+
     my $tarbin = "/usr/local/bin/tar";
     $tarbin = "/bin/tar" unless -x $tarbin;
     die "No tarbin found" unless -x $tarbin;
@@ -75,6 +92,7 @@ sub new {
                       TARBIN => $tarbin,
                       UNZIPBIN  => $unzipbin,
                       OPT => $opt,
+                      PIDFILE => $pidfile,
                      }, $class;
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
     if ($opt->{pick}) {
@@ -229,6 +247,9 @@ sub disconnect {
 sub DESTROY {
     my $self = shift;
     $self->disconnect;
+    if ($self->{PIDFILE}) {
+        unlink $self->{PIDFILE};
+    }
 }
 
 sub init_all {
@@ -343,6 +364,7 @@ sub checkfornew {
         }
         $self->verbose(1,"\n    Examining $dist ...\n");
         sleep 1;   # I think this might help us against wild processes
+        $0 = "mldistwatch: $dist";
 
         my $userid = PAUSE::dir2user($dist);
         $dio->{USERID} = $userid;
