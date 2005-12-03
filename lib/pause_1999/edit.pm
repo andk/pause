@@ -6459,8 +6459,8 @@ sub reset_version {
 
     <p>A: Combine a multi-module-distro with a small mistake in an
     older release or a bug in the PAUSE indexer. In such a case you
-    will be a happy user of his page and nobody else will ever
-    notice there was a problem.</p>
+    will be happy to use this page and nobody else will ever notice
+    there was a problem.</p>
 
 };
   my $blurb = "";
@@ -6537,7 +6537,12 @@ packages have their recorded version set to 'undef'.
     return @m;
   }
 
-  push @m, sprintf qq{<h3>%d Packages associated with $u->{userid}</h3>}, $sths->rows;
+  push @m, sprintf(
+                   qq{<h3>%d %s associated with %s</h3>},
+                   $sths->rows,
+                   $sths->rows == 1 ? "package" : "packages",
+                   $u->{userid},
+                  );
   my(@maxl,%p);
   while (my(@row) = $sths->fetchrow_array) {
     for my $i (0..$#row) {
