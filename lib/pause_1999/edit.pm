@@ -6442,18 +6442,25 @@ sub reset_version {
     the perl community does not want to allow falling version numbers
     on the CPAN. For now: use with care. Thanks.</p>
 
-
     <p>Below you see the packages and version numbers that
     the indexer considers the current and highest version number that
-    he has seen so far. By selecting an item in the list and clicking
+    it has seen so far. By selecting an item in the list and clicking
     <i>Forget</i>, this value is set to <i>undef</i>. This opens the
     way for a <i>Force Reindexing</i> run in which the version of the
     package in the reindexed distribution can become the current.</p>
 
-<p>Did I say, this operation should not be done lightly? Because users
-of the module out there may still have that higher version installed
-and so will not notice the newer but lower-numbered release. Let me
-repeat: please make responsible use of this page.</p>
+    <p>Did I say, this operation should not be done lightly? Because
+    users of the module out there may still have that higher version
+    installed and so will not notice the newer but lower-numbered
+    release. Let me repeat: please make responsible use of this
+    page.</p>
+
+    <p>Q: So why is this page up at all?</p>
+
+    <p>A: Combine a multi-module-distro with a small mistake in an
+    older release or a bug in the PAUSE indexer. In such a case you
+    will be a happy user of his page and nobody else will ever
+    notice there was a problem.</p>
 
 };
   my $blurb = "";
