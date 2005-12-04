@@ -17,6 +17,7 @@ use DynaLoader ();
 use Exporter ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
+use Fcntl qw();
 use File::Basename ();
 use File::Copy ();
 use File::Temp 0.14 (); # begin of OO interface
@@ -57,6 +58,7 @@ $Data::Dumper::Indent = 1;
 
 
 package PAUSE::mldistwatch;
+use Fcntl qw(:flock);
 # this class shows that it was born as spaghetticode
 
 sub new {
@@ -64,20 +66,19 @@ sub new {
     my $opt = shift;
 
     my $pidfile = "/var/run/mldistwatch.pid";
-    if (open my $fh, "<", $pidfile) {
-        my($otherpid) = <$fh>;
-        chomp $otherpid;
-        if (kill 0, $otherpid) {
-            die "other mlistwatch job[$otherpid] running, ".
+    my $fh;
+    if (open $fh, "+>>", $pidfile) {
+        if (flock $fh, LOCK_SH|LOCK_NB) {
+            truncate $fh, 0 or die;
+            seek $fh, 0, 0;
+            my $ofh = select $fh;
+            $|=1;
+            print $fh $$, "\n";
+            select $ofh;
+        } else {
+            die "other mlistwatch job running, ".
                 "will not run at the same time";
         }
-    }
-    if (open my $fh, ">", $pidfile) {
-        print $fh $$, "\n";
-        close $fh;
-    } else {
-        # normal user
-        $pidfile = undef;
     }
 
     my $tarbin = "/usr/local/bin/tar";
@@ -92,7 +93,7 @@ sub new {
                       TARBIN => $tarbin,
                       UNZIPBIN  => $unzipbin,
                       OPT => $opt,
-                      PIDFILE => $pidfile,
+                      PIDFILE => $fh,
                      }, $class;
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
     if ($opt->{pick}) {
@@ -247,9 +248,6 @@ sub disconnect {
 sub DESTROY {
     my $self = shift;
     $self->disconnect;
-    if ($self->{PIDFILE}) {
-        unlink $self->{PIDFILE};
-    }
 }
 
 sub init_all {
