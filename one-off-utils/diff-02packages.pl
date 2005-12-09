@@ -23,11 +23,13 @@ use Parse::CPAN::Packages;
 
 #-rw-r--r--  1 root root 390344 Sep 15 09:13 /home/ftp/pub/PAUSE/modules/02packages.details.txt-200509150913.gz
 #-rw-r--r--  1 root root 390964 Sep 15 04:48 /home/ftp/pub/PAUSE/modules/02packages.details.txt-200509150120.gz
+#-rw-r--r-- 1 500 500 411098 Dec  6 21:15 /home/ftp/pub/PAUSE/modules/02packages.details.txt-20051208.gz
+#-rw-r--r-- 1 500 500 411959 Dec  8 11:28 /home/ftp/pub/PAUSE/modules/02packages.details.txt-200512081128.gz
 
 my $p1 = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-2005120305.gz") or die;
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-20051208.gz") or die;
 my $p2 = Parse::CPAN::Packages->
-    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-2005121251.gz") or die;
+    new("/home/ftp/pub/PAUSE/modules/02packages.details.txt-200512081128.gz") or die;
 
 for my $d1 ($p1->latest_distributions){
   # printf "%s\n", $d1->dist;
