@@ -295,7 +295,7 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
 
 			    },
            dele_message => {
-			     verb => "Delete a message",
+			     verb => "Show/Delete Msgs",
 			     priv => "admin",
                               cat => "01usr/05",
 
