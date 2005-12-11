@@ -2,7 +2,11 @@
 
 =pod
 
-remove everything from distmtimes that prevents mldistwatch from indexing.
+Better name would hve been: reindex-from-lst or some such.
+
+Remove everything from distmtimes that prevents mldistwatch from indexing.
+
+Used twice to fix #16293 on rt.cpan.org
 
 =cut
 
