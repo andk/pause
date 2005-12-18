@@ -324,8 +324,8 @@ sub checkfornew {
     {
         $self->debug_mem;
         my %seen;
-        @all = keys %{$self->{ALLfound}},
-            keys %{$self->{ALLlasttime}};
+        @all = keys %{$self->{ALLfound}};
+        push @all, keys %{$self->{ALLlasttime}};
         $self->filter_dups(\@all);
         $self->debug_mem;
     }
@@ -352,12 +352,22 @@ sub checkfornew {
                                    PICK   => $self->{PICK},
                                   );
 
-        next BIGLOOP if $dio->ignoredist;
+        if ($dio->ignoredist){
+            delete $self->{ALLlasttime}{$dist};
+            delete $self->{ALLfound}{$dist};
+            next BIGLOOP;
+        }
 
         if (exists $self->{ALLfound}{$dist}) {
-            next BIGLOOP unless $dio->mtime_ok($self->{ALLlasttime}{$dist});
+            unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
+                delete $self->{ALLlasttime}{$dist};
+                delete $self->{ALLfound}{$dist};
+                next BIGLOOP;
+            }
         } else {
             $dio->delete_goner;
+            delete $self->{ALLlasttime}{$dist};
+            delete $self->{ALLfound}{$dist};
             next BIGLOOP;
         }
         $self->verbose(1,"\n    Examining $dist ...\n");
@@ -369,7 +379,11 @@ sub checkfornew {
 
         $dio->examine_dist; # checks for perl, developer, version, etc. and untars
         my $skip = $dio->skip;
-        next BIGLOOP if $skip;
+        if ($skip){
+            delete $self->{ALLlasttime}{$dist};
+            delete $self->{ALLfound}{$dist};
+            next BIGLOOP;
+        }
 
         $dio->read_dist;
         $dio->extract_readme_and_yaml;
@@ -2169,9 +2183,11 @@ Please contact modules\@perl.org if there are any open questions.
                                            '*DynaLoader::']);
                 $comp->share_from('version', ['&qv']);
                 # $comp->permit("require"); # no strict!
-                no strict;
-                local $PAUSE::Config;
-                $v = $comp->reval($eval);
+                {
+                    no strict;
+                    local $PAUSE::Config;
+                    $v = $comp->reval($eval);
+                }
                 if ($@){ # still in the child process, out of Safe::reval
                     my $err = $@;
                     # warn ">>>>>>>err[$err]<<<<<<<<";
@@ -2191,7 +2207,7 @@ Please contact modules\@perl.org if there are any open questions.
                     }
                 }
                 if (defined $v) {
-                    $v = $v->numify if ref($version) eq 'version';
+                    $v = $v->numify if ref($v) eq 'version';
                 } else {
                     $v = "";
                 }
