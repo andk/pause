@@ -68,7 +68,7 @@ sub new {
     my $pidfile = "/var/run/mldistwatch.pid";
     my $fh;
     if (open $fh, "+>>", $pidfile) {
-        if (flock $fh, LOCK_SH|LOCK_NB) {
+        if (flock $fh, LOCK_EX|LOCK_NB) {
             truncate $fh, 0 or die;
             seek $fh, 0, 0;
             my $ofh = select $fh;
