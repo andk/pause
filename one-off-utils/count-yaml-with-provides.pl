@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 =pod
 
 This program was used to investigate differences between decisions
@@ -8,13 +11,16 @@ META.yml files. The investigation took place before the indexer itself
 looked into the provides hashref. At the bottom of the program is a
 pod section that talks about findings and consequences
 
-I do not remember how this program was called and how the output
-looked like.
+As I do not remember how this program was called and how the output
+looked like, I reran it 2005-12-22 and the output went to STDERR, was
+chaotic and contained lots of Data::Dumper and in between:
+
+S1 has 10549 keys at count-yaml-with-provides.pl line 37.
+S2 has 2477 keys at count-yaml-with-provides.pl line 92.
+schnitt[981]S1[9568]s2[1496] at count-yaml-with-provides.pl line 111.
+schnitt[981]schnittOK[763] at count-yaml-with-provides.pl line 153.
 
 =cut
-
-use strict;
-use warnings;
 
 use Compress::Zlib;
 use File::Find;
