@@ -16,6 +16,10 @@ perl -MCPAN -e 'install Bundle::Snapshot_1996_09_29_00'
 
 =head1 CONTENTS
 
+Sub::Uplevel
+
+Test::Exception
+
 JSON
 
 Convert::BER
