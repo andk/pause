@@ -41,7 +41,7 @@ sub header {
     my($sql,$sth);
     $sql = qq{SELECT *
               FROM users
-              WHERE userid=?};
+              WHERE userid=? AND ustatus != 'nologin'};
     $sth = $dbh->prepare($sql);
     if ($sth->execute($u)) {
       $mgr->{User} = $mgr->fetchrow($sth, "fetchrow_hashref");
