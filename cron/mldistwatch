@@ -1356,8 +1356,8 @@ Please contact modules\@perl.org if there are any open questions.
 
             push @m, $tf->format(qq{The distribution does not unpack
                 into a single directory and is therefore not being
-                indexed. Hint: try 'make dist'. (The directories found
-                were: @{$self->{HAS_MULTIPLE_ROOT}})});
+                indexed. Hint: try 'make dist'. (The directory entries
+                found were: @{$self->{HAS_MULTIPLE_ROOT}})});
 
             push @m, qq{\n\n};
 
