@@ -1451,7 +1451,7 @@ href="mailto:},
                 255 characters.");
       }
 
-      if (
+    ALLOW_OVERWRITE: if (
 	  $filename =~ /(readme|\.html|\.txt|\.[xy]ml|\.rdf|\.pod)(\.gz|\.bz2)?$/i
           ||
           $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!

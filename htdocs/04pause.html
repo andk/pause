@@ -45,10 +45,11 @@ number</b>. For security reasons you will never be able to upload a
 file with identical name again. This strict requirement does have one
 exception: documentation files may be overwritten. There's a simple
 regular expression that draws the line between docu und code:
-<code>/(README|readme|\.html|\.txt)$/</code>. Filenames matching this
-RE can be uploaded as often as you like. By the way: it is highly
-appreciated, if your packages come tarred and gzipped with a
-Makefile.PL, so they can be installed in a standard way.
+<code>/(README|readme|\.html|\.txt)$/</code><!-- edit.pm:
+ALLOW_OVERWRITE -->. Filenames matching this RE can be uploaded as
+often as you like. By the way: it is highly appreciated, if your
+packages come tarred and gzipped with a Makefile.PL, so they can be
+installed in a standard way.
 
 </blockquote>
 
