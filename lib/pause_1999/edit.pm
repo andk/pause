@@ -823,7 +823,7 @@ sub select_user {
 				'name' => 'ACTIONREQ',
 				values => $mgr->{AllowAdminTakeover},
 				default => ['edit_cred'],
-				size => 10,
+				size => 13,
 			       );
   push @m, qq{\n<br />\n};
   push @m, qq{<input type="submit" name="pause99_select_user_sub" value="Submit" />};
