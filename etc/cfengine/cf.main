@@ -1,3 +1,7 @@
+files:
+  any::
+    /var/log/PAUSE-httpd/.  mode=0775 owner=root group=www-data action=touch
+
 links:
   any::
     /etc/aliases                         -> ../home/k/PAUSE/etc/aliases
@@ -20,6 +24,7 @@ links:
     /usr/local/apache/conf               -> ../../../home/k/PAUSE/apache-conf
     /usr/local/apache/htdocs             -> ../../../home/k/PAUSE/htdocs/
     /usr/local/apache/perl               -> ../../../home/k/PAUSE/apache-perl
+    /usr/local/apache/logs               -> /var/log/PAUSE-httpd
 
     /usr/lib/mon/mon.d/paused.monitor    -> ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
     /usr/lib/mon/mon.d/sm-mta.monitor    -> ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
