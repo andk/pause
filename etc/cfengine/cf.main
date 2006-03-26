@@ -23,3 +23,12 @@ links:
 
     /usr/lib/mon/mon.d/paused.monitor    -> ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
     /usr/lib/mon/mon.d/sm-mta.monitor    -> ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
+
+editfiles:
+  # warn: XXX nonsense to hardcode 1000 here but does cfengine help me do better?
+  any::
+    { /etc/group
+      AutoCreate
+      DeleteLinesContaining "k:x:1000:"
+      AppendIfNoSuchLine "k:x:1000:k,kstar,abh,SVN,ftp,nobody"
+    }
