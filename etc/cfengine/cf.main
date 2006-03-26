@@ -1,0 +1,3 @@
+links:
+  any::
+    /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf

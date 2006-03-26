@@ -1,0 +1,15 @@
+control:
+
+    actionsequence = (
+                      packages
+                      files
+                      directories
+                      shellcommands.svnclients
+                      links
+                      copy
+                      editfiles
+                      shellcommands
+                      tidy
+                      processes
+                      )
+
