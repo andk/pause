@@ -1,0 +1,169 @@
+# -*- mode: cperl -*-
+
+<IfModule mod_perl.c>
+
+
+  # I believe, this is only for the hardly needed Apache::AuthzDBI in /perl/admin
+  PerlSetVar Auth_DBI_data_source dbi:mysql:authen_pause
+  PerlSetVar Auth_DBI_username    root
+  # PerlSetVar Auth_DBI_password
+  PerlSetVar Auth_DBI_pwd_table   usertable
+  PerlSetVar Auth_DBI_grp_table   grouptable
+  PerlSetVar Auth_DBI_uid_field   user
+  PerlSetVar Auth_DBI_grp_field   ugroup
+  PerlSetVar Auth_DBI_pwd_field   password
+
+  PerlSetupEnv Off
+
+  PerlSetVar ReloadAll Off
+  PerlSetVar ReloadDebug On
+  PerlSetVar ReloadModules "pause_1999::config pause_1999::main PAUSE"
+
+<Perl>
+
+
+
+=head2 SEE ME
+
+A lone cut _starts_ pod
+
+CPerl-mode sees perl code after this =cut.
+
+I don't understand those indents, but they do no harm anyway...
+
+=cut
+
+
+
+#!perl
+
+    BEGIN {
+      push @INC, "/home/k/PAUSE/lib";
+      unshift @INC, "/home/k/dproj/PAUSE/SVN/lib",
+          "/home/k/dproj/PAUSE/SVN/privatelib"; # never use lib weil use
+                                           # lib immer ausserhalb der
+                                           # if/else wirkt
+    }
+
+# $debugging
+my $debugging;
+if (0 && Apache->define("PERL_DEBUG")) {
+  $debugging = 1;
+  require Apache::DB;
+  require 'Apache/perl5db.pl'; # this seems to be needed with
+                               # 5.7.2@@14159, otherwise we get "No
+                               # DB::DB routine defined at
+                               # /usr/local/apache/lib/map_box/registry.pm
+                               # line 3."
+  Apache::DB->init;
+}
+
+
+use Apache::Status;
+# use Apache::DBI;
+use strict;
+our %Location;
+
+# $Location{"/"}{PerlSetupEnv} = "On";
+
+# require CGI;
+
+
+for my $loc (qw( /status )){
+  $Location{$loc}{SetHandler} = "server-status";
+}
+for my $loc (qw( /server-info )){
+  $Location{$loc}{SetHandler} = "server-info";
+}
+for my $loc (qw( /perl-status )){
+  $Location{$loc}{SetHandler} = "perl-script";
+  $Location{$loc}{PerlHandler} = "Apache::Status";
+}
+
+#      if ($debugging) {
+#        $Location{$loc}{PerlFixupHandler} = "Apache::DB";
+#      }
+
+my $pause = "/pause";
+if (1) { # /pause/ directory
+  require pause_1999::main;
+
+  if (-f "/etc/PAUSE.CLOSED") {
+    my $loc = "/";
+    $Location{$loc}{SetHandler} = "perl-script";
+    $Location{$loc}{Options} = "ExecCGI";
+    $Location{$loc}{PerlHandler} = "perl_pause::disabled2";
+  } else {
+    for my $loc ($pause){
+      require pause_1999::fixup;
+      $Location{$loc}{PerlFixupHandler} = "pause_1999::fixup";
+    }
+    $Location{"/"}{PerlFixupHandler} = "pause_1999::index";
+    for my $loc ("$pause/query", "$pause/authenquery", "$pause/mimequery"){
+      # note: mimequery is experimental and will go away again
+      if ($debugging) {
+        $Location{$loc}{PerlFixupHandler} = "Apache::DB";
+      }
+      require pause_1999::config;
+      $Location{$loc}{SetHandler} = "perl-script";
+      $Location{$loc}{PerlHandler} = "pause_1999::config";
+    }
+    for my $loc (
+		 "$pause/authenquery",
+		 "$pause/mimequery",
+		 "/perl/user",
+		 "/perl/admin",
+		 "/pub",
+                 "/status",
+                 "/server-info",
+                 "/perl-status"
+		){
+      $Location{$loc}{PerlAuthenHandler} = "pause_1999::authen_user";
+      $Location{$loc}{AuthName} = "PAUSE";
+      $Location{$loc}{AuthType} = "Basic";
+      $Location{$loc}{require} = "valid-user";
+    }
+    $Location{"/perl/admin"}{PerlAuthzHandler} = "Apache::AuthzDBI";
+    $Location{"/perl/admin"}{require} = ["group", "admin"];
+  }
+}
+
+for my $loc ( "/perl" ){
+  $Location{$loc}{SetHandler} = "perl-script";
+  $Location{$loc}{Options} = "ExecCGI";
+  if (-f "/etc/PAUSE.CLOSED") {
+    $Location{$loc}{PerlHandler} = "perl_pause::disabled2";
+  } else {
+    $Location{$loc}{PerlHandler} = "Apache::Registry";
+  }
+}
+
+for my $loc (qw(/pub /incoming)){
+  $Location{$loc}{IndexOptions} = "FancyIndexing NameWidth=* SuppressDescription";
+}
+our $MinSpareServers = 2;
+our $MaxSpareServers = 2;
+our $StartServers = 2;
+our $MaxClients = 3;
+our $MaxRequestsPerChild;
+$MaxRequestsPerChild = 6; # set to 0 as long as it turns off the SEGV
+
+if (1){
+  for my $loc (qw( / )){
+    $Location{$loc}{PerlInitHandler} = "Apache::Reload";
+  }
+}
+
+
+__END__
+
+</Perl>
+
+</IfModule>
+
+<IfModule noexist.c>
+
+=cut
+
+</IfModule>
+

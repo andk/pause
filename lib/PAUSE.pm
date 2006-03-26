@@ -104,6 +104,34 @@ These are usernames and passwords in the two mysql databases.
 =cut
 
 
+=over
+
+=item downtimeinfo
+
+returns a hashref with keys C<downtime> and C<willlast>. C<downtime>
+is an integer denoting the system time (measured in epoch seconds) of
+the next downtime event. C<willlast> is an integer measuring seconds.
+
+If the downtime is in the future, we display an announcement on all
+pages. If we are now in the interval between the start of the downtime
+and the expected end, we display a trivial page saying I<closed for
+maintainance> while returning a 500 Server Error. This even works when
+mysql is not running (server error + custom response). Interestingly,
+it does not work if the user does not supply credentials at all.
+
+If current time is after the last downtime event plus scheduled
+downtime, then we're back to normal operation.
+
+=back
+
+=cut
+
+sub downtimeinfo {
+  return +{
+           downtime => 1143373084,
+           willlast => 900,
+          };
+}
 
 sub filehash {
   my($file) = @_;

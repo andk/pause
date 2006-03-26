@@ -146,12 +146,11 @@ Alias /bugzilla/ /home/ldachary/webspace/
   PerlSetVar Auth_DBI_grp_field   ugroup
   PerlSetVar Auth_DBI_pwd_field   password
 
-  PerlSetVar StatINCDebug On
-
   PerlSetupEnv Off
 
-
-
+  PerlSetVar ReloadAll Off
+  PerlSetVar ReloadDebug On
+  PerlSetVar ReloadModules "pause_1999::config pause_1999::main PAUSE"
 <Perl>
 
 
@@ -351,12 +350,10 @@ if ($SWITCH8000) {
 }
 $ServerAdmin = 'andreas.koenig@anima.de';
 
-if (0){
-
+if (1){
   for my $loc (qw( /pause )){
-    $Location{$loc}{PerlInitHandler} = "Apache::StatINC";
+    $Location{$loc}{PerlInitHandler} = "Apache::Reload";
   }
-
 }
 
 
