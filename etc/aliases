@@ -1,0 +1,46 @@
+#
+# Mail aliases for sendmail
+#
+# You must run newaliases(1) after making changes to this file.
+#
+
+# Required aliases
+postmaster:	root
+MAILER-DAEMON:	postmaster
+
+# Common aliases
+abuse:		postmaster
+spam:		postmaster
+
+# Other aliases
+# General redirections for pseudo accounts.
+bin:		root
+daemon:		root
+games:		root
+ingres:		root
+nobody:		root
+system:		root
+toor:		root
+uucp:		root
+
+# Well-known aliases.
+manager:	root
+dumper:		root
+operator:	root
+
+# trap decode to catch security attacks
+decode:		root
+
+# Person who should get root's mail
+root:		k
+upload:		k
+koenig:		k
+a.koenig:	k
+andreas.koenig:	k
+dubravka.koenig: k
+pause:		k
+logcheck:	k
+
+# Mailinglists
+pause-code-commits: k, autrijus@autrijus.org
+cpanpm-code-commits: k
