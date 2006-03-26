@@ -1,16 +1,25 @@
 links:
   any::
-    /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf
-    /usr/local/apache/htdocs          -> ../../../home/k/PAUSE/htdocs/
-    /usr/local/apache/perl            -> ../../../home/k/PAUSE/apache-perl
-    /etc/init.d/PAUSE-httpd           -> ../../home/k/PAUSE/etc/init.d/PAUSE-httpd
-    /etc/init.d/PAUSE-paused          -> ../../home/k/PAUSE/etc/init.d/PAUSE-paused
-    /etc/init.d/PAUSE-rsyncd          -> ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
-    /etc/apache2/apache2.conf         -> ../../home/k/PAUSE/apache-svn-conf/httpd.conf
+    /etc/aliases                         -> ../home/k/PAUSE/etc/aliases
+    /etc/ntp.conf                        -> ../home/k/PAUSE/etc/ntp.conf
+    /etc/proftpd.conf                    -> ../home/k/PAUSE/etc/proftpd.conf
+    /etc/rsyncd.conf                     -> ../home/k/PAUSE/etc/rsyncd.conf
+
+    /etc/apache2/apache2.conf            -> ../../home/k/PAUSE/apache-svn-conf/httpd.conf
+    /etc/apt/sources.list                -> ../../etc/apt/sources.list
+    /etc/cron.jobs/indexscripts.pl       -> ../../home/kstar/cron/indexscripts.pl
+    /etc/init.d/PAUSE-httpd              -> ../../home/k/PAUSE/etc/init.d/PAUSE-httpd
+    /etc/init.d/PAUSE-paused             -> ../../home/k/PAUSE/etc/init.d/PAUSE-paused
+    /etc/init.d/PAUSE-rsyncd             -> ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
+    /etc/mail/local-host-names           -> ../../home/k/PAUSE/etc/mail/local-host-names
+    /etc/mon/mon.cf                      -> ../../home/k/PAUSE/etc/mon/mon.cf
+    /etc/mysql/my.cnf                    -> ../../home/k/PAUSE/etc/my.cnf
+    /etc/security/limits.conf            -> ../../home/k/PAUSE/etc/security/limits.conf
+
     /etc/apache2/mods-available/ssl.conf -> ../../../home/k/PAUSE/apache-svn-conf/ssl.conf
-    /etc/rsyncd.conf                  -> ../home/k/PAUSE/etc/rsyncd.conf
-    /etc/proftpd.conf                 -> ../home/k/PAUSE/etc/proftpd.conf
-    /etc/mon/mon.cf                   -> ../../home/k/PAUSE/etc/mon/mon.cf
-    /etc/mysql/my.cnf                 -> ../../home/k/PAUSE/etc/my.cnf
-    /usr/lib/mon/mon.d/paused.monitor -> ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
-    /usr/lib/mon/mon.d/sm-mta.monitor -> ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
+    /usr/local/apache/conf               -> ../../../home/k/PAUSE/apache-conf
+    /usr/local/apache/htdocs             -> ../../../home/k/PAUSE/htdocs/
+    /usr/local/apache/perl               -> ../../../home/k/PAUSE/apache-perl
+
+    /usr/lib/mon/mon.d/paused.monitor    -> ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
+    /usr/lib/mon/mon.d/sm-mta.monitor    -> ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
