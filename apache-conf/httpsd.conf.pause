@@ -18,7 +18,7 @@ CPerl-mode now sees POD sections till the first =cut.
 ServerName pause.perl.org
 HostnameLookups Off
 User nobody
-Group nobody
+Group www-data
 BrowserMatch Mozilla/2 nokeepalive
 
 #ErrorLog logs/error_log
