@@ -11,7 +11,7 @@ links:
 
     /etc/apache2/apache2.conf            ->! ../../home/k/PAUSE/apache-svn-conf/httpd.conf
     /etc/apache2/ports.conf              ->! ../../home/k/PAUSE/apache-svn-conf/ports.conf
-    /etc/apt/sources.list                ->! ../../etc/apt/sources.list
+    /etc/apt/sources.list                ->! ../../home/k/PAUSE/etc/apt/sources.list
     /etc/cron.jobs/indexscripts.pl       ->! ../../home/kstar/cron/indexscripts.pl
     /etc/init.d/PAUSE-httpd              ->! ../../home/k/PAUSE/etc/init.d/PAUSE-httpd
     /etc/init.d/PAUSE-paused             ->! ../../home/k/PAUSE/etc/init.d/PAUSE-paused
