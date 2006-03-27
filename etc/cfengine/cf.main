@@ -17,7 +17,7 @@ links:
     /etc/init.d/PAUSE-rsyncd             -> ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
     /etc/mail/local-host-names           -> ../../home/k/PAUSE/etc/mail/local-host-names
     /etc/mon/mon.cf                      -> ../../home/k/PAUSE/etc/mon/mon.cf
-    /etc/mysql/my.cnf                    -> ../../home/k/PAUSE/etc/my.cnf
+    /etc/mysql/my.cnf                    -> ../../home/k/PAUSE/etc/my.cnf.pause2
     /etc/security/limits.conf            -> ../../home/k/PAUSE/etc/security/limits.conf
 
     /etc/apache2/mods-available/ssl.conf -> ../../../home/k/PAUSE/apache-svn-conf/ssl.conf
