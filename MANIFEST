@@ -109,6 +109,5 @@ mirror/mirror.defaults
 mirror/mymirror.config
 one-off-utils/fill_users_with_ustatus.pl
 one-off-utils/README
-rc/pause.rc
 SIGNATURE
 t/0-signature.t
