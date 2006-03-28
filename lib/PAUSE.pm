@@ -41,7 +41,7 @@ $PAUSE::Config ||=
      # previously also used for ftp password; still used in Error as
      # contact address and as address to send internal notifications
      # to:
-     ADMIN => qq{andreas.koenig\@pause.perl.org},
+     ADMIN => qq{andreas.koenig.gmwojprw+pause\@franz.ak.mind.de},
      ADMINS => [qq(modules\@perl.org)],
      ANON_FTP_PASS => qq{k\@pause.perl.org},
      AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
