@@ -17,6 +17,7 @@ links:
     /etc/init.d/PAUSE-paused             ->! ../../home/k/PAUSE/etc/init.d/PAUSE-paused
     /etc/init.d/PAUSE-rsyncd             ->! ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
     /etc/mail/local-host-names           ->! ../../home/k/PAUSE/etc/mail/local-host-names
+    /etc/mail/sendmail.mc                ->! ../../home/k/PAUSE/etc/mail/sendmail.mc
     /etc/mon/mon.cf                      ->! ../../home/k/PAUSE/etc/mon/mon.cf
     /etc/mysql/my.cnf                    ->! ../../home/k/PAUSE/etc/my.cnf.pause2
     /etc/security/limits.conf            ->! ../../home/k/PAUSE/etc/security/limits.conf
