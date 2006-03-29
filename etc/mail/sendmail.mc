@@ -97,13 +97,14 @@ dnl # If you're on a dialup link, you should enable this - so sendmail
 dnl # will not bring up the link (it will queue mail for later)
 dnl define(`confCON_EXPENSIVE',`True')dnl
 dnl #
-dnl # Default Mailer setup
-MAILER_DEFINITIONS
-MAILER(`local')dnl
-MAILER(`smtp')dnl
 
 dnl # Masquerading options
 FEATURE(`always_add_domain')dnl
 MASQUERADE_AS(`pause.perl.org')dnl
 FEATURE(`allmasquerade')dnl
 FEATURE(`masquerade_envelope')dnl
+
+dnl # Default Mailer setup
+MAILER_DEFINITIONS
+MAILER(`local')dnl
+MAILER(`smtp')dnl
