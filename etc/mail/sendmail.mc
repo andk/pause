@@ -62,9 +62,9 @@ dnl # Remove `, Addr=' clauses to receive from any interface
 dnl # If you want to support IPv6, switch the commented/uncommentd lines
 FEATURE(`no_default_msa')dnl
 dnl DAEMON_OPTIONS(`Family=inet6, Name=MTA-v6, Port=smtp, Addr=::1')dnl
-DAEMON_OPTIONS(`Family=inet,  Name=MTA-v4, Port=smtp, Addr=127.0.0.1')dnl
+DAEMON_OPTIONS(`Family=inet,  Name=MTA-v4, Port=smtp')dnl
 dnl DAEMON_OPTIONS(`Family=inet6, Name=MSP-v6, Port=submission, Addr=::1')dnl
-DAEMON_OPTIONS(`Family=inet,  Name=MSP-v4, Port=submission, Addr=127.0.0.1')dnl
+DAEMON_OPTIONS(`Family=inet,  Name=MSP-v4, Port=submission')dnl
 dnl #
 dnl # Be somewhat anal in what we allow
 define(`confPRIVACY_FLAGS',dnl
