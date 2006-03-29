@@ -1,3 +1,6 @@
+# 2006-03-29 akoenig : no dependencies! When a sendmail.mc is being changed,
+# we do no rerun make in the /etc/mail directory
+
 files:
   any::
     /var/log/PAUSE-httpd/.  mode=0775 owner=root group=www-data action=touch
