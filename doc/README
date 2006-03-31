@@ -109,10 +109,15 @@ root who starts the webservers.
 
 This setup must ensure that the user UNSAFE cannot read the database
 account informations. On the database side this is achieved by
-granting delete,index,insert,select,update privileges on the two
-tables, nothing else, to one user. This is the user whose access codes
-are stored in PrivatePAUSE.pm. The root password to mysql is not
-needed by any script, so can be stored offline.
+granting the privileges on the two tables, nothing else, to one user.
+The grant statement looks something like
+
+  grant delete,index,insert,select,update,lock tables on mod.* to \
+        'xxx'@'yyy' identified by 'zzz';
+
+This is the user whose access codes are stored in PrivatePAUSE.pm. The
+root password to mysql is not needed by any script, so can be stored
+offline.
 
 =head2 Other security considerations
 
