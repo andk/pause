@@ -18,11 +18,14 @@ my $Struct = [
               {backupdir => "$PAUSE::Config->{FTPPUB}/PAUSE-data",
                cfg_dsn => "MOD_DATA_SOURCE_NAME",
                cfg_user => "MOD_DATA_SOURCE_USER",
-               cfg_pw => "MOD_DATA_SOURCE_PW"},
+               cfg_pw => "MOD_DATA_SOURCE_PW",
+               master => 1,
+              },
               {backupdir => "/home/k/PAUSE/111_sensitive/backup",
                cfg_dsn => "AUTHEN_DATA_SOURCE_NAME",
                cfg_user => "AUTHEN_DATA_SOURCE_USER",
-               cfg_pw => "AUTHEN_DATA_SOURCE_PW"},
+               cfg_pw => "AUTHEN_DATA_SOURCE_PW",
+              },
 ];
 for my $struct (@$Struct) {
   my $backup_dir = $struct->{backupdir};
@@ -33,7 +36,11 @@ for my $struct (@$Struct) {
   for my $var ($db,$user,$password) {
     die "$Id: illegal variable value[$var]" if $var =~ /['";]/;
   }
-  system "mysqldump --lock-tables --add-drop-table --user='$user' --password='$password' '$db' > $backup_dir/.${db}dump.current";
+  my $master_data = "";
+  if ($struct->{master}) {
+    $master_data = " --master-data";
+  }
+  system "mysqldump$master_data --lock-tables --add-drop-table --user='$user' --password='$password' '$db' > $backup_dir/.${db}dump.current";
   rename "$backup_dir/.${db}dump.current", "$backup_dir/${db}dump.current";
   unlink "$backup_dir/${db}dump.current.bz2";
   system "$BZIP -9 --keep --small $backup_dir/${db}dump.current";

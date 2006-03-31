@@ -52,7 +52,7 @@ skip-external-locking
 #
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-bind-address            = 127.0.0.1
+bind-address            = 195.149.117.110
 #
 # * Fine Tuning
 #
@@ -79,12 +79,13 @@ query_cache_type        = 1
 #log-slow-queries	= /var/log/mysql/mysql-slow.log
 #
 # The following can be used as easy to replay backup logs or for replication.
-#server-id		= 1
+server-id		= 1
 log-bin			= /var/log/mysql/mysql-bin.log
 # See /etc/mysql/debian-log-rotate.conf for the number of files kept.
 max_binlog_size		= 104857600
-#binlog-do-db		= include_database_name
+binlog-do-db		= mod
 #binlog-ignore-db	= include_database_name
+log-warnings            = 2
 #
 # * BerkeleyDB
 #
