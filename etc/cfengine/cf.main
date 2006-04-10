@@ -8,6 +8,7 @@ files:
 links:
   any::
     /etc/aliases                         ->! ../home/k/PAUSE/etc/aliases
+    /etc/csync2.cfg                      ->! ../home/k/PAUSE/etc/csync2.cfg
     /etc/ntp.conf                        ->! ../home/k/PAUSE/etc/ntp.conf
     /etc/proftpd.conf                    ->! ../home/k/PAUSE/etc/proftpd.conf
     /etc/rsyncd.conf                     ->! ../home/k/PAUSE/etc/rsyncd.conf
