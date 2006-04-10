@@ -35,26 +35,11 @@ the section about user management.
 
 =head2 File system layout
 
-On PAUSE the files live in /home/k/PAUSE and the following symlinks
-make sure that installed programs find their configuration:
-
-(last time updated: 2003-08-03)
-
-  /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf
-  /usr/local/apache/htdocs          -> ../../../home/k/PAUSE/htdocs/
-  /usr/local/apache/perl            -> ../../../home/k/PAUSE/apache-perl
-  /etc/init.d/PAUSE-httpd           -> ../../home/k/PAUSE/etc/init.d/PAUSE-httpd
-  /etc/init.d/PAUSE-paused          -> ../../home/k/PAUSE/etc/init.d/PAUSE-paused
-  /etc/init.d/PAUSE-rsyncd          -> ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
-  /etc/apache2/apache2.conf         -> ../../home/k/PAUSE/apache-svn-conf/httpd.conf
-  /etc/apache2/mods-available/ssl.conf
-                                    -> ../../../home/k/PAUSE/apache-svn-conf/ssl.conf
-  /etc/rsyncd.conf                  -> ../home/k/PAUSE/etc/rsyncd.conf
-  /etc/proftpd.conf                 -> ../home/k/PAUSE/etc/proftpd.conf
-  /etc/mon/mon.cf                   -> ../../home/k/PAUSE/etc/mon/mon.cf
-  /etc/mysql/my.cnf                 -> ../../home/k/PAUSE/etc/my.cnf
-  /usr/lib/mon/mon.d/paused.monitor -> ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
-  /usr/lib/mon/mon.d/sm-mta.monitor -> ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
+On PAUSE most config files live in /home/k/PAUSE. Where files are
+needed elsewhere in the filesystem, we used to use symlinks. Cfengine
+was chosen to maintain the symlinks during the hardware upgrade in
+March 2006, so all the symlinks needed are now listed in the
+etc/cfengine directory.
 
 [ MISSING documentation:
 
@@ -78,8 +63,8 @@ make sure that installed programs find their configuration:
   gpg
   unzip
 
-At the time of this writing (2003-07-25), all perl scripts were
-running under 5.8.0.
+At the time of this writing (2006), all perl scripts were running
+under 5.8.7.
 
 =head2 Database schema
 
@@ -93,8 +78,7 @@ course -- not available.
 This section is about the fun of makeing mysql safe based on UNIX user
 and group permissions. This is dangerous stuff. Be careful here and
 follow the advice in the mysql manual about how to secure mysql in
-general. E.g. --skip-networking and root user password are a must,
-etc.
+general.
 
 User "nobody" runs the web server.
 
@@ -114,6 +98,13 @@ The grant statement looks something like
 
   grant delete,index,insert,select,update,lock tables on mod.* to \
         'xxx'@'yyy' identified by 'zzz';
+
+For replication, three additional privileges are needed: "reload,
+super, replication client".
+
+As an experimental feature we allowed replication to the world with
+
+  grant replication slave on *.* to repl@'%' identified by 'perl';
 
 This is the user whose access codes are stored in PrivatePAUSE.pm. The
 root password to mysql is not needed by any script, so can be stored
