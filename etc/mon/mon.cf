@@ -14,6 +14,8 @@ hostgroup pause / /home /home/ftp /tmp /var
 
 hostgroup paused localhost
 
+hostgroup rsyncd localhost
+
 # Monitor free disk space on the server
 #
 watch pause
@@ -22,7 +24,7 @@ watch pause
 	monitor freespace.monitor /:500000 /home:2000000 /home/ftp:30000000 /tmp:2000000 /var:1000000
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
-	    alertevery 1h
+	    alertevery 3h
 
 # Monitor PAUSE daemon running
 #
@@ -30,6 +32,14 @@ watch paused
     service paused
 	interval 1h
 	monitor paused.monitor
+	period wd {Sun-Sat}
+	    alert mail.alert k@localhost
+	    alertevery 3h
+
+watch rsyncd
+    service basic
+	interval 1h
+	monitor rsyncd.monitor
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
 	    alertevery 3h
