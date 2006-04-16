@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# $HeadURL$
+# $Id$
+
+my $runfile = "/var/run/tw_cli";
+open my $fh, $runfile or exit 0; # after boot
+my $DIE;
+while (<$fh>){
+    if (/NotOptimal .* = \s+ (\d+) /xi && $1>0){
+        print;
+        $DIE++;
+    }
+}
+close $fh or die "Could not close: $!";
+exit 1 if $DIE;

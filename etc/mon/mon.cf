@@ -16,6 +16,8 @@ hostgroup paused localhost
 
 hostgroup rsyncd localhost
 
+hostgroup threeware localhost
+
 # Monitor free disk space on the server
 #
 watch pause
@@ -43,3 +45,15 @@ watch rsyncd
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
 	    alertevery 3h
+
+watch threeware
+    service basic
+        description discover degraded disks
+        interval 10m
+        monitor 3ware_cli.monitor
+        period wd {Su-Sa}
+            alert mail.alert k@localhost_
+            upalert mail.alert k@localhost
+            alertevery 2h
+            comp_alerts
+            numalerts 10
