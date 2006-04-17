@@ -6,6 +6,27 @@
 # this is only about transfers
 
 use strict;
+use Getopt::Long;
+our %Opt;
+GetOptions(\%Opt,
+           "update!",
+           "tuxi=s",
+          );
+$Opt{update}++ unless %Opt;
+
+my $csync_command =
+    q(/usr/sbin/csync2 -B -v -G pause_perl_org -N pause.perl.org);
+if ($Opt{update}) {
+  $csync_command .= " -u";
+} elsif ($Opt{tuxi}) {
+  my($to) = $Opt{tuxi};
+  $csync_command .= " -TUXI pause.perl.org $to";
+} else {
+  die "illegal mode $Opt{mode}";
+}
+sub timestamp ();
+sub logger ($);
+sub count_csync_processes ();
 
 my $logfile = "/var/log/csync2.log";
 
@@ -14,12 +35,15 @@ if (count_csync_processes >= 10) {
   exit;
 }
 
-if (my $pid = open my $fh, q(/usr/sbin/csync2 -B -u -v -G pause_perl_org -N pause.perl.org 2>&1 |)) {
-  logger "Started csync2 with pid[$pid]";
+if (my $pid = open my $fh, qq($csync_command 2>&1 |)) {
+  logger "Started with pid[$pid] command[$csync_command]";
   local $/ = "\n";
   while (<$fh>) {
+    next if /^\s*$/;
+    chomp;
     logger $_;
   }
+  logger "reached end of output stream";
 } else {
   logger "could not fork csync2: $!";
 }
