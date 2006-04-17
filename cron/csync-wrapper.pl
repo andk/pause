@@ -10,14 +10,18 @@ use Getopt::Long;
 our %Opt;
 GetOptions(\%Opt,
            "update!",
+           "check!",
            "tuxi=s",
           );
 $Opt{update}++ unless %Opt;
 
 my $csync_command =
     q(/usr/sbin/csync2 -B -v -G pause_perl_org -N pause.perl.org);
-if ($Opt{update}) {
+if (0) {
+} elsif ($Opt{update}) {
   $csync_command .= " -u";
+} elsif ($Opt{check}) {
+  $csync_command .= " -cr /";
 } elsif ($Opt{tuxi}) {
   my($to) = $Opt{tuxi};
   $csync_command .= " -TUXI pause.perl.org $to";
