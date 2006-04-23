@@ -108,7 +108,6 @@ sub loop () { # we're NOT called as a method
     die "no executable gzip" unless -x $gzip;
   }
 
-
   my($dbh,$sth,$sth2,$query);
 
   my $now    = time ;
@@ -621,6 +620,7 @@ gives [";
     } else {
       rename($tpath,$lpath);
     }
+    PAUSE::newfile_hook($lpath);
     return -s $lpath;
   } else {
     my $logresponse = $response->error_as_HTML;

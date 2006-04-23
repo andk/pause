@@ -20,6 +20,7 @@ find(
         if (-l $_ && ! -e $_){
           warn "unlinking stale $File::Find::name\n";
           unlink $_;
+          PAUSE::delfile_hook($_);
         }
         if ($_ eq "CHECKSUMS") {
           opendir DIR, ".";
@@ -28,6 +29,7 @@ find(
           if (@readdir == 3) {
             warn "unlinking orphaned $File::Find::name\n";
             unlink $_ or die "Could not unlink $_: $!";
+            PAUSE::delfile_hook($_);
           }
         }
         return if -l $_;
@@ -39,6 +41,7 @@ find(
           if (@readdir == 2) {
             warn "rmdirring empty $File::Find::name\n";
             rmdir $_ or die "Could not rmdir $_: $!";
+            PAUSE::delfile_hook($_);
           }
         }
       },

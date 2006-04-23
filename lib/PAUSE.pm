@@ -297,4 +297,21 @@ sub gtest {
   return 1;
 }
 
+sub newfile_hook ($) {
+  my($f) = @_;
+  my @system = (csync2 => "-h",
+                $f, "-N", "pause.perl.org");
+  0==system @system or die "Couldn't execute system[@system]";
+}
+
+# yes, for csync2 the two hooks are identical. For now.
+sub delfile_hook ($) {
+  my($f) = @_;
+  my @system = (csync2 => "-h",
+                $f, "-N", "pause.perl.org");
+  0==system @system or die "Couldn't execute system[@system]";
+}
+
+
+
 1;

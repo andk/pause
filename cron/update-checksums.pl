@@ -3,6 +3,7 @@
 use CPAN::Checksums 1.018;
 use File::Copy qw(cp);
 use File::Find;
+use File::Spec;
 use strict;
 
 use lib "/home/k/PAUSE/lib";
@@ -84,6 +85,8 @@ find(sub {
          warn "debugdir[$debugdir]ret[$ret]cnt[$cnt]\n"
        }
        return if $ret == 1;
+       my $abs = File::Spec->rel2abs($File::Find::name);
+       PAUSE::newfile_hook($abs);
        $cnt++;
      }, $root);
 
