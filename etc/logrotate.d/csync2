@@ -1,0 +1,7 @@
+/var/log/csync2.log {
+  rotate 14
+  weekly
+  compress
+  missingok
+  notifempty
+}
