@@ -1124,6 +1124,7 @@ sub mlroot {
         local($CPAN::Checksums::SIGNING_KEY) =
             $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
         CPAN::Checksums::updatedir($dir);
+        PAUSE::newfile_hook("$dir/CHECKSUMS");
     }
 
     # package PAUSE::dist;
@@ -1685,6 +1686,7 @@ Please contact modules\@perl.org if there are any open questions.
             $self->{README} = $readme;
             File::Copy::copy $readme, "$MLROOT/$sans.readme";
             utime((stat $readme)[8,9], "$MLROOT/$sans.readme");
+            PAUSE::newfile_hook("$MLROOT/$sans.readme");
         } else {
             $self->{README} = "No README found";
             $self->verbose(1,"No readme in $dist\n");
@@ -1696,6 +1698,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $self->{YAML} = $yaml;
                 File::Copy::copy $yaml, "$MLROOT/$sans.meta";
                 utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
+                PAUSE::newfile_hook("$MLROOT/$sans.meta");
                 eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
                 if ($@) {
                     $self->verbose(1,"Error while parsing YAML: $@");
