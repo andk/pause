@@ -86,7 +86,7 @@ find(sub {
        }
        return if $ret == 1;
        my $abs = File::Spec->rel2abs($File::Find::name);
-       PAUSE::newfile_hook($abs);
+       PAUSE::newfile_hook("$abs/CHECKSUMS");
        $cnt++;
      }, $root);
 
