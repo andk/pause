@@ -32,7 +32,6 @@ close $fh;
 
 $SIG{HUP} = \&sighup;
 $SIG{TERM} = $SIG{INT} = \&sigtermint;
-$SIG{CHLD} = \&reaper;
 
 sub reaper {
   my $child;
@@ -270,6 +269,7 @@ skip        =not yet verified
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
 	$self->logge("Verified $hash->{uriid}");
+        $SIG{CHLD} = \&reaper;
         my $pid = fork;
         if (defined $pid) {
           if ($pid) {
