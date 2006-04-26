@@ -269,7 +269,7 @@ skip        =not yet verified
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
 	$self->logge("Verified $hash->{uriid}");
-        $SIG{CHLD} = \&reaper;
+        $SIG{CHLD} = \&main::reaper;
         my $pid = fork;
         if (defined $pid) {
           if ($pid) {
