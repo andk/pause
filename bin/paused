@@ -610,7 +610,7 @@ sub getit {
 	my @To = $PAUSE::Config->{ADMIN};
 
 	my $blurb = "For the resource [$uri]
-the command [zcat -t $tpath]
+the command [$zcat -t $tpath]
 returned status [$stat]
 and output [$ret].
 nosuccesscount is now at [$nosuccesscount].
