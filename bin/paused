@@ -597,7 +597,8 @@ sub getit {
       sleep 2;
       my $ls = `ls -l $tpath`;
       my $ret = `$zcat -t $tpath 2>&1`;
-      if ($stat = $?) {
+      $stat = $?;
+      if ($stat > 0) {
 	if ($ret =~ /decompression OK, trailing garbage ignored/) {
 	  rename $tpath, "$tpath.crcgarbage";
 	  my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
@@ -605,8 +606,10 @@ sub getit {
 	  $ret = `$zcat -t $tpath 2>&1`;
 	  $stat = $?;
 	}
+      } elsif ($stat < 0) {
+        $self->logge("failed to execute: $!");
       }
-      if ($stat) {
+      if ($stat > 0) {
         $ret =~ s/\n//g;
 	$self->logge("stat[$stat]ret[$ret]");
 	my @To = $PAUSE::Config->{ADMIN};
@@ -645,7 +648,7 @@ gives [$ls]\n\n";
 	$self->logge("Ran $system with return [$ret]");
       }
     } else {
-      rename($tpath,$lpath);
+      rename($tpath,$lpath) or return;
     }
     PAUSE::newfile_hook($lpath);
     return -s $lpath;
