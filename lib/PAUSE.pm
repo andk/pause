@@ -301,7 +301,7 @@ sub gtest {
 sub newfile_hook ($) {
   my($f) = @_;
   while () {
-    my @system = ("/usr/sbin/csync2" => "-m",
+    my @system = ("/usr/sbin/csync2" => "-h",
                   $f, "-N", "pause.perl.org");
 
     # do not want to die, do not know if csync2 dies when $f equals "/"
@@ -314,7 +314,7 @@ sub newfile_hook ($) {
 
 sub delfile_hook ($) {
   my($f) = @_;
-  my @system = ("/usr/sbin/csync2" => "-m",
+  my @system = ("/usr/sbin/csync2" => "-h",
                 $f, "-N", "pause.perl.org");
   0==system @system or warn "Couldn't execute system[@system]";
 }
