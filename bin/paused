@@ -594,6 +594,8 @@ sub getit {
   } elsif ($response->is_success) {
     if ($tpath =~ /\.(Z|gz)$/){
       my($stat) = 0;
+      sleep 2;
+      my $ls = `ls -l $tpath`;
       my $ret = `$zcat -t $tpath 2>&1`;
       if ($stat = $?) {
 	if ($ret =~ /decompression OK, trailing garbage ignored/) {
@@ -606,7 +608,7 @@ sub getit {
       }
       if ($stat) {
         $ret =~ s/\n//g;
-	$self->logge("ret[$ret]");
+	$self->logge("stat[$stat]ret[$ret]");
 	my @To = $PAUSE::Config->{ADMIN};
 
 	my $blurb = "For the resource [$uri]
@@ -615,9 +617,7 @@ returned status [$stat]
 and output [$ret].
 nosuccesscount is now at [$nosuccesscount].
 The command [ls -l $tpath]
-gives [";
-	$blurb .= `ls -l $tpath`;
-	$blurb .= "]\n\n";
+gives [$ls]\n\n";
 
         for my $to (@To) {
           mypause_send_mail->send({
