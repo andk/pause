@@ -17,6 +17,7 @@ use Mail::Send ();
 use DBI ();
 use PAUSE ();
 use PAUSE::MailAddress ();
+use POSIX ":sys_wait_h";
 use URI::URL ();
 use Getopt::Long;
 
@@ -31,6 +32,17 @@ close $fh;
 
 $SIG{HUP} = \&sighup;
 $SIG{TERM} = $SIG{INT} = \&sigtermint;
+$SIG{CHLD} = \&reaper;
+
+sub reaper {
+  my $child;
+  # If a second child dies while in the signal handler caused by the
+  # first death, we won’t get another signal. So must loop here else
+  # we will leave the unreaped child as a zombie. And the next time
+  # two children die we get another zombie. And so on.
+  1 while (($child = waitpid(-1,WNOHANG)) > 0);
+  $SIG{CHLD} = \&reaper;  # still loathe sysV
+}
 
 sub sigtermint {
   mypause_daemon_inspector->logge("Stopping");
@@ -258,6 +270,21 @@ skip        =not yet verified
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
 	$self->logge("Verified $hash->{uriid}");
+        my $pid = fork;
+        if (defined $pid) {
+          if ($pid) {
+            $self->logge("Started mldistwatch for lpath[$lpath]");
+          } else {
+            # child
+            exec '/home/k/PAUSE/cron/mldistwatch',
+                '--pick',
+                    $lpath,
+                        '--logfile',
+                            '/var/log/mldistwatch.log';
+          }
+        } else {
+          $self->logge("could not fork for mldistwatch: $!");
+        }
 	next URIRECORD;
       } else {
 	unlink $lpath;

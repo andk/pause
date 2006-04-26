@@ -14,6 +14,7 @@ it. Before you *use* a function here, please ask about its status.
 
 use Compress::Zlib ();
 use Exporter;
+use File::Basename qw(dirname);
 use IO::File ();
 use MD5 ();
 use Mail::Send ();
@@ -299,17 +300,23 @@ sub gtest {
 
 sub newfile_hook ($) {
   my($f) = @_;
-  my @system = ("/usr/sbin/csync2" => "-m",
-                $f, "-N", "pause.perl.org");
-  0==system @system or die "Couldn't execute system[@system]";
+  while () {
+    my @system = ("/usr/sbin/csync2" => "-m",
+                  $f, "-N", "pause.perl.org");
+
+    # do not want to die, do not know if csync2 dies when $f equals "/"
+    0==system @system or warn "Couldn't execute system[@system]";
+    my $Lf = $f;
+    $f = dirname $Lf;
+    last if $f eq $Lf;
+  }
 }
 
-# yes, for csync2 the two hooks are identical. For now.
 sub delfile_hook ($) {
   my($f) = @_;
   my @system = ("/usr/sbin/csync2" => "-m",
                 $f, "-N", "pause.perl.org");
-  0==system @system or die "Couldn't execute system[@system]";
+  0==system @system or warn "Couldn't execute system[@system]";
 }
 
 

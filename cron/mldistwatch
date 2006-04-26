@@ -79,19 +79,23 @@ sub new {
     my $class = shift;
     my $opt = shift;
 
-    my $pidfile = "/var/run/mldistwatch.pid";
     my $fh;
-    if (open $fh, "+>>", $pidfile) {
-        if (flock $fh, LOCK_EX|LOCK_NB) {
-            truncate $fh, 0 or die;
-            seek $fh, 0, 0;
-            my $ofh = select $fh;
-            $|=1;
-            print $fh $$, "\n";
-            select $ofh;
+    unless ($opt->{pick}) { # pick files shall not block full run
+        my $pidfile = "/var/run/mldistwatch.pid";
+        if (open $fh, "+>>", $pidfile) {
+            if (flock $fh, LOCK_EX|LOCK_NB) {
+                truncate $fh, 0 or die;
+                seek $fh, 0, 0;
+                my $ofh = select $fh;
+                $|=1;
+                print $fh $$, "\n";
+                select $ofh;
+            } else {
+                die "other mlistwatch job running, ".
+                    "will not run at the same time";
+            }
         } else {
-            die "other mlistwatch job running, ".
-                "will not run at the same time";
+            die "Could not open pidfile[$pidfile]: $!";
         }
     }
 
@@ -107,7 +111,7 @@ sub new {
                       TARBIN => $tarbin,
                       UNZIPBIN  => $unzipbin,
                       OPT => $opt,
-                      PIDFILE => $fh,
+                      PIDFH => $fh,
                      }, $class;
     $self->{VERBOSE} = -t STDOUT ? 2 : 1;
     if ($opt->{pick}) {
@@ -133,7 +137,13 @@ sub verbose {
         unshift @what, "Running $0, $Id, $now\n";
         $self->{INTRODUCED} = undef;
     }
-    print @what;
+    my $logfh;
+    if (my $logfile = $self->{OPT}{logfile}) {
+        open $logfh, ">>", $logfile or die;
+    } else {
+        $logfh = *STDOUT;
+    }
+    print $logfh @what;
 }
 
 sub work {
@@ -2981,6 +2991,7 @@ MAIN: {
     Getopt::Long::GetOptions(
                              \%Opt,
                              "debug_mem!",
+                             "logfile=s",
                              "pick=s@",
                              "rewrite!",
                             );
@@ -3024,7 +3035,8 @@ When we are done, we create summaries from the database.
 The purpose of the C<--pick> parameter is to focus on the indexing of
 one or more distros. When the C<--pick=distro> parameter is given
 (which may be given multiple times), writing of the C<0*> files is
-skipped. Not existing distros are not removed from the database.
+skipped. No find() is taking place. Not existing distros are not
+removed from the database.
 
 =head1 OVERVIEW
 
