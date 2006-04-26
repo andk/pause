@@ -19,7 +19,7 @@ my $csync_command =
     q(/usr/sbin/csync2 -B -v -G pause_perl_org -N pause.perl.org);
 if (0) {
 } elsif ($Opt{update}) {
-  $csync_command .= " -u";
+  $csync_command .= " -cu";
 } elsif ($Opt{check}) {
   $csync_command .= " -cr /";
 } elsif ($Opt{tuxi}) {
