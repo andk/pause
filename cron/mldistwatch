@@ -284,7 +284,6 @@ sub init_all {
 
 sub dbfind {
     my($self) = @_;
-    return $self->{PICK} if $self->{PICK};
     my %found;
     my($fh) = File::Temp->new(
                               DIR => "/tmp",
@@ -295,7 +294,14 @@ sub dbfind {
     my $sth = $dbh->prepare("SELECT dist, distmtime FROM distmtimes");
     $sth->execute;
     my($dist,$distmtime);
-    while (($dist,$distmtime) = $sth->fetchrow_array) {
+  RECORD: while (($dist,$distmtime) = $sth->fetchrow_array) {
+        if ($self->{PICK}){
+            my $hit;
+            for my $pd (keys %{$self->{PICK}}) {
+                $hit++ if $pd eq $dist;
+            }
+            next RECORD unless $hit;
+        }
         $found{$dist} = $distmtime;
     }
     $sth->finish;
