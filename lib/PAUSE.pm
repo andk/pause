@@ -308,7 +308,7 @@ sub newfile_hook ($) {
     0==system @system or warn "Couldn't execute system[@system]";
     my $Lf = $f;
     $f = dirname $Lf;
-    last if $f eq $Lf;
+    last if $f eq $Lf || $f =~ m!PAUSE/authors/id$!;
   }
 }
 

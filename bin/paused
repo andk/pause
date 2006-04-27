@@ -35,11 +35,13 @@ $SIG{TERM} = $SIG{INT} = \&sigtermint;
 
 sub reaper {
   my $child;
-  # If a second child dies while in the signal handler caused by the
+  # If a second child exits while in the signal handler caused by the
   # first death, we won’t get another signal. So must loop here else
   # we will leave the unreaped child as a zombie. And the next time
-  # two children die we get another zombie. And so on.
-  1 while (($child = waitpid(-1,WNOHANG)) > 0);
+  # two children exit we get another zombie. And so on.
+  while (($child = waitpid(-1,WNOHANG)) > 0){
+    mypause_daemon_inspector->logge("Reaped child[$child]");
+  }
   $SIG{CHLD} = \&reaper;  # still loathe sysV
 }
 
@@ -98,6 +100,7 @@ sub send {
 
 package mypause_daemon_inspector;
 
+# package mypause_daemon_inspector
 sub loop () { # we're NOT called as a method
 
 
@@ -273,7 +276,7 @@ skip        =not yet verified
         my $pid = fork;
         if (defined $pid) {
           if ($pid) {
-            $self->logge("Started mldistwatch for lpath[$lpath]");
+            $self->logge("Started mldistwatch for lpath[$lpath] with pid[$pid]");
           } else {
             # child
             exec '/home/k/PAUSE/cron/mldistwatch',
@@ -315,6 +318,7 @@ skip        =not yet verified
   $dbh->disconnect;
 }
 
+# package mypause_daemon_inspector
 sub woe {
   my($self) = @_;
 
@@ -445,6 +449,7 @@ $Id\n";
   }
 }
 
+# package mypause_daemon_inspector
 sub welcome_file {
   my($self,$size) = @_;
 
@@ -518,6 +523,7 @@ No action is required on your part
   sleep 15;
 }
 
+# package mypause_daemon_inspector
 sub is_valid {
   my($self,$uriid) = shift;
   my($dir,$basename) = $uriid =~ m| \A (.*) / ([^/]+) \z |x;
@@ -532,6 +538,7 @@ sub is_valid {
   return 1;
 }
 
+# package mypause_daemon_inspector
 sub getit {
   my($self) = @_;
 
@@ -670,12 +677,14 @@ gives [$ls]\n\n";
   }
 }
 
+# package mypause_daemon_inspector
 sub hp_tag {
   my($tag, $num) = @_;
   $hp_inside{$tag} += $num;
   $hp_text .= ".";
 }
 
+# package mypause_daemon_inspector
 sub hp_text {
   return if $hp_inside{script} || $hp_inside{style};
   my $text = $_[0];
@@ -684,6 +693,7 @@ sub hp_text {
 }
 
 # often called as a class method!
+# package mypause_daemon_inspector
 sub logge {
   my($self,$arg) = @_;
   my $stamp = $self->timestamp() . " \$\$$$ v$VERSION: ";
@@ -698,6 +708,7 @@ sub logge {
   close $LOG;
 }
 
+# package mypause_daemon_inspector
 sub timestamp { # Efficiently generate a time stamp for log files
   my $self = shift; # not needed, just to remind us that we're called as a method
   my $time = time;	# optimise for many calls in same second
@@ -709,6 +720,7 @@ sub timestamp { # Efficiently generate a time stamp for log files
 		      $year+1900,$mon+1,$mday, $hour,$min,$sec);
 }
 
+# package mypause_daemon_inspector
 sub writeback {
   my($self,$hash,$hash_orig,$dbh) = @_;
   my(@v,$v);
