@@ -9,7 +9,6 @@ use lib "/home/k/PAUSE/lib";
 use File::Path ();
 use HTTP::Date ();
 use HTTP::Status ();
-use HTML::Parser 3.00 ();
 use IO::File ();
 use LWP ();
 use MD5 ();
@@ -77,7 +76,6 @@ exit;
 package mypause_send_mail;
 
 our %hp_inside;
-our $hp_text;
 
 sub send {
   my($self,$header,$blurb) = @_;
@@ -666,36 +664,14 @@ gives [$ls]\n\n";
     PAUSE::newfile_hook($lpath);
     return -s $lpath;
   } else {
-    my $logresponse = $response->error_as_HTML;
-    $hp_text = "";
-    HTML::Parser->new(api_version => 3,
-                      handlers    => [start => [\&hp_tag, "tagname, '+1'"],
-                                      end   => [\&hp_tag, "tagname, '-1'"],
-                                      text  => [\&hp_text, "dtext"],
-                                     ],
-                      marked_sections => 1,
-                     )->parse($logresponse) || die "Can't open file: $!\n";;
-
-
-    # $logresponse =~ s/\n//gs ;
-    $self->logge(sprintf "nosuccesscount[%d] error[%s]", $self->{URIRECORD}{nosuccesscount}, $hp_text);
+    my $logresponse = $response->message;
+    $self->logge(sprintf(
+                         "nosuccesscount[%d] error[%s]",
+                         $self->{URIRECORD}{nosuccesscount},
+                         $logresponse,
+                        ));
     return;
   }
-}
-
-# package mypause_daemon_inspector
-sub hp_tag {
-  my($tag, $num) = @_;
-  $hp_inside{$tag} += $num;
-  $hp_text .= ".";
-}
-
-# package mypause_daemon_inspector
-sub hp_text {
-  return if $hp_inside{script} || $hp_inside{style};
-  my $text = $_[0];
-  $text =~ s/\n//gs;
-  $hp_text .= $text;
 }
 
 # often called as a class method!
