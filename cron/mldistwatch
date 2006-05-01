@@ -231,7 +231,7 @@ sub set_user_active_status {
     my @new_active_users;
     while (my $file = each %{$self->{ALLfound}}) {
         my($user) = $file =~ m|./../([^/]+)/|;
-        $self->verbose("Warning: user not defined for file[$file]\n")
+        $self->verbose(1,"Warning: user not defined for file[$file]\n")
             unless defined $user;
         next if exists $active->{$user};
         push @new_active_users, $user;
@@ -400,6 +400,10 @@ sub checkfornew {
             delete $self->{ALLfound}{$dist};
             next BIGLOOP;
         }
+        unless ($dio->lock) {
+            $self->verbose(1,"Could not obtain a lock on $dist\n");
+            next BIGLOOP;
+        }
         $self->verbose(1,"\n    Examining $dist ...\n");
         sleep 1;   # I think this might help us against wild processes
         $0 = "mldistwatch: $dist";
@@ -408,8 +412,7 @@ sub checkfornew {
         $dio->{USERID} = $userid;
 
         $dio->examine_dist; # checks for perl, developer, version, etc. and untars
-        my $skip = $dio->skip;
-        if ($skip){
+        if ($dio->skip){
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
             next BIGLOOP;
@@ -422,6 +425,7 @@ sub checkfornew {
         $dio->examine_pms;      # will switch user
 
         $dio->mail_summary;
+        $dio->set_indexed;
 
         $alert .= $dio->alert;  # now $dio can go out of scope
     }
@@ -1091,6 +1095,7 @@ sub mlroot {
     package PAUSE::dist;
     use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
+    # package PAUSE::dist
     sub DESTROY {}
 
     # package PAUSE::dist;
@@ -1139,7 +1144,11 @@ sub mlroot {
             $PAUSE::Config->{CHECKSUMS_SIGNING_PROGRAM};
         local($CPAN::Checksums::SIGNING_KEY) =
             $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
-        CPAN::Checksums::updatedir($dir);
+        eval { CPAN::Checksums::updatedir($dir); };
+        if ($@) {
+            $self->verbose(1,"CPAN::Checksums::updatedir died with error[$@]");
+            return; # a die might cause even more trouble
+        }
         PAUSE::newfile_hook("$dir/CHECKSUMS");
     }
 
@@ -1218,6 +1227,7 @@ sub mlroot {
         return 1;
     }
 
+    # package PAUSE::dist;
     sub skip { shift->{SKIP} }
 
     # package PAUSE::dist;
@@ -1301,18 +1311,21 @@ sub mlroot {
         $self->{SKIP}   = $skip;
     }
 
+    # package PAUSE::dist
     sub connect {
         my($self) = @_;
         my $main = $self->{MAIN};
         $main->connect;
     }
 
+    # package PAUSE::dist
     sub disconnect {
         my($self) = @_;
         my $main = $self->{MAIN};
         $main->disconnect;
     }
 
+    # package PAUSE::dist
     sub mlroot {
         my($self) = @_;
         my $main = $self->{MAIN};
@@ -1644,6 +1657,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
     }
 
+    # package PAUSE::dist
     sub chown_unsafe {
         my($self) = @_;
         return if $self->{CHOWN_UNSAFE_DONE};
@@ -1789,12 +1803,51 @@ Please contact modules\@perl.org if there are any open questions.
         return $self->{VERSION_FROM_YAML_OK} = $ok;
     }
 
+    # package PAUSE::dist
     sub verbose {
         my($self,$level,@what) = @_;
         my $main = $self->{MAIN};
         $main->verbose($level,@what);
     }
 
+    # package PAUSE::dist
+    sub lock {
+        my($self) = @_;
+        my $dist = $self->{DIST};
+        my $dbh = $self->connect;
+        my $rows_affected = $dbh->do("UPDATE distmtimes
+                                 SET indexing_at=NOW()
+                                 WHERE dist='$dist'
+                                 AND indexing_at IS NULL");
+        return 1 if $rows_affected > 0;
+        my $sth = $dbh->prepare("SELECT * FROM distmtimes WHERE dist=?");
+        $sth->execute($dist);
+        if ($sth->rows) {
+            my $row = $sth->fetchrow_hashref();
+            require Data::Dumper;
+            $self->verbose(1,
+                           sprintf(
+                                   "Cannot get lock, current record is[%s]",
+                                   Data::Dumper->new([$row],
+                                                     [qw(row)],
+                                                    )->Indent(1)->Useqq(1)->Dump,
+                                  ));
+        } else {
+            $self->verbose(1,"Weird: first we get no lock, then the record is gone???");
+        }
+        return;
+    }
+
+    # package PAUSE::dist
+    sub set_indexed {
+        my($self) = @_;
+        my $dist = $self->{DIST};
+        my $dbh = $self->connect;
+        my $rows_affected = $dbh->do("UPDATE distmtimes
+                                 SET indexed_at=NOW()
+                                 WHERE dist='$dist'");
+        $rows_affected > 0;
+    }
 }
 
 {
@@ -3041,8 +3094,8 @@ When we are done, we create summaries from the database.
 The purpose of the C<--pick> parameter is to focus on the indexing of
 one or more distros. When the C<--pick=distro> parameter is given
 (which may be given multiple times), writing of the C<0*> files is
-skipped. No find() is taking place. Not existing distros are not
-removed from the database.
+skipped. No find() is taking place. Inexistant distros are not removed
+from the database.
 
 =head1 OVERVIEW
 
