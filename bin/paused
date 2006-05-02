@@ -298,8 +298,7 @@ skip        =not yet verified
       $self->logge("WARNING: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
     }
 
-    # $self->logge("Need to get uriid[$hash->{uriid}]");
-
+    $self->logge("Need to get uriid[$hash->{uriid}]");
     my $size;
     if ($size = $self->getit()) {
       $self->welcome_file($size);
@@ -583,8 +582,9 @@ sub getit {
     $uri_obj->password($PAUSE::Config->{ANON_FTP_PASS});
   }
 
-  $self->logge(sprintf "Requesting a GET on uri [%s]", $uri_obj->abs);
-  my $request = HTTP::Request->new('GET', $uri_obj->abs);
+  my $uri_abs = $uri_obj->abs;
+  $self->logge(sprintf "Requesting a GET on uri [%s]", $uri_abs);
+  my $request = HTTP::Request->new('GET', $uri_abs);
   if ($uri_obj->scheme eq "http") {
     $request->header("Accept","*"); # Microsoft Personal Web Server
                                     # needs this, says Dan Sugalski in
