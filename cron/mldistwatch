@@ -2514,6 +2514,7 @@ package in packages  package in primeur
         if ($is_primeur->rows) {
 
             local($dbh->{RaiseError}) = 0;
+            local($dbh->{PrintError}) = 0;
             my $ret = $dbh->do($ins_perms);
             my $err = "";
             $err = $dbh->errstr unless defined $ret;
@@ -2659,7 +2660,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 
         # Parser problem
 
-        if ($pp->{version} =~ /^\{.*\}$/) { # JSON parser error
+        if ($pp->{version} && $pp->{version} =~ /^\{.*\}$/) { # JSON parser error
             my $err = JSON::jsonToObj($pp->{version});
             if ($err->{openerr}) {
                 $self->index_status($package,
