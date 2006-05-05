@@ -522,14 +522,23 @@ Last-Updated: $date\n\n};
 
     $list .= join "", sort {lc $a cmp lc $b} @listing02;
     if ($list ne $olist) {
-        if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
-            print F $header;
-            print F $list;
+        my $F;
+        if (open $F, ">", "$repfile.new") {
+            print $F $header;
+            print $F $list;
         } else {
-            $self->verbose(1,"Couldn't open 02packages...gz\n");
-            $self->alert("Couldn't open 02packages...gz");
+            $self->verbose(1,"Couldn't open >02packages\n");
+            $self->alert("Couldn't open >02packages");
         }
-        close F or die "Couldn't close: $!";
+        close $F or die "Couldn't close: $!";
+        rename "$repfile.new", $repfile or
+            $self->alert("Couldn't rename to '$repfile': $!");
+        PAUSE::newfile_hook($repfile);
+        0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
+            or $self->alert("Couldn't gzip for dome reason");
+        rename "$repfile.gz.new", "$repfile.gz" or
+            $self->alert("Couldn't rename to '$repfile.gz': $!");
+        PAUSE::newfile_hook("$repfile.gz");
     }
 }
 
