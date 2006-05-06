@@ -270,7 +270,8 @@ skip        =not yet verified
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
 	$self->logge("Verified $hash->{uriid}");
-        my $run_mldistwatch_from_paused = 1;
+        my $run_mldistwatch_from_paused = 0;
+        # need to lock CHECKSUMS files in update-checksums.pl and mldistwatch first
         if ($run_mldistwatch_from_paused) {
           $SIG{CHLD} = \&main::reaper;
           my $pid = fork;
