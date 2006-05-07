@@ -34,7 +34,9 @@ links:
     /usr/local/apache/logs               ->! /var/log/PAUSE-httpd
 
     /usr/lib/mon/mon.d/paused.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
+    /usr/lib/mon/mon.d/rsyncd.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rsyncd.monitor
     /usr/lib/mon/mon.d/sm-mta.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
+    /usr/lib/mon/mon.d/3ware_cli.monitor ->! ../../../../home/k/PAUSE/etc/mon/mon.d/3ware_cli.monitor
 
 editfiles:
   # warn: XXX nonsense to hardcode 1000 here but does cfengine help me do better?
