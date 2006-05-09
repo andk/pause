@@ -73,10 +73,15 @@ find(sub {
                                 "CHECKSUMS.old")
            ) or die $!;
        }
-       my $ret = CPAN::Checksums::updatedir($File::Find::name);
+       my $ffname = $File::Find::name;
+       my $ret = eval { CPAN::Checksums::updatedir($ffname); };
+       if ($@) {
+         warn "error[$@] in checksums file[$ffname]: must unlink";
+         unlink "$ffname/CHECKSUMS";
+       }
        if ($Opt{debug}) {
          cp(File::Spec->catfile(
-                                $File::Find::name,
+                                $ffname,
                                 "CHECKSUMS"
                                ),
             File::Spec->catfile($debugdir,
@@ -85,7 +90,7 @@ find(sub {
          warn "debugdir[$debugdir]ret[$ret]cnt[$cnt]\n"
        }
        return if $ret == 1;
-       my $abs = File::Spec->rel2abs($File::Find::name);
+       my $abs = File::Spec->rel2abs($ffname);
        PAUSE::newfile_hook("$abs/CHECKSUMS");
        $cnt++;
      }, $root);
