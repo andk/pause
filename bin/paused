@@ -39,13 +39,13 @@ sub reaper {
   # we will leave the unreaped child as a zombie. And the next time
   # two children exit we get another zombie. And so on.
   while (($child = waitpid(-1,WNOHANG)) > 0){
-    mypause_daemon_inspector->logge("Reaped child[$child]");
+    mypause_daemon_inspector->logge("Debug: Reaped child[$child]");
   }
   $SIG{CHLD} = \&reaper;  # still loathe sysV
 }
 
 sub sigtermint {
-  mypause_daemon_inspector->logge("Stopping");
+  mypause_daemon_inspector->logge("Info: Stopping");
   $mypause_daemon_inspector::Signal++;
   $mypause_daemon_inspector::Terminated++;
 }
@@ -55,13 +55,13 @@ sub sighup {
 }
 
 sub restart {
-  mypause_daemon_inspector->logge("Going to exec $^X $0");
+  mypause_daemon_inspector->logge("Info: Going to exec $^X $0");
   exec $^X, $0;
 }
 
 umask 0002;
 
-mypause_daemon_inspector->logge("Starting in a new process");
+mypause_daemon_inspector->logge("Info: Starting in a new process");
 
 while () {
   mypause_daemon_inspector::loop();
@@ -131,7 +131,7 @@ sub loop () { # we're NOT called as a method
 			       $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 			       { RaiseError => 0 }
 			      ) ) {
-    $self->logge($DBI::errstr);
+    $self->logge("Alert: $DBI::errstr");
     return; # let them sleep or whatever
   }
   $self->{DBH} = $dbh;
@@ -148,7 +148,7 @@ sub loop () { # we're NOT called as a method
 
   $sth = $dbh->prepare($query);
   unless ( $sth->execute ) {
-    $self->logge($DBI::errstr);
+    $self->logge("Alert: $DBI::errstr");
     return;
   }
   my $sql = qq{SELECT fullname, asciiname
@@ -171,7 +171,7 @@ sub loop () { # we're NOT called as a method
 
     if ( $hash->{uriid} =~ s/ (.*) \.Z$ /$1.gz/x ) {
       $query = "DELETE FROM uris WHERE uriid = '$1.Z'";
-      $self->logge("Will try to get rid of the .Z file. Will not try [$query]");
+      $self->logge("Info: Will try to get rid of the .Z file. Will not try [$query]");
     }
     my $lpath  = $PAUSE::Config->{MLROOT} . $hash->{uriid};
 
@@ -188,26 +188,26 @@ sub loop () { # we're NOT called as a method
 
 	my $request = HTTP::Request->new('HEAD', $hash->{uri});
 	my($mtime) = HTTP::Date::time2str((stat($lpath))[9]);
-	$self->logge("Is $hash->{uri} newer than $mtime?");
+	$self->logge("Info: Is $hash->{uri} newer than $mtime?");
 	$request->header('If-Modified-Since' => $mtime);
 
 	my($response,$success);
 
 	$response = $UA->request($request);
 	$success = $response->is_success;
-	# $self->logge("UA [$UA] response [$response] success [$success]");
+	# $self->logge("Debug: UA [$UA] response [$response] success [$success]");
 
 	if ( $success ){
-	  $self->logge("Yes");
+	  $self->logge("Info: Yes");
 	} else {
 	  # They didn't send success, so they have nothing new
-	  $self->logge("No");
+	  $self->logge("Info: No");
 	  $hash->{dverified} = $now;
 	  next URIRECORD;
 	}
       }
       $hash->{dverified} = 0;
-      $self->logge("(Re)set dverified to 0 for uriid[$hash->{uriid}]");
+      $self->logge("Info: (Re)set dverified to 0 for uriid[$hash->{uriid}]");
 
       $self->getit();
       $hash->{dverified} = $now;
@@ -215,7 +215,7 @@ sub loop () { # we're NOT called as a method
 
     }
 
-    # too soon: $self->logge("lpath [$lpath] uriid [$hash->{uriid}]");
+    # too soon: $self->logge("Debug: lpath [$lpath] uriid [$hash->{uriid}]");
 
     if (! $hash->{dverified} && $lpath =~ m,/$,) { # directory
 
@@ -249,7 +249,7 @@ skip        =not yet verified
                               $blurb
                              );
       $hash->{dverified}=1; # overloaded. This record in uris can be deleted after a while
-      $self->logge("sent mail about package $package");
+      $self->logge("Info: Sent mail about package $package");
       next URIRECORD;
     }
 
@@ -260,7 +260,7 @@ skip        =not yet verified
       next URIRECORD;
     }
 
-    # $self->logge("lpath[$lpath] uriid[$hash->{uriid}]");
+    # $self->logge("Debug: lpath[$lpath] uriid[$hash->{uriid}]");
 
     if ( -d $lpath ) {
       next URIRECORD;
@@ -269,15 +269,14 @@ skip        =not yet verified
       # otherwise this is a RE-upload of something README-ish
       if ($hash->{dgot}) {
 	$hash->{dverified} = $now;
-	$self->logge("Verified $hash->{uriid}");
-        my $run_mldistwatch_from_paused = 0;
-        # need to lock CHECKSUMS files in update-checksums.pl and mldistwatch first
+	$self->logge("Info: Verified $hash->{uriid}");
+        my $run_mldistwatch_from_paused = 1; # since Checksums 0.050 atomicity good enough?
         if ($run_mldistwatch_from_paused) {
           $SIG{CHLD} = \&main::reaper;
           my $pid = fork;
           if (defined $pid) {
             if ($pid) {
-              $self->logge("Started mldistwatch for lpath[$lpath] with pid[$pid]");
+              $self->logge("Info: Started mldistwatch for lpath[$lpath] with pid[$pid]");
             } else {
               # child
               exec '/home/k/PAUSE/cron/mldistwatch',
@@ -287,7 +286,7 @@ skip        =not yet verified
                               '/var/log/mldistwatch.log';
             }
           } else {
-            $self->logge("could not fork for mldistwatch: $!");
+            $self->logge("Alert: could not fork for mldistwatch: $!");
           }
         }
 	next URIRECORD;
@@ -296,10 +295,10 @@ skip        =not yet verified
       }
     }
     if ($hash->{dgot}) {
-      $self->logge("WARNING: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
+      $self->logge("Warning: why is it not on disk? dgot[$hash->{dgot}] uriid[$hash->{uriid}] lpath[$lpath]");
     }
 
-    $self->logge("Need to get uriid[$hash->{uriid}]");
+    $self->logge("Info: Need to get uriid[$hash->{uriid}]");
     my $size;
     if ($size = $self->getit()) {
       $self->welcome_file($size);
@@ -313,8 +312,8 @@ skip        =not yet verified
     main::restart() if $mypause_daemon_inspector::Signal;
   }
 
-      # disconnect, we want to sleep
-      $sth->finish;
+  # disconnect, we want to sleep
+  $sth->finish;
   $sth2->finish;
   $dbh->disconnect;
 }
@@ -457,7 +456,7 @@ sub welcome_file {
   my $hash = $self->{URIRECORD};
 
   $hash->{dgot} = $self->{NOW};
-  $self->logge("Got $hash->{uriid} (size $size)");
+  $self->logge("Info: Got $hash->{uriid} (size $size)");
   my $md5 = MD5->new;
   my $handle = IO::File->new;
   unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
@@ -520,8 +519,8 @@ No action is required on your part
                             $blurb
                            );
   }
-  $self->logge("Sent email(s) about uriid[$hash->{uriid}]");
-  sleep 15;
+  $self->logge("Info: Sent 'has entered' email about uriid[$hash->{uriid}]");
+  sleep 10;
 }
 
 # package mypause_daemon_inspector
@@ -529,11 +528,11 @@ sub is_valid {
   my($self,$uriid) = shift;
   my($dir,$basename) = $uriid =~ m| \A (.*) / ([^/]+) \z |x;
   if ($basename =~ m![^A-Za-z0-9_\-\.\@\+]!) {
-    $self->logge("basename[$basename] of uriid[$uriid] seems to contain illegal characters");
+    $self->logge("Debug: basename[$basename] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   if ($dir =~ m![^A-Za-z0-9_\-\@\+/]!) { # we allow user subdirectories, see edit.pm
-    $self->logge("dir[$dir] of uriid[$uriid] seems to contain illegal characters");
+    $self->logge("Debug: dir[$dir] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
   return 1;
@@ -562,19 +561,19 @@ sub getit {
     ($tmp) = $lpath =~ m,(.*)/,;
     File::Path::mkpath($tmp);
   }
-  $self->logge("Going to fetch uriid[$uriid]");
+  $self->logge("Info: Going to fetch uriid[$uriid]");
   my $uri_obj;
   eval {
     $uri_obj =  URI::URL->new($uri, $PAUSE::Config->{INCOMING})
   };
 
   if ($@ || ! $uri_obj) {
-    $self->logge("Bad URL: $uri");
+    $self->logge("Alert: Bad URL: $uri");
     return;
   }
 
   if ($uri_obj->scheme !~ /^(http|ftp|https)?$/ ) { # Cave canem, e.g. file:
-    $self->logge(sprintf "Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
+    $self->logge(sprintf "Alert: Bad Scheme[%s]uri[%s]", $uri_obj->scheme, $uri);
     return;
   }
 
@@ -584,7 +583,7 @@ sub getit {
   }
 
   my $uri_abs = $uri_obj->abs;
-  $self->logge(sprintf "Requesting a GET on uri [%s]", $uri_abs);
+  $self->logge(sprintf "Info: Requesting a GET on uri [%s]", $uri_abs);
   my $request = HTTP::Request->new('GET', $uri_abs);
   if ($uri_obj->scheme eq "http") {
     $request->header("Accept","*"); # Microsoft Personal Web Server
@@ -598,12 +597,12 @@ sub getit {
   our $zcat;
   our $gzip;
   if ($response->code == &HTTP::Status::RC_NOT_MODIFIED) {
-    $self->logge("no mirror: RC_NOT_MODIFIED for $tpath");
+    $self->logge("Alert: no mirror: RC_NOT_MODIFIED for $tpath");
     return;
   } elsif ($response->is_success) {
     if ($tpath =~ /\.(Z|gz)$/){
       my($stat) = 0;
-      sleep 2;
+      sleep 1;
       my $ls = `ls -l $tpath`;
       my $ret = `$zcat -t $tpath 2>&1`;
       $stat = $?;
@@ -616,11 +615,11 @@ sub getit {
 	  $stat = $?;
 	}
       } elsif ($stat < 0) {
-        $self->logge("failed to execute: $!");
+        $self->logge("Alert: failed to execute: $!");
       }
       if ($stat > 0) {
         $ret =~ s/\n//g;
-	$self->logge("stat[$stat]ret[$ret]");
+	$self->logge("Debug: stat[$stat]ret[$ret]");
 	my @To = $PAUSE::Config->{ADMIN};
 
 	my $blurb = "For the resource [$uri]
@@ -650,15 +649,15 @@ gives [$ls]\n\n";
 	$tpath =~ m/\.Z$/
        ) {
       if (-e $lpath) {
-	$self->logge("Seem to have both a .Z and a .gz");
+	$self->logge("Alert: Seem to have both a .Z and a .gz");
       } else {
 	my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
 	my $ret = system($system);
-	$self->logge("Ran $system with return [$ret]");
+	$self->logge("Info: Ran $system with return [$ret]");
       }
     } else {
       unless (rename($tpath,$lpath)) {
-        $self->logge("could not rename '$tpath' to '$lpath'");
+        $self->logge("Alert: could not rename '$tpath' to '$lpath'");
         return;
       }
     }
@@ -667,7 +666,7 @@ gives [$ls]\n\n";
   } else {
     my $logresponse = $response->message;
     $self->logge(sprintf(
-                         "nosuccesscount[%d] error[%s]",
+                         "Alert: nosuccesscount[%d] error[%s]",
                          $self->{URIRECORD}{nosuccesscount},
                          $logresponse,
                         ));
@@ -717,14 +716,14 @@ sub writeback {
   ($v = $hash_orig->{uriid}) =~ s/'/\\'/g;
   my $whereclause .= " WHERE uriid='$v'";
   $query .= $whereclause;
-  # $self->logge("Going to $query");
-  $dbh->do($query) or $self->logge("$DBI::errstr: $query");
+  # $self->logge("Info: Going to $query");
+  $dbh->do($query) or $self->logge("Alert: $DBI::errstr: $query");
   if ($DBI::errstr =~ /Non unique key|Duplicate/i) {
     my $dquery = "DELETE FROM uris $whereclause";
-    $self->logge("Non-uniq-Error; trying: $dquery");
-    $dbh->do($dquery) or $self->logge("$DBI::errstr: $dquery");
-    $self->logge("retry now: $query");
-    $dbh->do($query) or $self->logge("$DBI::errstr: $query");
+    $self->logge("Debug: Non-uniq-Error; trying: $dquery");
+    $dbh->do($dquery) or $self->logge("Debug: $DBI::errstr: $dquery");
+    $self->logge("Debug: retry now: $query");
+    $dbh->do($query) or $self->logge("Alert: $DBI::errstr: $query");
   }
   return 1;
 }
