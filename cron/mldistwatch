@@ -7,7 +7,7 @@ use lib "/home/k/PAUSE/lib";
 use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
-use CPAN::Checksums 1.016;
+use CPAN::Checksums 1.050; # 1.050 introduced atomic writing
 use Cwd ();
 use DBI;
 use Data::Dumper ();
