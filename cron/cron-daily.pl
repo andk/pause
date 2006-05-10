@@ -88,10 +88,10 @@ sub for_authors {
   my $current_excuse = "";
   my $excuse_file = "$PAUSE::Config->{FTPPUB}/authors/00.Directory.Is.Not.Maintained.Anymore";
   if (-f $excuse_file) {
-    open FH, $excuse_file or die;
+    open my $FH, $excuse_file or die;
     local $/;
-    $current_excuse = <FH>;
-    close FH;
+    $current_excuse = <$FH>;
+    close $FH;
   }
 
   my $my_excuse = "  ".
@@ -99,7 +99,7 @@ sub for_authors {
 qq{The symbolic links to the long usernames in this directory are an
 historic accident. Please do not use them, look into
 
-  CPAN/authors/00whois.html
+  CPAN/authors/00whois.{html,xml}
 
 or if you prefer
 
@@ -127,9 +127,10 @@ Thank you,
 Your CPAN team
 };
   if ($current_excuse ne $my_excuse) {
-    open FH, ">$excuse_file" or die;
-    print FH $my_excuse;
-    close FH;
+    open my $FH, ">", $excuse_file or die;
+    print $FH $my_excuse;
+    close $FH;
+    PAUSE::newfile_hook($excuse_file);
   }
 }
 
@@ -281,6 +282,7 @@ sub delete_scheduled_files {
 					 || 60*60*24*2);
       report "    Deleting $delete\n";
       unlink $delete;
+      PAUSE::delfile_hook($delete);
       $Dbh->do("DELETE FROM deletes WHERE deleteid='$d'");
       next if $d =~ /\.readme$/;
       my $readme = $delete;
@@ -288,12 +290,14 @@ sub delete_scheduled_files {
       if (-f $readme) {
 	report "     Deletin $readme\n";
 	unlink $readme;
+        PAUSE::delfile_hook($readme);
       }
       my $yaml = $readme;
       $yaml =~ s/readme$/meta/;
       if (-f $yaml) {
 	report "     Deletin $yaml\n";
 	unlink $yaml;
+        PAUSE::delfile_hook($yaml);
       }
     }
 }
@@ -517,6 +521,7 @@ sub whois {
         </dl></body></html>
     };
     close FH;
+    # XXX no time left to add the hook for csync2
     if (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
       report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
       copy '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html";
