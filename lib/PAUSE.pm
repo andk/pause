@@ -301,16 +301,14 @@ sub gtest {
 sub _path_normalize ($) {
   my($f) = @_;
   $f =~ s|/+|/|g;
-  $f =~ s|/[^/]+/../|/|g;
+  $f =~ s|/[^/]+/\.\./|/|g;
   $f =~ s|/$||;
   $f;
 }
 
 sub newfile_hook ($) {
   my($f) = @_;
-  warn "Debug: newfile_hook called with f[$f]";
   $f = _path_normalize($f);
-  warn "Debug: normalized to f[$f]";
   while () {
     my @system = ("/usr/sbin/csync2" => "-B", "-h",
                   $f, "-N", "pause.perl.org");
