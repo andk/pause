@@ -1509,7 +1509,7 @@ Please contact modules\@perl.org if there are any open questions.
             my $fh  = $msg->open('sendmail');
             print $fh @m;
             $fh->close;
-            $self->verbose(1,"-->> Sent mail about $substrdistro\n");
+            $self->verbose(1,"-->> Sent \"indexer report\" mail about $substrdistro\n");
         }
     }
 
