@@ -298,8 +298,17 @@ sub gtest {
   return 1;
 }
 
+sub _path_normalize ($) {
+  my($f) = @_;
+  $f =~ s|/+|/|g;
+  $f =~ s|/[^/]+/../|/|g;
+  $f =~ s|/$||;
+  $f;
+}
+
 sub newfile_hook ($) {
   my($f) = @_;
+  $f = _path_normalize($f);
   while () {
     my @system = ("/usr/sbin/csync2" => "-B", "-h",
                   $f, "-N", "pause.perl.org");
@@ -308,12 +317,13 @@ sub newfile_hook ($) {
     0==system @system or warn "Couldn't execute system[@system]";
     my $Lf = $f;
     $f = dirname $Lf;
-    last if $f eq $Lf || $f =~ m!PAUSE/authors/id$!;
+    last if $f eq $Lf || $f =~ m!/PAUSE(/authors(/id)?)?$!;
   }
 }
 
 sub delfile_hook ($) {
   my($f) = @_;
+  $f = _path_normalize($f);
   my @system = ("/usr/sbin/csync2" => "-B", "-h",
                 $f, "-N", "pause.perl.org");
   0==system @system or warn "Couldn't execute system[@system]";

@@ -282,7 +282,7 @@ sub delete_scheduled_files {
 					 || 60*60*24*2);
       report "    Deleting $delete\n";
       unlink $delete;
-      PAUSE::delfile_hook($delete);
+      # PAUSE::delfile_hook($delete);
       $Dbh->do("DELETE FROM deletes WHERE deleteid='$d'");
       next if $d =~ /\.readme$/;
       my $readme = $delete;
@@ -290,14 +290,14 @@ sub delete_scheduled_files {
       if (-f $readme) {
 	report "     Deletin $readme\n";
 	unlink $readme;
-        PAUSE::delfile_hook($readme);
+        # PAUSE::delfile_hook($readme);
       }
       my $yaml = $readme;
       $yaml =~ s/readme$/meta/;
       if (-f $yaml) {
 	report "     Deletin $yaml\n";
 	unlink $yaml;
-        PAUSE::delfile_hook($yaml);
+        # PAUSE::delfile_hook($yaml);
       }
     }
 }
@@ -344,6 +344,12 @@ sub timestamp { # Efficiently generate a time stamp for log files
 	= localtime($last_time = $time);
     $last_str = sprintf("%02d%02d%02d %02u:%02u:%02u",
 		    $year,$mon+1,$mday, $hour,$min,$sec);
+}
+
+sub xcopy ($$) {
+  my($from,$to) = @_;
+  copy($from,"$to.$$") or die;
+  rename("$to.$$", $to);
 }
 
 sub whois {
@@ -521,13 +527,18 @@ sub whois {
         </dl></body></html>
     };
     close FH;
-    # XXX no time left to add the hook for csync2
     if (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
       report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
-      copy '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html";
-      open my $xmlfh, ">:utf8", "$PAUSE::Config->{MLROOT}/../00whois.xml";
+      my $whois_file = "$PAUSE::Config->{MLROOT}/../00whois.html";
+      xcopy '00whois.new', $whois_file;
+      PAUSE::newfile_hook($whois_file);
+
+      my $xml_file = "$PAUSE::Config->{MLROOT}/../00whois.xml";
+      open my $xmlfh, ">:utf8", "$xml_file.$$";
       print $xmlfh $xml;
-      close $xmlfh;
+      close $xmlfh or die;
+      rename "$xml_file.$$", $xml_file or die;
+      PAUSE::newfile_hook($xml_file);
     }
     return;
 }
