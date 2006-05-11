@@ -1168,7 +1168,13 @@ sub mlroot {
         my $dist = $self->{DIST};
         my $dbh = $self->connect;
         unless ($otherts){ # positive $otherts means it was alive last time
-            $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
+            # Hahaha: he didn't think of the programmer who wants to
+            # introduce locking:
+            # $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
+
+            local($dbh->{RaiseError}) = 0;
+            # this may fail if we have a race condition, but we'll
+            # decide later if this is the case:
             $dbh->do("INSERT INTO distmtimes (dist) VALUES ('$dist')");
         }
         my $MLROOT = $self->mlroot;
