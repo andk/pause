@@ -155,11 +155,10 @@ sub dispatch {
     if (UNIVERSAL::isa($@,"Apache::HeavyCGI::Exception")) {
       if ($@->{ERROR}) {
         require Carp;
-	Carp::cluck("\$\@ ERROR[$@->{ERROR}]");
 	$@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR};
-	warn "\$\@ ERROR[$@->{ERROR}]";
 	push @{$self->{ERROR}}, @{$@->{ERROR}};
-	warn "self ERROR[$self->{ERROR}]";
+        require Data::Dumper;
+        print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$self->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump; # XXX
       } elsif ($@->{HTTP_STATUS}) {
 	return $@->{HTTP_STATUS};
       }
