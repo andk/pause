@@ -179,7 +179,7 @@ sub dispatch {
 }
 
 sub layout {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   $self->instance_of("pause_1999::layout")->layout($self);
 }
 
@@ -242,13 +242,13 @@ sub can_utf8 {
 }
 
 sub uagent {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   return $self->{UserAgent} if defined $self->{UserAgent};
   $self->{UserAgent} = $self->{R}->header_in('User-Agent');
 }
 
 sub connect {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   # local($SIG{PIPE}) = 'IGNORE';
   eval {$self->{DbHandle} ||= DBI->connect($self->{ModDsn},
 				     $self->{ModDsnUser},
@@ -281,7 +281,7 @@ Please try again later.
 }
 
 sub authen_connect {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   # local($SIG{PIPE}) = 'IGNORE';
   eval {$self->{DbHandle4Authen} ||= DBI->connect($self->{AuthenDsn},
 				     $self->{AuthenDsnUser},
@@ -432,7 +432,7 @@ sub send_mail {
 }
 
 sub finish {
-  my pause_1999::main $self = shift;
+  my $self = shift;
 
   if ($self->can_utf8) {
   } else {
@@ -681,7 +681,7 @@ sub escapeHTML {
 }
 
 sub can_multipart {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   return $self->{CanMultipart} if defined $self->{CanMultipart};
   my $req = $self->{CGI};
   my $can = $req->param('CAN_MULTIPART'); # no guessing, no special casing
@@ -690,21 +690,21 @@ sub can_multipart {
 }
 
 sub need_multipart {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   my $set = shift;
   $self->{NeedMultipart} = $set if defined $set;
   return $self->{NeedMultipart};
 }
 
 sub prefer_post {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   my $set = shift;
   $self->{PreferPost} = $set if defined $set;
   return $self->{PreferPost};
 }
 
 sub any2utf8 {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   my $s = shift;
 
   if ($s =~ /[\200-\377]/) {
@@ -730,7 +730,7 @@ sub any2utf8 {
 }
 
 sub decode_highbit_entities {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   my $s = shift;
   # warn "s[$s]";
   my $c;
@@ -776,13 +776,13 @@ sub submit {
 }
 
 sub DESTROY {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   $self->{DbHandle4Authen}->disconnect if ref $self->{DbHandle4Authen};
   $self->{DbHandle}->disconnect if ref $self->{DbHandle};
 }
 
 sub session {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   return $self->{Session} if defined $self->{Session};
   my $cgi = $self->{CGI};
   my $sid = $cgi->param('USERID'); # may fail
@@ -799,7 +799,7 @@ sub session {
 }
 
 sub userid {
-  my pause_1999::main $self = shift;
+  my $self = shift;
   # I'm working for the first time with Apache::Session::Counted
   # Things have changed a bit. Until today we had no userid until we
   # had dumped the current request. With Apache::Session we have a
@@ -834,7 +834,7 @@ sub userid {
 }
 
 sub wait_user_record_hook {
-  my pause_1999::main $self = shift;
+  my $self = shift;
 
   my $method = shift;
   my $id = shift;
