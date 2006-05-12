@@ -314,7 +314,7 @@ sub newfile_hook ($) {
                   $f, "-N", "pause.perl.org");
 
     # do not want to die, do not know if csync2 dies when $f equals "/"
-    0==system @system or warn "Couldn't execute system[@system]";
+    0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
     my $Lf = $f;
     $f = dirname $Lf;
     last if $f eq $Lf || $f =~ m!/PAUSE(/authors(/id)?)?$!;
@@ -326,7 +326,7 @@ sub delfile_hook ($) {
   $f = _path_normalize($f);
   my @system = ("/usr/sbin/csync2" => "-B", "-h",
                 $f, "-N", "pause.perl.org");
-  0==system @system or warn "Couldn't execute system[@system]";
+  0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
 }
 
 
