@@ -535,7 +535,7 @@ Last-Updated: $date\n\n};
             $self->alert("Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
-            or $self->alert("Couldn't gzip for dome reason");
+            or $self->alert("Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->alert("Couldn't rename to '$repfile.gz': $!");
         PAUSE::newfile_hook("$repfile.gz");
@@ -919,18 +919,22 @@ maintainer
 
     my $rssfile = "$MLROOT/../../modules/01modules.mtime.rss";
     # $self->verbose(1,"Writing $rssfile\n");
-    if (open F, ">$rssfile") {
-        print F $rss;
-        close F;
+    if (open my $F, ">", "$rssfile.new") {
+        print $F $rss;
+        close $F;
+        rename "$rssfile.new", $rssfile or die;
+        PAUSE::newfile_hook($rssfile);
     } else {
         die "Could not write-open >$rssfile:$!";
     }
 
     my $repfile = "$MLROOT/../../modules/01modules.mtime.html";
     # $self->verbose(1,"Writing $repfile\n");
-    if (open F, ">$repfile") {
-        print F $html;
-        close F;
+    if (open my $F, ">", "$repfile.new") {
+        print $F $html;
+        close $F;
+        rename "$repfile.new", $repfile or die;
+        PAUSE::newfile_hook($repfile);
     } else {
         die "Could not write-open >$repfile:$!";
     }
@@ -1015,17 +1019,27 @@ Date:        %s
     $list =~ s/^\s+//gm;
 
     if ($list ne $olist) {
-        if (open F, "| $PAUSE::Config->{GZIP} --best > $repfile.gz") {
+        my $F;
+        if (open $F, ">", "$repfile.new") {
             if ($] > 5.007) {
                 require Encode;
-                binmode F, ":utf8";
+                binmode $F, ":utf8";
             }
-            print F $header;
-            print F $list;
+            print $F $header;
+            print $F $list;
         } else {
-            die "Couldn't open | gzip...$repfile.gz";
+            $self->verbose(1,"Couldn't open >03...\n");
+            $self->alert("Couldn't open >03...");
         }
-        close F or die "Couldn't close: $!";
+        close $F or die "Couldn't close: $!";
+        rename "$repfile.new", $repfile or
+            $self->alert("Couldn't rename to '$repfile': $!");
+        PAUSE::newfile_hook($repfile);
+        0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
+            or $self->alert("Couldn't gzip for some reason");
+        rename "$repfile.gz.new", "$repfile.gz" or
+            $self->alert("Couldn't rename to '$repfile.gz': $!");
+        PAUSE::newfile_hook("$repfile.gz");
     }
 }
 
