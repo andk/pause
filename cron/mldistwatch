@@ -1433,16 +1433,16 @@ Please contact modules\@perl.org if there are any open questions.
             $status_over_all = "Failed";
 
         } else {
-            my $st = $self->{INDEX_STATUS};
-            if ($st && ref $st && %$st) {
+            my $inxst = $self->{INDEX_STATUS};
+            if ($inxst && ref $inxst && %$inxst) {
                 my $Lstatus = 0;
                 my $intro_written;
                 for my $p (sort {
-                    $st->{$b}{status} <=> $st->{$a}{status}
+                    $inxst->{$b}{status} <=> $inxst->{$a}{status}
                         or
                             $a cmp $b
-                        } keys %$st) {
-                    my $status = $st->{$p}{status};
+                        } keys %$inxst) {
+                    my $status = $inxst->{$p}{status};
                     unless (defined $status_over_all) {
                         if ($status) {
                             if ($status > PAUSE::mldistwatch::Constants::OK) {
@@ -1473,21 +1473,21 @@ Please contact modules\@perl.org if there are any open questions.
                                                  bodyIndent => 13,
                                                  firstIndent => 13,
                                                 );
-                    my $verb_status = $tf13->format($st->{$p}{verb_status});
+                    my $verb_status = $tf13->format($inxst->{$p}{verb_status});
                     $verb_status =~ s/^\s+//; # otherwise this line is too long
                     push @m, sprintf("     module: %s
     version: %s
     in file: %s
      status: %s\n",
                                      $p,
-                                     $st->{$p}{version},
-                                     $st->{$p}{infile},
+                                     $inxst->{$p}{version},
+                                     $inxst->{$p}{infile},
                                      $verb_status,
                                     );
                     $Lstatus = $status;
                 }
             } else {
-                warn sprintf "st[%s]", Data::Dumper::Dumper($st);
+                warn sprintf "st[%s]", Data::Dumper::Dumper($inxst);
                 if ($pmfiles > 0) {
                     if ($self->version_from_yaml_ok) {
 
@@ -1589,6 +1589,8 @@ Please contact modules\@perl.org if there are any open questions.
         if (@top > 1) {
             $self->verbose(1,"HAS_MULTIPLE_ROOT: top[@top]");
             $self->{HAS_MULTIPLE_ROOT} = \@top;
+        } else {
+            $self->{DISTROOT} = $top[0];
         }
     }
 
@@ -1663,28 +1665,52 @@ Please contact modules\@perl.org if there are any open questions.
         $binary_dist = 1 if $dist =~ /-bin-/i;
 
         my $pmfiles = $self->filter_pms;
-        for my $pmfile (@$pmfiles) {
-            if ($binary_dist) {
-                next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
-                # package would be
-                # better
-            } elsif ($pmfile =~ m|/blib/|) {
-                $self->alert("Still a blib directory detected:
+        if (0) {
+        } elsif (@$pmfiles) { # examine files
+            for my $pmfile (@$pmfiles) {
+                if ($binary_dist) {
+                    next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
+                    # package would be
+                    # better
+                } elsif ($pmfile =~ m|/blib/|) {
+                    $self->alert("Still a blib directory detected:
   dist[$dist]pmfile[$pmfile]
 ");
-                next;
+                    next;
+                }
+
+                $self->chown_unsafe;
+
+                my $fio = PAUSE::pmfile->new(
+                                             DIO => $self,
+                                             PMFILE => $pmfile,
+                                             TIME => $self->{TIME},
+                                             USERID => $self->{USERID},
+                                             YAML_CONTENT => $self->{YAML_CONTENT},
+                                            );
+                $fio->examine_fio;
             }
-
-            $self->chown_unsafe;
-
-            my $fio = PAUSE::pmfile->new(
-                                         DIO => $self,
-                                         PMFILE => $pmfile,
-                                         TIME => $self->{TIME},
-                                         USERID => $self->{USERID},
-                                         YAML_CONTENT => $self->{YAML_CONTENT},
-                                        );
-            $fio->examine_fio;
+        } elsif ($self->version_from_yaml_ok) { # no pmfiles but at least a yaml
+            my $yaml = $self->{YAML_CONTENT};
+            my $provides = $yaml->{provides};
+            if ($provides && %$provides) {
+                while (my($k,$v) = each %$provides) {
+                    $v->{infile} = "$v->{file} (according to META)";
+                    my $pio = PAUSE::package
+                        ->new(
+                              PACKAGE => $k,
+                              DIST => $dist,
+                              DIO => $self,
+                              PP => $v,
+                              TIME => $self->{TIME},
+                              PMFILE => "nil",
+                              USERID => $self->{USERID},
+                              YAML_CONTENT => $self->{YAML_CONTENT},
+                             );
+                    $pio->examine_pkg;
+                }
+            }
+        } else {
         }
     }
 
@@ -1844,6 +1870,7 @@ Please contact modules\@perl.org if there are any open questions.
     # package PAUSE::dist
     sub lock {
         my($self) = @_;
+        return 1 if $self->{MAIN}{OPT}{lock} == 0;
         my $dist = $self->{DIST};
         my $dbh = $self->connect;
         my $rows_affected = $dbh->do("UPDATE distmtimes
@@ -2023,7 +2050,6 @@ Please contact modules\@perl.org if there are any open questions.
         my $dbh = $self->connect;
         my $pmfile = $self->{PMFILE};
 
-
         my($filemtime) = (stat $pmfile)[9];
         $self->{MTIME} = $filemtime;
 
@@ -2053,7 +2079,6 @@ Please contact modules\@perl.org if there are any open questions.
             my $pio = PAUSE::package
                 ->new(
                       PACKAGE => $package,
-                      DBH => $dbh,
                       DIST => $dist,
                       PP => $ppp->{$package}, # hash containing
                                               # version
@@ -2170,7 +2195,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $ppp->{$pkg}{filemtime} = $filemtime;
                 $ppp->{$pkg}{pause_reg} = time;
             } else {
-                $self->verbose(1,"no pkg found");
+                $self->verbose(2,"no pkg found");
             }
         }
 
@@ -2469,8 +2494,13 @@ package in packages  package in primeur
 
     sub verbose {
         my($self,$level,@what) = @_;
-        my $main = $self->{FIO};
-        $main->verbose($level,@what);
+        my $parent = $self->parent;
+        $parent->verbose($level,@what);
+    }
+
+    sub parent {
+        my($self) = @_;
+        $self->{FIO} || $self->{DIO};
     }
 
     sub DESTROY {}
@@ -2485,8 +2515,8 @@ package in packages  package in primeur
     sub alert {
         my $self = shift;
         my $what = shift;
-        my $fio = $self->{FIO};
-        $fio->alert($what);
+        my $parent = $self->parent;
+        $parent->alert($what);
     }
 
     # package PAUSE::package;
@@ -2644,21 +2674,21 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
     # package PAUSE::package;
     sub connect {
         my($self) = @_;
-        my $fio = $self->{FIO};
-        $fio->connect;
+        my $parent = $self->parent;
+        $parent->connect;
     }
 
     # package PAUSE::package;
     sub disconnect {
         my($self) = @_;
-        my $fio = $self->{FIO};
-        $fio->disconnect;
+        my $parent = $self->parent;
+        $parent->disconnect;
     }
 
     # package PAUSE::package;
     sub mlroot {
         my($self) = @_;
-        my $fio = $self->{FIO};
+        my $fio = $self->parent;
         $fio->mlroot;
     }
 
@@ -2971,8 +3001,12 @@ WHERE package = '$package'
     # package PAUSE::package;
     sub index_status {
         my($self) = shift;
-        my $fio = $self->{FIO};
-        my $dio = $fio->{DIO};
+        my $dio;
+        if (my $fio = $self->{FIO}) {
+            $dio = $fio->{DIO};
+        } else {
+            $dio = $self->{DIO};
+        }
         $dio->index_status(@_);
     }
 
@@ -3081,10 +3115,12 @@ MAIN: {
     $|=1;
 
     my %Opt;
+    $Opt{lock} = 1;
     Getopt::Long::GetOptions(
                              \%Opt,
                              "debug_mem!",
                              "logfile=s",
+                             "lock!",
                              "pick=s@",
                              "rewrite!",
                             );
