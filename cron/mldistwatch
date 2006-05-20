@@ -1512,8 +1512,10 @@ Please contact modules\@perl.org if there are any open questions.
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
         if ($PAUSE::Config->{TESTHOST}) {
-            local $"="";
-            # warn "Unsent Report [@m]";
+            if ($self->{PICK}) {
+                local $"="";
+                warn "Unsent Report [@m]";
+            }
         } else {
             my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
             my $failed = "";
@@ -1641,7 +1643,7 @@ Please contact modules\@perl.org if there are any open questions.
             push @pmfile, $mf;
         }
         $self->verbose(1,"pmfile[@pmfile]");
-        @pmfile;
+        \@pmfile;
     }
 
     # package PAUSE::dist;
@@ -1660,8 +1662,8 @@ Please contact modules\@perl.org if there are any open questions.
         my $binary_dist;
         $binary_dist = 1 if $dist =~ /-bin-/i;
 
-        my @pmfile = $self->filter_pms;
-        for my $pmfile (@pmfile) {
+        my $pmfiles = $self->filter_pms;
+        for my $pmfile (@$pmfiles) {
             if ($binary_dist) {
                 next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
                 # package would be
@@ -2167,6 +2169,8 @@ Please contact modules\@perl.org if there are any open questions.
                 }
                 $ppp->{$pkg}{filemtime} = $filemtime;
                 $ppp->{$pkg}{pause_reg} = time;
+            } else {
+                $self->verbose(1,"no pkg found");
             }
         }
 
