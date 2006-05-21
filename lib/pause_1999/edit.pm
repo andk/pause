@@ -5082,7 +5082,7 @@ sub check_xhtml {
     push @m, $mgr->escapehtml($html);
   } else {
     require DirHandle;
-    my $dh = DirHandle->new($dir) or die "Couldn't open: $!";
+    my $dh = DirHandle->new($dir) or die "Couldn't open dir[$dir]: $!";
     if (my @dirent = grep /\.xhtml$/, $dh->read()) {
       my %label;
       my %mtime;

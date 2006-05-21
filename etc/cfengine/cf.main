@@ -3,7 +3,8 @@
 
 files:
   any::
-    /var/log/PAUSE-httpd/.  mode=0775 owner=root group=www-data action=touch
+    /var/log/PAUSE-httpd/.    mode=0775 owner=root group=www-data action=touch
+    /var/run/httpd/deadmeat/. mode=0755 owner=www-data group=www-data action=touch
 
 links:
   any::
