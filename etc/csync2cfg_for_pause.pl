@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 # $HeadURL: https://pause.perl.org:5460/svn/pause/trunk/etc/csync2.cfg $
 # $Id: csync2.cfg 754 2006-04-23 10:14:58Z k $
 
@@ -7,6 +9,7 @@ use Getopt::Long;
 use DBI;
 use File::Basename qw(dirname);
 use File::Path qw(mkpath);
+use File::Which qw(which);
 use Sys::Hostname;
 
 my $sys_hostname = Sys::Hostname::hostname();
@@ -92,7 +95,7 @@ $dbh->
     or die "Could not alter the database '$db': $DBI::errstr";
 
 
-unless ($Opt{check_inetd}) {
+if ($Opt{check_inetd}) {
   open my $fh, "/etc/inetd.conf" or die;
   local $/ = "\n";
   my $failmess = "Please correct or if this is indeed correct, rerun me with --nocheck_inetd";
@@ -103,18 +106,26 @@ unless ($Opt{check_inetd}) {
     $csync2_line_found++;
     my(@inet_args) = split " ", $_;
     die "csync2 line in inetd.conf too short" unless $#inet_args>6;
-    unless ($Opt{hostname} eq $sys_hostname) {
-      my $minus_N_ok;
-      for my $i (6..$#inet_args) {
-        if ($inet_args[$i] eq "-N") {
-          if ($inet_args[$i+1] eq $Opt{hostname}) {
-            $minus_N_ok++;
-          }
-        }
+    my $minus_N_arg;
+    for my $i (6..$#inet_args) {
+      if ($inet_args[$i] eq "-N") {
+        $minus_N_arg = $inet_args[$i+1];
       }
-      unless ($minus_N_ok) {
-        die "Your csync2 line in your inetd has not the expected argument '-N $Opt{hostname}'.
-$failmess";
+    }
+    if ($Opt{hostname} eq $sys_hostname) {
+      # check below
+    } else {
+      if ($minus_N_arg) {
+        # check below
+      } else {
+        die "Your csync2 line in inetd.conf needs a '-N $Opt{hostname}' argument. Please fix";
+      }
+    }
+    if ($minus_N_arg) {
+      if ($minus_N_arg eq $Opt{hostname}) {
+        # ok
+      } else {
+        die "Your csync2 line in inetd.conf contains '-N $minus_N_arg' but your hostname is '$Opt{hostname}': $failmess";
       }
     }
   }
@@ -169,7 +180,20 @@ group pause_perl_org {
   }
 }
 
-die "Todo: /home/ftp/pub/PAUSE/* checken; search csync2 in the path; ";
+{
+  my $pause_dir = '/home/ftp/pub/PAUSE/';
+  mkpath $pause_dir;
+  for my $d (qw(authors modules scripts)) {
+    mkpath "$pause_dir/$d";
+  }
+}
+
+{
+  my $csync2 = which "csync2";
+  unless ($csync2) {
+    die "Found no csync2 binary in path. You need to install the csync2 program.";
+  }
+}
 
 warn "Your csync2 slave is ready to go now. Please tell the PAUSE admin to add your host '$Opt{hostname}' to the csync2 config";
 
@@ -178,4 +202,6 @@ warn "Your csync2 slave is ready to go now. Please tell the PAUSE admin to add y
 # % ~k/PAUSE/cron/csync-wrapper.pl -tuxi $Opt{hostname} &
 # REGULARLY:
 # % csync2 -x -v -G pause_perl_org -N pause.perl.org
+
+__END__
 
