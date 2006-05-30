@@ -2339,6 +2339,7 @@ Please contact modules\@perl.org if there are any open questions.
                   local(\$^W) = 0;
                   PAUSE::pmfile::parse_version_safely("$pmcp");
                  };
+                $comp->permit("entereval"); # for MBARBON/Module-Info-0.30.tar.gz
                 $comp->share("*PAUSE::pmfile::parse_version_safely");
                 $comp->share("*version::new");
                 $comp->share("*version::numify");
