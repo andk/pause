@@ -75,7 +75,7 @@ sub count_csync_processes () {
   local $/ = "\n";
   my $count = 0;
   while (<$fh>) {
-    next unless m|^\s*\d+\s/usr/sbin/csync2\s|;
+    next unless m|^\s*(\d+\s)/usr/sbin/csync2\s|;
     $count++;
   }
   $count;
