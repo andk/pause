@@ -16,3 +16,9 @@ while (<>) {
     $jobs{$proc} = "$date $time $what";
   }
 }
+if (%jobs) {
+  print "Unfinished jobs:\n";
+  while (my($proc,$what) = each %jobs) {
+    printf "%5d: %s\n_______%s ---- UNFINISHED\n", $proc, $jobs{$proc};
+  }
+}
