@@ -19,6 +19,6 @@ while (<>) {
 if (%jobs) {
   print "Unfinished jobs:\n";
   while (my($proc,$what) = each %jobs) {
-    printf "%5d: %s\n_______%s ---- UNFINISHED\n", $proc, $jobs{$proc};
+    printf "%5d: %s\n_______UNFINISHED\n", $proc, $what;
   }
 }
