@@ -5,6 +5,23 @@
 # other jobs care for the hints and the collection of dirty files,
 # this is only about transfers
 
+# TODO: differentiate the running csync2 processes: every host that is
+# still being dealt with in a running job should be removed from the
+# lot. For the other hosts we can always start a new process. The
+# problem is that we do not know the exact plans of the running jobs,
+# so if job J1 is currently updating file F1 on host H1, we would
+# rotate H1 out of the pool but in a few seconds maybe J1 tries to
+# transfer file FX to host H2 and we maybe try the same thing in a few
+# seconds. So maybe we have to kill running processes? But how long
+# should we wait before killing? This is a nontrivial scheduling task.
+# So for now we set the number of -cu processes to a max of 2 and
+# allow two processes to try the same file to the same host.
+
+# I think we should try this: one cfg file per host and only one
+# running csync2 job per host. Or this: if there is no other -cu job
+# running, let csync2 work as it is designed. If there is a running
+# job, try to differentiate???
+
 use strict;
 use Getopt::Long;
 our %Opt;
@@ -30,12 +47,13 @@ if (0) {
 }
 sub timestamp ();
 sub logger ($);
-sub count_csync_processes ();
+sub csync_processes ();
 
 my $logfile = "/var/log/csync2.log";
 
-if (count_csync_processes >= 4) {
-  logger "csync2 contention, not starting";
+my $cp = csync_processes;
+if (@$cp >= 1) {
+  logger "EOJ: running csync2 processes[@$cp], not starting";
   exit;
 }
 
@@ -70,13 +88,13 @@ sub logger ($) {
   close $log;
 }
 
-sub count_csync_processes () {
+sub csync_processes () {
   open my $fh, "/bin/ps --no-headers -eo pid,rss,args |" or die "Could not fork ps: $!";
   local $/ = "\n";
-  my $count = 0;
+  my @c;
   while (<$fh>) {
-    next unless m|^\s*(\d+\s)/usr/sbin/csync2\s|;
-    $count++;
+    next unless m|^\s*(\d+)\s+\d+\s+/usr/sbin/csync2.*-cu|;
+    push @c, $1;
   }
-  $count;
+  \@c;
 }
