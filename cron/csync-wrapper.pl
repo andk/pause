@@ -34,8 +34,18 @@ $Opt{update}++ unless %Opt;
 
 my $csync_command =
     q(/usr/sbin/csync2 -B -v -G pause_perl_org -N pause.perl.org);
+
+sub timestamp ();
+sub logger ($);
+sub csync_processes ();
+
 if (0) {
 } elsif ($Opt{update}) {
+  my $cp = csync_processes;
+  if (@$cp >= 1) {
+    logger "EOJ: running csync2 processes[@$cp], not starting";
+    exit;
+  }
   $csync_command .= " -cu";
 } elsif ($Opt{check}) {
   $csync_command .= " -cr /";
@@ -45,17 +55,8 @@ if (0) {
 } else {
   die "illegal mode $Opt{mode}";
 }
-sub timestamp ();
-sub logger ($);
-sub csync_processes ();
 
 my $logfile = "/var/log/csync2.log";
-
-my $cp = csync_processes;
-if (@$cp >= 1) {
-  logger "EOJ: running csync2 processes[@$cp], not starting";
-  exit;
-}
 
 if (my $pid = open my $fh, qq($csync_command 2>&1 |)) {
   logger "Started with pid[$pid] command[$csync_command]";
