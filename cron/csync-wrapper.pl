@@ -34,7 +34,7 @@ sub count_csync_processes ();
 
 my $logfile = "/var/log/csync2.log";
 
-if (count_csync_processes >= 10) {
+if (count_csync_processes >= 4) {
   logger "csync2 contention, not starting";
   exit;
 }
@@ -47,9 +47,9 @@ if (my $pid = open my $fh, qq($csync_command 2>&1 |)) {
     chomp;
     logger $_;
   }
-  logger "reached end of output stream";
+  logger "EOJ: reached end of output stream";
 } else {
-  logger "could not fork csync2: $!";
+  logger "EOJ: could not fork csync2: $!";
 }
 
 sub timestamp () {
