@@ -22,6 +22,9 @@
 # running, let csync2 work as it is designed. If there is a running
 # job, try to differentiate???
 
+# Small talk with Slaven and I came to the conclusion that this is
+# really something that should be handled by csync2 or librsync.
+
 use strict;
 use Getopt::Long;
 our %Opt;
