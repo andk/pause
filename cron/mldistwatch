@@ -140,8 +140,8 @@ sub new {
             $self->{PICK}{$pick} = 1;
         }
     }
-    if ($opt->{force}) {
-        $self->{FORCE} = 1;
+    if ($opt->{'skip-locking'}) {
+        $self->{'SKIP-LOCKING'} = 1;
     }
     $self->verbose(1,"Hello world,");
     $self;
@@ -403,7 +403,7 @@ sub checkfornew {
                                    TARBIN => $self->{TARBIN},
                                    UNZIPBIN  => $self->{UNZIPBIN},
                                    PICK   => $self->{PICK},
-                                   FORCE  => $self->{FORCE},
+                                   'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
                                   );
 
         if ($dio->ignoredist){
@@ -1920,8 +1920,7 @@ Please contact modules\@perl.org if there are any open questions.
     # package PAUSE::dist
     sub lock {
         my($self) = @_;
-        return 1 if $self->{MAIN}{OPT}{lock} == 0;
-        if ($self->{FORCE}) {
+        if ($self->{'SKIP-LOCKING'}) {
             $self->verbose(1,"forcing indexing without a lock");
             return 1;
         }
@@ -3170,12 +3169,10 @@ MAIN: {
     $|=1;
 
     my %Opt;
-    $Opt{lock} = 1;
     Getopt::Long::GetOptions(
                              \%Opt,
                              "debug_mem!",
-                             "force!",
-                             "lock!",
+                             "skip-locking!",
                              "logfile=s",
                              "pick=s@",
                              "rewrite!",
@@ -3198,17 +3195,30 @@ mldistwatch - The infamous PAUSE indexer
 
 =head1 SYNOPSIS
 
- mldistwatch [--pick=distro]...
+ mldistwatch [OPTIONS]
+
+ OPTIONS:
+
+ usually used by paused after upload:
+   --pick=distro ...    distro is a full path
+   --logfile=logfile    diag not to STDOUT but to this file
+
+ useful if testing the indexer at home:
+   --skip-locking       (bool) skip locking (e.g. reindex if already indexed)
+
+ useful for testing:
+   --rewrite            (bool) do not index, only rewrite the index files
 
 =head1 DESCRIPTION
 
-We run through the whole filesystem and check for new files
-and for goners.
+We run through the whole filesystem and check for new files and for
+goners. We do this usually from a cronjob once per hour to catch file
+events that nobody has dealt with yet.
 
-We compare them with the database of distribution files and
-decide if we have to examine them closer. We also create a
-trivial "database" of CHECKSUMS in the same directory as a
-distro resides.
+We compare found files and goners with the database of distribution
+files and decide if we have to examine them closer. We also create a
+trivial "database" of CHECKSUMS in the same directory as a distro
+resides.
 
 We unzip new files into a tree and examine files in that tree
 and compare these with data about packages in the database.
@@ -3217,6 +3227,7 @@ During the course we write mails.
 
 When we are done, we create summaries from the database.
 
+The paused daemon immediately triggers I<small> mldistwatch runs.
 The purpose of the C<--pick> parameter is to focus on the indexing of
 one or more distros. When the C<--pick=distro> parameter is given
 (which may be given multiple times), writing of the C<0*> files is
