@@ -142,7 +142,7 @@ group pause_perl_org {
   key $Opt{pause_key_file};
   include /home/ftp/pub/PAUSE/authors;
   include /home/ftp/pub/PAUSE/modules;
-  #include /home/ftp/pub/PAUSE/scripts; # danger: CPAN has more than that
+  #include /home/ftp/pub/PAUSE/scripts; # danger: CPAN has more than PAUSE
   auto left;
 }
 };
@@ -183,7 +183,7 @@ group pause_perl_org {
 {
   my $pause_dir = '/home/ftp/pub/PAUSE/';
   mkpath $pause_dir;
-  for my $d (qw(authors modules scripts)) {
+  for my $d (qw(authors modules scripts)) { # XXX wait that scripts issues get resolved
     mkpath "$pause_dir/$d";
   }
 }
