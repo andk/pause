@@ -58,16 +58,36 @@ $Data::Dumper::Indent = 1;
     use File::Find;
     use File::Path qw(rmtree mkpath);
     our $Id = q$Id$;
-    our $ISAPERL = qr{
-                   /
-                   (
-                    perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[24680]\.\d+)
-                    |
-                    ponie-[\d.\-]
-                   )
-                   \.tar[._-]gz
-                   \z
-                 }x;
+    $PAUSE::mldistwatch::SUPPORT_BZ2 = 0;
+    if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
+        our $ISAPERL = qr{
+                          /
+                          (
+                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d+\.\d+)
+                          |
+                          ponie-[\d.\-]
+                         )
+                          (?:
+                          \.tar[._-]gz
+                          |
+                          \.tar\.bz2
+                         )
+                          \z
+                      }x;
+    } else {
+        our $ISAPERL = qr{
+                          /
+                          (
+                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d+\.\d+)
+                          |
+                          ponie-[\d.\-]
+                         )
+                          (?:
+                          \.tar[._-]gz
+                         )
+                          \z
+                      }x;
+    }
 }
 
 
@@ -119,6 +139,9 @@ sub new {
             $pick =~ s|^.*authors/id/|| if $pick =~ m|authors/id/./../|;
             $self->{PICK}{$pick} = 1;
         }
+    }
+    if ($opt->{force}) {
+        $self->{FORCE} = 1;
     }
     $self->verbose(1,"Hello world,");
     $self;
@@ -380,6 +403,7 @@ sub checkfornew {
                                    TARBIN => $self->{TARBIN},
                                    UNZIPBIN  => $self->{UNZIPBIN},
                                    PICK   => $self->{PICK},
+                                   FORCE  => $self->{FORCE},
                                   );
 
         if ($dio->ignoredist){
@@ -654,8 +678,13 @@ sub rewrite01 {
         # Sybase      MEWP   sybperl-2.03.tar.gz     91.8  31 Jan 1996
         # we are in authors/id/
         $pkg{rootpack} =~ s/\*$//; # XXX seems stemming from already deleted code
-        ($pkg{readme} = $pkg{dist}) =~
-            s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
+        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
+            ($pkg{readme} = $pkg{dist}) =~
+                s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|zip)$/.readme/;
+        } else {
+            ($pkg{readme} = $pkg{dist}) =~
+                s/\.(tar[._-]gz|tar.Z|tgz|zip)$/.readme/;
+        }
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
 
         $pkg{chapterid} = $achapter{$pkg{rootpack}}
@@ -883,8 +912,13 @@ maintainer
         $package{'useridpretty'} = ucfirst(
           $package{'useridlc'}   = lc $package{'userid'}
         );
-        ($package{basename}) =
-            $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$/;
+        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
+            ($package{basename}) =
+                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|zip)$/;
+        } else {
+            ($package{basename}) =
+                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$/;
+        }
 
         $html .= sprintf(
                          qq{<a href="../authors/id/%s">%s</a>%s<a
@@ -1233,7 +1267,13 @@ sub mlroot {
         local *TARTEST;
         my $tarbin = $self->{TARBIN};
         my $MLROOT = $self->mlroot;
-        open TARTEST, "$tarbin tzf $MLROOT/$dist |";
+        my $tar_opt = "tzf";
+        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
+            if ($dist =~ /\.tar\.bz2$/) {
+                $tar_opt = "tjf";
+            }
+        }
+        open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
         while (<TARTEST>) {
             if (m:^\.\./: || m:/\.\./: ) {
                 $self->verbose(1,"\n\n    ALERT: Updir detected in $dist!\n\n");
@@ -1249,9 +1289,15 @@ sub mlroot {
             return;
         }
         $self->verbose(1,"Going to untar $MLROOT/$dist\n");
-        unless (system($tarbin,'xzf',"$MLROOT/$dist")==0) {
+        $tar_opt = "xzf";
+        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
+            if ($dist =~ /\.tar\.bz2$/) {
+                $tar_opt = "xjf";
+            }
+        }
+        unless (system($tarbin,$tar_opt,"$MLROOT/$dist")==0) {
             print "Some error occurred during unzippping. Let's retry:\n";
-            system("$tarbin xvzf $MLROOT/$dist")==0 or return;
+            system("$tarbin v$tar_opt $MLROOT/$dist")==0 or return;
         }
         return 1;
     }
@@ -1266,6 +1312,10 @@ sub mlroot {
         my $MLROOT = $self->mlroot;
         my($suffix,$skip);
         $suffix = $skip = "";
+        my $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.Z)$/;
+        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
+            $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
+        }
         if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
             $self->verbose(1,"perl dist $dist from $u. Is he a trusted guy?\n");
@@ -1289,7 +1339,7 @@ sub mlroot {
             }
             $sth->finish;
             $adbh->disconnect;
-            if ($dist =~ /\.(tgz|tar[\._-]gz|tar\.Z)$/) {
+            if ($dist =~ $suffqr) {
                 $suffix = $1;
             } else {
                 $self->verbose(1,"A perl distro ($dist) with an unusual suffix!\n");
@@ -1309,7 +1359,7 @@ sub mlroot {
                 $self->{SKIP}   = 1;
                 return;
             }
-            if ($dist =~ /\.(tgz|tar[\._-]gz|tar\.Z)$/) {
+            if ($dist =~ $suffqr) {
                 $suffix = $1;
                 $skip = 1 unless $self->untar;
             } elsif ($dist =~ /\.pm\.(Z|gz)$/) {
@@ -1871,6 +1921,10 @@ Please contact modules\@perl.org if there are any open questions.
     sub lock {
         my($self) = @_;
         return 1 if $self->{MAIN}{OPT}{lock} == 0;
+        if ($self->{FORCE}) {
+            $self->verbose(1,"forcing indexing without a lock");
+            return 1;
+        }
         my $dist = $self->{DIST};
         my $dbh = $self->connect;
         my $rows_affected = $dbh->do("UPDATE distmtimes
@@ -3120,8 +3174,9 @@ MAIN: {
     Getopt::Long::GetOptions(
                              \%Opt,
                              "debug_mem!",
-                             "logfile=s",
+                             "force!",
                              "lock!",
+                             "logfile=s",
                              "pick=s@",
                              "rewrite!",
                             );
