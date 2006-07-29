@@ -142,7 +142,7 @@ group pause_perl_org {
   key $Opt{pause_key_file};
   include /home/ftp/pub/PAUSE/authors;
   include /home/ftp/pub/PAUSE/modules;
-  include /home/ftp/pub/PAUSE/scripts;
+  #include /home/ftp/pub/PAUSE/scripts; # danger: CPAN has more than that
   auto left;
 }
 };
@@ -160,7 +160,7 @@ group pause_perl_org {
                      key\s+\Q$Opt{pause_key_file}\E;\s* # keyfile
                      include \s+ /home/ftp/pub/PAUSE/authors;\s* #
                      include \s+ /home/ftp/pub/PAUSE/modules;\s* #
-                     include \s+ /home/ftp/pub/PAUSE/scripts;\s* #
+                     \#include \s+ /home/ftp/pub/PAUSE/scripts;.* #
                      auto \s+ left;\s*                           #
                      \}
                     |sx) {
