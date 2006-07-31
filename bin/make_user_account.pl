@@ -31,5 +31,5 @@ die "'@system' returned bad status: '$ret'" if $ret;
 $ret = system @system;
 die "'@system' returned bad status: '$ret'" if $ret;
 print "please run
-    vipw -s $lcuser
-now and set the crypted password to '$passwd'\n";
+    vipw -s
+now and set the crypted password of '$lcuser' to '$passwd'\n";
