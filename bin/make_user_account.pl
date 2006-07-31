@@ -23,7 +23,13 @@ my($passwd) = $sth->fetchrow_array;
 $sth->finish;
 $db->disconnect;
 
-my @system = ("adduser", "-p", $passwd, lc $user);
+my $lcuser = lc $user;
+my @system = ("adduser", "--group", $lcuser);
 $ret = system @system;
-
-die "adduser returned bad status: '$ret'" if $ret;
+die "'@system' returned bad status: '$ret'" if $ret;
+@system = ("adduser", "--ingroup", $lcuser, "--disabled-login", $lcuser);
+$ret = system @system;
+die "'@system' returned bad status: '$ret'" if $ret;
+print "please run
+    vipw -s $lcuser
+now and set the crypted password to '$passwd'\n";
