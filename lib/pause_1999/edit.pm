@@ -341,12 +341,20 @@ sub active_user_record {
     my $dbh1 = $mgr->connect;
     my $sth1 = $dbh1->prepare("SELECT * FROM users WHERE userid=?");
     $sth1->execute($hidden_user);
-    die Apache::HeavyCGI::Exception
-        ->new(ERROR =>
-              "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!")
-            unless $sth1->rows;
-
+    unless ($sth1->rows){
+      require Carp;
+      Carp::cluck(
+                  sprintf(
+                          "ALERT: hidden_user[%s] rows_as_s[%s] rows_as_d[%d]",
+                          $hidden_user,
+                          $sth1->rows,
+                          $sth1->rows,
+                         ));
+      die Apache::HeavyCGI::Exception
+          ->new(ERROR =>
+                "Unidentified error happened, please write to the PAUSE admin
+ at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
+    }
     my $h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
     $sth1->finish;
 
