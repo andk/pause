@@ -60,10 +60,19 @@ $Data::Dumper::Indent = 1;
     our $Id = q$Id$;
     $PAUSE::mldistwatch::SUPPORT_BZ2 = 0;
     if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-        our $ISAPERL = qr{
+        # ISA_REGULAR_PERL means a perl release for public consumption
+        # (and must exclude developer releases like 5.9.4). I need to
+        # rename it from ISAPERL to ISA_REGULAR_PERL to avoid
+        # confusion with CPAN.pm. CPAN.pm has a different regex for
+        # ISAPERL because there we want to protect the user from
+        # developer releases too, but here we want to index a distro
+        # with very special treatment that is only reserved for "real"
+        # perl distros. (The exclusion of developer releases was
+        # accidentally lost in rev 815)
+        our $ISA_REGULAR_PERL = qr{
                           /
                           (
-                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d+\.\d+)
+                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
                           |
                           ponie-[\d.\-]
                          )
@@ -75,10 +84,10 @@ $Data::Dumper::Indent = 1;
                           \z
                       }x;
     } else {
-        our $ISAPERL = qr{
+        our $ISA_REGULAR_PERL = qr{
                           /
                           (
-                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d+\.\d+)
+                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
                           |
                           ponie-[\d.\-]
                          )
@@ -1316,7 +1325,7 @@ sub mlroot {
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         }
-        if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/) {
+        if ($dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
             $self->verbose(1,"perl dist $dist from $u. Is he a trusted guy?\n");
             use DBI;
@@ -2683,7 +2692,7 @@ package in packages  package in primeur
             while (($p,$owner) = $sth_perms->fetchrow_array) {
                 push @owner, $owner; # array for debugging statement
             }
-            if ($dist =~ /$PAUSE::mldistwatch::ISAPERL/) {
+            if ($dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/) {
                 # seems ok: perl is always right
             } elsif (! grep { $_ eq $userid } @owner) {
                 # we must not index this and we have to inform somebody
@@ -2857,7 +2866,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         my $distorperlok = $dist !~ m|/perl|;
         # this dist is not named perl-something (lex ILYAZ)
 
-        my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISAPERL/;
+        my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
 
         $distorperlok ||= $isaperl;
         # or it is THE perl dist
@@ -2866,7 +2875,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
         # or it is called perl-something (e.g. perl-ldap) AND...
         my($something2) = $odist =~ m|/perl(.....)|;
         # and we compare against another perl-something AND...
-        my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISAPERL/;
+        my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
         # the file we're comparing with is not the perl dist
 
         $distorperlok ||= $something1 && $something2 &&
