@@ -5469,7 +5469,7 @@ decision.</li>
 following files have been scheduled for reindexing.
 
 %s
-Estimated time, when the job will be done: %s
+Estimated time of job completion: %s
 
 %s},
                       $mgr->{User}{fullname},
