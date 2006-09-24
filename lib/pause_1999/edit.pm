@@ -6472,7 +6472,7 @@ sub reset_version {
 
 };
   my $blurb = "";
-  my($usersubstr) = sprintf("%s/%s/%s",
+  my($usersubstr) = sprintf("%s/%s/%s/",
                             substr($u->{userid},0,1),
                             substr($u->{userid},0,2),
                             $u->{userid},
