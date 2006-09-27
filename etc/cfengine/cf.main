@@ -42,16 +42,16 @@ links:
 copy:
   any::
     # the SVN repository is not necessarily on PAUSE itself, of course
-    /home/k/dproj/PAUSE/SVN/svn/pause/hooks/post-commit
+    /home/k/PAUSE/svn/pause/hooks/post-commit
       dest=/home/SVN/repos/pause/hooks/post-commit
       owner=SVN group=www-data mode=0755
 
-    /home/k/dproj/PAUSE/SVN/svn/pause/hooks/commit-email.pl
+    /home/k/PAUSE/svn/pause/hooks/commit-email.pl
       dest=/home/SVN/repos/pause/hooks/commit-email.pl
       owner=SVN group=www-data mode=0755
 
     # XXX foreigner, not PAUSE related
-    /home/k/dproj/PAUSE/SVN/svn/cpanpm/hooks/post-commit
+    /home/k/PAUSE/svn/cpanpm/hooks/post-commit
       dest=/home/SVN/repos/cpanpm/hooks/post-commit
       owner=SVN group=www-data mode=0755
 
