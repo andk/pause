@@ -8,7 +8,6 @@ files:
 
 links:
   any::
-    /etc/aliases                         ->! ../home/k/PAUSE/etc/aliases
     /etc/csync2.cfg                      ->! ../home/k/PAUSE/etc/csync2.cfg
     /etc/ntp.conf                        ->! ../home/k/PAUSE/etc/ntp.conf
     /etc/proftpd.conf                    ->! ../home/k/PAUSE/etc/proftpd.conf
@@ -40,6 +39,26 @@ links:
     /usr/lib/mon/mon.d/sm-mta.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
     /usr/lib/mon/mon.d/3ware_cli.monitor ->! ../../../../home/k/PAUSE/etc/mon/mon.d/3ware_cli.monitor
 
+copy:
+  any::
+    # the SVN repository is not necessarily on PAUSE itself, of course
+    /home/k/dproj/PAUSE/SVN/svn/pause/hooks/post-commit
+      dest=/home/SVN/repos/pause/hooks/post-commit
+      owner=SVN group=www-data mode=0755
+
+    /home/k/dproj/PAUSE/SVN/svn/pause/hooks/commit-email.pl
+      dest=/home/SVN/repos/pause/hooks/commit-email.pl
+      owner=SVN group=www-data mode=0755
+
+    # XXX foreigner, not PAUSE related
+    /home/k/dproj/PAUSE/SVN/svn/cpanpm/hooks/post-commit
+      dest=/home/SVN/repos/cpanpm/hooks/post-commit
+      owner=SVN group=www-data mode=0755
+
+    # sendmail
+    /home/k/PAUSE/etc/aliases dest=/etc/aliases
+      owner=root group=root mode=0644 define=reload_aliases
+
 editfiles:
   # warn: XXX nonsense to hardcode 1000 here but does cfengine help me do better?
   any::
@@ -48,3 +67,7 @@ editfiles:
       DeleteLinesContaining "k:x:1000:"
       AppendIfNoSuchLine "k:x:1000:k,kstar,abh,SVN,ftp,nobody"
     }
+
+shellcommands:
+  reload_aliases::
+    "/usr/sbin/newaliases"

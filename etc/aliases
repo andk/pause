@@ -43,4 +43,4 @@ logcheck:	k
 
 # Mailinglists
 pause-code-commits: k, autrijus@autrijus.org
-cpanpm-code-commits: k
+cpanpm-code-commits: k, xdaveg@gmail.com
