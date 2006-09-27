@@ -1,5 +1,5 @@
 # 2006-03-29 akoenig : no dependencies! When a sendmail.mc is being changed,
-# we do no rerun make in the /etc/mail directory. Same after aliases ==> TODO
+# we do no rerun make in the /etc/mail directory ==> TODO
 
 files:
   any::
