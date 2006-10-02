@@ -66,11 +66,11 @@ find(
                 while (my($k,$v) = each %{$y->{requires}}) {
                   printf(
                          "k[%s]v[%s]g[%s]m[%s] %s\n",
-                         $k,
-                         $v,
+                         $k||"",
+                         $v||"",
                          $y->{generated_by}||"",
-                         $mtime,
-                         $name,
+                         $mtime||"0",
+                         $name||"",
                         );
                 }
               } else {
