@@ -152,7 +152,7 @@ sub new {
     if ($opt->{'skip-locking'}) {
         $self->{'SKIP-LOCKING'} = 1;
     }
-    $self->verbose(1,"Hello world,");
+    $self->verbose(1,"Starting");
     $self;
 }
 
@@ -166,12 +166,16 @@ sub verbose {
     return if $level > $self->{VERBOSE};
     unless (exists $self->{INTRODUCED}) {
         my $now = scalar localtime;
-        unshift @what, "Running $0, $Id, $now\n";
+        require Data::Dumper;
+        unshift @what, "Running $0, $Id, $now",
+            Data::Dumper->new([$self],[qw()])->Indent(1)->Useqq(1)->Dump;
         $self->{INTRODUCED} = undef;
     }
     my $logfh;
     if (my $logfile = $self->{OPT}{logfile}) {
         open $logfh, ">>", $logfile or die;
+        unshift @what, scalar localtime;
+        push @what, "\n";
     } else {
         $logfh = *STDOUT;
     }
@@ -1297,17 +1301,20 @@ sub mlroot {
             $self->{COULD_NOT_UNTAR}++;
             return;
         }
-        $self->verbose(1,"Going to untar $MLROOT/$dist\n");
         $tar_opt = "xzf";
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             if ($dist =~ /\.tar\.bz2$/) {
                 $tar_opt = "xjf";
             }
         }
+        $self->verbose(1,"Going to untar. Running '$tarbin' '$tar_opt' '$MLROOT/$dist'\n");
         unless (system($tarbin,$tar_opt,"$MLROOT/$dist")==0) {
-            print "Some error occurred during unzippping. Let's retry:\n";
-            system("$tarbin v$tar_opt $MLROOT/$dist")==0 or return;
+            $self->verbose(1, "Some error occurred during unzipping. Let's retry with -v:\n");
+            unless (system("$tarbin v$tar_opt $MLROOT/$dist")==0) {
+                $self->verbose(1, "Some error occurred during unzipping again; giving up\n");
+            }
         }
+        $self->verbose(1,"untarred '$MLROOT/$dist'\n");
         return 1;
     }
 
