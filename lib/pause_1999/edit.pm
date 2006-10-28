@@ -899,7 +899,7 @@ sub select_ml_action {
   while (my @row = $mgr->fetchrow($sth, "fetchrow_array")) {
     $u{$row[0]} = $row[0];
   }
-  my $size = $sth->rows > 5 ? 5 : $sth->rows;
+  my $size = $sth->rows > 8 ? 5 : $sth->rows;
   push @m, $mgr->scrolling_list(
 				'name'     =>'HIDDENNAME',
 				'values' => [sort {lc($u{$a}) cmp lc($u{$b})} keys %u],
@@ -911,7 +911,7 @@ sub select_ml_action {
 				'name' => 'ACTIONREQ',
 				values => $mgr->{AllowMlreprTakeover},
 				default => ['edit_ml'],
-				size => 3,
+				size => $size,
 			       );
   push @m, qq{<input type="submit"
  name="pause99_select_ml_action_sub" value="Submit" />};
@@ -1879,7 +1879,7 @@ sub scroll_subdirs {
   my @dirs = sort grep !$seen{$_}++, grep s|(.+)/[^/]+|$1|, keys %files;
   return "" unless @dirs;
   unshift @dirs, ".";
-  my $size = @dirs > 5 ? 5 : scalar(@dirs);
+  my $size = @dirs > 8 ? 5 : scalar(@dirs);
   my @m;
   push @m, $mgr->scrolling_list(
                                 'name' => "pause99_add_uri_subdirscrl",
@@ -3042,7 +3042,7 @@ Excerpt from a mail:<pre>
       }
     }
   }
-  my $size = @all_mls > 5 ? 5 : scalar(@all_mls);
+  my $size = @all_mls > 8 ? 5 : scalar(@all_mls);
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_edit_ml_3",
 				'values' => \@all_mls,
@@ -3284,7 +3284,7 @@ sub edit_mod {
     }
   }
   my $all_mods = scalar @all_mods;
-  my $size = $all_mods > 5 ? 5 : $all_mods;
+  my $size = $all_mods > 8 ? 5 : $all_mods;
   unless ($size) {
 
     push @m, qq{<p>Sorry, there are no modules registered belonging to
@@ -5715,7 +5715,7 @@ sub share_perms_remocos {
   $all_comaints = $self->all_comaints($mgr,$all_mods,$u);
   my @all = sort keys %$all_comaints;
   my $n = scalar @all;
-  my $size = $n > 7 ? 7 : $n;
+  my $size = $n > 8 ? 5 : $n;
   unless ($size) {
 
     push @m, qq{<p>There are no co-maintainers registered to any of
@@ -5824,7 +5824,7 @@ sub share_perms_remome {
 
   my @all_mods = sort keys %$all_mods;
   my $n = scalar @all_mods;
-  my $size = $n > 7 ? 7 : $n;
+  my $size = $n > 8 ? 5 : $n;
   unless ($size) {
 
     push @m, qq{<p>Sorry, $u->{userid} does not seem to be co-maintainer of any module.</p> };
@@ -5925,7 +5925,7 @@ sub share_perms_makeco {
 
   my @all_mods = sort keys %$all_mods;
   my $n = scalar @all_mods;
-  my $size = $n > 7 ? 7 : $n;
+  my $size = $n > 8 ? 5 : $n;
   unless ($size) {
 
     push @m, qq{<p>Sorry, there are no modules registered belonging to
@@ -6012,7 +6012,7 @@ sub share_perms_remopr {
   $all_mods = $self->all_pmods_not_mmods($mgr,$u); # yes, again!
   my @all_mods = sort keys %$all_mods;
   my $n = scalar @all_mods;
-  my $size = $n > 7 ? 7 : $n;
+  my $size = $n > 8 ? 5 : $n;
   unless ($size) {
 
     push @m, qq{<p>Sorry, there are no modules registered belonging to
@@ -6109,7 +6109,7 @@ sub share_perms_movepr {
   $all_mods = $self->all_pmods_not_mmods($mgr,$u); # yes, again!
   my @all_mods = sort keys %$all_mods;
   my $n = scalar @all_mods;
-  my $size = $n > 7 ? 7 : $n;
+  my $size = $n > 8 ? 5 : $n;
   unless ($size) {
 
     push @m, qq{<p>Sorry, there are no modules registered belonging to
