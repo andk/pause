@@ -3234,11 +3234,11 @@ sub edit_mod {
                 );
   }
   my($sql,@bind);
-  if (exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
+  if ($selectedid and exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
     $sql = qq{SELECT modid
               FROM mods, list2user
+                ON mods.userid = list2user.maillistid
               WHERE mods.userid=?
-                AND mods.userid = list2user.maillistid
                 AND list2user.userid = ?
               ORDER BY modid};
     @bind = ($selectedid, $mgr->{User}{userid});
@@ -3254,31 +3254,23 @@ sub edit_mod {
   my $ret = $sth->execute(@bind);
   # warn sprintf "ret[%s]rows[%s]", $ret, $sth->rows;
   my @all_mods;
-  my %mods_lab;
   my $is_only_one;
   if (my $rows = $sth->rows) {
-    my $sth2 = $dbh->prepare(qq{SELECT *
-                                FROM mods
-                                WHERE modid=?
-                                  AND userid=?});
     while (my($id) = $mgr->fetchrow($sth, "fetchrow_array")) {
       # register this mailinglist for the selectbox
       push @all_mods, $id;
-      # query for more info about it
-      $sth2->execute($id,$u->{userid}); # really needed only for the
-                                        # record we want to edit, but
-                                        # maybe also needed for a
-                                        # label in the selectbox
-      my($rec) = $mgr->fetchrow($sth2, "fetchrow_hashref");
-      # we will display the name along the ID
-      # $mods_lab{$id} = "$id ($rec->{userid})";
-      $mods_lab{$id} = $id; # redundant, but flexible
       if ($rows == 1) {
 	# if this is the selected one, we just store it immediately
 	$selectedid = $id;
-	$selectedrec = $rec;
         $is_only_one++;
-      } elsif ($id eq $selectedid) {
+      }
+      if ($id eq $selectedid) {
+        my $sth2 = $dbh->prepare(qq{SELECT *
+                                FROM mods
+                                WHERE modid=?
+                                  AND userid=?});
+        $sth2->execute($id,$u->{userid});
+        my($rec) = $mgr->fetchrow($sth2, "fetchrow_hashref");
 	$selectedrec = $rec;
       }
     }
@@ -3298,22 +3290,31 @@ sub edit_mod {
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_edit_mod_3",
 				'values' => \@all_mods,
-				'labels' => \%mods_lab,
 				'size' => $size,
 			       );
 
   push @m, qq{<input type="submit" name="pause99_edit_mod_2" value="Select" /><br />};
-
   if ($selectedid) {
+    push @m, $self->_edit_mod_selected($mgr,\@to,$selectedrec,$u,$is_only_one);
+  }
 
-    push @m, qq{<h3>Record for $selectedrec->{modid}</h3><p>More
+  @m;
+}
+
+sub _edit_mod_selected {
+  my($self,$mgr,$to,$selectedrec,$u,$is_only_one) = @_;
+  my @m;
+  my $req = $mgr->{CGI};
+  my @to = @$to;
+  my $dbh = $mgr->connect;
+  push @m, qq{<h3>Record for $selectedrec->{modid}</h3><p>More
         about the meaning of the DSLIP status in the <a href=
         "http://www.cpan.org/modules/00modlist.long.html#1)ModuleListing">module
         list</a>. To delete, add or rename an entry, mail to
         modules\@perl.org.</p>};
 
-    my @m_modrec;
-    my $force_sel = $req->param('pause99_edit_mod_2');
+  my @m_modrec;
+  my $force_sel = $req->param('pause99_edit_mod_2');
     # || $is_only_one;
     my $update_sel = $req->param('pause99_edit_mod_4');
 
@@ -3541,10 +3542,8 @@ $Yours};
 
     }
     push @m, @m_modrec;
-  }
-  @m;
+  return @m;
 }
-
 sub edit_uris {
   my pause_1999::edit $self = shift;
   my pause_1999::main $mgr = shift;
@@ -5579,7 +5578,7 @@ sub share_perms {
 
            <ul> <li> only one user per module can be either <br/> <ul>
            <li> registered in <i>modulelist</i> or </li> <li> primary
-           maintainer, mostly on a <i>first-come-first-serve</i>
+           maintainer on a <i>first-come-first-serve</i>
            basis;</li> </ul> </li> <li> many users can get granted
            permissions as <i>co-maintainers</i>, which means their
            uploads for the given module are honoured by the
@@ -5587,68 +5586,61 @@ sub share_perms {
 
            <p>You can <i>view</i> your current set of permissions on
            the <a href="authenquery?ACTION=peek_perms">View
-           Permissions</a> page. To <i>change</i> permissions, please
-           select one of the following 6 groups, each of which leads
-           you to a different action:</p>
+           Permissions</a> page. To <i>change</i> permissions,
+           select one of the following submit buttons, each of which leads
+           you to a different page:</p>
 
            <table class="texttable" cellspacing="2" cellpadding="3">
 
-           <tfoot><tr><td colspan="2"><sup>*</sup>Giving up
-           maintainership means becoming a co-maintainer instead. Who
-           does not want to keep co-maint status, needs to give it up
-           in a second step (see 4.1).</td></tr></tfoot>
+           <tbody>
 
-           <tbody><tr>
+           <tr>
+           <td colspan="3">1. You are registered in modulelist</td>
+           </tr>
 
-           <td colspan="2">1. You are registered in modulelist</td>
-
-           </tr> <tr><td>&nbsp;</td> <td>To enter a new
+           <tr><td>NONE</td><td>&nbsp;</td> <td>To enter a new
            owner or a new module status, please visit the <a
            href="authenquery?ACTION=edit_mod">Edit Module Metadata</a>
-           page.<sup>*</sup></td></tr> <tr>
+           page.</td></tr>
 
-           <td colspan="2">2. You are primary maintainer:</td>
 
-           </tr> <tr><td align="right"><input type="submit"
+           <tr><td colspan="3">2. You are primary
+           maintainer:</td></tr>
+
+           <tr><td rowspan="2">NONE</td><td align="right"><input type="submit"
            name="pause99_share_perms_movepr" value="Select" /></td>
-
            <td>2.1 Pass primary maintainership status to somebody else
-           (giving it up at the same time)<sup>*</sup></td>
+           (giving it up at the same time)</td> </tr>
 
-           </tr> <tr><td align="right"><input
+           <tr><td align="right"><input
            type="submit" name="pause99_share_perms_remopr"
            value="Select" /></td>
-
            <td>2.2 Give up primary maintainership status (without
-           transfering it)<sup>*</sup></td>
-
-           </tr> <tr>
-
-           <td colspan="2">3. Making and breaking co-maintainers (for both
-           modulelist owners and primary maintainers):</td>
-
+           transfering it)</td>
            </tr>
-           <tr><td align="right"><input type="submit"
-           name="pause99_share_perms_makeco" value="Select" /></td>
 
-           <td>3.1 Make somebody else co-maintainer </td>
-
+           <tr><td colspan="3">3. Making and breaking co-maintainers
+           (for both modulelist owners and primary maintainers):</td>
            </tr>
+
+           <tr><td rowspan="2">NONE</td><td align="right"><input
+           type="submit" name="pause99_share_perms_makeco"
+           value="Select" /></td> <td>3.1 Make somebody else
+           co-maintainer </td> </tr>
+
            <tr><td align="right"><input type="submit"
            name="pause99_share_perms_remocos" value="Select" /></td>
-
            <td>3.2 Remove co-maintainer</td>
-
            </tr>
+
            <tr>
-
-           <td colspan="2">4. You are co-maintainer</td>
-
+           <td colspan="3">4. You are co-maintainer</td>
            </tr>
-           <tr><td align="right"><input type="submit"
-           name="pause99_share_perms_remome" value="Select" /></td>
 
+           <tr><td>NONE</td><td align="right"><input type="submit"
+           name="pause99_share_perms_remome" value="Select" /></td>
            <td>4.1 Give up co-maintainership status</td></tr>
+
            </tbody>
            </table>};
 

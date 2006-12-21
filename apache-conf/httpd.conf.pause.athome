@@ -17,7 +17,12 @@
 
   PerlSetVar ReloadAll Off
   PerlSetVar ReloadDebug On
-  PerlSetVar ReloadModules "pause_1999::config pause_1999::main PAUSE"
+  PerlSetVar ReloadModules "pause_1999::config \
+                            pause_1999::main \
+                            pause_1999::edit \
+                            PAUSE \
+
+"
 
 <Perl>
 
