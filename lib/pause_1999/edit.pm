@@ -199,10 +199,16 @@ parameter ABRA=$param, but the database doesn't know about this token.");
     }
   }
   my $action = $mgr->{Action};
-  unless ($action) {
+  if (!$action || $req->param('lsw')) { # let submit win
+
+    # the let submit win parameter was introduced when I realized that
+    # submit should always win but was afraid that it might break
+    # something when we suddenly let submit win in all cases. So new
+    # forms should always specify lsw=1 so we can migrate to making it
+    # the default some day.
 
     # New and more generic than the inherited ones above: several submit buttons
-    my @params = grep s/^SUBMIT_pause99_//, $req->param;
+    my @params = grep s/^(weak)?SUBMIT_pause99_//i, $req->param;
     for my $p (@params) {
       # warn "p[$p]";
       for my $a (@allow_submit) {
@@ -3233,26 +3239,26 @@ sub edit_mod {
                      )
                 );
   }
-  my($sql,@bind);
+  my($sth);
   if ($selectedid and exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
-    $sql = qq{SELECT modid
+    my $sql = qq{SELECT modid
               FROM mods, list2user
                 ON mods.userid = list2user.maillistid
               WHERE mods.userid=?
                 AND list2user.userid = ?
               ORDER BY modid};
-    @bind = ($selectedid, $mgr->{User}{userid});
+    my @bind = ($selectedid, $mgr->{User}{userid});
+    $sth = $dbh->prepare($sql);
+    my $ret = $sth->execute(@bind);
   } else {
-    $sql = qq{SELECT modid
+    my $sql = qq{SELECT modid
               FROM mods
               WHERE userid=?
               ORDER BY modid};
-    @bind = $u->{userid};
+    my @bind = $u->{userid};
+    $sth = $dbh->prepare($sql);
+    my $ret = $sth->execute(@bind);
   }
-  # warn "sql[$sql]bind[@bind]";
-  my $sth = $dbh->prepare($sql);
-  my $ret = $sth->execute(@bind);
-  # warn sprintf "ret[%s]rows[%s]", $ret, $sth->rows;
   my @all_mods;
   my $is_only_one;
   if (my $rows = $sth->rows) {
@@ -5562,6 +5568,8 @@ sub share_perms {
       if ($req->param("pause99_share_perms_$sa")
           or
           $req->param("SUBMIT_pause99_share_perms_$sa")
+          or
+          $req->param("weaksubmit_pause99_share_perms_$sa")
          ) {
         $subaction = $sa;
         last SUBACTION;
@@ -5571,78 +5579,151 @@ sub share_perms {
   my $u = $self->active_user_record($mgr);
   # warn sprintf "subaction[%s] u->userid[%s]", $subaction||"", $u->{userid}||"";
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
+  push @m, qq{<input type="hidden" name="lsw" value="1" />}; # let submit win
+
+  my $scrolling_list_1 = $self->share_perms_scrl_1($mgr,$u->{userid});
+  my $scrolling_list_2 = $self->share_perms_scrl_2($mgr,$u);
+  my $scrolling_list_3 = $self->share_perms_scrl_3($mgr,$u);
+  my $scrolling_list_4 = $self->share_perms_scrl_4($mgr,$u);
 
   unless ($subaction) {
 
+    # NOTE: the 6 submit buttons below are "weak" submit buttons. I
+    # want that people first reach the next page with more text and
+    # more options.
+
+
     push @m, qq{<p>Permissions on PAUSE come in three flavors:</p>
 
-           <ul> <li> only one user per module can be either <br/> <ul>
-           <li> registered in <i>modulelist</i> or </li> <li> primary
-           maintainer on a <i>first-come-first-serve</i>
-           basis;</li> </ul> </li> <li> many users can get granted
-           permissions as <i>co-maintainers</i>, which means their
-           uploads for the given module are honoured by the
-           indexer.</li> </ul>
 
-           <p>You can <i>view</i> your current set of permissions on
-           the <a href="authenquery?ACTION=peek_perms">View
-           Permissions</a> page. To <i>change</i> permissions,
-           select one of the following submit buttons, each of which leads
-           you to a different page:</p>
+  <ul>
+    <li>
+      only one user per module can be either
+      <br/>
+      <ul>
+        <li>
+          registered in <i>modulelist</i> or
+        </li>
+        <li>
+          primary maintainer on a <i>first-come-first-serve</i>
+          basis;
+        </li>
+      </ul>
+    </li>
+    <li>
+      many users can get granted permissions as <i>co-maintainers</i>,
+      which means their uploads for the given module are honoured by
+      the indexer.
+    </li>
+  </ul>
 
-           <table class="texttable" cellspacing="2" cellpadding="3">
+  <p>You can <i>view</i> your current set of permissions on the <a
+  href="authenquery?ACTION=peek_perms">View Permissions</a> page. To
+  <i>change</i> permissions, select one of the following submit
+  buttons, each of which leads you to a different page:</p>
 
-           <tbody>
+  <table class="texttable" cellspacing="2" cellpadding="3">
 
-           <tr>
-           <td colspan="3">1. You are registered in modulelist</td>
-           </tr>
+    <tbody>
 
-           <tr><td>NONE</td><td>&nbsp;</td> <td>To enter a new
-           owner or a new module status, please visit the <a
-           href="authenquery?ACTION=edit_mod">Edit Module Metadata</a>
-           page.</td></tr>
+      <tr>
+        <td colspan="3">
+          1. You are registered in modulelist
+        </td>
+      </tr>
 
+      <tr>
+        <td valign="top">$scrolling_list_1</td>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_edit_mod_2"
+                 value="Select" />
+        </td>
+        <td valign="top">
+          By clicking select you enter the <i>Edit Module Metadata</i>
+          page where you can choose a new owner or edit other module
+          status data.
+        </td>
+      </tr>
 
-           <tr><td colspan="3">2. You are primary
-           maintainer:</td></tr>
+      <tr><td colspan="3">2. You are primary maintainer:</td></tr>
 
-           <tr><td rowspan="2">NONE</td><td align="right"><input type="submit"
-           name="pause99_share_perms_movepr" value="Select" /></td>
-           <td>2.1 Pass primary maintainership status to somebody else
-           (giving it up at the same time)</td> </tr>
+      <tr>
+        <td rowspan="2">$scrolling_list_2</td>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_movepr"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">
+          2.1 Pass primary maintainership status to somebody else
+          (giving it up at the same time)
+        </td>
+      </tr>
 
-           <tr><td align="right"><input
-           type="submit" name="pause99_share_perms_remopr"
-           value="Select" /></td>
-           <td>2.2 Give up primary maintainership status (without
-           transfering it)</td>
-           </tr>
+      <tr>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_remopr"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">
+          2.2 Give up primary maintainership status (without
+          transfering it)
+        </td>
+      </tr>
 
-           <tr><td colspan="3">3. Making and breaking co-maintainers
-           (for both modulelist owners and primary maintainers):</td>
-           </tr>
+      <tr>
+        <td colspan="3">
+          3. Making and unmaking co-maintainers (for both modulelist
+          owners and primary maintainers):
+        </td>
+      </tr>
 
-           <tr><td rowspan="2">NONE</td><td align="right"><input
-           type="submit" name="pause99_share_perms_makeco"
-           value="Select" /></td> <td>3.1 Make somebody else
-           co-maintainer </td> </tr>
+      <tr>
+        <td rowspan="2">$scrolling_list_3</td>
+        <td align="right"
+            valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_makeco"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">
+          3.1 Make somebody else co-maintainer
+        </td>
+      </tr>
 
-           <tr><td align="right"><input type="submit"
-           name="pause99_share_perms_remocos" value="Select" /></td>
-           <td>3.2 Remove co-maintainer</td>
-           </tr>
+      <tr>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_remocos"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">3.2 Remove co-maintainer</td>
+      </tr>
 
-           <tr>
-           <td colspan="3">4. You are co-maintainer</td>
-           </tr>
+      <tr> <td colspan="3">4. You are co-maintainer</td> </tr>
 
-           <tr><td>NONE</td><td align="right"><input type="submit"
-           name="pause99_share_perms_remome" value="Select" /></td>
-           <td>4.1 Give up co-maintainership status</td></tr>
+      <tr>
+        <td valign="top">$scrolling_list_4</td>
+        <td align="right"
+            valign="top"><input type="submit"
+            name="weaksubmit_pause99_share_perms_remome" value="Select"
+            />
+        </td>
+        <td valign="top">
+          4.1 Give up co-maintainership status
+        </td>
+      </tr>
 
-           </tbody>
-           </table>};
+    </tbody>
+  </table>
+
+};
 
     return @m;
   }
@@ -5651,6 +5732,85 @@ sub share_perms {
   # warn "method[$method]";
   push @m, $self->$method($mgr);
   @m;
+}
+
+sub share_perms_scrl_1 {
+  my($self,$mgr,$userid) = @_;
+  my $dbh = $mgr->connect;
+  my $sql = qq{SELECT modid
+              FROM mods
+              WHERE userid=?
+              ORDER BY modid};
+  my @bind = $userid;
+  my $sth = $dbh->prepare($sql);
+  my $ret = $sth->execute(@bind);
+  my @all_mods;
+  while (my($id) = $mgr->fetchrow($sth, "fetchrow_array")) {
+    # register this mailinglist for the selectbox
+    push @all_mods, $id;
+  }
+  return "--NONE--" unless @all_mods;
+  my $all_mods = scalar @all_mods;
+  my $size = $all_mods > 8 ? 5 : $all_mods;
+  $mgr->scrolling_list(
+                       'name' => "pause99_edit_mod_3",
+                       'values' => \@all_mods,
+                       'size' => $size,
+                      );
+}
+
+sub share_perms_scrl_2 {
+  my($self,$mgr,$u) = @_;
+  my $dbh = $mgr->connect;
+
+  my $all_mods = $self->all_pmods_not_mmods($mgr,$u);
+  my @all_mods = sort keys %$all_mods;
+  my $n = scalar @all_mods;
+  return "--NONE--" unless $n;
+  my $size = $n > 8 ? 5 : $n;
+  $mgr->scrolling_list(
+                       'name' => "pause99_share_perms_pr_m",
+                       'multiple' => 1,
+                       'values' => \@all_mods,
+                       'size' => $size,
+                      );
+}
+
+sub share_perms_scrl_3 {
+  my($self,$mgr,$u) = @_;
+  my $dbh = $mgr->connect;
+
+  my $all_mods = $self->all_pmods($mgr,$u);
+  my @all_mods = sort keys %$all_mods;
+  my $n = scalar @all_mods;
+  return "--NONE--" unless $n;
+  my $size = $n > 8 ? 5 : $n;
+  # it should be sufficiently helpful to prepare only makeco_m on
+  # these two submit buttons. For 3.2 people may be a little confused
+  # but it is so rarely needed that we do not worry.
+  $mgr->scrolling_list(
+                       'name' => "pause99_share_perms_makeco_m",
+                       'multiple' => 1,
+                       'values' => \@all_mods,
+                       'size' => $size,
+                      );
+}
+
+sub share_perms_scrl_4 {
+  my($self,$mgr,$u) = @_;
+  my $dbh = $mgr->connect;
+
+  my $all_mods = $self->all_only_cmods($mgr,$u);
+  my @all_mods = sort keys %$all_mods;
+  my $n = scalar @all_mods;
+  return "--NONE--" unless $n;
+  my $size = $n > 8 ? 5 : $n;
+  $mgr->scrolling_list(
+                       'name' => "pause99_share_perms_remome_m",
+                       'multiple' => 1,
+                       'values' => \@all_mods,
+                       'size' => $size,
+                      );
 }
 
 sub share_perms_remocos {
@@ -5758,15 +5918,8 @@ sub all_comaints {
   return $result;
 }
 
-sub share_perms_remome {
-  my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
-  my(@m);
-  my $req = $mgr->{CGI};
-
-  my $u = $self->active_user_record($mgr);
-
-  my $db = $mgr->connect;
+sub all_only_cmods {
+  my($self,$mgr,$u) = @_;
   my $all_mmods = $self->all_mmods($mgr,$u);
   my $all_pmods = $self->all_pmods($mgr,$u);
   my $all_mods = $self->all_cmods($mgr,$u);
@@ -5777,6 +5930,19 @@ sub share_perms_remome {
   for my $k (keys %$all_pmods) {
     delete $all_mods->{$k};
   }
+  $all_mods;
+}
+
+sub share_perms_remome {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr = shift;
+  my(@m);
+  my $req = $mgr->{CGI};
+
+  my $u = $self->active_user_record($mgr);
+  my $db = $mgr->connect;
+
+  my $all_mods = $self->all_only_cmods($mgr,$u);
 
   if (
       $req->param("SUBMIT_pause99_share_perms_remome")
@@ -5966,12 +6132,19 @@ sub share_perms_remopr {
 
   my $all_mods = $self->all_pmods_not_mmods($mgr,$u);
 
+  if (0) {
+    # here I discovered that Apache::Request has case-insensitive keys
+    my %p = map { $_, [ $req->param($_)] } $req->param;
+    require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%p],[qw()])->Indent(1)->Useqq(1)->Dump; # XXX
+
+  }
+
   if (
       $req->param("SUBMIT_pause99_share_perms_remopr")
      ) {
     eval {
       my(@selmods);
-      if (@selmods = $req->param("pause99_share_perms_remopr_m")
+      if (@selmods = $req->param("pause99_share_perms_pr_m")
          ) {
         local($db->{RaiseError}) = 0;
         my $sth = $db->prepare("DELETE FROM primeur WHERE userid=? AND package=?");
@@ -6021,10 +6194,10 @@ sub share_perms_remopr {
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
   if (@all_mods == 1) {
-    $req->param("pause99_share_perms_remopr_m",$all_mods[0]);
+    $req->param("pause99_share_perms_pr_m",$all_mods[0]);
   }
   push @m, $mgr->scrolling_list(
-				'name' => "pause99_share_perms_remopr_m",
+				'name' => "pause99_share_perms_pr_m",
                                 'multiple' => 1,
 				'values' => \@all_mods,
 				'size' => $size,
@@ -6053,7 +6226,7 @@ sub share_perms_movepr {
      ) {
     eval {
       my(@selmods,$other_user);
-      if (@selmods = $req->param("pause99_share_perms_movepr_m")
+      if (@selmods = $req->param("pause99_share_perms_pr_m")
           and
           $other_user = $req->param("pause99_share_perms_movepr_a")
          ) {
@@ -6121,10 +6294,10 @@ sub share_perms_movepr {
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
   if (@all_mods == 1) {
-    $req->param("pause99_share_perms_movepr_m",$all_mods[0]);
+    $req->param("pause99_share_perms_pr_m",$all_mods[0]);
   }
   push @m, $mgr->scrolling_list(
-				'name' => "pause99_share_perms_movepr_m",
+				'name' => "pause99_share_perms_pr_m",
                                 'multiple' => 1,
 				'values' => \@all_mods,
 				'size' => $size,
