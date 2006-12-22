@@ -24,13 +24,14 @@ sub parameter {
   my($param,@allow_submit,%allow_action);
 
   # What is allowed here is allowed to anybody
-  @allow_action{"who_is",
-                "pause_04about",
-                "pause_04imprint",
+  @allow_action{
+    "who_is",
+        "pause_04about",
+            "pause_04imprint",
                 "pause_06history",
-                "request_id",
-                "pause_05news",
-              } = ();
+                    "request_id",
+                        "pause_05news",
+                      } = ();
 
   @allow_submit = (
                    "request_id",
@@ -54,6 +55,7 @@ sub parameter {
                      "reindex",
                      "reset_version",
                      "share_perms",
+                     "show_files",
                      "tail_logfile",
 		    ) {
       $allow_action{$command} = undef;
@@ -2064,7 +2066,7 @@ glory is collected on http://history.perl.org/backpan/});
     my $blurb = $deletes{$f} ?
 	$self->scheduled($whendele{$f}) :
 	    HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = sprintf " %-30s %7d  %s", $f, -s _, $blurb;
+    $files{$f} = sprintf " %-50s %7d  %s", $f, -s _, $blurb;
   }
 
   chdir $cwd or die;
@@ -2080,6 +2082,76 @@ glory is collected on http://history.perl.org/backpan/});
   push @m, $field;
   push @m, "</pre>";
   push @m, $submit_butts;
+
+  @m;
+}
+
+sub show_files {
+  my pause_1999::edit $self = shift;
+  my pause_1999::main $mgr = shift;
+  my $req = $mgr->{CGI};
+  my $r = $mgr->{R};
+  my @m;
+  my $u = $self->active_user_record($mgr);
+  $mgr->prefer_post(1);
+  require ExtUtils::Manifest;
+  require HTTP::Date;
+  my $dbh = $mgr->connect;
+  local($dbh->{RaiseError}) = 0;
+  my $userhome = PAUSE::user2dir($u->{userid});
+  push @m, qq{<h3>Files in directory authors/id/$userhome</h3>};
+  require Cwd;
+  my $cwd = Cwd::cwd();
+
+  if (chdir "$PAUSE::Config->{MLROOT}/$userhome"){
+    warn "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] E:M:V[$ExtUtils::Manifest::VERSION]";
+  } else {
+    # QUICK DEPARTURE
+    push @m, qq{No files found in authors/id/$userhome};
+    return @m;
+  }
+
+  my $time = time;
+
+  push @m, "<pre>";
+
+  my %files = $self->manifind;
+
+  my(%deletes,%whendele,$sth);
+  if (
+      $sth = $dbh->prepare(qq{SELECT deleteid, changed
+                              FROM deletes
+                              WHERE deleteid
+                              LIKE '$userhome/%'})
+      and
+      $sth->execute
+      and
+      $sth->rows
+     ) {
+    my $dhash;
+    while ($dhash = $mgr->fetchrow($sth, "fetchrow_hashref")) {
+      $dhash->{deleteid} =~ s/\Q$userhome\E\///;
+      $deletes{$dhash->{deleteid}}++;
+      $whendele{$dhash->{deleteid}} = $dhash->{changed};
+    }
+  }
+  $sth->finish if ref $sth;
+
+  require HTTP::Date;
+  foreach my $f (sort keys %files) {
+    unless (stat $f) {
+      warn "ALERT: Could not stat f[$f]: $!";
+      next;
+    }
+    my $blurb = $deletes{$f} ?
+	$self->scheduled($whendele{$f}) :
+	    HTTP::Date::time2str((stat _)[9]);
+    push @m, sprintf " %-50s %7d  %s<br/>", $f, -s _, $blurb;
+  }
+
+  chdir $cwd or die;
+
+  push @m, "</pre>";
 
   @m;
 }

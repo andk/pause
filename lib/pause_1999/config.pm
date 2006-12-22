@@ -120,10 +120,18 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
 			 PAUSE.",
 
                       },
+           show_files => {
+                       verb => "Show my files",
+                       priv => "user",
+                       cat => "User/01Files/02show",
+
+                       desc => "find . -ls resemblance",
+
+                      },
            edit_uris => {
                          verb => "Repair a Pending Upload",
                          priv => "user",
-                         cat => "User/01Files/02rep",
+                         cat => "User/01Files/03rep",
 
                          desc => "When an upload you requested hangs
 			   for some reason, you can go here and edit
@@ -133,7 +141,7 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
            delete_files => {
                             verb => "Delete Files",
                             priv => "user",
-                            cat => "User/01Files/03del",
+                            cat => "User/01Files/04del",
 
                             desc => "Schedule files for deletion.
 			      There is a delay until the deletion
