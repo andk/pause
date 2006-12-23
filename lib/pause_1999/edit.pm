@@ -835,15 +835,29 @@ sub select_user {
                                 %{$user_meta{userid}{args}},
 			       );
   push @m, qq{\n<br />\n};
+  my $action_map = $self->_action_map_to_verb($mgr,$mgr->{AllowAdminTakeover});
   push @m, $mgr->scrolling_list(
 				'name' => 'ACTIONREQ',
 				values => $mgr->{AllowAdminTakeover},
+                                labels => $action_map,
 				default => ['edit_cred'],
 				size => 13,
 			       );
   push @m, qq{\n<br />\n};
   push @m, qq{<input type="submit" name="pause99_select_user_sub" value="Submit" />};
   @m;
+}
+
+sub _action_map_to_verb {
+  my($self,$mgr,$actions) = @_;
+  my %action_map = map { $_, $_ } @$actions;
+  while (my($k,$v) = each %{$mgr->{ActionTuning}}) {
+    next unless exists $action_map{$k};
+    for ($mgr->{ActionTuning}{$k}{verb}) {
+      $action_map{$k} = $_ if $_;
+    }
+  }
+  \%action_map;
 }
 
 =head2 select_ml_action
@@ -907,19 +921,22 @@ sub select_ml_action {
   while (my @row = $mgr->fetchrow($sth, "fetchrow_array")) {
     $u{$row[0]} = $row[0];
   }
-  my $size = $sth->rows > 8 ? 5 : $sth->rows;
+  my $size1 = $sth->rows > 8 ? 5 : $sth->rows;
+  my $size2 = scalar @{$mgr->{AllowMlreprTakeover}} > 8 ? 5 : scalar @{$mgr->{AllowMlreprTakeover}};
+  my($action_map) = $self->_action_map_to_verb($mgr,$mgr->{AllowMlreprTakeover});
   push @m, $mgr->scrolling_list(
 				'name'     =>'HIDDENNAME',
 				'values' => [sort {lc($u{$a}) cmp lc($u{$b})} keys %u],
 				default  => [$mgr->{User}{userid}],
-				size     => 1,
+				size     => $size1,
 				labels   => \%u,
 			       );
   push @m, $mgr->scrolling_list(
 				'name' => 'ACTIONREQ',
 				values => $mgr->{AllowMlreprTakeover},
+                                labels => $action_map,
 				default => ['edit_ml'],
-				size => $size,
+				size => $size2,
 			       );
   push @m, qq{<input type="submit"
  name="pause99_select_ml_action_sub" value="Submit" />};
