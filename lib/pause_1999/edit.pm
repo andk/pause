@@ -3308,8 +3308,12 @@ sub edit_mod {
             <p>The select box shows all the modules that have been
             registered for user <b>$u->{userid}</b> officially via
             modules\@perl.org, i.e. that are included (or about to be
-            included) in the module list. If you are missing certain
-            pieces, please let modules\@perl.org know, see <a href=
+            included) in the module list.</p><p>If you are missing a
+            module of yours, maybe you have never registered it?
+            Consider registering and visit the <a
+            href="?ACTION=apply_mod">Register Namespace page</a>. If
+            you are missing certain other pieces, please let
+            modules\@perl.org know, see <a href=
             "http://www.cpan.org/modules/04pause.html">modules/04pause.html
             on CPAN</a> for details.</p><p>You can edit the infos
             stored in the database on this page. The changes you make
