@@ -92,7 +92,7 @@ resulting email traffic will run through modules@perl.org and will be
 archived at <a
 href="http://www.xray.mpe.mpg.de/mailing-lists/modules">http://www.xray.mpe.mpg.de/mailing-lists/modules</a>.
 modules@perl.org isn't a mailing list, just an alias for the
-maintainers of the Perl 5 modules list. Please do not try to
+maintainers of the Perl 5 modules database. Please do not try to
 subscribe. Visit the archive instead.</p>
 
 <h3><a id="menu" name="menu"></a>Visit PAUSE</h3>
@@ -117,11 +117,12 @@ mention either your userid or the name you used when you registered.</p>
 
 <h3><a id="duties" name="duties">Your duties, the basics, traps</a></h3>
 
-We trust that you have read the module list top down and bottom up and
-back again and that you regularly check out uploads to CPAN and that
-you have been watching CPAN activities for a while to have an
-impression of how things fit together. It usually boils down to
-(slogan shamelessly stolen and adapted from sudo(1)):
+We trust that you have read the <code>perlmodinstall</code>,
+<code>perlmodlib</code>, <code>perlmodstyle</code>, and
+<code>perlnewmod</code> manpages and that you regularly check out
+uploads to CPAN and that you have been watching CPAN activities for a
+while to have an impression of how things fit together. It usually
+boils down to (slogan shamelessly stolen and adapted from sudo(1)):
 
 <ol>
   <li> Think, better even <b>talk</b> before you upload</li>
@@ -137,20 +138,19 @@ module. Usually it's not considered the perl way to have bureaucratic
 conventions, but when it comes to namespace pollution, there is the
 need of coordination. Just like the InterNIC has to care for unique
 names for internet hosts, somebody has to (sort of) guarantee
-uniqueness, consistency, and sanity of module names. The <a
-href="00modlist.long.html">modulelist</a> is the place where all
-currently registered module names can be found and the email address
+uniqueness, consistency, and sanity of module names. <a
+href="http://search.cpan.org/">search.cpan.org</a> is the place where
+all currently uploaded modules can be found and the email address
 <b>modules@perl.org</b> is an alias for a hand full of experienced
-volunteers who maintain the module list and--time permitting--try to
-give advice for the appropriate namespace for your modules.</p>
+volunteers who try to give advice for the appropriate namespace for
+your modules.</p>
 
 <p>Please consider the namespace you're going to occupy with all due
-sensitivity. Discuss it in the appropriate fora. Read what the <a
-href="00modlist.long.html#2)Guidelinesfor">modulelist</a> has to say
-about this. Pay special attention to the hints about <i>cutesy
-names</i>. Reading these sections carefully will help you and us to
-greatly improve the usefulness of the CPAN and avoid cumbersome
-renaming at a later date.</p>
+sensitivity. Discuss it in the appropriate fora. Read what the
+<code>perlmodlib</code> manpage has to say about this. Reading these
+sections carefully will help you and us to greatly improve the
+usefulness of the CPAN and avoid cumbersome renaming at a later
+date.</p>
 
 <blockquote> Also: think carefully and honestly whether your module
 would be better off if it were integrated as an option into an already
@@ -173,11 +173,7 @@ list. Please do not try to subscribe. We do not want to establish yet
 another perl mailing list. If we encounter hot topics, we move the
 discussion to the appropriate mailing lists. The traffic on
 <b>modules@perl.org</b> is archived at <a
-href="http://www.xray.mpe.mpg.de/mailing-lists/modules/">http://www.xray.mpe.mpg.de/mailing-lists/modules/</a>.
-The module list maintainers themselves are mostly
-lurkers. You need not wait for a response. Generally a lack of
-response can be taken as acceptance of the module name being
-proposed.</p>
+href="http://www.xray.mpe.mpg.de/mailing-lists/modules/">http://www.xray.mpe.mpg.de/mailing-lists/modules/</a>.</p>
 
 <p>When you're done with all your preparations, considerations, and
 investigations, visit the PAUSE and fill in the form for a new module
@@ -196,7 +192,7 @@ if the module names that are used in the uploaded packages are
 registered. The indexer unwraps all packages and scans the source code
 (namely all <code>*.pm</code> files) for package declarations. You run
 the <b>risk of being ignored</b> by the index generator if you do not
-talk to the modulelist maintainers about the namespace you are
+talk to the PAUSE maintainers about the namespace you are
 using.</p>
 
 <h3><a id="conventions" name="conventions">Other conventions you
@@ -243,7 +239,7 @@ package namespace by more than one author.</p>
 
 <p>Be prepared that very soon after your upload your module will be
 tested on dozens of architectures by the never tired <a
-href="http://testers.cpan.org/">cpan-testers</a>.
+href="http://cpantesters.perl.org/">cpantesters</a>.
 This helpful lot will send their findings to their mailing list and
 collect the results in a database. If they find problems, they try to
 diagnose or even solve them and inform you about their findings. So be
@@ -266,95 +262,50 @@ your editor.</p>
 
 <h3><a id="services" name="services"></a>Related services on PAUSE</h3>
 
-<p>The interdependence between metadata generators, metadata files,
-database tables, and human intervention are as follows:</p>
+<p>
+  Two documents are available about authors. <a
+  href="../authors/00whois.html">00whois.html</a> is a list of
+  authors, mailing lists and mailing list archives in HTML format,
+</p>
 
-<table border="1">
-<tr><td colspan="12" align="center">
-<h3>Modulelist Maintainance</h3>
+<p>
+  And <a href="../authors/01mailrc.txt.gz">01mailrc.txt.gz</a> is a
+  smaller list intended to be used as a .mailrc file. Both files are
+  maintained automatically.
+</p>
 
-The <a href="#namespace">above</a> described <a
-href="00modlist.long.html">Module List</a> is the heart. It is
-maintained manually and all modules listed there have to go through
-the <a href="#namespace">standard approval procedure</a>.
+<p>
+  When new files arrive on the PAUSE, an Upload Scanner program scans
+  the new files and categorizes them according to their contents. It
+  tries to detect namespace clashes and to keep track of version
+  numbers.
+</p>
 
-</td></tr>
-<tr>
-<td colspan="5" align="center">
+<p>
+  The document <a href="01modules.index.html">01modules.index.html</a>
+  lists only the most recent distribution files that contain the
+  latest of any given module that is available on CPAN. A second
+  version of this document is also available that is <a
+  href="01modules.mtime.html">sorted by modification date</a>. Both
+  are maintained by the scanner automatically.
+</p>
 
-On a more or less regular basis, the Module List in <a
-href="00modlist.long.html">HTML</a> and <a
-href="00modlist.long.txt.gz">TXT</a> format and a <a
-href="03modlist.data.gz">machine readable representation</a> are
-uploaded to CPAN.
+<p>
+  The listing <a
+  href="02packages.details.txt.gz">02packages.details.txt</a> is also
+  produced automatically. It is intended for programs but sometimes is
+  a valuable information for humans too. It simply lists the current
+  version number and the distribution file for all packages found on
+  CPAN.
+</p>
 
-</td>
-<td colspan="7" align="center">
-
-Jon Orwant is on the board of the module list maintainance group. He's
-maintaining a document with a different, considerably more verbose
-view on the evolving modules scene, <a
-href="../CPAN.html">CPAN.html</a>.
-
-</td>
-</tr>
-<tr><td colspan="12" align="center">
-<h3>Authors Registration</h3>
-
-The maintainers of the Module List do not only register modules'
-namespaces, they also register new authors and assign them a password
-that enables them to upload to the CPAN.
-
-</td></tr>
-<tr>
-<td colspan="6" align="center">
-
-Two documents are available about authors. <a
-href="../authors/00whois.html">00whois.html</a> is a list of authors,
-mailing lists and mailing list archives in HTML format,
-
-</td>
-
-<td colspan="6" align="center">
-and <a
-href="../authors/01mailrc.txt.gz">01mailrc.txt.gz</a> is a smaller
-list intended to be used as a .mailrc file. Both files are maintained
-automatically.
-
-</td>
-</tr>
-<tr><td colspan="12" align="center">
-<h3>Upload Scanner</h3>
-
-When new files arrive on the PAUSE, an Upload Scanner program scans
-the new files and categorizes them according to their contents. It
-tries to detect namespace clashes and to keep track of version
-numbers.
-
-</td></tr>
-<tr>
-<td colspan="4" align="center">
-
-The document <a href="01modules.index.html">01modules.index.html</a>
-lists only the most recent distribution files that contain the latest
-of any given module that is available on CPAN. A second version of
-this document is also available that is <a
-href="01modules.mtime.html">sorted by modification date</a>. Both are
-maintained by the scanner automatically.
-
-</td> <td colspan="4" align="center">The listing <a
-href="02packages.details.txt.gz">02packages.details.txt</a> is also
-produced automatically. It is intended for programs but sometimes is a
-valuable information for humans too. It simply lists the current
-version number and the distribution file for all packages found on
-CPAN.
-
-</td> <td colspan="4" align="center">There are also two symlink trees of
-modules maintained automatically. One is based on the basenames of the
-packages involved: <a href="by-module">by-module</a> and the other one
-devides the modules by the chapters of the Module List: <a
-href="by-category">by-category</a>. </td> </tr> </table>
-
+<p>
+  There are also two symlink trees of modules maintained
+  automatically. One is based on the basenames of the packages
+  involved: <a href="by-module">by-module</a> and the other one
+  devides the modules by the chapters of the Module List: <a
+  href="by-category">by-category</a>.
+</p>
 
 <h3><a id="ssl" name="ssl"></a>SSL support on PAUSE</h3>
 
@@ -375,7 +326,7 @@ The fingerprint of the self-signed certificate that expires on
 
 <h3><a id="other" name="other"></a>Other useful links</h3>
 
-<p>You have forgotten how your supposed to package your software?
+<p>You have forgotten how you're supposed to package your software?
 Maybe <a href="http://search.cpan.org/perldoc?perlnewmod">the
 perlnewmod manpage</a> can help you. You wanted to ask questions about
 authoring? Maybe the <a
@@ -403,7 +354,7 @@ Also a lot of work is done by the mirror program by Lee McLoughlin,
 available from the CPAN scripts/ftpstuff directory.</p>
 
 <p>The PAUSE source code is kept in a subversion repository at <a
-href="http://pause.perl.org:5459/svn/pause/trunk">http://pause.perl.org:5459/svn/pause/trunk</a>.
+href="https://pause.perl.org:5460/svn/pause/trunk">https://pause.perl.org:5460/svn/pause/trunk</a>.
 If you do not have a subversion client, a tarball of the repository is
 produced by a cronjob and accessible in the directory <a
 href="ftp://pause.perl.org/pub/PAUSE/PAUSE-code/">ftp://pause.perl.org/pub/PAUSE/PAUSE-code/</a>.
