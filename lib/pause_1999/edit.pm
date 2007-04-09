@@ -2983,6 +2983,7 @@ sub mailpw {
       } else {
         $me = $myurl->as_string;
       }
+      $me =~ s/^http:/https:/; # do not blindly inherit the schema
       my $mailblurb = qq{
 
 (this an automatic mail sent by a program because somebody asked for
