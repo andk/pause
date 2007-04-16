@@ -7,7 +7,7 @@ package=defaults
         mode_copy=false
 	dir_mode=0755
 	do_deletes=true
-	exclude_patt=(^|/)(\.mirror|core$|\.cap|\.in\..*\.$|MIRROR.LOG|#.*#|\.FSP|\.cache|\.zipped|\.notar|\.message|lost+found/|\ )
+	exclude_patt=(^|/)(\.mirror|core$|\.cap|\.in\..*\.$|MIRROR.LOG|#.*#|\.FSP|\.cache|\.zipped|\.notar|\.message|lost+found/|.*[~ ])
 	file_mode=0644
 #	follow_local_symlinks=.
 # from jost krieger:
