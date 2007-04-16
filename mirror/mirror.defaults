@@ -1,4 +1,3 @@
-#$Id: mirror.defaults,v 1.4 1997/12/17 20:07:51 k Exp k $
 
 package=defaults
 	compress_excl+|\.sig|\.html$|^\.notar$|-z|\.tgz$|\.taz$|\.tar.Z|\.arc$|\.zip$|\.lzh$|\.zoo$|\.exe$|\.lha$|\.zom$|\.gif$|\.jpeg$|\.jpg$|\.mpeg$|\.au$|read.*me|index|\.message|info|faq|gzip|compress|\.png$|(^|/)\.\.?$
