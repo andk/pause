@@ -1364,7 +1364,7 @@ sub mlroot {
             unless ($skip) {
                 $skip = 1 unless $self->untar;
             }
-        } else {                # ! isa_perl
+        } else {                # ! isa_regular_perl
             if (
                 $dist =~ /\d\.\d+_\d/
                 ||

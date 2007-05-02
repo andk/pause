@@ -535,6 +535,28 @@ sub is_valid {
     $self->logge("Debug: dir[$dir] of uriid[$uriid] seems to contain illegal characters");
     return;
   }
+  our $REJECT_FILES_MATCH = qr/^perl-[\d._-]*\.(tar[._-](gz|bz2)|tbz|tgz|zip)$/;
+  # /^perl-[0-9._-]+.t(ar[._-])?(gz|bz2?)$/
+  if ($basename =~ /$REJECT_FILES_MATCH/) {
+    my($u) = PAUSE::dir2user($uriid); # =~ /([A-Z][^\/]+)/; # XXX dist2user
+    my $adbh = DBI->connect(
+                            $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
+                            $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
+                            $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
+                           ) or die $DBI::errstr;
+    my $query = "SELECT * FROM grouptable
+                   WHERE user= ?
+                     AND ugroup='pumpking'";
+    my $sth = $adbh->prepare($query);
+    $sth->execute($u);
+    my $allowed;
+    if ($sth->rows > 0){
+      $allowed = 1;
+    }
+    $sth->finish;
+    $adbh->disconnect;
+    return unless $allowed;
+  }
   return 1;
 }
 
