@@ -1984,8 +1984,8 @@ Please contact modules\@perl.org if there are any open questions.
          EMISSPERM() => "Permission missing",
          EDUALOLDER() => "An older dual-life module stays reference",
          EDUALYOUNGER() => "Dual-life module stays reference",
-         EVERFALLING() => "Falling version number",
-         EMTIMEFALLING() => "Falling mtime on a file (category to be deprecated)",
+         EVERFALLING() => "Decreasing version number",
+         EMTIMEFALLING() => "Decreasing mtime on a file (category to be deprecated)",
          EOLDRELEASE() => "Release seems outdated",
          EPARSEVERSION() => "Version parsing problem",
          EOPENFILE() => "Problem while reading the distribtion",
@@ -2969,7 +2969,7 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                                     qq{Not indexed because $ofile in $odist
 has a higher version number ($oldversion)},
                                    );
-                $self->alert(qq{falling VERSION number [$pp->{version}]
+                $self->alert(qq{decreasing VERSION number [$pp->{version}]
  in package[$package]
  dist[$dist]
  oldversion[$oldversion]
