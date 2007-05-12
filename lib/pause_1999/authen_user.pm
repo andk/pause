@@ -19,7 +19,7 @@ user record early and this seems an appropriate place.
 
 sub header {
   my pause_1999::authen_user $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $r = $mgr->{R};
   if (my $u = $r->connection->user) {
 

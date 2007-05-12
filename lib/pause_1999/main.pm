@@ -193,7 +193,7 @@ sub layout {
 #
 
 sub can_gzip {
-  my Apache::HeavyCGI $self = shift;
+  my $self = shift;
   my $r = $self->{R};
   my $remote = $r->get_remote_host;
   # Just for debugging, because Netscape doesn't show source on gzipped pages
@@ -204,7 +204,7 @@ sub can_gzip {
 }
 
 sub can_utf8 {
-  my Apache::HeavyCGI $self = shift;
+  my $self = shift;
   return $self->{CAN_UTF8} if defined $self->{CAN_UTF8};
 
   # From chapter 14.2. HTTP/1.1
@@ -313,7 +313,7 @@ sub authen_connect {
 # 2002-06-08: Discovering that HeavyCGI gets https wrong. Retrying to
 # reanimate Apache::URI now.
 sub myurl {
-  my Apache::HeavyCGI $self = shift;
+  my $self = shift;
   return $self->{MYURL} if defined $self->{MYURL};
   use Apache::URI;
   use URI::URL;
@@ -335,11 +335,12 @@ sub myurl {
 
   my $Hhostname = $r->headers_in->get('Host');
   my $hostname = $uri->hostname();
-  # warn "hostname[$hostname]Hhostname[$Hhostname]";
+  warn "hostname[$hostname]Hhostname[$Hhostname]";
   # $uri->hostname($Hhostname); # contains :8443!!!!!
 
   my $rpath = $uri->rpath;
   $uri->path($rpath);
+  warn "DEBUG: uri[$uri]";
 
   # my $port = $r->server->port || 80;
   # my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";

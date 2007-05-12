@@ -44,7 +44,7 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
 
     return Apache::Constants::OK;
   }
-  my pause_1999::main $self = pause_1999::main->
+  my $self = pause_1999::main->
       new(
 
           DownTime => $downtime,

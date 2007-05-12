@@ -29,7 +29,10 @@ sub as_string {
     $enctype = "application/x-www-form-urlencoded";
     $method = "get";
   }
-  # warn "me[$me]enctype[$enctype]method[$method]";
+  if ($PAUSE::Config->{TESTHOST}) {
+    warn "DEBUG: me[$me]enctype[$enctype]method[$method]";
+    push @m, qq{<h2>[ATTN: Form going to post to $me]</h2>};
+  }
   push @m, qq{<form
  action="$me"
  enctype="$enctype"

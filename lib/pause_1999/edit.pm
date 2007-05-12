@@ -19,7 +19,7 @@ our $strict_chapterid = 1;
 
 sub parameter {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my($param,@allow_submit,%allow_action);
 
@@ -247,7 +247,7 @@ sub menu {
 
 sub as_string {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my @m;
   warn "mgr->Action undef" unless defined $mgr->{Action};
   my $action;
@@ -318,7 +318,7 @@ of a mailing list.
 
 sub active_user_record {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my $hidden_user = shift || $req->param('HIDDENNAME') || "";
@@ -452,7 +452,7 @@ sub active_user_record {
 
 sub edit_cred {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my($u,$nu); # user, newuser
   my @m = "\n";
@@ -814,7 +814,7 @@ The Pause
 
 sub select_user {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   if (my $action = $req->param("ACTIONREQ")) {
     if (
@@ -869,7 +869,7 @@ should be.
 
 sub select_ml_action {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $dbh = $mgr->connect;
   if (my $action = $req->param("ACTIONREQ")) {
@@ -945,13 +945,13 @@ sub select_ml_action {
 
 sub pause_04about {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   $self->show_document($mgr,"04pause.html",1);
 }
 
 sub pause_logout {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $x = $self->show_document($mgr,"logout.html");
   my $rand = rand 1;
   # the redirect solutions fail miserably the second time when tried
@@ -962,25 +962,25 @@ sub pause_logout {
 
 sub pause_04imprint {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   $self->show_document($mgr,"imprint.html");
 }
 
 sub pause_05news {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   $self->show_document($mgr,"index.html");
 }
 
 sub pause_06history {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   $self->show_document($mgr,"history.html");
 }
 
 sub show_document {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $doc = shift || "04pause.html";
   my $rewrite = shift || 0;
   my $r = $mgr->{R};
@@ -1030,7 +1030,7 @@ sub show_document {
 
 sub tail_logfile {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $cgi = $mgr->{CGI};
   my $tail = $cgi->param("pause99_tail_logfile_1") || 5000;
   my($file) = $PAUSE::Config->{PAUSE_LOG};
@@ -1057,7 +1057,7 @@ sub tail_logfile {
 
 sub who_is {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $dbh = $mgr->connect;
   my @m;
@@ -1149,7 +1149,7 @@ sub randchar ($) {
 
 sub change_passwd {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   $mgr->prefer_post(1);
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
@@ -1291,7 +1291,7 @@ The Pause
 
 sub add_uri {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
@@ -1933,7 +1933,7 @@ sub wrappar {
 
 sub delete_files {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my @m;
@@ -2105,7 +2105,7 @@ glory is collected on http://history.perl.org/backpan/});
 
 sub show_files {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my @m;
@@ -2211,7 +2211,7 @@ sub add_user_doit {
                     VALUES (
                      ?,          ?,        ?,         ?,
                      ?,        ?,          ?,        ?)};
-    @qbind = ($userid,$email,$homepage,$fullname,"",$T,$T,$mgr->{User}{userid});
+    @qbind = ($userid,"CENSORED",$homepage,$fullname,"",$T,$T,$mgr->{User}{userid});
   }
 
   # We have a query for INSERT INTO users
@@ -2275,16 +2275,17 @@ Description: };
         my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
                        $PAUSE::Config->{AUTHEN_USER_FLD},
                         $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
-                         forcechange,
-                          changed,
-                           changedby
+                         secretemail,
+                          forcechange,
+                           changed,
+                            changedby
                        ) VALUES (
-                       ?,?,?,?,?
+                       ?,?,?,?,?,?
                        )};
         my $pwenc = crypt($onetime,salt());
         my $dbh = $mgr->authen_connect;
         local($dbh->{RaiseError}) = 0;
-        my $rc = $dbh->do($sql,undef,$userid,$pwenc,1,time,$mgr->{User}{userid});
+        my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
         die Apache::HeavyCGI::Exception
             ->new(ERROR =>
                   [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
@@ -2410,7 +2411,7 @@ Subject: $subject\n};
 
 sub add_user {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my @m;
@@ -2617,7 +2618,7 @@ sub add_user {
 
 sub usertable {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $userid = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
@@ -2641,7 +2642,7 @@ sub usertable {
 
 sub request_id {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr  = shift;
+  my $mgr  = shift;
 
   my(@m);
 
@@ -2869,7 +2870,7 @@ $blurbcopy
 
 sub mailpw {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m,$param,$email);
   my $req = $mgr->{CGI};
 
@@ -3051,7 +3052,7 @@ will be mailed to that userid.</p>
 sub edit_ml {
   my pause_1999::edit $self = shift;
 
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   push @m, q{
 Excerpt from a mail:<pre>
@@ -3277,7 +3278,7 @@ things didn't proceed as expected.</p>";
 
 sub edit_mod {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
   my $selectedid = "";
@@ -3646,7 +3647,7 @@ $Yours};
 }
 sub edit_uris {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
   my $selectedid = "";
@@ -3870,7 +3871,7 @@ $Yours};
 
 sub show_ml_repr {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $dbh = $mgr->connect;
   my $sth = $dbh->prepare("SELECT * FROM list2user");
@@ -3900,7 +3901,7 @@ sub show_ml_repr {
 
 sub add_mod {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
@@ -4371,7 +4372,7 @@ $blurbcopy
 
 sub apply_mod {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   $mgr->prefer_post(1);
   my(@m);
   my $req = $mgr->{CGI};
@@ -4940,7 +4941,7 @@ a  - abandoned; volunteers welcome to take over maintainance<br/>
 
 sub chap_meta {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $dbh = $mgr->connect;
   my $sth3  = $dbh->prepare("SELECT chapterid, shorttitle
                              FROM   chapters");
@@ -5028,7 +5029,7 @@ $a und $b passieren.
 
 sub user_meta {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $dbh = $mgr->connect;
   my $sql = qq{SELECT userid, fullname, isa_list, asciiname
                FROM users};
@@ -5175,7 +5176,7 @@ sub user_meta {
 
 sub check_xhtml {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my @m;
   my $dir = "/var/run/httpd/deadmeat";
@@ -5215,7 +5216,7 @@ sub check_xhtml {
 
 sub index_users {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   push @m, "NOT YET";
   my $db = $mgr->connect;
@@ -5290,7 +5291,7 @@ sub WAIT::Filter::pause99_edit_users_utflc_20010505 {
 
 sub peek_perms {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $cgi = $mgr->{CGI};
 
   my @m;
@@ -5458,7 +5459,7 @@ sub peek_perms {
 
 sub reindex {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my @m;
@@ -5649,7 +5650,7 @@ Estimated time of job completion: %s
 
 sub share_perms {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
 
@@ -5909,7 +5910,7 @@ sub share_perms_scrl_4 {
 
 sub share_perms_remocos {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
 
@@ -5995,7 +5996,7 @@ sub share_perms_remocos {
 
 sub all_comaints {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $all_mods = shift;
   my $u = shift;
   my $result = {};
@@ -6029,7 +6030,7 @@ sub all_only_cmods {
 
 sub share_perms_remome {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
 
@@ -6107,7 +6108,7 @@ sub share_perms_remome {
 
 sub share_perms_makeco {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
 
@@ -6216,7 +6217,7 @@ sub share_perms_makeco {
 
 sub share_perms_remopr {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
 
@@ -6305,7 +6306,7 @@ sub share_perms_remopr {
 
 sub share_perms_movepr {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my(@m);
   my $req = $mgr->{CGI};
 
@@ -6695,7 +6696,7 @@ sub post_message {
 
 sub reset_version {
   my pause_1999::edit $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my @m;
