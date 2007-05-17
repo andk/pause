@@ -195,6 +195,31 @@ the <b>risk of being ignored</b> by the index generator if you do not
 talk to the PAUSE maintainers about the namespace you are
 using.</p>
 
+<p>A frequent cause for confusion is the relation between CPAN itself
+and search.cpan.org. The PAUSE/CPAN indexer produces the files</p>
+
+<pre>
+  authors/00whois.html
+  authors/00whois.xml
+  authors/01mailrc.txt.gz
+  modules/02packages.details.txt.gz
+  modules/03modlist.data.gz
+</pre>
+
+<p>These are the ones CPAN{,PLUS}.pm are using to make their download
+decisions.</p>
+
+<p><a href="http://search.cpan.org">search.cpan.org</a> has its own
+indexer which has to satisfy other demands. It is based on the
+PAUSE/CPAN indexes but it is being changed more often because of the
+specific needs search.cpan.org has.</p>
+
+<p>Questions regarding the PAUSE/CPAN indexer should be sent to
+modules@perl.org. The feedback addresses for issues with
+search.cpan.org are given at <a
+href="http://search.cpan.org/">search.cpan.org</a>. Click the
+<i>feedback</i> link there.</p>
+
 <h3><a id="conventions" name="conventions">Other conventions you
 should know about</a></h3>
 
