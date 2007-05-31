@@ -2221,7 +2221,11 @@ Please contact modules\@perl.org if there are any open questions.
                 next PLINE unless $pkg =~ /^[A-Za-z]/;
                 next PLINE unless $pkg =~ /\w$/;
                 next PLINE if $pkg eq "main";
-                next PLINE if length($pkg) > 64; #64 database
+                # Perl::Critic::Policy::TestingAndDebugging::ProhibitShebangWarningsArg
+                # database for modid in mods, package in packages, package in perms
+                # alter table mods modify modid varchar(128) binary NOT NULL default '';
+                # alter table packages modify package varchar(128) binary NOT NULL default '';
+                next PLINE if length($pkg) > 128;
                 #restriction
                 $ppp->{$pkg}{parsed}++;
                 $ppp->{$pkg}{infile} = $pmfile;
@@ -2264,7 +2268,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $ppp->{$pkg}{filemtime} = $filemtime;
                 $ppp->{$pkg}{pause_reg} = time;
             } else {
-                $self->verbose(2,"no pkg found");
+                # $self->verbose(2,"no pkg found");
             }
         }
 
@@ -2458,7 +2462,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($self,$v) = @_;
         $v = "undef" unless defined $v;
         my $dv = Dumpvalue->new;
-        my $sdv = $dv->stringify($v);
+        my $sdv = $dv->stringify($v,1); # second argument prevents ticks
         $self->verbose(1,"sdv[$sdv]\n");
 
         return $v if $v eq "undef";
@@ -2804,7 +2808,6 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                                     qq{The PAUSE indexer was not able to
              read the file. It issued the following error: C< $err->{openerr} >},
                                    );
-
             } else {
                 $self->index_status($package,
                                     "undef",
