@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-# $HeadURL: https://pause.perl.org:5460/svn/pause/trunk/etc/csync2.cfg $
-# $Id: csync2.cfg 754 2006-04-23 10:14:58Z k $
+# $HeadURL$
+# $Id$
 
 use strict;
 use warnings;
