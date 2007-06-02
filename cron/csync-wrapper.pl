@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# $HeadURL$
+# $Id$
+
 # prevent running more than N processes and log with timestamp and $$ interleaved
 
 # other jobs care for the hints and the collection of dirty files,
