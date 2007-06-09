@@ -38,15 +38,12 @@ GetOptions(\%Opt,
            "G=s",
           );
 $Opt{update}++ unless %Opt;
-$Opt{G} ||= "pause_perl_org";
-
-my $csync_command =
-    q(/usr/sbin/csync2 -B -v -G $Opt{G} -N pause.perl.org);
 
 sub timestamp ();
 sub logger ($);
 sub csync_processes ();
 
+my $ccappend;
 if (0) {
 } elsif ($Opt{update}) {
   my $cp = csync_processes;
@@ -54,15 +51,22 @@ if (0) {
     logger "EOJ: running csync2 processes[@$cp], not starting";
     exit;
   }
-  $csync_command .= " -cu";
+  $ccappend .= " -cu";
 } elsif ($Opt{check}) {
-  $csync_command .= " -cr /";
+  $ccappend .= " -cr /";
 } elsif ($Opt{tuxi}) {
   my($to) = $Opt{tuxi};
-  $csync_command .= " -TUXI pause.perl.org $to";
+  $Opt{G} ||= "pause_perl_org___$to";
+  $Opt{G} =~ s/\W/_/g;
+  $ccappend .= " -TUXI pause.perl.org $to";
 } else {
   die "illegal mode $Opt{mode}";
 }
+
+$Opt{G} ||= "pause_perl_org";
+my $csync_command =
+    q(/usr/sbin/csync2 -B -v -G $Opt{G} -N pause.perl.org $ccappend);
+
 
 my $logfile = "/var/log/csync2.log";
 
@@ -101,9 +105,13 @@ sub csync_processes () {
   open my $fh, "/bin/ps --no-headers -eo pid,rss,args |" or die "Could not fork ps: $!";
   local $/ = "\n";
   my @c;
-  while (<$fh>) {
-    next unless m|^\s*(\d+)\s+\d+\s+/usr/sbin/csync2.*-cu|;
-    push @c, $1;
+ PSLINE: while (<$fh>) {
+    next PSLINE unless m|^\s*(\d+)\s+\d+\s+/usr/sbin/csync2.*-cu|;
+    my $process = $1;
+    if ($Opt{G}) {
+      next PSLINE unless m|\Q$Opt{G}\E|;
+    }
+    push @c, $process;
   }
   \@c;
 }
