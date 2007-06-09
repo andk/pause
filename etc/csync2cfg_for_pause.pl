@@ -135,8 +135,10 @@ if ($Opt{check_inetd}) {
 }
 
 {
+  my $groupname = "pause_perl_org___$Opt{hostname}";
+  $groupname =~ s/\W/_/g;
   my $pause_stanza = qq{
-group pause_perl_org {
+group $groupname {
   host pause.perl.org;
   host ($Opt{hostname});
   key $Opt{pause_key_file};

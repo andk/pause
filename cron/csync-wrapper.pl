@@ -35,11 +35,13 @@ GetOptions(\%Opt,
            "update!",
            "check!",
            "tuxi=s",
+           "G=s",
           );
 $Opt{update}++ unless %Opt;
+$Opt{G} ||= "pause_perl_org";
 
 my $csync_command =
-    q(/usr/sbin/csync2 -B -v -G pause_perl_org -N pause.perl.org);
+    q(/usr/sbin/csync2 -B -v -G $Opt{G} -N pause.perl.org);
 
 sub timestamp ();
 sub logger ($);
