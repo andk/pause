@@ -65,7 +65,7 @@ if (0) {
 
 $Opt{G} ||= "pause_perl_org";
 my $csync_command =
-    q(/usr/sbin/csync2 -B -v -G $Opt{G} -N pause.perl.org $ccappend);
+    qq(/usr/sbin/csync2 -B -v -G $Opt{G} -N pause.perl.org $ccappend);
 
 
 my $logfile = "/var/log/csync2.log";
