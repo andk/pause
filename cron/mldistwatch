@@ -457,6 +457,9 @@ sub checkfornew {
 
         $dio->read_dist;
         $dio->extract_readme_and_yaml;
+        if ($dio->{YAML_CONTENT}{distribution_type} =~ m/^(script)$/) {
+            next BIGLOOP;
+        }
         $dio->check_blib;
         $dio->check_multiple_root;
         $dio->examine_pms;      # will switch user
