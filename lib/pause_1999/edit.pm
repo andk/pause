@@ -5358,18 +5358,21 @@ sub peek_perms {
     my @query       = (
                 qq{SELECT mods.modid,
                           mods.userid,
+                          users.fullname,
                           "modulelist"
-                   FROM mods
+                   FROM mods LEFT JOIN users ON mods.userid=users.userid
 },
                 qq{SELECT primeur.package,
                           primeur.userid,
+                          users.fullname,
                           "first-come"
-                   FROM primeur
+                   FROM primeur LEFT JOIN users ON primeur.userid=users.userid
 },
                 qq{SELECT perms.package,
                           perms.userid,
+                          users.fullname,
                           "co-maint"
-                   FROM perms
+                   FROM perms LEFT JOIN users ON perms.userid=users.userid
 },
                );
 
@@ -5434,19 +5437,22 @@ sub peek_perms {
         $a->[1] cmp $b->[1]
             ||
         $a->[2] cmp $b->[2]
+            ||
+        $a->[3] cmp $b->[3]
       } @res) {
           push @m, qq{<tr>};
           # pause99_peek_perms_by=m&pause99_peek_perms_query=PerlIO&pause99_peek_perms_sub=+Submit+
 
           push @m, sprintf(
                            qq{<td><a href="authenquery?pause99_peek_perms_by=me&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
-                               <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
+                               <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s (%s)</a></td>
                                <td>%s</td>},
                            $row->[0],
                            $row->[0],
                            $row->[1],
                            $row->[1],
                            $row->[2],
+                           $row->[3],
                            );
           push @m, qq{</tr>};
       }

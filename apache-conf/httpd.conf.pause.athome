@@ -1,8 +1,15 @@
 # -*- mode: cperl -*-
 
-# 1. symlink httpsd.conf -> httpd.conf.pause.athome
+# 1. symlink httpsd.conf -> httpd.conf.pause.athome; starten geht,
+# restarten geht nicht, braucht killall
+
 # 2. SSLCacheServerPort etc.
+
 # 3. Servername, User, Group
+
+# 4. Because we do unison between k76b and k75 we need to have the
+# same username and password on both machines or we write a special
+# rule for them in PrivatePAUSE which is also OK.
 
 ServerName k76b.linux.bogus
 HostnameLookups Off
@@ -88,6 +95,7 @@ Group www-data
                             pause_1999::main \
                             pause_1999::edit \
                             pause_1999::startform \
+                            pause_1999::authen_user \
                             PAUSE \
 
 "
