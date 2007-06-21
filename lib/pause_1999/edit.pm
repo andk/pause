@@ -4848,8 +4848,8 @@ sub stat_meta {
   @statl{@statl = qw(p c + o h ?)}       = qw( perl C C++ other hybrid unknown);
   @stati{@stati = qw(f r O p h n ?)}         = qw( functions
 	references+ties object-oriented pragma hybrid none unknown );
-  @statp{@statp = qw(p g l b a o d r n ?)}         = qw( Standard-Perl
-	GPL LGPL BSD Artistic open-source distribution_allowed
+  @statp{@statp = qw(p g l b a 2 o d r n ?)}         = qw( Standard-Perl
+	GPL LGPL BSD Artistic Artistic_2 open-source distribution_allowed
         restricted_distribution no_licence unknown );
 
   for my $hash (\%statd,\%stats,\%statl,\%stati,\%statp) {
@@ -4920,7 +4920,8 @@ a  - abandoned; volunteers welcome to take over maintainance<br/>
     stands for GNU General Public License, <br /> <b> LGPL</b> for GNU
     Lesser General Public License (previously known as "GNU Library
     General Public License"),<br /> <b>BSD</b> for the BSD License,
-    <br /> <b>Artistic</b> for the Artistic license alone, <br />
+    <br /> <b>Artistic</b> for the Artistic license alone,
+    <b>Artistic_2 for the artistic license 2.0 or later<br />
     <b>open-source</b> for any other Open Source license listed at <a
     href="http://www.opensource.org/licenses/">http://www.opensource.org/licenses/</a>,
     <br /><b>distribution_allowed</b> is for any license that is not
