@@ -2818,6 +2818,9 @@ sub request_id {
     if (my @x = $rationale =~ /(\.info)/g) {
       die "rationale looks like spam" if @x >= 5;
     }
+    if (my @x = $rationale =~ m|(http://)|g) {
+      die "rationale looks like spam" if @x >= 5;
+    }
     my $sessionID = $mgr->userid;
     my $host = "https://pause.perl.org";
     # $host = "http://k242.linux.bogus" if $PAUSE::Config->{TESTHOST};
