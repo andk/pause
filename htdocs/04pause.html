@@ -223,6 +223,8 @@ href="http://search.cpan.org/">search.cpan.org</a>. Click the
 <h3><a id="conventions" name="conventions">Other conventions you
 should know about</a></h3>
 
+<h4>README</h4>
+
 <p>Do not upload the <b>READMEs</b> that are integrated in your distribution
 files. PAUSE is designed to take care of unwrapping your file with tar
 or zip, registering all the modules it finds in there, and placing the
@@ -231,6 +233,8 @@ the top level directory of your package) into your directory. PAUSE
 will change the name of the file to
 <code><i>package-name</i><b>.readme</b></code>. It should do so within
 a few hours after your upload.</p>
+
+<h4>$VERSION</h4>
 
 <p>Please make sure all your <code>*.pm</code> files contain a
 <b><code>$VERSION</code></b> variable that conforms to the CPAN rules, i.e.
@@ -246,12 +250,16 @@ within a Safe compartement, so maybe even if the above command
 succeeds, PAUSE may fail if you're doing file IO or other potentially
 dangerous things within that line.</p>
 
+<h4>Developer Releases</h4>
+
 <p>The automatic integration of your work into several <b>indexes</b>
 and directory trees is not always what you desire. If you want to
 <b>prevent propagation</b> to places outside of your directory, simply
 choose a filename that matches <b><code>/\d\.\d+_\d/</code></b>. PAUSE
 will leave such distributions alone: no readme will be extracted, no
 index will be updated, no symlinks will be created.</p>
+
+<h4>Indexer</h4>
 
 <p>Any distribution that arrives at PAUSE is checked for <b>package names</b>
 contained in the distribution. A package name that arrives for the
