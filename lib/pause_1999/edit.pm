@@ -5297,7 +5297,7 @@ sub WAIT::Filter::pause99_edit_users_utflc_20010505 {
 }
 
 sub peek_perms {
-  my pause_1999::edit $self = shift;
+  my $self = shift;
   my $mgr = shift;
   my $cgi = $mgr->{CGI};
 
@@ -5431,6 +5431,22 @@ sub peek_perms {
       $sth->finish;
     }
     if (@res) {
+      my $output_format = $cgi->param("OF");
+      if ($output_format){
+        if ($output_format eq "YAML") {
+          require YAML::Syck;
+          local $YAML::Syck::ImplicitUnicode = 1;
+          my $dump = YAML::Syck::Dump(\@res);
+          my $edump = Encode::encode_utf8($dump);
+          my $r = $mgr->{R};
+          $r->content_type("text/plain; charset=utf8");
+          $r->send_http_header;
+          $r->print($edump);
+          return $mgr->{DONE} = Apache::Constants::DONE;
+        } else {
+          die "not supported OF=$output_format"
+        }
+      }
       push @m, qq{<table border="1" cellspacing="1" cellpadding="4">}; #};
       push @m, qq{<tr>};
       push @m, map { "<td><b>" . $mgr->escapeHTML($_) . "</b></td>"} qw(module who type);
