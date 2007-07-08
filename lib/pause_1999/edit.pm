@@ -5956,14 +5956,20 @@ sub share_perms_scrl_4 {
 
   my $all_mods = $self->all_only_cmods($mgr,$u);
   my @all_mods = sort keys %$all_mods;
+  my %labels;
+  for my $m (@all_mods) {
+    my $owner = $self->owner_of_module($mgr,$m);
+    $labels{$m} = sprintf "%s => %s", $m, $owner||"?";
+  }
   my $n = scalar @all_mods;
   return "--NONE--" unless $n;
   my $size = $n > 8 ? 5 : $n;
   $mgr->scrolling_list(
-                       'name' => "pause99_share_perms_remome_m",
-                       'multiple' => 1,
-                       'values' => \@all_mods,
-                       'size' => $size,
+                       name     => "pause99_share_perms_remome_m",
+                       multiple => 1,
+                       values   => \@all_mods,
+                       labels   => \%labels,
+                       size     => $size,
                       );
 }
 
