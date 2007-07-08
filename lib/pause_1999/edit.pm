@@ -5485,7 +5485,15 @@ sub peek_perms {
                            );
           push @m, qq{</tr>};
       }
-      push @m, qq{</table>};
+      my $href = sprintf("authenquery?pause99_peek_perms_by=%s;".
+                         "pause99_peek_perms_query=%s;pause99_peek_perms_sub=1;".
+                         "OF=YAML",
+                         $cgi->param("pause99_peek_perms_by"),
+                         $cgi->param("pause99_peek_perms_query"),
+                        );
+      push @m, qq{</table><a href="$href" style="text-decoration: none;">
+<span class="orange_button">YAML</span>
+</a>};
     } else {
       push @m, qq{No records found.};
     }
