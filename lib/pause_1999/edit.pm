@@ -5431,6 +5431,10 @@ sub peek_perms {
       $sth->finish;
     }
     if (@res) {
+      for my $row (@res) {
+        # add the owner on column 4
+        $row->[4] = $self->owner_of_module($mgr,$row->[0]);
+      }
       my $output_format = $cgi->param("OF");
       if ($output_format){
         if ($output_format eq "YAML") {
@@ -5449,7 +5453,7 @@ sub peek_perms {
       }
       push @m, qq{<table border="1" cellspacing="1" cellpadding="4">}; #};
       push @m, qq{<tr>};
-      push @m, map { "<td><b>" . $mgr->escapeHTML($_) . "</b></td>"} qw(module who type);
+      push @m, map { "<td><b>" . $mgr->escapeHTML($_) . "</b></td>"} qw(module who type owner);
       push @m, qq{</tr>};
       for my $row (sort {
         $a->[0] cmp $b->[0]
@@ -5459,6 +5463,8 @@ sub peek_perms {
         $a->[2] cmp $b->[2]
             ||
         $a->[3] cmp $b->[3]
+            ||
+        $a->[4] cmp $b->[4]
       } @res) {
           push @m, qq{<tr>};
           # pause99_peek_perms_by=m&pause99_peek_perms_query=PerlIO&pause99_peek_perms_sub=+Submit+
@@ -5466,13 +5472,16 @@ sub peek_perms {
           push @m, sprintf(
                            qq{<td><a href="authenquery?pause99_peek_perms_by=me&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
                                <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s (%s)</a></td>
-                               <td>%s</td>},
+                               <td>%s</td>
+                               <td>%s</td>
+},
                            $row->[0],
                            $row->[0],
                            $row->[1],
                            $row->[1],
                            $row->[2],
                            $row->[3],
+                           $row->[4],
                            );
           push @m, qq{</tr>};
       }
@@ -5484,6 +5493,27 @@ sub peek_perms {
   }
 
   @m;
+}
+
+sub owner_of_module {
+  my($self,$mgr,$m) = @_;
+  my $dbh = $mgr->connect;
+  my %query = (
+               mods => qq{SELECT modid,
+                          userid
+                   FROM mods where modid = ?},
+               primeur => qq{SELECT package,
+                          userid
+                   FROM primeur where package = ?},
+              );
+  for my $table (qw(mods primeur)) {
+    my $sth = $dbh->prepare($query{$table});
+    $sth->execute($m);
+    if ($sth->rows >= 1) {
+      return $sth->fetchrow_array; # ascii guaranteed
+    }
+  }
+  return;
 }
 
 sub reindex {
