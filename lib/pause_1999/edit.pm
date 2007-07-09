@@ -5435,12 +5435,17 @@ sub peek_perms {
         # add the owner on column 4
         $row->[4] = $self->owner_of_module($mgr,$row->[0]);
       }
+      my @column_names = qw(module userid fullname type owner);
       my $output_format = $cgi->param("OF");
       if ($output_format){
+        my @hres;
+        for my $row (@res) {
+          push @hres, { map {$column_names[$_] => $row->[$_] } 0..$#$row };
+        }
         if ($output_format eq "YAML") {
           require YAML::Syck;
           local $YAML::Syck::ImplicitUnicode = 1;
-          my $dump = YAML::Syck::Dump(\@res);
+          my $dump = YAML::Syck::Dump(\@hres);
           my $edump = Encode::encode_utf8($dump);
           my $r = $mgr->{R};
           $r->content_type("text/plain; charset=utf8");
@@ -5453,7 +5458,7 @@ sub peek_perms {
       }
       push @m, qq{<table border="1" cellspacing="1" cellpadding="4">}; #};
       push @m, qq{<tr>};
-      push @m, map { "<td><b>" . $mgr->escapeHTML($_) . "</b></td>"} qw(module who type owner);
+      push @m, map { "<td><b>" . $mgr->escapeHTML($_) . "</b></td>"} @column_names;
       push @m, qq{</tr>};
       for my $row (sort {
         $a->[0] cmp $b->[0]
@@ -5471,7 +5476,8 @@ sub peek_perms {
 
           push @m, sprintf(
                            qq{<td><a href="authenquery?pause99_peek_perms_by=me&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
-                               <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s (%s)</a></td>
+                               <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
+                               <td>%s</td>
                                <td>%s</td>
                                <td>%s</td>
 },
