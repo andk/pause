@@ -90,17 +90,18 @@ sub parameter {
     if (exists $mgr->{UserGroups}{admin}) {
       # warn "We have an admin here";
       for my $command (
+		       "add_user",
+		       "edit_ml",
+		       "select_user",
+		       "show_ml_repr",
                        "add_mod", # all admins may maintain the module list for now
                        "apply_mod",
-		       "add_user",
-                       "coredump",
-		       "edit_ml",
-		       "show_ml_repr",
-		       "select_user",
                        "check_xhtml",
-                       "index_users",
+                       "coredump",
                        "dele_message",
+                       "index_users",
                        "post_message",
+                       "reject_id_request",
                        # "test_session",
 		      ) {
 	$allow_action{$command} = undef;
@@ -245,8 +246,23 @@ sub menu {
   return;
 }
 
+sub reject_id_request {
+  my $self = shift;
+  my $mgr = shift;
+  my $req = $mgr->{CGI};
+  my @m;
+  if (exists $mgr->{UserGroups}{admin}) {
+    # https://pause.perl.org/pause/authenquery?ACTION=reject_request_id&USERID=d7f00000_d591bb2375f3b915
+
+    my $abra = $req->param('USERID');
+    # must get the session file name and delete the session or some such
+    push @m, "FIXME";
+  }
+  join "", @m;
+}
+
 sub as_string {
-  my pause_1999::edit $self = shift;
+  my $self = shift;
   my $mgr = shift;
   my @m;
   warn "mgr->Action undef" unless defined $mgr->{Action};
@@ -2820,6 +2836,9 @@ sub request_id {
     }
     if (my @x = $rationale =~ m|(http://)|g) {
       die "rationale looks like spam" if @x >= 5;
+    }
+    if ($rationale =~ /interesting/i && $homepage =~ m|http://[^/]+\.cn/.+\.htm$|) {
+      die "rationale looks like spam";
     }
     my $sessionID = $mgr->userid;
     my $host = "https://pause.perl.org";

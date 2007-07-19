@@ -274,6 +274,15 @@ inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </ht
 				  mailinglists.",
 
                        },
+           #reject_id_request => {
+           #             verb => "Reject a registration request (NOT WORKING)",
+           #             priv => "admin",
+           #             cat => "01usr/01rej",
+           #
+           #             desc => "Rejecting a request may be useful to
+           #                      prevent accidental registrations.",
+           #
+           #            },
            edit_ml => {
                        verb => "Edit a Mailinglist",
                        priv => "admin",
