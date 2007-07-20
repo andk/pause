@@ -2831,6 +2831,9 @@ sub request_id {
                          rationale => $rationale,
                         };
     require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$session->{APPLY}],[qw(APPLY)])->Indent(1)->Useqq(1)->Dump; # XXX
+    if (lc($fullname) eq lc($userid)) {
+      die "rationale looks like spam";
+    }
     if (my @x = $rationale =~ /(\.info)/g) {
       die "rationale looks like spam" if @x >= 5;
     }
