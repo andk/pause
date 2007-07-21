@@ -44,6 +44,8 @@ sub logger ($);
 sub csync_processes ();
 
 my $ccappend;
+my $logfile = "/var/log/csync2.log";
+
 if (0) {
 } elsif ($Opt{update}) {
   my $cp = csync_processes;
@@ -67,8 +69,6 @@ $Opt{G} ||= "pause_perl_org";
 my $csync_command =
     qq(/usr/sbin/csync2 -B -v -G $Opt{G} -N pause.perl.org $ccappend);
 
-
-my $logfile = "/var/log/csync2.log";
 
 if (my $pid = open my $fh, qq($csync_command 2>&1 |)) {
   logger "Started with pid[$pid] command[$csync_command]";
