@@ -1,5 +1,5 @@
 Creating a dump of the schemae is as easy as
 
- mysqldump ... authen_pause --where 1=0 > authen_pause.schema.txt
- mysqldump ... mod          --where 1=0 > mod.schema.txt
+ mysqldump ... authen_pause --where 1=0 --quote-names=false > authen_pause.schema.txt
+ mysqldump ... mod          --where 1=0 --quote-names=false > mod.schema.txt
 
