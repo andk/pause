@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: mod
 -- ------------------------------------------------------
--- Server version	4.0.24_Debian-2-log
+-- Server version	4.0.24_Debian-10sarge2-log
 
 --
 -- Table structure for table `applymod`
@@ -71,6 +71,8 @@ CREATE TABLE distmtimes (
   dist char(128) binary NOT NULL default '',
   distmtime char(10) default NULL,
   distmdatetime datetime NOT NULL default '0000-00-00 00:00:00',
+  indexing_at datetime default NULL,
+  indexed_at datetime default NULL,
   PRIMARY KEY  (dist)
 ) TYPE=ISAM PACK_KEYS=1;
 
@@ -161,19 +163,19 @@ CREATE TABLE mlas (
 --
 
 CREATE TABLE mods (
-  modid char(64) binary NOT NULL default '',
+  modid varchar(128) binary NOT NULL default '',
   mlstatus enum('list','hide','delete') NOT NULL default 'list',
   statd char(1) binary NOT NULL default '',
   stats char(1) binary NOT NULL default '',
   statl char(1) binary NOT NULL default '',
   stati char(1) binary NOT NULL default '',
   statp char(1) binary NOT NULL default '',
-  description char(88) binary NOT NULL default '',
-  userid char(10) NOT NULL default '',
+  description varchar(88) binary NOT NULL default '',
+  userid varchar(10) NOT NULL default '',
   chapterid int(10) unsigned NOT NULL default '0',
-  introduced char(10) default NULL,
-  changed char(10) default NULL,
-  changedby char(10) default NULL,
+  introduced varchar(10) default NULL,
+  changed varchar(10) default NULL,
+  changedby varchar(10) default NULL,
   PRIMARY KEY  (modid)
 ) TYPE=ISAM PACK_KEYS=1;
 
@@ -188,7 +190,7 @@ CREATE TABLE mods (
 --
 
 CREATE TABLE packages (
-  package varchar(100) binary NOT NULL default '',
+  package varchar(128) binary NOT NULL default '',
   version varchar(16) NOT NULL default '',
   dist varchar(128) NOT NULL default '',
   file varchar(128) NOT NULL default '',
@@ -276,7 +278,7 @@ CREATE TABLE uris (
 
 CREATE TABLE users (
   userid char(10) binary NOT NULL default '',
-  ustatus enum('unused','active','delete') NOT NULL default 'unused',
+  ustatus enum('unused','active','delete','nologin') NOT NULL default 'unused',
   ustatus_ch datetime NOT NULL default '0000-00-00 00:00:00',
   email char(255) NOT NULL default '',
   cpan_mail_alias enum('none','publ','secr') NOT NULL default 'none',
