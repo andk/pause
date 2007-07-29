@@ -2425,6 +2425,18 @@ Subject: $subject\n};
   @m;
 }
 
+sub get_secretemail {
+  my($self, $mgr, $userid) = @_;
+  my $dbh2 = $mgr->authen_connect;
+  my $sth2 = $dbh2->prepare("SELECT secretemail
+                             FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
+                             WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
+  $sth2->execute($userid);
+  my($h2) = $mgr->fetchrow($sth2, "fetchrow_array");
+  $sth2->finish;
+  $h2;
+}
+
 sub add_user {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
@@ -2507,24 +2519,28 @@ sub add_user {
 	}
 	my $s_code = $s_func->($surname);
 	warn "s_code[$s_code]";
-	my($suserid,$sfullname, $semail, $shomepage,
+	my($suserid,$sfullname, $spublic_email, $shomepage,
 	   $sintroduced, $schangedby, $schanged);
 	my @rows;
-	while (($suserid, $sfullname, $semail, $shomepage,
+	while (($suserid, $sfullname, $spublic_email, $shomepage,
 		$sintroduced, $schangedby, $schanged) =
                $mgr->fetchrow($sth, "fetchrow_array")) {
 	  (my $dbsurname = $sfullname) =~ s/.*\s//;
-	  next unless &$s_func($dbsurname) eq $s_code;
+	  next unless $s_func->($dbsurname) eq $s_code;
+          my $ssecretemail = $self->get_secretemail($mgr, $suserid);
 	  push @rows, "<tr>",
 	      map(
-		  "<td>".(
+		  "<td".(
+                         /^!!.+!!$/ ? qq{ style="color: red"} : ""
+                        ).">".(
                           defined($_)&&length($_) ?
                           $mgr->escapeHTML($_) :
                           "&nbsp;"
                          )."</td>",
                   $suserid,
                   $sfullname,
-		  $semail,
+		  $spublic_email,
+		  $ssecretemail ? "!!$ssecretemail!!" : "",
 		  $shomepage,
 		  $sintroduced ? scalar(gmtime($sintroduced)) : "?",
 		  $schangedby,
@@ -2543,6 +2559,7 @@ sub add_user {
  <tr><td>userid</td>
  <td>fullname</td>
  <td>(public) email</td>
+ <th style="color: red;">!!!SECRET!!! email</th>
  <td>homepage</td>
  <td>introduced</td>
  <td>changedby</td>
