@@ -25,7 +25,7 @@ to see the version requirements in the wild.
 
 use Compress::Zlib;
 use File::Find;
-use YAML;
+use YAML::Syck;
 
 open my $fh, "/home/ftp/pub/PAUSE/modules/02packages.details.txt.gz" or die;
 my $gz = gzopen $fh, "r";
@@ -49,17 +49,20 @@ find(
         my $yaml = $_;
         my($name) =
             $File::Find::name =~ m|([A-Z]/[A-Z][A-Z]/[A-Z][A-Z-]*[A-Z]/.+)\.meta$|;
-        return unless exists $S1->{$name};
+        return unless $name and exists $S1->{$name};
         my @stat = stat $yaml;
         my $mtime = localtime $stat[9];
         my $y;
-        eval { $y = YAML::LoadFile($yaml); };
+        eval { $y = YAML::Syck::LoadFile($yaml); };
         my $status;
         if ($@) {
           $status = "yaml_error";
         } else {
           if ($y) {
-            die unless ref $y and ref $y eq "HASH";
+            unless (ref $y and ref $y eq "HASH"){
+              warn "FFn[$File::Find::name]y[$y]";
+              return;
+            }
             if (exists $y->{requires}) {
               if (ref $y->{requires} eq "HASH") {
                 $status = "HASH";
