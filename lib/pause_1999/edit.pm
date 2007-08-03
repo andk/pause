@@ -5534,7 +5534,7 @@ sub peek_perms {
                          "pause99_peek_perms_query=%s;pause99_peek_perms_sub=1;".
                          "OF=YAML",
                          $cgi->param("pause99_peek_perms_by"),
-                         $cgi->param("pause99_peek_perms_query"),
+                         URI::Escape::uri_escape($cgi->param("pause99_peek_perms_query"),'\W'),
                         );
       push @m, qq{</table><a href="$href" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
