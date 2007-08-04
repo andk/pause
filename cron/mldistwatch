@@ -215,6 +215,7 @@ sub work2 {
         or die "Couldn't chdir to $MLROOT: $!";
     $self->rewrite01();
     $self->rewrite03();
+    $self->rewrite06();
     $self->verbose(1, sprintf(
                               "\nFinished rewrite03 and everything at %s\n",
                               scalar localtime
@@ -1080,6 +1081,105 @@ Date:        %s
         } else {
             $self->verbose(1,"Couldn't open >03...\n");
             $self->alert("Couldn't open >03...");
+        }
+        close $F or die "Couldn't close: $!";
+        rename "$repfile.new", $repfile or
+            $self->alert("Couldn't rename to '$repfile': $!");
+        PAUSE::newfile_hook($repfile);
+        0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
+            or $self->alert("Couldn't gzip for some reason");
+        rename "$repfile.gz.new", "$repfile.gz" or
+            $self->alert("Couldn't rename to '$repfile.gz': $!");
+        PAUSE::newfile_hook("$repfile.gz");
+    }
+}
+
+sub rewrite06 {
+    my($self) = shift;
+    our $Id;
+    #
+    # Rewriting 06perms.txt
+    #
+    $self->verbose(1,"\nEntering rewrite06\n");
+
+    my $MLROOT = $self->mlroot;
+    my $repfile = "$MLROOT/../../modules/06perms.txt";
+    my $list = "";
+    my $olist = "";
+    local($/) = "\n";
+    if (
+        -f "$repfile.gz" and
+        open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+       ) {
+        while (<F>) {
+            next if 1../^\s*$/;
+            $olist .= $_;
+        }
+        close F;
+    } else {
+        $self->verbose(1,"Couldn't open $repfile $!\n");
+        $self->alert("Couldn't open $repfile $!");
+    }
+    my $date = HTTP::Date::time2str();
+    my $dbh = $self->connect;
+    my @query       = (
+                qq{SELECT mods.modid,
+                          mods.userid,
+                          "m"
+                     FROM mods
+},
+                qq{SELECT primeur.package,
+                          primeur.userid,
+                          "f"
+                     FROM primeur
+},
+                qq{SELECT perms.package,
+                          perms.userid,
+                          "c"
+                     FROM perms
+},
+               );
+
+    my %seen;
+    {
+        local $; = ",";
+        for my $query (@query) {
+            my $sth = $dbh->prepare($query);
+            $sth->execute();
+            if ($sth->rows > 0) {
+                while (my @row = $sth->fetchrow_array()) {
+                    $seen{@row[0,1]} ||= $row[2];
+                }
+            }
+            $sth->finish;
+        }
+    }
+    my $header = sprintf qq{File:        06perms.txt
+Description: CSV file of upload permission to the CPAN per namespace
+    best-permission is one of "m" for "modulelist", "f" for
+    "first-come", "c" for "co-maint"
+Columns:     package,userid,best-permission
+Line-Count:  %d
+Written-By:  %s
+Date:        %s
+Status:      Testing phase, do not use yet
+
+}, scalar keys %seen, $Id, $date;
+
+    {
+        local $" = ",";
+        for my $k (sort keys %seen) {
+            $list .= "$k$seen{$k}\n";
+        }
+    }
+    if ($list ne $olist) {
+        my $F;
+        if (open $F, ">:utf8", "$repfile.new") {
+            print $F $header;
+            print $F $list;
+        } else {
+            $self->verbose(1,"Couldn't open >06...\n");
+            $self->alert("Couldn't open >06...");
         }
         close $F or die "Couldn't close: $!";
         rename "$repfile.new", $repfile or
