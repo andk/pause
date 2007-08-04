@@ -1136,13 +1136,12 @@ sub rewrite06 {
 
     my %seen;
     {
-        local $; = ",";
         for my $query (@query) {
             my $sth = $dbh->prepare($query);
             $sth->execute();
             if ($sth->rows > 0) {
                 while (my @row = $sth->fetchrow_array()) {
-                    $seen{@row[0,1]} ||= $row[2];
+                    $seen{join ",", @row[0,1]} ||= $row[2];
                 }
             }
             $sth->finish;
@@ -1161,9 +1160,8 @@ Status:      Testing phase, do not use yet
 }, scalar keys %seen, $Id, $date;
 
     {
-        local $" = ",";
         for my $k (sort keys %seen) {
-            $list .= "$k$seen{$k}\n";
+            $list .= sprintf "%s,%s\n", $k, $seen{$k};
         }
     }
     if ($list ne $olist) {
