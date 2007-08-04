@@ -311,6 +311,7 @@ sub _path_normalize ($) {
 sub newfile_hook ($) {
   my($f) = @_;
   $f = _path_normalize($f);
+  update_recent($f,"new");
   while () {
     my @system = ("/usr/sbin/csync2" => "-B", "-h",
                   $f, "-N", "pause.perl.org");
@@ -329,8 +330,14 @@ sub delfile_hook ($) {
   my @system = ("/usr/sbin/csync2" => "-B", "-h",
                 $f, "-N", "pause.perl.org");
   0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
+  update_recent($f,"delete");
 }
 
-
+sub update_recent {
+  my($f,$what) = @_;
+  if ($f =~ s|/home/ftp/pub/PAUSE/authors/id||) {
+    
+  }
+}
 
 1;
