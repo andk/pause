@@ -13,12 +13,14 @@ it. Before you *use* a function here, please ask about its status.
 # nono for non-CGI: use CGI::Switch ();
 
 use Compress::Zlib ();
+use DBI ();
 use Exporter;
+use Fcntl qw(:flock);
 use File::Basename qw(dirname);
 use IO::File ();
 use MD5 ();
 use Mail::Send ();
-use DBI ();
+use YAML::Syck;
 
 use strict;
 use vars qw(@ISA @EXPORT_OK $VERSION $Config);
@@ -335,8 +337,23 @@ sub delfile_hook ($) {
 
 sub update_recent {
   my($f,$what) = @_;
-  if ($f =~ s|/home/ftp/pub/PAUSE/authors/id||) {
-    
+  if ($f =~ s|/home/ftp/pub/PAUSE/authors/id/||) {
+    my $rfile = "/home/ftp/pub/PAUSE/authors/id/RECENT-48:00:00.yaml";
+    open my $fh, ">>", $rfile;
+    flock $fh, LOCK_EX;
+    my $recent = eval { YAML::Syck::LoadFile($rfile); };
+    $recent ||= [];
+  TRUNCATE: while (@$recent) {
+      if ($recent->[-1]{epoch} < time-60*60*48) {
+        pop @$recent;
+      } else {
+        last TRUNCATE;
+      }
+    }
+    unshift @$recent, { epoch => time, path => $f, type => $what };
+    YAML::Syck::DumpFile("$rfile.new",$recent);
+    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+    close $fh;
   }
 }
 
