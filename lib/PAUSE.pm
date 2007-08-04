@@ -354,6 +354,9 @@ sub update_recent {
     YAML::Syck::DumpFile("$rfile.new",$recent);
     rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
     close $fh;
+    my @system = ("/usr/sbin/csync2" => "-B", "-h",
+                  $rfile, "-N", "pause.perl.org");
+    0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
   }
 }
 
