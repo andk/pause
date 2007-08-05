@@ -359,6 +359,9 @@ sub update_recent {
         last TRUNCATE;
       }
     }
+    # remove older duplicate, irrespective of $what:
+    $recent = [ grep { $_->{path} ne $f } @$recent ];
+
     unshift @$recent, { epoch => time, path => $f, type => $what };
     YAML::Syck::DumpFile("$rfile.new",$recent);
     rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
