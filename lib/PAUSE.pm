@@ -305,7 +305,7 @@ sub gtest {
 sub _path_normalize ($) {
   my($f) = @_;
   $f =~ s|/+|/|g;
-  $f =~ s|/[^/]+/\.\./|/|g;
+  1 while $f =~ s|/[^/]+/\.\./|/|;
   $f =~ s|/$||;
   $f;
 }
