@@ -4,6 +4,7 @@ use CPAN::Checksums 1.018;
 use File::Copy qw(cp);
 use File::Find;
 use File::Spec;
+use Time::HiRes qw(time);
 use strict;
 
 use lib "/home/k/PAUSE/lib";
@@ -25,8 +26,8 @@ our $TESTDIR;
 # max: 15 was really slow, 100 is fine, 1000 was temporarily used
 # because of key-expiration on 2005-02-02; 1000 also seems appropriate
 # now that we know that the process is not faster when we write less
-# (2005-11-11)
-$Opt{max} ||= 1000;
+# (2005-11-11); but lower than 1000 helps to smoothen out peaks
+$Opt{max} ||= 64;
 
 my $cnt = 0;
 
@@ -52,6 +53,7 @@ find(sub {
        # $CPAN::Checksums::FORCE_UPDATE?
 
        my $debugdir;
+       my $start;
        if ( $Opt{debug} ) {
          require File::Temp;
          require File::Path;
@@ -72,6 +74,7 @@ find(sub {
             File::Spec->catfile($debugdir,
                                 "CHECKSUMS.old")
            ) or die $!;
+         $start = time;
        }
        my $ffname = $File::Find::name;
        my $ret = eval { CPAN::Checksums::updatedir($ffname); };
@@ -87,7 +90,8 @@ find(sub {
             File::Spec->catfile($debugdir,
                                 "CHECKSUMS.new")
            ) or die $!;
-         warn "debugdir[$debugdir]ret[$ret]cnt[$cnt]\n"
+         my $tooktime = sprintf "%.6f", time - $start;
+         warn "debugdir[$debugdir]ret[$ret]tooktime[$tooktime]cnt[$cnt]\n"
        }
        return if $ret == 1;
        my $abs = File::Spec->rel2abs($ffname);
