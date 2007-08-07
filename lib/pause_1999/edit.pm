@@ -1888,9 +1888,11 @@ into $her directory. The request used the following parameters:});
 
 sub manifind {
   my($self) = @_;
+  my $cwd = Cwd::cwd();
+  warn "cwd[$cwd]";
   my %files = %{ExtUtils::Manifest::manifind()};
   if (keys %files == 1 && exists $files{""} && $files{""} eq "") {
-    warn "ALERT: BUG !!!";
+    warn "ALERT: BUG in MANIFIND, falling back to zsh !!!";
 
     # This bug was caused by libc upgrade: perl and apache were
     # compiled with 2.1.3; upgrading to 2.2.5 and/or later
@@ -1901,6 +1903,8 @@ sub manifind {
     %files = map { chomp; $_ => "" } <$ls>;
     close $ls;
   }
+  require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%files],[qw(files)])->Indent(1)->Useqq(1)->Dump; # XXX
+
   %files;
 }
 
@@ -1966,7 +1970,7 @@ sub delete_files {
   my $cwd = Cwd::cwd();
 
   if (chdir "$PAUSE::Config->{MLROOT}/$userhome"){
-    warn "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] E:M:V[$ExtUtils::Manifest::VERSION]";
+    warn "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] ExtUtils:Manifest:VERSION[$ExtUtils::Manifest::VERSION]";
   } else {
     # QUICK DEPARTURE
     push @m, qq{No files found in authors/id/$userhome};
