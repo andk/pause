@@ -347,7 +347,7 @@ sub delfile_hook ($) {
 sub update_recent {
   my($f,$what) = @_;
   if ($f =~ s|/home/ftp/pub/PAUSE/authors/id/||) {
-    my $rfile = "/home/ftp/pub/PAUSE/authors/id/RECENT-48:00:00.yaml";
+    my $rfile = "/home/ftp/pub/PAUSE/authors/id/RECENT-2d.yaml";
     open my $fh, ">>", $rfile;
     flock $fh, LOCK_EX;
     my $recent = eval { YAML::Syck::LoadFile($rfile); };
