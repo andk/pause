@@ -3145,15 +3145,23 @@ has the same version number and the distro has a more recent modification time.}
         if ($ok) {
 
             my $query = qq{UPDATE packages SET
-version       = '$pp->{version}',
-dist          = '$dist',
-file          = '$pp->{infile}',
-filemtime     = '$pp->{filemtime}',
-pause_reg     = '$self->{TIME}'
-WHERE package = '$package'
+version       = ?,
+dist          = ?,
+file          = ?,
+filemtime     = ?,
+pause_reg     = ?
+WHERE package = ?
 };
             $self->verbose(1,"Q: [$query]\n");
-            $dbh->do($query);
+            $dbh->do($query,
+                     undef,
+                     $pp->{version},
+                     $dist,
+                     $pp->{infile},
+                     $pp->{filemtime},
+                     $self->{TIME},
+                     $package,
+                    );
             $self->index_status($package,
                                 $pp->{version},
                                 $pp->{infile},
@@ -3188,17 +3196,18 @@ WHERE package = '$package'
         $self->verbose(1,"First time here, eh?\n");
         my $query = qq{INSERT INTO packages
  (package, version, dist, file, filemtime, pause_reg)
-VALUES (
-        '$package',
-        '$pp->{version}',
-        '$dist',
-        '$pp->{infile}',
-        '$pp->{filemtime}',
-        '$self->{TIME}'
-       )
+VALUES (?,?,?,?,?,?)
 };
         $self->verbose(1,"Q: [$query]\n");
-        $dbh->do($query);
+        $dbh->do($query,
+                 undef,
+                 $package,
+                 $pp->{version},
+                 $dist,
+                 $pp->{infile},
+                 $pp->{filemtime},
+                 $self->{TIME},
+                );
         $self->index_status($package,
                             $pp->{version},
                             $pp->{infile},
