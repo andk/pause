@@ -5,6 +5,7 @@ use File::Copy qw(cp);
 use File::Find;
 use File::Spec;
 use Time::HiRes qw(time);
+use YAML::Syck;
 use strict;
 
 use lib "/home/k/PAUSE/lib";
@@ -53,7 +54,8 @@ find(sub {
        # $CPAN::Checksums::FORCE_UPDATE?
 
        my $debugdir;
-       my $start;
+       my $yaml;
+       my $ffname = $File::Find::name;
        if ( $Opt{debug} ) {
          require File::Temp;
          require File::Path;
@@ -64,34 +66,43 @@ find(sub {
                                           CLEANUP => 0,
                                          ) or die "Could not make a tmp directory";
          $debugdir = File::Spec->catdir($TESTDIR,
-                                        substr($File::Find::name,
+                                        substr($ffname,
                                                length($root)));
          File::Path::mkpath($debugdir);
-         cp(File::Spec->catfile(
-                                $File::Find::name,
-                                "CHECKSUMS"
-                               ),
+         my $old_checksums = File::Spec->catfile(
+                                                 $ffname,
+                                                 "CHECKSUMS"
+                                                );
+         my @stat = stat $old_checksums;
+         $yaml->{stat_1} = \@stat;
+         cp($old_checksums,
             File::Spec->catfile($debugdir,
                                 "CHECKSUMS.old")
            ) or die $!;
-         $start = time;
+         $yaml->{start} = time;
        }
-       my $ffname = $File::Find::name;
        my $ret = eval { CPAN::Checksums::updatedir($ffname); };
        if ($@) {
          warn "error[$@] in checksums file[$ffname]: must unlink";
          unlink "$ffname/CHECKSUMS";
        }
        if ($Opt{debug}) {
-         cp(File::Spec->catfile(
-                                $ffname,
-                                "CHECKSUMS"
-                               ),
+         my $new_checksums = File::Spec->catfile(
+                                                 $ffname,
+                                                 "CHECKSUMS"
+                                                );
+         my @stat = stat $new_checksums;
+         $yaml->{stat_2} = \@stat;
+         cp($new_checksums,
             File::Spec->catfile($debugdir,
                                 "CHECKSUMS.new")
            ) or die $!;
-         my $tooktime = sprintf "%.6f", time - $start;
-         warn "debugdir[$debugdir]ret[$ret]tooktime[$tooktime]cnt[$cnt]\n"
+         $yaml->{stop} = time;
+         my $tooktime = sprintf "%.6f", $yaml->{stop} - $yaml->{start};
+         warn "debugdir[$debugdir]ret[$ret]tooktime[$tooktime]cnt[$cnt]\n";
+         $yaml->{tooktime} = $tooktime;
+         YAML::Syck::DumpFile(File::Spec->catfile($debugdir,
+                                                  "YAML"), $yaml);
        }
        return if $ret == 1;
        my $abs = File::Spec->rel2abs($ffname);
