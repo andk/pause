@@ -1338,8 +1338,14 @@ sub mlroot {
         my $checksumtime = (stat "$dirname/CHECKSUMS")[9] || 0;
 
         if ($mtime) {
+            # ftp-mirroring can send us up to one day old files
             if ($mtime > $checksumtime - 86400) {
                 $self->writechecksum($dirname);
+                $checksumtime = (stat "$dirname/CHECKSUMS")[9] || 0;
+                if ($mtime > $checksumtime - 86400) {
+                    my $xtime = List::Util::min(time, $mtime+86401);
+                    warn qq{WANT TO: utime, $xtime, $xtime, "$dirname/CHECKSUMS";};
+                }
             }
             if ($mtime > $otherts) {
                 $dbh->do(qq{UPDATE distmtimes
