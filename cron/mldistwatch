@@ -1155,7 +1155,6 @@ Columns:     package,userid,best-permission
 Line-Count:  %d
 Written-By:  %s
 Date:        %s
-Status:      Testing phase, do not use yet
 
 }, scalar keys %seen, $Id, $date;
 
