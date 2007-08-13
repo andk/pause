@@ -320,7 +320,7 @@ sub hooklog {
 sub newfile_hook ($) {
   my($f) = @_;
   $f = _path_normalize($f);
-  hooklog($f);
+  #hooklog($f);
   update_recent($f,"new");
   while () {
     my @system = ("/usr/sbin/csync2" => "-B", "-h",
@@ -337,7 +337,7 @@ sub newfile_hook ($) {
 sub delfile_hook ($) {
   my($f) = @_;
   $f = _path_normalize($f);
-  hooklog($f);
+  #hooklog($f);
   my @system = ("/usr/sbin/csync2" => "-B", "-h",
                 $f, "-N", "pause.perl.org");
   0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
