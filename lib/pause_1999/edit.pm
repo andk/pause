@@ -1063,7 +1063,7 @@ sub tail_logfile {
   push @m, $mgr->scrolling_list(
 				name => "pause99_tail_logfile_1",
 				size => 1,
-				values => [qw( 5000 10000 20000 40000) ],
+				values => [qw( 2000 5000 10000 20000 40000) ],
 			       );
   push @m, qq{<input type="submit"
                name="pause99_tail_logfile_sub" value="Tail characters" />};
