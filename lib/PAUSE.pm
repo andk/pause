@@ -378,8 +378,8 @@ sub delfile_hook ($) {
     }
   }
 
-  sub naive_path_normalize ($) {
-    my($f) = @_;
+  sub naive_path_normalize {
+    my($self,$f) = @_;
     $f =~ s|/+|/|g;
     1 while $f =~ s|/[^/]+/\.\./|/|;
     $f =~ s|/$||;
