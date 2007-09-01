@@ -302,74 +302,90 @@ sub gtest {
   return 1;
 }
 
-sub _path_normalize ($) {
-  my($f) = @_;
-  $f =~ s|/+|/|g;
-  1 while $f =~ s|/[^/]+/\.\./|/|;
-  $f =~ s|/$||;
-  $f;
-}
-
-sub hooklog {
-  my($f) = @_;
-  open my $fh, ">>", "/tmp/hook.log";
-  use Carp;
-  printf $fh "%s: %s [%s]\n", scalar localtime, $f, Carp::longmess();
-}
+# log4perl!
+#sub hooklog {
+#  my($f) = @_;
+#  open my $fh, ">>", "/tmp/hook.log";
+#  use Carp;
+#  printf $fh "%s: %s [%s]\n", scalar localtime, $f, Carp::longmess();
+#}
 
 sub newfile_hook ($) {
   my($f) = @_;
-  $f = _path_normalize($f);
-  #hooklog($f);
-  update_recent($f,"new");
-  while () {
-    my @system = ("/usr/sbin/csync2" => "-B", "-h",
-                  $f, "-N", "pause.perl.org");
-
-    # do not want to die, do not know if csync2 dies when $f equals "/"
-    0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
-    my $Lf = $f;
-    $f = dirname $Lf;
-    last if $f eq $Lf || $f =~ m!/PAUSE(/authors(/id)?)?$!;
-  }
+  my $rf = File::Rsync::Mirror::Recentfile->new(
+                                                canonize => "naive_path_normalize",
+                                               );
+  $rf->update($f,"new");
 }
 
 sub delfile_hook ($) {
   my($f) = @_;
-  $f = _path_normalize($f);
-  #hooklog($f);
-  my @system = ("/usr/sbin/csync2" => "-B", "-h",
-                $f, "-N", "pause.perl.org");
-  0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
-  update_recent($f,"delete");
+  my $rf = File::Rsync::Mirror::Recentfile->new(
+                                                canonize => "naive_path_normalize",
+                                               );
+  $rf->update($f,"delete");
 }
 
-sub update_recent {
-  my($f,$what) = @_;
-  if ($f =~ s|/home/ftp/pub/PAUSE/authors/id/||) {
-    my $rfile = "/home/ftp/pub/PAUSE/authors/id/RECENT-2d.yaml";
-    open my $fh, ">>", $rfile;
-    flock $fh, LOCK_EX;
-    my $recent = eval { YAML::Syck::LoadFile($rfile); };
-    $recent ||= [];
-  TRUNCATE: while (@$recent) {
-      if ($recent->[-1]{epoch} < time-60*60*48) {
-        pop @$recent;
+{
+  package File::Rsync::Mirror::Recentfile;
+
+  use Fcntl qw(:flock);
+  use YAML::Syck;
+
+  use accessors qw(
+                   canonize
+                  );
+
+  sub new {
+    my($class, @args) = @_;
+    my $self = bless {}, $class;
+    while (@args) {
+      my($method,$arg) = splice @args, 0, 2;
+      $self->$method($arg);
+    }
+    return $self;
+  }
+
+  sub update {
+    my($self,$f,$what) = @_;
+    if (my $meth = $self->canonize) {
+      if (ref $meth && ref $meth eq "CODE") {
+        die "FIXME";
       } else {
-        last TRUNCATE;
+        $f = $self->$meth($f);
       }
     }
-    # remove older duplicate, irrespective of $what:
-    $recent = [ grep { $_->{path} ne $f } @$recent ];
+    if ($f =~ s|/home/ftp/pub/PAUSE/authors/id/||) {
+      my $rfile = "/home/ftp/pub/PAUSE/authors/id/RECENT-2d.yaml";
+      open my $fh, ">>", $rfile;
+      flock $fh, LOCK_EX;
+      my $recent = eval { YAML::Syck::LoadFile($rfile); };
+      $recent ||= [];
+    TRUNCATE: while (@$recent) {
+        if ($recent->[-1]{epoch} < time-60*60*48) {
+          pop @$recent;
+        } else {
+          last TRUNCATE;
+        }
+      }
+      # remove older duplicate, irrespective of $what:
+      $recent = [ grep { $_->{path} ne $f } @$recent ];
 
-    unshift @$recent, { epoch => time, path => $f, type => $what };
-    YAML::Syck::DumpFile("$rfile.new",$recent);
-    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
-    close $fh;
-    my @system = ("/usr/sbin/csync2" => "-B", "-h",
-                  $rfile, "-N", "pause.perl.org");
-    0==system @system or warn "Couldn't execute system[@system] (continuing anyway)";
+      unshift @$recent, { epoch => time, path => $f, type => $what };
+      YAML::Syck::DumpFile("$rfile.new",$recent);
+      rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+      close $fh;
+    }
   }
+
+  sub naive_path_normalize ($) {
+    my($f) = @_;
+    $f =~ s|/+|/|g;
+    1 while $f =~ s|/[^/]+/\.\./|/|;
+    $f =~ s|/$||;
+    $f;
+  }
+
 }
 
 1;
