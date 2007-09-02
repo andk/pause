@@ -85,6 +85,7 @@ while () {
   last if $mypause_daemon_inspector::Terminated;
   my $sleep = $PAUSE::Config->{SLEEP};
   # sleep $did_something ? 5 : $PAUSE::Config->{SLEEP};
+  $self->logge("Info: sleeping $sleep");
   $0 = "paused: sleeping $sleep";
   sleep $sleep;
 }
