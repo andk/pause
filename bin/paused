@@ -173,7 +173,7 @@ sub loop () { # we're NOT called as a method
   $sth = $dbh->prepare($query);
   if ( $sth->execute ) {
     my $rows = $sth->rows;
-    $self->logge("Info: rows[$rows] to process");
+    $self->logge("Info: rows[$rows]old[$old] to process");
   } else {
     $self->logge("Alert: $DBI::errstr");
     return;
