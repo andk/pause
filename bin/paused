@@ -7,6 +7,7 @@ my $Id = qq!paused, v$VERSION!;
 use lib "/home/k/PAUSE/lib";
 
 use DBI ();
+use Fcntl qw(:flock);
 use File::Path ();
 use Getopt::Long;
 use HTTP::Date ();
@@ -25,9 +26,21 @@ use vars qw(%Opt);
 
 GetOptions(\%Opt,qw(pidfile=s)) or die;
 
-open my $fh, ">", $Opt{pidfile} or die;
-print $fh $$;
-close $fh;
+my $pidfile = $Opt{pidfile} or die;
+my $lockfh;
+if (open $lockfh, "+>>", $pidfile) {
+  if (flock $lockfh, LOCK_EX|LOCK_NB) {
+    truncate $lockfh, 0 or die;
+    seek $lockfh, 0, 0;
+    print $lockfh $$, "\n";
+  } else {
+    die "other paused job running, ".
+        "will not run at the same time";
+  }
+} else {
+  die "Could not open pidfile[$pidfile]: $!";
+}
+# must no close $lockfh, need to hold lock
 
 $SIG{HUP} = \&sighup;
 $SIG{TERM} = $SIG{INT} = \&sigtermint;
