@@ -73,7 +73,7 @@ sub sighup {
 
 sub restart {
   mypause_daemon_inspector->logge("Info: Going to exec $^X $0");
-  exec $^X, $0;
+  exec $^X, $0, "--pidfile=$pidfile";
 }
 
 umask 0002;
