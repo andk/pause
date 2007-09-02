@@ -81,9 +81,12 @@ umask 0002;
 mypause_daemon_inspector->logge("Info: Starting in a new process");
 
 while () {
-  my $did_something = mypause_daemon_inspector::loop();
+  mypause_daemon_inspector::loop();
   last if $mypause_daemon_inspector::Terminated;
-  sleep $did_something ? 5 : $PAUSE::Config->{SLEEP};
+  my $sleep = $PAUSE::Config->{SLEEP};
+  # sleep $did_something ? 5 : $PAUSE::Config->{SLEEP};
+  $0 = "paused: sleeping $sleep";
+  sleep $sleep;
 }
 
 exit;
@@ -120,6 +123,8 @@ use List::Util qw(max);
 # package mypause_daemon_inspector
 sub loop () { # we're NOT called as a method
 
+
+  $0 = "paused: now in loop()";
 
   my $self = bless {}, __PACKAGE__;
 
@@ -166,7 +171,10 @@ sub loop () { # we're NOT called as a method
                     ) }; #};
 
   $sth = $dbh->prepare($query);
-  unless ( $sth->execute ) {
+  if ( $sth->execute ) {
+    my $rows = $sth->rows;
+    $self->logge("Info: rows[$rows] to process");
+  } else {
     $self->logge("Alert: $DBI::errstr");
     return;
   }
@@ -177,9 +185,8 @@ sub loop () { # we're NOT called as a method
   $self->{STH2} = $sth2;
 
   # we have a continue block, so be careful with the scope
-  my($hash, $hash_orig, $did_something);
+  my($hash, $hash_orig);
  URIRECORD: while ( $hash  = $sth->fetchrow_hashref ) {
-    $did_something++;
     $self->{URIRECORD} = $hash;
     if ($] > 5.007) {
       require Encode;
@@ -336,7 +343,6 @@ skip        =not yet verified
   $sth->finish;
   $sth2->finish;
   $dbh->disconnect;
-  return $did_something;
 }
 
 # package mypause_daemon_inspector
