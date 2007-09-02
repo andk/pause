@@ -17,6 +17,7 @@ use DBI ();
 use Exporter;
 use Fcntl qw(:flock);
 use File::Basename qw(dirname);
+use File::Spec ();
 use IO::File ();
 use MD5 ();
 use Mail::Send ();
@@ -315,6 +316,7 @@ sub newfile_hook ($) {
   my $rf = File::Rsync::Mirror::Recentfile->new(
                                                 canonize => "naive_path_normalize",
                                                 localroot => "/home/ftp/pub/PAUSE/authors/id/",
+                                                intervals => [qw(2d)],
                                                );
   $rf->update($f,"new");
 }
@@ -324,6 +326,7 @@ sub delfile_hook ($) {
   my $rf = File::Rsync::Mirror::Recentfile->new(
                                                 canonize => "naive_path_normalize",
                                                 localroot => "/home/ftp/pub/PAUSE/authors/id/",
+                                                intervals => [qw(2d)],
                                                );
   $rf->update($f,"delete");
 }
@@ -337,6 +340,7 @@ sub delfile_hook ($) {
   use accessors qw(
                    canonize
                    localroot
+                   intervals
                   );
 
   sub new {
@@ -360,25 +364,29 @@ sub delfile_hook ($) {
     }
     my $lrd = $self->localroot;
     if ($f =~ s|\Q$lrd\E||) {
-      my $rfile = "$lrd/RECENT-2d.yaml";
-      open my $fh, ">>", $rfile;
-      flock $fh, LOCK_EX;
-      my $recent = eval { YAML::Syck::LoadFile($rfile); };
-      $recent ||= [];
-    TRUNCATE: while (@$recent) {
-        if ($recent->[-1]{epoch} < time-60*60*48) {
-          pop @$recent;
-        } else {
-          last TRUNCATE;
+      for my $interval (@{$self->intervals}) {
+        my $rfile = File::Spec->catfile($lrd, "RECENT-$interval.yaml");
+        my $secs = $self->interval_to_seconds($interval);
+        my $oldest_allowed = time-$secs;
+        open my $fh, ">>", $rfile;
+        flock $fh, LOCK_EX;
+        my $recent = eval { YAML::Syck::LoadFile($rfile); };
+        $recent ||= [];
+      TRUNCATE: while (@$recent) {
+          if ($recent->[-1]{epoch} < $oldest_allowed) {
+            pop @$recent;
+          } else {
+            last TRUNCATE;
+          }
         }
-      }
-      # remove older duplicate, irrespective of $what:
-      $recent = [ grep { $_->{path} ne $f } @$recent ];
+        # remove older duplicate, irrespective of $what:
+        $recent = [ grep { $_->{path} ne $f } @$recent ];
 
-      unshift @$recent, { epoch => time, path => $f, type => $what };
-      YAML::Syck::DumpFile("$rfile.new",$recent);
-      rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
-      close $fh;
+        unshift @$recent, { epoch => time, path => $f, type => $what };
+        YAML::Syck::DumpFile("$rfile.new",$recent);
+        rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+        close $fh;
+      }
     }
   }
 
@@ -388,6 +396,17 @@ sub delfile_hook ($) {
     1 while $f =~ s|/[^/]+/\.\./|/|;
     $f =~ s|/$||;
     $f;
+  }
+
+  sub recent_events {
+    my($self, $interval) = @_;
+    die "FIXME";
+  }
+
+  sub interval_to_seconds {
+    my($self,$interval) = @_;
+    return 60*60*48 if $interval eq "2d";
+    die "FIXME";
   }
 
 }
