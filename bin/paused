@@ -32,7 +32,11 @@ if (open $lockfh, "+>>", $pidfile) {
   if (flock $lockfh, LOCK_EX|LOCK_NB) {
     truncate $lockfh, 0 or die;
     seek $lockfh, 0, 0;
+    # because we must not close, we need to flush
+    my $ofh = select $lockfh;
+    $|=1;
     print $lockfh $$, "\n";
+    select $ofh;
   } else {
     die "other paused job running, ".
         "will not run at the same time";
@@ -40,7 +44,7 @@ if (open $lockfh, "+>>", $pidfile) {
 } else {
   die "Could not open pidfile[$pidfile]: $!";
 }
-# must no close $lockfh, need to hold lock
+# must no close $lockfh
 
 $SIG{HUP} = \&sighup;
 $SIG{TERM} = $SIG{INT} = \&sigtermint;
