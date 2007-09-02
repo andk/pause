@@ -64,9 +64,9 @@ umask 0002;
 mypause_daemon_inspector->logge("Info: Starting in a new process");
 
 while () {
-  mypause_daemon_inspector::loop();
+  my $did_something = mypause_daemon_inspector::loop();
   last if $mypause_daemon_inspector::Terminated;
-  sleep $PAUSE::Config->{SLEEP};
+  sleep $did_something ? 5 : $PAUSE::Config->{SLEEP};
 }
 
 exit;
@@ -160,8 +160,9 @@ sub loop () { # we're NOT called as a method
   $self->{STH2} = $sth2;
 
   # we have a continue block, so be careful with the scope
-  my($hash, $hash_orig);
+  my($hash, $hash_orig, $did_something);
  URIRECORD: while ( $hash  = $sth->fetchrow_hashref ) {
+    $did_something++;
     $self->{URIRECORD} = $hash;
     if ($] > 5.007) {
       require Encode;
@@ -318,6 +319,7 @@ skip        =not yet verified
   $sth->finish;
   $sth2->finish;
   $dbh->disconnect;
+  return $did_something;
 }
 
 # package mypause_daemon_inspector
