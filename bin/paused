@@ -167,11 +167,11 @@ sub loop () { # we're NOT called as a method
 	      WHERE length(userid) > 1
                 AND ( dverified=''
                       OR
-                      dverified > '$old'
+                      dverified+0 > ?
                     ) }; #};
 
   $sth = $dbh->prepare($query);
-  if ( $sth->execute ) {
+  if ( $sth->execute($old) ) {
     my $rows = $sth->rows;
     $self->logge("Info: rows[$rows]old[$old] to process");
   } else {
