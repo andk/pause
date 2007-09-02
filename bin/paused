@@ -6,19 +6,20 @@ my $Id = qq!paused, v$VERSION!;
 
 use lib "/home/k/PAUSE/lib";
 
+use DBI ();
 use File::Path ();
+use Getopt::Long;
 use HTTP::Date ();
 use HTTP::Status ();
 use IO::File ();
+use List::Util qw(max);
 use LWP ();
 use MD5 ();
 use Mail::Send ();
-use DBI ();
 use PAUSE ();
 use PAUSE::MailAddress ();
 use POSIX ":sys_wait_h";
 use URI::URL ();
-use Getopt::Long;
 
 use strict;
 use vars qw(%Opt);
@@ -700,7 +701,8 @@ gives [$ls]\n\n";
 # package mypause_daemon_inspector
 sub logge {
   my($self,$arg) = @_;
-  my $stamp = $self->timestamp() . " \$\$$$ v$VERSION: ";
+  my $v = max $VERSION, $PAUSE::VERSION;
+  my $stamp = $self->timestamp() . " \$\$$$ v$v: ";
   my @caller = caller;
   shift @caller;
   $caller[0] =~ s|.*/||;
