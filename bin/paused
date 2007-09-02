@@ -85,7 +85,6 @@ while () {
   last if $mypause_daemon_inspector::Terminated;
   my $sleep = $PAUSE::Config->{SLEEP};
   # sleep $did_something ? 5 : $PAUSE::Config->{SLEEP};
-  $self->logge("Info: sleeping $sleep");
   $0 = "paused: sleeping $sleep";
   sleep $sleep;
 }
@@ -344,6 +343,7 @@ skip        =not yet verified
   $sth->finish;
   $sth2->finish;
   $dbh->disconnect;
+  $self->logge("Info: leaving loop");
 }
 
 # package mypause_daemon_inspector
