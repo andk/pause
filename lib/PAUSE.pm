@@ -74,7 +74,7 @@ $PAUSE::Config ||=
      RUNTIME_MLDISTWATCH => 600, # 720 was the longest of on 2003-08-10,
                                  # 2004-12-xx we frequently see >20 minutes
                                  # 2006-05-xx 7-9 minutes observed
-     SLEEP => 90,
+     SLEEP => 75,
      # path to repository without "/trunk"
      SVNPATH => "/home/SVN/repos",
      # path to where we find the svn binaries
