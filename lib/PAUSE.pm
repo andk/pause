@@ -314,6 +314,7 @@ sub newfile_hook ($) {
   my($f) = @_;
   my $rf = File::Rsync::Mirror::Recentfile->new(
                                                 canonize => "naive_path_normalize",
+                                                localroot => "/home/ftp/pub/PAUSE/authors/id/",
                                                );
   $rf->update($f,"new");
 }
@@ -322,6 +323,7 @@ sub delfile_hook ($) {
   my($f) = @_;
   my $rf = File::Rsync::Mirror::Recentfile->new(
                                                 canonize => "naive_path_normalize",
+                                                localroot => "/home/ftp/pub/PAUSE/authors/id/",
                                                );
   $rf->update($f,"delete");
 }
@@ -334,6 +336,7 @@ sub delfile_hook ($) {
 
   use accessors qw(
                    canonize
+                   localroot
                   );
 
   sub new {
@@ -355,8 +358,9 @@ sub delfile_hook ($) {
         $f = $self->$meth($f);
       }
     }
-    if ($f =~ s|/home/ftp/pub/PAUSE/authors/id/||) {
-      my $rfile = "/home/ftp/pub/PAUSE/authors/id/RECENT-2d.yaml";
+    my $lrd = $self->localroot;
+    if ($f =~ s|\Q$lrd\E||) {
+      my $rfile = "$lrd/RECENT-2d.yaml";
       open my $fh, ">>", $rfile;
       flock $fh, LOCK_EX;
       my $recent = eval { YAML::Syck::LoadFile($rfile); };
