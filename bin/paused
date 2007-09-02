@@ -35,7 +35,7 @@ if (open $lockfh, "+>>", $pidfile) {
     # because we must not close, we need to flush
     my $ofh = select $lockfh;
     $|=1;
-    print $lockfh $$, "\n";
+    print $lockfh $$;
     select $ofh;
   } else {
     die "other paused job running, ".
