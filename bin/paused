@@ -12,7 +12,6 @@ use Getopt::Long;
 use HTTP::Date ();
 use HTTP::Status ();
 use IO::File ();
-use List::Util qw(max);
 use LWP ();
 use MD5 ();
 use Mail::Send ();
@@ -98,6 +97,8 @@ sub send {
 }
 
 package mypause_daemon_inspector;
+
+use List::Util qw(max);
 
 # package mypause_daemon_inspector
 sub loop () { # we're NOT called as a method
