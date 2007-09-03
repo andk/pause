@@ -8,7 +8,18 @@ posted by Steffen mueller on modules@perl.org on Aug 31, 2007
 
 use strict;
 use warnings;
-require "03modlist.data";
+{
+  open my $fh1, '<', "03modlist.data" or die;
+  while (<$fh1>) {
+    next unless /^\s*$/;
+    last;
+  }
+  local $/;
+  my $code = <$fh1>;
+  warn sprintf "length(code)[%d]", length $code;
+  eval $code;
+  close $fh1;
+}
 
 open my $fh, '<', "02packages.details.txt" or die $!;
 my %packages;
