@@ -313,21 +313,23 @@ sub gtest {
 
 sub newfile_hook ($) {
   my($f) = @_;
-  my $rf = File::Rsync::Mirror::Recentfile->new(
-                                                canonize => "naive_path_normalize",
-                                                localroot => "/home/ftp/pub/PAUSE/authors/id/",
-                                                intervals => [qw(2d)],
-                                               );
+  my $rf = File::Rsync::Mirror::Recentfile->new
+      (
+       canonize => "naive_path_normalize",
+       localroot => "/home/ftp/pub/PAUSE/authors/id/",
+       intervals => [qw(2d)],
+      );
   $rf->update($f,"new");
 }
 
 sub delfile_hook ($) {
   my($f) = @_;
-  my $rf = File::Rsync::Mirror::Recentfile->new(
-                                                canonize => "naive_path_normalize",
-                                                localroot => "/home/ftp/pub/PAUSE/authors/id/",
-                                                intervals => [qw(2d)],
-                                               );
+  my $rf = File::Rsync::Mirror::Recentfile->new
+      (
+       canonize => "naive_path_normalize",
+       localroot => "/home/ftp/pub/PAUSE/authors/id/",
+       intervals => [qw(2d)],
+      );
   $rf->update($f,"delete");
 }
 
@@ -335,6 +337,7 @@ sub delfile_hook ($) {
   package File::Rsync::Mirror::Recentfile;
 
   use Fcntl qw(:flock);
+  use File::Rsync;
   use YAML::Syck;
 
   use accessors qw(
@@ -342,9 +345,12 @@ sub delfile_hook ($) {
                    localroot
                    intervals
                    _default_interval
+                   _remotebase
                    remote_host
                    remote_module
                    remote_dir
+                   _rsync
+                   rsync_options
                   );
 
   sub new {
@@ -413,11 +419,20 @@ sub delfile_hook ($) {
   sub recentfile {
     my($self, $interval) = @_;
     $interval ||= $self->default_interval;
-    my $recent = File::Spec->catfile($self->localroot,
-                                     sprintf("RECENT-%s.yaml",
-                                             $interval
-                                            ));
+    my $recent = File::Spec->catfile(
+                                     $self->localroot,
+                                     $self->recentfile_basename($interval),
+                                    );
     return $recent;
+  }
+
+  sub recentfile_basename {
+    my($self, $interval) = @_;
+    $interval ||= $self->default_interval;
+    my $file = sprintf("RECENT-%s.yaml",
+                       $interval
+                      );
+    return $file;
   }
 
   sub interval_to_seconds {
@@ -444,6 +459,31 @@ sub delfile_hook ($) {
     return $return;
   }
 
+  sub remotebase {
+    my($self) = @_;
+    my $remotebase = $self->_remotebase;
+    unless (defined $remotebase) {
+      $remotebase = sprintf(
+                            "%s::%s/%s",
+                            $self->remote_host,
+                            $self->remote_module,
+                            $self->remote_dir,
+                           );
+      $self->_remotebase($remotebase);
+    }
+    return $remotebase;
+  }
+
+  sub rsync {
+    my($self) = @_;
+    my $rsync = $self->_rsync;
+    unless (defined $rsync) {
+      my $rsync_options = $self->rsync_options || {};
+      $rsync = File::Rsync->new($rsync_options);
+      $self->_rsync($rsync);
+    }
+    return $rsync;
+  }
 }
 
 1;

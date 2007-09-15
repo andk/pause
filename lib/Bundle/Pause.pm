@@ -33,6 +33,7 @@ XML::SAX::Writer
 DB_File::Lock
 
 Time::Period
+File::Rsync
 
 Encode::MIME::Header
 
