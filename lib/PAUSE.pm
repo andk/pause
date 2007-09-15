@@ -341,6 +341,10 @@ sub delfile_hook ($) {
                    canonize
                    localroot
                    intervals
+                   _default_interval
+                   remote_host
+                   remote_module
+                   remote_dir
                   );
 
   sub new {
@@ -400,13 +404,44 @@ sub delfile_hook ($) {
 
   sub recent_events {
     my($self, $interval) = @_;
-    die "FIXME";
+    $interval ||= $self->default_interval;
+    my $recent = $self->recentfile($interval);
+    my($recent_data) = YAML::Syck::LoadFile($recent);
+    $recent_data;
+  }
+
+  sub recentfile {
+    my($self, $interval) = @_;
+    $interval ||= $self->default_interval;
+    my $recent = File::Spec->catfile($self->localroot,
+                                     sprintf("RECENT-%s.yaml",
+                                             $interval
+                                            ));
+    return $recent;
   }
 
   sub interval_to_seconds {
     my($self,$interval) = @_;
     return 60*60*48 if $interval eq "2d";
     die "FIXME";
+  }
+
+  sub default_interval {
+    my($self,$set) = @_;
+    if ($set) {
+      $self->_default_interval($set);
+    }
+    my $return;
+    if ($return = $self->_default_interval) {
+    } elsif (my $ivls = $self->intervals) {
+      if (@$ivls) {
+        $return = $ivls->[0];
+      }
+    } else {
+      die "Neither a default interval nor an array of intervals specified";
+    }
+    # warn "DEBUG: return[$return]";
+    return $return;
   }
 
 }
