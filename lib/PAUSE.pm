@@ -369,16 +369,16 @@ sub delfile_hook ($) {
   }
 
   sub update {
-    my($self,$f,$what) = @_;
+    my($self,$path,$what) = @_;
     if (my $meth = $self->canonize) {
       if (ref $meth && ref $meth eq "CODE") {
         die "FIXME";
       } else {
-        $f = $self->$meth($f);
+        $path = $self->$meth($path);
       }
     }
     my $lrd = $self->localroot;
-    if ($f =~ s|\Q$lrd\E||) {
+    if ($path =~ s|\Q$lrd\E||) {
       for my $interval (@{$self->intervals}) {
         my $rfile = File::Spec->catfile($lrd, "RECENT-$interval.yaml");
         my $secs = $self->interval_to_seconds($interval);
@@ -395,9 +395,9 @@ sub delfile_hook ($) {
           }
         }
         # remove older duplicate, irrespective of $what:
-        $recent = [ grep { $_->{path} ne $f } @$recent ];
+        $recent = [ grep { $_->{path} ne $path } @$recent ];
 
-        unshift @$recent, { epoch => time, path => $f, type => $what };
+        unshift @$recent, { epoch => time, path => $path, type => $what };
         YAML::Syck::DumpFile("$rfile.new",$recent);
         rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
         close $fh;
@@ -406,11 +406,11 @@ sub delfile_hook ($) {
   }
 
   sub naive_path_normalize {
-    my($self,$f) = @_;
-    $f =~ s|/+|/|g;
-    1 while $f =~ s|/[^/]+/\.\./|/|;
-    $f =~ s|/$||;
-    $f;
+    my($self,$path) = @_;
+    $path =~ s|/+|/|g;
+    1 while $path =~ s|/[^/]+/\.\./|/|;
+    $path =~ s|/$||;
+    $path;
   }
 
   sub recent_events {
