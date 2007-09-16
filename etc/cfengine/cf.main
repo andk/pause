@@ -5,6 +5,7 @@ files:
   any::
     /var/log/PAUSE-httpd/.    mode=0775 owner=root group=www-data action=touch
     /var/run/httpd/deadmeat/. mode=0755 owner=www-data group=www-data action=touch
+    /home/k/PAUSE/privatelib/. mode=0750 owner=k group=k action=touch
 
 links:
   any::

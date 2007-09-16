@@ -16,7 +16,6 @@ use Compress::Zlib ();
 use DBI ();
 use Exporter;
 use Fcntl qw(:flock);
-use File::Basename qw(dirname);
 use File::Spec ();
 use IO::File ();
 use MD5 ();
@@ -93,7 +92,10 @@ $PAUSE::Config ||=
     };
 
 
-require PrivatePAUSE;
+eval { require PrivatePAUSE; };
+if ($@) {
+  # warn "Could not find or read PrivatePAUSE.pm; will try to work without";
+}
 
 
 =pod
@@ -337,7 +339,10 @@ sub delfile_hook ($) {
   package File::Rsync::Mirror::Recentfile;
 
   use Fcntl qw(:flock);
+  use File::Basename qw(dirname);
+  use File::Path qw(mkpath);
   use File::Rsync;
+  use File::Temp;
   use YAML::Syck;
 
   use accessors qw(
@@ -412,8 +417,59 @@ sub delfile_hook ($) {
     my($self, $interval) = @_;
     $interval ||= $self->default_interval;
     my $recent = $self->recentfile($interval);
-    my($recent_data) = YAML::Syck::LoadFile($recent);
+    my($recent_data) = $self->recent_events_from_file($recent);
     $recent_data;
+  }
+
+  sub recent_events_from_file {
+    my($self, $file) = @_;
+    die "called without file" unless defined $file;
+    my($recent_data) = YAML::Syck::LoadFile($file);
+    $recent_data;
+  }
+
+  sub local_event_path {
+    my($self,$path) = @_;
+    my @p = split m|/|, $path; # rsync paths are always slash-separated
+    File::Spec->catfile($self->localroot,@p);
+  }
+
+  sub mirror_path {
+    my($self,$path) = @_;
+    my $dst = $self->local_event_path($path);
+    mkpath dirname $dst;
+    unless ($self->rsync->exec
+            (
+             src => join("/",
+                         $self->remotebase,
+                         $path
+                        ),
+             dst => $dst,
+            )) {
+      die sprintf "Error: %s", $self->rsync->err;
+    }
+    return 1;
+  }
+
+  sub get_remote_recentfile_as_tempfile {
+    my($self,$interval) = @_;
+    my($fh) = File::Temp->new(TEMPLATE => ".RECENT-XXXX",
+                              DIR => $self->localroot,
+                              SUFFIX => "yaml",
+                              UNLINK => 0,
+                             );
+    my($trecentfile) = $fh->filename;
+    unless ($self->rsync->exec(
+                               src => join("/",
+                                           $self->remotebase,
+                                           $self->recentfile_basename),
+                               dst => $trecentfile,
+                              )) {
+      die sprintf "Error while rsyncing: %s", $self->rsync->err;
+    }
+    my $mode = 0644;
+    chmod $mode, $trecentfile;
+    return $trecentfile;
   }
 
   sub recentfile {
