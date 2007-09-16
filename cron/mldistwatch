@@ -1338,12 +1338,19 @@ sub mlroot {
 
         if ($mtime) {
             # ftp-mirroring can send us up to one day old files
-            if ($mtime > $checksumtime - 86400) {
-                $self->writechecksum($dirname);
+            my $sane_checksumtime = $mtime + 86400;
+            if ($sane_checksumtime > $checksumtime) {
+                $self->writechecksum($dirname); # may do nothing
                 $checksumtime = (stat "$dirname/CHECKSUMS")[9] || 0;
-                if ($mtime > $checksumtime - 86400) {
-                    my $xtime = List::Util::min(time, $mtime+86401);
-                    utime $xtime, $xtime, "$dirname/CHECKSUMS";
+                if ($sane_checksumtime > $checksumtime # still too old
+                    &&
+                    time > $sane_checksumtime          # and now in the past
+                   ) {
+                    utime(
+                          $sane_checksumtime,
+                          $sane_checksumtime,
+                          "$dirname/CHECKSUMS",
+                         );
                 }
             }
             if ($mtime > $otherts) {
