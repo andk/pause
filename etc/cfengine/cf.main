@@ -23,6 +23,7 @@ links:
     /etc/init.d/PAUSE-rsyncd             ->! ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
     /etc/logrotate.d/csync2              ->! ../../home/k/PAUSE/etc/logrotate.d/csync2
     /etc/logrotate.d/mldistwatch         ->! ../../home/k/PAUSE/etc/logrotate.d/mldistwatch
+    /etc/logrotate.d/rsyncd              ->! ../../home/k/PAUSE/etc/logrotate.d/rsyncd
     /etc/mail/local-host-names           ->! ../../home/k/PAUSE/etc/mail/local-host-names
     /etc/mail/sendmail.mc                ->! ../../home/k/PAUSE/etc/mail/sendmail.mc
     /etc/mon/mon.cf                      ->! ../../home/k/PAUSE/etc/mon/mon.cf
