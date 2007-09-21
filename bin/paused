@@ -173,7 +173,7 @@ sub loop () { # we're NOT called as a method
   $sth = $dbh->prepare($query);
   if ( $sth->execute($old) ) {
     my $rows = $sth->rows;
-    $self->logge("Info: rows[$rows]old[$old] to process");
+    # $self->logge("Info: rows[$rows]old[$old] to process");
   } else {
     $self->logge("Alert: $DBI::errstr");
     return;
@@ -343,7 +343,7 @@ skip        =not yet verified
   $sth->finish;
   $sth2->finish;
   $dbh->disconnect;
-  $self->logge("Info: leaving loop");
+  # $self->logge("Info: leaving loop");
 }
 
 # package mypause_daemon_inspector
