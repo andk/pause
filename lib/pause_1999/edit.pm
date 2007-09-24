@@ -2526,6 +2526,13 @@ sub add_user {
 	my($suserid,$sfullname, $spublic_email, $shomepage,
 	   $sintroduced, $schangedby, $schanged);
 	my @rows;
+        # if a user has a preference to display secret emails in a
+        # certain color, they can enter it here:
+        my %se_color_map = (
+                            jv => "black",
+                            andk => "white",
+                           );
+        my $se_color = $se_color_map{lc $mgr->{User}{userid}} || "red";
 	while (($suserid, $sfullname, $spublic_email, $shomepage,
 		$sintroduced, $schangedby, $schanged) =
                $mgr->fetchrow($sth, "fetchrow_array")) {
@@ -2533,6 +2540,8 @@ sub add_user {
 	  next unless $s_func->($dbsurname) eq $s_code;
           my $ssecretemail = $self->get_secretemail($mgr, $suserid);
 	  push @rows, "<tr>";
+          my $broken_spublic_email = $spublic_email;
+          $broken_spublic_email =~ s|@|<br/>@|;
           push @rows, map(
                           "<td>".(
                                   defined($_)&&length($_) ?
@@ -2541,11 +2550,11 @@ sub add_user {
                                  )."</td>",
                           $suserid,
                           $sfullname,
-                          $spublic_email,
+                          $broken_spublic_email,
                          );
           push @rows, "<td>";
           if ($ssecretemail) {
-            push @rows, "<span style='color: red'>secret&nbsp;email:&nbsp;$ssecretemail</span><br/>";
+            push @rows, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$ssecretemail</span><br/>";
           }
           if ($shomepage) {
             push @rows, "homepage:&nbsp;$shomepage<br/>";
@@ -2555,11 +2564,12 @@ sub add_user {
             $time =~ s/\s/\&nbsp;/g;
             push @rows, "introduced&nbsp;on:&nbsp;$time<br/>";
           }
-          push @rows, "changed&nbsp;by:&nbsp;$schangedby<br/>";
           if ($schanged) {
             my $time = scalar(gmtime($schanged));
             $time =~ s/\s/\&nbsp;/g;
-            push @rows, "changed&nbsp;on:&nbsp;$time<br/>";
+            push @rows, "changed&nbsp;on:&nbsp;$time&nbsp;by&nbsp;$schangedby<br/>";
+          } else {
+            push @rows, "changed&nbsp;by:&nbsp;$schangedby<br/>";
           }
           push @rows, "</tr>\n";
 	}
