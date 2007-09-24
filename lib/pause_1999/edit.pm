@@ -2540,8 +2540,6 @@ sub add_user {
 	  next unless $s_func->($dbsurname) eq $s_code;
           my $ssecretemail = $self->get_secretemail($mgr, $suserid);
 	  push @rows, "<tr>";
-          my $broken_spublic_email = $spublic_email;
-          $broken_spublic_email =~ s|@|<br/>@|;
           push @rows, map(
                           "<td>".(
                                   defined($_)&&length($_) ?
@@ -2550,8 +2548,11 @@ sub add_user {
                                  )."</td>",
                           $suserid,
                           $sfullname,
-                          $broken_spublic_email,
                          );
+          my $broken_spublic_email = $spublic_email;
+          $broken_spublic_email =~ $mgr->escapeHTML($broken_spublic_email);
+          $broken_spublic_email =~ s|@|<br/>@|;
+          push @rows, "<td>$broken_spublic_email</td>";
           push @rows, "<td>";
           if ($ssecretemail) {
             push @rows, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$ssecretemail</span><br/>";
