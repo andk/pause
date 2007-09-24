@@ -2534,9 +2534,7 @@ sub add_user {
           my $ssecretemail = $self->get_secretemail($mgr, $suserid);
 	  push @rows, "<tr>",
 	      map(
-		  "<td".(
-                         /^!!.+!!$/ ? qq{ style="color: red"} : ""
-                        ).">".(
+		  "<td>".(
                           defined($_)&&length($_) ?
                           $mgr->escapeHTML($_) :
                           "&nbsp;"
@@ -2544,7 +2542,7 @@ sub add_user {
                   $suserid,
                   $sfullname,
 		  $spublic_email,
-		  $ssecretemail ? "!!$ssecretemail!!" : "",
+		  $ssecretemail ? $ssecretemail : "",
 		  $shomepage,
 		  $sintroduced ? scalar(gmtime($sintroduced)) : "?",
 		  $schangedby,
@@ -2563,7 +2561,7 @@ sub add_user {
  <tr><td>userid</td>
  <td>fullname</td>
  <td>(public) email</td>
- <th style="color: red;">!!!SECRET!!! email</th>
+ <th style="color: red;">secret email</th>
  <td>homepage</td>
  <td>introduced</td>
  <td>changedby</td>
