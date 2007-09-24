@@ -2532,23 +2532,36 @@ sub add_user {
 	  (my $dbsurname = $sfullname) =~ s/.*\s//;
 	  next unless $s_func->($dbsurname) eq $s_code;
           my $ssecretemail = $self->get_secretemail($mgr, $suserid);
-	  push @rows, "<tr>",
-	      map(
-		  "<td>".(
-                          defined($_)&&length($_) ?
-                          $mgr->escapeHTML($_) :
-                          "&nbsp;"
-                         )."</td>",
-                  $suserid,
-                  $sfullname,
-		  $spublic_email,
-		  $ssecretemail ? $ssecretemail : "",
-		  $shomepage,
-		  $sintroduced ? scalar(gmtime($sintroduced)) : "?",
-		  $schangedby,
-		  $schanged ? scalar(gmtime($schanged)) : "?",
-		 ),
-		      "</tr>\n";
+	  push @rows, "<tr>";
+          push @rows, map(
+                          "<td>".(
+                                  defined($_)&&length($_) ?
+                                  $mgr->escapeHTML($_) :
+                                  "&nbsp;"
+                                 )."</td>",
+                          $suserid,
+                          $sfullname,
+                          $spublic_email,
+                         );
+          push @rows, "<td>";
+          if ($ssecretemail) {
+            push @rows, "<span style='color: red'>secret email: $ssecretemail</span><br/>";
+          }
+          if ($shomepage) {
+            push @rows, "homepage: $shomepage<br/>";
+          }
+          if ($sintroduced) {
+            my $time = scalar(gmtime($sintroduced));
+            $time =~ s/\s/\&nbsp;/g;
+            push @rows, "introduced on: $time<br/>";
+          }
+          push @rows, "changed by: $schangedby<br/>";
+          if ($schanged) {
+            my $time = scalar(gmtime($schanged));
+            $time =~ s/\s/\&nbsp;/g;
+            push @rows, "changed on: $time<br/>";
+          }
+          push @rows, "</tr>\n";
 	}
 	if (@rows) {
 	  $doit = 0;
@@ -2561,11 +2574,7 @@ sub add_user {
  <tr><td>userid</td>
  <td>fullname</td>
  <td>(public) email</td>
- <th style="color: red;">secret email</th>
- <td>homepage</td>
- <td>introduced</td>
- <td>changedby</td>
- <td>changed</td>
+ <td>other</td>
  </tr>
 };
 	  push @rows, qq{</table>\n};
