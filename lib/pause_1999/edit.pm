@@ -2545,21 +2545,21 @@ sub add_user {
                          );
           push @rows, "<td>";
           if ($ssecretemail) {
-            push @rows, "<span style='color: red'>secret email: $ssecretemail</span><br/>";
+            push @rows, "<span style='color: red'>secret&nbsp;email:&nbsp;$ssecretemail</span><br/>";
           }
           if ($shomepage) {
-            push @rows, "homepage: $shomepage<br/>";
+            push @rows, "homepage:&nbsp;$shomepage<br/>";
           }
           if ($sintroduced) {
             my $time = scalar(gmtime($sintroduced));
             $time =~ s/\s/\&nbsp;/g;
-            push @rows, "introduced on: $time<br/>";
+            push @rows, "introduced&nbsp;on:&nbsp;$time<br/>";
           }
-          push @rows, "changed by: $schangedby<br/>";
+          push @rows, "changed&nbsp;by:&nbsp;$schangedby<br/>";
           if ($schanged) {
             my $time = scalar(gmtime($schanged));
             $time =~ s/\s/\&nbsp;/g;
-            push @rows, "changed on: $time<br/>";
+            push @rows, "changed&nbsp;on:&nbsp;$time<br/>";
           }
           push @rows, "</tr>\n";
 	}
