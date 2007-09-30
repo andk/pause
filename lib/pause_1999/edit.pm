@@ -3344,8 +3344,9 @@ things didn't proceed as expected.</p>";
 }
 
 sub edit_mod {
-  my pause_1999::edit $self = shift;
+  my $self = shift;
   my $mgr = shift;
+  $mgr->prefer_post(0);
   my(@m);
   my $req = $mgr->{CGI};
   my $selectedid = "";
@@ -4984,8 +4985,8 @@ a  - abandoned; volunteers welcome to take over maintainance<br/>
     stands for GNU General Public License, <br /> <b> LGPL</b> for GNU
     Lesser General Public License (previously known as "GNU Library
     General Public License"),<br /> <b>BSD</b> for the BSD License,
-    <br /> <b>Artistic</b> for the Artistic license alone,
-    <b>Artistic_2 for the artistic license 2.0 or later<br />
+    <br /> <b>Artistic</b> for the Artistic license alone,<br />
+    <b>Artistic_2</b> for the artistic license 2.0 or later<br />
     <b>open-source</b> for any other Open Source license listed at <a
     href="http://www.opensource.org/licenses/">http://www.opensource.org/licenses/</a>,
     <br /><b>distribution_allowed</b> is for any license that is not
@@ -5865,7 +5866,7 @@ sub share_perms {
         <td valign="top">$scrolling_list_1</td>
         <td align="right" valign="top">
           <input type="submit"
-                 name="weaksubmit_pause99_edit_mod_2"
+                 name="pause99_edit_mod_2"
                  value="Select" />
         </td>
         <td valign="top">

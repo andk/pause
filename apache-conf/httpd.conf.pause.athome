@@ -11,6 +11,8 @@
 # same username and password on both machines or we write a special
 # rule for them in PrivatePAUSE which is also OK.
 
+# (0) k76 currently uses /usr/local/perl-5.8.7/bin/cpan
+
 ServerName k76b.linux.bogus
 HostnameLookups Off
 User www-data
