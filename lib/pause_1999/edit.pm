@@ -831,6 +831,7 @@ The Pause
 sub select_user {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
+  $mgr->prefer_post(0);
   my $req = $mgr->{CGI};
   if (my $action = $req->param("ACTIONREQ")) {
     if (
