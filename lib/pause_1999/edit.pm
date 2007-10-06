@@ -1316,8 +1316,8 @@ sub add_uri {
   my $u = $self->active_user_record($mgr);
   die Apache::HeavyCGI::Exception
       ->new(ERROR =>
-            "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!")
+            "Unidentified error happened, please write to the PAUSE admins
+ at $PAUSE::Config->{ADMIN} and help them identifying what's going on. Thanks!")
           unless $u->{userid};
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
   my $can_multipart = $mgr->can_multipart;
@@ -1330,7 +1330,6 @@ sub add_uri {
   my $didit = 0;
   my $mailblurb = "";
   my $success = "";
-  my $mail_announce;
   my $now = time;
   if (
       $req->param("SUBMIT_pause99_add_uri_httpupload") || # from 990806
@@ -1440,211 +1439,9 @@ filename[%s]. </p>
 
   if (! $uri ) {
     push @m, "\n\n<div class='noactionnoresponse'></div>\n\n";
-    
   } else {
-    # Oh, let's process that thar URL!
-    push @m, "\n\n<blockquote class='actionresponse'>\n",
-     "<!-- start of response to user's action -->\n\n",
-    ;
-
-    require URI::URL;
-    eval { URI::URL->new("$uri", $PAUSE::Config->{INCOMING}); };
-
-
-    if ($@) {
-      die Apache::HeavyCGI::Exception
-	  ->new(ERROR => [qq{
-Sorry, <b>$uri</b> could not be recognized as an uri (},
-			  $@,
-			 qq{\)<p>Please
-try again or report errors to <a
-href="mailto:},
-			  $PAUSE::Config->{ADMIN},
-			  qq{">the administrator</a></p>}]);
-    } else {
-      my $filename;
-      ($filename = $uri) =~ s,.*/,, ;
-      $filename =~ s/[^A-Za-z0-9_\-\.\@\+]//g; # only ASCII-\w and - . @ + allowed
-
-      if ($filename eq "CHECKSUMS") {
-        # userid DERHAAG demonstrated that it could be uploaded on 2002-04-26
-        die Apache::HeavyCGI::Exception
-            ->new(ERROR => "Files with the name CHECKSUMS cannot be
-                            uploaded to CPAN, they are reserved for
-                            CPAN's internals.");
-
-      }
-
-      my $subdir = "";
-      if ( $req->param("pause99_add_uri_subdirtext") ) {
-        $subdir = $req->param("pause99_add_uri_subdirtext");
-      } elsif ( $req->param("pause99_add_uri_subdirscrl") ) {
-        $subdir = $req->param("pause99_add_uri_subdirscrl");
-      }
-
-      my $uriid = "$userhome/$filename";
-
-      if (defined $subdir && length $subdir) {
-        # disallowing . to make /./ and /../ handling easier
-        $subdir =~ s|[^A-Za-z0-9_\-\@\+/]||g; # as above minus "." plus "/"
-        $subdir =~ s|^/+||;
-        $subdir =~ s|/$||;
-        $subdir =~ s|/+|/|g;
-      }
-      if (defined $subdir && length $subdir) {
-        $uriid = "$userhome/$subdir/$filename";
-      }
-
-      if ( length $uriid > 255 ) {
-        die Apache::HeavyCGI::Exception
-            ->new(ERROR => "Path name too long: $uriid is longer than
-                255 characters.");
-      }
-
-    ALLOW_OVERWRITE: if (
-	  $filename =~ /(readme|\.html|\.txt|\.[xy]ml|\.[pr]df|\.pod)(\.gz|\.bz2)?$/i
-          ||
-          $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!
-	 ) {
-	# Overwriting allowed
-	my $dele_query = "DELETE FROM uris WHERE uriid = '$uriid'";
-	$dbh->do($dele_query);
-      }
-      $mail_announce = $req->param("pause99_add_uri_mail_announce")
-	  if $mgr->{UserGroups}{admin} || $mgr->{UserGroups}{pumpking};
-      $mail_announce ||= "";
-      my $query = qq{INSERT INTO uris
-                            (uriid,     userid,
-                             basename,
-                             uri,    mailto_p5p,
-		             changedby, changed)
-                     VALUES ('$uriid', '$u->{userid}',
-                             '$filename',
-                             '$uri', '$mail_announce',
-                             '$mgr->{User}{userid}', '$now')};
-      #display query
-      my $cp = $mgr->escapeHTML($query);
-      push @m, qq{<h3>Submitting query</h3>};
-      if ($mgr->{UseModuleSet} eq "patchedCGI") {
-        warn "patchedCGI not supported anymore";
-	my @debug = "DEBUGGING patched CGI:\n";
-	push @debug, scalar localtime;
-	my %headers_in = $r->headers_in;
-	for my $h (keys %headers_in) {
-          next if $h =~ /Authorization/; # security!
-	  push @debug, sprintf " %s: %s\n", $h, $headers_in{$h};
-	}
-	for ($req->param) {
-	  push @debug, " $_: ";
-	  my($val) = $req->param($_);
-	  push @debug, $val;
-	  push @debug, "<br />\n";
-	  if (ref $val) {
-	    push @debug, " <blockquote>";
-	    my $valh;
-	    if ($val->can("multipart_header")) {
-	      $valh = $val->multipart_header;
-	    } else {
-	      push(
-                   @debug,
-                   "      CAN'T multipart_header, val[$val]<br /></ul><br />\n");
-	      next;
-	    }
-	    push @debug, "      valh[$valh]";
-	    for my $h (keys %$valh) {
-	      push @debug, "      $h: $valh->{$h}<br />\n";
-	    }
-	    push @debug, " </blockquote><br />\n";
-	  }
-	}
-	warn join "", @debug;
-	push @m, "Resulting SQL: ", $cp;
-      }
-      local($dbh->{RaiseError}) = 0;
-      if ($dbh->do($query)) {
-	$success .= qq{
-
-The request is now entered into the database where the PAUSE daemon
-will pick it up as soon as possible (usually 1-2 minutes).
-
-};
-	$didit = 1;
-	push @m, (qq{
-
-<p>Query succeeded. <b>Thank you for your contribution</b></p>
-
-<p>As it is done by a separate process, it may take a few minutes to
-complete the upload. The processing of your file is going on while you
-read this. There\'s no need for you to retry. The form below is only
-here in case you want to upload further files.</p>
-
-<p><b>Please tidy up your homedir:</b> CPAN is getting larger every day which
-is nice but usually there is no need to keep old an outdated version
-of a module on several hundred mirrors. Please consider <a
-href="authenquery?ACTION=delete_files">removing</a> old versions of
-your module from PAUSE and CPAN. If you are worried that someone might
-need an old version, it can always be found on the <a
-href="http://backpan.cpan.org/authors/id/$userhome/">backpan</a>
-</p>
-
-});
-
-	my $tmpdir = "ftp://$server/tmp/$userhome";
-	my $usrdir = "https://$server/pub/PAUSE/authors/id/$userhome";
-	my $tailurl = "https://$server/pause/authenquery?ACTION=tail_logfile" .
-            "&pause99_tail_logfile_1=5000";
-	my $etailurl = $mgr->escapeHTML($tailurl);
-	push @m, (qq{
-
-<p><b>Debugging:</b> you may want to watch the temporary directory
-where your submission should show up soon: <a
-href="$tmpdir">$tmpdir</a> (be patient, this directory may not exist
-yet). If it passes some simple tests, it will be uploaded to its <a
-href="$usrdir">final destination</a>. If something's wrong, please
-check the logfile of the daemon. See the tail of it with <a
-href="$etailurl">$etailurl</a>. If you already know what's going wrong, you
-may wish to visit the <a href="authenquery?ACTION=edit_uris">repair
-tool</a> for pending uploads.</p>
-
-}
-		 );
-
-	$success .= qq{
-
-During upload you can watch the logfile in $tailurl.
-
-You'll be notified as soon as the upload has succeeded, and if the
-uploaded package contains modules, you'll get another notification
-from the indexer a little later (usually within 1 hour).
-
-};
-
-      } else {
-	my $errmsg = $dbh->errstr;
-	push @m, (qq{
-
-<p><b>Could not enter the URL into the database.
-Reason:</b></p><p>$errmsg</p>
-
-});
-	if ($errmsg =~ /non\s+unique\s+key|Duplicate/i) {
-	  push @m, qq{
-
-<p>This indicates that you probably tried to upload a file that is
-already in the database. You will most probably have to rename your
-file and try again, because <b>PAUSE doesn\'t let you upload a file
-twice</b>.</p>
-
-};
-	}
-      }
-    }
-    
-    push @m, "\n<!-- end of the response to the user's action -->\n</blockquote>\n";
-    
-    push @m, (qq{<hr noshade="noshade" />\n});
+    push @m, $self->add_uri_continue_with_uri($mgr,$uri,\$success,\$didit);
   }
-  
 
   if ( exists $mgr->{UserGroups}{pumpking} ) {
     push @m, qq{\n<b>For pumpkings only</b>:};
@@ -1885,6 +1682,225 @@ into $her directory. The request used the following parameters:});
   }
 
   @m;
+}
+
+sub add_uri_continue_with_uri {
+  my($self,$mgr,$uri,$success,$didit) = @_;
+  my $req = $mgr->{CGI};
+  my $u = $self->active_user_record($mgr);
+  my $userhome = PAUSE::user2dir($u->{userid});
+  my $dbh = $mgr->connect;
+  my $now = time;
+  my $r = $mgr->{R};
+  my $server = $r->server->server_hostname;
+  my @m;
+    push @m, "\n\n<blockquote class='actionresponse'>\n",
+     "<!-- start of response to user's action -->\n\n",
+    ;
+
+    require URI::URL;
+    eval { URI::URL->new("$uri", $PAUSE::Config->{INCOMING}); };
+
+
+    if ($@) {
+      die Apache::HeavyCGI::Exception
+	  ->new(ERROR => [qq{
+Sorry, <b>$uri</b> could not be recognized as an uri (},
+			  $@,
+			 qq{\)<p>Please
+try again or report errors to <a
+href="mailto:},
+			  $PAUSE::Config->{ADMIN},
+			  qq{">the administrator</a></p>}]);
+    } else {
+      my $filename;
+      ($filename = $uri) =~ s,.*/,, ;
+      $filename =~ s/[^A-Za-z0-9_\-\.\@\+]//g; # only ASCII-\w and - . @ + allowed
+
+      if ($filename eq "CHECKSUMS") {
+        # userid DERHAAG demonstrated that it could be uploaded on 2002-04-26
+        die Apache::HeavyCGI::Exception
+            ->new(ERROR => "Files with the name CHECKSUMS cannot be
+                            uploaded to CPAN, they are reserved for
+                            CPAN's internals.");
+
+      }
+
+      my $subdir = "";
+      if ( $req->param("pause99_add_uri_subdirtext") ) {
+        $subdir = $req->param("pause99_add_uri_subdirtext");
+      } elsif ( $req->param("pause99_add_uri_subdirscrl") ) {
+        $subdir = $req->param("pause99_add_uri_subdirscrl");
+      }
+
+      my $uriid = "$userhome/$filename";
+
+      if (defined $subdir && length $subdir) {
+        # disallowing . to make /./ and /../ handling easier
+        $subdir =~ s|[^A-Za-z0-9_\-\@\+/]||g; # as above minus "." plus "/"
+        $subdir =~ s|^/+||;
+        $subdir =~ s|/$||;
+        $subdir =~ s|/+|/|g;
+      }
+      if (defined $subdir && length $subdir) {
+        $uriid = "$userhome/$subdir/$filename";
+      }
+
+      if ( length $uriid > 255 ) {
+        die Apache::HeavyCGI::Exception
+            ->new(ERROR => "Path name too long: $uriid is longer than
+                255 characters.");
+      }
+
+    ALLOW_OVERWRITE: if (
+	  $filename =~ /(readme|\.html|\.txt|\.[xy]ml|\.[pr]df|\.pod)(\.gz|\.bz2)?$/i
+          ||
+          $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!
+	 ) {
+	# Overwriting allowed
+	my $dele_query = "DELETE FROM uris WHERE uriid = '$uriid'";
+	$dbh->do($dele_query);
+      }
+      my $mail_announce = $req->param("pause99_add_uri_mail_announce")
+	  if $mgr->{UserGroups}{admin} || $mgr->{UserGroups}{pumpking};
+      $mail_announce ||= "";
+      my $query = qq{INSERT INTO uris
+                            (uriid,     userid,
+                             basename,
+                             uri,    mailto_p5p,
+		             changedby, changed)
+                     VALUES ('$uriid', '$u->{userid}',
+                             '$filename',
+                             '$uri', '$mail_announce',
+                             '$mgr->{User}{userid}', '$now')};
+      #display query
+      my $cp = $mgr->escapeHTML($query);
+      push @m, qq{<h3>Submitting query</h3>};
+      if ($mgr->{UseModuleSet} eq "patchedCGI") {
+        warn "patchedCGI not supported anymore";
+	my @debug = "DEBUGGING patched CGI:\n";
+	push @debug, scalar localtime;
+	my %headers_in = $r->headers_in;
+	for my $h (keys %headers_in) {
+          next if $h =~ /Authorization/; # security!
+	  push @debug, sprintf " %s: %s\n", $h, $headers_in{$h};
+	}
+	for ($req->param) {
+	  push @debug, " $_: ";
+	  my($val) = $req->param($_);
+	  push @debug, $val;
+	  push @debug, "<br />\n";
+	  if (ref $val) {
+	    push @debug, " <blockquote>";
+	    my $valh;
+	    if ($val->can("multipart_header")) {
+	      $valh = $val->multipart_header;
+	    } else {
+	      push(
+                   @debug,
+                   "      CAN'T multipart_header, val[$val]<br /></ul><br />\n");
+	      next;
+	    }
+	    push @debug, "      valh[$valh]";
+	    for my $h (keys %$valh) {
+	      push @debug, "      $h: $valh->{$h}<br />\n";
+	    }
+	    push @debug, " </blockquote><br />\n";
+	  }
+	}
+	warn join "", @debug;
+	push @m, "Resulting SQL: ", $cp;
+      }
+      local($dbh->{RaiseError}) = 0;
+      if ($dbh->do($query)) {
+	$$success .= qq{
+
+The request is now entered into the database where the PAUSE daemon
+will pick it up as soon as possible (usually 1-2 minutes).
+
+};
+	$$didit = 1;
+	push @m, (qq{
+
+<p>Query succeeded. <b>Thank you for your contribution</b></p>
+
+<p>As it is done by a separate process, it may take a few minutes to
+complete the upload. The processing of your file is going on while you
+read this. There\'s no need for you to retry. The form below is only
+here in case you want to upload further files.</p>
+
+<p><b>Please tidy up your homedir:</b> CPAN is getting larger every day which
+is nice but usually there is no need to keep old an outdated version
+of a module on several hundred mirrors. Please consider <a
+href="authenquery?ACTION=delete_files">removing</a> old versions of
+your module from PAUSE and CPAN. If you are worried that someone might
+need an old version, it can always be found on the <a
+href="http://backpan.cpan.org/authors/id/$userhome/">backpan</a>
+</p>
+
+});
+
+	my $tmpdir = "ftp://$server/tmp/$userhome";
+	my $usrdir = "https://$server/pub/PAUSE/authors/id/$userhome";
+	my $tailurl = "https://$server/pause/authenquery?ACTION=tail_logfile" .
+            "&pause99_tail_logfile_1=5000";
+	my $etailurl = $mgr->escapeHTML($tailurl);
+	push @m, (qq{
+
+<p><b>Debugging:</b> you may want to watch the temporary directory
+where your submission should show up soon: <a
+href="$tmpdir">$tmpdir</a> (be patient, this directory may not exist
+yet). If it passes some simple tests, it will be uploaded to its <a
+href="$usrdir">final destination</a>. If something's wrong, please
+check the logfile of the daemon. See the tail of it with <a
+href="$etailurl">$etailurl</a>. If you already know what's going wrong, you
+may wish to visit the <a href="authenquery?ACTION=edit_uris">repair
+tool</a> for pending uploads.</p>
+
+}
+		 );
+
+	$$success .= qq{
+
+During upload you can watch the logfile in $tailurl.
+
+You'll be notified as soon as the upload has succeeded, and if the
+uploaded package contains modules, you'll get another notification
+from the indexer a little later (usually within 1 hour).
+
+};
+
+      } else {
+	my $errmsg = $dbh->errstr;
+	push @m, (qq{
+
+<p><b>Could not enter the URL into the database.
+Reason:</b></p><p>$errmsg</p>
+
+});
+	if ($errmsg =~ /non\s+unique\s+key|Duplicate/i) {
+          my $sth = $dbh->prepare("SELECT * FROM uris WHERE uriid=?");
+          $sth->execute($uriid);
+          my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
+          my $as_table = $self->hash_as_table($rec);
+	  push @m, qq{
+
+<p>This indicates that you probably tried to upload a file that is
+already in the database. You will most probably have to rename your
+file and try again, because <b>PAUSE doesn\'t let you upload a file
+twice</b>.</p>
+
+<p>This seems to be the record causing the conflict:<br/>$as_table</p>
+
+};
+	}
+      }
+    }
+    
+    push @m, "\n<!-- end of the response to the user's action -->\n</blockquote>\n";
+    
+    push @m, (qq{<hr noshade="noshade" />\n});
+  return @m;
 }
 
 sub manifind {
@@ -2684,9 +2700,14 @@ sub usertable {
   $sth->execute($userid);
   return unless $sth->rows == 1;
   my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
+  return $self->hash_as_table($rec);
+}
+
+sub hash_as_table {
+  my($self,$rec) = @_;
   my @m;
   push @m, qq{<table border="1">};
-  for my $k (keys %$rec) {
+  for my $k (sort keys %$rec) {
     push @m, sprintf(qq{<tr><td>%s</td><td>%s</td></tr>\n},
                      $k,
                      $rec->{$k} || "&nbsp;"
