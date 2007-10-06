@@ -161,7 +161,7 @@ sub loop () { # we're NOT called as a method
   $self->{DBH} = $dbh;
 
   # Not yet known is how it could happen that 5 uploads came without a
-  # userid. We didn;t catch it:-(
+  # userid. We didn't catch it:-(
   $query = qq{SELECT *
               FROM uris
 	      WHERE length(userid) > 1
