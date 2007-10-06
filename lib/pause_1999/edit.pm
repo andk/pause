@@ -1883,8 +1883,8 @@ Reason:</b></p><p>$errmsg</p>
           $sth->execute($uriid);
           my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
           for my $k (qw(changed dgot dverified)) {
-            if ($k) {
-              $rec->{$k} .= sprintf " [%s GMT]", scalar gmtime $k;
+            if ($rec->{$k}) {
+              $rec->{$k} .= sprintf " [%s GMT]", scalar gmtime $rec->{$k};
             }
           }
           my $as_table = $self->hash_as_table($rec);
