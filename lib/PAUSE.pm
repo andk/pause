@@ -383,9 +383,9 @@ sub delfile_hook ($) {
         my $rfile = File::Spec->catfile($lrd, "RECENT-$interval.yaml");
         my $secs = $self->interval_to_seconds($interval);
         my $oldest_allowed = time-$secs;
-        open my $fh, ">>", $rfile or die "Couldn't open '$rfile': $!";
+        open my $fh, ">", "$rfile.lock" or die "Couldn't open '$rfile.lock': $!";
         flock $fh, LOCK_EX;
-        my $recent = eval { YAML::Syck::LoadFile($rfile); };
+        my $recent = $self->recent_events_from_file($rfile);
         $recent ||= [];
       TRUNCATE: while (@$recent) {
           if ($recent->[-1]{epoch} < $oldest_allowed) {
@@ -400,6 +400,7 @@ sub delfile_hook ($) {
         unshift @$recent, { epoch => time, path => $path, type => $what };
         YAML::Syck::DumpFile("$rfile.new",$recent);
         rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+        unlink "$rfile.lock";
         close $fh;
       }
     }
@@ -424,8 +425,6 @@ sub delfile_hook ($) {
   sub recent_events_from_file {
     my($self, $file) = @_;
     die "called without file" unless defined $file;
-    open my $fh, "<", $file or die "Couldn't open '$file': $!";
-    flock $fh, LOCK_SH;
     my($recent_data) = YAML::Syck::LoadFile($file);
     $recent_data;
   }
