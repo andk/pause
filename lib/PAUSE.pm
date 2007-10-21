@@ -338,11 +338,11 @@ sub delfile_hook ($) {
 {
   package File::Rsync::Mirror::Recentfile;
 
-  use Fcntl qw(:flock);
   use File::Basename qw(dirname);
   use File::Path qw(mkpath);
   use File::Rsync;
   use File::Temp;
+  use Time::HiRes qw(sleep);
   use YAML::Syck;
 
   use accessors qw(
@@ -383,8 +383,14 @@ sub delfile_hook ($) {
         my $rfile = File::Spec->catfile($lrd, "RECENT-$interval.yaml");
         my $secs = $self->interval_to_seconds($interval);
         my $oldest_allowed = time-$secs;
-        open my $fh, ">", "$rfile.lock" or die "Couldn't open '$rfile.lock': $!";
-        flock $fh, LOCK_EX;
+
+        # not using flock because it locks on filehandles instead of
+        # old school ressources.
+        my $locked;
+        while (!$locked) {
+          sleep 0.01;
+          $locked = mkdir "$rfile.lock";
+        }
         my $recent = $self->recent_events_from_file($rfile);
         $recent ||= [];
       TRUNCATE: while (@$recent) {
@@ -400,8 +406,7 @@ sub delfile_hook ($) {
         unshift @$recent, { epoch => time, path => $path, type => $what };
         YAML::Syck::DumpFile("$rfile.new",$recent);
         rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
-        unlink "$rfile.lock";
-        close $fh;
+        rmdir "$rfile.lock";
       }
     }
   }
