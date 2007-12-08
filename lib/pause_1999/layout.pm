@@ -86,24 +86,17 @@ work. The estimated downtime is $willlast_dur.</p>}; #};
     push @l, qq{</div>};
 
   } elsif (time < $downtime+$willlast) {
-    my $user =  $mgr->{User}{userid};
+    my $user = $mgr->{User}{userid};  # if closed and somebody comes
+                                      # here, it currently is always
+                                      # ANDK
 
-    push @l, qq{<div align="center"> <p class="motd">Hi $user, I'm a
-bit surprised to see you here. Right now PAUSE is closed for
-maintainance. Please be careful not to disturb the database operation.
-Expect failures everywhere.</p> </div>};
+    my $closed_text = $mgr->{R}->notes("CLOSED");
 
-  }
-
-  if (time <  1078009200 ) {
-    push @l, qq{<div align="center">};
-
-    push @l, qq{<p class="motd"><b>Scheduled Downtime</b><br/> On
-Saturday, Feb 28, the PAUSE box may be down for several hours due to
-scheduled power outages. The exact times of the outages are not yet
-known. Sorry for the inconvenience.</p>};
-
-    push @l, qq{</div>};
+    push @l, qq{<div align="center"> <p class="motd">Hi $user, you
+see the site now <b>but it is closed for maintainance</b>.
+Please be careful not to disturb the database operation. Expect
+failures everywhere. Do not edit anything, it may get lost. Other
+users get the following text:</p> $closed_text </div>};
 
   }
 

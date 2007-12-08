@@ -29,20 +29,29 @@ sub handler {
   my $downtime = $dti->{downtime};
   my $willlast = $dti->{willlast};
   my $user = $r->connection->user;
-  if (time >= $downtime && time < $downtime + $willlast && $user ne "ANDK") {
-    $r->content_type("text/html");
-    $r->send_http_header;
+  if (time >= $downtime && time < $downtime + $willlast) {
     use Time::Duration;
     my $delta = $downtime + $willlast - time;
     my $expr = Time::Duration::duration($delta);
     my $willlast_dur = Time::Duration::duration($willlast);
 
-    $r->print(qq{<html> <head><title>PAUSE CLOSED</title></head><body>
-<h1>Closed for Maintainance</h1> <p>PAUSE is closed for maintainance for
-about $willlast_dur. Estimated time of opening is in $expr.</p><p>Sorry for the
-inconvenience and Thanks for your patience.</p><p>Andreas Koenig</p></body> </html>});
+    my $closed_text = qq{<p class="motd">PAUSE is closed for
+maintainance for about $willlast_dur. Estimated time of opening is in
+$expr.</p><p class="motd">Sorry for the inconvenience and Thanks for
+your patience.</p>};
 
-    return Apache::Constants::OK;
+    if ($user eq "ANDK") { # would prefer a check of the admin role here
+      $r->notes("CLOSED", $closed_text);
+    } else {
+      $r->content_type("text/html");
+      $r->send_http_header;
+
+      $r->print(qq{<html> <head><title>PAUSE
+CLOSED</title></head><body> <h1>Closed for Maintainance</h1>
+$closed_text <p>Andreas Koenig</p></body> </html>});
+
+      return Apache::Constants::OK;
+    }
   }
   my $self = pause_1999::main->
       new(
