@@ -155,6 +155,7 @@ sub handler {
 	     };
 
   my $dbh;
+  warn "DEBUG: attr.data_source[$attr->{data_source}]";
   unless ($dbh = DBI->connect($attr->{data_source},
 			      $attr->{username},
 			      $attr->{password})) {

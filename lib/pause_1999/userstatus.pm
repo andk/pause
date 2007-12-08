@@ -7,8 +7,8 @@ use utf8;
 our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub as_string {
-  my pause_1999::userstatus $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $self = shift;
+  my $mgr = shift;
   my $r = $mgr->{R};
   my $user = $r->connection->user;
   my $server = $mgr->myurl->can("host") ? $mgr->myurl->host : $mgr->myurl->hostname;

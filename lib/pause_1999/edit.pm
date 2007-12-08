@@ -338,6 +338,7 @@ sub active_user_record {
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   my $hidden_user = shift || $req->param('HIDDENNAME') || "";
+  my $opt = shift || {}; # hashref, e.g. checkonly => 1
   {
     my $uc_hidden_user = uc $hidden_user;
     unless ($uc_hidden_user eq $hidden_user) {
@@ -384,7 +385,10 @@ sub active_user_record {
 
     # $h1 should now be WNODOM's record
 
-    if (
+    if ($opt->{checkonly}) {
+      # since we have checkonly this is the MSERGEANT case
+      return $h1;
+    } elsif (
 	$h1->{isa_list}
        ) {
 
@@ -3629,7 +3633,7 @@ mlstatus
               $param = $ucparam;
               $req->param($fieldname, $param);
             }
-            my $nu = $self->active_user_record($mgr, $param);
+            my $nu = $self->active_user_record($mgr, $param, {checkonly => 1});
 
             die Apache::HeavyCGI::Exception
                 ->new(ERROR => sprintf("Unknown user[%s]",

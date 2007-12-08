@@ -8,7 +8,7 @@ our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub layout {
   my($self) = shift;
-  my pause_1999::main $mgr = shift;
+  my $mgr = shift;
 
   # on a high-end application we would cache aggressively the three or
   # twelve layouts that might be generated. On the PAUSE we don't mind

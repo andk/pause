@@ -21,8 +21,8 @@ use vars qw( $Exeplan );
 our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub as_string {
-  my pause_1999::speedlinkgif $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $self = shift;
+  my $mgr = shift;
   my $pngjpg = $mgr->can_png ? "png" : "jpg";
   my $pnggif = $mgr->can_png ? "png" : "gif";
   my $validator_href = "http://validator.w3.org/check/referer";

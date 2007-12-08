@@ -7,8 +7,8 @@ use utf8;
 our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 
 sub as_string {
-  my pause_1999::message $self = shift;
-  my pause_1999::main $mgr = shift;
+  my $self = shift;
+  my $mgr = shift;
   my $r = $mgr->{R};
   my $user = $mgr->{HiddenUser}{userid} || $mgr->{User}{userid} or return;
   my @m;
