@@ -150,7 +150,18 @@ Alias /bugzilla/ /home/ldachary/webspace/
 
   PerlSetVar ReloadAll Off
   PerlSetVar ReloadDebug On
-  PerlSetVar ReloadModules "pause_1999::config pause_1999::main PAUSE"
+  PerlSetVar ReloadModules "pause_1999::config \
+                            pause_1999::authen_user \
+                            pause_1999::edit \
+                            pause_1999::layout \
+                            pause_1999::main \
+                            pause_1999::message \
+                            pause_1999::speedlinkgif \
+                            pause_1999::startform \
+                            pause_1999::userstatus \
+                            PAUSE \
+                            PrivatePAUSE \
+"
 <Perl>
 
 
