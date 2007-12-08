@@ -136,8 +136,8 @@ downtime, then we're back to normal operation.
 
 sub downtimeinfo {
   return +{
-           downtime => 1143373084,
-           willlast => 900,
+           downtime => 1197129600,
+           willlast => 1800,
           };
 }
 
@@ -170,8 +170,10 @@ sub filehash {
 
 sub dbh {
   my($db) = shift || "mod";
+  my $dsn = $PAUSE::Config->{uc($db)."_DATA_SOURCE_NAME"};
+  warn "DEBUG: dsn[$dsn]";
   DBI->connect(
-               $PAUSE::Config->{uc($db)."_DATA_SOURCE_NAME"},
+               $dsn,
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_USER"},
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_PW"},
                { RaiseError => 1 }
@@ -336,6 +338,46 @@ sub delfile_hook ($) {
 }
 
 {
+  # File::Mirror           (JWU/File-Mirror/File-Mirror-0.10.tar.gz)      only local trees
+  # Mirror::YAML           (ADAMK/Mirror-YAML-0.02.tar.gz)                make test hangs
+  # Net::DownloadMirror    (KNORR/Net-DownloadMirror-0.04.tar.gz)         FTP sites and stuff
+  # Net::MirrorDir         (KNORR/Net-MirrorDir-0.05.tar.gz)              "
+  # Net::UploadMirror      (KNORR/Net-UploadMirror-0.06.tar.gz)           "
+  # Pushmi::Mirror         (CLKAO/Pushmi-v1.0.0.tar.gz)                   something SVK
+
+  package File::Rsync::Mirror::Recentdata;
+
+  use Scalar::Util qw(reftype);
+
+  sub new {
+    my($class,$data) = @_;
+    if (my $reftype = reftype $data) {
+      if ($reftype eq 'ARRAY') {
+        bless {
+               meta => {
+                        protocol => 1,
+                       },
+               recent => $data,
+              }, $class;
+      } elsif ($reftype eq 'HASH') {
+        die "FIXME: not yet implemented";
+      } else {
+        die "Invalid data: neither array nor hash";
+      }
+    } else {
+      die "Invalid data: not a ref";
+    }
+  }
+
+  sub recent {
+    my($self,$recent) = @_;
+    my $old = $self->{recent};
+    if (defined $recent) {
+      $self->{recent} = $recent;
+    }
+    return $old;
+  }
+
   package File::Rsync::Mirror::Recentfile;
 
   use File::Basename qw(dirname);
