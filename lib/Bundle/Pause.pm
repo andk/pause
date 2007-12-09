@@ -167,6 +167,7 @@ Apache
 Apache::AuthDBI
 Apache::Session
 Apache::Session::Counted
+Apache::Reload
 Apache::Request
 Apache::HeavyCGI
 
