@@ -136,8 +136,8 @@ downtime, then we're back to normal operation.
 
 sub downtimeinfo {
   return +{
-           downtime => 1197133200,
-           willlast => 5400,
+           downtime => 1197317508,
+           willlast => 1800,
           };
 }
 
