@@ -31,8 +31,13 @@ HTTPDCONF=/home/k/PAUSE/apache-conf/httpsd.conf.pause
 case "$1" in
   start)
 	echo -n "Starting httpd: "
-        : limit coredumpsize 30m -- commend not known
 	nice -11 $HTTPD -f $HTTPDCONF
+	echo
+	touch /var/lock/httpd
+	;;
+  startwithmax1)
+	echo -n "Starting httpd with maxrequestperchild set to 1: "
+	nice -11 $HTTPD -f $HTTPDCONF -DONE_PROCESS
 	echo
 	touch /var/lock/httpd
 	;;
