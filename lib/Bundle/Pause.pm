@@ -54,6 +54,7 @@ XML::Parser
 Class::Singleton -- lexikon
 Unicode::String -- Apache::HeavyCGI
 YAML
+YAML::Syck
 
 Text::Unidecode
 
@@ -160,6 +161,7 @@ XML::LibXML -- OReilly
 XML::LibXSLT -- OReilly
 
 XML::Simple
+
 
 BerkeleyDB
 

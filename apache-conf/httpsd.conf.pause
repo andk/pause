@@ -149,7 +149,7 @@ Alias /bugzilla/ /home/ldachary/webspace/
   PerlSetupEnv Off
 
   PerlSetVar ReloadAll Off
-  PerlSetVar ReloadDebug On
+  PerlSetVar ReloadDebug Off
   PerlSetVar ReloadModules "pause_1999::config \
                             pause_1999::authen_user \
                             pause_1999::edit \
