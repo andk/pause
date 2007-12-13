@@ -44,7 +44,7 @@ a.menuitem { text-decoration: none; }
 a.menuitem:hover { text-decoration: underline; }
 h4.altering { margin: 0 0 12px; }
 p.motd { margin: 10px 1in; padding: 5px; color: black; background: yellow; font-size: small; }
-p.versionspecial { margin: 10px 1in; padding: 5px; color: white; background: black; font-size: small; }
+p.versionspecial { margin: 10px 1in; padding: 5px; color: white; background: gray; font-size: small; }
 a.versionspecial { color: yellow; }
 a.versionspecial:hover { color: red; }
 td.activemenu { border: green solid 1px; }

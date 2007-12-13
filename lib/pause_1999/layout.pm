@@ -72,8 +72,8 @@ $hspecial
   my $willlast = $mgr->{WillLast}||0;
   if ($] > 5.009005) {
     require Config;
-    push @l, sprintf(qq{<p class="versionspecial">PAUSE is running under %vd},
-                     $^V,
+    push @l, sprintf(qq{<p class="versionspecial">PAUSE is running under %s},
+                     $Config::Config{bin},
                     );
     push @l, sprintf(qq{, cf_time %s<br/>},
                      $Config::Config{cf_time},
