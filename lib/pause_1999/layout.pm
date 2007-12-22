@@ -72,19 +72,20 @@ $hspecial
   my $willlast = $mgr->{WillLast}||0;
   if ($] > 5.009005) {
     require Config;
-    push @l, sprintf(qq{<p class="versionspecial">PAUSE is running under %s},
-                     $Config::Config{bin},
+    my($bin) = $Config::Config{bin} =~ m|^.*?/perl-(.+?)/|;
+    push @l, sprintf(qq{<p class="versionspecial">This is perl %s;},
+                     $bin,
                     );
-    push @l, sprintf(qq{, cf_time %s<br/>},
+    push @l, sprintf(qq{ cf_time %s; },
                      $Config::Config{cf_time},
                     );
 
-    push @l, qq{If you encounter problems during your visit at PAUSE,
-    please retry your request at <a class="versionspecial"
-    href="https://pause.perl.org:8443/pause/authenquery">Port&nbsp;8443&nbsp;(SSL)</a>,
-    where perl 5.8.7 should be running. Or, if you can't use SSL, try
-    <a class="versionspecial"
-    href="http://pause.perl.org:8000/pause/query">Port&nbsp;8000</a>.</p>};
+    push @l, qq{when you run into problems try <a
+    class="versionspecial"
+    href="https://pause.perl.org:8443/pause/authenquery">Port&nbsp;8443&nbsp;(https)</a>,
+    where perl 5.8.7 should be running (or <a class="versionspecial"
+    href="http://pause.perl.org:8000/pause/query">Port&nbsp;8000</a>
+    if you need http).</p>};
 
   }
 
