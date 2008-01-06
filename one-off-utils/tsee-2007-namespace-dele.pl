@@ -259,5 +259,7 @@ for my $dele (@dele) {
   $cnt = $sth4->execute($dele);
   print ".m$cnt|";
   die "die assertion failure: $dele/$cnt" unless $cnt==1;
+  print "'$dele' done\n";
+  sleep 2;
 }
 
