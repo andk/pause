@@ -1,5 +1,16 @@
 #!/usr/local/bin/perl -w
 
+=pod
+
+Before extended-insert:
+
+-rw-r--r--  1 root root 39114962 Jan  6 15:47 moddump.current
+-rw-r--r--  1 root root  7031636 Jan  6 15:47 moddump.200801061447GMT.bz2
+
+After extended-insert:
+
+=cut
+
 use strict;
 
 our $Id = q$Id$;
@@ -34,7 +45,7 @@ for my $struct (@$Struct) {
   my $user = $PAUSE::Config->{$struct->{cfg_user}};
   my $password = $PAUSE::Config->{$struct->{cfg_pw}};
   for my $var ($db,$user,$password) {
-    die "$Id$var =~ /['";]/;
+    die "$Id$var =~ /[\'\"\;]/;
   }
   my $master_data = "";
   if ($struct->{master}) {
