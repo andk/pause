@@ -206,21 +206,25 @@ for my $e (@confirmed,@handchecked) {
 
 die sprintf "assertion failure: \@dele not == 116+48: %d", scalar @dele, unless @dele == 116+48;
 
-$|=1;
-for my $dele (@dele) {
-  print ".";
-  my @result = `grep "'$dele'" ~/dproj/PAUSE/00-before-SVN/modulelist/moddump.current`;
 
-  for my $table (qw(mods perms primeur)) {
-    my @subresult = grep /INSERT INTO .$table. /, @result;
-    my $max = 1;
-    if ($dele =~ /^(Apache::DCELogin|WWW::Search::.*)$/) {
-      $max = 2;
-    }
-    if (@subresult > $max) {
-      local $" = "\n";
-      warn @subresult < 20 ? "@subresult" : sprintf "%s and %d more", $subresult[0], @subresult-1;
-      die "not exactly one record for '$dele'";
+$|=1;
+
+if (-f "$ENV{HOME}/dproj/PAUSE/00-before-SVN/modulelist/moddump.current") {
+  for my $dele (@dele) {
+    print ".";
+    my @result = `grep "'$dele'" ~/dproj/PAUSE/00-before-SVN/modulelist/moddump.current`;
+    
+    for my $table (qw(mods perms primeur)) {
+      my @subresult = grep /INSERT INTO .$table. /, @result;
+      my $max = 1;
+      if ($dele =~ /^(Apache::DCELogin|WWW::Search::.*)$/) {
+        $max = 2;
+      }
+      if (@subresult > $max) {
+        local $" = "\n";
+        warn @subresult < 20 ? "@subresult" : sprintf "%s and %d more", $subresult[0], @subresult-1;
+        die "not exactly one record for '$dele'";
+      }
     }
   }
 }
