@@ -9,6 +9,9 @@ Before extended-insert:
 
 After extended-insert:
 
+-rw-r--r--  1 root root 50195254 Jan  6 17:47 moddump.current
+-rw-r--r--  1 root root  7203437 Jan  6 17:47 moddump.200801061647GMT.bz2
+
 =cut
 
 use strict;
