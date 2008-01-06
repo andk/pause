@@ -34,13 +34,13 @@ for my $struct (@$Struct) {
   my $user = $PAUSE::Config->{$struct->{cfg_user}};
   my $password = $PAUSE::Config->{$struct->{cfg_pw}};
   for my $var ($db,$user,$password) {
-    die "$Id: illegal variable value[$var]" if $var =~ /['";]/;
+    die "$Id$var =~ /['";]/;
   }
   my $master_data = "";
   if ($struct->{master}) {
     $master_data = " --master-data";
   }
-  system "mysqldump$master_data --lock-tables --add-drop-table --user='$user' --password='$password' '$db' > $backup_dir/.${db}dump.current";
+  system "mysqldump$master_data --lock-tables --add-drop-table --user='$user' --password='$password' '--extended-insert=0' '$db' > $backup_dir/.${db}dump.current";
   rename "$backup_dir/.${db}dump.current", "$backup_dir/${db}dump.current";
   unlink "$backup_dir/${db}dump.current.bz2";
   system "$BZIP -9 --keep --small $backup_dir/${db}dump.current";
