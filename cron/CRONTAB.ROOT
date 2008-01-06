@@ -7,8 +7,8 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 45 * * * *            find /home/ftp/pub/PAUSE/authors/id -name CHECKSUMS -exec perl -c {} \; 2>&1 | grep -v OK | cat
 * * * * *             date -u > /home/ftp/tmp/02STAMP && mv /home/ftp/tmp/02STAMP /home/ftp/pub/PAUSE/authors/02STAMP
 */5 * * * *           threeware_root.sh
-*/3 * * * *           csync-wrapper.pl -G pause_perl_org -update
-*/30 * * * *          csync-wrapper.pl --check
+# */2 * * * *           csync-wrapper.pl -G pause_perl_org -update
+# 31 * * * *            csync-wrapper.pl --check
 29 * * * *            cleanup-incoming.pl
 19 06,18 * * *        cron-daily.pl
 37 05 * * *           gmls-lR.pl
