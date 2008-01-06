@@ -45,7 +45,8 @@ for my $struct (@$Struct) {
   my $user = $PAUSE::Config->{$struct->{cfg_user}};
   my $password = $PAUSE::Config->{$struct->{cfg_pw}};
   for my $var ($db,$user,$password) {
-    die "$Id$var =~ /[\'\"\;]/;
+    die q$Id$
+        if $var =~ /[\'\"\;]/;
   }
   my $master_data = "";
   if ($struct->{master}) {
