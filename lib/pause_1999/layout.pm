@@ -70,7 +70,8 @@ $hspecial
 
   my $downtime = $mgr->{DownTime}||0;
   my $willlast = $mgr->{WillLast}||0;
-  if ($] > 5.009005) {
+  my $deploy_two_apaches = 0;
+  if ($deploy_two_apaches && $] > 5.009005) {
     require Config;
     my($bin) = $Config::Config{bin} =~ m|^.*?/perl-(.+?)/|;
     push @l, sprintf(qq{<p class="versionspecial">This is perl %s;},
