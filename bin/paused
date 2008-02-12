@@ -503,7 +503,7 @@ sub welcome_file {
   my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
   my $address  = $pma->address;
   my @To = qq{"$asciiname" <$address>};
-  push @To, $PAUSE::Config->{CPAN_TESTERS};
+  push @To, $PAUSE::Config->{TO_CPAN_TESTERS};
   push @To, $PAUSE::Config->{'P5P'} if
       $hash->{'mailto_p5p'}==1;
 
@@ -542,7 +542,7 @@ No action is required on your part
     mypause_send_mail->send({
                              To => join(",",$to),
                              Subject => "CPAN Upload: $hash->{uriid}",
-                             "Reply-To" => $PAUSE::Config->{CPAN_TESTERS},
+                             "Reply-To" => $PAUSE::Config->{REPLY_TO_CPAN_TESTERS},
                             },
                             $blurb
                            );
