@@ -4581,13 +4581,26 @@ sub apply_mod {
 
       # XXX check if somebody has already uploaded the module and if
       # so, tell the user. Link to readme.
+
+      # XXX nonono, we should rather check the perms, not the uploads.
+      # If somebody else has first come rights we must reject
+      # everything now. If this user has first come rights we can
+      # auto-register immediately (unless other errors occur, maybe
+      # even a root namespace should be rejected). Only if nobody has
+      # first come rights we shall proceed with the application.
       my $rows = $sth->rows;
       if ($rows > 0) {
         my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
         my $dist = $rec->{dist};
         my $registered_userid = $mgr->file_to_user($dist);
 
-        if ($applying_userid ne $registered_userid) {
+        if ($applying_userid eq $registered_userid) {
+          if ($PAUSE::Config->{AUTO_REGISTER_FOR_FIRST_COME}) {
+            # examine the perms of this user now if he is first-come,
+            # set something so that we do not even send a mail and
+            # promote/upgrade him to state "module list" right away.
+          }
+        } else {
           push @errors, qq{Dist <i>$dist</i>, current version
         <i>$rec->{version}</i> has been uploaded by <i>$registered_userid</i>.
         Please contact <i>$registered_userid</i> or choose a different namespace.};
