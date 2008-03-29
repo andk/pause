@@ -1,0 +1,6 @@
+name: My-Dist
+version: 0.02
+provides:
+  My::Dist:
+   version: 0.02
+   file: lib/My/Dist.pm

@@ -1,0 +1,30 @@
+- 
+  - ~
+  - { skip: 0, reason: "no keyword 'no_index' or 'private' in YAML_CONTENT" }
+
+-
+  - { namespace: 'My::' }
+  - { skip: 1, reason: "due to v[My]" }
+-
+  - { namespace: [ 'My::' ] }
+  - { skip: 1, reason: "due to ve[My]" }
+-
+  - { package: 'My::Package' }
+  - { skip: 1, reason: "due to v[My::Package]" }
+-
+  - { package: [ 'My::Package' ] }
+  - { skip: 1, reason: "due to ve[My::Package]" }
+
+-
+  - { namespace: 'Your::' }
+  - { skip: 0, reason: "due to v[Your]" }
+-
+  - { namespace: ['Your::'] }
+  - { skip: 0, reason: "due to ve[Your]" }
+-
+  - { package: 'Your::Package' }
+  - { skip: 0, reason: "due to v[Your::Package]" }
+-
+  - { package: ['Your::Package'] }
+  - { skip: 0, reason: "due to ve[Your::Package]" }
+

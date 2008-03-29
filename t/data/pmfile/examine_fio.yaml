@@ -1,0 +1,10 @@
+---
+args: 
+  mock:
+    pmfile: 
+      set_always:
+        version_from_yaml_ok: 0
+        parse_version: 0.03
+tests:
+  - []
+...
