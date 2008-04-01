@@ -1,0 +1,25 @@
+default:
+	@echo nothing done
+	@echo for very quick solution run the script apache2-ssl-certificate
+
+OPENSSL = /usr/bin/openssl
+BITS    = 2048
+DAYS    = 730
+
+ssl.csr/%.csr ssl.key/%.key: ssl.cnf/%.cnf
+	[ -f "ssl.key/$*.key" ] || ${OPENSSL} genrsa -out ssl.key/$*.key $(BITS)
+	${OPENSSL} req -config $< -new -key ssl.key/$*.key -out ssl.csr/$*.csr
+
+# -x509 -nodes -days $(DAYS)
+# alles falsch, hier irgendwas mit "ca"
+ssl.crt/%.crt: ssl.csr/%.csr
+	cat ssl.key/$*.key $< > $@
+	echo ln -s -f $@ `${OPENSSL} x509 -noout -hash < $@`.0
+	cd ssl.crt && $(MAKE) -f Makefile.crtdir
+	${OPENSSL} x509 -noout -text -in $@
+	@echo Please take note of the fingerprint:
+	${OPENSSL} x509 -noout -fingerprint -in $@
+
+# Local Variables:
+# mode: Makefile
+# End:

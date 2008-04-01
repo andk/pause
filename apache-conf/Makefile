@@ -1,3 +1,5 @@
+# superceded by ~/SVN/bin/Makefile.crt which can produce csr
+
 default:
 	@echo nothing done
 
