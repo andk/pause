@@ -1,8 +1,8 @@
 [ req ]
 default_bits		= 2048
-# default_keyfile 	= privkey.pem
 distinguished_name	= req_distinguished_name
 attributes		= req_attributes
+req_extensions          = v3_req
 
 [ req_distinguished_name ]
 countryName			= Country Name (2 letter code)
@@ -31,11 +31,14 @@ emailAddress_max		= 64
 emailAddress_default            = andreas.koenig.7os6VVqR@franz.ak.mind.de
 
 [ req_attributes ]
-challengePassword		= A challenge password
-challengePassword_min		= 4
-challengePassword_max		= 20
+challengePassword	= A challenge password
+challengePassword_min	= 4
+challengePassword_max	= 20
 
-unstructuredName		= An optional company name
+unstructuredName	= An optional company name
+
+[ v3_req ]
+subjectAltName          = DNS:pause.cpan.org
 
 [ x509v3_extensions ]
 
@@ -44,4 +47,3 @@ nsComment			= "This is a comment"
 
 # under ASN.1, the 0 bit would be encoded as 80
 nsCertType			= 0x40
-

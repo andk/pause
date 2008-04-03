@@ -10,6 +10,9 @@ ssl.csr/%.csr ssl.key/%.key: ssl.cnf/%.cnf
 	[ -f "ssl.key/$*.key" ] || ${OPENSSL} genrsa -out ssl.key/$*.key $(BITS)
 	${OPENSSL} req -config $< -new -key ssl.key/$*.key -out ssl.csr/$*.csr
 
+ssl.csr/%.csr.asc: ssl.csr/%.csr
+	gpg -s -a $<
+
 # -x509 -nodes -days $(DAYS)
 # alles falsch, hier irgendwas mit "ca"
 ssl.crt/%.crt: ssl.csr/%.csr
