@@ -11,7 +11,7 @@ links:
   any::
     /etc/csync2.cfg                      ->! ../home/k/PAUSE/etc/csync2.cfg
     /etc/ntp.conf                        ->! ../home/k/PAUSE/etc/ntp.conf
-    /etc/proftpd.conf                    ->! ../home/k/PAUSE/etc/proftpd.conf
+    /etc/proftpd/proftpd.conf            ->! ../home/k/PAUSE/etc/proftpd/proftpd.conf
     /etc/rsyncd.conf                     ->! ../home/k/PAUSE/etc/rsyncd.conf
 
     /etc/apache2/apache2.conf            ->! ../../home/k/PAUSE/apache-svn-conf/httpd.conf
