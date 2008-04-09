@@ -52,12 +52,21 @@ UserDir enabled jwied
     SSLCacheServerPort 8111
   </IfDefine>
 
-  # next two lines may point to nonexisting files, it seems, but must be there
-  # SSLCACertificatePath /usr/local/ssl/demoCA/
-  # SSLCACertificateFile /usr/local/ssl/demoCA/ttt.pem
+#  #### solution before cacert: ####
+#  # next two lines may point to nonexisting files, it seems, but must be there
+#  # SSLCACertificatePath /usr/local/ssl/demoCA/
+#  # SSLCACertificateFile /usr/local/ssl/demoCA/ttt.pem
+#  SSLCertificateFile  /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
+#  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
 
-  SSLCertificateFile  /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
-  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
+  #### solution after cacert: ####
+  # I believe in this directory must be run:
+  #     ln -s -f cacert-class3.crt `openssl x509 -noout -hash < cacert-class3.crt`.0
+  #     ln -s -f pause.perl.org.crt `openssl x509 -noout -hash < pause.perl.org.crt`.0
+  SSLCACertificatePath  /home/k/PAUSE/111_sensitive/apache-conf/
+  SSLCACertificateFile  /home/k/PAUSE/111_sensitive/apache-conf/cacert-class3.crt
+  SSLCertificateFile    /home/k/PAUSE/111_sensitive/apache-conf/pause.perl.org.crt
+  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.key-200804
 
   SSLVerifyClient 0
   SSLVerifyDepth 10
