@@ -348,6 +348,32 @@ keep up the http server for the time being. So if you have
 difficulties accessing https, you can always fall back to http, but
 using SSL greatly improves your and PAUSE's security.</p>
 
+<h4>Cacert root certificate</h4>
+
+<p>During April 2008 PAUSE switches to use a cacert certificate. (A
+big ThankYou to RJOOP for providing it.) This means to you that if
+your browser already has cacert support built in, you need not confirm
+the SSL connection manually. If you have no cacert certificate in your
+browser you may choose to either install it manually or still accept
+the connection without installing the cacert certificate.</p>
+
+<p>Debian users can access the cacert class 3 certificate by installing
+the <b>ca-certificates</b> package. It contains the file
+<code>cacert.org/root.crt</code> which is the certificate itself. You
+can also download it from <a
+href="http://www.cacert.org/index.php?id=3">cacert</a> directly.
+Cacert provides a description how <a
+href="http://wiki.cacert.org/wiki/BrowserClients">to install this
+certificate into your browser.</a></p>
+
+<p>The fingerprint of the cacert class 3 certificate is
+<code>SHA1 Fingerprint=DB:4C:42:69:07:3F:E9:C2:A3:7D:89:0A:5C:1B:18:C4:18:4E:2A:2D</code></p>
+
+<p>The fingerprint of the new PAUSE certificate is
+<code>SHA1 Fingerprint=82:7A:33:53:B4:20:36:D4:37:E4:54:F6:F3:15:87:63:3B:23:52:3E</code></p>
+
+<h4>Setup until Cacert certificate is in place</h4> 
+
 <p>PAUSE's private key is not registered with any certificate
 authority, so when you access the SSL channel for the first time, your
 browser will most likely complain that it <i>does not recognize the
