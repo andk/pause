@@ -123,7 +123,7 @@ users get the following text:</p> $closed_text </div>};
   push @l, qq{<div align="center">};
   push @l, qq{<p class="motd"><b>Upcoming New Certificate</b><br />
 On Sat Apr 19 2008 PAUSE will switch to a new certificate. Please
-<a href="authenquery?ACTION=pause_04about#ssl">prepare you browser</a>.</p>};
+<a href="authenquery?ACTION=pause_04about#ssl">prepare your browser</a>.</p>};
 
   push @l, qq{</div>};
 
