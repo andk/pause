@@ -120,13 +120,6 @@ users get the following text:</p> $closed_text </div>};
 
   }
 
-  push @l, qq{<div align="center">};
-  push @l, qq{<p class="motd"><b>Upcoming New Certificate</b><br />
-On Sat Apr 19 2008 PAUSE will switch to a new certificate. Please
-<a href="http://www.cpan.org/modules/04pause.html#ssl">prepare your browser</a>.</p>};
-
-  push @l, qq{</div>};
-
   push @l, $mgr->instance_of("pause_1999::message");
   if ($mgr->{ERROR} && @{$mgr->{ERROR}}) {
     push @l, qq{<h1>Error</h1><p>\n}, @{$mgr->{ERROR}},
