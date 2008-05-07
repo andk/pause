@@ -140,7 +140,7 @@ sub loop () { # we're NOT called as a method
   }
   our $gzip;
   unless ($gzip) {
-    my $gzip = "/bin/gzip";
+    $gzip = "/bin/gzip";
     die "no executable gzip" unless -x $gzip;
   }
 
