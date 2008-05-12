@@ -250,14 +250,57 @@ within a Safe compartment, so maybe even if the above command
 succeeds, PAUSE may fail if you're doing file IO or other potentially
 dangerous things within that line.</p>
 
+<p>Before you decide which style of versioning you prefer, you might
+want to read the <a
+href="http://search.cpan.org/perldoc?version">version</a> manpage.</p>
+
 <h4>Developer Releases</h4>
 
 <p>The automatic integration of your work into several <b>indexes</b>
-and directory trees is not always what you desire. If you want to
-<b>prevent propagation</b> to places outside of your directory, simply
-choose a filename that matches <b><code>/\d\.\d+_\d/</code></b>. PAUSE
-will leave such distributions alone: no readme will be extracted, no
-index will be updated, no symlinks will be created.</p>
+and directory trees is not always what you desire. Often you want to
+release code for testing out the next release. Code that propagates
+through CPAN but is not in a stable state. Something <i>between</i>
+two versions.</p>
+
+<p>If you want to do that simply choose a filename that matches
+<b><code>/\d\.\d+_\d/</code></b>. Please choose a sequence that is
+easy to comprehend. People have adopted different conventions:</p>
+
+<pre>
+# 1.92 release and bug fixes
+1.92
+1.9201
+1.9202
+...
+
+# dev releases towards 1.93
+1.92_50
+1.92_51
+1.92_52
+...
+</pre>
+
+<p>This allows two separate development tracks between 1.92 and 1.93.</p>
+
+<p>Other people do odd and even, with all odd majors always being dev releases:</p>
+
+<pre>
+0.15_01
+0.15_02
+0.16
+0.1601
+0.1602
+0.17_01
+0.17_02
+...
+</pre>
+
+<p>PAUSE will leave the underscore distributions alone: no readme will
+be extracted, no index will be updated, no symlinks will be created.
+Of course many users on the CPAN will take note of the developer
+releases. <a href="http://cpantesters.perl.org/">Cpan testers</a> will
+test them and bug chasers will probably file bug reports in <a
+href="http://rt.cpan.org">RT</a>.</p>
 
 <h4>Indexer</h4>
 
