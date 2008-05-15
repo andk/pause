@@ -1313,7 +1313,7 @@ sub mlroot {
             $self->verbose(1,"CPAN::Checksums::updatedir died with error[$@]");
             return; # a die might cause even more trouble
         }
-        return unless -e "$dir/CHECKSUMS";
+        return unless -e "$dir/CHECKSUMS"; # e.g. only files-to-ignore
         PAUSE::newfile_hook("$dir/CHECKSUMS");
     }
 
