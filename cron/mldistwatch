@@ -198,9 +198,7 @@ sub work {
                                      ) or die "Could not make a tmp directory";
     chdir $testdir
         or die("Couldn't change to $testdir: $!");
-    {
-        $self->checkfornew();
-    }
+    $self->checkfornew($testdir);
     chdir $startdir or die "Could not chdir to '$startdir'";
     rmtree $testdir;
     return if $self->{OPT}{pick};
@@ -268,8 +266,10 @@ sub set_user_active_status {
     my @new_active_users;
     while (my $file = each %{$self->{ALLfound}}) {
         my($user) = $file =~ m|./../([^/]+)/|;
-        $self->verbose(1,"Warning: user not defined for file[$file]\n")
-            unless defined $user;
+        unless (defined $user){
+            $self->verbose(1,"Warning: user not defined for file[$file]\n");
+            next;
+        }
         next if exists $active->{$user};
         push @new_active_users, $user;
     }
@@ -376,7 +376,7 @@ sub manifind {
 }
 
 sub checkfornew {
-    my $self = shift;
+    my($self,$testdir) = @_;
     local $/ = "";
     my $dbh = $self->connect;
     my $time = time;
@@ -400,7 +400,7 @@ sub checkfornew {
     die "Panic: unusual small number of files involved ($all)"
         if !$self->{PICK} && $all < 20000;
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
-  BIGLOOP: for (my $i=0;scalar @all;$self->empty_curdir) {
+  BIGLOOP: for (my $i=0;scalar @all;$self->empty_dir($testdir)) {
         my $dist = shift @all;
         #
         # Examine all files, even CHECKSUMS and READMEs
@@ -489,8 +489,9 @@ sub checkfornew {
     }
 }
 
-sub empty_curdir {
-    my($self) = @_;
+sub empty_dir {
+    my($self,$testdir) = @_;
+    chdir $testdir or die "Could not chdir to '$testdir': $!"; # reassure
     my($dh) = DirHandle->new(".");
     for my $dirent ($dh->read) {
         next if $dirent eq "." || $dirent eq "..";
