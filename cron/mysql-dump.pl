@@ -26,6 +26,7 @@ $m[4]++;
 my $D = sprintf "%04d%02d%02d%02d%02dGMT",@m[5,4,3,2,1];
 my $BZIP = "/usr/local/bin/bzip2";
 $BZIP = "/usr/bin/bzip2" unless -x $BZIP;
+$BZIP = "/bin/bzip2" unless -x $BZIP;
 die "where is BZIP" unless -x $BZIP;
 
 my $Struct = [
