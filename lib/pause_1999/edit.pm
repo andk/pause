@@ -3973,7 +3973,9 @@ sub show_ml_repr {
   my $mgr = shift;
   my(@m);
   my $dbh = $mgr->connect;
-  my $sth = $dbh->prepare("SELECT * FROM list2user");
+  my $sth = $dbh->prepare("SELECT maillistid, userid
+ FROM list2user
+ ORDER BY maillistid, userid");
   $sth->execute;
 
   push @m, qq{<p>These are the contents of the table <b>list2user</b>.
