@@ -60,14 +60,17 @@ UserDir enabled jwied
 #  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.pem
 
   #### solution after cacert: ####
-  # I believe in this directory must be run:
+  # key (two hops) to /home/k/PAUSE/111_sensitive/apache-conf/pause.perl.org-xxx.key
+  # crt (two hops) to /home/k/PAUSE/111_sensitive/apache-conf/pause.perl.org-xxx.crt
+  # Then on pause:
+  #     cd /home/k/PAUSE/111_sensitive/apache-conf/
   #     ln -s -f cacert-class3.crt  `openssl x509 -noout -hash < cacert-class3.crt`.0
   #     ln -s -f cacert-root.crt    `openssl x509 -noout -hash < cacert-root.crt`.0
-  #     ln -s -f pause.perl.org.crt `openssl x509 -noout -hash < pause.perl.org.crt`.0
+  #     ln -s -f pause.perl.org-xxx.crt `openssl x509 -noout -hash < pause.perl.org-xxx.crt`.0
   SSLCACertificatePath  /home/k/PAUSE/111_sensitive/apache-conf/
   SSLCACertificateFile  /home/k/PAUSE/111_sensitive/apache-conf/cacert-class3.crt
-  SSLCertificateFile    /home/k/PAUSE/111_sensitive/apache-conf/pause.perl.org.crt
-  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.key-200804
+  SSLCertificateFile    /home/k/PAUSE/111_sensitive/apache-conf/pause.perl.org-20080523.crt
+  SSLCertificateKeyFile /home/k/PAUSE/111_sensitive/apache-conf/pause.perl.org-20080519.key
 
   SSLVerifyClient 0
   SSLVerifyDepth 10
