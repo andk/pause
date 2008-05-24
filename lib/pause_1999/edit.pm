@@ -5620,22 +5620,7 @@ sub peek_perms {
 sub owner_of_module {
   my($self,$mgr,$m) = @_;
   my $dbh = $mgr->connect;
-  my %query = (
-               mods => qq{SELECT modid,
-                          userid
-                   FROM mods where modid = ?},
-               primeur => qq{SELECT package,
-                          userid
-                   FROM primeur where package = ?},
-              );
-  for my $table (qw(mods primeur)) {
-    my $sth = $dbh->prepare($query{$table});
-    $sth->execute($m);
-    if ($sth->rows >= 1) {
-      return $sth->fetchrow_array; # ascii guaranteed
-    }
-  }
-  return;
+  return PAUSE::owner_of_module($m, $dbh);
 }
 
 sub reindex {

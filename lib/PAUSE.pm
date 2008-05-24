@@ -241,6 +241,27 @@ sub user_is {
   return $ret;
 }
 
+sub owner_of_module {
+    my($m, $dbh) = @_;
+    $dbh ||= dbh();
+    my %query = (
+                 mods => qq{SELECT modid,
+                          userid
+                   FROM mods where modid = ?},
+                 primeur => qq{SELECT package,
+                          userid
+                   FROM primeur where package = ?},
+                );
+    for my $table (qw(mods primeur)) {
+        my $sth = $dbh->prepare($query{$table});
+        $sth->execute($m);
+        if ($sth->rows >= 1) {
+            return $sth->fetchrow_array; # ascii guaranteed
+        }
+    }
+    return;
+}
+
 sub gzip {
   my($read,$write) = @_;
   my($buffer,$fhw);
