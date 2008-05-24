@@ -449,6 +449,12 @@ sub checkfornew {
         my $userid = PAUSE::dir2user($dist);
         $dio->{USERID} = $userid;
 
+        # >99% of all distros are already registered by the
+        # newfilehook but the few coming though mirror(1) are not.
+        # Registering *everything* that comes here should catch them
+        # and if we re-register this or that it should not hurt.
+        PAUSE::newfile_hook("$MLROOT/$dist");
+
         $dio->examine_dist; # checks for perl, developer, version, etc. and untars
         if ($dio->skip){
             delete $self->{ALLlasttime}{$dist};
