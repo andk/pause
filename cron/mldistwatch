@@ -3178,15 +3178,9 @@ has the same version number and the distro has a more recent modification time.}
 
         if ($ok) {
 
-            my $query = qq{UPDATE packages SET
-version       = ?,
-dist          = ?,
-file          = ?,
-filemtime     = ?,
-pause_reg     = ?
-WHERE package = ?
-};
-            $self->verbose(1,"Q: [$query]$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package,\n");
+            my $query = qq{UPDATE packages SET version = ?, dist = ?, file = ?,
+filemtime = ?, pause_reg = ? WHERE package = ?};
+            $self->verbose(1,"Q: [$query]$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
             $dbh->do($query,
                      undef,
                      $pp->{version},
