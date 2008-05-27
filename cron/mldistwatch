@@ -156,6 +156,12 @@ sub new {
     $self;
 }
 
+sub sleep {
+    my($self) = @_;
+    my $sleep = $self->{OPT}{sleep} ||= 1;
+    sleep $sleep;
+}
+
 sub verbose {
     my($self,$level,@what) = @_;
     our $Id;
@@ -443,7 +449,7 @@ sub checkfornew {
             next BIGLOOP;
         }
         $self->verbose(1,"\n    Examining $dist ...\n");
-        sleep 1;   # I think this might help us against wild processes
+        $self->sleep;
         $0 = "mldistwatch: $dist";
 
         my $userid = PAUSE::dir2user($dist);
@@ -3324,6 +3330,7 @@ MAIN: {
                              "logfile=s",
                              "pick=s@",
                              "rewrite!",
+                             "sleep=i",
                             );
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     if ($Opt{rewrite}) {
