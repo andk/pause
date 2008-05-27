@@ -1681,12 +1681,14 @@ Please contact modules\@perl.org if there are any open questions.
                         push @m, qq{Nothing in this distro has been
                      indexed, because according to META.yml this
                      package does not provide any modules.\n\n};
+                        $status_over_all = "Empty_provides";
 
                     } else {
 
                         push @m, qq{No package statements could be
                      found in the distro (maybe a script or
                      documentation distribution?)\n\n};
+                        $status_over_all = "Empty_no_pm";
 
                     }
                 } else {
