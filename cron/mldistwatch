@@ -453,6 +453,7 @@ sub checkfornew {
         # newfilehook but the few coming though mirror(1) are not.
         # Registering *everything* that comes here should catch them
         # and if we re-register this or that it should not hurt.
+        my $MLROOT = $self->mlroot;
         PAUSE::newfile_hook("$MLROOT/$dist");
 
         $dio->examine_dist; # checks for perl, developer, version, etc. and untars
