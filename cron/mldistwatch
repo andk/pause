@@ -2839,13 +2839,13 @@ package in packages  package in primeur
 Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
                                    );
                 $self->alert(qq{not owner:
- package[$package]
- version[$pp->{version}]
- file[$pp->{infile}]
- dist[$dist]
- userid[$userid]
- owners[@owner]
- owner[$owner]
+  package[$package]
+  version[$pp->{version}]
+  file[$pp->{infile}]
+  dist[$dist]
+  userid[$userid]
+  owners[@owner]
+  owner[$owner]
 });
                 return;         # early return
             }
@@ -3101,10 +3101,10 @@ Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
 has a higher version number ($oldversion)},
                                    );
                 $self->alert(qq{decreasing VERSION number [$pp->{version}]
- in package[$package]
- dist[$dist]
- oldversion[$oldversion]
- pmfile[$pmfile]
+  in package[$package]
+  dist[$dist]
+  oldversion[$oldversion]
+  pmfile[$pmfile]
 }); # });
             } elsif ($oisaperl) {
                 $ok++;          # new on 2002-08-01
