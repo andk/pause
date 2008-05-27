@@ -449,7 +449,6 @@ sub checkfornew {
             next BIGLOOP;
         }
         $self->verbose(1,"\n    Examining $dist ...\n");
-        $self->sleep;
         $0 = "mldistwatch: $dist";
 
         my $userid = PAUSE::dir2user($dist);
@@ -479,6 +478,7 @@ sub checkfornew {
         $dio->examine_pms;      # will switch user
 
         $dio->mail_summary;
+        $self->sleep;
         $dio->set_indexed;
 
         $alert .= $dio->alert;  # now $dio can go out of scope
@@ -3184,7 +3184,7 @@ filemtime     = ?,
 pause_reg     = ?
 WHERE package = ?
 };
-            $self->verbose(1,"Q: [$query]\n");
+            $self->verbose(1,"Q: [$query]$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package,\n");
             $dbh->do($query,
                      undef,
                      $pp->{version},
@@ -3230,7 +3230,7 @@ WHERE package = ?
  (package, version, dist, file, filemtime, pause_reg)
 VALUES (?,?,?,?,?,?)
 };
-        $self->verbose(1,"Q: [$query]\n");
+        $self->verbose(1,"Q: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
         $dbh->do($query,
                  undef,
                  $package,
