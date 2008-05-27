@@ -28,7 +28,7 @@ use vars qw(@ISA @EXPORT_OK $VERSION $Config);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(urecord);
 
-$VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+$VERSION = "1.005";
 
 # for Configuration Variable we use PrivatePAUSE.pm, because these are
 # really variables we cannot publish. Will separate harmless variables
