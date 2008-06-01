@@ -2,7 +2,6 @@
 
 use strict;
 use lib "/home/k/PAUSE/lib";
-
 use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
@@ -813,6 +812,7 @@ category    maintainer
 
 };
 
+#'
     $list .= join("",
                   map {sprintf(
                                qq{%-12s<a href="../authors/id/%s">%s</a>%s<a
@@ -3314,7 +3314,6 @@ VALUES (?,?,?,?,?,?)
 }
 
 1;
-
 __END__
 
 =head1 NAME

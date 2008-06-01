@@ -1,0 +1,5 @@
+- [ 'verbose', 1, 'test message' ] 
+- [ 'alert', 'warning' ]
+- [ 'connect' ]
+- [ 'disconnect' ]
+- [ 'mlroot' ]
