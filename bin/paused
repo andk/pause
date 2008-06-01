@@ -1,5 +1,11 @@
 #!/usr/local/bin/perl -- -*- mode: cperl -*-
 
+
+# predeclare
+sub mypause_daemon_inspector::loop ();
+
+
+
 my $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
 # $Date$
 my $Id = qq!paused, v$VERSION!;
