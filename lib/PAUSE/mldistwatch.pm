@@ -1,3 +1,7 @@
+# Some POD is after __END__
+
+use strict;
+use lib "/home/k/PAUSE/lib";
 
 use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
