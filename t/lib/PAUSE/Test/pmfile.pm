@@ -3,6 +3,7 @@ use warnings;
 
 package PAUSE::Test::pmfile;
 
+use Test::FITesque::Fixture;
 use base qw(Test::FITesque::Fixture);
 use Test::More;
 

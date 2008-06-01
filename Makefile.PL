@@ -19,5 +19,7 @@ requires        (map +($_ => 0), qw(
     Text::Unidecode     Time::HiRes         URI::Escape
     URI::URL            Unicode::Collate    Unicode::String
     WAIT                XML::SAX::Base      YAML
+
+    Test::FITesque::Fixture
 ));
 WriteAll        ( sign => 1, check_nmake => 0 );
