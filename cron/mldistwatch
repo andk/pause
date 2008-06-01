@@ -2835,8 +2835,9 @@ package in packages  package in primeur
                                     $pp->{version},
                                     $pp->{infile},
                                     PAUSE::mldistwatch::Constants::EMISSPERM,
-                                    qq{Not indexed because permissions missing.
-Visit PAUSE and click "View Permissions" to find the legitimate maintainer(s).},
+                                    qq{Not indexed because permission missing.
+Current registered primary maintainer is $owner.
+Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Permissions".},
                                    );
                 $self->alert(qq{not owner:
   package[$package]
