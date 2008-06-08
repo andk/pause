@@ -454,9 +454,18 @@ sub checkfornew {
         # >99% of all distros are already registered by the
         # newfilehook but the few coming though mirror(1) are not.
         # Registering *everything* that comes here should catch them
-        # and if we re-register this or that it should not hurt.
-        my $MLROOT = $self->mlroot;
-        PAUSE::newfile_hook("$MLROOT/$dist");
+        # and if we re-register this or that it should not hurt. But
+        # everything older than a day does not belong here, like when
+        # people re-index an old distro.
+        {
+            my $MLROOT = $self->mlroot;
+            for my $f ("$MLROOT/$dist") {
+                local $^T = time;
+                if (-M $f < 1) {
+                    PAUSE::newfile_hook($f);
+                }
+            }
+        }
 
         $dio->examine_dist; # checks for perl, developer, version, etc. and untars
         if ($dio->skip){
