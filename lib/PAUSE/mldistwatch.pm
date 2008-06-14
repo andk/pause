@@ -2340,7 +2340,7 @@ Please contact modules\@perl.org if there are any open questions.
                          ( $ | [\}\;] )
                         }x) {
                 $pkg = $2;
-
+                next PLINE if $pkg eq "DB";
             }
 
             if ($pkg) {
