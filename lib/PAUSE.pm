@@ -368,39 +368,6 @@ sub delfile_hook ($) {
   # Net::UploadMirror      (KNORR/Net-UploadMirror-0.06.tar.gz)           "
   # Pushmi::Mirror         (CLKAO/Pushmi-v1.0.0.tar.gz)                   something SVK
 
-  package File::Rsync::Mirror::Recentdata;
-
-  use Scalar::Util qw(reftype);
-
-  sub new {
-    my($class,$data) = @_;
-    if (my $reftype = reftype $data) {
-      if ($reftype eq 'ARRAY') {
-        bless {
-               meta => {
-                        protocol => 1,
-                       },
-               recent => $data,
-              }, $class;
-      } elsif ($reftype eq 'HASH') {
-        die "FIXME: not yet implemented";
-      } else {
-        die "Invalid data: neither array nor hash";
-      }
-    } else {
-      die "Invalid data: not a ref";
-    }
-  }
-
-  sub recent {
-    my($self,$recent) = @_;
-    my $old = $self->{recent};
-    if (defined $recent) {
-      $self->{recent} = $recent;
-    }
-    return $old;
-  }
-
   package File::Rsync::Mirror::Recentfile;
 
   use File::Basename qw(dirname);
