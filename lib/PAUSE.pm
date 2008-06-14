@@ -362,7 +362,7 @@ sub delfile_hook ($) {
 
 {
   # File::Mirror           (JWU/File-Mirror/File-Mirror-0.10.tar.gz)      only local trees
-  # Mirror::YAML           (ADAMK/Mirror-YAML-0.02.tar.gz)                make test hangs
+  # Mirror::YAML           (ADAMK/Mirror-YAML-0.03.tar.gz)                some sort of inner circle
   # Net::DownloadMirror    (KNORR/Net-DownloadMirror-0.04.tar.gz)         FTP sites and stuff
   # Net::MirrorDir         (KNORR/Net-MirrorDir-0.05.tar.gz)              "
   # Net::UploadMirror      (KNORR/Net-UploadMirror-0.06.tar.gz)           "
