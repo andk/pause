@@ -356,6 +356,15 @@ sub newfile_hook ($) {
        protocol => 1,
       );
   $rf->update($f,"new");
+  $rf = File::Rsync::Mirror::Recentfile->new
+      (
+       canonize => "naive_path_normalize",
+       localroot => "/home/ftp/pub/PAUSE/modules/",
+       interval => q(1W),
+       filenameroot => "TESTPLEASEIGNORE",
+       protocol => 1,
+      );
+  $rf->update($f,"new");
 }
 
 sub delfile_hook ($) {
@@ -371,6 +380,15 @@ sub delfile_hook ($) {
       (
        canonize => "naive_path_normalize",
        localroot => "/home/ftp/pub/PAUSE/authors/",
+       interval => q(1W),
+       filenameroot => "TESTPLEASEIGNORE",
+       protocol => 1,
+      );
+  $rf->update($f,"delete");
+  $rf = File::Rsync::Mirror::Recentfile->new
+      (
+       canonize => "naive_path_normalize",
+       localroot => "/home/ftp/pub/PAUSE/modules/",
        interval => q(1W),
        filenameroot => "TESTPLEASEIGNORE",
        protocol => 1,
