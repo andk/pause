@@ -524,7 +524,10 @@ sub delfile_hook ($) {
   sub recent_events_from_file {
     my($self, $file) = @_;
     die "called without file" unless defined $file;
-    my($data) = YAML::Syck::LoadFile($file);
+    my($data) = eval {YAML::Syck::LoadFile($file);};
+    if ($@ or !$data) {
+      return [];
+    }
     unless (reftype $data eq 'ARRAY') { # not protocol 0
       my $meth = sprintf "read_recent_%d", $data->{meta}{protocol};
       return $self->$meth($data);
