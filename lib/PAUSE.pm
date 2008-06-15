@@ -347,6 +347,15 @@ sub newfile_hook ($) {
        interval => q(2d),
       );
   $rf->update($f,"new");
+  $rf = File::Rsync::Mirror::Recentfile->new
+      (
+       canonize => "naive_path_normalize",
+       localroot => "/home/ftp/pub/PAUSE/authors/",
+       interval => q(1W),
+       filenameroot => "TESTPLEASEIGNORE",
+       protocol => 1,
+      );
+  $rf->update($f,"new");
 }
 
 sub delfile_hook ($) {
@@ -356,6 +365,15 @@ sub delfile_hook ($) {
        canonize => "naive_path_normalize",
        localroot => "/home/ftp/pub/PAUSE/authors/id/",
        interval => q(2d),
+      );
+  $rf->update($f,"delete");
+  $rf = File::Rsync::Mirror::Recentfile->new
+      (
+       canonize => "naive_path_normalize",
+       localroot => "/home/ftp/pub/PAUSE/authors/",
+       interval => q(1W),
+       filenameroot => "TESTPLEASEIGNORE",
+       protocol => 1,
       );
   $rf->update($f,"delete");
 }
@@ -374,11 +392,24 @@ sub delfile_hook ($) {
   use File::Path qw(mkpath);
   use File::Rsync;
   use File::Temp;
+  use Scalar::Util qw(reftype);
   use Time::HiRes qw(sleep);
   use YAML::Syck;
 
+  # cf. interval_in_seconds
+  my %seconds = (
+                 s => 1,
+                 m => 60,
+                 h => 60*60,
+                 d => 60*60*24,
+                 W => 60*60*24*7,
+                 M => 60*60*30,
+                 Y => 60*60*365.25,
+                );
+
   use accessors (
                  "canonize",
+                 "filenameroot",
                  "localroot",
                  "interval",
                  "protocol",            # reader/writer modifier
@@ -398,7 +429,10 @@ sub delfile_hook ($) {
       $self->$method($arg);
     }
     unless (defined $self->protocol) {
-        $self->protocol(0); # default protocol will soon be 1
+      $self->protocol(0); # default protocol will soon be 1
+    }
+    unless (defined $self->filenameroot) {
+      $self->filenameroot("RECENT");
     }
     return $self;
   }
@@ -414,36 +448,60 @@ sub delfile_hook ($) {
     }
     my $lrd = $self->localroot;
     if ($path =~ s|\Q$lrd\E||) {
-      for my $interval ($self->interval) {
-        my $rfile = File::Spec->catfile($lrd, "RECENT-$interval.yaml");
-        my $secs = $self->interval_in_seconds();
-        my $oldest_allowed = time-$secs;
+      my $interval = $self->interval;
+      my $rfile = File::Spec->catfile($lrd,
+                                      sprintf("%s-%s.yaml",
+                                              $self->filenameroot,
+                                              $interval,
+                                             ));
+      my $secs = $self->interval_in_seconds();
+      my $oldest_allowed = time-$secs;
 
-        # not using flock because it locks on filehandles instead of
-        # old school ressources.
-        my $locked;
-        while (!$locked) {
-          sleep 0.01;
-          $locked = mkdir "$rfile.lock";
-        }
-        my $recent = $self->recent_events_from_file($rfile);
-        $recent ||= [];
-      TRUNCATE: while (@$recent) {
-          if ($recent->[-1]{epoch} < $oldest_allowed) {
-            pop @$recent;
-          } else {
-            last TRUNCATE;
-          }
-        }
-        # remove older duplicate, irrespective of $what:
-        $recent = [ grep { $_->{path} ne $path } @$recent ];
-
-        unshift @$recent, { epoch => time, path => $path, type => $what };
-        YAML::Syck::DumpFile("$rfile.new",$recent);
-        rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
-        rmdir "$rfile.lock";
+      # not using flock because it locks on filehandles instead of
+      # old school ressources.
+      my $locked;
+      while (!$locked) {
+        sleep 0.01;
+        $locked = mkdir "$rfile.lock";
       }
+      my $recent = $self->recent_events_from_file($rfile);
+      $recent ||= [];
+    TRUNCATE: while (@$recent) {
+        if ($recent->[-1]{epoch} < $oldest_allowed) {
+          pop @$recent;
+        } else {
+          last TRUNCATE;
+        }
+      }
+      # remove older duplicate, irrespective of $what:
+      $recent = [ grep { $_->{path} ne $path } @$recent ];
+
+      unshift @$recent, { epoch => time, path => $path, type => $what };
+      $self->write_recent($rfile,$recent);
     }
+  }
+
+  sub write_recent {
+    my($self,$rfile,$recent) = @_;
+    my $meth = sprintf "write_%d", $self->protocol;
+    $self->$meth($rfile,$recent);
+    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+    rmdir "$rfile.lock";
+  }
+
+  sub write_0 {
+    my($self,$rfile,$recent) = @_;
+    YAML::Syck::DumpFile("$rfile.new",$recent);
+  }
+
+  sub write_1 {
+    my($self,$rfile,$recent) = @_;
+    YAML::Syck::DumpFile("$rfile.new",{
+                                       meta => {
+                                                protocol => $self->protocol,
+                                               },
+                                       recent => $recent,
+                                      });
   }
 
   sub naive_path_normalize {
@@ -461,11 +519,22 @@ sub delfile_hook ($) {
     $recent_data;
   }
 
+  # it seems the code relies on the resource being locked (which it
+  # probably is)
   sub recent_events_from_file {
     my($self, $file) = @_;
     die "called without file" unless defined $file;
-    my($recent_data) = YAML::Syck::LoadFile($file);
-    $recent_data;
+    my($data) = YAML::Syck::LoadFile($file);
+    unless (reftype $data eq 'ARRAY') { # not protocol 0
+      my $meth = sprintf "read_recent_%d", $data->{meta}{protocol};
+      return $self->$meth($data);
+    }
+    return $data;
+  }
+
+  sub read_recent_1 {
+    my($self,$data) = @_;
+    return $data->{recent};
   }
 
   sub local_event_path {
@@ -493,7 +562,9 @@ sub delfile_hook ($) {
 
   sub get_remote_recentfile_as_tempfile {
     my($self,$interval) = @_;
-    my($fh) = File::Temp->new(TEMPLATE => ".RECENT-XXXX",
+    my($fh) = File::Temp->new(TEMPLATE => sprintf(".%s-XXXX",
+                                                  $self->filenameroot,
+                                                 ),
                               DIR => $self->localroot,
                               SUFFIX => "yaml",
                               UNLINK => 0,
@@ -524,7 +595,8 @@ sub delfile_hook ($) {
   sub recentfile_basename {
     my($self) = @_;
     my $interval = $self->interval;
-    my $file = sprintf("RECENT-%s.yaml",
+    my $file = sprintf("%s-%s.yaml",
+                       $self->filenameroot,
                        $interval
                       );
     return $file;
@@ -533,8 +605,8 @@ sub delfile_hook ($) {
   sub interval_in_seconds {
     my($self) = @_;
     my $interval = $self->interval;
-    return 60*60*48 if $interval eq "2d";
-    die "FIXME";
+    my($n,$t) = $interval =~ /^(\d+)([smhdWMY]$)/ or die "Could not determine seconds from interval[$interval]";
+    return $seconds{$t}*$n;
   }
 
   sub remotebase {
@@ -565,3 +637,8 @@ sub delfile_hook ($) {
 }
 
 1;
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 2
+# End:
