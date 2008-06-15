@@ -344,7 +344,7 @@ sub newfile_hook ($) {
       (
        canonize => "naive_path_normalize",
        localroot => "/home/ftp/pub/PAUSE/authors/id/",
-       intervals => [qw(2d)],
+       interval => q(2d),
       );
   $rf->update($f,"new");
 }
@@ -355,7 +355,7 @@ sub delfile_hook ($) {
       (
        canonize => "naive_path_normalize",
        localroot => "/home/ftp/pub/PAUSE/authors/id/",
-       intervals => [qw(2d)],
+       interval => q(2d),
       );
   $rf->update($f,"delete");
 }
@@ -377,18 +377,18 @@ sub delfile_hook ($) {
   use Time::HiRes qw(sleep);
   use YAML::Syck;
 
-  use accessors qw(
-                   canonize
-                   localroot
-                   intervals
-                   _default_interval
-                   _remotebase
-                   remote_host
-                   remote_module
-                   remote_dir
-                   _rsync
-                   rsync_options
-                  );
+  use accessors (
+                 "canonize",
+                 "localroot",
+                 "interval",
+                 "protocol",            # reader/writer modifier
+                 "_remotebase",
+                 "remote_host",
+                 "remote_module",
+                 "remote_dir",
+                 "_rsync",
+                 "rsync_options",
+                );
 
   sub new {
     my($class, @args) = @_;
@@ -396,6 +396,9 @@ sub delfile_hook ($) {
     while (@args) {
       my($method,$arg) = splice @args, 0, 2;
       $self->$method($arg);
+    }
+    unless (defined $self->protocol) {
+        $self->protocol(0); # default protocol will soon be 1
     }
     return $self;
   }
@@ -411,9 +414,9 @@ sub delfile_hook ($) {
     }
     my $lrd = $self->localroot;
     if ($path =~ s|\Q$lrd\E||) {
-      for my $interval (@{$self->intervals}) {
+      for my $interval ($self->interval) {
         my $rfile = File::Spec->catfile($lrd, "RECENT-$interval.yaml");
-        my $secs = $self->interval_to_seconds($interval);
+        my $secs = $self->interval_in_seconds();
         my $oldest_allowed = time-$secs;
 
         # not using flock because it locks on filehandles instead of
@@ -452,9 +455,8 @@ sub delfile_hook ($) {
   }
 
   sub recent_events {
-    my($self, $interval) = @_;
-    $interval ||= $self->default_interval;
-    my $recent = $self->recentfile($interval);
+    my($self) = @_;
+    my $recent = $self->recentfile();
     my($recent_data) = $self->recent_events_from_file($recent);
     $recent_data;
   }
@@ -511,46 +513,28 @@ sub delfile_hook ($) {
   }
 
   sub recentfile {
-    my($self, $interval) = @_;
-    $interval ||= $self->default_interval;
+    my($self) = @_;
     my $recent = File::Spec->catfile(
                                      $self->localroot,
-                                     $self->recentfile_basename($interval),
+                                     $self->recentfile_basename(),
                                     );
     return $recent;
   }
 
   sub recentfile_basename {
-    my($self, $interval) = @_;
-    $interval ||= $self->default_interval;
+    my($self) = @_;
+    my $interval = $self->interval;
     my $file = sprintf("RECENT-%s.yaml",
                        $interval
                       );
     return $file;
   }
 
-  sub interval_to_seconds {
-    my($self,$interval) = @_;
+  sub interval_in_seconds {
+    my($self) = @_;
+    my $interval = $self->interval;
     return 60*60*48 if $interval eq "2d";
     die "FIXME";
-  }
-
-  sub default_interval {
-    my($self,$set) = @_;
-    if ($set) {
-      $self->_default_interval($set);
-    }
-    my $return;
-    if ($return = $self->_default_interval) {
-    } elsif (my $ivls = $self->intervals) {
-      if (@$ivls) {
-        $return = $ivls->[0];
-      }
-    } else {
-      die "Neither a default interval nor an array of intervals specified";
-    }
-    # warn "DEBUG: return[$return]";
-    return $return;
   }
 
   sub remotebase {
