@@ -1580,27 +1580,17 @@ Please contact modules\@perl.org if there are any open questions.
         my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
         my $substrdistro = substr $distro, 5;
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-        my $show_meta_yml = 1;
-        if ($show_meta_yml) {
-            push @m, qq{
+        my $versions_from_metayaml = $self->{VERSION_FROM_YAML_OK} ? "yes" : "no";
+        push @m, qq{
                User: $author ($asciiname)
   Distribution file: $distrobasename
     Number of files: $nfiles
          *.pm files: $pmfiles
              README: $self->{README}
            META.yml: $self->{YAML}
+  META-driven index: $versions_from_metayaml
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
-        } else {
-            push @m, qq{
-               User: $author ($asciiname)
-  Distribution file: $distrobasename
-    Number of files: $nfiles
-         *.pm files: $pmfiles
-             README: $self->{README}
-  Timestamp of file: $mtime UTC
-   Time of this run: $time UTC\n\n};
-        }
         my $tf = Text::Format->new(firstIndent=>0);
 
         my $status_over_all;
