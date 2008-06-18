@@ -414,7 +414,7 @@ sub delfile_hook ($) {
   use Time::HiRes qw(sleep);
   use YAML::Syck;
 
-  # cf. interval_in_seconds
+  # cf. interval_secs
   my %seconds = (
                  s => 1,
                  m => 60,
@@ -472,7 +472,7 @@ sub delfile_hook ($) {
                                               $self->filenameroot,
                                               $interval,
                                              ));
-      my $secs = $self->interval_in_seconds();
+      my $secs = $self->interval_secs();
       my $oldest_allowed = time-$secs;
 
       # not using flock because it locks on filehandles instead of
@@ -516,6 +516,9 @@ sub delfile_hook ($) {
     my($self,$rfile,$recent) = @_;
     YAML::Syck::DumpFile("$rfile.new",{
                                        meta => {
+                                                canonize => $self->canonize,
+                                                filenameroot => $self->filenameroot,
+                                                interval_secs => $self->interval_secs,
                                                 protocol => $self->protocol,
                                                },
                                        recent => $recent,
@@ -623,7 +626,7 @@ sub delfile_hook ($) {
     return $file;
   }
 
-  sub interval_in_seconds {
+  sub interval_secs {
     my($self) = @_;
     my $interval = $self->interval;
     my($n,$t) = $interval =~ /^(\d+)([smhdWMY]$)/ or die "Could not determine seconds from interval[$interval]";
