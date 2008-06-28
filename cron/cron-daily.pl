@@ -281,23 +281,25 @@ sub delete_scheduled_files {
       next if $now - $fields{changed} < ($PAUSE::Config->{DELETES_EXPIRE}
 					 || 60*60*24*2);
       report "    Deleting $delete\n";
+      # we must propagate immediately, the files cannot be rsynced
+      # anymore in a millisecond!
+      PAUSE::delfile_hook($delete);
       unlink $delete;
-      # PAUSE::delfile_hook($delete);
       $Dbh->do("DELETE FROM deletes WHERE deleteid='$d'");
       next if $d =~ /\.readme$/;
       my $readme = $delete;
       $readme =~ s/(\.tar.gz|\.tgz|\.zip)$/.readme/;
       if (-f $readme) {
 	report "     Deletin $readme\n";
+        PAUSE::delfile_hook($readme);
 	unlink $readme;
-        # PAUSE::delfile_hook($readme);
       }
       my $yaml = $readme;
       $yaml =~ s/readme$/meta/;
       if (-f $yaml) {
 	report "     Deletin $yaml\n";
+        PAUSE::delfile_hook($yaml);
 	unlink $yaml;
-        # PAUSE::delfile_hook($yaml);
       }
     }
 }
