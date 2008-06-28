@@ -411,7 +411,7 @@ sub delfile_hook ($) {
   use File::Rsync;
   use File::Temp;
   use Scalar::Util qw(reftype);
-  use Time::HiRes qw(sleep);
+  use Time::HiRes qw();
   use YAML::Syck;
 
   # cf. interval_secs
@@ -429,6 +429,7 @@ sub delfile_hook ($) {
                  "canonize",
                  "filenameroot",
                  "localroot",
+                 "ignore_link_stat_errors",
                  "interval",
                  "protocol",            # reader/writer modifier
                  "_remotebase",
@@ -437,6 +438,7 @@ sub delfile_hook ($) {
                  "remote_dir",
                  "_rsync",
                  "rsync_options",
+                 "verbose",
                 );
 
   sub new {
@@ -479,7 +481,7 @@ sub delfile_hook ($) {
       # old school ressources.
       my $locked;
       while (!$locked) {
-        sleep 0.01;
+        Time::HiRes::sleep 0.01;
         $locked = mkdir "$rfile.lock";
       }
       my $recent = $self->recent_events_from_file($rfile);
@@ -491,10 +493,10 @@ sub delfile_hook ($) {
           last TRUNCATE;
         }
       }
-      # remove older duplicate, irrespective of $what:
+      # remove older duplicates of this $path, irrespective of $what:
       $recent = [ grep { $_->{path} ne $path } @$recent ];
 
-      unshift @$recent, { epoch => time, path => $path, type => $what };
+      unshift @$recent, { epoch => Time::HiRes::time, path => $path, type => $what };
       $self->write_recent($rfile,$recent);
     }
   }
@@ -579,18 +581,25 @@ sub delfile_hook ($) {
                         ),
              dst => $dst,
             )) {
-      die sprintf "Error: %s", $self->rsync->err;
+      my($err) = $self->rsync->err;
+      if ($self->ignore_link_stat_errors && $err =~ m{^ rsync: \s link_stat }x ) {
+        if ($self->verbose) {
+          warn "Info: ignoring link_stat error '$err'";
+        }
+        return 1;
+      }
+      die sprintf "Error: %s", $err;
     }
     return 1;
   }
 
   sub get_remote_recentfile_as_tempfile {
-    my($self,$interval) = @_;
+    my($self) = @_;
     my($fh) = File::Temp->new(TEMPLATE => sprintf(".%s-XXXX",
                                                   $self->filenameroot,
                                                  ),
                               DIR => $self->localroot,
-                              SUFFIX => "yaml",
+                              SUFFIX => ".yaml",
                               UNLINK => 0,
                              );
     my($trecentfile) = $fh->filename;
@@ -600,6 +609,7 @@ sub delfile_hook ($) {
                                            $self->recentfile_basename),
                                dst => $trecentfile,
                               )) {
+      unlink $trecentfile or die "Couldn't unlink '$trecentfile': $!";
       die sprintf "Error while rsyncing: %s", $self->rsync->err;
     }
     my $mode = 0644;
@@ -638,10 +648,10 @@ sub delfile_hook ($) {
     my $remotebase = $self->_remotebase;
     unless (defined $remotebase) {
       $remotebase = sprintf(
-                            "%s::%s/%s",
+                            "%s::%s%s",
                             $self->remote_host,
                             $self->remote_module,
-                            $self->remote_dir,
+                            ($self->remote_dir ? ("/".$self->remote_dir) : ""),
                            );
       $self->_remotebase($remotebase);
     }
