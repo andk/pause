@@ -338,60 +338,49 @@ sub gtest {
 #  printf $fh "%s: %s [%s]\n", scalar localtime, $f, Carp::longmess();
 #}
 
+our @common_args =
+    (
+     canonize => "naive_path_normalize",
+     interval => q(6h),
+     filenameroot => "RECENT",
+     protocol => 1,
+     comment => "These 'RECENT' files are part of a test of a new CPAN mirroring concept. Please ignore them for now.",
+    );
+
 sub newfile_hook ($) {
   my($f) = @_;
-  my $rf = File::Rsync::Mirror::Recentfile->new
-      (
-       canonize => "naive_path_normalize",
-       localroot => "/home/ftp/pub/PAUSE/authors/id/",
-       interval => q(2d),
-      );
-  $rf->update($f,"new");
+  my $rf;
   $rf = File::Rsync::Mirror::Recentfile->new
       (
-       canonize => "naive_path_normalize",
+       @common_args,
        localroot => "/home/ftp/pub/PAUSE/authors/",
-       interval => q(1W),
-       filenameroot => "TESTPLEASEIGNORE",
-       protocol => 1,
+       aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
       );
   $rf->update($f,"new");
   $rf = File::Rsync::Mirror::Recentfile->new
       (
-       canonize => "naive_path_normalize",
+       @common_args,
        localroot => "/home/ftp/pub/PAUSE/modules/",
-       interval => q(1W),
-       filenameroot => "TESTPLEASEIGNORE",
-       protocol => 1,
+       aggregator => [qw(1W Z)],
       );
   $rf->update($f,"new");
 }
 
 sub delfile_hook ($) {
   my($f) = @_;
-  my $rf = File::Rsync::Mirror::Recentfile->new
-      (
-       canonize => "naive_path_normalize",
-       localroot => "/home/ftp/pub/PAUSE/authors/id/",
-       interval => q(2d),
-      );
-  $rf->update($f,"delete");
+  my $rf;
   $rf = File::Rsync::Mirror::Recentfile->new
       (
-       canonize => "naive_path_normalize",
+       @common_args,
        localroot => "/home/ftp/pub/PAUSE/authors/",
-       interval => q(1W),
-       filenameroot => "TESTPLEASEIGNORE",
-       protocol => 1,
+       aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
       );
   $rf->update($f,"delete");
   $rf = File::Rsync::Mirror::Recentfile->new
       (
-       canonize => "naive_path_normalize",
+       @common_args,
        localroot => "/home/ftp/pub/PAUSE/modules/",
-       interval => q(1W),
-       filenameroot => "TESTPLEASEIGNORE",
-       protocol => 1,
+       aggregator => [qw(1W Z)],
       );
   $rf->update($f,"delete");
 }
@@ -414,6 +403,8 @@ sub delfile_hook ($) {
   use Time::HiRes qw();
   use YAML::Syck;
 
+  use constant MAX_INT => ~0>>1; # anything better?
+
   # cf. interval_secs
   my %seconds = (
                  s => 1,
@@ -422,21 +413,26 @@ sub delfile_hook ($) {
                  d => 60*60*24,
                  W => 60*60*24*7,
                  M => 60*60*30,
+                 Q => 60*60*90,
                  Y => 60*60*365.25,
                 );
 
   use accessors (
+                 "_is_locked",
+                 "_remotebase",
+                 "_rfile",
+                 "_rsync",
+                 "aggregator",
                  "canonize",
+                 "comment",
                  "filenameroot",
-                 "localroot",
                  "ignore_link_stat_errors",
                  "interval",
+                 "localroot",
                  "protocol",            # reader/writer modifier
-                 "_remotebase",
+                 "remote_dir",
                  "remote_host",
                  "remote_module",
-                 "remote_dir",
-                 "_rsync",
                  "rsync_options",
                  "verbose",
                 );
@@ -457,8 +453,23 @@ sub delfile_hook ($) {
     return $self;
   }
 
+  sub rfile {
+    my($self) = @_;
+    my $rfile = $self->_rfile;
+    return $rfile if defined $rfile;
+    $rfile = File::Spec->catfile
+        ($self->localroot,
+         sprintf ("%s-%s.yaml",
+                  $self->filenameroot,
+                  $self->interval,
+                 )
+        );
+    $self->_rfile ($rfile);
+    return $rfile;
+  }
+
   sub update {
-    my($self,$path,$what) = @_;
+    my($self,$path,$type) = @_;
     if (my $meth = $self->canonize) {
       if (ref $meth && ref $meth eq "CODE") {
         die "FIXME";
@@ -467,24 +478,14 @@ sub delfile_hook ($) {
       }
     }
     my $lrd = $self->localroot;
-    if ($path =~ s|\Q$lrd\E||) {
+    if ($path =~ s|^\Q$lrd\E||) {
       my $interval = $self->interval;
-      my $rfile = File::Spec->catfile($lrd,
-                                      sprintf("%s-%s.yaml",
-                                              $self->filenameroot,
-                                              $interval,
-                                             ));
       my $secs = $self->interval_secs();
-      my $oldest_allowed = time-$secs;
+      my $epoch = Time::HiRes::time;
+      my $oldest_allowed = $epoch-$secs;
 
-      # not using flock because it locks on filehandles instead of
-      # old school ressources.
-      my $locked;
-      while (!$locked) {
-        Time::HiRes::sleep 0.01;
-        $locked = mkdir "$rfile.lock";
-      }
-      my $recent = $self->recent_events_from_file($rfile);
+      $self->lock;
+      my $recent = $self->recent_events;
       $recent ||= [];
     TRUNCATE: while (@$recent) {
         if ($recent->[-1]{epoch} < $oldest_allowed) {
@@ -493,38 +494,73 @@ sub delfile_hook ($) {
           last TRUNCATE;
         }
       }
-      # remove older duplicates of this $path, irrespective of $what:
+      # remove older duplicates of this $path, irrespective of $type:
       $recent = [ grep { $_->{path} ne $path } @$recent ];
 
-      unshift @$recent, { epoch => Time::HiRes::time, path => $path, type => $what };
-      $self->write_recent($rfile,$recent);
+      unshift @$recent, { epoch => $epoch, path => $path, type => $type };
+      $self->write_recent($recent);
+      $self->unlock;
     }
   }
 
-  sub write_recent {
-    my($self,$rfile,$recent) = @_;
-    my $meth = sprintf "write_%d", $self->protocol;
-    $self->$meth($rfile,$recent);
-    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+  sub lock {
+    my ($self) = @_;
+    # not using flock because it locks on filehandles instead of
+    # old school ressources.
+    my $locked = $self->_is_locked and return;
+    my $rfile = $self->rfile;
+    # XXX need a way to allow breaking the lock
+    while (not mkdir "$rfile.lock") {
+      Time::HiRes::sleep 0.01;
+    }
+    $self->_is_locked (1);
+  }
+
+  sub unlock {
+    my($self) = @_;
+    return unless $self->_is_locked;
+    my $rfile = $self->rfile;
     rmdir "$rfile.lock";
+    $self->_is_locked (0);
+  }
+
+  sub write_recent {
+    my ($self,$recent) = @_;
+    my $meth = sprintf "write_%d", $self->protocol;
+    $self->$meth($recent);
   }
 
   sub write_0 {
-    my($self,$rfile,$recent) = @_;
+    my ($self,$recent) = @_;
+    my $rfile = $self->rfile;
     YAML::Syck::DumpFile("$rfile.new",$recent);
+    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
   }
 
   sub write_1 {
-    my($self,$rfile,$recent) = @_;
+    my ($self,$recent) = @_;
+    my $rfile = $self->rfile;
     YAML::Syck::DumpFile("$rfile.new",{
-                                       meta => {
-                                                canonize => $self->canonize,
-                                                filenameroot => $self->filenameroot,
-                                                interval_secs => $self->interval_secs,
-                                                protocol => $self->protocol,
-                                               },
+                                       meta => $self->meta_data,
                                        recent => $recent,
                                       });
+    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
+  }
+
+  sub meta_data {
+    my($self) = @_;
+    my $ret = {};
+    for my $m (
+               "aggregator",
+               "canonize",
+               "comment",
+               "filenameroot",
+               "interval_secs",
+               "protocol",
+              ) {
+      $ret->{$m} = $self->$m;
+    }
+    return $ret;
   }
 
   sub naive_path_normalize {
@@ -535,27 +571,22 @@ sub delfile_hook ($) {
     $path;
   }
 
+  # the code relies on the resource being written atomically. We
+  # cannot lock because we may have no write access.
   sub recent_events {
-    my($self) = @_;
-    my $recent = $self->recentfile();
-    my($recent_data) = $self->recent_events_from_file($recent);
-    $recent_data;
-  }
-
-  # it seems the code relies on the resource being locked (which it
-  # probably is)
-  sub recent_events_from_file {
-    my($self, $file) = @_;
-    die "called without file" unless defined $file;
-    my($data) = eval {YAML::Syck::LoadFile($file);};
-    if ($@ or !$data) {
+    my ($self) = @_;
+    my $rfile = $self->rfile;
+    my ($data) = eval {YAML::Syck::LoadFile($rfile);};
+    my $err = $@;
+    if ($err or !$data) {
       return [];
     }
-    unless (reftype $data eq 'ARRAY') { # not protocol 0
+    if (reftype $data eq 'ARRAY') { # protocol 0
+      return $data;
+    } else {
       my $meth = sprintf "read_recent_%d", $data->{meta}{protocol};
       return $self->$meth($data);
     }
-    return $data;
   }
 
   sub read_recent_1 {
@@ -637,10 +668,17 @@ sub delfile_hook ($) {
   }
 
   sub interval_secs {
-    my($self) = @_;
+    my ($self) = @_;
     my $interval = $self->interval;
-    my($n,$t) = $interval =~ /^(\d+)([smhdWMY]$)/ or die "Could not determine seconds from interval[$interval]";
-    return $seconds{$t}*$n;
+    my ($n,$t) = $interval =~ /^(\d*)([smhdWMYZ]$)/ or
+        die "Could not determine seconds from interval[$interval]";
+    if ($interval eq "Z") {
+      return MAX_INT;
+    } elsif (exists $seconds{$t} and $n =~ /^\d+$/) {
+      return $seconds{$t}*$n;
+    } else {
+      die "Invalid interval specification: n[$n]t[$t]";
+    }
   }
 
   sub remotebase {
