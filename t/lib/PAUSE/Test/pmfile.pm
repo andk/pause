@@ -128,11 +128,11 @@ sub examine_fio :Test :Plan(3) {
     ],
     "correct package info",
   );
+  delete $PACKAGE->{PP}{pause_reg}; # cannot guess
   is_deeply(
     $PACKAGE->{PP},
     {
       parsed => 1,
-      pause_reg => (stat $pmfile->{PMFILE})[9],
       filemtime => (stat $pmfile->{PMFILE})[9],
       infile    => $pmfile->{PMFILE},
       simile    => $pmfile->{PMFILE},
