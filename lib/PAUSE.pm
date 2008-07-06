@@ -418,10 +418,12 @@ sub delfile_hook ($) {
                 );
 
   use accessors (
+                 "_current_tempfile",
                  "_is_locked",
                  "_remotebase",
                  "_rfile",
                  "_rsync",
+                 "_use_tempfile",
                  "aggregator",
                  "canonize",
                  "comment",
@@ -455,17 +457,21 @@ sub delfile_hook ($) {
 
   sub rfile {
     my($self) = @_;
-    my $rfile = $self->_rfile;
-    return $rfile if defined $rfile;
-    $rfile = File::Spec->catfile
-        ($self->localroot,
-         sprintf ("%s-%s.yaml",
-                  $self->filenameroot,
-                  $self->interval,
-                 )
-        );
-    $self->_rfile ($rfile);
-    return $rfile;
+    if ($self->_use_tempfile) {
+      return $self->_current_tempfile;
+    } else {
+      my $rfile = $self->_rfile;
+      return $rfile if defined $rfile;
+      $rfile = File::Spec->catfile
+          ($self->localroot,
+           sprintf ("%s-%s.yaml",
+                    $self->filenameroot,
+                    $self->interval,
+                   )
+          );
+      $self->_rfile ($rfile);
+      return $rfile;
+    }
   }
 
   sub update {
@@ -571,6 +577,14 @@ sub delfile_hook ($) {
     $path;
   }
 
+  sub recent_events_from_tempfile {
+    my ($self) = @_;
+    $self->_use_tempfile(1);
+    my $ret = $self->recent_events;
+    $self->_use_tempfile(0);
+    return $ret;
+  }
+
   # the code relies on the resource being written atomically. We
   # cannot lock because we may have no write access.
   sub recent_events {
@@ -644,7 +658,8 @@ sub delfile_hook ($) {
       die sprintf "Error while rsyncing: %s", $self->rsync->err;
     }
     my $mode = 0644;
-    chmod $mode, $trecentfile;
+    chmod $mode, $trecentfile or die "Could not chmod $mode '$trecentfile': $!";
+    $self->_current_tempfile ($trecentfile);
     return $trecentfile;
   }
 
