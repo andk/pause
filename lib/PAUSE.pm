@@ -16,6 +16,7 @@ use Compress::Zlib ();
 use DBI ();
 use Exporter;
 use Fcntl qw(:flock);
+eval {require File::Rsync::Mirror::Recentfile;};
 use File::Spec ();
 use IO::File ();
 use MD5 ();
@@ -350,12 +351,18 @@ our @common_args =
 sub newfile_hook ($) {
   my($f) = @_;
   my $rf;
-  $rf = File::Rsync::Mirror::Recentfile->new
-      (
-       @common_args,
-       localroot => "/home/ftp/pub/PAUSE/authors/",
-       aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
-      );
+  eval {
+    $rf = File::Rsync::Mirror::Recentfile->new
+        (
+         @common_args,
+         localroot => "/home/ftp/pub/PAUSE/authors/",
+         aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
+        );
+  };
+  unless ($rf) {
+    warn "ALERT: Could not create an rf: $@";
+    return;
+  }
   $rf->update($f,"new");
   $rf = File::Rsync::Mirror::Recentfile->new
       (
@@ -369,12 +376,18 @@ sub newfile_hook ($) {
 sub delfile_hook ($) {
   my($f) = @_;
   my $rf;
-  $rf = File::Rsync::Mirror::Recentfile->new
-      (
-       @common_args,
-       localroot => "/home/ftp/pub/PAUSE/authors/",
-       aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
-      );
+  eval {
+    $rf = File::Rsync::Mirror::Recentfile->new
+        (
+         @common_args,
+         localroot => "/home/ftp/pub/PAUSE/authors/",
+         aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
+        );
+  };
+  unless ($rf) {
+    warn "ALERT: Could not create an rf: $@";
+    return;
+  }
   $rf->update($f,"delete");
   $rf = File::Rsync::Mirror::Recentfile->new
       (
@@ -383,344 +396,6 @@ sub delfile_hook ($) {
        aggregator => [qw(1W Z)],
       );
   $rf->update($f,"delete");
-}
-
-{
-  # File::Mirror           (JWU/File-Mirror/File-Mirror-0.10.tar.gz)      only local trees
-  # Mirror::YAML           (ADAMK/Mirror-YAML-0.03.tar.gz)                some sort of inner circle
-  # Net::DownloadMirror    (KNORR/Net-DownloadMirror-0.04.tar.gz)         FTP sites and stuff
-  # Net::MirrorDir         (KNORR/Net-MirrorDir-0.05.tar.gz)              "
-  # Net::UploadMirror      (KNORR/Net-UploadMirror-0.06.tar.gz)           "
-  # Pushmi::Mirror         (CLKAO/Pushmi-v1.0.0.tar.gz)                   something SVK
-
-  package File::Rsync::Mirror::Recentfile;
-
-  use File::Basename qw(dirname);
-  use File::Path qw(mkpath);
-  use File::Rsync;
-  use File::Temp;
-  use Scalar::Util qw(reftype);
-  use Time::HiRes qw();
-  use YAML::Syck;
-
-  use constant MAX_INT => ~0>>1; # anything better?
-
-  # cf. interval_secs
-  my %seconds = (
-                 s => 1,
-                 m => 60,
-                 h => 60*60,
-                 d => 60*60*24,
-                 W => 60*60*24*7,
-                 M => 60*60*30,
-                 Q => 60*60*90,
-                 Y => 60*60*365.25,
-                );
-
-  use accessors (
-                 "_current_tempfile",
-                 "_is_locked",
-                 "_remotebase",
-                 "_rfile",
-                 "_rsync",
-                 "_use_tempfile",
-                 "aggregator",
-                 "canonize",
-                 "comment",
-                 "filenameroot",
-                 "ignore_link_stat_errors",
-                 "interval",
-                 "localroot",
-                 "protocol",            # reader/writer modifier
-                 "remote_dir",
-                 "remote_host",
-                 "remote_module",
-                 "rsync_options",
-                 "verbose",
-                );
-
-  sub new {
-    my($class, @args) = @_;
-    my $self = bless {}, $class;
-    while (@args) {
-      my($method,$arg) = splice @args, 0, 2;
-      $self->$method($arg);
-    }
-    unless (defined $self->protocol) {
-      $self->protocol(0); # default protocol will soon be 1
-    }
-    unless (defined $self->filenameroot) {
-      $self->filenameroot("RECENT");
-    }
-    return $self;
-  }
-
-  sub rfile {
-    my($self) = @_;
-    if ($self->_use_tempfile) {
-      return $self->_current_tempfile;
-    } else {
-      my $rfile = $self->_rfile;
-      return $rfile if defined $rfile;
-      $rfile = File::Spec->catfile
-          ($self->localroot,
-           sprintf ("%s-%s.yaml",
-                    $self->filenameroot,
-                    $self->interval,
-                   )
-          );
-      $self->_rfile ($rfile);
-      return $rfile;
-    }
-  }
-
-  sub update {
-    my($self,$path,$type) = @_;
-    if (my $meth = $self->canonize) {
-      if (ref $meth && ref $meth eq "CODE") {
-        die "FIXME";
-      } else {
-        $path = $self->$meth($path);
-      }
-    }
-    my $lrd = $self->localroot;
-    if ($path =~ s|^\Q$lrd\E||) {
-      my $interval = $self->interval;
-      my $secs = $self->interval_secs();
-      my $epoch = Time::HiRes::time;
-      my $oldest_allowed = $epoch-$secs;
-
-      $self->lock;
-      my $recent = $self->recent_events;
-      $recent ||= [];
-    TRUNCATE: while (@$recent) {
-        if ($recent->[-1]{epoch} < $oldest_allowed) {
-          pop @$recent;
-        } else {
-          last TRUNCATE;
-        }
-      }
-      # remove older duplicates of this $path, irrespective of $type:
-      $recent = [ grep { $_->{path} ne $path } @$recent ];
-
-      unshift @$recent, { epoch => $epoch, path => $path, type => $type };
-      $self->write_recent($recent);
-      $self->unlock;
-    }
-  }
-
-  sub lock {
-    my ($self) = @_;
-    # not using flock because it locks on filehandles instead of
-    # old school ressources.
-    my $locked = $self->_is_locked and return;
-    my $rfile = $self->rfile;
-    # XXX need a way to allow breaking the lock
-    while (not mkdir "$rfile.lock") {
-      Time::HiRes::sleep 0.01;
-    }
-    $self->_is_locked (1);
-  }
-
-  sub unlock {
-    my($self) = @_;
-    return unless $self->_is_locked;
-    my $rfile = $self->rfile;
-    rmdir "$rfile.lock";
-    $self->_is_locked (0);
-  }
-
-  sub write_recent {
-    my ($self,$recent) = @_;
-    my $meth = sprintf "write_%d", $self->protocol;
-    $self->$meth($recent);
-  }
-
-  sub write_0 {
-    my ($self,$recent) = @_;
-    my $rfile = $self->rfile;
-    YAML::Syck::DumpFile("$rfile.new",$recent);
-    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
-  }
-
-  sub write_1 {
-    my ($self,$recent) = @_;
-    my $rfile = $self->rfile;
-    YAML::Syck::DumpFile("$rfile.new",{
-                                       meta => $self->meta_data,
-                                       recent => $recent,
-                                      });
-    rename "$rfile.new", $rfile or die "Could not rename to '$rfile': $!";
-  }
-
-  sub meta_data {
-    my($self) = @_;
-    my $ret = {};
-    for my $m (
-               "aggregator",
-               "canonize",
-               "comment",
-               "filenameroot",
-               "interval_secs",
-               "protocol",
-              ) {
-      $ret->{$m} = $self->$m;
-    }
-    return $ret;
-  }
-
-  sub naive_path_normalize {
-    my($self,$path) = @_;
-    $path =~ s|/+|/|g;
-    1 while $path =~ s|/[^/]+/\.\./|/|;
-    $path =~ s|/$||;
-    $path;
-  }
-
-  sub recent_events_from_tempfile {
-    my ($self) = @_;
-    $self->_use_tempfile(1);
-    my $ret = $self->recent_events;
-    $self->_use_tempfile(0);
-    return $ret;
-  }
-
-  # the code relies on the resource being written atomically. We
-  # cannot lock because we may have no write access.
-  sub recent_events {
-    my ($self) = @_;
-    my $rfile = $self->rfile;
-    my ($data) = eval {YAML::Syck::LoadFile($rfile);};
-    my $err = $@;
-    if ($err or !$data) {
-      return [];
-    }
-    if (reftype $data eq 'ARRAY') { # protocol 0
-      return $data;
-    } else {
-      my $meth = sprintf "read_recent_%d", $data->{meta}{protocol};
-      return $self->$meth($data);
-    }
-  }
-
-  sub read_recent_1 {
-    my($self,$data) = @_;
-    return $data->{recent};
-  }
-
-  sub local_event_path {
-    my($self,$path) = @_;
-    my @p = split m|/|, $path; # rsync paths are always slash-separated
-    File::Spec->catfile($self->localroot,@p);
-  }
-
-  sub mirror_path {
-    my($self,$path) = @_;
-    my $dst = $self->local_event_path($path);
-    mkpath dirname $dst;
-    unless ($self->rsync->exec
-            (
-             src => join("/",
-                         $self->remotebase,
-                         $path
-                        ),
-             dst => $dst,
-            )) {
-      my($err) = $self->rsync->err;
-      if ($self->ignore_link_stat_errors && $err =~ m{^ rsync: \s link_stat }x ) {
-        if ($self->verbose) {
-          warn "Info: ignoring link_stat error '$err'";
-        }
-        return 1;
-      }
-      die sprintf "Error: %s", $err;
-    }
-    return 1;
-  }
-
-  sub get_remote_recentfile_as_tempfile {
-    my($self) = @_;
-    my($fh) = File::Temp->new(TEMPLATE => sprintf(".%s-XXXX",
-                                                  $self->filenameroot,
-                                                 ),
-                              DIR => $self->localroot,
-                              SUFFIX => ".yaml",
-                              UNLINK => 0,
-                             );
-    my($trecentfile) = $fh->filename;
-    unless ($self->rsync->exec(
-                               src => join("/",
-                                           $self->remotebase,
-                                           $self->recentfile_basename),
-                               dst => $trecentfile,
-                              )) {
-      unlink $trecentfile or die "Couldn't unlink '$trecentfile': $!";
-      die sprintf "Error while rsyncing: %s", $self->rsync->err;
-    }
-    my $mode = 0644;
-    chmod $mode, $trecentfile or die "Could not chmod $mode '$trecentfile': $!";
-    $self->_current_tempfile ($trecentfile);
-    return $trecentfile;
-  }
-
-  sub recentfile {
-    my($self) = @_;
-    my $recent = File::Spec->catfile(
-                                     $self->localroot,
-                                     $self->recentfile_basename(),
-                                    );
-    return $recent;
-  }
-
-  sub recentfile_basename {
-    my($self) = @_;
-    my $interval = $self->interval;
-    my $file = sprintf("%s-%s.yaml",
-                       $self->filenameroot,
-                       $interval
-                      );
-    return $file;
-  }
-
-  sub interval_secs {
-    my ($self) = @_;
-    my $interval = $self->interval;
-    my ($n,$t) = $interval =~ /^(\d*)([smhdWMYZ]$)/ or
-        die "Could not determine seconds from interval[$interval]";
-    if ($interval eq "Z") {
-      return MAX_INT;
-    } elsif (exists $seconds{$t} and $n =~ /^\d+$/) {
-      return $seconds{$t}*$n;
-    } else {
-      die "Invalid interval specification: n[$n]t[$t]";
-    }
-  }
-
-  sub remotebase {
-    my($self) = @_;
-    my $remotebase = $self->_remotebase;
-    unless (defined $remotebase) {
-      $remotebase = sprintf(
-                            "%s::%s%s",
-                            $self->remote_host,
-                            $self->remote_module,
-                            ($self->remote_dir ? ("/".$self->remote_dir) : ""),
-                           );
-      $self->_remotebase($remotebase);
-    }
-    return $remotebase;
-  }
-
-  sub rsync {
-    my($self) = @_;
-    my $rsync = $self->_rsync;
-    unless (defined $rsync) {
-      my $rsync_options = $self->rsync_options || {};
-      $rsync = File::Rsync->new($rsync_options);
-      $self->_rsync($rsync);
-    }
-    return $rsync;
-  }
 }
 
 1;
