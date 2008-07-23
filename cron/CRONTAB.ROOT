@@ -1,7 +1,7 @@
 MAILTO=k
 PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 
-29 * * * *            mldistwatch --logfile /var/log/mldistwatch.cron.log
+02 * * * *            mldistwatch --logfile /var/log/mldistwatch.cron.log
 16 15,21,03,09 * * *  update-checksums.pl
 46 * * * *            find /home/ftp/pub/PAUSE/authors/id -name 'CHECKSUMS.????'
 45 * * * *            find /home/ftp/pub/PAUSE/authors/id -name CHECKSUMS -exec perl -c {} \; 2>&1 | grep -v OK | cat
