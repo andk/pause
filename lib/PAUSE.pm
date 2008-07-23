@@ -342,7 +342,7 @@ sub gtest {
 our @common_args =
     (
      canonize => "naive_path_normalize",
-     interval => q(6h),
+     interval => q(1h),
      filenameroot => "RECENT",
      protocol => 1,
      comment => "These 'RECENT' files are part of a test of a new CPAN mirroring concept. Please ignore them for now.",
@@ -356,7 +356,7 @@ sub newfile_hook ($) {
         (
          @common_args,
          localroot => "/home/ftp/pub/PAUSE/authors/",
-         aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
+         aggregator => [qw(6h 1d 1W 1M 1Q 1Y Z)],
         );
   };
   unless ($rf) {
@@ -368,7 +368,7 @@ sub newfile_hook ($) {
       (
        @common_args,
        localroot => "/home/ftp/pub/PAUSE/modules/",
-       aggregator => [qw(1W Z)],
+       aggregator => [qw(1d 1W Z)],
       );
   $rf->update($f,"new");
 }
@@ -381,7 +381,7 @@ sub delfile_hook ($) {
         (
          @common_args,
          localroot => "/home/ftp/pub/PAUSE/authors/",
-         aggregator => [qw(1d 1W 1M 1Q 1Y Z)],
+         aggregator => [qw(6h 1d 1W 1M 1Q 1Y Z)],
         );
   };
   unless ($rf) {
@@ -393,7 +393,7 @@ sub delfile_hook ($) {
       (
        @common_args,
        localroot => "/home/ftp/pub/PAUSE/modules/",
-       aggregator => [qw(1W Z)],
+       aggregator => [qw(1d 1W Z)],
       );
   $rf->update($f,"delete");
 }
