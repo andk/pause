@@ -656,7 +656,7 @@ sub getit {
     $self->logge("Alert: no mirror: RC_NOT_MODIFIED for $tpath");
     return;
   } elsif ($response->is_success) {
-    if ($tpath =~ /\.(Z|gz)$/){
+    if ($tpath =~ /\.(Z|t?gz)$/){
       my($stat) = 0;
       sleep 1;
       my $ls = `ls -l $tpath`;
