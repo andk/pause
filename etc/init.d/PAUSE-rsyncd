@@ -6,7 +6,7 @@ DAEMON=/usr/bin/rsync
 # I plead for rsyncd.pid
 PIDFILE=/var/run/rsyncd.pid
 
-ARGS="--daemon --no-detach"
+ARGS="--daemon"
 
 test -x $DAEMON || exit 0
 
@@ -29,7 +29,7 @@ case "$1" in
     sh $0 start
     ;;
   *)
-    echo "Usage: /etc/init.d/rsync {start|stop|restart|force-reload|reload}"
+    echo "Usage: /etc/init.d/PAUSE-rsyncd {start|stop|restart|force-reload|reload}"
     exit 1
     ;;
 esac
