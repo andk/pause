@@ -204,14 +204,16 @@ sub handler {
     my($crypt_got) = crypt($sent_pw,$crypt_pw);
     if ($crypt_got eq $crypt_pw){
       $r->pnotes("usersecrets", $user_record);
-      $dbh->do("UPDATE usertable SET lastvisit=NOW() where user=?",
-               +{},
-               $user_record->{user});
+      $dbh->do
+          ("UPDATE usertable SET lastvisit=NOW() where user=?",
+           +{},
+           $user_record->{user},
+          );
       $dbh->disconnect;
       return OK;
     } else {
-      warn sprintf "crypt_pw[%s]crypt_got[%s]uri[%s]auth_required[%d]",
-	  $crypt_pw, $crypt_got, $r->uri, AUTH_REQUIRED;
+      warn sprintf "crypt_pw[%s]crypt_got[%s]user[%s]uri[%s]auth_required[%d]",
+	  $crypt_pw, $crypt_got, $user_record->{user}, $r->uri, AUTH_REQUIRED;
     }
   }
 
