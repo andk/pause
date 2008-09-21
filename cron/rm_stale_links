@@ -1,5 +1,18 @@
 #!/usr/local/bin/perl -w -- -*- mode: cperl -*-
 
+=pod
+
+misnomer
+
+we do not only remove links but also CHECKSUMS files from directories
+that contain nothing but them. And empty directories.
+
+And we call the delfile hook for the CHECKSUMS files. Up to recently
+we called the delfile hook with a relative path so the hook dropped it
+on the floor:-(
+
+=cut
+
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
 
@@ -9,6 +22,7 @@ use vars qw($Id);
 $Id = q$Id: rm_stale_links 385 2003-07-25 19:50:38Z k $;
 
 use File::Find;
+use File::Spec;
 chdir "$PAUSE::Config->{MLROOT}../..";
 
 find(
@@ -20,7 +34,7 @@ find(
         if (-l $_ && ! -e $_){
           warn "unlinking stale $File::Find::name\n";
           unlink $_;
-          PAUSE::delfile_hook($_);
+          # PAUSE::delfile_hook(File::Spec->rel2abs($_)); # do we track symlinks?
         }
         if ($_ eq "CHECKSUMS") {
           opendir DIR, ".";
@@ -29,7 +43,7 @@ find(
           if (@readdir == 3) {
             warn "unlinking orphaned $File::Find::name\n";
             unlink $_ or die "Could not unlink $_: $!";
-            PAUSE::delfile_hook($_);
+            PAUSE::delfile_hook(File::Spec->rel2abs($_)); # definitely needed
           }
         }
         return if -l $_;
@@ -41,7 +55,7 @@ find(
           if (@readdir == 2) {
             warn "rmdirring empty $File::Find::name\n";
             rmdir $_ or die "Could not rmdir $_: $!";
-            PAUSE::delfile_hook($_);
+            # PAUSE::delfile_hook(File::Spec->rel2abs($_)); # we do not track directories
           }
         }
       },
