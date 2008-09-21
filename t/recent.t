@@ -1,6 +1,6 @@
 use Test::More tests=>1;
 use lib 't/lib';
-use PAUSE;
+use File::Rsync::Mirror::Recentfile;
 my $rf = File::Rsync::Mirror::Recentfile->new
     (
      canonize => "naive_path_normalize",
