@@ -4,6 +4,7 @@ use strict;
 use lib "/home/k/PAUSE/lib";
 use PAUSE::mldistwatch ();
 use Getopt::Long ();
+sub Usage () { "FIXME Usage: $0 [options]" }
 MAIN: {
     umask 0002;
     $|=1;
@@ -17,7 +18,7 @@ MAIN: {
                              "pick=s@",
                              "rewrite!",
                              "sleep=i",
-                            );
+                            ) or die Usage;
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     if ($Opt{rewrite}) {
         $mldw->work2;
