@@ -18,45 +18,37 @@ perl -MCPAN -e 'install Bundle::Snapshot_1996_09_29_00'
 
 accessors
 
-Sub::Uplevel
-
-Test::Exception
-
-JSON
-
-Convert::BER
-
-XML::SAX::Expat
-
-XML::SAX::Writer
-
-DB_File::Lock
-
-Time::Period
-File::Rsync
-
-Encode::MIME::Header
-
-Time::HiRes
-Time::Duration
 BSD::Resource
-
-Set::Crontab
-DBI
-DBD::mysql
-MD5
 CGI
-Compress::Zlib
-CPAN::Checksums
-String::Random
 CPAN
-XML::Parser
+CPAN::Checksums
+CPAN::Indexer::Mirror
 Class::Singleton -- lexikon
+Compress::Zlib
+Convert::BER
+DBD::mysql
+DBI
+DB_File::Lock
+Encode::MIME::Header
+File::Rsync
+JSON
+JSON::XS
+MD5
+Set::Crontab
+String::Random
+Sub::Uplevel
+Test::Exception
+Text::Unidecode
+Time::Duration
+Time::HiRes
+Time::Period
 Unicode::String -- Apache::HeavyCGI
+XML::Parser
+XML::SAX::Expat
+XML::SAX::Writer
 YAML
 YAML::Syck
 
-Text::Unidecode
 
 DBI
 
