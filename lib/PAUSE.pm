@@ -45,6 +45,7 @@ $PAUSE::Config ||=
      # previously also used for ftp password; still used in Error as
      # contact address and as address to send internal notifications
      # to:
+     FTP_RUN => qq{/home/ftp/run},
      ADMIN => qq{andreas.koenig.gmwojprw+pause\@franz.ak.mind.de},
      ADMINS => [qq(modules\@perl.org)],
      ANON_FTP_PASS => qq{k\@pause.perl.org},

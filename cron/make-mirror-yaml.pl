@@ -6,9 +6,10 @@ use CPAN::Indexer::Mirror;
 use File::Path qw(mkpath);
 use LWP::UserAgent;
 
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/wc/lib";
 use PAUSE;
 
+die "FTP_RUN not defined" unless defined $PAUSE::Config->{FTP_RUN};
 my $rundir = "$PAUSE::Config->{FTP_RUN}/mirroryaml";
 mkpath $rundir;
 my $ua = LWP::UserAgent->new(agent => "PAUSE/20080922");
