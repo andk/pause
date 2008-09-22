@@ -1929,7 +1929,6 @@ sub manifind {
     %files = map { chomp; $_ => "" } <$ls>;
     close $ls;
   }
-  require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%files],[qw(files)])->Indent(1)->Useqq(1)->Dump; # XXX
 
   %files;
 }
