@@ -596,12 +596,12 @@ Last-Updated: $date\n\n};
         }
         close $F or die "Couldn't close: $!";
         rename "$repfile.new", $repfile or
-            $self->verbose("Couldn't rename to '$repfile': $!");
+            $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
-            or $self->verbose("Couldn't gzip for some reason");
+            or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
-            $self->verbose("Couldn't rename to '$repfile.gz': $!");
+            $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
         PAUSE::newfile_hook("$repfile.gz");
     }
 }
@@ -1104,12 +1104,12 @@ Date:        %s
         }
         close $F or die "Couldn't close: $!";
         rename "$repfile.new", $repfile or
-            $self->verbose("Couldn't rename to '$repfile': $!");
+            $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
-            or $self->verbose("Couldn't gzip for some reason");
+            or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
-            $self->verbose("Couldn't rename to '$repfile.gz': $!");
+            $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
         PAUSE::newfile_hook("$repfile.gz");
     }
 }
@@ -1198,27 +1198,29 @@ Date:        %s
         }
         close $F or die "Couldn't close: $!";
         rename "$repfile.new", $repfile or
-            $self->verbose("Couldn't rename to '$repfile': $!");
+            $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
-            or $self->verbose("Couldn't gzip for some reason");
+            or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
-            $self->verbose("Couldn't rename to '$repfile.gz': $!");
+            $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
         PAUSE::newfile_hook("$repfile.gz");
     }
 }
 
 sub overwrite07 {
     my($self) = @_;
-    my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose("FTP_RUN not defined");
-    -d $fromdir or $self->verbose("directory '$fromdir' not found");
-    my $mlroot = $PAUSE::Config->{MLROOT}   or $self->verbose("MLROOT not defined");
+    my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose(1,"FTP_RUN not defined");
+    $fromdir .= "/mirroryaml";
+    -d $fromdir or $self->verbose(1,"directory '$fromdir' not found");
+    my $mlroot = $PAUSE::Config->{MLROOT}   or $self->verbose(1,"MLROOT not defined");
     my $todir = "$mlroot/../../modules";
-    -d $todir or $self->verbose("directory '$todir' not found");
+    -d $todir or $self->verbose(1,"directory '$todir' not found");
     for my $exte (qw(json yml)) {
         my $f = "$fromdir/mirror.$exte";
         my $t = "$todir/07mirror.$exte";
-        rename $f, $t or $self->verbose("Could not rename $f -> $t: $!");
+        rename $f, $t or $self->verbose(1,"Could not rename $f -> $t: $!");
+        PAUSE::newfile_hook($t);
     }
 }
 
