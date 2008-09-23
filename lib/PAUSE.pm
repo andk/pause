@@ -16,12 +16,21 @@ use Compress::Zlib ();
 use DBI ();
 use Exporter;
 use Fcntl qw(:flock);
-eval {require File::Rsync::Mirror::Recentfile;};
+my $HAVE_RECENTFILE = eval {require File::Rsync::Mirror::Recentfile; 1;};
 use File::Spec ();
 use IO::File ();
 use MD5 ();
 use Mail::Send ();
+use Sys::Hostname ();
 use YAML::Syck;
+
+my $USE_RECENTFILE_HOOKS = Sys::Hostname::hostname =~ /pause/;
+if ($USE_RECENTFILE_HOOKS) {
+  unless ($HAVE_RECENTFILE) {
+    die "Did not find Recentfile library!";
+  }
+}
+
 
 use strict;
 use vars qw(@ISA @EXPORT_OK $VERSION $Config);
@@ -350,6 +359,7 @@ our @common_args =
     );
 
 sub newfile_hook ($) {
+  return unless $USE_RECENTFILE_HOOKS;
   my($f) = @_;
   my $rf;
   eval {
@@ -375,6 +385,7 @@ sub newfile_hook ($) {
 }
 
 sub delfile_hook ($) {
+  return unless $USE_RECENTFILE_HOOKS;
   my($f) = @_;
   my $rf;
   eval {
