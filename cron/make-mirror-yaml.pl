@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use CPAN::Indexer::Mirror;
+use CPAN::Indexer::Mirror 0.05; # atomic writes
 use File::Path qw(mkpath);
 use LWP::UserAgent;
 
