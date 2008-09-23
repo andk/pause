@@ -21,6 +21,9 @@ sub new_from_userid {
           or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
   my $dsn = $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME};
   my(undef,undef,$dbname) = split /:/, $dsn;
+  if ($dbname =~ /;/) {
+      ($dbname) = $dsn =~ /database=(\w+)/;
+  }
   my $sth = $dbh->prepare("SELECT secretemail
                              FROM $dbname.$PAUSE::Config->{AUTHEN_USER_TABLE}
                              WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
