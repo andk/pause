@@ -218,6 +218,7 @@ sub work2 {
     $self->rewrite01();
     $self->rewrite03();
     $self->rewrite06();
+    $self->overwrite07();
     $self->verbose(1, sprintf(
                               "\nFinished rewrite03 and everything at %s\n",
                               scalar localtime
@@ -1204,6 +1205,20 @@ Date:        %s
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose("Couldn't rename to '$repfile.gz': $!");
         PAUSE::newfile_hook("$repfile.gz");
+    }
+}
+
+sub overwrite07 {
+    my($self) = @_;
+    my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose("FTP_RUN not defined");
+    -d $fromdir or $self->verbose("directory '$fromdir' not found");
+    my $mlroot = $PAUSE::Config->{MLROOT}   or $self->verbose("MLROOT not defined");
+    my $todir = "$mlroot/../../modules";
+    -d $todir or $self->verbose("directory '$todir' not found");
+    for my $exte (qw(json yml)) {
+        my $f = "$fromdir/mirror.$exte";
+        my $t = "$todir/07mirror.$exte";
+        rename $f, $t or $self->verbose("Could not rename $f -> $t: $!");
     }
 }
 
