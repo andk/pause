@@ -22,6 +22,7 @@ use File::Temp 0.14 (); # begin of OO interface
 use HTTP::Date ();
 use JSON ();
 use List::Util ();
+use List::MoreUtils ();
 use Mail::Send ();
 use PAUSE ();
 use PAUSE::MailAddress ();
@@ -482,6 +483,7 @@ sub checkfornew {
         }
         $dio->check_blib;
         $dio->check_multiple_root;
+        $dio->check_world_writable;
         $dio->examine_pms;      # will switch user
 
         $dio->mail_summary;
@@ -1600,8 +1602,20 @@ Please contact modules\@perl.org if there are any open questions.
 
             push @m, $tf->format(qq{The distribution does not unpack
                 into a single directory and is therefore not being
-                indexed. Hint: try 'make dist'. (The directory entries
-                found were: @{$self->{HAS_MULTIPLE_ROOT}})});
+                indexed. Hint: try 'make dist' or 'Build dist'. (The
+                directory entries found were: @{$self->{HAS_MULTIPLE_ROOT}})});
+
+            push @m, qq{\n\n};
+
+            $status_over_all = "Failed";
+
+        } elsif ($self->{HAS_WORLD_WRITABLE}) {
+
+            push @m, $tf->format(qq{The distribution contains the
+                following world writable directories or files and is
+                therefore considered a security breach and as such not
+                being indexed: @{$self->{HAS_WORLD_WRITABLE}} . Hint:
+                maybe try 'make dist' or 'Build dist'.});
 
             push @m, qq{\n\n};
 
@@ -1782,6 +1796,18 @@ Please contact modules\@perl.org if there are any open questions.
     }
 
     # package PAUSE::dist;
+    sub check_world_writable {
+        my($self) = @_;
+        my @files = @{$self->{MANIFOUND}};
+        my @dirs = List::MoreUtils::uniq map {File::Basename::dirname($_) . "/"} @files;
+        my @ww = grep {my @stat = stat $_; $stat[2] & 2} @dirs, @files;
+        if (@ww) {
+            $self->verbose(1,"HAS_WORLD_WRITABLE: ww[@ww]");
+            $self->{HAS_WORLD_WRITABLE} = \@ww;
+        }
+    }
+
+    # package PAUSE::dist;
     sub filter_pms {
         my($self) = @_;
         my @pmfile;
@@ -1840,6 +1866,7 @@ Please contact modules\@perl.org if there are any open questions.
         my $self = shift;
         return if $self->{HAS_BLIB};
         return if $self->{HAS_MULTIPLE_ROOT};
+        return if $self->{HAS_WORLD_WRITABLE};
         return if $self->{COULD_NOT_UNTAR}; # XXX not yet reached, we
                                             # need to re-examine what
                                             # happens without SKIP.
