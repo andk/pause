@@ -33,6 +33,7 @@ Encode::MIME::Header
 File::Rsync
 JSON
 JSON::XS
+List::MoreUtils
 MD5
 Set::Crontab
 String::Random
