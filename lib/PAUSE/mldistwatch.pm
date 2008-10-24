@@ -3207,10 +3207,13 @@ has the same version number and the distro has a more recent modification time.}
 
         if ($ok) {              # sanity check
 
-            if (! $pp->{simile}
-                &&
-                $fio->simile($ofile,$package)
-               ) {
+            if ($self->{DIO}{VERSION_FROM_YAML_OK}) {
+                # nothing to argue at the moment, e.g. lib_pm.PL
+            } elsif (
+                     ! $pp->{simile}
+                     &&
+                     (!$fio || $fio->simile($ofile,$package)) # if we have no fio, we can't check simile
+                    ) {
                 $self->verbose(1,
                                "Warning: we ARE NOT simile BUT WE HAVE BEEN ".
                                "simile some time earlier:\n");
