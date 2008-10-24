@@ -34,6 +34,7 @@ File::Rsync
 JSON
 JSON::XS
 List::MoreUtils
+List::Pairwise
 MD5
 Set::Crontab
 String::Random
