@@ -3044,7 +3044,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
         # decrementing Version numbers are quite common :-(
         my $ok = 0;
 
-        my $distorperlok = $dist !~ m|/perl|;
+        my $distorperlok = File::Basename::basename($dist) !~ m|/perl|;
         # this dist is not named perl-something (lex ILYAZ)
 
         my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
@@ -3052,9 +3052,9 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
         $distorperlok ||= $isaperl;
         # or it is THE perl dist
 
-        my($something1) = $dist =~ m|/perl(.....)|;
+        my($something1) = File::Basename::basename($dist) =~ m|/perl(.....)|;
         # or it is called perl-something (e.g. perl-ldap) AND...
-        my($something2) = $odist =~ m|/perl(.....)|;
+        my($something2) = File::Basename::basename($odist) =~ m|/perl(.....)|;
         # and we compare against another perl-something AND...
         my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
         # the file we're comparing with is not the perl dist
