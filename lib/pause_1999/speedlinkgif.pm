@@ -37,9 +37,9 @@ sub as_string {
        <td rowspan="2" valign="top">
         <div class="xexplain">The PAUSE is sponsored by</div><br />
         <a href="http://www.fiz-chemie.de/">
-         <img src="http://www.fiz-chemie.de/img/fizlogo.gif" border="0"
+         <img src="http://www.fiz-chemie.de/fileadmin/template/img/logos/FIZ_Logo_4c.gif" border="0"
               alt="FIZ Chemie Berlin Logo"
-              width="239" height="58" align="left" />
+              width="252" height="60" align="left" />
         </a>
        </td>
        <td width="100%" valign="top" align="center"><div class="xexplain">Rev: $version</div></td>
