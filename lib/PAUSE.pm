@@ -35,7 +35,7 @@ if ($USE_RECENTFILE_HOOKS) {
 use strict;
 use vars qw(@ISA @EXPORT_OK $VERSION $Config);
 
-@ISA = qw(Exporter);
+@ISA = qw(Exporter); ## no critic
 @EXPORT_OK = qw(urecord);
 
 $VERSION = "1.005";
