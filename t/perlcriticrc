@@ -1,0 +1,21 @@
+severity  = 3
+only      = 1
+force     = 0
+verbose   = 4
+top       = 50
+theme     = bugs || complexity
+include   = ClassHierarchies
+#exclude   = Variables  Modules::RequirePackage    #Space-delimited list
+#criticism-fatal = 1                               #Zero or One
+#color     = 1                                     #Zero or One
+#
+#[Perl::Critic::Policy::Category::PolicyName]
+#severity = 1
+#set_themes = foo bar
+#add_themes = baz
+#maximum_violations_per_document = 57
+#arg1 = value1
+#arg2 = value2
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 90
