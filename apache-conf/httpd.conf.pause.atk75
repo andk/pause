@@ -18,7 +18,8 @@ HostnameLookups Off
 User www-data
 Group www-data
 # DocumentRoot /home/src/www/apache/apachebin/1.3.37/htdocs/
-DocumentRoot /home/k/dproj/PAUSE/SVN/htdocs
+DocumentRoot /home/k/dproj/PAUSE/GIT-II/htdocs
+Port 8406
 
 <IfModule mod_perl.c>
 
@@ -67,8 +68,8 @@ I don't understand those indents, but they do no harm anyway...
 
     BEGIN {
       push @INC, "/home/k/PAUSE/lib";
-      unshift @INC, "/home/k/dproj/PAUSE/SVN/lib",
-          "/home/k/dproj/PAUSE/SVN/privatelib"; # never use lib weil use
+      unshift @INC, "/home/k/dproj/PAUSE/GIT-II/lib",
+          "/home/k/dproj/PAUSE/GIT-II/privatelib"; # never use lib weil use
                                            # lib immer ausserhalb der
                                            # if/else wirkt
     }
