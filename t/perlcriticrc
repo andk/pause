@@ -18,4 +18,4 @@ include   = ClassHierarchies
 #arg2 = value2
 
 [Subroutines::ProhibitExcessComplexity]
-max_mccabe = 90
+max_mccabe = 76

@@ -4007,7 +4007,6 @@ sub add_mod {
   my $r = $mgr->{R};
 
   my $dbh = $mgr->connect;
-  my $sth;
   local($dbh->{RaiseError}) = 0;
 
   my %meta = ($self->modid_meta,
@@ -4043,83 +4042,9 @@ sub add_mod {
   my($guessing,$modid);
   if ( $req->param("SUBMIT_pause99_add_mod_hint") ) {
     $guessing++;
-    my($dsli,@desc);
-    ($modid,$dsli,@desc) = split /\s+/, $req->param("pause99_add_mod_modid");
-
-    my $userid = pop @desc;
-    my $sth_mods = $dbh->prepare(qq{SELECT * FROM mods WHERE modid=?});
-    $sth_mods->execute($modid);
-
-    if ($sth_mods->rows > 0) {
-      my $rec = $mgr->fetchrow($sth_mods, "fetchrow_hashref");
-      my $userid = $rec->{userid};
-      push @hints, "$modid is registered in the module list by $userid. ";
-    } else {
-      push @hints, "$modid is not registered in the module list. ";
-    }
-
-    $sth = $dbh->prepare(qq{SELECT * FROM packages
-                            WHERE package=?});
-    $sth->execute($modid);
-
-    if ($userid) {
-      warn "userid[$userid]";
-      # XXX check if user exists, and if not, suggest alternatives
-    } else {
-      # XXX check if somebody has already uploaded the module and if
-      # so, tell the user. Link to readme.
-      my $rows = $sth->rows;
-      warn "rows[$rows]";
-      if ($rows > 0) {
-        my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
-        my $dist = $rec->{dist};
-        my $readme = $dist;
-        $readme =~ s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
-        $userid = $mgr->file_to_user($dist);
-
-        push @hints, qq{Dist <i>$dist</i>, current version
-        <i>$rec->{version}</i> has been uploaded by <i>$userid</i>.
-        Try the <a href="/pub/PAUSE/authors/id/$readme">readme</a>.}
-
-      }
-    }
-    $sth->finish;
-
-    # guess the chapter, code also found in mldistwatch
-    my($root) = $modid =~ /^([^:]+)/;
-
-    $sth = $dbh->prepare("SELECT chapterid
-                          FROM   mods
-                          WHERE  modid = ?");
-    $sth->execute($root);
-    my $chapterid;
-    if ($sth->rows == 1) {
-      $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
-    } else {
-      $sth = $dbh->prepare(qq{SELECT chapterid
-                              FROM   mods
-                              WHERE  modid LIKE '$root\::%'});
-
-      $sth->execute;
-      $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
-    }
-
-    warn "chapterid[$chapterid]";
-    $req->param("pause99_add_mod_modid",$modid);
-    my(@dsli) = $dsli =~ /(.?)(.?)(.?)(.?)(.?)/;
-    $req->param("pause99_add_mod_statd",$dsli[0]||"?");
-    $req->param("pause99_add_mod_stats",$dsli[1]||"?");
-    $req->param("pause99_add_mod_statl",$dsli[2]||"?");
-    $req->param("pause99_add_mod_stati",$dsli[3]||"?");
-    $req->param("pause99_add_mod_statp",$dsli[4]||"?");
-    my $description = join " ", @desc;
-    $description ||= "";
-    $req->param("pause99_add_mod_description",$description);
-    $chapterid ||= "";
-    warn "chapterid[$chapterid]";
-    $req->param("pause99_add_mod_chapterid",$chapterid);
-    $req->param("pause99_add_mod_userid",$userid);
-
+    my $wanted = {};
+    $self->_add_mod_hint($mgr, $wanted, $dbh, \@hints);
+    $modid = $wanted->{modid};
   } elsif ( $req->param("SUBMIT_pause99_add_mod_insertit") ) {
 
     $modid = $req->param('pause99_add_mod_modid')||"";
@@ -4468,6 +4393,87 @@ $blurbcopy
   push @m, qq{<br />};
   push @m, $submit_butts;
   return @m;
+}
+
+sub _add_mod_hint {
+    my($self, $mgr, $wanted, $dbh, $hints) = @_;
+    my($dsli,@desc);
+    my $req = $mgr->{CGI};
+    ($wanted->{modid},$dsli,@desc) = split /\s+/, $req->param("pause99_add_mod_modid");
+
+    my $userid = pop @desc;
+    my $sth_mods = $dbh->prepare(qq{SELECT * FROM mods WHERE modid=?});
+    $sth_mods->execute($wanted->{modid});
+
+    if ($sth_mods->rows > 0) {
+      my $rec = $mgr->fetchrow($sth_mods, "fetchrow_hashref");
+      my $userid = $rec->{userid};
+      push @$hints, "$wanted->{modid} is registered in the module list by $userid. ";
+    } else {
+      push @$hints, "$wanted->{modid} is not registered in the module list. ";
+    }
+
+    my $sth = $dbh->prepare(qq{SELECT * FROM packages
+                            WHERE package=?});
+    $sth->execute($wanted->{modid});
+
+    if ($userid) {
+      warn "userid[$userid]";
+      # XXX check if user exists, and if not, suggest alternatives
+    } else {
+      # XXX check if somebody has already uploaded the module and if
+      # so, tell the user. Link to readme.
+      my $rows = $sth->rows;
+      warn "rows[$rows]";
+      if ($rows > 0) {
+        my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
+        my $dist = $rec->{dist};
+        my $readme = $dist;
+        $readme =~ s/(\.tar[._-]gz|\.tar.Z|\.tgz|\.zip)$/.readme/;
+        $userid = $mgr->file_to_user($dist);
+
+        push @$hints, qq{Dist <i>$dist</i>, current version
+        <i>$rec->{version}</i> has been uploaded by <i>$userid</i>.
+        Try the <a href="/pub/PAUSE/authors/id/$readme">readme</a>.}
+
+      }
+    }
+    $sth->finish;
+
+    # guess the chapter, code also found in mldistwatch
+    my($root) = $wanted->{modid} =~ /^([^:]+)/;
+
+    $sth = $dbh->prepare("SELECT chapterid
+                          FROM   mods
+                          WHERE  modid = ?");
+    $sth->execute($root);
+    my $chapterid;
+    if ($sth->rows == 1) {
+      $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
+    } else {
+      $sth = $dbh->prepare(qq{SELECT chapterid
+                              FROM   mods
+                              WHERE  modid LIKE '$root\::%'});
+
+      $sth->execute;
+      $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
+    }
+
+    warn "chapterid[$chapterid]";
+    $req->param("pause99_add_mod_modid",$wanted->{modid});
+    my(@dsli) = $dsli =~ /(.?)(.?)(.?)(.?)(.?)/;
+    $req->param("pause99_add_mod_statd",$dsli[0]||"?");
+    $req->param("pause99_add_mod_stats",$dsli[1]||"?");
+    $req->param("pause99_add_mod_statl",$dsli[2]||"?");
+    $req->param("pause99_add_mod_stati",$dsli[3]||"?");
+    $req->param("pause99_add_mod_statp",$dsli[4]||"?");
+    my $description = join " ", @desc;
+    $description ||= "";
+    $req->param("pause99_add_mod_description",$description);
+    $chapterid ||= "";
+    warn "chapterid[$chapterid]";
+    $req->param("pause99_add_mod_chapterid",$chapterid);
+    $req->param("pause99_add_mod_userid",$userid);
 }
 
 sub apply_mod {
