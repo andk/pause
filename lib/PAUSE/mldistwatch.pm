@@ -1927,6 +1927,11 @@ Please contact modules\@perl.org if there are any open questions.
             if ($provides && %$provides) {
                 while (my($k,$v) = each %$provides) {
                     $v->{infile} = "$v->{file} (according to META)";
+                    if (my @stat = stat $v->{file}) {
+                        $v->{filemtime} = $stat[9];
+                    } else {
+                        $v->{filemtime} = 0;
+                    }
                     my $pio = PAUSE::package
                         ->new(
                               PACKAGE => $k,
