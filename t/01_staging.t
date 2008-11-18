@@ -39,8 +39,8 @@ BEGIN {
 use Test::More tests => 2;
 
 my $resp = _ua->get("$root/pause/authenquery");
-ok $resp->is_success;
-like $resp->decoded_content, qr/Hi Andreas J. König,/;
+ok $resp->is_success, "Got root[$root]";
+like $resp->decoded_content, qr/Hi Andreas J. König,/, "Saw name of Andreas Koenig";
 
 # Local Variables:
 # mode: cperl
