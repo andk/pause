@@ -1517,6 +1517,8 @@ sub mlroot {
                 $dist =~ /\d\.\d+_\d/
                 ||
                 $dist =~ /TRIAL/
+                ||
+                $dist =~ m|/perl-\d+\.\d+\.\d+-RC\d+\.|x
                ) {
                 $self->verbose(1,"  developer release\n");
                 $self->{SUFFIX} = "N/A";
