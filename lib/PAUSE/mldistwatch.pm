@@ -1716,9 +1716,10 @@ Please contact modules\@perl.org if there are any open questions.
 
                     } else {
 
-                        push @m, qq{No package statements could be
-                     found in the distro (maybe a script or
-                     documentation distribution?)\n\n};
+                        push @m, qq{No or no indexable package
+                     statements could be found in the distro (maybe a
+                     script or documentation distribution or a
+                     developer release?)\n\n};
                         $status_over_all = "Empty_no_pm";
 
                     }
@@ -1876,7 +1877,7 @@ Please contact modules\@perl.org if there are any open questions.
             }
             push @pmfile, $mf;
         }
-        $self->verbose(1,"pmfile[@pmfile]");
+        $self->verbose(1,"pmfile[@pmfile]\n");
         \@pmfile;
     }
 
@@ -2641,7 +2642,13 @@ Please contact modules\@perl.org if there are any open questions.
         return $v if $v =~ /^\{.*\}$/; # JSON object
         $v =~ s/^\s+//;
         $v =~ s/\s+\z//;
-        return $v if $v =~ /_/;
+        if ($v =~ /_/) {
+            # XXX should pass something like EDEVELOPERRELEASE up e.g.
+            # SIXTEASE/XML-Entities-0.0306.tar.gz had nothing but one
+            # such modules and the mesage was not helpful that "nothing
+            # was found".
+            return $v ;
+        }
         my $vv = version->new($v)->numify;
         if ($vv eq $v) {
             # the boring 3.14
