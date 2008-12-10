@@ -2962,9 +2962,19 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
         my $pmfile = $self->{PMFILE};
 
         # should they be cought earlier? Maybe.
-        if ($package !~ /\w/
+        # but as an ultimate sanity check suggested by Richard Soderberg
+        # XXX should be in a separate sub and be tested
+        if ($package !~ /^\w[\w\:\']*\w?\z/
             ||
-            $package =~ /:/ && $package !~ /::/){
+            $package !~ /\w\z/
+            ||
+            $package =~ /:/ && $package !~ /::/
+            ||
+            $package =~ /\w:\w/
+            ||
+            $package =~ /:::/
+           ){
+            $self->verbose(1,"package[$package] did not pass the ultimate sanity check");
             delete $self->{FIO};    # circular reference
             return;
         }
