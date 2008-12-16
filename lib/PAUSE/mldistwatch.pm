@@ -1469,6 +1469,11 @@ sub mlroot {
     # package PAUSE::dist;
     sub skip { shift->{SKIP} }
 
+    sub isa_regular_perl {
+        my($self,$dist) = @_;
+        scalar $dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
+    }
+
     # package PAUSE::dist;
     sub examine_dist {
         my($self) = @_;
@@ -1480,7 +1485,7 @@ sub mlroot {
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         }
-        if ($dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/) {
+        if ($self->isa_regular_perl($dist)) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
             $self->verbose(1,"perl dist $dist from $u. Is he a trusted guy?\n");
             use DBI;
@@ -2383,7 +2388,12 @@ Please contact modules\@perl.org if there are any open questions.
                          ( $ | [\}\;] )
                         }x) {
                 $pkg = $2;
-                next PLINE if $pkg eq "DB";
+                if ($pkg eq "DB"){
+                    # XXX if pumpkin and perl make him comaintainer! I
+                    # think I always made the pumpkins comaint on DB
+                    # without further ado (?)
+                    next PLINE;
+                }
             }
 
             if ($pkg) {
@@ -2715,7 +2725,7 @@ P1.0 If there is a registered maintainer in mods, put him into perms
 P2.0 If perms knows about this package but current user is not in
      perms for this package, return.
 
- P2.1 but if user is primeur, go on
+ P2.1 but if user is primeur or perl, go on
 
  P2.2 but if there is no primeur, make this user primeur
 
@@ -2800,8 +2810,8 @@ package in packages  package in primeur
 
     # perm_check: we're both guessing and setting.
 
-    # P2.1: returns 1 if user is owner; makes him co-maintainer at the
-    # same time
+    # P2.1: returns 1 if user is owner or perl; makes him
+    # co-maintainer at the same time
 
     # P2.0: otherwise returns false if the package is already known in
     # perms table AND the user is not among the co-maintainers
@@ -2821,6 +2831,18 @@ package in packages  package in primeur
 
         my $ins_perms = "INSERT INTO perms (package, userid) VALUES ".
             "('$package', '$userid')";
+
+        if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
+            local($dbh->{RaiseError}) = 0;
+            local($dbh->{PrintError}) = 0;
+            my $ret = $dbh->do($ins_perms);
+            my $err = "";
+            $err = $dbh->errstr unless defined $ret;
+            $ret ||= "";
+            # print "(primeur)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
+
+            return 1;           # P2.1, P3.0
+        }
 
         my($is_primeur) = $dbh->prepare(qq{SELECT package, userid
                                          FROM   primeur
@@ -2882,7 +2904,7 @@ package in packages  package in primeur
             while (($p,$owner) = $sth_perms->fetchrow_array) {
                 push @owner, $owner; # array for debugging statement
             }
-            if ($dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/) {
+            if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
                 # seems ok: perl is always right
             } elsif (! grep { $_ eq $userid } @owner) {
                 # we must not index this and we have to inform somebody
@@ -3071,7 +3093,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
         my $distorperlok = File::Basename::basename($dist) !~ m|/perl|;
         # this dist is not named perl-something (lex ILYAZ)
 
-        my $isaperl = $dist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
+        my $isaperl = $self->{FIO}{DIO}->isa_regular_perl($dist);
 
         $distorperlok ||= $isaperl;
         # or it is THE perl dist
@@ -3080,7 +3102,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
         # or it is called perl-something (e.g. perl-ldap) AND...
         my($something2) = File::Basename::basename($odist) =~ m|/perl(.....)|;
         # and we compare against another perl-something AND...
-        my($oisaperl) = $odist =~ /$PAUSE::mldistwatch::ISA_REGULAR_PERL/;
+        my($oisaperl) = $self->{FIO}{DIO}->isa_regular_perl($odist);
         # the file we're comparing with is not the perl dist
 
         $distorperlok ||= $something1 && $something2 &&
