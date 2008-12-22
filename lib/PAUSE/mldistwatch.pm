@@ -1638,8 +1638,8 @@ Please contact modules\@perl.org if there are any open questions.
             push @m, $tf->format(qq{The distribution contains the
                 following world writable directories or files and is
                 therefore considered a security breach and as such not
-                being indexed: @{$self->{HAS_WORLD_WRITABLE}} . Hint:
-                maybe try 'make dist' or 'Build dist'.});
+                being indexed: @{$self->{HAS_WORLD_WRITABLE}} . See
+                also http://use.perl.org/~bart/journal/38127});
 
             push @m, qq{\n\n};
 
