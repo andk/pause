@@ -3411,23 +3411,11 @@ __END__
 
 =head1 NAME
 
-mldistwatch - The infamous PAUSE indexer
+PAUSE::mldistwatch - The module driving the infamous PAUSE indexer
 
 =head1 SYNOPSIS
 
- mldistwatch [OPTIONS]
-
- OPTIONS:
-
- usually used by paused after upload:
-   --pick=distro ...    distro is a full path
-   --logfile=logfile    diag not to STDOUT but to this file
-
- useful if testing the indexer at home:
-   --skip-locking       (bool) skip locking (e.g. reindex if already indexed)
-
- useful for testing:
-   --rewrite            (bool) do not index, only rewrite the index files
+ See mldistwatch
 
 =head1 DESCRIPTION
 
@@ -3483,8 +3471,6 @@ their arguments up in the "stack" of objects. Similarly index_status
 passes arguments up till they reach the PAUSE::dist object. From there
 they are harvested in the mail_summary() method that sends a report to
 the owner of the package
-
-
 
 =cut
 

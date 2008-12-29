@@ -1,10 +1,68 @@
 #!/usr/local/bin/perl -w
 
+=head1 NAME
+
+mldistwatch - this is the pause indexer
+
+=head1 SYNOPSIS
+
+  mldistwatch [OPTIONS]
+
+=head1 OPTIONS
+
+Usually called by cron. But occasionally called manually.
+
+=over 8
+
+=cut
+
+my @opt =
+map { /B<--(.+)>/ }
+grep {s/^=item\s+//} 
+        split /\n/, <<'=cut';
+
+=item B<--debug_mem!>
+
+Spits out noise about used memory
+
+=item B<--skip-locking!>
+
+skip locking (e.g. reindex if already indexed)
+
+=item B<--logfile=s>
+
+diag not to STDOUT but to this file
+
+=item B<--pick=s@>
+
+distro is a full path
+
+=item B<--rewrite!>
+
+do not index, only rewrite the index files
+
+=item B<--sleep=i>
+
+time to sleep at the end of big loop
+
+
+=cut
+
+=back
+
+=head1 DESCRIPTION
+
+(TBD)
+
+=cut
+
 use strict;
 use lib "/home/k/PAUSE/lib";
 use PAUSE::mldistwatch ();
+
 use Getopt::Long ();
-sub Usage () { "FIXME Usage: $0 [options]" }
+use Pod::Usage;
+
 MAIN: {
     umask 0002;
     $|=1;
@@ -12,13 +70,8 @@ MAIN: {
     my %Opt;
     Getopt::Long::GetOptions(
                              \%Opt,
-                             "debug_mem!",
-                             "skip-locking!",
-                             "logfile=s",
-                             "pick=s@",
-                             "rewrite!",
-                             "sleep=i",
-                            ) or die Usage;
+                             @opt,
+                            ) or pod2usage(1);
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     if ($Opt{rewrite}) {
         $mldw->work2;
