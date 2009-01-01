@@ -45,6 +45,9 @@ do not index, only rewrite the index files
 
 time to sleep at the end of big loop
 
+=item B<--testhost!>
+
+Setting testhost prevents sending mail; automatically sets skip-locking too.
 
 =cut
 
@@ -72,6 +75,9 @@ MAIN: {
                              \%Opt,
                              @opt,
                             ) or pod2usage(1);
+    if ($Opt{testhost}) {
+        $Opt{"skip-locking"} = 1;
+    }
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     if ($Opt{rewrite}) {
         $mldw->work2;

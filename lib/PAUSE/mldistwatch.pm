@@ -497,7 +497,7 @@ sub checkfornew {
     undef $fh;
     if ($alert) {
         $self->verbose(1,$alert); # summary
-        if ($PAUSE::Config->{TESTHOST}) {
+        if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
         } else {
             our $Id;
             my($msg) = Mail::Send->new(
@@ -1643,6 +1643,25 @@ Please contact modules\@perl.org if there are any open questions.
 
             push @m, qq{\n\n};
 
+            if ($self->{HAS_WORLD_WRITABLE_FIXEDFILE}) {
+
+                push @m, $tf->format(qq{For your convenience PAUSE has
+                    tried to write a new tarball with all the
+                    world-writable bits removed. The file is available
+                    for a *very* short period at
+                    '$PAUSE::Config->{INCOMING}$self->{HAS_WORLD_WRITABLE_FIXEDFILE}'.
+                    In case you use this file, please verify carefully
+                    whether it is a suitable replacement.});
+
+                push @m, qq{\n\n};
+
+            } else {
+
+                my $err = join "\n", @{$self->{HAS_WORLD_WRITABLE_FIXINGERRORS}||[]};
+                $self->alert("Fixing a world-writable tarball failed: $err");
+
+            }
+
             $status_over_all = "Failed";
 
         } elsif ($self->{HAS_BLIB}) {
@@ -1737,7 +1756,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
-        if ($PAUSE::Config->{TESTHOST}) {
+        if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
             if ($self->{PICK}) {
                 local $"="";
                 warn "Unsent Report [@m]";
@@ -1825,10 +1844,42 @@ Please contact modules\@perl.org if there are any open questions.
         my($self) = @_;
         my @files = @{$self->{MANIFOUND}};
         my @dirs = List::MoreUtils::uniq map {File::Basename::dirname($_) . "/"} @files;
+        my $Ldirs = @dirs;
+        while () {
+            @dirs = List::MoreUtils::uniq map {($_,File::Basename::dirname($_) . "/")} @dirs;
+            my $dirs = @dirs;
+            last if $dirs == $Ldirs;
+            $Ldirs = $dirs;
+        }
         my @ww = grep {my @stat = stat $_; $stat[2] & 2} @dirs, @files;
         if (@ww) {
+            # XXX todo: set a variable if we could successfully build the
+            # new tarball and make it visible for debugging and later
+            # visible for the user
+
+            # we are now in temp dir and in front of us is
+            # $self->{DISTROOT}, e.g. 'Tk-Wizard-2.142'
+            my @wwfixingerrors;
+            for my $wwf (@ww) {
+                my @stat = stat $wwf;
+                unless (chmod $stat[2] &~ 0022, $wwf) {
+                    push @wwfixingerrors, "error during 'chmod $stat[2] &~ 0022, $wwf': $!";
+                }
+            }
+            my $fixedfile = "$self->{DISTROOT}-withoutworldwriteables.tar.gz";
+            unless (0 == system (tar => "czf",
+                                 "$PAUSE::Config->{INCOMING_LOC}/$fixedfile",
+                                 $self->{DISTROOT}
+                                )) {
+                push @wwfixingerrors, "error during 'tar ...': $!";
+            }
             $self->verbose(1,"HAS_WORLD_WRITABLE: ww[@ww]");
             $self->{HAS_WORLD_WRITABLE} = \@ww;
+            if (@wwfixingerrors) {
+                $self->{HAS_WORLD_WRITABLE_FIXINGERRORS} = \@wwfixingerrors;
+            } else {
+                $self->{HAS_WORLD_WRITABLE_FIXEDFILE} = $fixedfile;
+            }
         }
     }
 
