@@ -615,6 +615,7 @@ sub mailrc {
     } else {
 #	print "Endlich keine neue Version geschrieben\n";
     }
+    PAUSE::newfile_hook($repfile);
     return;
 }
 
