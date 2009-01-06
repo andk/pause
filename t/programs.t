@@ -9,6 +9,7 @@ my $Id = q$Id: bap.t 26 2003-02-16 19:01:03Z k $;
 my @s = qw(
            bin/paused
            cron/mldistwatch
+           cron/cleanup-incoming.pl
           );
 for my $dir (qw(bin cron)) {
     opendir my $dh, $dir or die "Could not opendir $dir: $!";

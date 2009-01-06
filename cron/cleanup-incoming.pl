@@ -26,6 +26,12 @@ for my $dirent (readdir DIR) {
   next if -M $absdirent < 1/24;
   $sth->execute($dirent);
   next if $sth->rows > 0;
+  if ($dirent =~ /-withoutworldwriteables/) {
+      my $representing = $dirent;
+      $representing =~ s/-withoutworldwriteables//;
+      $sth->execute($representing);
+      next if $sth->rows > 0;
+  }
   my $size = -s $absdirent;
   if (0 && $dirent =~ /^(\d+)\.(\d+)$/) { # these come often, but I could not decipher
     open my $fh, $absdirent or die "Could not open $absdirent: $!";
