@@ -1956,15 +1956,15 @@ Please contact modules\@perl.org if there are any open questions.
 
         my $pmfiles = $self->filter_pms;
         my($yaml,$provides,$indexingrule);
-        if (!$indexingrule && @$pmfiles) { # examine files
-                $indexingrule = 1;
-        }
         if (my $version_from_yaml_ok = $self->version_from_yaml_ok) {
             $yaml = $self->{YAML_CONTENT};
             $provides = $yaml->{provides};
             if (!$indexingrule && $provides && "HASH" eq ref $provides) {
                 $indexingrule = 2;
             }
+        }
+        if (!$indexingrule && @$pmfiles) { # examine files
+                $indexingrule = 1;
         }
         if (0) {
         } elsif (1==$indexingrule) { # examine files
@@ -1999,11 +1999,21 @@ Please contact modules\@perl.org if there are any open questions.
                     } else {
                         $v->{filemtime} = 0;
                     }
+                    # going from a distro object to a package object
+                    # is only possible via a file object
+                    my $fio = PAUSE::pmfile->new
+                        (
+                         DIO => $self,
+                         PMFILE => $v->{infile},
+                         TIME => $self->{TIME},
+                         USERID => $self->{USERID},
+                         YAML_CONTENT => $self->{YAML_CONTENT},
+                        );
                     my $pio = PAUSE::package
                         ->new(
                               PACKAGE => $k,
                               DIST => $dist,
-                              DIO => $self,
+                              FIO => $fio,
                               PP => $v,
                               TIME => $self->{TIME},
                               PMFILE => "nil",
