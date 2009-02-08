@@ -1955,8 +1955,19 @@ Please contact modules\@perl.org if there are any open questions.
         $binary_dist = 1 if $dist =~ /-bin-/i;
 
         my $pmfiles = $self->filter_pms;
+        my($yaml,$provides,$indexingrule);
+        if (my $version_from_yaml_ok = $self->version_from_yaml_ok) {
+            $yaml = $self->{YAML_CONTENT};
+            $provides = $yaml->{provides};
+            if ($provides && "HASH" eq ref $provides) {
+                $indexingrule = 2;
+            }
+        }
+        if (!$indexingrule && @$pmfiles) { # examine files
+                $indexingrule = 1;
+        }
         if (0) {
-        } elsif (@$pmfiles) { # examine files
+        } elsif (1==$indexingrule) { # examine files
             for my $pmfile (@$pmfiles) {
                 if ($binary_dist) {
                     next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
@@ -1980,10 +1991,7 @@ Please contact modules\@perl.org if there are any open questions.
                                             );
                 $fio->examine_fio;
             }
-        } elsif ($self->version_from_yaml_ok) { # no pmfiles but at least a yaml
-            my $yaml = $self->{YAML_CONTENT};
-            my $provides = $yaml->{provides};
-            if ($provides && %$provides) {
+        } elsif (2==$indexingrule) { # no pmfiles but at least a yaml
                 while (my($k,$v) = each %$provides) {
                     $v->{infile} = "$v->{file} (according to META)";
                     if (my @stat = stat $v->{file}) {
@@ -2004,8 +2012,8 @@ Please contact modules\@perl.org if there are any open questions.
                              );
                     $pio->examine_pkg;
                 }
-            }
         } else {
+            $self->alert("Does this work out elsewhere? Neither yaml nor pmfiles indexing in dist[$dist]???");
         }
     }
 
