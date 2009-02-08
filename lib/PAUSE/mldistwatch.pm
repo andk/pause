@@ -2891,7 +2891,7 @@ package in packages  package in primeur
         my $ins_perms = "INSERT INTO perms (package, userid) VALUES ".
             "('$package', '$userid')";
 
-        if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
+        if ($self->{FIO}{DIO} && $self->{FIO}{DIO}->isa_regular_perl($dist)) {
             local($dbh->{RaiseError}) = 0;
             local($dbh->{PrintError}) = 0;
             my $ret = $dbh->do($ins_perms);
