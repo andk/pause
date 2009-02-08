@@ -1756,7 +1756,7 @@ Please contact modules\@perl.org if there are any open questions.
         }
         push @m, qq{__END__\n};
         my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
-        if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
+        if ($PAUSE::Config->{TESTHOST} || $self->{MAIN}{OPT}{testhost}) {
             if ($self->{PICK}) {
                 local $"="";
                 warn "Unsent Report [@m]";
