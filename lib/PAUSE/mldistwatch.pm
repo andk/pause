@@ -2816,10 +2816,11 @@ package in packages  package in primeur
 
     sub verbose {
         my($self,$level,@what) = @_;
-        require Carp;
-        if (my $parent = $self->parent) {
+        my $parent = $self->parent;
+        if ($parent) {
             $parent->verbose($level,@what);
         } else {
+            require Carp;
             Carp::cluck("Could not find a parent to log level[$level]what[@what]");
         }
     }
