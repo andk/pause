@@ -2818,7 +2818,13 @@ package in packages  package in primeur
         my($self,$level,@what) = @_;
         my $parent = $self->parent;
         if ($parent) {
-            $parent->verbose($level,@what);
+            require Scalar::Util;
+            if (Scalar::Util::blessed($parent)) {
+                $parent->verbose($level,@what);
+            } else {
+                require Carp;
+                Carp::cluck("Could not find a sane parent[$parent] to log level[$level]what[@what]");
+            }
         } else {
             require Carp;
             Carp::cluck("Could not find a parent to log level[$level]what[@what]");
