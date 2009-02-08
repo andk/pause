@@ -2816,7 +2816,8 @@ package in packages  package in primeur
 
     sub verbose {
         my($self,$level,@what) = @_;
-        my $parent = $self->parent;
+        require Carp;
+        my $parent = $self->parent or Carp::cluck("Could not find a parent to log level[$level]what[@what]");
         $parent->verbose($level,@what);
     }
 
