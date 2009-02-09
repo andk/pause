@@ -1956,15 +1956,15 @@ Please contact modules\@perl.org if there are any open questions.
 
         my $pmfiles = $self->filter_pms;
         my($yaml,$provides,$indexingrule);
+        if (!$indexingrule && @$pmfiles) { # examine files
+                $indexingrule = 1;
+        }
         if (my $version_from_yaml_ok = $self->version_from_yaml_ok) {
             $yaml = $self->{YAML_CONTENT};
             $provides = $yaml->{provides};
             if (!$indexingrule && $provides && "HASH" eq ref $provides) {
                 $indexingrule = 2;
             }
-        }
-        if (!$indexingrule && @$pmfiles) { # examine files
-                $indexingrule = 1;
         }
         if (0) {
         } elsif (1==$indexingrule) { # examine files
