@@ -1993,7 +1993,7 @@ Please contact modules\@perl.org if there are any open questions.
             }
         } elsif (2==$indexingrule) { # no pmfiles but at least a yaml
                 while (my($k,$v) = each %$provides) {
-                    $v->{infile} = "$v->{file} (according to META)";
+                    $v->{infile} = "$v->{file}";
                     my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
                     if (@stat) {
                         $v->{filemtime} = $stat[9];
