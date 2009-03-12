@@ -65,7 +65,7 @@ $Data::Dumper::Indent = 1;
     use File::Find;
     use File::Path qw(rmtree mkpath);
     our $Id = q$Id$;
-    $PAUSE::mldistwatch::SUPPORT_BZ2 = 0;
+    $PAUSE::mldistwatch::SUPPORT_BZ2 = 1;
     if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
         # ISA_REGULAR_PERL means a perl release for public consumption
         # (and must exclude developer releases like 5.9.4). I need to
