@@ -32,10 +32,11 @@ use Text::Format;
     my $HAVE_YAML = eval { require YAML; 1; };
     my $HAVE_YAML_SYCK = eval { require YAML::Syck; 1; };
     my $HAVE_YAML_XS = eval { require YAML::XS; 1; };
-    $PAUSE::dist::YAML_MODULE = $HAVE_YAML_XS ?
-        "YAML::XS" : $HAVE_YAML_SYCK ?
-            "YAML::Syck" : $HAVE_YAML ?
-                "YAML" : die "Found neither YAML::XS nor YAML::Syck nor YAML installed";
+    $PAUSE::dist::YAML_MODULE =
+        $HAVE_YAML_XS ? "YAML::XS" :
+            $HAVE_YAML_SYCK ? "YAML::Syck" :
+                $HAVE_YAML ? "YAML" :
+                    die "Found neither YAML::XS nor YAML::Syck nor YAML installed";
 }
 
 $Data::Dumper::Indent = 1;
