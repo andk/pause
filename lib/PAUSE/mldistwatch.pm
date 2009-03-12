@@ -1616,6 +1616,7 @@ Please contact modules\@perl.org if there are any open questions.
         my $substrdistro = substr $distro, 5;
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
         my $versions_from_metayaml = $self->{VERSION_FROM_YAML_OK} ? "yes" : "no";
+        my $yaml_module_version = $PAUSE::dist::YAML_MODULE->VERSION;
         push @m, qq{
                User: $author ($asciiname)
   Distribution file: $distrobasename
@@ -1623,6 +1624,7 @@ Please contact modules\@perl.org if there are any open questions.
          *.pm files: $pmfiles
              README: $self->{README}
            META.yml: $self->{YAML}
+        YAML-Parser: $PAUSE::dist::YAML_MODULE $yaml_module_version
   META-driven index: $versions_from_metayaml
   Timestamp of file: $mtime UTC
    Time of this run: $time UTC\n\n};
