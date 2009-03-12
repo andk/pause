@@ -28,7 +28,15 @@ use PAUSE ();
 use PAUSE::MailAddress ();
 use Safe;
 use Text::Format;
-use YAML ();
+{
+    my $HAVE_YAML = eval { require YAML; 1; };
+    my $HAVE_YAML_SYCK = eval { require YAML::Syck; 1; };
+    my $HAVE_YAML_XS = eval { require YAML::XS; 1; };
+    $PAUSE::dist::YAML_MODULE = $HAVE_YAML_XS ?
+        "YAML::XS" : $HAVE_YAML_SYCK ?
+            "YAML::Syck" : $HAVE_YAML ?
+                "YAML" : die "Found neither YAML::XS nor YAML::Syck nor YAML installed";
+}
 
 $Data::Dumper::Indent = 1;
 
@@ -1297,7 +1305,7 @@ sub mlroot {
 
 {
     package PAUSE::dist;
-    use vars qw(%CHECKSUMDONE $AUTOLOAD);
+    use vars qw(%CHECKSUMDONE $AUTOLOAD $YAML_MODULE);
 
     # package PAUSE::dist
     sub DESTROY {}
@@ -2100,7 +2108,8 @@ Please contact modules\@perl.org if there are any open questions.
                 File::Copy::copy $yaml, "$MLROOT/$sans.meta";
                 utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
                 PAUSE::newfile_hook("$MLROOT/$sans.meta");
-                eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
+                my $yamlloadfile = \&{"$YAML_MODULE\::LoadFile"};
+                eval { $self->{YAML_CONTENT} = $yamlloadfile->($yaml); };
                 if ($@) {
                     $self->verbose(1,"Error while parsing YAML: $@");
                     if ($@ =~ /msg: Unrecognized implicit value/) {
@@ -2111,7 +2120,8 @@ Please contact modules\@perl.org if there are any open questions.
 
                         my $cat = do { open my($f), $yaml or die; local $/; <$f> };
                         $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
-                        eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
+                        my $yamlload     = \&{"$YAML_MODULE\::Load"};
+                        eval { $self->{YAML_CONTENT} = $yamlload->($cat); };
                         if ($@) {
                             $self->{YAML_CONTENT} = {};
                             $self->{YAML} = "META.yml found but error ".
