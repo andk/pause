@@ -79,7 +79,7 @@ use base Apache::HeavyCGI;
 
 use strict;
 use vars qw($VERSION %entity2char $DO_UTF8);
-$VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+$VERSION = "854";
 
 $DO_UTF8 = 1;
 require Unicode::String;

@@ -4,7 +4,7 @@ use base 'Class::Singleton';
 use Apache::HeavyCGI::Layout;
 use pause_1999::main;
 use strict;
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "994";
 
 sub layout {
   my($self) = shift;

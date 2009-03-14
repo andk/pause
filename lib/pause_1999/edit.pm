@@ -13,7 +13,7 @@ our $Yours = "Thanks,\n-- \nThe PAUSE\n";
 
 use utf8; # must be after the qr// for perl-5.6.1
 
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "1071";
 
 our $strict_chapterid = 1;
 
