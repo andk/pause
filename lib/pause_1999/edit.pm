@@ -13,7 +13,7 @@ our $Yours = "Thanks,\n-- \nThe PAUSE\n";
 
 use utf8; # must be after the qr// for perl-5.6.1
 
-our $VERSION = "1071";
+our $VERSION = "1071.01";
 
 our $strict_chapterid = 1;
 
@@ -2603,8 +2603,8 @@ sub add_user {
 	  $doit = 0;
 	  $dont_clear = 1;
 	  unshift @rows, qq{
- <h3>Not submitting, maybe we have a duplicate here</h3>
- <p>$s_package converted the last name to [$s_code]</p>
+ <h3>Not submitting <i>$userid</i>, maybe we have a duplicate here</h3>
+ <p>$s_package converted the fullname[$fullname] to [$s_code]</p>
  <p>$query</p>
  <table border="1">
  <tr><td>userid</td>
