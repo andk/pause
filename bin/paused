@@ -6,8 +6,7 @@ sub mypause_daemon_inspector::loop ();
 
 
 
-my $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
-# $Date$
+my $VERSION = "1047";
 my $Id = qq!paused, v$VERSION!;
 
 use lib "/home/k/PAUSE/lib";
