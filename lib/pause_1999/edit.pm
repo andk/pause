@@ -13,7 +13,7 @@ our $Yours = "Thanks,\n-- \nThe PAUSE\n";
 
 use utf8; # must be after the qr// for perl-5.6.1
 
-our $VERSION = "1071.01";
+our $VERSION = "1071.02";
 
 our $strict_chapterid = 1;
 
@@ -2548,6 +2548,9 @@ sub add_user {
 	}
 	my $s_code = $s_func->($surname);
 	warn "s_code[$s_code]";
+        my $reqfullname = $req->param("pause99_add_user_fullname")||"";
+        my $reqemail    = $req->param("pause99_add_user_email")||"";
+        my $reqhomepage = $req->param("pause99_add_user_homepage")||"";
 	my($suserid,$sfullname, $spublic_email, $shomepage,
 	   $sintroduced, $schangedby, $schanged);
 	my @rows;
@@ -2555,7 +2558,7 @@ sub add_user {
         # certain color, they can enter it here:
         my %se_color_map = (
                             jv => "black",
-                            andk => "white",
+                            andk => "#f33",
                            );
         my $se_color = $se_color_map{lc $mgr->{User}{userid}} || "red";
 	while (($suserid, $sfullname, $spublic_email, $shomepage,
@@ -2572,18 +2575,45 @@ sub add_user {
                                   "&nbsp;"
                                  )."</td>",
                           $suserid,
-                          $sfullname,
                          );
+          {
+              my($bold,$end_bold) = ("","");
+              if ($sfullname eq $reqfullname) {
+                  ($bold,$end_bold) = ("<b>","</b>");
+              }
+              push @rows, map(
+                              "<td>$bold".(
+                                      defined($_)&&length($_) ?
+                                      $mgr->escapeHTML($_) :
+                                      "&nbsp;"
+                                     )."$end_bold</td>",
+                              $sfullname,
+                             );
+          }
           my $broken_spublic_email = $spublic_email;
           $broken_spublic_email =~ $mgr->escapeHTML($broken_spublic_email);
           $broken_spublic_email =~ s|@|<br/>@|;
-          push @rows, "<td>$broken_spublic_email</td>";
+          {
+              my($bold,$end_bold) = ("","");
+              if ($spublic_email eq $reqemail) {
+                  ($bold,$end_bold) = ("<b>","</b>");
+              }
+              push @rows, "<td>$bold$broken_spublic_email$end_bold</td>";
+          }
           push @rows, "<td>";
           if ($ssecretemail) {
-            push @rows, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$ssecretemail</span><br/>";
+              my($bold,$end_bold) = ("","");
+              if ($ssecretemail eq $reqemail) {
+                  ($bold,$end_bold) = ("<b>","</b>");
+              }
+              push @rows, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$bold$ssecretemail$end_bold</span><br/>";
           }
           if ($shomepage) {
-            push @rows, "homepage:&nbsp;$shomepage<br/>";
+              my($bold,$end_bold) = ("","");
+              if ($shomepage eq $reqhomepage) {
+                  ($bold,$end_bold) = ("<b>","</b>");
+              }
+              push @rows, "homepage:&nbsp;$bold$shomepage$end_bold<br/>";
           }
           if ($sintroduced) {
             my $time = scalar(gmtime($sintroduced));
