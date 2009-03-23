@@ -16,6 +16,8 @@ hostgroup paused localhost
 
 hostgroup rsyncd localhost
 
+hostgroup rsyncd localhost
+
 hostgroup threeware localhost
 
 # Monitor free disk space on the server
@@ -42,6 +44,14 @@ watch rsyncd
     service basic
 	interval 1h
 	monitor rsyncd.monitor
+	period wd {Sun-Sat}
+	    alert mail.alert k@localhost
+	    alertevery 3h
+
+watch rsyncd2
+    service basic
+	interval 1h
+	monitor rsyncd2.monitor
 	period wd {Sun-Sat}
 	    alert mail.alert k@localhost
 	    alertevery 3h
