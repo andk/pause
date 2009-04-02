@@ -13,14 +13,17 @@ links:
     /etc/ntp.conf                        ->! ../home/k/PAUSE/etc/ntp.conf
     /etc/proftpd/proftpd.conf            ->! ../home/k/PAUSE/etc/proftpd/proftpd.conf
     /etc/rsyncd.conf                     ->! ../home/k/PAUSE/etc/rsyncd.conf
+    /etc/rsyncd2.conf                    ->! ../home/k/PAUSE/etc/rsyncd2.conf
 
     /etc/apache2/apache2.conf            ->! ../../home/k/PAUSE/apache-svn-conf/httpd.conf
     /etc/apache2/ports.conf              ->! ../../home/k/PAUSE/apache-svn-conf/ports.conf
     /etc/apt/sources.list                ->! ../../home/k/PAUSE/etc/apt/sources.list
     /etc/cron.jobs/indexscripts.pl       ->! ../../home/kstar/cron/indexscripts.pl
+# all four got a manual 'update-rc.d PAUSE-xxx defaults':
     /etc/init.d/PAUSE-httpd              ->! ../../home/k/PAUSE/etc/init.d/PAUSE-httpd
     /etc/init.d/PAUSE-paused             ->! ../../home/k/PAUSE/etc/init.d/PAUSE-paused
     /etc/init.d/PAUSE-rsyncd             ->! ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd
+    /etc/init.d/PAUSE-rsyncd2            ->! ../../home/k/PAUSE/etc/init.d/PAUSE-rsyncd2
     /etc/logrotate.d/csync2              ->! ../../home/k/PAUSE/etc/logrotate.d/csync2
     /etc/logrotate.d/mldistwatch         ->! ../../home/k/PAUSE/etc/logrotate.d/mldistwatch
     /etc/logrotate.d/rsyncd              ->! ../../home/k/PAUSE/etc/logrotate.d/rsyncd
@@ -41,6 +44,7 @@ links:
 
     /usr/lib/mon/mon.d/paused.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
     /usr/lib/mon/mon.d/rsyncd.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rsyncd.monitor
+    /usr/lib/mon/mon.d/rsyncd2.monitor   ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rsyncd2.monitor
     /usr/lib/mon/mon.d/sm-mta.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
     /usr/lib/mon/mon.d/3ware_cli.monitor ->! ../../../../home/k/PAUSE/etc/mon/mon.d/3ware_cli.monitor
 

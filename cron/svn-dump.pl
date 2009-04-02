@@ -1,6 +1,8 @@
 #!/usr/local/bin/perl -w
 
 
+die "deprecated since we are in git";
+
 =pod
 
 Check current version out in a temporary directory, make a tarball.

@@ -7,7 +7,7 @@ use strict;
 use PAUSE ();
 use vars qw( $Exeplan );
 use vars qw($VERSION);
-$VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+$VERSION = "949";
 
 # Tell the system which packages want to see the headers or the
 # parameters.

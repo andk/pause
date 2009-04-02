@@ -18,7 +18,7 @@ use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
 use vars qw( $Exeplan );
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "1069";
 
 sub as_string {
   my $self = shift;

@@ -2,7 +2,7 @@
 package pause_1999::fixup;
 use strict;
 use Apache::Constants qw(:common);
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "85";
 
 =comment
 

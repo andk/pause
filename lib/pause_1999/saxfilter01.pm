@@ -11,7 +11,7 @@ PAUSE, the links are not correct and we need to do some rewriting.
 package pause_1999::saxfilter01;
 use base XML::SAX::Base;
 use strict;
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "512";
 
 sub start_element {
   my($self,$prop) = @_;

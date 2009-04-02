@@ -1,7 +1,7 @@
 package pause_1999::index;
 use strict;
 use Apache::Constants qw(:common);
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "304";
 
 sub handler {
   my $r = shift or return DECLINED;

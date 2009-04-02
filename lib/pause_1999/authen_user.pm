@@ -5,7 +5,7 @@ use Apache::Constants qw( AUTH_REQUIRED MOVED OK SERVER_ERROR );
 use base 'Class::Singleton';
 use PAUSE ();
 use strict;
-our $VERSION = sprintf "%d", q$Rev$ =~ /(\d+)/;
+our $VERSION = "1052";
 
 =comment
 
