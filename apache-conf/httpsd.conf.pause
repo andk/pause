@@ -212,7 +212,7 @@ if (Apache->define("PERL_DEBUG")) {
 
 
 use Apache::httpd_conf;
-use Apache::Status;
+# use Apache::Status;
 # use Apache::DBI;
 use strict;
 use vars qw(
@@ -330,7 +330,7 @@ if (1) { # /pause/ directory
 		 "/pub",
                  "/status",
                  "/server-info",
-                 "/perl-status"
+                 # "/perl-status"
 		){
       $Location{$loc}{PerlAuthenHandler} = "pause_1999::authen_user";
       $Location{$loc}{AuthName} = "PAUSE";
