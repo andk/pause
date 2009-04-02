@@ -289,10 +289,10 @@ for my $loc (qw( /status )){
 for my $loc (qw( /server-info )){
   $Location{$loc}{SetHandler} = "server-info";
 }
-for my $loc (qw( /perl-status )){
-  $Location{$loc}{SetHandler} = "perl-script";
-  $Location{$loc}{PerlHandler} = "Apache::Status";
-}
+#for my $loc (qw( /perl-status )){
+#  $Location{$loc}{SetHandler} = "perl-script";
+#  $Location{$loc}{PerlHandler} = "Apache::Status";
+#}
 
 #      if ($debugging) {
 #        $Location{$loc}{PerlFixupHandler} = "Apache::DB";
