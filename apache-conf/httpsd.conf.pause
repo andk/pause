@@ -194,7 +194,7 @@ I don't understand those indents, but they do no harm anyway...
 #!perl
 
     BEGIN {
-      push @INC, "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/SVN/lib";
+      push @INC, "/home/k/PAUSE/lib";
     }
 
 # $debugging
