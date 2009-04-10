@@ -355,7 +355,7 @@ our @common_args =
      interval => q(1h),
      filenameroot => "RECENT",
      protocol => 1,
-     comment => "These 'RECENT' files are part of a test of a new CPAN mirroring concept. Please ignore them for now.",
+     comment => "These files are part of the CPAN mirroring concept, described in File::Rsync::Mirror::Recent",
     );
 
 sub newfile_hook ($) {
