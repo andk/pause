@@ -2141,7 +2141,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $self->{YAML} = "Empty META.yml found, ignoring\n";
             }
         } else {
-            $self->{YAML} = "No META.yml found\n";
+            $self->{YAML} = "No META.yml found";
             $self->verbose(1,"No META.yml in $dist");
         }
     }
