@@ -21,8 +21,9 @@ BEGIN {
     unshift @INC, './lib', './t';
 
     my $exit_message;
-    if (hostname eq "k75") {
-        $root = "http://andk:ddd\@k75:8406";
+    my $hostname = hostname;
+    if ($hostname =~ /^k(75|81)/) {
+        $root = "http://andk:ddd\@$hostname:8406";
         my $resp = _ua->get("$root/pause/query");
         unless ($resp->is_success) {
             $exit_message = "local staging host not running, maybe try 'sudo /home/src/www/apache/apachebin/1.3.37/bin/httpd -f  `pwd`/apache-conf/httpd.conf.pause.atk75' (watch error log '...')";
