@@ -107,7 +107,7 @@ $PAUSE::Config ||=
 
 eval { require PrivatePAUSE; };
 if ($@) {
-  # warn "Could not find or read PrivatePAUSE.pm; will try to work without";
+  warn "Could not find or read PrivatePAUSE.pm; will try to work without";
 }
 
 
