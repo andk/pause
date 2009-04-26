@@ -66,6 +66,11 @@ and insert the result into a record for yourself like
 
   mysql -uroot -p authen_pause -e 'insert into usertable (user,password) values ("ANDK", "efRzRzo0x4kCw")'
 
+You probably want to make yourself an admin to try out the admin
+interfaces:
+
+  mysql -uroot -p authen_pause -e 'insert into grouptable (user,ugroup) values ("ANDK", "admin")'
+
 And finally we must make these databases available to the perl.
 
   mkdir privatelib/
