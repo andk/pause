@@ -1,7 +1,7 @@
 # Some POD is after __END__
 
 use strict;
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/pause/lib";
 use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
@@ -855,9 +855,11 @@ category    maintainer
         $olist       =~ s/.+?<hr\b//s;
 
     if ($comparelist ne $olist) {
-        if (open F, ">$repfile") {
+        if (open F, ">$repfile.new") {
             print F $list;
             close F;
+            rename "$repfile.new", $repfile or die;
+            PAUSE::newfile_hook($repfile);
             $self->write_01sorted(\@listing01);
         } else {
             $self->verbose(1,"Couldn't open 01modules...\n");
