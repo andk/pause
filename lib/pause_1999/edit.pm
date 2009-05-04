@@ -615,6 +615,8 @@ sub edit_cred {
     my $wantemail = $req->param("pause99_edit_cred_email");
     my $wantsecretemail = $req->param("pause99_edit_cred_secretemail");
     my $wantalias = $req->param("pause99_edit_cred_cpan_mail_alias");
+    use Email::Address;
+    my $addr_spec = $Email::Address::addr_spec;
     if ($wantemail=~/^\s*$/ && $wantsecretemail=~/^\s*$/) {
       push @m, qq{<b>ERROR</b>: Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.<hr />};
     } elsif ($wantalias eq "publ" && $wantemail=~/^\s*$/) {
@@ -625,6 +627,10 @@ sub edit_cred {
       push @m, qq{<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.<hr />};
     } elsif ($wantalias eq "secr" && $wantsecretemail=~/\Q$cpan_alias\E/i) {
       push @m, qq{<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address field contains $cpan_alias. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.<hr />};
+    } elsif ($wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
+      push @m, qq{<b>ERROR</b>: Your secret email address doesn't look like valid email address.<hr />};
+    } elsif ($wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/) {
+      push @m, qq{<b>ERROR</b>: Your public email address doesn't look like valid email address.<hr />};
     } else {
       $consistentsubmit = 1;
     }
