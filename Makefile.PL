@@ -13,15 +13,14 @@ requires        (map +($_ => 0), qw(
     Apache::Session::Counted BSD::Resource            CPAN::Checksums
     CPAN::Indexer::Mirror    Class::Singleton         Compress::Zlib
     Cwd                      DBI                      Devel::Peek
-    Dumpvalue                HTML::Entities           HTTP::Date
-    MD5                      Mail::Mailer             Mail::Send
-    Module::Faker::Dist      Module::Signature        Net::FTP
-    Set::Crontab             String::Random           Test::FITesque::Fixture
-    Text::Format             Text::Metaphone          Text::Unidecode
-    Time::HiRes              URI::Escape              URI::URL
-    Unicode::Collate         Unicode::String          XML::SAX::Base
-    XML::SAX::Writer         YAML::XS
-    
+    Dumpvalue                Email::Address           HTML::Entities
+    HTTP::Date               MD5                      Mail::Mailer
+    Mail::Send               Module::Faker::Dist      Module::Signature
+    Net::FTP                 Set::Crontab             String::Random
+    Test::FITesque::Fixture  Text::Format             Text::Metaphone
+    Text::Unidecode          Time::HiRes              URI::Escape
+    URI::URL                 Unicode::Collate         Unicode::String
+    XML::SAX::Base           XML::SAX::Writer         YAML::XS
 ));
 WriteAll        ( sign => 1, check_nmake => 0 );
 open my $fh, ">>", "Makefile" or die;
