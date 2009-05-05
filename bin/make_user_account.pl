@@ -7,7 +7,7 @@ use PAUSE;
 use DBI;
 
 my %Opt;
-Getoptions(\%Opt,
+GetOptions(\%Opt,
            "dry-run|n",
           ) or die;
 
