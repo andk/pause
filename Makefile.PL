@@ -27,4 +27,9 @@ open my $fh, ">>", "Makefile" or die;
 print $fh <<EOF;
 cpanshell ::
 \t\$(PERL) -MCPAN -e shell
+
+rsynctest ::
+\t\$(ECHO) USER=\$(USER) RSYNC_PASSWORD=\$(RSYNC_PASSWORD) ...
+\tUSER=\$(USER) RSYNC_PASSWORD=\$(RSYNC_PASSWORD) rsync --port=8732 pause.perl.org::PAUSE/authors/02STAMP
+
 EOF
