@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 use lib "/home/k/pause/lib";
 use PAUSE ();
