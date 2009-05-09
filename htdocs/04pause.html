@@ -17,7 +17,7 @@
   <li><a href="#takeover">Taking over</a></li>
   <li><a href="#conventions">Other conventions you should know about</a></li>
   <li><a href="#services">Related services on PAUSE</a></li>
-  <li><a href="#ssl">SSL support on PAUSE</a></li>
+  <li><a href="#ssl">CACERT-ified SSL on PAUSE</a></li>
   <li><a href="#other">Other useful links</a></li>
   <li><a href="#credits">Software used to run PAUSE</a></li>
 </ol>
@@ -478,25 +478,18 @@ your editor.</p>
   href="by-category">by-category</a>.
 </p>
 
-<h3><a id="ssl" name="ssl"></a>SSL support on PAUSE</h3>
+<h3><a id="ssl" name="ssl"></a>CACERT-ified SSL on PAUSE</h3>
 
-<p>PAUSE supports both http and https (SSL). Please try PAUSE over an SSL
-connection if you can. For our firewall impaired developers we will
-keep up the http server for the time being. So if you have
-difficulties accessing https, you can always fall back to http, but
-using SSL greatly improves your and PAUSE's security.</p>
+<p>On Sat, April 19 2008, PAUSE switched to use a cacert certificate. <b><a
+href="http://www.cacert.org/index.php?id=3">Get it now</a></b>.</p>
 
-<h4>Cacert root certificate</h4>
+<p>As soon as you have cacert support installed into your browser, you
+need not confirm the SSL connection manually anymore. If you have no
+cacert certificate in your browser (and unfortunately many browsers do
+not have it) you may choose to either install it manually or still
+accept the connection without installing the cacert certificate.</p>
 
-<p>On Sat, April 19 2008, PAUSE switched to use a cacert certificate.
-(A big ThankYou to RJOOP for providing it.) This means to you that if
-your browser already has cacert support built in, you need not confirm
-the SSL connection manually. If you have no cacert certificate in your
-browser you may choose to either install it manually or still accept
-the connection without installing the cacert certificate.</p>
-
-<p>You
-can download the certificate from <a
+<p>Repeat: you can download the certificate from <a
 href="http://www.cacert.org/index.php?id=3">cacert</a> directly.
 Cacert provides guidance how <a
 href="http://wiki.cacert.org/wiki/BrowserClients">to install this
@@ -511,6 +504,8 @@ the above link.</p>
 
 <p>The fingerprint of the cacert root certificate is
 <code>SHA1 Fingerprint=13:5C:EC:36:F4:9C:B8:E9:3B:1A:B2:70:CD:80:88:46:76:CE:8F:33</code></p>
+
+<p>A big ThankYou to RJOOP for providing it.</p>
 
 <p>In case all of the above does not work out for you, the fingerprint
 of the new PAUSE certificate is <code>SHA1
