@@ -2460,7 +2460,11 @@ Please contact modules\@perl.org if there are any open questions.
 
             $pline =~ s/\#.*//;
             next if $pline =~ /^\s*$/;
-            last PLINE if $pline =~ /\b__(END|DATA)__\b/;
+            if ($pline =~ /\b__(?:END|DATA)__\b/
+                and $pmfile !~ /\.PL$/   # PL files may well have code after __DATA__
+               ){
+                last PLINE;
+            }
 
             my $pkg;
 
