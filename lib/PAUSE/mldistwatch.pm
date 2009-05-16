@@ -1903,7 +1903,7 @@ Please contact modules\@perl.org if there are any open questions.
 
         # very similar code is in PAUSE::package::filter_ppps
       MANI: for my $mf ( @{$self->{MANIFOUND}} ) {
-            next unless $mf =~ /\.pm$/i;
+            next unless $mf =~ /\.pm(?:\.PL)?$/i;
             my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
             next if $inmf =~ m!^(?:t|inc)/!;
             if ($self->{YAML_CONTENT}){
@@ -2287,7 +2287,7 @@ Please contact modules\@perl.org if there are any open questions.
         # this directory but have the package HTML::Simple in it.
         # Afaik, they wouldn't be able to do so with deeper nested packages
         $file =~ s|.*/||;
-        $file =~ s|\.pm||;
+        $file =~ s|\.pm(?:\.PL)?||;
         my $ret = $package =~ m/\b\Q$file\E$/;
         $ret ||= 0;
         unless ($ret) {
