@@ -59,7 +59,7 @@ $hspecial
  cellpadding="0" cellspacing="0"><tr><td valign="middle">}; #};
   push @l, $mgr->instance_of("pause_1999::pausegif");
   push @l, qq{</td><td nowrap="nowrap"><h4
-  style="margin: 0 0 0 0; padding: 0 1em;">The Perl Authors Upload
+  style="margin: 0 0 0 0; padding: 0 1em;">The [Perl programming] Authors Upload
   Server</h4></td><td align="right" style="width: 100%;">};
   push @l, $mgr->instance_of("pause_1999::userstatus");
   push @l, qq{</td></tr></table><br />};
