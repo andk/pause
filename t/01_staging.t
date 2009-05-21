@@ -23,10 +23,19 @@ BEGIN {
     my $exit_message;
     my $hostname = hostname;
     if ($hostname =~ /^k(75|81)/) {
+        my $h = $1;
         $root = "http://andk:ddd\@$hostname:8406";
         my $resp = _ua->get("$root/pause/query");
         unless ($resp->is_success) {
-            $exit_message = "local staging host not running, maybe try 'sudo /home/src/www/apache/apachebin/1.3.37/bin/httpd -f  `pwd`/apache-conf/httpd.conf.pause.atk75' (watch error log '...')";
+            my $apache;
+            for $path ("/home/src/apache/apachebin/1.3.41/bin/httpd",
+                       "/home/src/www/apache/apachebin/1.3.37/bin/httpd") {
+                if ( -f $path ) {
+                    $apache = $path;
+                    last;
+                }
+            }
+            $exit_message = sprintf "local staging host not running, maybe try 'sudo %s -f  `pwd`/apache-conf/httpd.conf.pause.atk%s' (watch error log '...')", $apache, $h;
         }
     } else {
         $exit_message = sprintf "unknown staging host[%s]", hostname;
