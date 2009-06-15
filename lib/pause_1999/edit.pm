@@ -337,7 +337,12 @@ sub active_user_record {
   my $mgr = shift;
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
-  my $hidden_user = shift || $req->param('HIDDENNAME') || "";
+  my $hidden_user = shift;
+  warn "DEBUG: hidden_user[$hidden_user] passed in as argument";
+  my $hiddenname_para = $req->param('HIDDENNAME');
+  $hidden_user ||= $hiddenname_para;
+  warn "DEBUG: hidden_user[$hidden_user] after hiddenname parameter[$hiddenname_para]";
+  $hidden_user ||= "";
   my $opt = shift || {}; # hashref, e.g. checkonly => 1
   {
     my $uc_hidden_user = uc $hidden_user;
@@ -380,22 +385,22 @@ sub active_user_record {
                 "Unidentified error happened, please write to the PAUSE admin
  at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
     }
-    my $h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
+    my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
     $sth1->finish;
 
-    # $h1 should now be WNODOM's record
+    # $hiddenuser_h1 should now be WNODOM's record
 
     if ($opt->{checkonly}) {
       # since we have checkonly this is the MSERGEANT case
-      return $h1;
+      return $hiddenuser_h1;
     } elsif (
-	$h1->{isa_list}
+	$hiddenuser_h1->{isa_list}
        ) {
 
       # This is NOT the MSERGEANT case
 
       if (
-	  exists $mgr->{IsMailinglistRepresentative}{$h1->{userid}}
+	  exists $mgr->{IsMailinglistRepresentative}{$hiddenuser_h1->{userid}}
 	  ||
 	  (
 	   $mgr->{UserGroups}
@@ -409,7 +414,8 @@ sub active_user_record {
 	if (
 	    grep { $_ eq $mgr->{Action} } @{$mgr->{AllowMlreprTakeover}}
 	   ) {
-	  $u = $h1; # no secrets for a mailinglist
+          warn "Watch: privilege escalation";
+	  $u = $hiddenuser_h1; # no secrets for a mailinglist
 	} else {
 	  die Apache::HeavyCGI::Exception
 	      ->new(ERROR =>
@@ -434,9 +440,9 @@ sub active_user_record {
                                  FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
                                  WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
       $sth2->execute($hidden_user);
-      my $h2 = $mgr->fetchrow($sth2, "fetchrow_hashref");
+      my $hiddenuser_h2 = $mgr->fetchrow($sth2, "fetchrow_hashref");
       $sth2->finish;
-      for my $h ($h1, $h2) {
+      for my $h ($hiddenuser_h1, $hiddenuser_h2) {
 	for my $k (keys %$h) {
 	  $u->{$k} = $h->{$k};
 	}
@@ -444,7 +450,18 @@ sub active_user_record {
     } else {
       # So here is the MSERGEANT case, most probably
       # But the ordinary record must do. No secret email stuff here, no passwords
-      return $h1;
+      # 2009-06-15 akoenig : adamk reports a massive security hole
+      require YAML::Syck;
+      require Carp;
+      Carp::confess
+              (
+               YAML::Syck::Dump({ hiddenuser => $hiddenuser_h1,
+                                  error => "looks like unwanted privilege escalation",
+                                  u => $u,
+                                }));
+      # maybe we should just return the current user here? or we
+      # should check the action? Don't think so, filling HiddenUser
+      # member might be OK but returning the other user? Unlikely.
     }
   } else {
     unless ($mgr->{User}{fullname}) {
