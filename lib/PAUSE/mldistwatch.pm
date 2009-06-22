@@ -571,9 +571,10 @@ sub rewrite02 {
         my $infile = $row[0];
         $infile =~ s/^.+:://;
         next unless $row[3];
-        next unless index($row[3],"$infile.pm")>=0 or
-            $row[3]=~/VERSION/i; # VERSION is Russ Allbery's idea to
-                                 # force inclusion
+        next unless index($row[3],"$infile.pm")>=0
+            or $row[3]=~/VERSION/i # VERSION is Russ Allbery's idea to
+                                   # force inclusion
+                or $row[3] eq "missing in META.yml, tolerated by PAUSE indexer";
         $row[1] =~ s/^\+//;
         $one=30;
         $two=8;
@@ -1736,7 +1737,9 @@ Please contact modules\@perl.org if there are any open questions.
      status: %s\n",
                                      $p,
                                      $inxst->{$p}{version},
-                                     $inxst->{$p}{infile},
+                                     # magic words, see also report02() around line 573, same wording there,
+                                     # exception prompted by JOESUF/libapreq2-2.12.tar.gz
+                                     $inxst->{$p}{infile} || "missing in META.yml, tolerated by PAUSE indexer",
                                      $verb_status,
                                     );
                     $Lstatus = $status;
