@@ -729,7 +729,7 @@ sub rewrite01 {
         $pkg{rootpack} =~ s/\*$//; # XXX seems stemming from already deleted code
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             ($pkg{readme} = $pkg{dist}) =~
-                s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|zip)$/.readme/;
+                s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/.readme/;
         } else {
             ($pkg{readme} = $pkg{dist}) =~
                 s/\.(tar[._-]gz|tar.Z|tgz|zip)$/.readme/;
@@ -965,7 +965,7 @@ maintainer
         );
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             ($package{basename}) =
-                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|zip)$/;
+                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/;
         } else {
             ($package{basename}) =
                 $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$/;
@@ -1442,7 +1442,7 @@ sub mlroot {
         my $MLROOT = $self->mlroot;
         my $tar_opt = "tzf";
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            if ($dist =~ /\.tar\.bz2$/) {
+            if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
                 $tar_opt = "tjf";
             }
         }
@@ -1463,7 +1463,7 @@ sub mlroot {
         }
         $tar_opt = "xzf";
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            if ($dist =~ /\.tar\.bz2$/) {
+            if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
                 $tar_opt = "xjf";
             }
         }
@@ -1495,7 +1495,7 @@ sub mlroot {
         $suffix = $skip = "";
         my $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.Z)$/;
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
+            $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         }
         if ($self->isa_regular_perl($dist)) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
