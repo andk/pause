@@ -335,15 +335,24 @@ of a mailing list.
 sub active_user_record {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
+  my $hidden_user = shift;
+  my $opt = shift || {}; # hashref, e.g. checkonly => 1
+
+  my $hidden_user_ok = $opt->{hidden_user_ok}; # caller is absolutely
+                                               # sure that hidden_user
+                                               # is authenticated or
+                                               # harmless (mailpw)
+
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
-  my $hidden_user = shift;
-  warn "DEBUG: hidden_user[$hidden_user] passed in as argument";
-  my $hiddenname_para = $req->param('HIDDENNAME');
-  $hidden_user ||= $hiddenname_para;
-  warn "DEBUG: hidden_user[$hidden_user] after hiddenname parameter[$hiddenname_para]";
-  $hidden_user ||= "";
-  my $opt = shift || {}; # hashref, e.g. checkonly => 1
+  if ($hidden_user) {
+    require Carp;
+    Carp::cluck("hidden_user[$hidden_user] passed in as argument with hidden_user_ok[$hidden_user_ok]");
+  } else {
+    my $hiddenname_para = $req->param('HIDDENNAME') || "";
+    $hidden_user ||= $hiddenname_para;
+    warn "DEBUG: hidden_user[$hidden_user] after hiddenname parameter[$hiddenname_para]";
+  }
   {
     my $uc_hidden_user = uc $hidden_user;
     unless ($uc_hidden_user eq $hidden_user) {
@@ -447,6 +456,8 @@ sub active_user_record {
 	  $u->{$k} = $h->{$k};
 	}
       }
+    } elsif ($hidden_user_ok) {
+      return $u;
     } else {
       # So here is the MSERGEANT case, most probably
       # But the ordinary record must do. No secret email stuff here, no passwords
@@ -3074,7 +3085,9 @@ sub mailpw {
       $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
     } else {
       my $u;
-      eval { $u = $self->active_user_record($mgr,$param); };
+      eval {
+        $u = $self->active_user_record($mgr,$param);
+      };
       if ($@) {
         die Apache::HeavyCGI::Exception->new(ERROR =>
                                              qq{Cannot find a userid
@@ -3104,7 +3117,7 @@ sub mailpw {
     # TUT: all users may have a secret and a public email. We pick what
     # we have.
     unless ($email = $rec->{secretemail}) {
-      my $u = $self->active_user_record($mgr,$param);
+      my $u = $self->active_user_record($mgr,$param,{hidden_user_ok => 1});
       $email = $u->{email};
     }
     if ($email) {
