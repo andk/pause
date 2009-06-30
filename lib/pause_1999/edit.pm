@@ -1526,7 +1526,11 @@ filename[%s]. </p>
 
   push @m, qq{<tr><td bgcolor="#ffe0ff"><b>GET URL:</b> PAUSE fetches
       any http or ftp URL that can be handled by LWP: use the text
-      field (please specify the <i>complete URL</i>)</td></tr>\n};
+      field (please specify the <i>complete URL</i>). How to use this
+      for direct publishing from your github repository has been
+      described by Mike Schilli <a
+      href="http://blog.usarundbrief.com/?p=36">in his
+      blog</a></td></tr>\n};
 
   push @m, qq{<tr><td bgcolor="#ffff80"><b>FTP PUT + Confirmation via
       form:</b> After you have transferred the file to the incoming
