@@ -3120,8 +3120,9 @@ sub mailpw {
 
     # TUT: all users may have a secret and a public email. We pick what
     # we have.
+    my $u;
     unless ($email = $rec->{secretemail}) {
-      my $u = $self->active_user_record($mgr,$param,{hidden_user_ok => 1});
+      $u = $self->active_user_record($mgr,$param,{hidden_user_ok => 1});
       $email = $u->{email};
     }
     if ($email) {
@@ -3200,6 +3201,8 @@ $Yours};
       return @m; # no need to repeat form
 
     } else {
+      require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({u => $u}); # XXX
+
       push @m, sprintf qq{
 
  <p>We have not found the email of <i>$param</i>. Please try with a different
