@@ -395,6 +395,8 @@ sub active_user_record {
  at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
     }
     my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
+    require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({hiddenuser_h1 => $hiddenuser_h1}); # XXX
+
     $sth1->finish;
 
     # $hiddenuser_h1 should now be WNODOM's record
@@ -437,12 +439,15 @@ sub active_user_record {
 	}
       }
     } elsif (
+             $hidden_user_ok
+             ||
 	$mgr->{UserGroups}
 	&&
 	exists $mgr->{UserGroups}{admin}
        ) {
 
       # This isn't the MSERGEANT case either, must be admin
+      # The case of hidden_user_ok is when they forgot password
 
       my $dbh2 = $mgr->authen_connect;
       my $sth2 = $dbh2->prepare("SELECT secretemail, lastvisit
@@ -456,7 +461,7 @@ sub active_user_record {
 	  $u->{$k} = $h->{$k};
 	}
       }
-    } elsif ($hidden_user_ok) {
+    } elsif (0) {
       return $u;
     } else {
       # So here is the MSERGEANT case, most probably
@@ -3120,9 +3125,10 @@ sub mailpw {
 
     # TUT: all users may have a secret and a public email. We pick what
     # we have.
-    my $u;
     unless ($email = $rec->{secretemail}) {
-      $u = $self->active_user_record($mgr,$param,{hidden_user_ok => 1});
+      my $u = $self->active_user_record($mgr,$param,{hidden_user_ok => 1});
+      require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({u=>$u}); # XXX
+
       $email = $u->{email};
     }
     if ($email) {
@@ -3201,8 +3207,6 @@ $Yours};
       return @m; # no need to repeat form
 
     } else {
-      require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({u => $u}); # XXX
-
       push @m, sprintf qq{
 
  <p>We have not found the email of <i>$param</i>. Please try with a different
