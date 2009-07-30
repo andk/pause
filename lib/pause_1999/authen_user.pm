@@ -43,7 +43,19 @@ sub header {
     $sth = $dbh->prepare($sql);
     if ($sth->execute($u)) {
       if (0 == $sth->rows) {
-        die Apache::HeavyCGI::Exception->new(ERROR => "User '$u' either not known or set to nologin");
+        my($sql7,$sth7);
+        $sql7 = qq{SELECT *
+              FROM users
+              WHERE userid=?};
+        $sth7 = $dbh->prepare($sql7);
+        $sth7->execute($u);
+        my $error;
+        if ($sth7->rows > 0) {
+          $error = "User '$u' set to nologin. Many users with an insecure password have got their password reset recently because of an incident on perlmonks.org. Please talk to modules\@perl.org to find out how to proceed";
+        } else {
+          $error = "User '$u' not known";
+        }
+        die Apache::HeavyCGI::Exception->new(ERROR => $error);
       } else {
         $mgr->{User} = $mgr->fetchrow($sth, "fetchrow_hashref");
       }
