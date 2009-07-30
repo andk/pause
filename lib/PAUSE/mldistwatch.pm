@@ -1,7 +1,7 @@
 # Some POD is after __END__
 
 use strict;
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/pause/lib";
 use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
@@ -571,9 +571,10 @@ sub rewrite02 {
         my $infile = $row[0];
         $infile =~ s/^.+:://;
         next unless $row[3];
-        next unless index($row[3],"$infile.pm")>=0 or
-            $row[3]=~/VERSION/i; # VERSION is Russ Allbery's idea to
-                                 # force inclusion
+        next unless index($row[3],"$infile.pm")>=0
+            or $row[3]=~/VERSION/i # VERSION is Russ Allbery's idea to
+                                   # force inclusion
+                or $row[3] eq "missing in META.yml, tolerated by PAUSE indexer";
         $row[1] =~ s/^\+//;
         $one=30;
         $two=8;
@@ -728,7 +729,7 @@ sub rewrite01 {
         $pkg{rootpack} =~ s/\*$//; # XXX seems stemming from already deleted code
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             ($pkg{readme} = $pkg{dist}) =~
-                s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|zip)$/.readme/;
+                s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/.readme/;
         } else {
             ($pkg{readme} = $pkg{dist}) =~
                 s/\.(tar[._-]gz|tar.Z|tgz|zip)$/.readme/;
@@ -855,9 +856,11 @@ category    maintainer
         $olist       =~ s/.+?<hr\b//s;
 
     if ($comparelist ne $olist) {
-        if (open F, ">$repfile") {
+        if (open F, ">$repfile.new") {
             print F $list;
             close F;
+            rename "$repfile.new", $repfile or die;
+            PAUSE::newfile_hook($repfile);
             $self->write_01sorted(\@listing01);
         } else {
             $self->verbose(1,"Couldn't open 01modules...\n");
@@ -962,7 +965,7 @@ maintainer
         );
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
             ($package{basename}) =
-                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|zip)$/;
+                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/;
         } else {
             ($package{basename}) =
                 $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$/;
@@ -1439,7 +1442,7 @@ sub mlroot {
         my $MLROOT = $self->mlroot;
         my $tar_opt = "tzf";
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            if ($dist =~ /\.tar\.bz2$/) {
+            if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
                 $tar_opt = "tjf";
             }
         }
@@ -1460,7 +1463,7 @@ sub mlroot {
         }
         $tar_opt = "xzf";
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            if ($dist =~ /\.tar\.bz2$/) {
+            if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
                 $tar_opt = "xjf";
             }
         }
@@ -1492,7 +1495,7 @@ sub mlroot {
         $suffix = $skip = "";
         my $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.Z)$/;
         if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
+            $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         }
         if ($self->isa_regular_perl($dist)) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
@@ -1734,7 +1737,9 @@ Please contact modules\@perl.org if there are any open questions.
      status: %s\n",
                                      $p,
                                      $inxst->{$p}{version},
-                                     $inxst->{$p}{infile},
+                                     # magic words, see also report02() around line 573, same wording there,
+                                     # exception prompted by JOESUF/libapreq2-2.12.tar.gz
+                                     $inxst->{$p}{infile} || "missing in META.yml, tolerated by PAUSE indexer",
                                      $verb_status,
                                     );
                     $Lstatus = $status;
@@ -1901,7 +1906,7 @@ Please contact modules\@perl.org if there are any open questions.
 
         # very similar code is in PAUSE::package::filter_ppps
       MANI: for my $mf ( @{$self->{MANIFOUND}} ) {
-            next unless $mf =~ /\.pm$/i;
+            next unless $mf =~ /\.pm(?:\.PL)?$/i;
             my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
             next if $inmf =~ m!^(?:t|inc)/!;
             if ($self->{YAML_CONTENT}){
@@ -2285,7 +2290,7 @@ Please contact modules\@perl.org if there are any open questions.
         # this directory but have the package HTML::Simple in it.
         # Afaik, they wouldn't be able to do so with deeper nested packages
         $file =~ s|.*/||;
-        $file =~ s|\.pm||;
+        $file =~ s|\.pm(?:\.PL)?||;
         my $ret = $package =~ m/\b\Q$file\E$/;
         $ret ||= 0;
         unless ($ret) {
@@ -2458,7 +2463,11 @@ Please contact modules\@perl.org if there are any open questions.
 
             $pline =~ s/\#.*//;
             next if $pline =~ /^\s*$/;
-            last PLINE if $pline =~ /\b__(END|DATA)__\b/;
+            if ($pline =~ /\b__(?:END|DATA)__\b/
+                and $pmfile !~ /\.PL$/   # PL files may well have code after __DATA__
+               ){
+                last PLINE;
+            }
 
             my $pkg;
 

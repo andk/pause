@@ -34,9 +34,14 @@ sub handler {
 
     # CASE 1
 
-    my $proto = $r->server->port == 443 ? "https" : "http";
+    my $port = $r->server->port;
+    my $colonport = ":" . $port;
+    if ($port==80 || $port==443) {
+      $colonport = "";
+    }
+    my $proto = $port == 443 ? "https" : "http";
     my $server = $r->server->server_hostname;
-    my $redir = "$proto://$server$location/query";
+    my $redir = "$proto://$server$colonport$location/query";
     $r->header_out("Location",$redir);
     # warn "redir[$redir]";
     $r->status(Apache::Constants::MOVED());
@@ -57,3 +62,8 @@ sub handler {
 }
 
 1;
+
+#Local Variables:
+#mode: cperl
+#cperl-indent-level: 2
+#End:

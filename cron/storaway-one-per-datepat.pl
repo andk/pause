@@ -2,7 +2,7 @@
 
 =pod
 
-Usage: $0 /home/k/PAUSE/111_sensitive/backup 'authen_pausedump\.(\d\d\d\d)(\d\d)\d+GMT\.bz2'
+Usage: $0 /home/k/pause/111_sensitive/backup 'authen_pausedump\.(\d\d\d\d)(\d\d)\d+GMT\.bz2'
 
 =cut
 

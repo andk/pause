@@ -107,6 +107,7 @@ $PAUSE::Config ||=
 
 eval { require PrivatePAUSE; };
 if ($@) {
+  # PAUSE.pm is used in the timestamp cronjob without access to privatelib; cannot warn every minute
   # warn "Could not find or read PrivatePAUSE.pm; will try to work without";
 }
 

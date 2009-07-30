@@ -335,10 +335,24 @@ of a mailing list.
 sub active_user_record {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
+  my $hidden_user = shift;
+  my $opt = shift || {}; # hashref, e.g. checkonly => 1
+
+  my $hidden_user_ok = $opt->{hidden_user_ok}; # caller is absolutely
+                                               # sure that hidden_user
+                                               # is authenticated or
+                                               # harmless (mailpw)
+
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
-  my $hidden_user = shift || $req->param('HIDDENNAME') || "";
-  my $opt = shift || {}; # hashref, e.g. checkonly => 1
+  if ($hidden_user) {
+    require Carp;
+    Carp::cluck("hidden_user[$hidden_user] passed in as argument with hidden_user_ok[$hidden_user_ok]");
+  } else {
+    my $hiddenname_para = $req->param('HIDDENNAME') || "";
+    $hidden_user ||= $hiddenname_para;
+    warn "DEBUG: hidden_user[$hidden_user] after hiddenname parameter[$hiddenname_para]";
+  }
   {
     my $uc_hidden_user = uc $hidden_user;
     unless ($uc_hidden_user eq $hidden_user) {
@@ -380,22 +394,24 @@ sub active_user_record {
                 "Unidentified error happened, please write to the PAUSE admin
  at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
     }
-    my $h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
+    my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
+    require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({hiddenuser_h1 => $hiddenuser_h1}); # XXX
+
     $sth1->finish;
 
-    # $h1 should now be WNODOM's record
+    # $hiddenuser_h1 should now be WNODOM's record
 
     if ($opt->{checkonly}) {
       # since we have checkonly this is the MSERGEANT case
-      return $h1;
+      return $hiddenuser_h1;
     } elsif (
-	$h1->{isa_list}
+	$hiddenuser_h1->{isa_list}
        ) {
 
       # This is NOT the MSERGEANT case
 
       if (
-	  exists $mgr->{IsMailinglistRepresentative}{$h1->{userid}}
+	  exists $mgr->{IsMailinglistRepresentative}{$hiddenuser_h1->{userid}}
 	  ||
 	  (
 	   $mgr->{UserGroups}
@@ -409,7 +425,8 @@ sub active_user_record {
 	if (
 	    grep { $_ eq $mgr->{Action} } @{$mgr->{AllowMlreprTakeover}}
 	   ) {
-	  $u = $h1; # no secrets for a mailinglist
+          warn "Watch: privilege escalation";
+	  $u = $hiddenuser_h1; # no secrets for a mailinglist
 	} else {
 	  die Apache::HeavyCGI::Exception
 	      ->new(ERROR =>
@@ -422,29 +439,45 @@ sub active_user_record {
 	}
       }
     } elsif (
+             $hidden_user_ok
+             ||
 	$mgr->{UserGroups}
 	&&
 	exists $mgr->{UserGroups}{admin}
        ) {
 
       # This isn't the MSERGEANT case either, must be admin
+      # The case of hidden_user_ok is when they forgot password
 
       my $dbh2 = $mgr->authen_connect;
       my $sth2 = $dbh2->prepare("SELECT secretemail, lastvisit
                                  FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
                                  WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
       $sth2->execute($hidden_user);
-      my $h2 = $mgr->fetchrow($sth2, "fetchrow_hashref");
+      my $hiddenuser_h2 = $mgr->fetchrow($sth2, "fetchrow_hashref");
       $sth2->finish;
-      for my $h ($h1, $h2) {
+      for my $h ($hiddenuser_h1, $hiddenuser_h2) {
 	for my $k (keys %$h) {
 	  $u->{$k} = $h->{$k};
 	}
       }
+    } elsif (0) {
+      return $u;
     } else {
       # So here is the MSERGEANT case, most probably
       # But the ordinary record must do. No secret email stuff here, no passwords
-      return $h1;
+      # 2009-06-15 akoenig : adamk reports a massive security hole
+      require YAML::Syck;
+      require Carp;
+      Carp::confess
+              (
+               YAML::Syck::Dump({ hiddenuser => $hiddenuser_h1,
+                                  error => "looks like unwanted privilege escalation",
+                                  u => $u,
+                                }));
+      # maybe we should just return the current user here? or we
+      # should check the action? Don't think so, filling HiddenUser
+      # member might be OK but returning the other user? Unlikely.
     }
   } else {
     unless ($mgr->{User}{fullname}) {
@@ -615,6 +648,8 @@ sub edit_cred {
     my $wantemail = $req->param("pause99_edit_cred_email");
     my $wantsecretemail = $req->param("pause99_edit_cred_secretemail");
     my $wantalias = $req->param("pause99_edit_cred_cpan_mail_alias");
+    use Email::Address;
+    my $addr_spec = $Email::Address::addr_spec;
     if ($wantemail=~/^\s*$/ && $wantsecretemail=~/^\s*$/) {
       push @m, qq{<b>ERROR</b>: Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.<hr />};
     } elsif ($wantalias eq "publ" && $wantemail=~/^\s*$/) {
@@ -625,6 +660,10 @@ sub edit_cred {
       push @m, qq{<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.<hr />};
     } elsif ($wantalias eq "secr" && $wantsecretemail=~/\Q$cpan_alias\E/i) {
       push @m, qq{<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address field contains $cpan_alias. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.<hr />};
+    } elsif ($wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
+      push @m, qq{<b>ERROR</b>: Your secret email address doesn't look like valid email address.<hr />};
+    } elsif ($wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/) {
+      push @m, qq{<b>ERROR</b>: Your public email address doesn't look like valid email address.<hr />};
     } else {
       $consistentsubmit = 1;
     }
@@ -1492,7 +1531,11 @@ filename[%s]. </p>
 
   push @m, qq{<tr><td bgcolor="#ffe0ff"><b>GET URL:</b> PAUSE fetches
       any http or ftp URL that can be handled by LWP: use the text
-      field (please specify the <i>complete URL</i>)</td></tr>\n};
+      field (please specify the <i>complete URL</i>). How to use this
+      for direct publishing from your github repository has been
+      described by Mike Schilli <a
+      href="http://blog.usarundbrief.com/?p=36">in his
+      blog</a></td></tr>\n};
 
   push @m, qq{<tr><td bgcolor="#ffff80"><b>FTP PUT + Confirmation via
       form:</b> After you have transferred the file to the incoming
@@ -2548,12 +2591,12 @@ sub add_user {
 	}
 	my $s_code = $s_func->($surname);
 	warn "s_code[$s_code]";
+        my $requserid   = $req->param("pause99_add_user_userid")||"";
         my $reqfullname = $req->param("pause99_add_user_fullname")||"";
         my $reqemail    = $req->param("pause99_add_user_email")||"";
         my $reqhomepage = $req->param("pause99_add_user_homepage")||"";
 	my($suserid,$sfullname, $spublic_email, $shomepage,
 	   $sintroduced, $schangedby, $schanged);
-	my @rows;
         # if a user has a preference to display secret emails in a
         # certain color, they can enter it here:
         my %se_color_map = (
@@ -2561,34 +2604,41 @@ sub add_user {
                             andk => "#f33",
                            );
         my $se_color = $se_color_map{lc $mgr->{User}{userid}} || "red";
+        my @urows;
 	while (($suserid, $sfullname, $spublic_email, $shomepage,
 		$sintroduced, $schangedby, $schanged) =
                $mgr->fetchrow($sth, "fetchrow_array")) {
 	  (my $dbsurname = $sfullname) =~ s/.*\s//;
 	  next unless $s_func->($dbsurname) eq $s_code;
+          my @urow;
+          my $score = 0;
           my $ssecretemail = $self->get_secretemail($mgr, $suserid);
-	  push @rows, "<tr>";
-          push @rows, map(
-                          "<td>".(
-                                  defined($_)&&length($_) ?
-                                  $mgr->escapeHTML($_) :
-                                  "&nbsp;"
-                                 )."</td>",
-                          $suserid,
-                         );
+	  push @urow, "<tr>";
+          if (defined($suserid)&&length($suserid)) {
+              my $duserid = $mgr->escapeHTML($suserid);
+              if ($requserid eq $suserid) {
+                  $duserid = "<b>$duserid</b>";
+                  $score++;
+              }
+              push @urow, "<td>$duserid</td>";
+          } else {
+              push @urow, "<td>&nbsp;</td>";
+          }
           {
               my($bold,$end_bold) = ("","");
+              my $dfullname = $mgr->escapeHTML($sfullname);
               if ($sfullname eq $reqfullname) {
-                  ($bold,$end_bold) = ("<b>","</b>");
+                  $dfullname = "<b>$dfullname</b>";
+                  $score++;
+              } elsif ($sfullname =~ /\Q$surname\E/) {
+                  $dfullname =~ s|(\Q$surname\E)|<b>$1</b>|;
+                  $score++;
               }
-              push @rows, map(
-                              "<td>$bold".(
-                                      defined($_)&&length($_) ?
-                                      $mgr->escapeHTML($_) :
-                                      "&nbsp;"
-                                     )."$end_bold</td>",
-                              $sfullname,
-                             );
+              if (defined($sfullname)&&length($sfullname)) {
+                  push @urow, "<td>$bold$dfullname$end_bold</td>";
+              } else {
+                  push @urow, "<td>&nbsp;</td>";
+              }
           }
           my $broken_spublic_email = $spublic_email;
           $broken_spublic_email =~ $mgr->escapeHTML($broken_spublic_email);
@@ -2597,45 +2647,50 @@ sub add_user {
               my($bold,$end_bold) = ("","");
               if ($spublic_email eq $reqemail) {
                   ($bold,$end_bold) = ("<b>","</b>");
+                  $score++;
               }
-              push @rows, "<td>$bold$broken_spublic_email$end_bold</td>";
+              push @urow, "<td>$bold$broken_spublic_email$end_bold</td>";
           }
-          push @rows, "<td>";
+          push @urow, "<td>";
           if ($ssecretemail) {
               my($bold,$end_bold) = ("","");
               if ($ssecretemail eq $reqemail) {
                   ($bold,$end_bold) = ("<b>","</b>");
+                  $score++;
               }
-              push @rows, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$bold$ssecretemail$end_bold</span><br/>";
+              push @urow, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$bold$ssecretemail$end_bold</span><br/>";
           }
           if ($shomepage) {
               my($bold,$end_bold) = ("","");
               if ($shomepage eq $reqhomepage) {
                   ($bold,$end_bold) = ("<b>","</b>");
+                  $score++;
               }
-              push @rows, "homepage:&nbsp;$bold$shomepage$end_bold<br/>";
+              push @urow, "homepage:&nbsp;$bold$shomepage$end_bold<br/>";
           }
           if ($sintroduced) {
             my $time = scalar(gmtime($sintroduced));
             $time =~ s/\s/\&nbsp;/g;
-            push @rows, "introduced&nbsp;on:&nbsp;$time<br/>";
+            push @urow, "introduced&nbsp;on:&nbsp;$time<br/>";
           }
           if ($schanged) {
             my $time = scalar(gmtime($schanged));
             $time =~ s/\s/\&nbsp;/g;
-            push @rows, "changed&nbsp;on:&nbsp;$time&nbsp;by&nbsp;$schangedby<br/>";
+            push @urow, "changed&nbsp;on:&nbsp;$time&nbsp;by&nbsp;$schangedby<br/>";
           } else {
-            push @rows, "changed&nbsp;by:&nbsp;$schangedby<br/>";
+            push @urow, "changed&nbsp;by:&nbsp;$schangedby<br/>";
           }
-          push @rows, "</tr>\n";
+          push @urow, "</tr>\n";
+          my $line = join "", @urow;
+          push @urows, { line => $line, score => $score };
 	}
-	if (@rows) {
+	if (@urows) {
+          my @rows = map { $_->{line} } sort { $b->{score} <=> $a->{score} } @urows;
 	  $doit = 0;
 	  $dont_clear = 1;
 	  unshift @rows, qq{
  <h3>Not submitting <i>$userid</i>, maybe we have a duplicate here</h3>
- <p>$s_package converted the fullname[$fullname] to [$s_code]</p>
- <p>$query</p>
+ <p>$s_package converted the fullname [<b>$fullname</b>] to [$s_code]</p>
  <table border="1">
  <tr><td>userid</td>
  <td>fullname</td>
@@ -3039,7 +3094,9 @@ sub mailpw {
       $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
     } else {
       my $u;
-      eval { $u = $self->active_user_record($mgr,$param); };
+      eval {
+        $u = $self->active_user_record($mgr,$param);
+      };
       if ($@) {
         die Apache::HeavyCGI::Exception->new(ERROR =>
                                              qq{Cannot find a userid
@@ -3069,7 +3126,9 @@ sub mailpw {
     # TUT: all users may have a secret and a public email. We pick what
     # we have.
     unless ($email = $rec->{secretemail}) {
-      my $u = $self->active_user_record($mgr,$param);
+      my $u = $self->active_user_record($mgr,$param,{hidden_user_ok => 1});
+      require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({u=>$u}); # XXX
+
       $email = $u->{email};
     }
     if ($email) {
@@ -7051,3 +7110,7 @@ packages have their recorded version set to 'undef'.
 }
 
 1;
+#Local Variables:
+#mode: cperl
+#cperl-indent-level: 2
+#End:
