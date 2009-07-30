@@ -42,7 +42,11 @@ sub header {
               WHERE userid=? AND ustatus != 'nologin'};
     $sth = $dbh->prepare($sql);
     if ($sth->execute($u)) {
-      $mgr->{User} = $mgr->fetchrow($sth, "fetchrow_hashref");
+      if (0 == $sth->rows) {
+        die Apache::HeavyCGI::Exception->new(ERROR => "User '$u' either not known or set to nologin");
+      } else {
+        $mgr->{User} = $mgr->fetchrow($sth, "fetchrow_hashref");
+      }
     } else {
       die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
     }
