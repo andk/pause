@@ -32,8 +32,6 @@ sub header {
     # hasn't changed since the last time, but for most cases it's
     # safer to expire
 
-    my($userhash);
-
     # we are not authenticating here, we retrieve the user record from
     # the open database. Thus
     my $dbh = $mgr->connect; # and not authentication database
