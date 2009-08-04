@@ -42,5 +42,4 @@ pause:		k
 logcheck:	k
 
 # Mailinglists
-pause-code-commits: k, autrijus@autrijus.org
-cpanpm-code-commits: k, xdaveg@gmail.com
+security: k, kstar@cpan.org, bdfoy@cpan.org, jv@cpan.org, gbarr@cpan.org, smueller@cpan.org, adamk@cpan.org, dagolden@cpan.org, abh@cpan.org
