@@ -203,7 +203,7 @@ sub work {
         or die "Couldn't chdir to $MLROOT";
     $self->init_all();
     $self->verbose(2,"Registering new users\n");
-    $self->set_user_active_status();
+    $self->set_ustatus_to_active();
     my $testdir = File::Temp::tempdir(
                                       "mldistwatch_work_XXXX",
                                       DIR => "/tmp",
@@ -268,7 +268,7 @@ sub filter_dups {
     return;
 }
 
-sub set_user_active_status {
+sub set_ustatus_to_active {
     my $self = shift;
     my $db = $self->connect;
     my $active = $db->selectall_hashref("SELECT userid
@@ -292,8 +292,7 @@ sub set_user_active_status {
     return unless @new_active_users;
     $self->verbose(2,"Info: new_active_users[@new_active_users]");
     my $sth = $db->prepare("UPDATE users
-                            SET ustatus='active', ustatus_ch=NOW()
-                             WHERE userid=?");
+SET ustatus='active', ustatus_ch=NOW() WHERE ustatus<>'nologin' AND userid=?");
     for my $user (@new_active_users) {
         $sth->execute($user);
     }
