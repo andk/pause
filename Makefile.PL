@@ -13,7 +13,8 @@ requires        (map +($_ => 0), qw(
     Apache::Session::Counted BSD::Resource            CPAN::Checksums
     CPAN::Indexer::Mirror    Class::Singleton         Compress::Zlib
     Cwd                      DBI                      Devel::Peek
-    Dumpvalue                Email::Address           HTML::Entities
+    Dumpvalue                Email::Address           File::Rsync::Mirror::Recentfile
+    HTML::Entities
     HTTP::Date               MD5                      Mail::Mailer
     Mail::Send               Module::Faker::Dist      Module::Signature
     Net::FTP                 Set::Crontab             String::Random
