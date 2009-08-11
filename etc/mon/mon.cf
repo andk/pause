@@ -27,7 +27,7 @@ watch pause
 	interval 1m
 	monitor freespace.monitor /:500000 /home:2000000 /home/ftp:30000000 /tmp:2000000 /var:1000000
 	period wd {Sun-Sat}
-	    alert mail.alert k@localhost
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 	    alertevery 3h
 
 # Monitor PAUSE daemon running
@@ -37,7 +37,7 @@ watch paused
 	interval 1h
 	monitor paused.monitor
 	period wd {Sun-Sat}
-	    alert mail.alert k@localhost
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 	    alertevery 3h
 
 watch rsyncd
@@ -45,7 +45,7 @@ watch rsyncd
 	interval 1h
 	monitor rsyncd.monitor
 	period wd {Sun-Sat}
-	    alert mail.alert k@localhost
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 	    alertevery 3h
 
 watch rsyncd2
@@ -53,7 +53,7 @@ watch rsyncd2
 	interval 1h
 	monitor rsyncd2.monitor
 	period wd {Sun-Sat}
-	    alert mail.alert k@localhost
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 	    alertevery 3h
 
 watch threeware
@@ -62,8 +62,7 @@ watch threeware
         interval 10m
         monitor 3ware_cli.monitor
         period wd {Su-Sa}
-            alert mail.alert k@localhost_
-            upalert mail.alert k@localhost
+            alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+            upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
             alertevery 2h
             comp_alerts
-            numalerts 10
