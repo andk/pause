@@ -3152,7 +3152,7 @@ sub mailpw {
       } elsif ($authen_dbh->errstr =~ /Duplicate entry/) {
 
 	die Apache::HeavyCGI::Exception->new(ERROR =>
-					     qq{A ticket for <i>$param</i>
+					     qq{A token for <i>$param</i>
  that allows changing of the password has been requested recently
  and is still valid. Nothing done.});
 
@@ -3181,7 +3181,7 @@ Somebody, probably you, has visited the URL
 
     $me?ACTION=mailpw
 
-and asked that you, "$param", should get a ticket that enables the
+and asked that you, "$param", should get a token that enables the
 setting of a new password. Here it is (please watch out for line
 wrapping errors of your mail reader and other cut and paste errors,
 this URL must not contain any spaces):
@@ -3189,7 +3189,7 @@ this URL must not contain any spaces):
     $me?ACTION=change_passwd;ABRA=$param.$passwd
 
 Please visit this URL, it should open you the door to a password
-changer that lets you set a new password for yourself. This ticket
+changer that lets you set a new password for yourself. This token
 will expire within a few hours. If you don't need it, do nothing. By
 the way, your old password is still valid.
 
@@ -3200,7 +3200,7 @@ $Yours};
 
       push @m, qq{
 
- <p>A ticket to change the password for <i>$param</i> is on its way to its
+ <p>A token to change the password for <i>$param</i> is on its way to its
  owner. Should the mail not arrive, please tell us.</p>
 
 };
@@ -3221,9 +3221,9 @@ $Yours};
   # TUT: First time here, send them the password requesting form
   push @m, qq{
 
-<p>This form lets you request a ticket that enables you to set a new
+<p>This form lets you request a token that enables you to set a new
 password. It only operates correctly if the database knows you and
-your email adress. Please fill in your userid on the CPAN. The ticket
+your email adress. Please fill in your userid on the CPAN. The token
 will be mailed to that userid.</p>
 
 };
