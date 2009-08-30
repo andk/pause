@@ -46,11 +46,21 @@ BEGIN {
         eval "require POSIX; 1" and POSIX::_exit(0);
     }
 }
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 my $resp = _ua->get("$root/pause/authenquery");
 ok $resp->is_success, "Got root[$root]";
 like $resp->decoded_content, qr/Hi Andreas J. König,/, "Saw name of Andreas Koenig";
+
+# apply for the namespace Test::Please::Ignore
+
+# die "have you verified that this test does not send mail?";
+
+$resp = _ua->get("$root/pause/authenquery?HIDDENNAME=ANDK&pause99_apply_mod_modid=Test%3A%3APlease%3A%3AIgnore&pause99_apply_mod_chapterid=15&pause99_apply_mod_statd=i&pause99_apply_mod_stats=n&pause99_apply_mod_statl=p&pause99_apply_mod_stati=p&pause99_apply_mod_statp=o&pause99_apply_mod_description=Test%2C+please+ignore&pause99_apply_mod_communities=Registration+links&pause99_apply_mod_similar=Registration+links&pause99_apply_mod_rationale=Have+you+had+your+pill+today%3F&SUBMIT_pause99_apply_mod_send=+Submit+to+modules%40perl.org+");
+my($url,$sid) = $resp->decoded_content =~ /(https:.*USERID=([[:xdigit:]]+)_\S+?)"/;
+$sid =~ s/0+$//;
+my $rsid = scalar reverse $sid;
+ok $rsid gt 0, "Found a (reversed) session ID of '$rsid' in '$url'";
 
 # Local Variables:
 # mode: cperl

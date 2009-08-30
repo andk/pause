@@ -241,6 +241,7 @@ sub watch_files {
 		     sub {
 			 stat;
 			 -f _ or return;
+                         return if $File::Find::name =~ m|/old/|;
 			 -M _ > 35 && unlink($_) && return;
 		     }, $PAUSE::Config->{PAUSE_PUBLIC_DATA});
 
