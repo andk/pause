@@ -4886,6 +4886,7 @@ sub apply_mod {
                         };
     my $sessionID = $mgr->userid;
     $subject = qq{Module submission $modid};
+    my $urlenc_module = URI::Escape::uri_escape($modid,'\W');
     @blurb = qq{
 The following module was proposed for inclusion in the Module List:
 
@@ -4917,6 +4918,8 @@ Registration form with editing capabilities:
   https://pause.perl.org/pause/authenquery?ACTION=add_mod&USERID=$sessionID&SUBMIT_pause99_add_mod_preview=1
 Immediate (one click) registration:
   https://pause.perl.org/pause/authenquery?ACTION=add_mod&USERID=$sessionID&SUBMIT_pause99_add_mod_insertit=1
+Peek at the current permissions:
+  https://pause.perl.org/pause/authenquery?pause99_peek_perms_by=me&pause99_peek_perms_query=$urlenc_module
 };
 
     my($blurb) = join "", @blurb;
