@@ -639,7 +639,11 @@ sub edit_cred {
  address for you and it's your choice if you want it to point to your
  public email address or to your secret one. Please allow a few hours
  for any change you make to this setting for propagation. BTW, let us
- reassure you that cpan.org gets the data through a secure channel."
+ reassure you that cpan.org gets the data through a secure
+ channel.<br/><br/><b>Note:</b> you can disable redirect by clicking
+ <i>neither nor</i> or by using an invalid email address in the
+ according field above, but this will prevent you from recieving
+ emails from services like rt.cpan.org."
 
 				 },
 	     );
