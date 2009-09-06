@@ -20,6 +20,8 @@ hostgroup rsyncd localhost
 
 hostgroup threeware localhost
 
+hostgroup rersyncrecent authors modules
+
 # Monitor free disk space on the server
 #
 watch pause
@@ -65,4 +67,15 @@ watch threeware
             alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
             upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
             alertevery 2h
+            comp_alerts
+
+watch rersyncrecent
+    service basic
+        description missings on disk or index
+        interval 1h
+        monitor rersyncrecent.monitor
+        period wd {Su-Sa}
+            alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+            upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+            alertevery 12h
             comp_alerts
