@@ -16,7 +16,7 @@ hostgroup paused localhost
 
 hostgroup rsyncd localhost
 
-hostgroup rsyncd localhost
+hostgroup rsyncd2 localhost
 
 hostgroup threeware localhost
 
