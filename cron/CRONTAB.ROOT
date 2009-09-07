@@ -21,5 +21,5 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 #22,52 * * * *         mail-stats.pl
 23 05,11,17,23 * * *  run_mirrors.sh
 #23 10 * * *           svn-dump.pl
-24 * * * *            sync-04pause.sh
+22 * * * *            sync-04pause.pl
 # 27 3,15 * * *         rsync --exclude CHECKSUMS -vrptgx /home/ftp/pub/PAUSE/authors/id/ /home/ftp/pub/backpan/authors/id/ && date
