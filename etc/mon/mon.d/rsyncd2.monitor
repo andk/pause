@@ -3,13 +3,14 @@
 use strict;
 $ENV{USER} = "andk";
 $ENV{RSYNC_PASSWD} = "not_the_password";
-open P, "rsync --port=8732 pause.perl.org::PAUSE 2>&1 |";
+
+open my $P, "rsync --port=8732 pause.perl.org::PAUSE 2>&1 |" or die "Could not fork: $!";
 my $running;
-while (<P>){
+while (<$P>){
   next unless m{ ERROR }ix;
   $running++;
 }
-close P or die "Could not close P";
+close $P or die "Could not close: $!";
 unless ($running >= 2){
   print "error message missing\n";
   exit 1;

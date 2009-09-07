@@ -6,7 +6,7 @@ use warnings;
 my $aumu = shift or die "Usage: ... <modules|authors>";
 
 chdir "/home/k/sources/rersyncrecent" or die "could not chdir: $!";
-open my $fh, "-|", "perl", "-I", "lib", "bin/rrr-fsck", "-n", "--verbose", "/home/ftp/pub/PAUSE/$aumu/RECENT.recent" or die "could not fork: $!";
+open my $fh, "perl -I lib bin/rrr-fsck -n --verbose /home/ftp/pub/PAUSE/$aumu/RECENT.recent 2>&1 |" or die "could not fork: $!";
 
 my $ret = 0;
 while (<$fh>) {
