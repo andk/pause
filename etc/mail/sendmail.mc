@@ -104,6 +104,11 @@ MASQUERADE_AS(`pause.perl.org')dnl
 FEATURE(`allmasquerade')dnl
 FEATURE(`masquerade_envelope')dnl
 
+define(`confHOST_STATUS_DIRECTORY',`host_status')dnl
+define(`confSINGLE_THREAD_DELIVERY', True)dnl
+define(`SMTP_MAILER_MAXMSGS', 1)dnl
+define(`RELAY_MAILER_MAXMSGS', 1)dnl
+
 dnl # Default Mailer setup
 MAILER_DEFINITIONS
 MAILER(`local')dnl
