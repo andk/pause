@@ -52,11 +52,11 @@ watch rsyncd
 
 watch rsyncd2
     service basic
-	interval 1h
+	interval 2h
 	monitor rsyncd2.monitor
 	period wd {Sun-Sat}
 	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
-	    alertevery 3h
+	    alertevery 2h
 
 watch threeware
     service basic

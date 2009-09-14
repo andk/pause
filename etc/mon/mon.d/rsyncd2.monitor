@@ -6,12 +6,15 @@ $ENV{RSYNC_PASSWD} = "not_the_password";
 
 open my $P, "rsync --port=8732 pause.perl.org::PAUSE 2>&1 |" or die "Could not fork: $!";
 my $running;
+my @got;
 while (<$P>){
-  next unless m{ ERROR }ix;
-  $running++;
+    push @got, $_;
+    next unless m{ ERROR }ix;
+    $running++;
 }
-close $P or die "Could not close: $!";
-unless ($running >= 2){
-  print "error message missing\n";
-  exit 1;
+close $P; # must fail, rsync asks for password and refuses to run! # or die "Could not close: $!";
+unless ($running >= 1){
+    local $"="";
+    print "error message missing, got[@got]\n";
+    exit 1;
 }
