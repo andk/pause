@@ -4,6 +4,7 @@ package pause_1999::edit;
 use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
+use Apache::Table ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
 use Text::Format;
@@ -1357,6 +1358,8 @@ sub add_uri {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{CGI};
+  my $debug_table = $req->parms;
+  warn sprintf "DEBUG: req[%s]", join(":",%$debug_table);
   my $r = $mgr->{R};
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
   my @m;
@@ -1373,6 +1376,28 @@ sub add_uri {
   my($tryupload) = $mgr->can_multipart;
   my($uri);
   my $userhome = PAUSE::user2dir($u->{userid});
+
+  if ($req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
+      || $req->param("SUBMIT_pause99_add_uri_httpupload")) {
+    my $upl = $req->upload;
+    unless ($upl->size) {
+      warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
+      $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
+      $req->param("SUBMIT_pause99_add_uri_httpupload","");
+    }
+  }
+  if (!   $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
+      &&! $req->param("SUBMIT_pause99_add_uri_httpupload")
+      &&! $req->param("SUBMIT_pause99_add_uri_uri")
+      &&! $req->param("SUBMIT_pause99_add_uri_upload")
+     ) {
+    # no submit button
+    if ($req->param("pause99_add_uri_uri")) {
+      $req->param("SUBMIT_pause99_add_uri_uri", "2ndguess");
+    } elsif ($req->param("pause99_add_uri_upload")) {
+      $req->param("SUBMIT_pause99_add_uri_upload", "2ndguess");
+    }
+  }
 
   my $didit = 0;
   my $mailblurb = "";
