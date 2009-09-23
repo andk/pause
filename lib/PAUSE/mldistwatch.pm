@@ -2015,6 +2015,12 @@ Please contact modules\@perl.org if there are any open questions.
                     } else {
                         $v->{filemtime} = 0;
                     }
+                    unless (defined $v->{version}) {
+                        # 2009-09-23 get a bugreport due to
+                        # RKITOVER/MooseX-Types-0.20.tar.gz not
+                        # setting version for MooseX::Types::Util
+                        $v->{version} = "undef";
+                    }
                     # going from a distro object to a package object
                     # is only possible via a file object
                     my $fio = PAUSE::pmfile->new
