@@ -670,7 +670,9 @@ sub getit {
 	  $stat = $?;
 	}
       } elsif ($stat < 0) {
-        $self->logge("Alert: failed to execute: $!");
+        my $olderr = $!;
+        my @stat = stat $tpath;
+        $self->logge("Debug: ls[$ls]zcat[$zcat]tpath[$tpath]ret[$ret]stat[@stat]: $olderr");
       }
       if ($stat > 0) {
         $ret =~ s/\n//g;
