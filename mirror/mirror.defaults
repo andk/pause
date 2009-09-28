@@ -3,7 +3,7 @@ package=defaults
 	compress_excl+|\.sig|\.html$|^\.notar$|-z|\.tgz$|\.taz$|\.tar.Z|\.arc$|\.zip$|\.lzh$|\.zoo$|\.exe$|\.lha$|\.zom$|\.gif$|\.jpeg$|\.jpg$|\.mpeg$|\.au$|read.*me|index|\.message|info|faq|gzip|compress|\.png$|(^|/)\.\.?$
 	compress_patt=.
 	compress_prog=gzip
-	delete_excl=(^|/)\.(mirror|notar)$
+	delete_excl=((^|/)\.(mirror|notar)|\.meta)$
         mode_copy=false
 	dir_mode=0755
 	do_deletes=true
