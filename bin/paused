@@ -9,7 +9,7 @@ sub mypause_daemon_inspector::loop ();
 my $VERSION = "1047";
 my $Id = qq!paused, v$VERSION!;
 
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/lib";
 
 use DBI ();
 use Fcntl qw(:flock);
@@ -655,71 +655,12 @@ sub getit {
     $self->logge("Alert: no mirror: RC_NOT_MODIFIED for $tpath");
     return;
   } elsif ($response->is_success) {
-    if ($tpath =~ /\.(Z|t?gz)$/){
-      my($stat) = 0;
-      sleep 1;
-      my $ls = `ls -l $tpath`;
-      my $ret = `$zcat -t $tpath 2>&1`;
-      $stat = $?;
-      if ($stat > 0) { # it happened once that perl set $stat to <0
-	if ($ret =~ /decompression OK, trailing garbage ignored/) {
-	  rename $tpath, "$tpath.crcgarbage" or $self->logge("Could not rename '$tpath': $!");
-	  my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
-	  system($system); # ignore return value
-	  $ret = `$zcat -t $tpath 2>&1`;
-	  $stat = $?;
-	}
-      } elsif ($stat < 0) {
-        my $olderr = $!;
-        my @stat = stat $tpath;
-        $self->logge("Debug: ls[$ls]zcat[$zcat]tpath[$tpath]ret[$ret]stat[@stat]: $olderr");
-      }
-      if ($stat > 0) {
-        $ret =~ s/\n//g;
-	$self->logge("Debug: stat[$stat]ret[$ret]");
-	my @To = $PAUSE::Config->{ADMIN};
-
-	my $blurb = "For the resource [$uri]
-the command [$zcat -t $tpath]
-returned status [$stat]
-and output [$ret].
-nosuccesscount is now at [$nosuccesscount].
-The command [ls -l $tpath]
-gives [$ls]\n\n";
-
-        for my $to (@To) {
-          mypause_send_mail->send({
-                                    To      => $to,
-                                    Subject => "Upload problem $uri"
-                                   },
-                                   $blurb
-                                  );
-        }
-        if ($ret =~ /not in gzip format/) {
-          $self->{URIRECORD}{nosuccesscount} = $PAUSE::Config->{MAXRETRIES} - 1;
-          $self->{ErrNotGzip}++;
-        }
-	return;
-      }
-    }
-    if (
-	$tpath =~ m/\.Z$/
-       ) {
-      if (-e $lpath) {
-	$self->logge("Alert: Seem to have both a .Z and a .gz");
+      if (my $size = $self->verify_gzip_tar($tpath,$uri,$nosuccesscount,$lpath)) {
+          PAUSE::newfile_hook($lpath);
+          return $size;
       } else {
-	my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
-	my $ret = system($system);
-	$self->logge("Info: Ran $system with return [$ret]");
+          return;
       }
-    } else {
-      unless (rename($tpath,$lpath)) {
-        $self->logge("Alert: could not rename '$tpath' to '$lpath'");
-        return;
-      }
-    }
-    PAUSE::newfile_hook($lpath);
-    return -s $lpath;
   } else {
     my $logresponse = $response->message;
     $self->logge(sprintf(
@@ -729,6 +670,76 @@ gives [$ls]\n\n";
                         ));
     return;
   }
+}
+
+sub verify_gzip_tar {
+    my($self,$tpath,$uri,$nosuccesscount,$lpath) = @_;
+    our $zcat;
+    our $gzip;
+    if ($tpath =~ /\.(Z|t?gz)$/){
+        my($stat) = 0;
+        sleep 1;
+        my $ls = `ls -l $tpath`;
+        my $ret = `$zcat -t $tpath 2>&1`;
+        $stat = $?;
+        if ($stat > 0) { # it happened once that perl set $stat to <0
+            if ($ret =~ /decompression OK, trailing garbage ignored/) {
+                rename $tpath, "$tpath.crcgarbage" or $self->logge("Could not rename '$tpath': $!");
+                my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
+                system($system); # ignore return value
+                $ret = `$zcat -t $tpath 2>&1`;
+                $stat = $?;
+            }
+        } elsif ($stat < 0) {
+            my $olderr = $!;
+            my @stat = stat $tpath;
+            $self->logge("Debug: ls[$ls]zcat[$zcat]tpath[$tpath]ret[$ret]stat[@stat]: $olderr");
+        }
+        if ($stat > 0) {
+            $ret =~ s/\n//g;
+            $self->logge("Debug: stat[$stat]ret[$ret]");
+            my @To = $PAUSE::Config->{ADMIN};
+
+            my $blurb = "For the resource [$uri]
+ the command [$zcat -t $tpath]
+ returned status [$stat]
+ and output [$ret].
+ nosuccesscount is now at [$nosuccesscount].
+ The command [ls -l $tpath]
+ gives [$ls]\n\n";
+
+            for my $to (@To) {
+                mypause_send_mail->send
+                    ({
+                      To      => $to,
+                      Subject => "Upload problem $uri"
+                     },
+                     $blurb
+                    );
+            }
+            if ($ret =~ /not in gzip format/) {
+                $self->{URIRECORD}{nosuccesscount} = $PAUSE::Config->{MAXRETRIES} - 1;
+                $self->{ErrNotGzip}++;
+            }
+            return;
+        }
+    }
+    if (
+	$tpath =~ m/\.Z$/
+       ) {
+        if (-e $lpath) {
+            $self->logge("Alert: Seem to have both a .Z and a .gz");
+        } else {
+            my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
+            my $ret = system($system);
+            $self->logge("Info: Ran $system with return [$ret]");
+        }
+    } else {
+        unless (rename($tpath,$lpath)) {
+            $self->logge("Alert: could not rename '$tpath' to '$lpath'");
+            return;
+        }
+    }
 }
 
 # often called as a class method!
@@ -821,3 +832,7 @@ tries to send that mail on C<not in gzip format>.
 
 =cut
 
+#Local Variables:
+#mode: cperl
+#cperl-indent-level: 4
+#End:
