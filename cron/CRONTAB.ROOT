@@ -14,6 +14,7 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 19 06,18 * * *        cron-daily.pl
 37 05 * * *           gmls-lR.pl
 47 05,11,17,23 * * *  mysql-dump.pl
+4,56 * * * *          session-backup.zsh
 19 * * * *            make-mirror-yaml.pl
 19,49 * * * *         publish-crontab.sh
 38 04 * * 7           restart-httpd
