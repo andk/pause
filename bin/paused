@@ -6,7 +6,7 @@ sub mypause_daemon_inspector::loop ();
 
 
 
-my $VERSION = "1047";
+my $VERSION = "1048";
 my $Id = qq!paused, v$VERSION!;
 
 use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/lib";
