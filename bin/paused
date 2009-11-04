@@ -740,6 +740,7 @@ sub verify_gzip_tar {
             return;
         }
     }
+    return -s $lpath;
 }
 
 # often called as a class method!
