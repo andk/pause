@@ -1,0 +1,160 @@
+=pod
+
+=head1 Choose a good module name.
+
+Naming your Perl packages well is one of the most important things you
+can
+do. Choose a good name and people will naturally find it on CPAN.
+Choose a bad name, and your otherwise excellent code might never get a
+download. Imagine your module going out to CPAN one day. Will people
+look at your module name and instantly know what your module does? Will
+its name fit in with everything else that's already on CPAN.
+
+There isn't a set of formal rules, or even its less restrictive little
+brother, guidelines, for naming your packages. Your module can use any
+name that it likes, but like all names, a good one goes a long way.
+
+The C<modules@perl.org> (the mailing list for PAUSE admins) and
+C<module-authors@perl.org> can help you choose a good name. Not only
+are they generally good at names, but they also know quite a bit about
+what is already on CPAN. They can help you choose a name that puts
+your module into the right place with all of the other modules.
+
+=head1 Naming Goals
+
+A module name must accomplish quite a bit in a few characters, and,
+once chosen, you rarely have the opportunity to change it after people
+start using it. The name of the module isn't for you; you don't need a
+name because you created it and understand it. The name is for other
+people, and those other people don't have any of the context that you
+do. Your name needs to convey three things.
+
+=head2 Providing context
+
+CPAN is mostly without context other than "This is something in Perl".
+We can categorize modules, but that categorization lives outside the
+module and disappears once someone downloads it, blogs about it, or
+uses it in their code. As a maintenance programmer, what would you
+think about seeing:
+
+   use XYZ::WWR::JKL;
+
+You might think that's a silly example, but we've seen modules without
+a single vowel and no recognizable initializations.
+
+The task or the feature the module provides has a context, usually
+given to it by its author who created it to scratch some itch. In the
+author's mind, it's always obvious what the module does and what the
+name means. Other people don't have that context, and the name needs
+to provide it.
+
+For example, in the Debian Linux distribution, the package manager is
+called C<dpkg>. As a name alone, however, that has no meaning to someone
+who doesn't use Debian. In the context of Debian, it makes perfect
+sense. In the context of Perl, it means nothing so people need extra
+clues.
+
+Almost any abbreviation or acronym is going to be ambiguous. If the
+first
+page of Google hits for your initialization isn't about your topic, then
+you have the wrong name.
+
+=head2 Describing key features
+
+Some modules are designed for a particular task. Other modules perform
+a general set of tasks. Your name should describe the level of
+generality. What does an C<HTML> module do? Well, you really can't
+tell from that name. How about C<HTML::Parser>, C<HTML::TreeBuilder>,
+and C<HTML::SimpleLinkExtor>? Those names give you more information
+about what the module can do for you. When you choose your name, when
+want to show that same kindness to other people.
+
+=head2 Distinguishing characteristics
+
+Many of the modules on CPAN work towards similar goals in different
+ways, or work in the same way towards different goals. How many
+C<Config> and C<Getopt> modules can you find on CPAN? Can you tell
+what they all do just from the name? If your module is going to live
+under the same namespace as other modules, how is yours different? Why
+should people use your module over modules with very similar names?
+
+=head2 App
+
+You can distribute applications as Perl distributions. Typically,
+those sorts of distributions go under the C<App> namespace, like
+C<App::Ack>, C<App::Cpan>, and C<App::Prove>. The namespace implies
+that its a ready-to-use program rather than a module.
+
+=head2 Local
+
+By convention, the top-level C<Local> namespace should never conflict
+with anything on CPAN. This allows you to be confident that the name
+you choose under C<Local> isn't going to conflict with anything from
+the outside world.
+
+=head2 Active projects
+
+Some projects, such as Moose, DBI, DateTime, and Catalyst, try to
+organize the activity under their namespace to ensure everything works
+together nicely. If you want to add a module to such a project,
+discuss it on their mailing list.
+
+=head1 Names to avoid
+
+CPAN has been around since 1995, and over time the various
+administrators have discovered or followed certain conventions to make
+the designed anarchy a bit less chaotic. As an evolutionary process,
+it is historically inconsistent but modernly optimal. That is, looking
+at the past as an example might not be the best thing. Just because
+other people did it doesn't mean you should.
+
+=head2 Top-level namespaces
+
+In general, top level namespaces are bad, unless they are a nexus for
+several modules under that namespace or they are a fanciful name that
+describes something more application oriented. You might think that
+C<XXX> is a good name because it's that database portion of your code,
+but it doesn't say much about what it is doing.
+
+That doesn't mean that all top-level namespaces are bad. For
+frameworks like C<Moose>, C<Catalyst>, or C<DBI> provide a functionality
+around an idea rather than a particular low-level or general task.
+They don't live in a hierarchy because they are large enough to stand
+on their own.
+
+=head2 Net
+
+The C<Net> namespace is one of the most abused namespaces out there.
+Originally designed as a home for the code that knows how to talk
+various defined network protocols, such as FTP, HTTP, NNTP, and so on,
+people started using it for code that merely used the network without
+knowing anything about it. Modules that interact with websites use the
+network, but they aren't about the network, and they have much better
+homes in C<WWW> or C<WebService>. If you are implementing a network
+protocol rather than an application protocol, then C<Net> might be for
+you. Otherwise, it isn't.
+
+=head2 Avoid Simple, Easy, Reduced, Tiny
+
+The terms C<Simple>, C<Easy>, C<Reduced>, and C<Tiny> are some of the
+worst parts of the names on CPAN. They all indicate that the module is
+a variation of another module, but why is that variation interesting?
+It's usually missing or hiding some features, less flexible than the
+original, and in most cases, tailored to the task the author needed.
+What is that task though? Making it easy for you doesn't mean its easy
+for the next programmer.
+
+=head2 Avoid API, Interface, and the like
+
+Your module is an API? No kidding? Don't waste space in your name
+telling people what they already know. If your code wasn't an interface
+of some sort, it wouldn't be very useful.
+
+=head2 Naming the module after yourself
+
+Many people, lacking other ideas about what their module does, just
+use their own name. They might have really good names, but that
+doesn't help anyone figure out what the code does, even if they do
+attach C<Util> to the end.
+
+=cut
