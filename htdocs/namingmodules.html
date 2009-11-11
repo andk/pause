@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title></title>
+	<meta name="description" content="Pod documentation for " />
+	<meta name="inputfile" content="*main::ARGV" />
+	<meta name="outputfile" content="&lt;standard output&gt;" />
+	<meta name="created" content="Wed Nov 11 08:38:15 2009" />
+	<meta name="generator" content="Pod::Xhtml 1.59" />
+</head>
+<body>
+<div class="pod">
+<!-- INDEX START -->
+<h3 id="TOP">Index</h3>
+
+<ul><li><a href="#Choose_a_good_module_name">Choose a good module name.</a></li>
+<li><a href="#Naming_Goals">Naming Goals</a>
+<ul><li><a href="#Providing_context">Providing context</a></li>
+<li><a href="#Describing_key_features">Describing key features</a></li>
+<li><a href="#Distinguishing_characteristics">Distinguishing characteristics</a></li>
+<li><a href="#App">App</a></li>
+<li><a href="#Local">Local</a></li>
+<li><a href="#Active_projects">Active projects</a></li>
+</ul>
+</li>
+<li><a href="#Names_to_avoid">Names to avoid</a>
+<ul><li><a href="#Top_level_namespaces">Top-level namespaces</a></li>
+<li><a href="#Net">Net</a></li>
+<li><a href="#Avoid_Simple_Easy_Reduced_Tiny">Avoid Simple, Easy, Reduced, Tiny</a></li>
+<li><a href="#Avoid_API_Interface_and_the_like">Avoid API, Interface, and the like</a></li>
+<li><a href="#Naming_the_module_after_yourself">Naming the module after yourself</a>
+</li>
+</ul>
+</li>
+</ul><hr />
+<!-- INDEX END -->
+
+<h1 id="Choose_a_good_module_name">Choose a good module name.</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="Choose_a_good_module_name_CONTENT">
+<p>Naming your Perl packages well is one of the most important things you
+can
+do. Choose a good name and people will naturally find it on CPAN.
+Choose a bad name, and your otherwise excellent code might never get a
+download. Imagine your module going out to CPAN one day. Will people
+look at your module name and instantly know what your module does? Will
+its name fit in with everything else that's already on CPAN.</p>
+<p>There isn't a set of formal rules, or even its less restrictive little
+brother, guidelines, for naming your packages. Your module can use any
+name that it likes, but like all names, a good one goes a long way.</p>
+<p>The <code>modules@perl.org</code> (the mailing list for PAUSE admins) and
+<code>module-authors@perl.org</code> can help you choose a good name. Not only
+are they generally good at names, but they also know quite a bit about
+what is already on CPAN. They can help you choose a name that puts
+your module into the right place with all of the other modules.</p>
+
+</div>
+<h1 id="Naming_Goals">Naming Goals</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="Naming_Goals_CONTENT">
+<p>A module name must accomplish quite a bit in a few characters, and,
+once chosen, you rarely have the opportunity to change it after people
+start using it. The name of the module isn't for you; you don't need a
+name because you created it and understand it. The name is for other
+people, and those other people don't have any of the context that you
+do. Your name needs to convey three things.</p>
+
+</div>
+<h2 id="Providing_context">Providing context</h2>
+<div id="Providing_context_CONTENT">
+<p>CPAN is mostly without context other than &quot;This is something in Perl&quot;.
+We can categorize modules, but that categorization lives outside the
+module and disappears once someone downloads it, blogs about it, or
+uses it in their code. As a maintenance programmer, what would you
+think about seeing:</p>
+<pre>   use XYZ::WWR::JKL;
+
+</pre>
+<p>You might think that's a silly example, but we've seen modules without
+a single vowel and no recognizable initializations.</p>
+<p>The task or the feature the module provides has a context, usually
+given to it by its author who created it to scratch some itch. In the
+author's mind, it's always obvious what the module does and what the
+name means. Other people don't have that context, and the name needs
+to provide it.</p>
+<p>For example, in the Debian Linux distribution, the package manager is
+called <code>dpkg</code>. As a name alone, however, that has no meaning to someone
+who doesn't use Debian. In the context of Debian, it makes perfect
+sense. In the context of Perl, it means nothing so people need extra
+clues.</p>
+<p>Almost any abbreviation or acronym is going to be ambiguous. If the
+first
+page of Google hits for your initialization isn't about your topic, then
+you have the wrong name.</p>
+
+</div>
+<h2 id="Describing_key_features">Describing key features</h2>
+<div id="Describing_key_features_CONTENT">
+<p>Some modules are designed for a particular task. Other modules perform
+a general set of tasks. Your name should describe the level of
+generality. What does an <code>HTML</code> module do? Well, you really can't
+tell from that name. How about <code>HTML::Parser</code>, <code>HTML::TreeBuilder</code>,
+and <code>HTML::SimpleLinkExtor</code>? Those names give you more information
+about what the module can do for you. When you choose your name, when
+want to show that same kindness to other people.</p>
+
+</div>
+<h2 id="Distinguishing_characteristics">Distinguishing characteristics</h2>
+<div id="Distinguishing_characteristics_CONTE">
+<p>Many of the modules on CPAN work towards similar goals in different
+ways, or work in the same way towards different goals. How many
+<code>Config</code> and <code>Getopt</code> modules can you find on CPAN? Can you tell
+what they all do just from the name? If your module is going to live
+under the same namespace as other modules, how is yours different? Why
+should people use your module over modules with very similar names?</p>
+
+</div>
+<h2 id="App">App</h2>
+<div id="App_CONTENT">
+<p>You can distribute applications as Perl distributions. Typically,
+those sorts of distributions go under the <code>App</code> namespace, like
+<code>App::Ack</code>, <code>App::Cpan</code>, and <code>App::Prove</code>. The namespace implies
+that its a ready-to-use program rather than a module.</p>
+
+</div>
+<h2 id="Local">Local</h2>
+<div id="Local_CONTENT">
+<p>By convention, the top-level <code>Local</code> namespace should never conflict
+with anything on CPAN. This allows you to be confident that the name
+you choose under <code>Local</code> isn't going to conflict with anything from
+the outside world.</p>
+
+</div>
+<h2 id="Active_projects">Active projects</h2>
+<div id="Active_projects_CONTENT">
+<p>Some projects, such as Moose, DBI, DateTime, and Catalyst, try to
+organize the activity under their namespace to ensure everything works
+together nicely. If you want to add a module to such a project,
+discuss it on their mailing list.</p>
+
+</div>
+<h1 id="Names_to_avoid">Names to avoid</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="Names_to_avoid_CONTENT">
+<p>CPAN has been around since 1995, and over time the various
+administrators have discovered or followed certain conventions to make
+the designed anarchy a bit less chaotic. As an evolutionary process,
+it is historically inconsistent but modernly optimal. That is, looking
+at the past as an example might not be the best thing. Just because
+other people did it doesn't mean you should.</p>
+
+</div>
+<h2 id="Top_level_namespaces">Top-level namespaces</h2>
+<div id="Top_level_namespaces_CONTENT">
+<p>In general, top level namespaces are bad, unless they are a nexus for
+several modules under that namespace or they are a fanciful name that
+describes something more application oriented. You might think that
+<code>XXX</code> is a good name because it's that database portion of your code,
+but it doesn't say much about what it is doing.</p>
+<p>That doesn't mean that all top-level namespaces are bad. For
+frameworks like <code>Moose</code>, <code>Catalyst</code>, or <code>DBI</code> provide a functionality
+around an idea rather than a particular low-level or general task.
+They don't live in a hierarchy because they are large enough to stand
+on their own.</p>
+
+</div>
+<h2 id="Net">Net</h2>
+<div id="Net_CONTENT">
+<p>The <code>Net</code> namespace is one of the most abused namespaces out there.
+Originally designed as a home for the code that knows how to talk
+various defined network protocols, such as FTP, HTTP, NNTP, and so on,
+people started using it for code that merely used the network without
+knowing anything about it. Modules that interact with websites use the
+network, but they aren't about the network, and they have much better
+homes in <code>WWW</code> or <code>WebService</code>. If you are implementing a network
+protocol rather than an application protocol, then <code>Net</code> might be for
+you. Otherwise, it isn't.</p>
+
+</div>
+<h2 id="Avoid_Simple_Easy_Reduced_Tiny">Avoid Simple, Easy, Reduced, Tiny</h2>
+<div id="Avoid_Simple_Easy_Reduced_Tiny_CONTE">
+<p>The terms <code>Simple</code>, <code>Easy</code>, <code>Reduced</code>, and <code>Tiny</code> are some of the
+worst parts of the names on CPAN. They all indicate that the module is
+a variation of another module, but why is that variation interesting?
+It's usually missing or hiding some features, less flexible than the
+original, and in most cases, tailored to the task the author needed.
+What is that task though? Making it easy for you doesn't mean its easy
+for the next programmer.</p>
+
+</div>
+<h2 id="Avoid_API_Interface_and_the_like">Avoid API, Interface, and the like</h2>
+<div id="Avoid_API_Interface_and_the_like_CON">
+<p>Your module is an API? No kidding? Don't waste space in your name
+telling people what they already know. If your code wasn't an interface
+of some sort, it wouldn't be very useful.</p>
+
+</div>
+<h2 id="Naming_the_module_after_yourself">Naming the module after yourself</h2>
+<div id="Naming_the_module_after_yourself_CON">
+<p>Many people, lacking other ideas about what their module does, just
+use their own name. They might have really good names, but that
+doesn't help anyone figure out what the code does, even if they do
+attach <code>Util</code> to the end.</p>
+
+</div>
+</div></body>
+</html>

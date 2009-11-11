@@ -34,3 +34,10 @@ rsynctest ::
 \tUSER=\$(USER) RSYNC_PASSWORD=\$(RSYNC_PASSWORD) rsync --port=8732 pause.perl.org::PAUSE/authors/02STAMP
 
 EOF
+
+print $fh <<'EOF' or die;
+htdocs/namingmodules.html: htdocs/namingmodules.pod
+	-[ -r $@ ] && chmod +w $@
+	-$(PERL) -MPod::Xhtml -e 'Pod::Xhtml->new->parse_from_file(\*ARGV)' htdocs/namingmodules.pod > $@
+
+EOF
