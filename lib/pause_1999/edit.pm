@@ -30,8 +30,9 @@ sub parameter {
         "pause_04about",
             "pause_04imprint",
                 "pause_06history",
-                    "request_id",
-                        "pause_05news",
+                    "pause_namingmodules",
+                        "request_id",
+                            "pause_05news",
                       } = ();
 
   @allow_submit = (
@@ -1041,6 +1042,12 @@ sub pause_06history {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   $self->show_document($mgr,"history.html");
+}
+
+sub pause_namingmodules {
+  my pause_1999::edit $self = shift;
+  my $mgr = shift;
+  $self->show_document($mgr,"namingmodules.html");
 }
 
 sub show_document {

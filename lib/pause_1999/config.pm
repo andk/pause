@@ -91,7 +91,7 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
            pause_04imprint => {
                                verb => "Imprint/Impressum",
                                priv => "public",
-                               cat => "01self/04b",
+                               cat => "01self/06b",
                             },
            pause_05news => {
                             verb => "PAUSE News",
@@ -104,6 +104,12 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
                                priv => "public",
                                desc => "Old News",
                                cat => "01self/06",
+                              },
+           pause_namingmodules => {
+                               verb => "On The Naming of Modules",
+                               priv => "public",
+                               desc => "A couple of suggestions that hopefully get you on track",
+                               cat => "01self/04b",
                               },
            who_is => {
                       verb => "Who is Who (long)",
