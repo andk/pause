@@ -2,11 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-	<title></title>
-	<meta name="description" content="Pod documentation for " />
+	<title>Choose a good module name.</title>
+	<meta name="description" content="Pod documentation for Choose a good module name." />
 	<meta name="inputfile" content="*main::ARGV" />
 	<meta name="outputfile" content="&lt;standard output&gt;" />
-	<meta name="created" content="Wed Nov 11 08:38:15 2009" />
+	<meta name="created" content="Fri Nov 13 07:49:16 2009" />
 	<meta name="generator" content="Pod::Xhtml 1.59" />
 </head>
 <body>
@@ -14,37 +14,51 @@
 <!-- INDEX START -->
 <h3 id="TOP">Index</h3>
 
-<ul><li><a href="#Choose_a_good_module_name">Choose a good module name.</a></li>
-<li><a href="#Naming_Goals">Naming Goals</a>
+<ul><li><a href="#NAME">NAME </a></li>
+<li><a href="#INTRODUCTION">INTRODUCTION</a></li>
+<li><a href="#NAMING_GOALS">NAMING GOALS</a>
 <ul><li><a href="#Providing_context">Providing context</a></li>
 <li><a href="#Describing_key_features">Describing key features</a></li>
 <li><a href="#Distinguishing_characteristics">Distinguishing characteristics</a></li>
 <li><a href="#App">App</a></li>
 <li><a href="#Local">Local</a></li>
-<li><a href="#Active_projects">Active projects</a></li>
+<li><a href="#Big_projects">Big projects</a></li>
+<li><a href="#Existing_modules">Existing modules</a></li>
 </ul>
 </li>
-<li><a href="#Names_to_avoid">Names to avoid</a>
+<li><a href="#NAMES_TO_AVOID">NAMES TO AVOID</a>
 <ul><li><a href="#Top_level_namespaces">Top-level namespaces</a></li>
+<li><a href="#All_lowercase_name">All-lowercase name</a></li>
 <li><a href="#Net">Net</a></li>
-<li><a href="#Avoid_Simple_Easy_Reduced_Tiny">Avoid Simple, Easy, Reduced, Tiny</a></li>
-<li><a href="#Avoid_API_Interface_and_the_like">Avoid API, Interface, and the like</a></li>
-<li><a href="#Naming_the_module_after_yourself">Naming the module after yourself</a>
-</li>
+<li><a href="#Avoid_Simple_Easy_Reduced_Tiny_Fast_">Avoid Simple, Easy, Reduced, Tiny, Fast, Small, Super, Hyper</a></li>
+<li><a href="#Avoid_the_too_general_nouns_like_Dev">Avoid the too-general nouns like Devel, Sys, Text, Data</a></li>
 </ul>
+</li>
+<li><a href="#Unicode_and_unicore_are_off_limits">Unicode and unicore are off-limits</a>
+<ul><li><a href="#Avoid_API_Interface_and_the_like">Avoid API, Interface, and the like</a></li>
+<li><a href="#Naming_the_module_after_yourself">Naming the module after yourself</a></li>
+</ul>
+</li>
+<li><a href="#AUTHORS">AUTHORS</a>
 </li>
 </ul><hr />
 <!-- INDEX END -->
 
-<h1 id="Choose_a_good_module_name">Choose a good module name.</h1><p><a href="#TOP" class="toplink">Top</a></p>
-<div id="Choose_a_good_module_name_CONTENT">
+<h1 id="NAME">NAME </h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="NAME_CONTENT">
+<p>Choose a good module name.</p>
+
+</div>
+<h1 id="INTRODUCTION">INTRODUCTION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="INTRODUCTION_CONTENT">
+<p>First and foremost: you are naming your module so that people can find
+your module.  It's as easy--and as difficult--as that.</p>
 <p>Naming your Perl packages well is one of the most important things you
-can
-do. Choose a good name and people will naturally find it on CPAN.
+can do. Choose a good name and people will naturally find it on CPAN.
 Choose a bad name, and your otherwise excellent code might never get a
 download. Imagine your module going out to CPAN one day. Will people
-look at your module name and instantly know what your module does? Will
-its name fit in with everything else that's already on CPAN.</p>
+look at your module name and instantly know what your module does?
+Will its name fit in with everything else that's already on CPAN.</p>
 <p>There isn't a set of formal rules, or even its less restrictive little
 brother, guidelines, for naming your packages. Your module can use any
 name that it likes, but like all names, a good one goes a long way.</p>
@@ -55,8 +69,8 @@ what is already on CPAN. They can help you choose a name that puts
 your module into the right place with all of the other modules.</p>
 
 </div>
-<h1 id="Naming_Goals">Naming Goals</h1><p><a href="#TOP" class="toplink">Top</a></p>
-<div id="Naming_Goals_CONTENT">
+<h1 id="NAMING_GOALS">NAMING GOALS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="NAMING_GOALS_CONTENT">
 <p>A module name must accomplish quite a bit in a few characters, and,
 once chosen, you rarely have the opportunity to change it after people
 start using it. The name of the module isn't for you; you don't need a
@@ -130,16 +144,25 @@ you choose under <code>Local</code> isn't going to conflict with anything from
 the outside world.</p>
 
 </div>
-<h2 id="Active_projects">Active projects</h2>
-<div id="Active_projects_CONTENT">
+<h2 id="Big_projects">Big projects</h2>
+<div id="Big_projects_CONTENT">
 <p>Some projects, such as Moose, DBI, DateTime, and Catalyst, try to
 organize the activity under their namespace to ensure everything works
 together nicely. If you want to add a module to such a project,
 discuss it on their mailing list.</p>
 
 </div>
-<h1 id="Names_to_avoid">Names to avoid</h1><p><a href="#TOP" class="toplink">Top</a></p>
-<div id="Names_to_avoid_CONTENT">
+<h2 id="Existing_modules">Existing modules</h2>
+<div id="Existing_modules_CONTENT">
+<p>Co-operate. If your module would work as a patch to an existing
+module, contact the author of that module and suggest this
+possibility. Be polite. Document your changes carefully and supply
+good tests. Also, this way you can get someone else maintaining your
+code.</p>
+
+</div>
+<h1 id="NAMES_TO_AVOID">NAMES TO AVOID</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="NAMES_TO_AVOID_CONTENT">
 <p>CPAN has been around since 1995, and over time the various
 administrators have discovered or followed certain conventions to make
 the designed anarchy a bit less chaotic. As an evolutionary process,
@@ -153,13 +176,31 @@ other people did it doesn't mean you should.</p>
 <p>In general, top level namespaces are bad, unless they are a nexus for
 several modules under that namespace or they are a fanciful name that
 describes something more application oriented. You might think that
-<code>XXX</code> is a good name because it's that database portion of your code,
-but it doesn't say much about what it is doing.</p>
+<code>DB</code> is a good name because it's that database portion of your code,
+but it doesn't say much about what it is doing, and it also happens
+to be the namespace for the Perl debugger.</p>
 <p>That doesn't mean that all top-level namespaces are bad. For
-frameworks like <code>Moose</code>, <code>Catalyst</code>, or <code>DBI</code> provide a functionality
-around an idea rather than a particular low-level or general task.
-They don't live in a hierarchy because they are large enough to stand
-on their own.</p>
+frameworks like <code>Moose</code>, <code>Catalyst</code>, or <code>DBI</code> provide a
+functionality around an idea rather than a particular low-level or
+general task. They don't live in a hierarchy because they are large
+enough to stand on their own.</p>
+<p>Even though the module naming is in practice a first-come first-served
+process, it is quite impolite to grab top-level names.  Yes, even if
+your project/product is named with just a single word, please think of
+people trying to find something that would help them in their
+problems.  Unless they know of your project/product, they might not
+ever find your module.</p>
+<p>Remember that though you may be the first to contribute to a
+namespace, you may well not be the last or the only one.  Someone
+might later want to use the namespace, for something unrelated to your
+modules.</p>
+
+</div>
+<h2 id="All_lowercase_name">All-lowercase name</h2>
+<div id="All_lowercase_name_CONTENT">
+<p>Perl reserves all lowercase namespaces for pragmas. That doesn't mean
+you can't write a pragma, but you should get the blessing of p5p 
+(<i>perl5-porters@perl.org</i>).</p>
 
 </div>
 <h2 id="Net">Net</h2>
@@ -175,15 +216,36 @@ protocol rather than an application protocol, then <code>Net</code> might be for
 you. Otherwise, it isn't.</p>
 
 </div>
-<h2 id="Avoid_Simple_Easy_Reduced_Tiny">Avoid Simple, Easy, Reduced, Tiny</h2>
-<div id="Avoid_Simple_Easy_Reduced_Tiny_CONTE">
+<h2 id="Avoid_Simple_Easy_Reduced_Tiny_Fast_">Avoid Simple, Easy, Reduced, Tiny, Fast, Small, Super, Hyper</h2>
+<div id="Avoid_Simple_Easy_Reduced_Tiny_Fast_-2">
 <p>The terms <code>Simple</code>, <code>Easy</code>, <code>Reduced</code>, and <code>Tiny</code> are some of the
 worst parts of the names on CPAN. They all indicate that the module is
 a variation of another module, but why is that variation interesting?
 It's usually missing or hiding some features, less flexible than the
 original, and in most cases, tailored to the task the author needed.
-What is that task though? Making it easy for you doesn't mean its easy
+What is that task though? Making it easy for you doesn't mean it's easy
 for the next programmer.</p>
+
+</div>
+<h2 id="Avoid_the_too_general_nouns_like_Dev">Avoid the too-general nouns like Devel, Sys, Text, Data</h2>
+<div id="Avoid_the_too_general_nouns_like_Dev-2">
+<p>Devel is mainly meant for modules to do with low-level debugging
+of/inside Perl itself. It does not stand for &quot;development&quot; or
+&quot;developer&quot; in general.</p>
+<p>Sys is a complete disaster. Adding Sys:: in front of something is
+completely redundant. We are sorry it ever got used. Yes, we know
+there's Sys::Syslog in the core, and we are we ashamed because of it.</p>
+<p>Text is most often very low in information, too. If your module is
+working with a natural language or languages, use &quot;Lingua::&quot;. 
+&quot;Text::&quot; is fine if your module is dealing with formatting of text,
+for example.  If you are thinking of using &quot;Text&quot; because your data is
+&quot;text&quot;, please don't.</p>
+
+</div>
+<h1 id="Unicode_and_unicore_are_off_limits">Unicode and unicore are off-limits</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="Unicode_and_unicore_are_off_limits_C">
+<p>Unicore/unicore is reserved for the use of the Perl core for Unicode
+things.</p>
 
 </div>
 <h2 id="Avoid_API_Interface_and_the_like">Avoid API, Interface, and the like</h2>
@@ -199,6 +261,12 @@ of some sort, it wouldn't be very useful.</p>
 use their own name. They might have really good names, but that
 doesn't help anyone figure out what the code does, even if they do
 attach <code>Util</code> to the end.</p>
+
+</div>
+<h1 id="AUTHORS">AUTHORS</h1><p><a href="#TOP" class="toplink">Top</a></p>
+<div id="AUTHORS_CONTENT">
+<p>brian d foy <code>&lt;bdfoy@cpan.org&gt;</code></p>
+<p>Jarkko Hietaniemi <code>&lt;jhi@cpan.org&gt;</code></p>
 
 </div>
 </div></body>
