@@ -1,14 +1,20 @@
 =pod
 
-=head1 Choose a good module name.
+=head1 NAME 
+
+Choose a good module name.
+
+=head1 INTRODUCTION
+
+First and foremost: you are naming your module so that people can find
+your module.  It's as easy--and as difficult--as that.
 
 Naming your Perl packages well is one of the most important things you
-can
-do. Choose a good name and people will naturally find it on CPAN.
+can do. Choose a good name and people will naturally find it on CPAN.
 Choose a bad name, and your otherwise excellent code might never get a
 download. Imagine your module going out to CPAN one day. Will people
-look at your module name and instantly know what your module does? Will
-its name fit in with everything else that's already on CPAN.
+look at your module name and instantly know what your module does?
+Will its name fit in with everything else that's already on CPAN.
 
 There isn't a set of formal rules, or even its less restrictive little
 brother, guidelines, for naming your packages. Your module can use any
@@ -20,7 +26,7 @@ are they generally good at names, but they also know quite a bit about
 what is already on CPAN. They can help you choose a name that puts
 your module into the right place with all of the other modules.
 
-=head1 Naming Goals
+=head1 NAMING GOALS
 
 A module name must accomplish quite a bit in a few characters, and,
 once chosen, you rarely have the opportunity to change it after people
@@ -92,14 +98,22 @@ with anything on CPAN. This allows you to be confident that the name
 you choose under C<Local> isn't going to conflict with anything from
 the outside world.
 
-=head2 Active projects
+=head2 Big projects
 
 Some projects, such as Moose, DBI, DateTime, and Catalyst, try to
 organize the activity under their namespace to ensure everything works
 together nicely. If you want to add a module to such a project,
 discuss it on their mailing list.
 
-=head1 Names to avoid
+=head2 Existing modules
+
+Co-operate. If your module would work as a patch to an existing
+module, contact the author of that module and suggest this
+possibility. Be polite. Document your changes carefully and supply
+good tests. Also, this way you can get someone else maintaining your
+code.
+
+=head1 NAMES TO AVOID
 
 CPAN has been around since 1995, and over time the various
 administrators have discovered or followed certain conventions to make
@@ -113,14 +127,33 @@ other people did it doesn't mean you should.
 In general, top level namespaces are bad, unless they are a nexus for
 several modules under that namespace or they are a fanciful name that
 describes something more application oriented. You might think that
-C<XXX> is a good name because it's that database portion of your code,
-but it doesn't say much about what it is doing.
+C<DB> is a good name because it's that database portion of your code,
+but it doesn't say much about what it is doing, and it also happens
+to be the namespace for the Perl debugger.
 
 That doesn't mean that all top-level namespaces are bad. For
-frameworks like C<Moose>, C<Catalyst>, or C<DBI> provide a functionality
-around an idea rather than a particular low-level or general task.
-They don't live in a hierarchy because they are large enough to stand
-on their own.
+frameworks like C<Moose>, C<Catalyst>, or C<DBI> provide a
+functionality around an idea rather than a particular low-level or
+general task. They don't live in a hierarchy because they are large
+enough to stand on their own.
+
+Even though the module naming is in practice a first-come first-served
+process, it is quite impolite to grab top-level names.  Yes, even if
+your project/product is named with just a single word, please think of
+people trying to find something that would help them in their
+problems.  Unless they know of your project/product, they might not
+ever find your module.
+
+Remember that though you may be the first to contribute to a
+namespace, you may well not be the last or the only one.  Someone
+might later want to use the namespace, for something unrelated to your
+modules.
+
+=head2 All-lowercase name
+
+Perl reserves all lowercase namespaces for pragmas. That doesn't mean
+you can't write a pragma, but you should get the blessing of p5p 
+(I<perl5-porters@perl.org>).
 
 =head2 Net
 
@@ -134,15 +167,36 @@ homes in C<WWW> or C<WebService>. If you are implementing a network
 protocol rather than an application protocol, then C<Net> might be for
 you. Otherwise, it isn't.
 
-=head2 Avoid Simple, Easy, Reduced, Tiny
+=head2 Avoid Simple, Easy, Reduced, Tiny, Fast, Small, Super, Hyper
 
 The terms C<Simple>, C<Easy>, C<Reduced>, and C<Tiny> are some of the
 worst parts of the names on CPAN. They all indicate that the module is
 a variation of another module, but why is that variation interesting?
 It's usually missing or hiding some features, less flexible than the
 original, and in most cases, tailored to the task the author needed.
-What is that task though? Making it easy for you doesn't mean its easy
+What is that task though? Making it easy for you doesn't mean it's easy
 for the next programmer.
+
+=head2 Avoid the too-general nouns like Devel, Sys, Text, Data
+
+Devel is mainly meant for modules to do with low-level debugging
+of/inside Perl itself. It does not stand for "development" or
+"developer" in general.
+
+Sys is a complete disaster. Adding Sys:: in front of something is
+completely redundant. We are sorry it ever got used. Yes, we know
+there's Sys::Syslog in the core, and we are we ashamed because of it.
+
+Text is most often very low in information, too. If your module is
+working with a natural language or languages, use "Lingua::". 
+"Text::" is fine if your module is dealing with formatting of text,
+for example.  If you are thinking of using "Text" because your data is
+"text", please don't.
+
+=head1 Unicode and unicore are off-limits
+
+Unicore/unicore is reserved for the use of the Perl core for Unicode
+things.
 
 =head2 Avoid API, Interface, and the like
 
@@ -156,5 +210,11 @@ Many people, lacking other ideas about what their module does, just
 use their own name. They might have really good names, but that
 doesn't help anyone figure out what the code does, even if they do
 attach C<Util> to the end.
+
+=head1 AUTHORS
+
+brian d foy C<< <bdfoy@cpan.org> >>
+
+Jarkko Hietaniemi C<< <jhi@cpan.org> >>
 
 =cut
