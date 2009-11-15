@@ -1967,7 +1967,8 @@ Please contact modules\@perl.org if there are any open questions.
         my $dist = $self->{DIST};
 
         my $binary_dist;
-        $binary_dist = 1 if $dist =~ /-bin-/i;
+        # ftp://ftp.funet.fi/pub/CPAN/modules/05bindist.convention.html
+        $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
 
         my $pmfiles = $self->filter_pms;
         my($yaml,$provides,$indexingrule);
