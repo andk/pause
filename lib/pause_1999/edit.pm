@@ -5,6 +5,7 @@ use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
 use Apache::Table ();
+use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
 use Text::Format;
@@ -26,14 +27,16 @@ sub parameter {
 
   # What is allowed here is allowed to anybody
   @allow_action{
-    "who_is",
-        "pause_04about",
-            "pause_04imprint",
-                "pause_06history",
-                    "pause_namingmodules",
-                        "request_id",
-                            "pause_05news",
-                      } = ();
+    (
+     "pause_04about",
+     "pause_04imprint",
+     "pause_05news",
+     "pause_06history",
+     "pause_namingmodules",
+     "request_id",
+     "who_is",
+     "who_pumpkin",
+    )} = ();
 
   @allow_submit = (
                    "request_id",
@@ -5535,6 +5538,55 @@ sub WAIT::Filter::pause99_edit_users_utflc_20010505 {
   my $s = shift;
   my $lc = lc $s;
   $lc;
+}
+
+sub who_pumpkin {
+  my $self = shift;
+  my $mgr = shift;
+  my $cgi = $mgr->{CGI};
+
+  my @m;
+
+  push @m, qq{<p>Query the <code>grouptable</code> table for who is a
+          pumpkin bit holder</p>
+
+          <p>Registered pumpkins:
+};
+
+  my @hres;
+  {
+    my $db = $mgr->authen_connect;
+    my $sth = $db->prepare("SELECT user FROM grouptable WHERE ugroup='pumpking' order by user");
+    $sth->execute;
+    while (my @row = $sth->fetchrow_array) {
+      push @hres, $row[0];
+    }
+    $sth->finish;
+  };
+  my $output_format = $cgi->param("OF");
+  if ($output_format){
+    if ($output_format eq "YAML") {
+      require YAML::Syck;
+      local $YAML::Syck::ImplicitUnicode = 1;
+      my $dump = YAML::Syck::Dump(\@hres);
+      my $edump = Encode::encode_utf8($dump);
+      my $r = $mgr->{R};
+      $r->content_type("text/plain; charset=utf8");
+      $r->send_http_header;
+      $r->print($edump);
+      return $mgr->{DONE} = Apache::Constants::DONE;
+    } else {
+      die "not supported OF=$output_format"
+    }
+  } else {
+    push @m, join ", ", @hres;
+    push @m, "</p>";
+    my $href = sprintf("query?ACTION=who_pumpkin;OF=YAML");
+    push @m, qq{<p><a href="$href" style="text-decoration: none;">
+<span class="orange_button">YAML</span>
+</a></p>};
+    return join "", @m;
+  }
 }
 
 sub peek_perms {

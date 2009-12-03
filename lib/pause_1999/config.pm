@@ -18,11 +18,6 @@ pause_1999::edit
 pause_1999::usermenu
 )]);
 
-# edit must be before usermenu because it determines the AllowAction attribute
-
-# http://hohenstaufen.in-berlin.de:81/pause/mimequery
-# König
-
 sub handler {
   my($r) = shift;
   my $dti = PAUSE::downtimeinfo();
@@ -118,6 +113,15 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 
                       desc => "A database query. Output is very
 			similar to CPAN/authors/00whois.html",
+
+                     },
+
+           who_pumpkin => {
+                      verb => "List of pumpkins",
+                      priv => "public",
+                      cat => "02serv/05",
+
+                      desc => "A list, also available as YAML",
 
                      },
 
@@ -308,7 +312,7 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 				 list.",
 
                       },
-	     select_user => {
+           select_user => {
 			     verb => "Select User/Action",
 			     priv => "admin",
                               cat => "01usr/03",
