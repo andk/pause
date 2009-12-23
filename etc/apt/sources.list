@@ -1,30 +1,15 @@
 # the main Debian packages.  Uncomment the deb-src line if you
 # want 'apt-get source' to work with most packages.
 deb http://ftp.de.debian.org/pub/debian/ stable main contrib non-free
-# deb-src http://217.75.108.231/debian/ woody main contrib non-free
 
-# the non-US Debian packages.  Uncomment the deb-src line if you
-# want 'apt-get source' to work with non-US packages.
-# deb http://non-us.debian.org/debian-non-US/ woody/non-US main contrib non-free
-# deb-src http://non-us.debian.org/debian-non-US/ woody/non-US main contrib non-free
+# Security
 deb http://security.debian.org stable/updates main contrib non-free
-
-#deb http://people.debian.org/~cjwatson/subversion-woody ./
-### deb http://k66/apt-cacher/ftp.de.debian.org/debian/pool/main/g/gnus ./
 
 # Testing
 deb http://ftp.de.debian.org/pub/debian testing main contrib non-free
-# deb http://ftp.de.debian.org/pub/debian-non-US  main contrib non-free
-deb http://ftp.de.debian.org/debian-secure-testing etch/security-updates main contrib non-free
+# deb http://ftp.de.debian.org/debian-secure-testing squeeze/security-updates main contrib non-free
 
-
+# Unstable
 deb http://ftp.de.debian.org/pub/debian unstable main contrib non-free
-# deb http://ftp.de.debian.org/pub/debian-non-US  main contrib non-free
-
-# deb http://ftp.de.debian.org/debian-secure-testing etch/security-updates main contrib non-free
-# deb-src http://ftp.de.debian.org/debian-secure-testing etch/security-updates main contrib non-free
-
-deb http://security.debian.org/ etch/updates main
-deb-src http://security.debian.org/ etch/updates main
 
 
