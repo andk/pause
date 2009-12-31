@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# Startup script for the Apache Web Server
+#
+# chkconfig: 345 85 15
+# description: loadbalancer
+# processname: perlbal
+# config: /etc/perlbal/perlbal.conf
+
+
+# Source function library.
+SLEEP=12
+
+DAEMON=/usr/local/perl-5.10.1/bin/perlbal
+
+# See how we were called.
+case "$1" in
+  start)
+        echo -n "Starting perlbal: "
+        nice -7 $DAEMON --daemon
+        echo
+        touch /var/lock/perlbal
+        ;;
+  stop)
+        echo -n "Shutting down perlbal: "
+        killall perlbal
+        echo perlbal
+        rm -f /var/lock/perlbal
+        ;;
+  status)
+        status perlbal
+        ;;
+  restart)
+        $0 stop
+        echo Sleeping $SLEEP seconds
+        sleep $SLEEP
+        $0 start
+        ;;
+  reload)
+        echo -n "Reloading perlbal: "
+        killall -HUP perlbal
+        echo perlbal
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+
+exit 0

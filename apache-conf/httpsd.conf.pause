@@ -87,7 +87,7 @@ UserDir enabled jwied
   </IfDefine>
   <IfDefine !SWITCH8000>
     SSLCacheServerPort 8111
-    <VirtualHost _default_:80>
+    <VirtualHost _default_:81>
       SSLDisable
       <Location /ssl-only>
         deny from all
@@ -266,7 +266,7 @@ $TransferLog = "logs/access_log$ext";
 $PidFile = "logs/httpd.pid$ext";
 $ScoreBoardFile = "logs/apache_status$ext";
 
-my $ord_port = $SWITCH8000 ? 8000 : 80;
+my $ord_port = $SWITCH8000 ? 8000 : 81; # must change also: _default_:81 above
 $Port   =  $ord_port;
 $Listen =  $ord_port;
 $BindAddress = undef;
