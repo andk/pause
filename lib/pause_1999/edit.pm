@@ -9,6 +9,8 @@ use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use URI::Escape;
 use Text::Format;
+eval {require Time::Duration};
+our $HAVE_TIME_DURATION = !$@;
 
 our $Valid_Userid = qr/^[A-Z]{3,9}$/;
 our $Yours = "Thanks,\n-- \nThe PAUSE\n";
@@ -3181,7 +3183,7 @@ sub mailpw {
       my $passwd = sprintf "%08x" x 4, rand(0xffffffff), rand(0xffffffff),
 	  rand(0xffffffff), rand(0xffffffff);
       # warn "pw[$passwd]";
-      my $then = time + 86400/4;
+      my $then = time + $PAUSE::Config->{ABRA_EXPIRATION};
       $sql = sprintf qq{INSERT INTO abrakadabra
                         ( user, chpasswd, expires )
                   VALUES
@@ -3189,12 +3191,22 @@ sub mailpw {
       local($authen_dbh->{RaiseError}) = 0;
       if ( $authen_dbh->do($sql,undef,$param,$passwd,$then) ) {
       } elsif ($authen_dbh->errstr =~ /Duplicate entry/) {
-
-	die Apache::HeavyCGI::Exception->new(ERROR =>
-					     qq{A token for <i>$param</i>
- that allows changing of the password has been requested recently
- and is still valid. Nothing done.});
-
+        my $duration;
+        if ($HAVE_TIME_DURATION) {
+          $duration = Time::Duration::duration($PAUSE::Config->{ABRA_EXPIRATION});
+        } else {
+          $duration = sprintf "%d seconds", $PAUSE::Config->{ABRA_EXPIRATION};
+        }
+	die Apache::HeavyCGI::Exception->new
+            (
+             ERROR => sprintf(
+                              qq{A token for <i>$param</i> that allows
+                  changing of the password has been requested recently
+                  (less than %s ago) and is still valid. Nothing
+                  done.},
+                              $duration,
+                             ),
+            );
       } else {
 	die Apache::HeavyCGI::Exception->new(ERROR => $authen_dbh->errstr);
       }
