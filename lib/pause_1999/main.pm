@@ -342,6 +342,11 @@ sub myurl {
   $uri->path($rpath);
   warn "DEBUG: uri[$uri]";
 
+  # XXX should have additional test if we are on pause
+  if ($uri->port == 81 and $PAUSE::Config->{HAVE_PERLBAL}) {
+      $uri->port(80);
+  }
+
   # my $port = $r->server->port || 80;
   # my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";
   # $self->{MYURL} = URI::URL->new(

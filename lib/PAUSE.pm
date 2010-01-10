@@ -103,6 +103,7 @@ $PAUSE::Config ||=
      CHECKSUMS_SIGNING_KEY => '450F89EC',
      BATCH_SIG_HOME => '/home/k/PAUSE/111_sensitive/gnupg-pause-batch-signing-home',
      MIN_MTIME_CHECKSUMS => (time - 60*60*24*365.25), # max one year old
+     HAVE_PERLBAL => 1,
     };
 
 
