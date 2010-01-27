@@ -254,7 +254,7 @@ use vars qw(
 
 $ServerRoot = "/usr/local/apache";
 $DocumentRoot = "/usr/local/apache/htdocs";
-$LogFormat = ('"%h %l %u %t \\"%r\\" %s %b %P %p %T \\"%{Referer}i\\" \\"%{User-Agent}i\\""');
+$LogFormat = ('"%h %l %u %t \\"%r\\" %s %b %P %p %T \\"%{Referer}i\\" \\"%{User-Agent}i\\" %{Host}"');
 $ServerType = "standalone";
 $PerlWarn = "On";
 
