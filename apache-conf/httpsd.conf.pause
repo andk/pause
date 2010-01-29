@@ -24,6 +24,7 @@ BrowserMatch Mozilla/2 nokeepalive
 #ErrorLog logs/error_log
 #TransferLog logs/access_log
 # LogFormat "%h %l %u %t \"%r\" %s %b %P %T"
+LogFormat = "%h %l %u %t \"%r\" %s %b %P %p %T \"%{Referer}i\" \"%{User-Agent}i\" %{Host}i";
 
 #PidFile logs/httpd.pid
 #ScoreBoardFile logs/apache_status
@@ -224,7 +225,6 @@ use vars qw(
  $KeepAlive
  $LanguagePriority
  $Listen
- $LogFormat
  $MaxClients
  $MaxRequestsPerChild
  $MaxSpareServers
@@ -254,7 +254,6 @@ use vars qw(
 
 $ServerRoot = "/usr/local/apache";
 $DocumentRoot = "/usr/local/apache/htdocs";
-$LogFormat = ('"%h %l %u %t \\"%r\\" %s %b %P %p %T \\"%{Referer}i\\" \\"%{User-Agent}i\\" %{Host}"');
 $ServerType = "standalone";
 $PerlWarn = "On";
 
