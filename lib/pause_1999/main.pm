@@ -82,6 +82,7 @@ use vars qw($VERSION %entity2char $DO_UTF8);
 $VERSION = "854";
 
 $DO_UTF8 = 1;
+use Apache::Constants qw(:common);
 require Unicode::String;
 use HTML::Entities;
 use String::Random ();
@@ -150,6 +151,12 @@ WillLast
 sub dispatch {
   my $self = shift;
   $self->init;
+  my $r = $self->{R};
+  warn sprintf "DEBUG: uri[%s]location[%s]", $r->uri, $r->location;
+  if ($r->uri =~ m|^/pause/query/|) { # path info?
+      warn "Warning: killing this request, it has a path_info, only bots have them";
+      return NOT_FOUND;
+  }
   eval { $self->prepare; };
   if ($@) {
     if (UNIVERSAL::isa($@,"Apache::HeavyCGI::Exception")) {
@@ -168,7 +175,7 @@ sub dispatch {
 	push @{$self->{ERROR}}, " ", $@;
       } else {
 	$self->{R}->log_error($@);
-	return Apache::Constants::SERVER_ERROR;
+	return SERVER_ERROR;
       }
     }
   }
@@ -182,15 +189,6 @@ sub layout {
   my $self = shift;
   $self->instance_of("pause_1999::layout")->layout($self);
 }
-
-# PAUSE has more Lynx users than other servers and not only
-# "Lynx/2.8rel.3 libwww-FM/2.14" isn't able to handle gzipped data
-# although it says so. Goto Lynx mailing list?
-
-# It turned out, lynx is OK, I just had a wrong Content-Type header on
-# that day
-
-#
 
 sub can_gzip {
   my $self = shift;
@@ -340,7 +338,7 @@ sub myurl {
 
   my $rpath = $uri->rpath;
   $uri->path($rpath);
-  warn "DEBUG: uri[$uri]";
+  warn sprintf "DEBUG: uri[%s]location[%s]", $uri, $r->location;
 
   # XXX should have additional test if we are on pause
   if ($uri->port == 81 and $PAUSE::Config->{HAVE_PERLBAL}) {
