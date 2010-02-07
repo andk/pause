@@ -108,6 +108,9 @@ $Data::Dumper::Indent = 1;
 
 
 package PAUSE::mldistwatch;
+
+our $MAINTAIN_SYMLINKTREE = 1;
+
 use Fcntl qw(:flock);
 # this class shows that it was born as spaghetticode
 
@@ -752,37 +755,39 @@ sub rewrite01 {
 
 
         $self->verbose(2,".") if !($i % 16);
-        my $bymod = "$MLROOT/../../modules/".
-            "by-module/$pkg{rootpack}/$pkg{filenameonly}";
-        my $bycat = "$MLROOT/../../modules/".
-            "by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
-        next if -e $bymod and -e $bycat;
+        if ($MAINTAIN_SYMLINKTREE) {
+            my $bymod = "$MLROOT/../../modules/".
+                "by-module/$pkg{rootpack}/$pkg{filenameonly}";
+            my $bycat = "$MLROOT/../../modules/".
+                "by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
+            next if -e $bymod and -e $bycat;
 
-        $self->chdir_ln_chdir($MLROOT,
-                              "../../../authors/id/$pkg{dist}",
-                              "../../modules/by-module/$pkg{rootpack}".
-                              "/$pkg{filenameonly}");
-        $self->chdir_ln_chdir($MLROOT,
-                              "../../../authors/id/$pkg{readme}",
-                              "../../modules/by-module/$pkg{rootpack}".
-                              "/$pkg{readmefn}")
-            if -f $pkg{readme};
-        $self->chdir_ln_chdir($MLROOT,
-                              "../../../authors/id/$userdir",
-                              "../../modules/by-module/$pkg{rootpack}/$pkg{userid}");
-        $self->chdir_ln_chdir($MLROOT,
-                              "../../../../authors/id/$pkg{dist}",
-                              "../../modules/by-category/$pkg{chapter}".
-                              "/$pkg{rootpack}/$pkg{filenameonly}");
-        $self->chdir_ln_chdir($MLROOT,
-                              "../../../../authors/id/$pkg{readme}",
-                              "../../modules/by-category/$pkg{chapter}".
-                              "/$pkg{rootpack}/$pkg{readmefn}")
-            if -f $pkg{readme};
-        $self->chdir_ln_chdir($MLROOT,
-                              "../../../../authors/id/$userdir",
-                              "../../modules/by-category/$pkg{chapter}".
-                              "/$pkg{rootpack}/$pkg{userid}");
+            $self->chdir_ln_chdir($MLROOT,
+                                  "../../../authors/id/$pkg{dist}",
+                                  "../../modules/by-module/$pkg{rootpack}".
+                                  "/$pkg{filenameonly}");
+            $self->chdir_ln_chdir($MLROOT,
+                                  "../../../authors/id/$pkg{readme}",
+                                  "../../modules/by-module/$pkg{rootpack}".
+                                  "/$pkg{readmefn}")
+                if -f $pkg{readme};
+            $self->chdir_ln_chdir($MLROOT,
+                                  "../../../authors/id/$userdir",
+                                  "../../modules/by-module/$pkg{rootpack}/$pkg{userid}");
+            $self->chdir_ln_chdir($MLROOT,
+                                  "../../../../authors/id/$pkg{dist}",
+                                  "../../modules/by-category/$pkg{chapter}".
+                                  "/$pkg{rootpack}/$pkg{filenameonly}");
+            $self->chdir_ln_chdir($MLROOT,
+                                  "../../../../authors/id/$pkg{readme}",
+                                  "../../modules/by-category/$pkg{chapter}".
+                                  "/$pkg{rootpack}/$pkg{readmefn}")
+                if -f $pkg{readme};
+            $self->chdir_ln_chdir($MLROOT,
+                                  "../../../../authors/id/$userdir",
+                                  "../../modules/by-category/$pkg{chapter}".
+                                  "/$pkg{rootpack}/$pkg{userid}");
+        }
     }
     $list = qq{<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
