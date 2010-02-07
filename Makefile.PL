@@ -15,7 +15,8 @@ requires        (map +($_ => 0), qw(
     Cwd                      DBI                      Devel::Peek
     Dumpvalue                Email::Address           File::Rsync::Mirror::Recentfile
     HTML::Entities
-    HTTP::Date               MD5                      Mail::Mailer
+    HTTP::Date               IPC::Run3
+    MD5                      Mail::Mailer
     Mail::Send               Module::Faker::Dist      Module::Signature
     Net::FTP                 Set::Crontab             String::Random
     Test::FITesque::Fixture  Text::Format             Text::Metaphone
