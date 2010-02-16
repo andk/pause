@@ -5,12 +5,17 @@
 auto lo
 iface lo inet loopback
 
+####IP-Adresse: 195.37.231.65
+####Netmask: 255.255.255.128
+####Gateway: 195.37.231.1
+####DNS: 195.37.231.8 / 195.37.231.9  (sind noch offline)
+
 # The primary network interface
 auto eth0
 iface eth0 inet static
-	address 195.149.117.110
-	netmask 255.255.255.0
-	gateway 195.149.117.1
-	dns-nameservers 195.149.117.10 195.149.117.11
+	address 195.37.231.65
+	netmask 255.255.255.128
+	gateway 195.37.231.1
+	dns-nameservers 195.37.231.8 195.37.231.9
 	dns-search fiz-chemie.de
 
