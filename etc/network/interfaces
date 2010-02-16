@@ -1,0 +1,16 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet static
+	address 195.149.117.110
+	netmask 255.255.255.0
+	gateway 195.149.117.1
+	dns-nameservers 195.149.117.10 195.149.117.11
+	dns-search fiz-chemie.de
+

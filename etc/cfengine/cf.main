@@ -32,10 +32,11 @@ links:
     /etc/mail/sendmail.mc                ->! ../../home/k/PAUSE/etc/mail/sendmail.mc
     /etc/mon/mon.cf                      ->! ../../home/k/PAUSE/etc/mon/mon.cf
     /etc/mysql/my.cnf                    ->! ../../home/k/PAUSE/etc/my.cnf.pause2
+    /etc/network/interfaces              ->! ../../home/k/PAUSE/etc/network/interfaces
     /etc/perlbal/perlbal.conf            ->! ../../home/k/PAUSE/etc/perlbal/perlbal.conf
     /etc/security/limits.conf            ->! ../../home/k/PAUSE/etc/security/limits.conf
 
-    /etc/apache2/mods-enabled/ssl.conf ->! ../../../home/k/PAUSE/apache-svn-conf/ssl.conf
+    /etc/apache2/mods-enabled/ssl.conf   ->! ../../../home/k/PAUSE/apache-svn-conf/ssl.conf
     /etc/apache2/sites-enabled/000-default ->! ../../../home/k/PAUSE/apache-svn-conf/default-site.conf
 
     /usr/local/apache/conf               ->! ../../../home/k/PAUSE/apache-conf
