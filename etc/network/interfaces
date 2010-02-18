@@ -18,5 +18,5 @@ iface eth0 inet static
 	gateway 195.37.231.1
 	dns-nameservers 195.37.231.8 195.37.231.9
 	dns-search fiz-chemie.de
-	up iptables -N BLACKLIST
-	up iptables -A INPUT -p tcp -m tcp --dport 22 --syn -j BLACKLIST
+	up /sbin/iptables -N BLACKLIST
+	up /sbin/iptables -A INPUT -p tcp -m tcp --dport 22 --syn -j BLACKLIST
