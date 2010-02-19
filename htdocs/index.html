@@ -6,7 +6,16 @@
       <dd>
         <ul>
           <li>
-            Pause gets a new IP address. The planning was close to perfect. But I forgot that there was the IP address in the bind-address variable in my.cnf. And since I didn't change it, mysql didn't start. Sorry for that.</a>
+            Pause gets a new IP address. First I forgot that there was
+            the old IP address hardcoded in the bind-address variable
+            in my.cnf. This caused mysql not to start. What's worse,
+            after that I didn't notice that DNS was not working. This
+            allowed uploads to take place but they all hung during the
+            first step that required DNS and this prevented all
+            uploads to succeed. Fortunately they were not dropped but
+            just in a retry loop. As soon as the DNS problem was
+            fixed, the jam dissolved. So all Friday uploads got a
+            considerable delay, I'm sorry for that.
           </li>
         </ul>
       </dd>
@@ -14,7 +23,8 @@
       <dd>
         <ul>
           <li>
-            Pause code moves to <a href="git://github.com/andk/pause.git">git://github.com/andk/pause.git</a>
+            Pause code moves to <a
+            href="git://github.com/andk/pause.git">git://github.com/andk/pause.git</a>
           </li>
         </ul>
       </dd>
