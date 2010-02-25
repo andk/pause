@@ -10,13 +10,17 @@ iface lo inet loopback
 ####Gateway: 195.37.231.1
 ####DNS: 195.37.231.8 / 195.37.231.9  (sind noch offline)
 
+#2010-02-25 akoenig : Momentan kann ich Dir nur unsere externen DNS-Server anbieten:
+#boo.fiz-chemie.de    85.214.94.114
+#lua.fiz-chemie.de     85.214.98.176
+
 # The primary network interface
 auto eth0
 iface eth0 inet static
 	address 195.37.231.65
 	netmask 255.255.255.128
 	gateway 195.37.231.1
-	dns-nameservers 195.37.231.8 195.37.231.9
+	dns-nameservers 85.214.94.114 85.214.98.176 212.42.235.66
 	dns-search fiz-chemie.de
 	up /sbin/iptables -N BLACKLIST
 	up /sbin/iptables -A INPUT -p tcp -m tcp --dport 22 --syn -j BLACKLIST
