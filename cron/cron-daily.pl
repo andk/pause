@@ -212,7 +212,7 @@ sub watch_files {
 			 if (-f _) {
 			   # ROGER
 			 } elsif (-d _) {
-			   return if $_ eq "old" || $_ eq "." || $_ eq "..";
+			   return if /^(old|broken)$/ || $_ eq "." || $_ eq "..";
 			   # all other directories are forbidden
 			   require Dumpvalue;
 			   my $d = Dumpvalue->new(
