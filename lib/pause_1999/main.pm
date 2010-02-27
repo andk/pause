@@ -221,21 +221,23 @@ sub can_utf8 {
     } else {
       $self->{CAN_UTF8} = 0;
     }
-    # warn "CAN_UTF8[$self->{CAN_UTF8}]";
+    warn "CAN_UTF8[$self->{CAN_UTF8}]acce[$acce]";
     return $self->{CAN_UTF8};
   }
   # Mozilla/5.0 (X11; U; Linux 2.2.16-RAID i686; en-US; m18)
-  if ($self->uagent =~ /^Mozilla\/(\d+)\.\d+\s+\(X11;/
+  my $uagent = $self->uagent;
+  if ($uagent =~ /^Mozilla\/(\d+)\.\d+\s+\(X11;/
       &&
       $1 >= 5
      ) {
-    # warn "CAN_UTF8[$self->{CAN_UTF8}]";
-    return $self->{CAN_UTF8} = "mozilla 5X";
+      $self->{CAN_UTF8} = "mozilla 5X";
+      warn "CAN_UTF8[$self->{CAN_UTF8}]uagent[$uagent]";
+      return $self->{CAN_UTF8};
   }
   my $protocol = $self->{R}->protocol || "";
   my($major,$minor) = $protocol =~ m|HTTP/(\d+)\.(\d+)|;
   $self->{CAN_UTF8} = $major >= 1 && $minor >= 1;
-  # warn "CAN_UTF8[$self->{CAN_UTF8}]";
+  warn "CAN_UTF8[$self->{CAN_UTF8}]protocol[$protocol]uagent[$uagent]";
   $self->{CAN_UTF8};
 }
 
@@ -440,6 +442,7 @@ sub finish {
 
   if ($self->can_utf8) {
   } else {
+    warn sprintf "DEBUG: using Unicode::String uri[%s]gmtime[%s]", $self->{R}->uri, scalar gmtime();
     my $ustr = Unicode::String::utf8($self->{CONTENT});
     $self->{CONTENT} = $ustr->latin1;
     $self->{CHARSET} = "ISO-8859-1";
