@@ -43,7 +43,6 @@ links:
     /usr/local/apache/htdocs             ->! ../../../home/k/PAUSE/htdocs/
     /usr/local/apache/perl               ->! ../../../home/k/PAUSE/apache-perl
     /usr/local/apache/logs               ->! /var/log/PAUSE-httpd
-    /usr/local/apache/rundata            ->! /var/run/PAUSE-httpd/rundata
 
     /usr/lib/mon/mon.d/paused.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
     /usr/lib/mon/mon.d/rsyncd.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rsyncd.monitor
