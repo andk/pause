@@ -9,7 +9,7 @@
 
 
 # Source function library.
-SLEEP=12
+SLEEP=1
 
 DAEMON=/usr/local/perl-5.10.1/bin/perlbal
 
