@@ -1531,7 +1531,7 @@ filename[%s]. </p>
     push @m, qq{\n<b>For pumpkings only</b>:};
     push @m, $mgr->checkbox(
 			    name    => 'pause99_add_uri_mail_announce',
-			    checked => 1,
+			    checked => 0,
 			    value   => '1', # not more space in database than 1 byte
 			   );
     push @m, "\nSend a CC of the Upload Notification to $PAUSE::Config->{P5P}";
