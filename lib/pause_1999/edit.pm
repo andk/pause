@@ -1960,6 +1960,7 @@ from the indexer a little later (usually within 1 hour).
 
       } else {
 	my $errmsg = $dbh->errstr;
+        $r->status(406);
 	push @m, (qq{
 
 <p><b>Could not enter the URL into the database.
