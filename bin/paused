@@ -697,14 +697,14 @@ sub verify_gzip_tar {
         my($child_stat) = 0;
         sleep 1;
         my $ls = `ls -l $tpath`;
-        IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err);
+        IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
         $child_stat = $?;
         if ($child_stat > 0) {
             if ($err =~ /decompression OK, trailing garbage ignored/) {
                 rename $tpath, "$tpath.crcgarbage" or $self->logge("Could not rename '$tpath': $!");
                 my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
                 system($system); # ignore return value
-                IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err);
+                IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
                 $child_stat = $?;
             }
         } elsif ($child_stat < 0) {
@@ -712,7 +712,7 @@ sub verify_gzip_tar {
             my @stat = stat $tpath;
             $self->logge("Debug: ls[$ls]zcat[$zcat]tpath[$tpath]err[$err]stat[@stat]: $olderr");
         }
-        if ($child_stat > 0) {
+        if ($child_stat != 0) {
             $err =~ s/\n/ /g;
             $self->logge("Debug: child_stat[$child_stat]err[$err]");
             my @To = $PAUSE::Config->{ADMIN};
