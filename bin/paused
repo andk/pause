@@ -696,6 +696,7 @@ sub verify_gzip_tar {
     if ($tpath =~ /\.(Z|t?gz)$/){
         my($child_stat) = 0;
         sleep 1;
+        local $SIG{CHLD};
         my $ls = `ls -l $tpath`;
         IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
         $child_stat = $?;
