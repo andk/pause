@@ -6,7 +6,7 @@ sub mypause_daemon_inspector::loop ();
 
 
 
-my $VERSION = "1048";
+my $VERSION = "1049";
 my $Id = qq!paused, v$VERSION!;
 
 use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/lib";
@@ -18,7 +18,7 @@ use Getopt::Long;
 use HTTP::Date ();
 use HTTP::Status ();
 use IO::File ();
-use IPC::Run3 ();
+use IPC::Run3 qw(run3);
 use LWP ();
 use MD5 ();
 use Mail::Send ();
@@ -151,16 +151,6 @@ sub loop () { # we're NOT called as a method
     $UA =  LWP::UserAgent->new;
     $UA->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
   }
-  our $zcat;
-  unless ($zcat) {
-    $zcat = "/bin/zcat";
-    die "no executable zcat" unless -x $zcat;
-  }
-  our $gzip;
-  unless ($gzip) {
-    $gzip = "/bin/gzip";
-    die "no executable gzip" unless -x $gzip;
-  }
 
   my($dbh,$sth,$sth2,$query);
 
@@ -189,8 +179,9 @@ sub loop () { # we're NOT called as a method
                     ) }; #};
 
   $sth = $dbh->prepare($query);
+  my $rows;
   if ( $sth->execute($old) ) {
-    my $rows = $sth->rows;
+    $rows = $sth->rows;
     # $self->logge("Info: rows[$rows]old[$old] to process");
   } else {
     $self->logge("Alert: $DBI::errstr");
@@ -664,8 +655,6 @@ sub getit {
   our $UA;
   my $response = $UA->request($request,$tpath);
 
-  our $zcat;
-  our $gzip;
   if ($response->code == &HTTP::Status::RC_NOT_MODIFIED) {
     $self->logge("Alert: no mirror: RC_NOT_MODIFIED for $tpath");
     return;
@@ -689,36 +678,49 @@ sub getit {
 
 sub verify_gzip_tar {
     my($self,$tpath,$uri,$nosuccesscount,$lpath) = @_;
-    our $zcat;
-    our $gzip;
+    my $zcat;
+    my $gzip;
+    if ($tpath =~ /\.t(ar\.)?gz$/) {
+        $zcat = "/bin/zcat";
+        $gzip = "/bin/gzip";
+    } elsif ($tpath =~ /\.t(ar\.)?bz$/) {
+        $zcat = "/bin/bzcat";
+        $gzip = "/bin/bzip2";
+    } else {
+        # nothing I could verify
+        return -s $tpath;
+    }
+    die "no executable for zcat '$zcat'" unless -x $zcat;
+    die "no executable for gzip '$gzip'" unless -x $gzip;
+    my($in,$out,$err);
     if ($tpath =~ /\.(Z|t?gz)$/){
-        my($stat) = 0;
+        my($child_stat) = 0;
         sleep 1;
         my $ls = `ls -l $tpath`;
-        my $ret = `$zcat -t $tpath 2>&1`;
-        $stat = $?;
-        if ($stat > 0) { # it happened once that perl set $stat to <0
-            if ($ret =~ /decompression OK, trailing garbage ignored/) {
+        run3([$zcat, "-t", $tpath], $in, $out, $err);
+        $child_stat = $?;
+        if ($child_stat > 0) {
+            if ($err =~ /decompression OK, trailing garbage ignored/) {
                 rename $tpath, "$tpath.crcgarbage" or $self->logge("Could not rename '$tpath': $!");
                 my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
                 system($system); # ignore return value
-                $ret = `$zcat -t $tpath 2>&1`;
-                $stat = $?;
+                run3([$zcat, "-t", $tpath], $in, $out, $err);
+                $child_stat = $?;
             }
-        } elsif ($stat < 0) {
+        } elsif ($child_stat < 0) {
             my $olderr = $!;
             my @stat = stat $tpath;
-            $self->logge("Debug: ls[$ls]zcat[$zcat]tpath[$tpath]ret[$ret]stat[@stat]: $olderr");
+            $self->logge("Debug: ls[$ls]zcat[$zcat]tpath[$tpath]err[$err]stat[@stat]: $olderr");
         }
-        if ($stat > 0) {
-            $ret =~ s/\n//g;
-            $self->logge("Debug: stat[$stat]ret[$ret]");
+        if ($child_stat > 0) {
+            $err =~ s/\n/ /g;
+            $self->logge("Debug: child_stat[$child_stat]err[$err]");
             my @To = $PAUSE::Config->{ADMIN};
 
             my $blurb = "For the resource [$uri]
  the command [$zcat -t $tpath]
- returned status [$stat]
- and output [$ret].
+ returned status [$child_stat]
+ and stdout[$out] and stderr[$err].
  nosuccesscount is now at [$nosuccesscount].
  The command [ls -l $tpath]
  gives [$ls]\n\n";
@@ -732,16 +734,14 @@ sub verify_gzip_tar {
                      $blurb
                     );
             }
-            if ($ret =~ /not in gzip format/) {
+            if ($err =~ /not in gzip format/) {
                 $self->{URIRECORD}{nosuccesscount} = $PAUSE::Config->{MAXRETRIES} - 1;
                 $self->{ErrNotGzip}++;
             }
             return;
         }
     }
-    if (
-	$tpath =~ m/\.Z$/
-       ) {
+    if ( $tpath =~ m/\.Z$/ ) {
         if (-e $lpath) {
             $self->logge("Alert: Seem to have both a .Z and a .gz");
         } else {
