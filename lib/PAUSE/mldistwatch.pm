@@ -130,7 +130,7 @@ sub new {
                 print $fh $$, "\n";
                 select $ofh;
             } else {
-                die "other mlistwatch job running, ".
+                die "other mldistwatch job running, ".
                     "will not run at the same time";
             }
         } else {
