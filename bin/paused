@@ -30,9 +30,21 @@ use URI::URL ();
 use strict;
 use vars qw(%Opt);
 
-GetOptions(\%Opt,qw(pidfile=s)) or die;
+GetOptions
+    (
+     \%Opt,
+     "mlroot=s",
+     "pause_log",
+     "pidfile=s",
+     "tmp=s",
+    ) or die "Usage: ...";
 
-my $pidfile = $Opt{pidfile} or die;
+my $pidfile = $Opt{pidfile} or die "pidfile not specified, cannot continue";
+for my $c ("mlroot","pause_log","tmp") {
+    if ($Opt{$c}) {
+        $PAUSE::Config->{uc $c} = $Opt{$c};
+    }
+}
 my $lockfh;
 if (open $lockfh, "+>>", $pidfile) {
   if (flock $lockfh, LOCK_EX|LOCK_NB) {
@@ -509,9 +521,11 @@ sub welcome_file {
   my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
   my $address  = $pma->address;
   my @To = qq{"$asciiname" <$address>};
-  push @To, $PAUSE::Config->{TO_CPAN_TESTERS};
-  push @To, $PAUSE::Config->{'P5P'} if
-      $hash->{'mailto_p5p'}==1;
+  unless ($PAUSE::Config->{TESTHOST}) {
+      push @To, $PAUSE::Config->{TO_CPAN_TESTERS};
+      push @To, $PAUSE::Config->{'P5P'} if
+          $hash->{'mailto_p5p'}==1;
+  }
 
   my $blurb = "The URL";
   $blurb = "The uploaded file" if $hash->{uri} !~ m,/,;
