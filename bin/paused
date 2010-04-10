@@ -18,7 +18,7 @@ use Getopt::Long;
 use HTTP::Date ();
 use HTTP::Status ();
 use IO::File ();
-use IPC::Run3 qw(run3);
+use IPC::Run3 ();
 use LWP ();
 use MD5 ();
 use Mail::Send ();
@@ -697,14 +697,14 @@ sub verify_gzip_tar {
         my($child_stat) = 0;
         sleep 1;
         my $ls = `ls -l $tpath`;
-        run3([$zcat, "-t", $tpath], $in, $out, $err);
+        IPC::Run3::run3([$zcat, "-t", $tpath], $in, $out, $err);
         $child_stat = $?;
         if ($child_stat > 0) {
             if ($err =~ /decompression OK, trailing garbage ignored/) {
                 rename $tpath, "$tpath.crcgarbage" or $self->logge("Could not rename '$tpath': $!");
                 my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
                 system($system); # ignore return value
-                run3([$zcat, "-t", $tpath], $in, $out, $err);
+                IPC::Run3::run3([$zcat, "-t", $tpath], $in, $out, $err);
                 $child_stat = $?;
             }
         } elsif ($child_stat < 0) {
