@@ -18,7 +18,7 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 19 * * * *            make-mirror-yaml.pl
 19,49 * * * *         publish-crontab.sh
 38 04 * * 7           restart-httpd
-21 * * * *            rm_stale_links
+21 */6 * * *            rm_stale_links
 #22,52 * * * *         mail-stats.pl
 23 05,11,17,23 * * *  run_mirrors.sh
 #23 10 * * *           svn-dump.pl
