@@ -1714,7 +1714,8 @@ filename[%s]. </p>
 
   push @m, "\n</table>\n";
 
-  if ($didit) {
+  my $want_to_send_email_on_upload_submission = 0;
+  if ($want_to_send_email_on_upload_submission && $didit) {
     my $her = $mgr->{User}{userid} eq $u->{userid} ? "his/her" :
 	"$u->{userid}'s";
 
