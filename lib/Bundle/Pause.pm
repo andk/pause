@@ -29,8 +29,11 @@ Convert::BER
 DBD::mysql
 DBI
 DB_File::Lock
+Email::Address
 Encode::MIME::Header
 File::Rsync
+File::Rsync::Mirror::Recent
+IPC::Run3
 JSON
 JSON::XS
 List::MoreUtils
@@ -50,6 +53,7 @@ XML::SAX::Expat
 XML::SAX::Writer
 YAML
 YAML::Syck
+YAML::XS
 
 
 DBI
