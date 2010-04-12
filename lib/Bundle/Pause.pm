@@ -18,6 +18,7 @@ perl -MCPAN -e 'install Bundle::Snapshot_1996_09_29_00'
 
 accessors
 
+LWP::UserAgent
 BSD::Resource
 CGI
 CPAN
