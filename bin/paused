@@ -688,7 +688,13 @@ sub verify_gzip_tar {
         $gzip = "/bin/bzip2";
     } else {
         # nothing I could verify
-        return -s $tpath;
+        if (rename($tpath,$lpath)) {
+            $self->logge("Info: renamed '$tpath' to '$lpath'");
+            return -s $lpath;
+        } else {
+            $self->logge("Alert: could not rename '$tpath' to '$lpath'");
+            return;
+        }
     }
     die "no executable for zcat '$zcat'" unless -x $zcat;
     die "no executable for gzip '$gzip'" unless -x $gzip;
