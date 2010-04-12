@@ -3472,8 +3472,16 @@ VALUES (?,?,?,?,?,?)
 
         local($dbh->{RaiseError}) = 0;
         local($dbh->{PrintError}) = 0;
-
-        my $userid = $self->{USERID} or die;
+        
+        my $userid;
+        my $dio; # = $self->parent->parent ??? ->{FIO}{DIO} ???;   # XXX lookup in $self->...
+        if (exists $dio->{YAML_CONTENT}{x_authority}) {
+            $userid = $dio->{YAML_CONTENT}{x_authority};
+            $userid =~ s/^cpan://i;
+            # validate userid existing
+        } else {
+            $userid = $self->{USERID} or die;
+        }
         my $query = "INSERT INTO primeur (package, userid) VALUES (?,?)";
         my $ret = $dbh->do($query, {}, $package, $userid);
         my $err = "";
