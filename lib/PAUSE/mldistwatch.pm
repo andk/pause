@@ -1665,11 +1665,12 @@ Please contact modules\@perl.org if there are any open questions.
 
                 push @m, $tf->format(qq{For your convenience PAUSE has
                     tried to write a new tarball with all the
-                    world-writable bits removed. The file is available
-                    for a *very* short period at
-                    '$PAUSE::Config->{INCOMING}$self->{HAS_WORLD_WRITABLE_FIXEDFILE}'.
-                    In case you use this file, please verify carefully
-                    whether it is a suitable replacement.});
+                    world-writable bits removed. The file is put on
+                    the CPAN as
+                    '$self->{HAS_WORLD_WRITABLE_FIXEDFILE}' along with
+                    your upload and will be indexed automatically
+                    unless there are other errors that prevent that.
+                    Please watch for a separate indexing report.});
 
                 push @m, qq{\n\n};
 
@@ -1887,8 +1888,14 @@ Please contact modules\@perl.org if there are any open questions.
                 }
             }
             my $fixedfile = "$self->{DISTROOT}-withoutworldwriteables.tar.gz";
-            unless (0 == system (tar => "czf",
-                                 "$PAUSE::Config->{INCOMING_LOC}/$fixedfile",
+            my $todir = File::Basename::dirname($self->{DIST}); # M/MA/MAKAROW
+            my $to_abs = "$self->{MAIN}{MLROOT}/$todir/$fixedfile";
+            if ($self->{DISTROOT} =~ /-withoutworldwriteables/) {
+                push @wwfixingerrors, "Sanity check failed: incoming file '$self->{DISTROOT}' already has '-withoutworldwriteables' in the name";
+            } elsif (-e $to_abs) {
+                push @wwfixingerrors, "File '$to_abs' already exists, won't overwrite";
+            } elsif (0 != system (tar => "czf",
+                                 $to_abs,
                                  $self->{DISTROOT}
                                 )) {
                 push @wwfixingerrors, "error during 'tar ...': $!";
@@ -3472,7 +3479,7 @@ VALUES (?,?,?,?,?,?)
 
         local($dbh->{RaiseError}) = 0;
         local($dbh->{PrintError}) = 0;
-        
+
         my $userid;
         my $dio; # = $self->parent->parent ??? ->{FIO}{DIO} ???;   # XXX lookup in $self->...
         if (exists $dio->{YAML_CONTENT}{x_authority}) {
