@@ -65,45 +65,29 @@ $Data::Dumper::Indent = 1;
     use File::Find;
     use File::Path qw(rmtree mkpath);
     our $Id = q$Id$;
-    $PAUSE::mldistwatch::SUPPORT_BZ2 = 1;
-    if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-        # ISA_REGULAR_PERL means a perl release for public consumption
-        # (and must exclude developer releases like 5.9.4). I need to
-        # rename it from ISAPERL to ISA_REGULAR_PERL to avoid
-        # confusion with CPAN.pm. CPAN.pm has a different regex for
-        # ISAPERL because there we want to protect the user from
-        # developer releases too, but here we want to index a distro
-        # with very special treatment that is only reserved for "real"
-        # perl distros. (The exclusion of developer releases was
-        # accidentally lost in rev 815)
-        our $ISA_REGULAR_PERL = qr{
-                          /
-                          (
-                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
-                          |
-                          ponie-[\d.\-]
-                         )
-                          (?:
-                          \.tar[._-]gz
-                          |
-                          \.tar\.bz2
-                         )
-                          \z
-                      }x;
-    } else {
-        our $ISA_REGULAR_PERL = qr{
-                          /
-                          (
-                          perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
-                          |
-                          ponie-[\d.\-]
-                         )
-                          (?:
-                          \.tar[._-]gz
-                         )
-                          \z
-                      }x;
-    }
+    # ISA_REGULAR_PERL means a perl release for public consumption
+    # (and must exclude developer releases like 5.9.4). I need to
+    # rename it from ISAPERL to ISA_REGULAR_PERL to avoid
+    # confusion with CPAN.pm. CPAN.pm has a different regex for
+    # ISAPERL because there we want to protect the user from
+    # developer releases too, but here we want to index a distro
+    # with very special treatment that is only reserved for "real"
+    # perl distros. (The exclusion of developer releases was
+    # accidentally lost in rev 815)
+    our $ISA_REGULAR_PERL = qr{
+                                  /
+                                  (
+                                      perl-?5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
+                                  |
+                                      ponie-[\d.\-]
+                                  )
+                                  (?:
+                                      \.tar[._-]gz
+                                  |
+                                      \.tar\.bz2
+                                  )
+                                  \z
+                          }x;
 }
 
 
@@ -729,13 +713,9 @@ sub rewrite01 {
         # Sybase      MEWP   sybperl-2.03.tar.gz     91.8  31 Jan 1996
         # we are in authors/id/
         $pkg{rootpack} =~ s/\*$//; # XXX seems stemming from already deleted code
-        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            ($pkg{readme} = $pkg{dist}) =~
-                s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/.readme/;
-        } else {
-            ($pkg{readme} = $pkg{dist}) =~
-                s/\.(tar[._-]gz|tar.Z|tgz|zip)$/.readme/;
-        }
+        # should use CPAN::DistnameInfo
+        ($pkg{readme} = $pkg{dist}) =~
+            s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/.readme/;
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
 
         $pkg{chapterid} = $achapter{$pkg{rootpack}}
@@ -967,13 +947,9 @@ maintainer
         $package{'useridpretty'} = ucfirst(
           $package{'useridlc'}   = lc $package{'userid'}
         );
-        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            ($package{basename}) =
-                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/;
-        } else {
-            ($package{basename}) =
-                $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar.Z|tgz|zip)$/;
-        }
+        # should use CPAN::DistnameInfo
+        ($package{basename}) =
+            $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/;
 
         $html .= sprintf(
                          qq{<a href="../authors/id/%s">%s</a>%s<a
@@ -1445,10 +1421,8 @@ sub mlroot {
         my $tarbin = $self->{TARBIN};
         my $MLROOT = $self->mlroot;
         my $tar_opt = "tzf";
-        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
-                $tar_opt = "tjf";
-            }
+        if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
+            $tar_opt = "tjf";
         }
         open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
         while (<TARTEST>) {
@@ -1466,10 +1440,8 @@ sub mlroot {
             return;
         }
         $tar_opt = "xzf";
-        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
-                $tar_opt = "xjf";
-            }
+        if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
+            $tar_opt = "xjf";
         }
         $self->verbose(1,"Going to untar. Running '$tarbin' '$tar_opt' '$MLROOT/$dist'\n");
         unless (system($tarbin,$tar_opt,"$MLROOT/$dist")==0) {
@@ -1497,10 +1469,7 @@ sub mlroot {
         my $MLROOT = $self->mlroot;
         my($suffix,$skip);
         $suffix = $skip = "";
-        my $suffqr = qr/\.(tgz|tar[\._-]gz|tar\.Z)$/;
-        if ($PAUSE::mldistwatch::SUPPORT_BZ2) {
-            $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
-        }
+        my $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         if ($self->isa_regular_perl($dist)) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
             $self->verbose(1,"perl dist $dist from $u. Is he a trusted guy?\n");
