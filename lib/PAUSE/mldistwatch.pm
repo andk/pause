@@ -6,6 +6,7 @@ use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
 use CPAN::Checksums 1.050; # 1.050 introduced atomic writing
+use CPAN::DistnameInfo ();
 use Cwd ();
 use DBI;
 use Data::Dumper ();
@@ -713,9 +714,12 @@ sub rewrite01 {
         # Sybase      MEWP   sybperl-2.03.tar.gz     91.8  31 Jan 1996
         # we are in authors/id/
         $pkg{rootpack} =~ s/\*$//; # XXX seems stemming from already deleted code
-        # should use CPAN::DistnameInfo
-        ($pkg{readme} = $pkg{dist}) =~
-            s/\.(tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/.readme/;
+        {
+            my $d = CPAN::DistnameInfo->new("authors/id/$pkg{dist}");
+            my $exte = $d->extension;
+            ($pkg{readme} = $pkg{dist}) =~
+                s/\.\Q$exte\E/.readme/;
+        }
         $pkg{readmefn} = File::Basename::basename($pkg{readme});
 
         $pkg{chapterid} = $achapter{$pkg{rootpack}}
@@ -947,10 +951,12 @@ maintainer
         $package{'useridpretty'} = ucfirst(
           $package{'useridlc'}   = lc $package{'userid'}
         );
-        # should use CPAN::DistnameInfo
-        ($package{basename}) =
-            $package{filenameonly} =~ /^(.*)\.(?:tar[._-]gz|tar\.bz2|tar.Z|tgz|tbz|zip)$/;
-
+        {
+            my $d = CPAN::DistnameInfo->new("authors/id/$package{dist}");
+            my $exte = $d->extension;
+            ($package{basename}) =
+                $package{filenameonly} =~ /^(.*)\.(?:\Q$exte\E)/;
+        }
         $html .= sprintf(
                          qq{<a href="../authors/id/%s">%s</a>%s<a
  href="../authors/id/%s">%s</a> %s %s   %s\n},
@@ -1469,6 +1475,8 @@ sub mlroot {
         my $MLROOT = $self->mlroot;
         my($suffix,$skip);
         $suffix = $skip = "";
+        # should use CPAN::DistnameInfo but note: "zip" not contained
+        # because special-cased in line 1525 below;
         my $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         if ($self->isa_regular_perl($dist)) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user

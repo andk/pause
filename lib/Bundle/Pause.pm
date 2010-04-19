@@ -23,6 +23,7 @@ BSD::Resource
 CGI
 CPAN
 CPAN::Checksums
+CPAN::DistnameInfo
 CPAN::Indexer::Mirror
 Class::Singleton -- lexikon
 Compress::Zlib

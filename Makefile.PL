@@ -15,6 +15,7 @@ requires        (map +($_ => 0), qw(
     Apache::Session::Counted
     BSD::Resource
     CPAN::Checksums
+    CPAN::DistnameInfo
     CPAN::Indexer::Mirror
     Class::Singleton
     Compress::Zlib
