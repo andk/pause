@@ -31,6 +31,7 @@ watch pause
 	period wd {Sun-Sat}
 	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 	    alertevery 3h
+            upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 
 # Monitor PAUSE daemon running
 #
