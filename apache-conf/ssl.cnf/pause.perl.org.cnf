@@ -17,10 +17,10 @@ localityName			= Locality Name (eg, city)
 localityName_default		= Berlin
 
 0.organizationName		= Organization Name (eg, company)
-0.organizationName_default	= Perl Authors Upload Server
+0.organizationName_default	= cacert ignores this--ak
 
 organizationalUnitName		= Organizational Unit Name (eg, section)
-organizationalUnitName_default	= Webserver 2008
+organizationalUnitName_default	= cacert ignores this--ak
 
 commonName			= Common Name (eg, YOUR name)
 commonName_max			= 64
@@ -38,7 +38,8 @@ challengePassword_max	= 20
 unstructuredName	= An optional company name
 
 [ v3_req ]
-subjectAltName          = DNS:pause.cpan.org
+# 2010 Robert sent them the old CSR again (intentionally), not this one
+subjectAltName          = DNS:pause.perl.org, DNS:pause.cpan.org
 
 [ x509v3_extensions ]
 
