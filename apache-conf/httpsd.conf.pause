@@ -212,9 +212,6 @@ if (Apache->define("PERL_DEBUG")) {
 }
 
 
-use Apache::httpd_conf;
-# use Apache::Status;
-# use Apache::DBI;
 use strict;
 use vars qw(
  $AccessConfig
