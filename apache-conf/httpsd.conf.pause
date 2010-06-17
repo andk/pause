@@ -359,7 +359,7 @@ if ($SWITCH8000) {
   $KeepAlive = "Off";
   $MaxRequestsPerChild = 0;
 }
-$ServerAdmin = 'andreas.koenig@anima.de';
+$ServerAdmin = 'andk@cpan.org';
 
 if (1){
   for my $loc (qw( /pause )){
