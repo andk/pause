@@ -2264,6 +2264,11 @@ Please contact modules\@perl.org if there are any open questions.
     package PAUSE::pmfile;
     use vars qw($AUTOLOAD);
 
+    sub parent {
+        my($self) = @_;
+        $self->{DIO};
+    }
+
     sub DESTROY {}
 
     sub verbose {
@@ -3458,7 +3463,7 @@ VALUES (?,?,?,?,?,?)
         local($dbh->{PrintError}) = 0;
 
         my $userid;
-        my $dio; # = $self->parent->parent ??? ->{FIO}{DIO} ???;   # XXX lookup in $self->...
+        my $dio = $self->parent->parent;
         if (exists $dio->{YAML_CONTENT}{x_authority}) {
             $userid = $dio->{YAML_CONTENT}{x_authority};
             $userid =~ s/^cpan://i;
