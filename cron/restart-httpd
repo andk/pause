@@ -8,9 +8,7 @@ our $D;
   $D = sprintf "%04d%02d%02d", @m[5,4,3];
 }
 our $LOGDIR = "/usr/local/apache/logs";
-our $NICE   = "/usr/bin/nice";
-our $BZIP2  = "/usr/bin/bzip2";
-our $HTCONF = "/home/k/PAUSE/apache-conf/httpsd.conf.pause";
+our $BZIP2  = "/bin/bzip2";
 
 # abstract the filename away (httpd/httpsd/etc.)
 0 == system "/etc/init.d/PAUSE-httpd", "stop" or die "error stopping httpd";
