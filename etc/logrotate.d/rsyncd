@@ -1,5 +1,5 @@
 /var/log/rsyncd /var/log/rsyncd2 {
-  rotate 52
+  rotate 28
   weekly
   compress
   missingok
