@@ -25,7 +25,6 @@ $Id = q$Id$;
 
 my $subject;
 my $do_send         = 0; # not for symlinks only
-my $cc_cpan_testers = 0;
 my $to_cpan_admin   = 0;
 
 if ($ARGV[0] eq "-s"){
@@ -75,13 +74,11 @@ for my $line (split /\n/, $stdin) {
     my $file = $1;
     $report .= PAUSE::filehash("$targetdir/$file");
     $do_send++;
-    $cc_cpan_testers++;
   } elsif ($line =~ /^Failed/) {
     # $subject .= " ALERT";
     my($src_path) = $line =~ /src_path\[(.+?)\]/;
     $to_cpan_admin++;
     $do_send++;
-    $cc_cpan_testers = 0;
     my($host,$lower_path) = $sourcedir =~ /^(.+?):(.+)$/;
     my($local_abs) = "$targetdir/$src_path";
     require File::Basename;
@@ -105,7 +102,6 @@ remote_abs[$remote_abs]\n\n";
   }
 }
 
-push @recipients, $PAUSE::Config->{CPAN_TESTERS} if $cc_cpan_testers;
 push @recipients, $PAUSE::Config->{ADMIN} if $to_cpan_admin;
 $report .= "\n";
 
@@ -119,8 +115,6 @@ if ($do_send) {
 			    Subject => "CPAN mirror: $subject"
 			   );
   $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-  $msg->add("Reply-To", $PAUSE::Config->{CPAN_TESTERS})
-      if $cc_cpan_testers;
   warn "opening sendmail for $msg\n";
   my $fh  = $msg->open('sendmail');
   print $fh $report, $stdin;
