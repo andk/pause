@@ -93,6 +93,20 @@ sub parameter {
       }
     }
 
+    # Postmaster or admin
+    if (
+        exists $mgr->{UserGroups}{admin}
+        or
+        exists $mgr->{UserGroups}{postmaster}
+       ) {
+      for my $command (
+                       "email_for_admin",
+		      ) {
+	$allow_action{$command} = undef;
+	push @allow_submit, $command;
+      }
+    }
+
     # Only Admins
     if (exists $mgr->{UserGroups}{admin}) {
       # warn "We have an admin here";
@@ -109,7 +123,6 @@ sub parameter {
                        "index_users",
                        "post_message",
                        "reject_id_request",
-                       "email_for_admin",
                        # "test_session",
 		      ) {
 	$allow_action{$command} = undef;
