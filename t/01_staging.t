@@ -28,8 +28,11 @@ BEGIN {
         my $resp = _ua->get("$root/pause/query");
         unless ($resp->is_success) {
             my $apache;
-            for $path ("/home/src/apache/apachebin/1.3.41/bin/httpd",
-                       "/home/src/www/apache/apachebin/1.3.37/bin/httpd") {
+            for $path (
+                       "/home/src/apache/apache_1.3.42/src/httpd",
+                       "/home/src/apache/apachebin/1.3.41/bin/httpd",
+                       "/home/src/www/apache/apachebin/1.3.37/bin/httpd",
+                      ) {
                 if ( -f $path ) {
                     $apache = $path;
                     last;
