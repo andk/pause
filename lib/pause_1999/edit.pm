@@ -5614,7 +5614,7 @@ sub email_for_admin {
 
   push @m, qq{<p>Query a combination of <code>usertable</code> table and user for public or private emails according to the preferences</p>
 
-          <table><tr><th>id</th><th><i>id</i>@cpan.org gets forwarded to</th></tr>
+          <table><tr><th>id</th><th><i>id</i>\@cpan.org gets forwarded to</th></tr>
 };
 
   {
