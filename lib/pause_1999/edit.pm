@@ -5651,10 +5651,6 @@ sub email_for_admin {
     }
     $sth2->finish;
     $sth3->finish;
-    for my $id (sort keys %ALL) {
-      my($mail) = $ALL{$id};
-      push @m, "<tr><td>$id</td><td>$mail</td></tr>\n";
-    }
   };
   my $output_format = $cgi->param("OF");
   if ($output_format){
@@ -5672,8 +5668,9 @@ sub email_for_admin {
       die "not supported OF=$output_format"
     }
   } else {
-    for my $k (keys %ALL) {
-      push @m, sprintf "<tr><td>%s</td><td>%s</td></tr>\n", $k, $ALL{$k};
+    for my $id (sort keys %ALL) {
+      my($mail) = $ALL{$id};
+      push @m, "<tr><td>$id</td><td>$mail</td></tr>\n";
     }
     push @m, "</table>";
     my $href = sprintf("authenquery?ACTION=email_for_admin;OF=YAML");
