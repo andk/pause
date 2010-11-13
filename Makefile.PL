@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 
 use strict;
-use inc::Module::Install;
-
-name            ('PAUSE');
-version_from    ('lib/PAUSE.pm');
-abstract        ('Perl Authors Upload Server');
-author          ('Andreas Koenig <andreas.koenig.7os6VVqR@franz.ak.mind.de>');
-license         ('perl');
-requires        (map +($_ => 0), qw(
+use ExtUtils::MakeMaker;
+WriteMakefile(
+              NAME          => 'PAUSE',
+              VERSION_FROM  => 'lib/PAUSE.pm',
+              ABSTRACT_FROM => 'lib/PAUSE.pod',
+              AUTHOR        => 'Andreas Koenig <andreas.koenig.7os6VVqR@franz.ak.mind.de>',
+              LICENSE       => 'perl',
+              PREREQ_PM     => { map +($_ => 0), qw(
     Apache::DB
     Apache::HeavyCGI
     Apache::Request
@@ -48,8 +48,9 @@ requires        (map +($_ => 0), qw(
     XML::SAX::Base
     XML::SAX::Writer
     YAML::XS
-));
-WriteAll        ( sign => 1, check_nmake => 0 );
+)},
+              SIGN => 1,
+             );
 open my $fh, ">>", "Makefile" or die;
 print $fh <<EOF;
 cpanshell ::

@@ -75,11 +75,6 @@ htdocs/pause/vcss.gif
 htdocs/pause/vcss.png
 htdocs/robots.txt
 htdocs/ssl-only/hello.txt
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/WriteAll.pm
 lib/Bundle/Pause.pm
 lib/PAUSE.pm
 lib/PAUSE.pod
