@@ -109,6 +109,7 @@ sub parameter {
                        "index_users",
                        "post_message",
                        "reject_id_request",
+                       "email_for_admin",
                        # "test_session",
 		      ) {
 	$allow_action{$command} = undef;
@@ -5596,6 +5597,86 @@ sub who_pumpkin {
     push @m, join ", ", @hres;
     push @m, "</p>";
     my $href = sprintf("query?ACTION=who_pumpkin;OF=YAML");
+    push @m, qq{<p><a href="$href" style="text-decoration: none;">
+<span class="orange_button">YAML</span>
+</a></p>};
+    return join "", @m;
+  }
+}
+
+sub email_for_admin {
+  my $self = shift;
+  my $mgr = shift;
+  my $cgi = $mgr->{CGI};
+
+  my @m;
+  my %ALL;
+
+  push @m, qq{<p>Query the <code>usertable</code> table for private emails</p>
+
+          <table><tr><th>id</th><th>private email</th></tr>
+};
+
+  {
+    my $dba = $mgr->authen_connect;
+    my $dbm = $mgr->connect;
+    my $sth1 = $dbm->prepare(qq{SELECT userid, email
+                                FROM   users
+                                WHERE  isa_list = ''
+                                  AND  (
+                                        cpan_mail_alias='publ'
+                                        OR
+                                        cpan_mail_alias='secr'
+                                       )});
+    $sth1->execute;
+    while (my($id,$mail) = $sth1->fetchrow_array) {
+      $ALL{$id} = $mail; # we store public email even for those who want
+                         # secret, because we never know if we will find a
+                         # secret one
+    }
+    $sth1->finish;
+    my $sth2 = $dbm->prepare(qq{SELECT userid
+                                FROM   users
+                                WHERE  cpan_mail_alias='secr'
+                                  AND  isa_list = ''});
+    $sth2->execute;
+    my $sth3 = $dba->prepare(qq{SELECT secretemail
+                                FROM   usertable
+                                WHERE  user=?});
+    while (my($id) = $sth2->fetchrow_array) {
+      $sth3->execute($id);
+      next unless $sth3->rows;
+      my($mail) = $sth3->fetchrow_array or next;
+      $ALL{$id} = $mail;
+    }
+    $sth2->finish;
+    $sth3->finish;
+    for my $id (sort keys %ALL) {
+      my($mail) = $ALL{$id};
+      push @m, "<tr><td>$id</td><td>$mail</td></tr>\n";
+    }
+  };
+  my $output_format = $cgi->param("OF");
+  if ($output_format){
+    if ($output_format eq "YAML") {
+      require YAML::Syck;
+      local $YAML::Syck::ImplicitUnicode = 1;
+      my $dump = YAML::Syck::Dump(\%ALL);
+      my $edump = Encode::encode_utf8($dump);
+      my $r = $mgr->{R};
+      $r->content_type("text/plain; charset=utf8");
+      $r->send_http_header;
+      $r->print($edump);
+      return $mgr->{DONE} = Apache::Constants::DONE;
+    } else {
+      die "not supported OF=$output_format"
+    }
+  } else {
+    for my $k (keys %ALL) {
+      push @m, sprintf "<tr><td>%s</td><td>%s</td></tr>\n", $k, $ALL{$k};
+    }
+    push @m, "</table>";
+    my $href = sprintf("authenquery?ACTION=email_for_admin;OF=YAML");
     push @m, qq{<p><a href="$href" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
 </a></p>};

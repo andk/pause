@@ -84,6 +84,13 @@ use Test::More;
     like $resp->decoded_content, qr/\bJHI\b/, "found the 5.8++ pumpkin";
 }
 
+{
+    # emails for ABH
+    BEGIN { $tests+=1 }
+    my $resp = _ua->get("$root/pause/authenquery?ACTION=email_for_admin;OF=YAML");
+    like $resp->decoded_content, qr/\bANDK:\s.+franz\b/, "found andk on host franz";
+}
+
 BEGIN { plan tests => $tests }
 
 # Local Variables:
