@@ -50,6 +50,13 @@ WriteMakefile(
     YAML::XS
 )},
               SIGN => 1,
+              ($ExtUtils::MakeMaker::VERSION >= 6.4502 ?
+               (META_ADD => {
+                             resources => {
+                                 repository => "git://github.com/andk/pause.git",
+                             },
+                             keywords => ['CPAN','perl','perl authors upload server'],
+                            }) : ()),
              );
 open my $fh, ">>", "Makefile" or die;
 print $fh <<EOF;
