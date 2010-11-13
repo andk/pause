@@ -41,6 +41,7 @@ JSON::XS
 List::MoreUtils
 List::Pairwise
 MD5
+Module::Faker::Dist
 Set::Crontab
 String::Random
 Sub::Uplevel
