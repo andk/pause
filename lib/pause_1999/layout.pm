@@ -33,7 +33,7 @@ sub layout {
   push @l, qq{<html xmlns="http://www.w3.org/1999/xhtml"><head><title>};
   push @l, $PAUSE::Config->{TESTHOST} ? qq{pause\@home: } : qq{PAUSE: };
   push @l, $mgr->{Action} || "The CPAN back stage entrance";
-  my $hspecial = $PAUSE::Config->{TESTHOST} ? "h2,h4,b { color: #f0f; }" : "";
+  my $hspecial = $PAUSE::Config->{TESTHOST} ? "h2,h4,b,th,td { color: #486f8d; }" : "";
 
 
 =pod

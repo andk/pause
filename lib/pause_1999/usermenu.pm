@@ -11,7 +11,15 @@ sub as_string {
   my $mgr = shift;
   my $r = $mgr->{R};
   my $user = $r->connection->user;
-  my $server = $mgr->myurl->can("host") ? $mgr->myurl->host : $mgr->myurl->hostname;
+  my $myurl = $mgr->myurl;
+  my $server = $myurl->can("host") ? $myurl->host : $myurl->hostname;
+  if (my $port = $myurl->port) {
+      if ($port != 80) {
+          warn "DEBUG: url[$myurl]port[$port]";
+          $server .= ":$port";
+      }
+  }
+
   if (0) {
     $r->log_error(sprintf(
                           "Watch: server[%s]at[%s]line[%d]",
@@ -28,7 +36,11 @@ sub as_string {
     if ($mgr->{R}->server->port == 8000) {
       $server =~ s/:8000/:8443/ or $server .= ":8443";
     }
-    push @m, qq{<a class="menuitem" href="https://$server/pause/authenquery">Login</a>};
+    my $schema = "https";
+    if ($PAUSE::Config->{TESTHOST_SCHEMA} && $PAUSE::Config->{TESTHOST_SCHEMA}) {
+        $schema = $PAUSE::Config->{TESTHOST_SCHEMA};
+    }
+    push @m, qq{<a class="menuitem" href="$schema://$server/pause/authenquery">Login</a>};
     push @m, qq{</td></tr>\n};
 
   }
