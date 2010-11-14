@@ -28,6 +28,7 @@ WriteMakefile(
     HTML::Entities
     HTTP::Date
     IPC::Run3
+    JSON::XS
     MD5
     Mail::Mailer
     Mail::Send
