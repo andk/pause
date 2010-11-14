@@ -7,7 +7,7 @@ use utf8;
 our $VERSION = "854";
 
 sub as_string {
-  my pause_1999::usermenu $self = shift;
+  my $self = shift;
   my $mgr = shift;
   my $r = $mgr->{R};
   my $user = $r->connection->user;
