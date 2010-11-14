@@ -334,7 +334,8 @@ push @m, qq{<p>View all pending applications for new user IDs and for modules re
   my $jx = JSON::XS->new->indent->canonical;
   for my $k (sort { $ALL{$b}{type} cmp $ALL{$a}{type} || $ALL{$b}{mtime} <=> $ALL{$a}{mtime} } keys %ALL) {
     my $esc = $mgr->escapeHTML($jx->encode($ALL{$k}{session}));
-    #$esc =~ s/ /&nbsp;/g;
+    $esc =~ s/ /&nbsp;/g;
+    $esc =~ s/\n/<br\/>/g;
     $esc =~ s/\\n/<br\/>/g;
     push @m, sprintf
         (
