@@ -293,12 +293,11 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 				  mailinglists.",
 
                        },
-           reject_id_request => {
-                        verb => "Reject a registration request (BROKEN)",
+           manage_id_requests => {
+                        verb => "Manage a registration request (alpha)",
                         priv => "admin",
                         cat => "01usr/01rej",
-                        desc => "Rejecting a request may be useful to
-                                 prevent accidental registrations.",
+                        desc => "show/reject open registration requests",
 
                        },
            edit_ml => {

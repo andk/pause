@@ -69,3 +69,11 @@ td.activemenu { border: green solid 1px; }
  padding:0pt 3px;
  text-decoration:none;
 }
+#contentBox {
+ width:600px;
+ height:auto;
+}
+td.administration {
+  border-top: 2px grey solid;
+  border-left: 2px grey solid;
+}

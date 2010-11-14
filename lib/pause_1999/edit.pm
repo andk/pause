@@ -7,6 +7,8 @@ use strict;
 use Apache::Table ();
 use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
+use File::Find qw(find);
+use POSIX ();
 use URI::Escape;
 use Text::Format;
 eval {require Time::Duration};
@@ -122,7 +124,7 @@ sub parameter {
                        "dele_message",
                        "index_users",
                        "post_message",
-                       "reject_id_request",
+                       "manage_id_requests",
                        # "test_session",
 		      ) {
 	$allow_action{$command} = undef;
@@ -267,18 +269,93 @@ sub menu {
   return;
 }
 
-sub reject_id_request {
+sub manage_id_requests { # was reject_id_request
+  # intimate knowledge of session handling required
   my $self = shift;
   my $mgr = shift;
+  return unless exists $mgr->{UserGroups}{admin};
   my $req = $mgr->{CGI};
   my @m;
-  if (exists $mgr->{UserGroups}{admin}) {
-    # https://pause.perl.org/pause/authenquery?ACTION=reject_request_id&USERID=d7f00000_d591bb2375f3b915
-
-    my $abra = $req->param('USERID');
-    # must get the session file name and delete the session or some such
-    push @m, "FIXME";
+  my %ALL;
+  my $delete;
+  if ($req->param("subaction") && $req->param("subaction") eq "delete") {
+    $delete = $req->param("USERID");
   }
+  my $dbh = $mgr->connect;
+  my $sthu = $dbh->prepare("SELECT userid from users where userid=?");
+  my $sthm = $dbh->prepare("SELECT modid from mods where modid=?");
+  find
+      (
+       {wanted => sub {
+          my $path = $_;
+          my @stat = stat $path or die "Could not stat '$path': $!";
+          return unless -f _;
+          my $mtime = $stat[9];
+          open my $fh, $path or die "Couldn't open '$path': $!";
+          local $/;
+          my $content = <$fh>;
+          my $session = Storable::thaw $content;
+          # warn "DEBUG: mtime[$mtime]stat[@stat]session[$session]";
+          my $userid = $session->{APPLY}{userid} or return;
+          if ($delete && $session->{_session_id} eq $delete) {
+            unlink $path or die "Could not unlink '$path': $!";
+            return;
+          }
+          if (exists $session->{APPLY}{fullname}) {
+            $sthu->execute($userid);
+            return if $sthu->rows > 0;
+          } elsif (exists $session->{APPLY}{modid}) {
+            $sthm->execute($session->{APPLY}{modid});
+            return if $sthm->rows > 0;
+          }
+          if ($session->{APPLY}{rationale} =~ /\b(?:BLONDE\s+NAKED|NAKED\s+SEXY|FREE\s+CUMSHOT|CUMSHOT\s+VIDEOS|FREE\s+SEX|FREE\s+TUBE|GROUP\s+SEX|FREE\s+PORN|SEX\s+VIDEO|SEX\s+MOVIES?|SEX\s+TUBE|SEX\s+MATURE|STREET\s+BLOWJOBS|SEX\s+PUBLIC|TUBE\s+PORN|PORN\s+TUBE|TUBE\s+VIDEOS|VIDEO\s+TUBE|XNXX\s+VIDEOS|XXX\s+FREE|ANIMAL\s+SEX|GIRLS\s+SEX|PORN\s+VIDEOS?|PORN\s+MOVIES|TITS\s+PORN|RAW\s+SEX|DEEPTHROAT\s+TUBE|celeb\s+porn|PREGNANT\s+TUBE|picture\s+sex|NAKED\s+WOMEN|WOMEN\s+MOVIES|MATURE\s+NAKED|SEX\s+ANIME|hot\s+nude|nude\s+celebs|ANIME\s+TUBES|SEX\s+DOG|MATURE\s+SEX|MATURE\s+PUSSY|Rape\s+Porn|brutal\s+fuck|rape\s+video|ANIMAL\s+TUBE|SHEMALE\s+CUMSHOT|ANIMAL\s+PORN|ANIMAP\s+CLIP|CLIP\s+SEX|PUBLIC\s+BLOWJOB|free\s+lesbian|lesbian\s+sex|SEX\s+ZOO|tv-adult|numismata.org|www.soulcommune.com|www.petsusa.org|www.csucssa.org|www.thisis50.com|www.comunidad-latina.net|www.singlefathernetwork.com|www.freetoadvertise.biz|gayforum.dk|www.purevolume.com|playgroup.themouthpiece.com|www.bananacorp.cl|party.thebamboozle.com|blog.tellurideskiresort.com|www.pethealthforums.com|www.burropride.com|lpokemon.19.forumer.com|Zootube365|Eskimotube|xtube-1|phentermine without a prescription)\b/i) {
+            unlink $path or die "Could not unlink '$path': $!";
+            return;
+          }
+          $ALL{$path} = {
+                         session => $session,
+                         mtime   => $mtime,
+                        };
+        },
+        no_chdir => 1,
+       },
+       $mgr->{SessionDataDir}, # a bit under $PAUSE::Config->{RUNDATA}
+      );
+push @m, qq{<p>view all pending applications for new user IDs and for modules registrations</p>
+<p><table class="administration">
+<tr><th>Userid</th><th>raw</th></tr>
+};
+  require YAML::Syck;
+  require JSON::XS;
+  my $jx = JSON::XS->new->indent->canonical;
+  for my $k (sort { $ALL{$b}{mtime} <=> $ALL{$a}{mtime} } keys %ALL) {
+    my $esc = $mgr->escapeHTML($jx->encode($ALL{$k}{session}));
+    #$esc =~ s/ /&nbsp;/g;
+    $esc =~ s/\\n/<br\/>/g;
+    push @m, sprintf
+        (
+         '<tr><td class="administration" valign="top">
+%s
+<br/>
+%s
+<br/>
+<br/>
+<a href="authenquery?ACTION=%s;USERID=%s;SUBMIT_pause99_%s=1">Go To Registration</a>
+<br/>
+<a href="authenquery?ACTION=manage_id_requests;subaction=delete;USERID=%s">Delete Registration</a>
+</td><td valign="top">%s</td>
+<td valign="top"><div id="contentBox"><pre style="overflow: auto; position: relative; height: auto; vertical-align: top">%s</pre></div></td></tr>
+',
+         $ALL{$k}{session}{APPLY}{userid},
+         POSIX::strftime("%FT%TZ", gmtime $ALL{$k}{mtime}),
+         exists $ALL{$k}{session}{APPLY}{fullname} ? "add_user" : "add_mod",
+         $ALL{$k}{session}{_session_id},
+         exists $ALL{$k}{session}{APPLY}{fullname} ? "add_user_sub" : "add_mod_preview",
+         $ALL{$k}{session}{_session_id},
+         $esc,
+        );
+  }
+  push @m, "</table></p>";
   join "", @m;
 }
 
