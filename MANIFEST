@@ -48,7 +48,6 @@ etc/mon/mon.d/paused.monitor
 etc/mon/mon.d/README
 etc/mon/mon.d/sm-mta.monitor
 etc/my.cnf
-etc/proftpd.conf
 etc/rsyncd.conf
 etc/security/limits.conf
 ftpd/messages/incoming.txt
