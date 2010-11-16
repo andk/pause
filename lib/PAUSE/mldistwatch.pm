@@ -1856,7 +1856,7 @@ Please contact modules\@perl.org if there are any open questions.
             # visible for the user
 
             # we are now in temp dir and in front of us is
-            # $self->{DISTROOT}, e.g. 'Tk-Wizard-2.142'
+            # $self->{DISTROOT}, e.g. 'Tk-Wizard-2.142' (the directory, not necessarily the significant part of the distro name)
             my @wwfixingerrors;
             for my $wwf (@ww) {
                 my @stat = stat $wwf;
@@ -1867,8 +1867,10 @@ Please contact modules\@perl.org if there are any open questions.
             my $fixedfile = "$self->{DISTROOT}-withoutworldwriteables.tar.gz";
             my $todir = File::Basename::dirname($self->{DIST}); # M/MA/MAKAROW
             my $to_abs = "$self->{MAIN}{MLROOT}/$todir/$fixedfile";
-            if ($self->{DISTROOT} =~ /-withoutworldwriteables/) {
-                push @wwfixingerrors, "Sanity check failed: incoming file '$self->{DISTROOT}' already has '-withoutworldwriteables' in the name";
+            if (! length $self->{DISTROOT}) {
+                push @wwfixingerrors, "Alert: \$self->{DISTROOT} is empty, cannot fix";
+            } elsif ($self->{DIST} =~ /-withoutworldwriteables/) {
+                push @wwfixingerrors, "Sanity check failed: incoming file '$self->{DIST}' already has '-withoutworldwriteables' in the name";
             } elsif (-e $to_abs) {
                 push @wwfixingerrors, "File '$to_abs' already exists, won't overwrite";
             } elsif (0 != system (tar => "czf",
