@@ -1713,15 +1713,16 @@ Please contact modules\@perl.org if there are any open questions.
                                                 );
                     my $verb_status = $tf13->format($inxst->{$p}{verb_status});
                     $verb_status =~ s/^\s+//; # otherwise this line is too long
+                    # magic words, see also report02() around line 573, same wording there,
+                    # exception prompted by JOESUF/libapreq2-2.12.tar.gz
+                    $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
                     push @m, sprintf("     module: %s
     version: %s
     in file: %s
      status: %s\n",
                                      $p,
                                      $inxst->{$p}{version},
-                                     # magic words, see also report02() around line 573, same wording there,
-                                     # exception prompted by JOESUF/libapreq2-2.12.tar.gz
-                                     $inxst->{$p}{infile} || "missing in META.yml, tolerated by PAUSE indexer",
+                                     $inxst->{$p}{infile},
                                      $verb_status,
                                     );
                     $Lstatus = $status;
