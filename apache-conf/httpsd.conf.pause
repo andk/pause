@@ -147,6 +147,20 @@ Alias /bugzilla/ /home/ldachary/webspace/
 ##############################################
 
 
+##############################################
+# For munin
+##############################################
+Alias /munin /var/cache/munin/www
+<Directory /var/cache/munin/www>
+    Options None
+    <IfModule mod_expires.c>
+        ExpiresActive On
+    	ExpiresDefault M310
+    </IfModule>
+</Directory> 
+##############################################
+
+
 <IfModule mod_perl.c>
 
 
@@ -318,6 +332,7 @@ if (1) { # /pause/ directory
 		 "/pub",
                  "/status",
                  "/server-info",
+                 "/munin",
 		){
       $Location{$loc}{PerlAuthenHandler} = "pause_1999::authen_user";
       $Location{$loc}{AuthName} = "PAUSE";
