@@ -108,7 +108,7 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
                               },
            who_is => {
                       verb => "Who is Who (long)",
-                      priv => "public",
+                      priv => "user",
                       cat => "02serv/02",
 
                       desc => "A database query. Output is very
