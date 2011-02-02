@@ -5452,11 +5452,11 @@ sub user_meta {
         defined && /[^\000-\177]/ && Encode::_utf8_on($_) for @row;
       }
       my $disp = $row[2] ?
-          "mailinglist $row[0]" :
+          "$row[0] (mailinglist)" :
               $row[3] ?
-                  "$row[3]=$row[1] ($row[0])" :
-                      "$row[1] ($row[0])";
-      substr($disp, 52) = "... ($row[0])" if length($disp) - length($row[0]) > 55;
+                  "$row[0]:$row[3]=$row[1]" :
+                      "$row[0]:$row[1]";
+      substr($disp, 52) = "..." if length($disp) > 55;
       my($sort) = $disp =~ /^([\000-\177]+)/;
       utf8::downgrade($sort) if $] > 5.007;
       $u{$row[0]} = lc $sort;
