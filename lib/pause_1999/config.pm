@@ -106,15 +106,6 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
                                desc => "A couple of suggestions that hopefully get you on track",
                                cat => "01self/04b",
                               },
-           who_is => {
-                      verb => "Who is Who (long)",
-                      priv => "user",
-                      cat => "02serv/02",
-
-                      desc => "A database query. Output is very
-			similar to CPAN/authors/00whois.html",
-
-                     },
 
            who_pumpkin => {
                       verb => "List of pumpkins",

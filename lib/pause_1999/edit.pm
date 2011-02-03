@@ -38,7 +38,6 @@ sub parameter {
      "pause_06history",
      "pause_namingmodules",
      "request_id",
-     "who_is",
      "who_pumpkin",
     )} = ();
 
@@ -1230,84 +1229,6 @@ sub tail_logfile {
                name="pause99_tail_logfile_sub" value="Tail characters" />};
   push @m, "<pre>", $mgr->escapeHTML(<$fh>), "</pre>";
   join "", @m;
-}
-
-sub who_is {
-  my pause_1999::edit $self = shift;
-  my $mgr = shift;
-  my $req = $mgr->{CGI};
-  my $dbh = $mgr->connect;
-  my @m;
-  push @m, qq{<h3>People, <a href="#mailinglists">Mailinglists</a> And
-	       <a href="#mlarchives">Mailinglist Archives</a></h3>};
-  my $query = qq{SELECT fullname, email, homepage, userid
-	         FROM users
-                 WHERE isa_list=''
-                 ORDER BY fullname
-    };
-  my $sth = $dbh->prepare($query);
-  $sth->execute;
-  my($hash,@row,$n);
-  while ($hash = $mgr->fetchrow($sth, "fetchrow_hashref")) {
-    for my $att (qw(homepage fullname email userid)) {
-      $hash->{$att} = $mgr->escapeHTML($hash->{$att});
-    }
-    my $nom = $hash->{homepage} ?
-	qq{<a href="$hash->{homepage}">$hash->{fullname}</a>} :
-	    qq{$hash->{fullname}};
-    $n++;
-    my $e = join(
-		 "",
-		 qq{ <a href="mailto:$hash->{email}">},
-		 qq{&lt;},
-		 qq{$hash->{email}},
-		 qq{&gt;},
-		 qq{</a>},
-		);
-    my $userdir = PAUSE::user2dir($hash->{userid});
-    my $pr_userid;
-    if (-d "$PAUSE::Config->{MLROOT}/$userdir") {
-      $pr_userid = qq{<a href="/pub/PAUSE/authors/id/$userdir">$hash->{userid}</a>};
-    } else {
-      $pr_userid = $hash->{userid};
-    }
-    push @m, "$n. $nom $e -- $pr_userid<br />\n",
-  }
-  $query = qq{SELECT maillistid, maillistname, address, subscribe
-              FROM maillists
-              ORDER BY  maillistid};
-  $sth = $dbh->prepare($query);
-  $sth->execute;
-  push @m, qq{<h3><a id="mailinglists"
- name="mailinglists">Mailing Lists</a></h3><dl>};
-
-  while (@row = $mgr->fetchrow($sth, "fetchrow_array")){
-    my $subscribe = $row[3];
-    $subscribe =~ s/\s+/ /gs;
-    $mgr->escapeHTML($subscribe);
-    push @m, qq{<dt><a id=\"$row[0]\" name=\"$row[0]\"></a>$row[0]</dt><dd>$row[1]};
-    push @m, " &lt;$row[2]&gt;" if $row[2];
-    push @m, "<br />";
-    push @m, $mgr->escapeHTML($subscribe);
-    push @m, "<br /></dd>\n";
-  }
-  push @m, qq{</dl>\n};
-  $query = qq{SELECT mlaid, comment
-              FROM mlas
-              ORDER BY mlaid};
-  $sth = $dbh->prepare($query);
-  $sth->execute;
-  push @m, qq{<h3><a id="mlarchives"
- name="mlarchives">Mailing List Archives</a></h3><dl>};
-  while ($hash = $mgr->fetchrow($sth, "fetchrow_hashref")) {
-    for (keys %$hash) {
-      $mgr->escapeHTML($hash->{$_});
-    }
-    push @m, qq{<dt><a href="$hash->{mlaid}">$hash->{mlaid}</a></dt>
-<dd>$hash->{comment}<br /></dd>\n};
-  }
-  push @m, qq{</dl>};
-  @m;
 }
 
 sub salt () {
@@ -3217,7 +3138,7 @@ sub mailpw {
     unless ($param =~ /^[A-Z\-]+$/) {
       if ($param =~ /@/) {
         die Apache::HeavyCGI::Exception->new(ERROR =>
-                                             qq{Please supply a userid, not an email address. You can find valid userids in <a href="/pause/query?ACTION=who_is">/pause/query?ACTION=who_is</a>});
+                                             qq{Please supply a userid, not an email address.});
       }
       die Apache::HeavyCGI::Exception->new(ERROR =>
                                            sprintf qq{A userid of <i>%s</i>
