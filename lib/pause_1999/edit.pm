@@ -1548,17 +1548,6 @@ filename[%s]. </p>
     push @m, $self->add_uri_continue_with_uri($mgr,$uri,\$success,\$didit);
   }
 
-  if ( exists $mgr->{UserGroups}{pumpking} ) {
-    push @m, qq{\n<b>For pumpkings only</b>:};
-    push @m, $mgr->checkbox(
-			    name    => 'pause99_add_uri_mail_announce',
-			    checked => 0,
-			    value   => '1', # not more space in database than 1 byte
-			   );
-    push @m, "\nSend a CC of the Upload Notification to $PAUSE::Config->{P5P}";
-
-  }
-
   push @m, qq{\n<!-- Preamble: By uploading material to the
       PAUSE, you cause an eminent wide distribution mechanism, the
       CPAN, to bring your material to hundreds of mirroring ftp
@@ -1871,17 +1860,14 @@ href="mailto:},
 	my $dele_query = "DELETE FROM uris WHERE uriid = '$uriid'";
 	$dbh->do($dele_query);
       }
-      my $mail_announce = $req->param("pause99_add_uri_mail_announce")
-	  if $mgr->{UserGroups}{admin} || $mgr->{UserGroups}{pumpking};
-      $mail_announce ||= "";
       my $query = qq{INSERT INTO uris
                             (uriid,     userid,
                              basename,
-                             uri,    mailto_p5p,
+                             uri,
 		             changedby, changed)
                      VALUES ('$uriid', '$u->{userid}',
                              '$filename',
-                             '$uri', '$mail_announce',
+                             '$uri',
                              '$mgr->{User}{userid}', '$now')};
       #display query
       my $cp = $mgr->escapeHTML($query);
