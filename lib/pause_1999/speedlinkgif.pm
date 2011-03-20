@@ -37,7 +37,7 @@ sub as_string {
        <td rowspan="2" valign="top">
         <div class="xexplain">The PAUSE is sponsored by</div><br />
         <a href="http://www.fiz-chemie.de/">
-         <img src="http://www.fiz-chemie.de/fileadmin/template/img/logos/FIZ_Logo_4c.gif" border="0"
+         <img src="//www.fiz-chemie.de/fileadmin/template/img/logos/FIZ_Logo_4c.gif" border="0"
               alt="FIZ Chemie Berlin Logo"
               width="252" height="60" align="left" />
         </a>
