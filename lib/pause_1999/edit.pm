@@ -1976,6 +1976,7 @@ Reason:</b></p><p>$errmsg</p>
 
 });
 	if ($errmsg =~ /non\s+unique\s+key|Duplicate/i) {
+          $r->status(409);
           my $sth = $dbh->prepare("SELECT * FROM uris WHERE uriid=?");
           $sth->execute($uriid);
           my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
