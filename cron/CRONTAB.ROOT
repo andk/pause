@@ -6,6 +6,7 @@ PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 46 * * * *            find /home/ftp/pub/PAUSE/authors/id -name 'CHECKSUMS.????'
 45 * * * *            find /home/ftp/pub/PAUSE/authors/id -name CHECKSUMS -exec perl -c {} \; 2>&1 | grep -v OK | cat
 * * * * *             date -u +"\%s \%a \%b \%e \%T \%Z \%Y" > /home/ftp/tmp/02STAMP && mv /home/ftp/tmp/02STAMP /home/ftp/pub/PAUSE/authors/02STAMP && /usr/local/perl-5.10.0-RC2/bin/perl -I /home/k/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/authors/02STAMP
+08 * * * *             date -u +"\%s \%FT\%TZ" > /home/ftp/tmp/02STAMPm && mv /home/ftp/tmp/02STAMPm /home/ftp/pub/PAUSE/modules/02STAMP && /usr/local/perl-5.10.0-RC2/bin/perl -I /home/k/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/modules/02STAMP
 * * * * *             recentfile-aggregate.sh
 */5 * * * *           threeware_root.sh
 # */2 * * * *           csync-wrapper.pl -G pause_perl_org -update
