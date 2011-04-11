@@ -1647,24 +1647,24 @@ Please contact modules\@perl.org if there are any open questions.
 
         } elsif ($self->{HAS_WORLD_WRITABLE}) {
 
-            push @m, $tf->format(qq{The distribution contains the
+            push @m, $tf->format(qq[The distribution contains the
                 following world writable directories or files and is
                 therefore considered a security breach and as such not
                 being indexed: @{$self->{HAS_WORLD_WRITABLE}} . See
-                also http://use.perl.org/~bart/journal/38127});
+                also http://use.perl.org/~bart/journal/38127]);
 
             push @m, qq{\n\n};
 
             if ($self->{HAS_WORLD_WRITABLE_FIXEDFILE}) {
 
-                push @m, $tf->format(qq{For your convenience PAUSE has
+                push @m, $tf->format(qq[For your convenience PAUSE has
                     tried to write a new tarball with all the
                     world-writable bits removed. The file is put on
                     the CPAN as
                     '$self->{HAS_WORLD_WRITABLE_FIXEDFILE}' along with
                     your upload and will be indexed automatically
                     unless there are other errors that prevent that.
-                    Please watch for a separate indexing report.});
+                    Please watch for a separate indexing report.]);
 
                 push @m, qq{\n\n};
 
