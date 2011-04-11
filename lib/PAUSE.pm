@@ -169,8 +169,8 @@ sub filehash {
   my($ret,$authorfile,$size,$md5,$hexdigest);
   $ret = "";
   if (substr($file,0,length($Config->{MLROOT})) eq $Config->{MLROOT}) {
-    $authorfile = "\$CPAN/authors/id/" . 
-	substr($file,length($Config->{MLROOT}));
+    $authorfile = "\$CPAN/authors/id/" .
+    substr($file,length($Config->{MLROOT}));
   } else {
     $authorfile = $file;
   }
@@ -337,8 +337,8 @@ sub gtest {
   my($buffer);
   my $gz;
   unless (
-	  $gz = Compress::Zlib::gzopen($read, "rb")
-	 ) {
+    $gz = Compress::Zlib::gzopen($read, "rb")
+  ) {
     warn("Cannot open $read: $!\n");
     return;
   }
