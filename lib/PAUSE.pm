@@ -368,7 +368,7 @@ our @common_args =
      comment => "These files are part of the CPAN mirroring concept, described in File::Rsync::Mirror::Recent",
     );
 
-sub newfile_hook ($) {
+sub newfile_hook {
   return unless $USE_RECENTFILE_HOOKS;
   my($f) = @_;
   my $rf;
@@ -394,7 +394,7 @@ sub newfile_hook ($) {
   $rf->update($f,"new");
 }
 
-sub delfile_hook ($) {
+sub delfile_hook {
   return unless $USE_RECENTFILE_HOOKS;
   my($f) = @_;
   my $rf;
