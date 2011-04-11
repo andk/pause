@@ -186,7 +186,7 @@ sub verbose {
     print $logfh @what;
 }
 
-sub work {
+sub reindex {
     my $self = shift;
     my $startdir = Cwd::cwd();
     my $MLROOT = $self->mlroot;
@@ -206,10 +206,10 @@ sub work {
     chdir $startdir or die "Could not chdir to '$startdir'";
     rmtree $testdir;
     return if $self->{OPT}{pick};
-    $self->work2;
+    $self->rewrite_indexes;
 }
 
-sub work2 {
+sub rewrite_indexes {
     my $self = shift;
     $self->rewrite02();
     my $MLROOT = $self->mlroot;
