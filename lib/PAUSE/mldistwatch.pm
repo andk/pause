@@ -1618,7 +1618,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
         my $versions_from_metayaml = $self->{VERSION_FROM_YAML_OK} ? "yes" : "no";
         my $yaml_module_version = $PAUSE::dist::YAML_MODULE->VERSION;
-        push @m, qq{
+        push @m, qq[
                User: $author ($asciiname)
   Distribution file: $distrobasename
     Number of files: $nfiles
@@ -1628,7 +1628,7 @@ Please contact modules\@perl.org if there are any open questions.
         YAML-Parser: $PAUSE::dist::YAML_MODULE $yaml_module_version
   META-driven index: $versions_from_metayaml
   Timestamp of file: $mtime UTC
-   Time of this run: $time UTC\n\n};
+   Time of this run: $time UTC\n\n];
         my $tf = Text::Format->new(firstIndent=>0);
 
         my $status_over_all;
@@ -1636,10 +1636,10 @@ Please contact modules\@perl.org if there are any open questions.
         if (0) {
         } elsif ($self->{HAS_MULTIPLE_ROOT}) {
 
-            push @m, $tf->format(qq{The distribution does not unpack
+            push @m, $tf->format(qq[The distribution does not unpack
                 into a single directory and is therefore not being
                 indexed. Hint: try 'make dist' or 'Build dist'. (The
-                directory entries found were: @{$self->{HAS_MULTIPLE_ROOT}})});
+                directory entries found were: @{$self->{HAS_MULTIPLE_ROOT}})]);
 
             push @m, qq{\n\n};
 
