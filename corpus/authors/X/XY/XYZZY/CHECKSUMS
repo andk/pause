@@ -1,0 +1,19 @@
+# CHECKSUMS file written on Mon Apr 18 10:35:22 2011 GMT by CPAN::Checksums (v2.07)
+$cksum = {
+  'Hall-MtKing-0.01.tar.gz' => {
+    'md5' => '4a7a096a0f85d717cffe57e1add2592c',
+    'md5-ungz' => '0fc12384000e64aa1a03ed36c3aa9b8e',
+    'mtime' => '2011-04-18',
+    'sha256' => '26c11d15b2d7925475a05ceca9b4de2904b1b6ac352c2feafb8ec8dc9f5c3251',
+    'sha256-ungz' => '3f55081c7d405ac037123c3e0715d9d6846c40aaa544f5d4e14c71bfd53e30e4',
+    'size' => 664
+  },
+  'Y-2.tar.gz' => {
+    'md5' => 'f273778a0815e56a07b875846c92293a',
+    'md5-ungz' => 'b6e50104e74e8b7dbf470cc469af6979',
+    'mtime' => '2011-04-18',
+    'sha256' => '231ed0327e2fb2a3a26824f23d6718eb1576d98c22839a89eddd73c285e373b4',
+    'sha256-ungz' => '975fd51333d684b13c9bcea133679153cd79313665e633de8ae7c45e9ac539d4',
+    'size' => 623
+  }
+};
