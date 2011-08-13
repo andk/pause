@@ -79,6 +79,7 @@ $PAUSE::Config ||=
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
      MLROOT => '/home/ftp/pub/PAUSE/authors/id/', # originally module list root
      ML_CHOWN_USER => qq{UNSAFE},
+     ML_CHOWN_GROUP => qq{UNSAFE},
      ML_MAILER => 'sendmail',
      ML_MIN_INDEX_LINES => 1_000, # 02packages must be this long
      ML_MIN_FILES => 20_000, # must be this many files to run mldistwatch

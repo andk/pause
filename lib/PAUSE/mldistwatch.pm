@@ -2065,7 +2065,7 @@ Please contact modules\@perl.org if there are any open questions.
         return if $self->{CHOWN_UNSAFE_DONE};
         use File::Find;
         my(undef,undef,$uid,$gid) = getpwnam($PAUSE::Config->{ML_CHOWN_USER});
-        die "user UNSAFE not found, cannot continue" unless defined $uid;
+        die "user $PAUSE::Config->{ML_CHOWN_USER} not found, cannot continue" unless defined $uid;
         find(sub {
                  chown $uid, $gid, $_;
              },
@@ -2697,11 +2697,11 @@ Please contact modules\@perl.org if there are any open questions.
                 # warn ">>>>>>>>read v[$v]<<<<<<<<";
                 close $kid;
             } else {
-                my($gnam,$gpw,$gid,$gmem) = getgrnam("UNSAFE");
-                die "Could not determine GID of UNSAFE" unless $gid;
+                my($gnam,$gpw,$gid,$gmem) = getgrnam($PAUSE::Config->{ML_CHOWN_GROUP});
+                die "Could not determine GID of $PAUSE::Config->{ML_CHOWN_GROUP}" unless $gid;
                 my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) =
-                    getpwnam("UNSAFE");
-                die "Could not determine UID of UNSAFE" unless $uid;
+                    getpwnam($PAUSE::Config->{ML_CHOWN_USER});
+                die "Could not determine UID of $PAUSE::Config->{ML_CHOWN_USER}" unless $uid;
                 $( = $gid; $) = "$gid $gid";
                 $< = $> = $uid;
 
