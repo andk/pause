@@ -1771,7 +1771,7 @@ Please contact modules\@perl.org if there are any open questions.
             }
         }
         push @m, qq{__END__\n};
-        my $pma = PAUSE::MailAddress->new_from_userid($author,{dbh => $self->connect});
+        my $pma = PAUSE::MailAddress->new_from_userid($author);
         if ($PAUSE::Config->{TESTHOST} || $self->{MAIN}{OPT}{testhost}) {
             if ($self->{PICK}) {
                 local $"="";
