@@ -510,7 +510,7 @@ sub checkfornew {
                                        Subject => "Upload Permission or Version mismatch"
                                       );
             $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-            my $fh  = $msg->open('sendmail');
+            my $fh  = $msg->open($PAUSE::Config->{ML_MAILER});
             print $fh "Not indexed.\n\t$Id\n\n", $alert;
             $fh->close;
         }
@@ -1786,7 +1786,7 @@ Please contact modules\@perl.org if there are any open questions.
                       Subject => $failed."PAUSE indexer report $substrdistro",
                      );
             $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-            my $fh  = $msg->open('sendmail');
+            my $fh  = $msg->open($PAUSE::Config->{ML_MAILER});
             print $fh @m;
             $fh->close;
             $self->verbose(1,"-->> Sent \"indexer report\" mail about $substrdistro\n");
