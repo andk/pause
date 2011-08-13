@@ -601,7 +601,7 @@ Last-Updated: $date\n\n};
             print $F $header;
             print $F $list;
         } else {
-            $self->verbose(1,"Couldn't open >02packages\n");
+            $self->verbose(1,"Couldn't open $repfile for writing 02packages: $!\n");
         }
         close $F or die "Couldn't close: $!";
         rename "$repfile.new", $repfile or
