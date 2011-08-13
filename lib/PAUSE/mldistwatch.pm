@@ -581,7 +581,10 @@ sub rewrite02 {
         push @listing02, sprintf "%-${one}s %${two}s  %s\n", @row;
     }
     my $numlines = @listing02;
-    die "Absurd small number of lines" unless $numlines > 1000;
+
+    die "Absurd small number of lines"
+      unless $numlines > $PAUSE::Config->{ML_MIN_INDEX_LINES};
+
     my $header = qq{File:         02packages.details.txt
 URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
 Description:  Package names found in directory \$CPAN/authors/id/
