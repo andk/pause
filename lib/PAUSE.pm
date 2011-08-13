@@ -22,6 +22,7 @@ use IO::File ();
 use MD5 ();
 use Mail::Send ();
 use Sys::Hostname ();
+use Time::Piece;
 use YAML::Syck;
 
 my $USE_RECENTFILE_HOOKS = Sys::Hostname::hostname =~ /pause/;
@@ -413,6 +414,17 @@ sub delfile_hook ($) {
        aggregator => [qw(1d 1W Z)],
       );
   $rf->update($f,"delete");
+}
+
+sub _time_string {
+  my ($self, $s) = @_;
+  my $time = Time::Piece->new($s);
+  return join q{ }, $time->ymd, $time->hms;
+}
+
+sub _now_string {
+  my ($self) = @_;
+  return $self->_time_string(time);
 }
 
 1;

@@ -30,7 +30,6 @@ use PAUSE ();
 use PAUSE::MailAddress ();
 use Safe;
 use Text::Format;
-use Time::Piece;
 {
     my $HAVE_YAML = eval { require YAML; 1; };
     my $HAVE_YAML_SYCK = eval { require YAML::Syck; 1; };
@@ -286,20 +285,9 @@ sub set_ustatus_to_active {
     my $sth = $db->prepare("UPDATE users
 SET ustatus='active', ustatus_ch=? WHERE ustatus<>'nologin' AND userid=?");
     for my $user (@new_active_users) {
-        $sth->execute($self->_now_string, $user);
+        $sth->execute(PAUSE->_now_string, $user);
     }
     $sth->finish;
-}
-
-sub _time_string {
-  my ($self, $s) = @_;
-  my $time = Time::Piece->new($s);
-  return join q{ }, $time->ymd, $time->hms;
-}
-
-sub _now_string {
-  my ($self) = @_;
-  return $self->_time_string(time);
 }
 
 sub connect {
@@ -1420,7 +1408,7 @@ sub mlroot {
                    WHERE dist=?},
                    undef,
                    $mtime,
-                   $self->_time_string($mtime),
+                   PAUSE->_time_string($mtime),
                    $dist,
                 );
                 $self->verbose(1,"DEBUG5: mtime assigned [$mtime] to dist[$dist]\n");
@@ -2237,7 +2225,7 @@ Please contact modules\@perl.org if there are any open questions.
           WHERE dist='$dist'
           AND indexing_at IS NULL",
           undef,
-          $self->_now_string,
+          PAUSE->_now_string,
         );
         return 1 if $rows_affected > 0;
         my $sth = $dbh->prepare("SELECT * FROM distmtimes WHERE dist=?");
@@ -2266,7 +2254,7 @@ Please contact modules\@perl.org if there are any open questions.
         my $rows_affected = $dbh->do(
           "UPDATE distmtimes SET indexed_at=?  WHERE dist='$dist'",
           undef,
-          $self->_now_string,
+          PAUSE->_now_string,
         );
         $rows_affected > 0;
     }
