@@ -24,6 +24,10 @@ WriteMakefile(
     Devel::Peek
     Dumpvalue
     Email::Address
+    Email::MIME
+    Email::Sender::Simple
+    File::Copy::Recursive
+    File::pushd
     File::Rsync::Mirror::Recentfile
     HTML::Entities
     HTTP::Date
@@ -35,9 +39,12 @@ WriteMakefile(
     Mail::Send
     Module::Faker::Dist
     Module::Signature
+    MooseX::StrictConstructor
     Net::FTP
+    Parse::CPAN::Packages
     Set::Crontab
     String::Random
+    Test::Deep
     Test::FITesque::Fixture
     Text::Format
     Text::Metaphone
