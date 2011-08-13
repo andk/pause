@@ -77,6 +77,7 @@ $PAUSE::Config ||=
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
      MLROOT => '/home/ftp/pub/PAUSE/authors/id/', # originally module list root
+     ML_MIN_FILES => 20_000, # must be this many files to run mldistwatch
      MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
      NO_SUCCESS_BREAK => 900,
      P5P => 'release-announce@perl.org',

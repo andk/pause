@@ -386,6 +386,12 @@ sub manifind {
     return \%found;
 }
 
+sub _newcountokay {
+  my ($self, $count) = @_;
+  my $MIN = $PAUSE::Config->{ML_MIN_FILES};
+  return $count >= $MIN;
+}
+
 sub checkfornew {
     my($self,$testdir) = @_;
     local $/ = "";
@@ -409,7 +415,7 @@ sub checkfornew {
     }
     my $all = scalar @all;
     die "Panic: unusual small number of files involved ($all)"
-        if !$self->{PICK} && $all < 20000;
+        if !$self->{PICK} && ! $self->_newcountokay($all);
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
   BIGLOOP: for (my $i=0;scalar @all;$self->empty_dir($testdir)) {
         my $dist = shift @all;
