@@ -31,7 +31,7 @@ sub deploy_schemas_at {
   `sqlite3 "$dir/mod.sqlite"    < doc/schemas/mod.schema.sqlite`;
 }
 
-sub test {
+sub test_reindex {
   my ($self, $code) = @_;
 
   my $tmpdir = File::Temp->newdir;

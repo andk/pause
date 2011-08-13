@@ -12,7 +12,7 @@ use Test::More;
 
 my $result = PAUSE::TestPAUSE->new({
   author_root => 'corpus/authors',
-})->test;
+})->test_reindex;
 
 ok(
   -e $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
