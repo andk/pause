@@ -86,10 +86,10 @@ sub filter_ppps :Test :Plan(3) {
     my $reason = $expect->{reason};
     if ($no_index) {
       $reason = ($expect->{skip} ? "" : "NOT ")
-        . "skipping ppp[$ppp] $reason";
+        . "Skipping ppp[$ppp] $reason";
     }
     $self->{dist}->next_call_ok(verbose => [ 1, $reason ]);
-    $self->{dist}->next_call_ok(verbose => [ 1, "res[@res]" ]);
+    $self->{dist}->next_call_ok(verbose => [ 1, "Result of filter_ppps: res[@res]" ]);
   } else {
     ok( ! $self->{dist}->called('verbose'), "no verbose() call");
     ok(1, "dummy");
@@ -104,7 +104,7 @@ sub simile :Test :Plan(2) {
   ok( $self->{pmfile}->simile($file, $package) == $ret, $label );
   $file =~ s/\.pm$//;
   $self->{dist}->verbose_ok(
-    1, "simile: file[$file] package[$package] ret[$ret]\n"
+    1, "Result of simile(): file[$file] package[$package] ret[$ret]\n"
   );
 }
 
@@ -119,7 +119,7 @@ sub examine_fio :Test :Plan(3) {
 #  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
 #  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in YAML_CONTENT");
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");
-  $self->{dist}->verbose_ok(1, "will check keys_ppp[My::Dist]\n");
+  $self->{dist}->verbose_ok(1, "Will check keys_ppp[My::Dist]\n");
   is_deeply(
     [ @{$PACKAGE}{ qw(PACKAGE DIST FIO TIME PMFILE USERID YAML_CONTENT) } ],
     [

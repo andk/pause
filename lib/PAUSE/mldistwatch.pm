@@ -1396,7 +1396,7 @@ sub mlroot {
                                     $self->verbose(1,"Skipping ppp[$ppp] due to ve[$ve]");
                                     next MANI;
                                 } else {
-                                    $self->verbose(1,"NOT skipping ppp[$ppp] due to ve[$ve]");
+                                    $self->verbose(1,"NOT Skipping ppp[$ppp] due to ve[$ve]");
                                 }
                             }
                         } else {
@@ -1405,7 +1405,7 @@ sub mlroot {
                                 $self->verbose(1,"Skipping ppp[$ppp] due to v[$v]");
                                 next MANI;
                             } else {
-                                $self->verbose(1,"NOT skipping ppp[$ppp] due to v[$v]");
+                                $self->verbose(1,"NOT Skipping ppp[$ppp] due to v[$v]");
                             }
                         }
                     }
