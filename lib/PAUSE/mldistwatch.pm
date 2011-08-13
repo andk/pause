@@ -13,6 +13,8 @@ use Data::Dumper ();
 use DirHandle ();
 use Dumpvalue ();
 use DynaLoader ();
+use Email::MIME;
+use Email::Sender::Simple qw(sendmail);
 use Exporter ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
@@ -27,7 +29,6 @@ use IPC::Cmd ();
 use JSON ();
 use List::Util ();
 use List::MoreUtils ();
-use Mail::Send ();
 use PAUSE ();
 use PAUSE::dist ();
 use PAUSE::pmfile ();
@@ -471,14 +472,21 @@ sub checkfornew {
         if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
         } else {
             our $Id;
-            my($msg) = Mail::Send->new(
-                                       To => $PAUSE::Config->{ADMIN},
-                                       Subject => "Upload Permission or Version mismatch"
-                                      );
-            $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-            my $fh  = $msg->open($PAUSE::Config->{ML_MAILER});
-            print $fh "Not indexed.\n\t$Id\n\n", $alert;
-            $fh->close;
+            my $email = Email::MIME->create(
+                header_str => [
+                    To      => $PAUSE::Config->{ADMIN},
+                    Subject => "Upload Permission or Version mismatch",
+                    From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+                ],
+                attributes => {
+                  charset      => 'utf-8',
+                  content_type => 'text/plain',
+                  encoding     => 'quoted-printable',
+                },
+                body_str => join(qq{\n\n}, "Not indexed.\n\t$Id", $alert),
+            );
+
+            sendmail($email);
         }
     }
 }

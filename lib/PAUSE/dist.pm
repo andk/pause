@@ -2,6 +2,8 @@ use strict;
 use warnings;
 package PAUSE::dist;
 use vars qw(%CHECKSUMDONE $AUTOLOAD $YAML_MODULE);
+
+use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
 use List::MoreUtils ();
 use PAUSE::mldistwatch::Constants;
@@ -502,15 +504,23 @@ sub mail_summary {
     if ($status_over_all ne "OK") {
       $failed = "Failed: ";
     }
-    my($msg) = Mail::Send
-    ->new(
-      To      => $to,
-      Subject => $failed."PAUSE indexer report $substrdistro",
+
+    my $email = Email::MIME->create(
+        header_str => [
+            To      => $to,
+            Subject => $failed."PAUSE indexer report $substrdistro",
+            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+        ],
+        attributes => {
+          charset      => 'utf-8',
+          content_type => 'text/plain',
+          encoding     => 'quoted-printable',
+        },
+        body_str => join( ($, // q{}) , @m),
     );
-    $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-    my $fh  = $msg->open($PAUSE::Config->{ML_MAILER});
-    print $fh @m;
-    $fh->close;
+
+    sendmail($email);
+
     $self->verbose(1,"Sent \"indexer report\" mail about $substrdistro\n");
   }
 }

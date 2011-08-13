@@ -21,7 +21,7 @@ sub tmpdir {
 
 has config_overrides => (
   reader   => '_config_overrides',
-  isa      => 'HashRef[Str]',
+  isa      => 'HashRef',
   required => 1,
 );
 

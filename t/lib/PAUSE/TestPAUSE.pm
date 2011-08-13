@@ -61,7 +61,6 @@ sub test_reindex {
     MLROOT                    => File::Spec->catdir($ml_root),
     ML_CHOWN_GROUP => +(getgrgid($)))[0],
     ML_CHOWN_USER  => +(getpwuid($>))[0],
-    ML_MAILER      => 'testfile',
     ML_MIN_FILES       => 1,
     ML_MIN_INDEX_LINES => 1,
     MOD_DATA_SOURCE_NAME    => "$dsnbase/mod.sqlite",
