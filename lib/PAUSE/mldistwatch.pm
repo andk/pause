@@ -508,13 +508,13 @@ sub rewrite02 {
     local($/) = "\n";
     if (
         -f "$repfile.gz" and
-        open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+        open my $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
        ) {
-        while (<F>) {
+        while (<$fh>) {
             next if 1../^$/;
             $olist .= $_;
         }
-        close F;
+        close $fh;
     }
     my $date = HTTP::Date::time2str();
     my $sth = $dbh->prepare(qq{SELECT package, version, dist, file
@@ -592,13 +592,12 @@ sub rewrite01 {
     my $list = "";
     my $olist = "";
     local $/;
-    local *F;
     if (-e $repfile) {
-        if (open F, $repfile) {
-            while (<F>) {
+        if (open my $fh, $repfile) {
+            while (<$fh>) {
                 $olist .= $_;
             }
-            close F;
+            close $fh;
         } else {
             $self->verbose(1,"Couldn't open $repfile $!\n");
         }
@@ -826,9 +825,9 @@ category    maintainer
         $olist       =~ s/.+?<hr\b//s;
 
     if ($comparelist ne $olist) {
-        if (open F, ">$repfile.new") {
-            print F $list;
-            close F;
+        if (open my $fh, ">$repfile.new") {
+            print $fh $list;
+            close $fh;
             rename "$repfile.new", $repfile or die;
             PAUSE::newfile_hook($repfile);
             $self->write_01sorted(\@listing01);
@@ -1008,17 +1007,17 @@ sub rewrite03 {
     local($/) = "\n";
     if (-f "$repfile.gz") {
         if (
-          open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+          open my $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
         ) {
           if ($] > 5.007) {
               require Encode;
-              binmode F, ":utf8";
+              binmode $fh, ":utf8";
           }
-          while (<F>) {
+          while (<$fh>) {
               next if 1../^\s*$/;
               $olist .= $_;
           }
-          close F;
+          close $fh;
         } else {
             $self->verbose(1,"Couldn't open $repfile $!\n");
         }
@@ -1112,13 +1111,13 @@ sub rewrite06 {
     local($/) = "\n";
     if (-f "$repfile.gz") {
         if (
-            open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+            open my $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
            ) {
-            while (<F>) {
+            while (<$fh>) {
                 next if 1../^\s*$/;
                 $olist .= $_;
             }
-            close F;
+            close $fh;
         } else {
             $self->verbose(1,"Couldn't open $repfile $!\n");
         }
