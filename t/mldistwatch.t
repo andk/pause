@@ -19,11 +19,6 @@ ok(
   "our indexer indexed",
 );
 
-my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-  'SELECT * FROM packages ORDER BY package, version',
-  { Slice => {} },
-);
-
 my @want = (
   { package => 'Bug::Gold',      version => '9.001' },
   { package => 'Hall::MtKing',   version => '0.01'  },
@@ -31,10 +26,29 @@ my @want = (
   { package => 'Y',              version => 2       },
 );
 
-cmp_deeply(
-  $pkg_rows,
-  [ map {; superhashof($_) } @want ],
-  "we indexed exactly the dists we expected to",
-);
+subtest "tests with the data in the modules db" => sub {
+  my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
+    'SELECT * FROM packages ORDER BY package, version',
+    { Slice => {} },
+  );
+
+  cmp_deeply(
+    $pkg_rows,
+    [ map {; superhashof($_) } @want ],
+    "we db-inserted exactly the dists we expected to",
+  );
+};
+
+subtest "tests with the parsed 02packages data" => sub {
+  my $p = $result->packages_data;
+
+  my @packages = sort { $a->package cmp $b->package } $p->packages;
+
+  cmp_deeply(
+    \@packages,
+    [ map {; methods(%$_) } @want ],
+    "we built exactly the 02packages we expected",
+  );
+};
 
 done_testing;

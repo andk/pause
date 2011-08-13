@@ -3,6 +3,7 @@ use Moose;
 use MooseX::StrictConstructor;
 
 use DBI;
+use Parse::CPAN::Packages;
 use Path::Class;
 
 use namespace::autoclean;
@@ -48,6 +49,14 @@ sub connect_authen_db {
 sub connect_mod_db {
   my ($self) = @_;
   return $self->__connect( $self->mod_db_file );
+}
+
+sub packages_data {
+  my ($self) = @_;
+
+  return Parse::CPAN::Packages->new(
+    q{} . $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  );
 }
 
 1;
