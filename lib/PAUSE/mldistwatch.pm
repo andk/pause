@@ -1281,29 +1281,6 @@ sub mlroot {
 
 
 
-
-{
-    package PAUSE::mldistwatch::Constants;
-    our $heading =
-        {
-         EMISSPERM() => "Permission missing",
-         EDUALOLDER() => "An older dual-life module stays reference",
-         EDUALYOUNGER() => "Dual-life module stays reference",
-         EVERFALLING() => "Decreasing version number",
-         EMTIMEFALLING() => "Decreasing mtime on a file (category to be deprecated)",
-         EOLDRELEASE() => "Release seems outdated",
-         EPARSEVERSION() => "Version parsing problem",
-         EOPENFILE() => "Problem while reading the distribtion",
-         OK() => "Successfully indexed",
-        };
-
-    sub heading ($) {
-        my($status) = shift;
-        # warn "status[$status]";
-        $heading->{$status};
-    }
-}
-
 {
     package PAUSE::pmfile;
     use vars qw($AUTOLOAD);
