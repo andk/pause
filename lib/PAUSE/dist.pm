@@ -16,21 +16,16 @@ use PAUSE::mldistwatch::Constants;
 # perl distros. (The exclusion of developer releases was
 # accidentally lost in rev 815)
 our $ISA_REGULAR_PERL = qr{
-                              /
-                              (
-                                  perl-5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
-                              |
-                                  perl5[._](00\d(_[0-4][0-9])?)
-                              |
-                                  ponie-[\d.\-]
-                              )
-                              (?:
-                                  \.tar[._-]gz
-                              |
-                                  \.tar\.bz2
-                              )
-                              \z
-                      }x;
+    /
+    ( perl-5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
+    | perl5[._](00\d(_[0-4][0-9])?)
+    | ponie-[\d.\-]
+    )
+    (?: \.tar[._-]gz
+    |   \.tar\.bz2
+    )
+    \z
+}x;
 
 # package PAUSE::dist
 sub DESTROY {}
