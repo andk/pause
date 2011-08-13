@@ -6,6 +6,7 @@ package PAUSE::Test::pmfile;
 use Test::FITesque::Fixture;
 use base qw(Test::FITesque::Fixture);
 use Test::More;
+use Test::Deep;
 
 use Test::MockObject;
 use Test::MockObject::Extends;
@@ -77,7 +78,7 @@ sub filter_ppps :Test :Plan(3) {
   $self->{pmfile}{YAML_CONTENT}{no_index} = $no_index;
 
   my @res = $self->{pmfile}->filter_ppps($ppp);
-  is_deeply(
+  cmp_deeply(
     \@res,
     $expect->{skip} ? [] : [$ppp],
     "expected result",
@@ -121,7 +122,7 @@ sub examine_fio :Test :Plan(3) {
 #  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in YAML_CONTENT");
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");
   $self->{dist}->verbose_ok(1, "Will check keys_ppp[My::Dist]\n");
-  is_deeply(
+  cmp_deeply(
     [ @{$PACKAGE}{ qw(PACKAGE DIST FIO TIME PMFILE USERID YAML_CONTENT) } ],
     [
       'My::Dist', 'My-Dist', $pmfile,
@@ -130,7 +131,7 @@ sub examine_fio :Test :Plan(3) {
     "correct package info",
   );
   delete $PACKAGE->{PP}{pause_reg}; # cannot guess
-  is_deeply(
+  cmp_deeply(
     $PACKAGE->{PP},
     {
       parsed => 1,
