@@ -65,6 +65,7 @@ $PAUSE::Config ||=
      AUTHEN_USER_FLD => "user",
      AUTHEN_USER_TABLE => "usertable",
      CPAN_TESTERS => qq(cpan-uploads\@perl.org), # cpan-uploads is a mailing list, BINGOS relies on it
+     ML_CHOWN_USER => qq{UNSAFE},
      TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
      REPLY_TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
      DELETES_EXPIRE => 60*60*72,

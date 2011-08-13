@@ -2061,7 +2061,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($self) = @_;
         return if $self->{CHOWN_UNSAFE_DONE};
         use File::Find;
-        my(undef,undef,$uid,$gid) = getpwnam("UNSAFE");
+        my(undef,undef,$uid,$gid) = getpwnam($PAUSE::Config->{ML_CHOWN_USER});
         die "user UNSAFE not found, cannot continue" unless defined $uid;
         find(sub {
                  chown $uid, $gid, $_;
