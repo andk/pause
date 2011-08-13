@@ -629,13 +629,17 @@ sub rewrite01 {
     my $olist = "";
     local $/;
     local *F;
-    if (open F, $repfile) {
-        while (<F>) {
-            $olist .= $_;
+    if (-e $repfile) {
+        if (open F, $repfile) {
+            while (<F>) {
+                $olist .= $_;
+            }
+            close F;
+        } else {
+            $self->verbose(1,"Couldn't open $repfile $!\n");
         }
-        close F;
     } else {
-        $self->verbose(1,"Couldn't open $repfile $!\n");
+        $self->verbose(1,"No 01modules exist; won't try to read it");
     }
     my(%firstlevel,%achapter);
     my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
@@ -1036,21 +1040,24 @@ sub rewrite03 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    if (
-        -f "$repfile.gz" and
-        open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
-       ) {
-        if ($] > 5.007) {
-            require Encode;
-            binmode F, ":utf8";
+    if (-f "$repfile.gz") {
+        if (
+          open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+        ) {
+          if ($] > 5.007) {
+              require Encode;
+              binmode F, ":utf8";
+          }
+          while (<F>) {
+              next if 1../^\s*$/;
+              $olist .= $_;
+          }
+          close F;
+        } else {
+            $self->verbose(1,"Couldn't open $repfile $!\n");
         }
-        while (<F>) {
-            next if 1../^\s*$/;
-            $olist .= $_;
-        }
-        close F;
     } else {
-        $self->verbose(1,"Couldn't open $repfile $!\n");
+        $self->verbose(1,"No 03modlists exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
@@ -1137,17 +1144,20 @@ sub rewrite06 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    if (
-        -f "$repfile.gz" and
-        open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
-       ) {
-        while (<F>) {
-            next if 1../^\s*$/;
-            $olist .= $_;
+    if (-f "$repfile.gz") {
+        if (
+            open F, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+           ) {
+            while (<F>) {
+                next if 1../^\s*$/;
+                $olist .= $_;
+            }
+            close F;
+        } else {
+            $self->verbose(1,"Couldn't open $repfile $!\n");
         }
-        close F;
     } else {
-        $self->verbose(1,"Couldn't open $repfile $!\n");
+        $self->verbose(1,"No 01modules exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
