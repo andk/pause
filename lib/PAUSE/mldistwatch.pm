@@ -3458,11 +3458,8 @@ filemtime = ?, pause_reg = ? WHERE package = ?};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
         my $pmfile = $self->{PMFILE};
-        my $query = qq{INSERT INTO packages
- (package, version, dist, file, filemtime, pause_reg)
-VALUES (?,?,?,?,?,?)
-};
-        $self->verbose(1,"Inserting package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
+        my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg) VALUES (?,?,?,?,?,?) };
+        $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
         $dbh->do($query,
                  undef,
                  $package,
