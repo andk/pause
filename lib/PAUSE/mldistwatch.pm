@@ -29,6 +29,7 @@ use PAUSE ();
 use PAUSE::MailAddress ();
 use Safe;
 use Text::Format;
+use Time::Piece;
 {
     my $HAVE_YAML = eval { require YAML; 1; };
     my $HAVE_YAML_SYCK = eval { require YAML::Syck; 1; };
@@ -282,11 +283,17 @@ sub set_ustatus_to_active {
     return unless @new_active_users;
     $self->verbose(2,"Info: new_active_users[@new_active_users]");
     my $sth = $db->prepare("UPDATE users
-SET ustatus='active', ustatus_ch=NOW() WHERE ustatus<>'nologin' AND userid=?");
+SET ustatus='active', ustatus_ch=? WHERE ustatus<>'nologin' AND userid=?");
     for my $user (@new_active_users) {
-        $sth->execute($user);
+        $sth->execute($self->_now_string, $user);
     }
     $sth->finish;
+}
+
+sub _now_string {
+  my ($self) = @_;
+  my $time = Time::Piece->new;
+  return join q{ }, $time->ymd, $time->hms;
 }
 
 sub connect {
@@ -2208,10 +2215,13 @@ Please contact modules\@perl.org if there are any open questions.
         }
         my $dist = $self->{DIST};
         my $dbh = $self->connect;
-        my $rows_affected = $dbh->do("UPDATE distmtimes
-                                 SET indexing_at=NOW()
-                                 WHERE dist='$dist'
-                                 AND indexing_at IS NULL");
+        my $rows_affected = $dbh->do(
+          "UPDATE distmtimes SET indexing_at=?
+          WHERE dist='$dist'
+          AND indexing_at IS NULL",
+          undef,
+          $self->_now_string,
+        );
         return 1 if $rows_affected > 0;
         my $sth = $dbh->prepare("SELECT * FROM distmtimes WHERE dist=?");
         $sth->execute($dist);
@@ -2236,9 +2246,11 @@ Please contact modules\@perl.org if there are any open questions.
         my($self) = @_;
         my $dist = $self->{DIST};
         my $dbh = $self->connect;
-        my $rows_affected = $dbh->do("UPDATE distmtimes
-                                 SET indexed_at=NOW()
-                                 WHERE dist='$dist'");
+        my $rows_affected = $dbh->do(
+          "UPDATE distmtimes SET indexed_at=?  WHERE dist='$dist'",
+          undef,
+          $self->_now_string,
+        );
         $rows_affected > 0;
     }
 }
