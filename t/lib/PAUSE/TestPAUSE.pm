@@ -44,12 +44,13 @@ sub test {
 
   mkdir File::Spec->catdir($tmpdir, 'db');
   my $db_root = File::Spec->catdir($tmpdir, 'db');
-  my $dsnbase = "DBI:SQLite:dbname=$db_root";
 
   my $pid_dir = File::Spec->catdir($tmpdir, 'run');
   mkdir $pid_dir;
 
   $self->deploy_schemas_at($db_root);
+
+  my $dsnbase = "DBI:SQLite:dbname=$db_root";
 
   my %overrides = (
     AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
@@ -78,6 +79,8 @@ sub test {
   return PAUSE::TestPAUSE::Result->new({
     tmpdir => $tmpdir,
     config_overrides => \%overrides,
+    authen_db_file   => File::Spec->catfile($db_root, 'authen.sqlite'),
+    mod_db_file      => File::Spec->catfile($db_root, 'mod.sqlite'),
   });
 }
 
