@@ -1,0 +1,6 @@
+This directory contains schemas for different databases that are
+equivalent to the official PAUSE/MySQL schemas.  They were created
+with SQL::Translator as follows (e.g for SQLite):
+
+  $ sqlt -f MySQL -t SQLite mod.schema.txt > mod.schema.sqlite
+
