@@ -607,7 +607,7 @@ Last-Updated: $date\n\n};
         rename "$repfile.new", $repfile or
             $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
-        0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
+        0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
@@ -1116,7 +1116,7 @@ Date:        %s
         rename "$repfile.new", $repfile or
             $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
-        0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
+        0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
@@ -1210,7 +1210,7 @@ Date:        %s
         rename "$repfile.new", $repfile or
             $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
-        0==system "$PAUSE::Config->{GZIP} --best --rsyncable --stdout $repfile > $repfile.gz.new"
+        0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");

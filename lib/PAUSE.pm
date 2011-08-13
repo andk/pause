@@ -71,6 +71,7 @@ $PAUSE::Config ||=
      FTPPUB => '/home/ftp/pub/PAUSE/',
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP => '/bin/gzip',
+     GZIP_OPTIONS => '--best --rsyncable',
      HOME => '/home/k/',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log',
      INCOMING => 'ftp://pause.perl.org/incoming/',

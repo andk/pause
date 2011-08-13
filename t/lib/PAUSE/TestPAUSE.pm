@@ -6,8 +6,9 @@ use autodie;
 
 use DBI;
 use File::Path qw(make_path);
-use File::Temp ();
 use File::Copy::Recursive qw(dircopy);
+use File::Temp ();
+use File::Which;
 
 use PAUSE;
 use PAUSE::mldistwatch;
@@ -53,6 +54,8 @@ sub test {
   my %overrides = (
     AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
     CHECKSUMS_SIGNING_PROGRAM => "\0",
+    GZIP                      => which('gzip'),
+    GZIP_OPTIONS              => '',
     MLROOT                    => File::Spec->catdir($ml_root),
     ML_CHOWN_GROUP => +(getgrgid($)))[0],
     ML_CHOWN_USER  => +(getpwuid($>))[0],
