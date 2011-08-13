@@ -27,6 +27,7 @@ WriteMakefile(
     File::Rsync::Mirror::Recentfile
     HTML::Entities
     HTTP::Date
+    IPC::Cmd
     IPC::Run3
     JSON::XS
     MD5

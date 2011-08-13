@@ -22,6 +22,7 @@ use File::Copy ();
 use File::Spec ();
 use File::Temp 0.14 (); # begin of OO interface
 use HTTP::Date ();
+use IPC::Cmd ();
 use JSON ();
 use List::Util ();
 use List::MoreUtils ();
@@ -1353,9 +1354,11 @@ sub mlroot {
     sub writechecksum {
         my($self, $dir) = @_;
         return if $CHECKSUMDONE{$dir}++;
+        return unless IPC::Cmd::can_run( $PAUSE::Config->{CHECKSUMS_SIGNING_PROGRAM} );
         local($CPAN::Checksums::CAUTION) = 1;
         local($CPAN::Checksums::SIGNING_PROGRAM) =
-            $PAUSE::Config->{CHECKSUMS_SIGNING_PROGRAM};
+            $PAUSE::Config->{CHECKSUMS_SIGNING_PROGRAM} . " " .
+            $PAUSE::Config->{CHECKSUMS_SIGNING_ARGS};
         local($CPAN::Checksums::SIGNING_KEY) =
             $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
         eval { CPAN::Checksums::updatedir($dir); };

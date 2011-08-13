@@ -104,7 +104,8 @@ $PAUSE::Config ||=
      TMP => '/home/ftp/tmp/',
      UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
-     CHECKSUMS_SIGNING_PROGRAM => ('gpg --homedir /home/k/PAUSE/111_sensi'.
+     CHECKSUMS_SIGNING_PROGRAM => ('gpg'),
+     CHECKSUMS_SIGNING_ARGS => ('--homedir /home/k/PAUSE/111_sensi'.
                                    'tive/gnupg-pause-batch-signing-home  '.
                                    '--clearsign --default-key '),
      CHECKSUMS_SIGNING_KEY => '450F89EC',
