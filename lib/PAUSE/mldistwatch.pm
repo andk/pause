@@ -1,4 +1,5 @@
 # Some POD is after __END__
+package PAUSE::mldistwatch;
 
 use strict;
 use lib "/home/k/pause/lib";
@@ -52,19 +53,11 @@ $Data::Dumper::Indent = 1;
 
 # "MAIN" at the end of file to guarantee all packages are inintialized
 
-{
-    package PAUSE::mldistwatch;
-    ###### data initialization ######
-    use DB_File;
-    use Fcntl qw(O_RDWR O_CREAT);
-    use File::Find;
-    use File::Path qw(rmtree mkpath);
-    our $Id = q$Id$;
-}
-
-
-package PAUSE::mldistwatch;
-
+use DB_File;
+use Fcntl qw(O_RDWR O_CREAT);
+use File::Find;
+use File::Path qw(rmtree mkpath);
+our $Id = q$Id$;
 our $MAINTAIN_SYMLINKTREE = 1;
 
 use Fcntl qw(:flock);
