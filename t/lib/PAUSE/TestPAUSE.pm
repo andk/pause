@@ -2,12 +2,16 @@ package PAUSE::TestPAUSE;
 use Moose;
 use MooseX::StrictConstructor;
 
+use autodie;
+
+use DBI;
 use File::Path qw(make_path);
 use File::Temp ();
 use File::Copy::Recursive qw(dircopy);
 
 use PAUSE;
 use PAUSE::mldistwatch;
+use PAUSE::TestPAUSE::Result;
 
 use namespace::autoclean;
 
@@ -41,29 +45,37 @@ sub test {
   my $db_root = File::Spec->catdir($tmpdir, 'db');
   my $dsnbase = "DBI:SQLite:dbname=$db_root";
 
-  local $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = "$dsnbase/authen.sqlite";
-  local $PAUSE::Config->{MOD_DATA_SOURCE_NAME} = "$dsnbase/mod.sqlite";
+  my $pid_dir = File::Spec->catdir($tmpdir, 'run');
+  mkdir $pid_dir;
 
   $self->deploy_schemas_at($db_root);
 
-  local $PAUSE::Config->{MLROOT}  = File::Spec->catdir($ml_root);
+  my %overrides = (
+    AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
+    # CHECKSUMS_SIGNING_PROGRAM => 'xyzzy',
+    MLROOT                    => File::Spec->catdir($ml_root),
+    ML_CHOWN_GROUP => +(getgrgid($)))[0],
+    ML_CHOWN_USER  => +(getpwuid($>))[0],
+    ML_MAILER      => 'testfile',
+    ML_MIN_FILES       => 1,
+    ML_MIN_INDEX_LINES => 1,
+    MOD_DATA_SOURCE_NAME    => "$dsnbase/mod.sqlite",
+    PID_DIR            => $pid_dir,
+  );
 
-  local $PAUSE::Config->{PID_DIR} = File::Spec->catdir($tmpdir, 'run');
-  mkdir $PAUSE::Config->{PID_DIR};
-
-  local $PAUSE::Config->{ML_MIN_FILES} = 1;
-  local $PAUSE::Config->{ML_MIN_INDEX_LINES} = 1;
-
-  local $PAUSE::Config->{ML_CHOWN_USER}  = +(getpwuid($>))[0];
-  local $PAUSE::Config->{ML_CHOWN_GROUP} = +(getgrgid($)))[0];
-
-  local $PAUSE::Config->{ML_MAILER} = 'testfile';
+  local $PAUSE::Config = {
+    %{ $PAUSE::Config },
+    %overrides,
+  };
 
   PAUSE::mldistwatch->new->reindex;
 
   $code->($tmpdir) if $code;
 
-  return $tmpdir;
+  return PAUSE::TestPAUSE::Result->new({
+    tmpdir => $tmpdir,
+    config_overrides => \%overrides,
+  });
 }
 
 1;
