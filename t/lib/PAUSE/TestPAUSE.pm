@@ -52,7 +52,7 @@ sub test {
 
   my %overrides = (
     AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
-    # CHECKSUMS_SIGNING_PROGRAM => 'xyzzy',
+    CHECKSUMS_SIGNING_PROGRAM => "\0",
     MLROOT                    => File::Spec->catdir($ml_root),
     ML_CHOWN_GROUP => +(getgrgid($)))[0],
     ML_CHOWN_USER  => +(getpwuid($>))[0],
