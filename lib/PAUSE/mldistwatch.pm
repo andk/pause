@@ -175,11 +175,11 @@ sub verbose {
             Data::Dumper->new([$self],[qw()])->Indent(1)->Useqq(1)->Dump;
         $self->{INTRODUCED} = undef;
     }
+    push @what, "\n" unless $what[-1] =~ m{\n$};
     my $logfh;
     if (my $logfile = $self->{OPT}{logfile}) {
         open $logfh, ">>", $logfile or die;
         unshift @what, scalar localtime;
-        push @what, "\n";
     } else {
         $logfh = *STDOUT;
     }
