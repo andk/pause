@@ -21,6 +21,7 @@ use File::Basename ();
 use File::Copy ();
 use File::Spec ();
 use File::Temp 0.14 (); # begin of OO interface
+use File::Which ();
 use HTTP::Date ();
 use IPC::Cmd ();
 use JSON ();
@@ -127,12 +128,10 @@ sub new {
         }
     }
 
-    my $tarbin = "/usr/local/bin/tar";
-    $tarbin = "/bin/tar" unless -x $tarbin;
+    my $tarbin = File::Which::which('tar');
     die "No tarbin found" unless -x $tarbin;
 
-    my $unzipbin = "/usr/local/bin/unzip";
-    $unzipbin = "/usr/bin/unzip" unless -x $unzipbin;
+    my $unzipbin = File::Which::which('unzip');
     die "No unzip found" unless -x $unzipbin;
 
     my $self = bless {
