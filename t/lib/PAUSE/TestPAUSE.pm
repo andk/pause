@@ -5,8 +5,9 @@ use MooseX::StrictConstructor;
 use autodie;
 
 use DBI;
-use File::Path qw(make_path);
 use File::Copy::Recursive qw(dircopy);
+use File::Path qw(make_path);
+use File::pushd;
 use File::Temp ();
 use File::Which;
 
@@ -71,6 +72,8 @@ sub test {
     %{ $PAUSE::Config },
     %overrides,
   };
+
+  my $chdir_guard = pushd;
 
   PAUSE::mldistwatch->new->reindex;
 
