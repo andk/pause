@@ -150,7 +150,7 @@ sub new {
     if ($opt->{'skip-locking'}) {
         $self->{'SKIP-LOCKING'} = 1;
     }
-    $self->verbose(1,"Starting");
+    $self->verbose(1,"PAUSE::mldistwatch object created");
     $self;
 }
 
@@ -220,7 +220,7 @@ sub rewrite_indexes {
     $self->rewrite06();
     $self->overwrite07();
     $self->verbose(1, sprintf(
-                              "\nFinished rewrite03 and everything at %s\n",
+                              "Finished rewrite03 and everything at %s\n",
                               scalar localtime
                              ));
 }
@@ -452,7 +452,7 @@ sub checkfornew {
             $self->verbose(1,"Could not obtain a lock on $dist\n");
             next BIGLOOP;
         }
-        $self->verbose(1,"\n    Examining $dist ...\n");
+        $self->verbose(1,"Examining $dist ...\n");
         $0 = "mldistwatch: $dist";
 
         my $userid = PAUSE::dir2user($dist);
@@ -501,6 +501,7 @@ sub checkfornew {
     untie @all;
     undef $fh;
     if ($alert) {
+        # XXX This should get cleaned up for logging -- dagolden, 2011-08-13
         $self->verbose(1,$alert); # summary
         if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
         } else {
@@ -534,7 +535,7 @@ sub rewrite02 {
     #
     # Rewriting 02packages.details.txt
     #
-    $self->verbose(1,"\n\nEntering rewrite02\n");
+    $self->verbose(1,"Entering rewrite02\n");
 
     my $dbh = $self->connect;
     my $MLROOT = $self->mlroot;
@@ -561,7 +562,7 @@ sub rewrite02 {
     $sth->execute;
     my(@row,@listing02);
     my $numrows = $sth->rows;
-    $self->verbose(2,"numrows[$numrows]\n");
+    $self->verbose(2,"Number of indexed packages: $numrows");
     while (@row = $sth->fetchrow_array) {
         my($one,$two);
         my $infile = $row[0];
@@ -620,7 +621,7 @@ sub rewrite01 {
     #
     # Rewriting 01modules.index.html
     #
-    $self->verbose(1, "\nEntering rewrite01\n");
+    $self->verbose(1, "Entering rewrite01\n");
     my $dbh = $self->connect;
 
     my $MLROOT = $self->mlroot;
@@ -673,7 +674,8 @@ sub rewrite01 {
 
     $sth = $dbh->prepare("SELECT package, dist FROM packages");
     $sth->execute;
-    my(@listing01,%count,$count);
+    my(@listing01,%count);
+    my $count = 0;
     my(%seen);
 
     my(%usercache,%userdircache,$i);
@@ -746,14 +748,15 @@ sub rewrite01 {
                 $pkg{chapter} = $chaptitle[$pkg{chapterid}]
             } else {
                 $pkg{chapter} = "99_Not_In_Modulelist";
-                $self->verbose(1,"\nfound no chapterid for $pkg{rootpack}\n");
+                $self->verbose(1,"Found no chapterid for $pkg{rootpack}\n");
             }
         } else {
             $pkg{chapter} = "99_Not_In_Modulelist";
-            $self->verbose(1,"found no chapter for $pkg{rootpack}\n");
+            $self->verbose(1,"Found no chapter for $pkg{rootpack}\n");
         }
 
 
+        # XXX need to split progress tracking from logging -- dagolden, 2011-08-13
         $self->verbose(2,".") if !($i % 16);
         if ($MAINTAIN_SYMLINKTREE) {
             my $bymod = "$MLROOT/../../modules/".
@@ -1033,7 +1036,7 @@ sub rewrite03 {
     #
     # Rewriting 03modlist.data
     #
-    $self->verbose(1,"\nEntering rewrite03\n");
+    $self->verbose(1,"Entering rewrite03\n");
 
     my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/03modlist.data";
@@ -1137,7 +1140,7 @@ sub rewrite06 {
     #
     # Rewriting 06perms.txt
     #
-    $self->verbose(1,"\nEntering rewrite06\n");
+    $self->verbose(1,"Entering rewrite06\n");
 
     my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/06perms.txt";
@@ -1232,10 +1235,10 @@ sub overwrite07 {
     my($self) = @_;
     my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose(1,"FTP_RUN not defined");
     $fromdir .= "/mirroryaml";
-    -d $fromdir or $self->verbose(1,"directory '$fromdir' not found");
+    -d $fromdir or $self->verbose(1,"Directory '$fromdir' not found");
     my $mlroot = $PAUSE::Config->{MLROOT}   or $self->verbose(1,"MLROOT not defined");
     my $todir = "$mlroot/../../modules";
-    -d $todir or $self->verbose(1,"directory '$todir' not found");
+    -d $todir or $self->verbose(1,"Directory '$todir' not found");
     for my $exte (qw(json yml)) {
         my $f = "$fromdir/mirror.$exte";
         my $t = "$todir/07mirror.$exte";
@@ -1269,10 +1272,10 @@ sub chdir_ln_chdir {
         }
     }
     if (-l $to) {
-        $self->verbose(1, qq{unlinking symlink $to in $dir\n});
+        $self->verbose(1, qq{Unlinking symlink $to in $dir\n});
         unlink $to or die qq{Couldn\'t unlink $to $!};
     } elsif (-f $to) {
-        $self->verbose(1, "unlinking file $to in dir $dir\n");
+        $self->verbose(1, "Unlinking file $to in dir $dir\n");
         unlink $to or die qq{Couldn\'t unlink $to $!};
     } elsif (-d $to) {
         $self->verbose(1,"ALERT: Have to rmtree $to in dir $dir\n");
@@ -1426,7 +1429,7 @@ sub mlroot {
                    PAUSE->_time_string($mtime),
                    $dist,
                 );
-                $self->verbose(1,"DEBUG5: mtime assigned [$mtime] to dist[$dist]\n");
+                $self->verbose(1,"Assigned mtime '$mtime' to dist '$dist'\n");
                 return 1;
             }
         }
@@ -1462,14 +1465,14 @@ sub mlroot {
         open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
         while (<TARTEST>) {
             if (m:^\.\./: || m:/\.\./: ) {
-                $self->verbose(1,"\n\n    ALERT: Updir detected in $dist!\n\n");
+                $self->verbose(1,"*** ALERT: Updir detected in $dist!\n\n");
                 $self->alert("ALERT: Updir detected in $dist!");
                 $self->{COULD_NOT_UNTAR}++;
                 return;
             }
         }
         unless (close TARTEST) {
-            $self->verbose(1,"\nCould not untar $dist!\n");
+            $self->verbose(1,"Could not untar $dist!\n");
             $self->alert("\nCould not untar $dist!\n");
             $self->{COULD_NOT_UNTAR}++;
             return;
@@ -1485,7 +1488,7 @@ sub mlroot {
                 $self->verbose(1, "Some error occurred during unzipping again; giving up\n");
             }
         }
-        $self->verbose(1,"untarred '$MLROOT/$dist'\n");
+        $self->verbose(1,"Untarred '$MLROOT/$dist'\n");
         return 1;
     }
 
@@ -1509,7 +1512,6 @@ sub mlroot {
         my $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
         if ($self->isa_regular_perl($dist)) {
             my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
-            $self->verbose(1,"perl dist $dist from $u. Is he a trusted guy?\n");
             use DBI;
             my $adbh = DBI->connect(
                                     $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
@@ -1523,10 +1525,10 @@ sub mlroot {
             $sth->execute($u);
             if ($sth->rows > 0){
                 $skip = 0;
-                $self->verbose(1,"Yes.\n");
+                $self->verbose(1,"Perl dist $dist from trusted user $u");
             } else {
                 $skip = 1;
-                $self->verbose(1,"NO! Skip set to [$skip]\n");
+                $self->verbose(1,"*** ALERT: Perl dist $dist from untrusted user $u. Skip set to [$skip]\n");
             }
             $sth->finish;
             $adbh->disconnect;
@@ -1547,7 +1549,7 @@ sub mlroot {
                 ||
                 $dist =~ m|/perl-\d+\.\d+\.\d+-RC\d+\.|x
                ) {
-                $self->verbose(1,"  developer release\n");
+                $self->verbose(1,"Dist '$dist' is a developer release\n");
                 $self->{SUFFIX} = "N/A";
                 $self->{SKIP}   = 1;
                 return;
@@ -1562,7 +1564,7 @@ sub mlroot {
                 my $willunzip = $file;
                 $willunzip =~ s/\.(Z|gz)$//;
                 unless (PAUSE::gunzip($file,$willunzip)) {
-                    $self->verbose(1,"    no gunzip on $file\n");
+                    $self->verbose(1,"Failed gunzip on $file\n");
                 }
             } elsif ($dist =~ /\.zip$/) {
                 $suffix = "zip";
@@ -1575,7 +1577,7 @@ sub mlroot {
                     system("$unzipbin -t $MLROOT/$dist");
                 }
             } else {
-                $self->verbose(1,"  no dist\n");
+                $self->verbose(1,"File '$dist' does not resemble a distribution");
                 $skip = 1;
             }
         }
@@ -1804,7 +1806,7 @@ Please contact modules\@perl.org if there are any open questions.
             my $fh  = $msg->open($PAUSE::Config->{ML_MAILER});
             print $fh @m;
             $fh->close;
-            $self->verbose(1,"-->> Sent \"indexer report\" mail about $substrdistro\n");
+            $self->verbose(1,"Sent \"indexer report\" mail about $substrdistro\n");
         }
     }
 
@@ -1944,7 +1946,7 @@ Please contact modules\@perl.org if there are any open questions.
                             for my $ve (@$v) {
                                 $ve =~ s|/+$||;
                                 if ($inmf =~ /^$ve$rest/){
-                                    $self->verbose(1,"skipping inmf[$inmf] due to ve[$ve]");
+                                    $self->verbose(1,"Skipping inmf[$inmf] due to ve[$ve]");
                                     next MANI;
                                 } else {
                                     $self->verbose(1,"NOT skipping inmf[$inmf] due to ve[$ve]");
@@ -1953,7 +1955,7 @@ Please contact modules\@perl.org if there are any open questions.
                         } else {
                             $v =~ s|/+$||;
                             if ($inmf =~ /^$v$rest/){
-                                $self->verbose(1,"skipping inmf[$inmf] due to v[$v]");
+                                $self->verbose(1,"Skipping inmf[$inmf] due to v[$v]");
                                 next MANI;
                             } else {
                                 $self->verbose(1,"NOT skipping inmf[$inmf] due to v[$v]");
@@ -1969,7 +1971,7 @@ Please contact modules\@perl.org if there are any open questions.
             }
             push @pmfile, $mf;
         }
-        $self->verbose(1,"pmfile[@pmfile]\n");
+        $self->verbose(1,"Finished with pmfile[@pmfile]\n");
         \@pmfile;
     }
 
@@ -2230,7 +2232,7 @@ Please contact modules\@perl.org if there are any open questions.
     sub lock {
         my($self) = @_;
         if ($self->{'SKIP-LOCKING'}) {
-            $self->verbose(1,"forcing indexing without a lock");
+            $self->verbose(1,"Forcing indexing without a lock");
             return 1;
         }
         my $dist = $self->{DIST};
@@ -2334,7 +2336,7 @@ Please contact modules\@perl.org if there are any open questions.
             # Apache::mod_perl_guide stuffs it into Version.pm
             $ret = 1 if lc $file eq 'version';
         }
-        $self->verbose(1,"simile: file[$file] package[$package] ret[$ret]\n");
+        $self->verbose(1,"Result of simile(): file[$file] package[$package] ret[$ret]\n");
         $ret;
     }
 
@@ -2386,7 +2388,7 @@ Please contact modules\@perl.org if there are any open questions.
                             for my $ve (@$v) {
                                 $ve =~ s|::$||;
                                 if ($ppp =~ /^$ve$rest/){
-                                    $self->verbose(1,"skipping ppp[$ppp] due to ve[$ve]");
+                                    $self->verbose(1,"Skipping ppp[$ppp] due to ve[$ve]");
                                     next MANI;
                                 } else {
                                     $self->verbose(1,"NOT skipping ppp[$ppp] due to ve[$ve]");
@@ -2395,7 +2397,7 @@ Please contact modules\@perl.org if there are any open questions.
                         } else {
                             $v =~ s|::$||;
                             if ($ppp =~ /^$v$rest/){
-                                $self->verbose(1,"skipping ppp[$ppp] due to v[$v]");
+                                $self->verbose(1,"Skipping ppp[$ppp] due to v[$v]");
                                 next MANI;
                             } else {
                                 $self->verbose(1,"NOT skipping ppp[$ppp] due to v[$v]");
@@ -2403,14 +2405,14 @@ Please contact modules\@perl.org if there are any open questions.
                         }
                     }
                 } else {
-                    $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
+                    $self->verbose(1,"No keyword 'no_index' or 'private' in YAML_CONTENT");
                 }
             } else {
                 # $self->verbose(1,"no YAML_CONTENT"); # too noisy
             }
             push @res, $ppp;
         }
-        $self->verbose(1,"res[@res]");
+        $self->verbose(1,"Result of filter_ppps: res[@res]");
         @res;
     }
 
@@ -2437,7 +2439,7 @@ Please contact modules\@perl.org if there are any open questions.
 
         my($ppp) = $self->packages_per_pmfile;
         my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
-        $self->verbose(1,"will check keys_ppp[@keys_ppp]\n");
+        $self->verbose(1,"Will check keys_ppp[@keys_ppp]\n");
 
         #
         # Immediately after each package (pmfile) examined contact
@@ -2775,7 +2777,7 @@ Please contact modules\@perl.org if there are any open questions.
         $v = "undef" unless defined $v;
         my $dv = Dumpvalue->new;
         my $sdv = $dv->stringify($v,1); # second argument prevents ticks
-        $self->verbose(1,"sdv[$sdv]\n");
+        $self->verbose(1,"Result of normalize_version: sdv[$sdv]\n");
 
         return $v if $v eq "undef";
         return $v if $v =~ /^\{.*\}$/; # JSON object
@@ -2943,7 +2945,7 @@ package in packages  package in primeur
             my $err = "";
             $err = $dbh->errstr unless defined $ret;
             $ret ||= "";
-            $self->verbose(1,"into perms package[$package]mods_userid".
+            $self->verbose(1,"Insert into perms package[$package]mods_userid".
                            "[$mods_userid]ret[$ret]err[$err]\n");
         }
     }
@@ -3018,7 +3020,7 @@ package in packages  package in primeur
                 my $err = "";
                 $err = $dbh->errstr unless defined $ret;
                 $ret ||= "";
-                $self->verbose(1,"(ownerless)ins_perms[$ins_perms]ret[$ret]err[$err]\n");
+                $self->verbose(1,"Got unowned package: insperms[$ins_perms]ret[$ret]err[$err]\n");
 
                 return 1;       # P2.2, P3.0
             }
@@ -3078,7 +3080,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
             my $err = "";
             $err = $dbh->errstr unless defined $ret;
             $ret ||= "";
-            $self->verbose(1,"(uploader)ins_perms[$ins_perms]ret[$ret]err[$err]\n");
+            $self->verbose(1,"Package is new: (uploader)ins_perms[$ins_perms]ret[$ret]err[$err]\n");
 
         }
         $self->verbose(1,sprintf( # just for debugging
@@ -3136,7 +3138,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
             ||
             $package =~ /:::/
            ){
-            $self->verbose(1,"package[$package] did not pass the ultimate sanity check");
+            $self->verbose(1,"Package[$package] did not pass the ultimate sanity check");
             delete $self->{FIO};    # circular reference
             return;
         }
@@ -3222,7 +3224,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
 
 
         my($opack,$oldversion,$odist,$ofilemtime,$ofile) = $sth_pack->fetchrow_array;
-        $self->verbose(1,"opack[$opack]oldversion[$oldversion]".
+        $self->verbose(1,"Old package data: opack[$opack]oldversion[$oldversion]".
                        "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]\n");
         my $MLROOT = $self->mlroot;
         my $odistmtime = (stat "$MLROOT/$odist")[9];
@@ -3248,7 +3250,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
         $distorperlok ||= $something1 && $something2 &&
             $something1 eq $something2 && !$oisaperl;
 
-        $self->verbose(1, "package[$package]infile[$pp->{infile}]".
+        $self->verbose(1, "New package data: package[$package]infile[$pp->{infile}]".
                        "distorperlok[$distorperlok]oldversion[$oldversion]".
                        "odist[$odist]\n");
 
@@ -3316,7 +3318,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Perm
             }
         } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
             # higher VERSION here
-            $self->verbose(1, "$package version better ".
+            $self->verbose(1, "Package '$package' has newer version ".
                            "[$pp->{version} > $oldversion] $dist wins\n");
             $ok++;
         } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
@@ -3357,6 +3359,7 @@ has a higher version number ($oldversion)},
 
             if ($pp->{version} eq "undef"||$pp->{version} == 0) { # no version here,
                 if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
+                    # XXX needs better logging message -- dagolden, 2011-08-13
                     $self->verbose(1, "$package noversion comp $dist vs $odist: >=\n");
                     $ok++;
                 } else {
@@ -3372,6 +3375,7 @@ also has a zero version number and the distro has a more recent modification tim
             } elsif (CPAN::Version
                      ->vcmp($pp->{version},
                             $oldversion)==0) {    # equal version here
+                # XXX needs better logging message -- dagolden, 2011-08-13
                 $self->verbose(1, "$package version eq comp $dist vs $odist\n");
                 if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
                     $ok++;
@@ -3403,6 +3407,7 @@ has the same version number and the distro has a more recent modification time.}
                 $self->verbose(1,
                                "Warning: we ARE NOT simile BUT WE HAVE BEEN ".
                                "simile some time earlier:\n");
+                # XXX need a better way to log data -- dagolden, 2011-08-13
                 $self->verbose(1,Data::Dumper::Dumper($pp), "\n");
                 $ok = 0;
             }
@@ -3412,7 +3417,7 @@ has the same version number and the distro has a more recent modification time.}
 
             my $query = qq{UPDATE packages SET version = ?, dist = ?, file = ?,
 filemtime = ?, pause_reg = ? WHERE package = ?};
-            $self->verbose(1,"Q: [$query]$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
+            $self->verbose(1,"Updating package: [$query]$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
             $dbh->do($query,
                      undef,
                      $pp->{version},
@@ -3453,12 +3458,11 @@ filemtime = ?, pause_reg = ? WHERE package = ?};
         my $dist = $self->{DIST};
         my $pp = $self->{PP};
         my $pmfile = $self->{PMFILE};
-        $self->verbose(1,"First time here, eh?\n");
         my $query = qq{INSERT INTO packages
  (package, version, dist, file, filemtime, pause_reg)
 VALUES (?,?,?,?,?,?)
 };
-        $self->verbose(1,"Q: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
+        $self->verbose(1,"Inserting package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
         $dbh->do($query,
                  undef,
                  $package,
@@ -3514,7 +3518,7 @@ VALUES (?,?,?,?,?,?)
         $err = $dbh->errstr unless defined $ret;
         $ret ||= "";
         $self->verbose(1,
-                       "into primeur package[$package]userid[$userid]ret[$ret]".
+                       "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
                        "err[$err]\n");
     }
 
