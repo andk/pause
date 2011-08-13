@@ -10,22 +10,16 @@ sub new {
 }
 
 sub new_from_userid {
-  my($class,$userid,$opt) = @_;
-  my $dbh = $opt->{dbh} ||
-      DBI->connect(
-                   $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-                   $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-                   $PAUSE::Config->{MOD_DATA_SOURCE_PW},
+  my($class,$userid) = @_;
+  my $dbh = DBI->connect(
+                   $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
+                   $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
+                   $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
                    { RaiseError => 1 }
                   )
           or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
-  my $dsn = $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME};
-  my(undef,undef,$dbname) = split /:/, $dsn;
-  if ($dbname =~ /;/) {
-      ($dbname) = $dsn =~ /database=(\w+)/;
-  }
   my $sth = $dbh->prepare("SELECT secretemail
-                             FROM $dbname.$PAUSE::Config->{AUTHEN_USER_TABLE}
+                             FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
                              WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
   $sth->execute($userid);
   my $me = {};
@@ -37,6 +31,13 @@ sub new_from_userid {
     $me->{address} = $addr;
     $me->{is_secret} = 1;
   } else {
+    my $dbh = DBI->connect(
+                    $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
+                    $PAUSE::Config->{MOD_DATA_SOURCE_USER},
+                    $PAUSE::Config->{MOD_DATA_SOURCE_PW},
+                    { RaiseError => 1 }
+                    )
+            or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
     $sth = $dbh->prepare("SELECT email FROM users WHERE userid=?");
     $sth->execute($userid);
     if ($sth->rows >= 0){
