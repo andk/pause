@@ -291,10 +291,15 @@ SET ustatus='active', ustatus_ch=? WHERE ustatus<>'nologin' AND userid=?");
     $sth->finish;
 }
 
+sub _time_string {
+  my ($self, $s) = @_;
+  my $time = Time::Piece->new($s);
+  return join q{ }, $time->ymd, $time->hms;
+}
+
 sub _now_string {
   my ($self) = @_;
-  my $time = Time::Piece->new;
-  return join q{ }, $time->ymd, $time->hms;
+  return $self->_time_string(time);
 }
 
 sub connect {
@@ -1410,9 +1415,14 @@ sub mlroot {
                 }
             }
             if ($mtime > $otherts) {
-                $dbh->do(qq{UPDATE distmtimes
-                     SET distmtime='$mtime', distmdatetime=from_unixtime('$mtime')
-                   WHERE dist='$dist'});
+                $dbh->do(
+                  qq{UPDATE distmtimes SET distmtime=?, distmdatetime=?
+                   WHERE dist=?},
+                   undef,
+                   $mtime,
+                   $self->_time_string($mtime),
+                   $dist,
+                );
                 $self->verbose(1,"DEBUG5: mtime assigned [$mtime] to dist[$dist]\n");
                 return 1;
             }
