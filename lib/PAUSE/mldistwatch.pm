@@ -19,6 +19,7 @@ use ExtUtils::Manifest;
 use Fcntl qw();
 use File::Basename ();
 use File::Copy ();
+use File::Spec ();
 use File::Temp 0.14 (); # begin of OO interface
 use HTTP::Date ();
 use JSON ();
@@ -108,7 +109,7 @@ sub new {
 
     my $fh;
     unless ($opt->{pick}) { # pick files shall not block full run
-        my $pidfile = "/var/run/mldistwatch.pid";
+        my $pidfile = File::Spec->catfile( $PAUSE::Config->{PID_DIR}, 'mldistwatch.pid');
         if (open $fh, "+>>", $pidfile) {
             if (flock $fh, LOCK_EX|LOCK_NB) {
                 truncate $fh, 0 or die;

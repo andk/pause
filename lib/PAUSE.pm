@@ -80,6 +80,7 @@ $PAUSE::Config ||=
      MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
      NO_SUCCESS_BREAK => 900,
      P5P => 'release-announce@perl.org',
+     PID_DIR => "/var/run/",
      PAUSE_LOG => "/home/k/PAUSE/log/paused.log",
      PAUSE_LOG_DIR => "/home/k/PAUSE/log/",
      PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
