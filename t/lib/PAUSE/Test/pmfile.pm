@@ -85,8 +85,9 @@ sub filter_ppps :Test :Plan(3) {
   if ($expect->{reason}) {
     my $reason = $expect->{reason};
     if ($no_index) {
-      $reason = ($expect->{skip} ? "" : "NOT ")
-        . "Skipping ppp[$ppp] $reason";
+      $reason = ($expect->{skip})
+              ? "Skipping ppp[$ppp] $reason"
+              : "NOT skipping ppp[$ppp] $reason";
     }
     $self->{dist}->next_call_ok(verbose => [ 1, $reason ]);
     $self->{dist}->next_call_ok(verbose => [ 1, "Result of filter_ppps: res[@res]" ]);
