@@ -22,6 +22,7 @@ WriteMakefile(
     Cwd
     DB_File
     DBI
+    DBIx::RunSQL
     Devel::Peek
     Dumpvalue
     Email::Address

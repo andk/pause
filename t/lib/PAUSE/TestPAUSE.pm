@@ -5,6 +5,7 @@ use MooseX::StrictConstructor;
 use autodie;
 
 use DBI;
+use DBIx::RunSQL;
 use File::Copy::Recursive qw(dircopy);
 use File::Path qw(make_path);
 use File::pushd;
@@ -26,9 +27,17 @@ has author_root => (
 sub deploy_schemas_at {
   my ($self, $dir) = @_;
 
-  # DESPERATELY EVIL -- rjbs, 2011-08-13
-  `sqlite3 "$dir/authen.sqlite" < doc/schemas/authen_pause.schema.sqlite`;
-  `sqlite3 "$dir/mod.sqlite"    < doc/schemas/mod.schema.sqlite`;
+  my %schemas = (
+    authen => "doc/schemas/authen_pause.schema.sqlite",
+    mod => "doc/schemas/mod.schema.sqlite",
+  );
+
+  while ( my ($db,$sql) = each %schemas ) {
+    DBIx::RunSQL->create(
+      dsn => "dbi:SQLite:dbname=$dir/$db.sqlite",
+      sql => $sql,
+    );
+  }
 }
 
 sub test_reindex {
