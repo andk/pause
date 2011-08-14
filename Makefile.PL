@@ -20,6 +20,7 @@ WriteMakefile(
     Class::Singleton
     Compress::Zlib
     Cwd
+    DB_File
     DBI
     Devel::Peek
     Dumpvalue
