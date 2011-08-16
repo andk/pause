@@ -88,7 +88,7 @@ use Test::More;
     # emails for ABH
     BEGIN { $tests+=1 }
     my $resp = _ua->get("$root/pause/authenquery?ACTION=email_for_admin;OF=YAML");
-    like $resp->decoded_content, qr/\bANDK:\s.+franz\b/, "found andk on host franz";
+    like $resp->decoded_content, qr/\bANDK:\s.+franz\b/, "found andk on host $hostname";
 }
 
 BEGIN { plan tests => $tests }
