@@ -45,7 +45,7 @@ number</b>. For security reasons you will never be able to upload a
 file with identical name again. This strict requirement does have one
 exception: documentation files may be overwritten. There's a simple
 regular expression that draws the line between docu and code:
-<code>/(readme|\.html|\.txt|\.[xy]ml|\.[pr]df|\.pod)$/i</code><!--
+<code>/(readme|\.html|\.txt|\.[xy]ml|\.json|\.[pr]df|\.pod)(\.gz|\.bz2)?$/i</code><!--
 see pause_1999/edit.pm: ALLOW_OVERWRITE -->. Filenames matching this
 regexp can be uploaded as often as you like. By the way: it is highly
 appreciated if your packages come tarred and gzipped with a
