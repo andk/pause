@@ -1,34 +1,81 @@
-my $tests;
-BEGIN { $tests = 0 }
+use strict;
+use warnings;
+
+use lib 't/lib';
+
+use Email::Sender::Transport::Test;
+$ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
+
+use File::Spec;
+use PAUSE;
+use PAUSE::TestPAUSE;
+
+use Test::Deep;
 use Test::More;
-use PAUSE::mldistwatch;
 
-{
-    my %p;
-    BEGIN {
-        %p =
-            (
-             "C/CB/CBAIL/perl5_003.tar-gz" => 1,
-             "A/AN/ANDYD/perl5.003_07.tar.gz" => 1,
-             "T/TI/TIMB/perl5.004_04.tar.gz" => 1,
-             "I/IN/INGY/perl5-0.02.tar.gz" => 0,
-             "D/DA/DAPM/perl-5.10.1.tar.bz2" => 1,
-             "N/NW/NWCLARK/perl-5.8.9.tar.gz" => 1,
-             "J/JE/JESSE/perl-5.14.0-RC3.tar.gz" => 0,
-             "B/BI/BINGOS/perl-5.13.7.tar.gz" => 0,
-             "J/JE/JESSE/perl-5.14.0.tar.gz" => 1,
-            );
-        $tests += keys %p;
-    }
-    for my $k (sort keys %p) {
-        my $expect = $p{$k};
-        is(PAUSE::dist->isa_regular_perl($k)||0, $expect, $k);
-    }
-}
+my $result = PAUSE::TestPAUSE->new({
+  author_root => 'corpus/authors',
+})->test_reindex;
 
-BEGIN { plan tests => $tests }
+ok(
+  -e $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  "our indexer indexed",
+);
 
-# Local Variables:
-# mode: cperl
-# cperl-indent-level: 4
-# End:
+my @want = (
+  { package => 'Bug::Gold',      version => '9.001' },
+  { package => 'Hall::MtKing',   version => '0.01'  },
+  { package => 'XForm::Rollout', version => '1.00'  },
+  { package => 'Y',              version => 2       },
+);
+
+subtest "tests with the data in the modules db" => sub {
+  my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
+    'SELECT * FROM packages ORDER BY package, version',
+    { Slice => {} },
+  );
+
+  cmp_deeply(
+    $pkg_rows,
+    [ map {; superhashof($_) } @want ],
+    "we db-inserted exactly the dists we expected to",
+  );
+};
+
+subtest "tests with the parsed 02packages data" => sub {
+  my $p = $result->packages_data;
+
+  my @packages = sort { $a->package cmp $b->package } $p->packages;
+
+  cmp_deeply(
+    \@packages,
+    [ map {; methods(%$_) } @want ],
+    "we built exactly the 02packages we expected",
+  );
+};
+
+# PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz
+# PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz
+# PAUSE indexer report XYZZY/Hall-MtKing-0.01.tar.gz
+# PAUSE indexer report XYZZY/Y-2.tar.gz
+
+subtest "tests for the emails we sent out" => sub {
+  my @deliveries = sort {
+    $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
+  } Email::Sender::Simple->default_transport->deliveries;
+
+  my @subj_want = (
+    'PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz',
+    'PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz',
+    'PAUSE indexer report XYZZY/Hall-MtKing-0.01.tar.gz',
+    'PAUSE indexer report XYZZY/Y-2.tar.gz',
+  );
+
+  is_deeply(
+    [ map {; $_->{email}->get_header('Subject') } @deliveries ],
+    \@subj_want,
+    "we sent mail with the right subjects",
+  );
+};
+
+done_testing;

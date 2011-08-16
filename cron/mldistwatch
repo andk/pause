@@ -80,9 +80,9 @@ MAIN: {
     }
     my $mldw = PAUSE::mldistwatch->new(\%Opt);
     if ($Opt{rewrite}) {
-        $mldw->work2;
+        $mldw->rewrite_indexes;
     } else {
-        $mldw->work;
+        $mldw->reindex;
     }
 }
 
