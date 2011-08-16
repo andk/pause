@@ -57,7 +57,7 @@ use DB_File;
 use Fcntl qw(O_RDWR O_CREAT);
 use File::Find;
 use File::Path qw(rmtree mkpath);
-our $Id = q$Id$;
+our $Id = "PAUSE version $PAUSE::VERSION";
 our $MAINTAIN_SYMLINKTREE = 1;
 
 use Fcntl qw(:flock);
@@ -121,7 +121,6 @@ sub sleep {
 
 sub verbose {
     my($self,$level,@what) = @_;
-    our $Id;
     unless (@what) {
         @what = ("warning: verbose called without \@what: ", $level);
         $level = 1;
@@ -464,7 +463,6 @@ sub checkfornew {
         $self->verbose(1,$alert); # summary
         if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
         } else {
-            our $Id;
             my $email = Email::MIME->create(
                 header_str => [
                     To      => $PAUSE::Config->{ADMIN},
@@ -476,7 +474,7 @@ sub checkfornew {
                   content_type => 'text/plain',
                   encoding     => 'quoted-printable',
                 },
-                body_str => join(qq{\n\n}, "Not indexed.\n\t$Id", $alert),
+                body_str => join(qq{\n\n}, "Not indexed.\n\n\t$Id", $alert),
             );
 
             sendmail($email);
@@ -497,7 +495,6 @@ sub empty_dir {
 
 sub rewrite02 {
     my $self = shift;
-    our $Id;
     #
     # Rewriting 02packages.details.txt
     #
@@ -997,7 +994,6 @@ maintainer
 
 sub rewrite03 {
     my($self) = shift;
-    our $Id;
     #
     # Rewriting 03modlist.data
     #
@@ -1101,7 +1097,6 @@ Date:        %s
 
 sub rewrite06 {
     my($self) = shift;
-    our $Id;
     #
     # Rewriting 06perms.txt
     #
