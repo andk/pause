@@ -1,0 +1,19 @@
+# CHECKSUMS file written on Mon Apr 18 10:35:22 2011 GMT by CPAN::Checksums (v2.07)
+$cksum = {
+  'Bug-Gold-9.001.tar.gz' => {
+    'md5' => 'a450f562155ff2173923d42dd34b5277',
+    'md5-ungz' => '6b3b44272f49c8f3cd5b9972dd48cce3',
+    'mtime' => '2011-04-18',
+    'sha256' => '168e272bc72c4e80afbbbcac9746b816c3922742a504a8449ff112063ceb0204',
+    'sha256-ungz' => 'e2d3b15d1c0418bd0209f0a32f070698ea8a36f999f6b20a5dd91a33638440d7',
+    'size' => 660
+  },
+  'XForm-Rollout-1.00.tar.gz' => {
+    'md5' => 'a2d5abfc9065cb4dde779cf0e3867a2a',
+    'md5-ungz' => '8e7cb18710dc9ef63e063e59105b6c7d',
+    'mtime' => '2011-04-18',
+    'sha256' => 'ab2498b621f6280b722a204b5d01dc751cebd5caf5da0b8965c741ff91daeb20',
+    'sha256-ungz' => '0c20be27b5400fbae08fcbc594c0ee3f118867f5f91bb17bc09612d8ab3dff61',
+    'size' => 667
+  }
+};

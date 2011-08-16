@@ -1,0 +1,208 @@
+-- 
+-- Created by SQL::Translator::Producer::SQLite
+-- Created on Sat Aug 13 10:46:04 2011
+-- 
+
+BEGIN TRANSACTION;
+
+--
+-- Table: applymod
+--
+CREATE TABLE applymod (
+  modid varchar(64) NOT NULL DEFAULT '',
+  statd char(1) NOT NULL DEFAULT '',
+  stats char(1) NOT NULL DEFAULT '',
+  statl char(1) NOT NULL DEFAULT '',
+  stati char(1) NOT NULL DEFAULT '',
+  statp char(1) NOT NULL DEFAULT '',
+  chapterid int(10) NOT NULL DEFAULT 0,
+  description varchar(88) NOT NULL DEFAULT '',
+  userid varchar(10) NOT NULL DEFAULT '',
+  communities varchar(120) NOT NULL DEFAULT '',
+  similar varchar(120) NOT NULL DEFAULT '',
+  rationale text,
+  PRIMARY KEY (modid)
+);
+
+--
+-- Table: chapters
+--
+CREATE TABLE chapters (
+  chapterid int(10) NOT NULL DEFAULT 0,
+  longtitle char(80) NOT NULL DEFAULT '',
+  shorttitle char(40) NOT NULL DEFAULT ''
+);
+
+--
+-- Table: deletes
+--
+CREATE TABLE deletes (
+  deleteid char(255) NOT NULL DEFAULT '',
+  changed char(10) DEFAULT NULL,
+  changedby char(10) DEFAULT NULL,
+  PRIMARY KEY (deleteid)
+);
+
+--
+-- Table: distmtimes
+--
+CREATE TABLE distmtimes (
+  dist char(128) NOT NULL DEFAULT '',
+  distmtime char(10) DEFAULT NULL,
+  distmdatetime datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  indexing_at datetime DEFAULT NULL,
+  indexed_at datetime DEFAULT NULL,
+  PRIMARY KEY (dist)
+);
+
+--
+-- Table: list2user
+--
+CREATE TABLE list2user (
+  maillistid char(10) NOT NULL DEFAULT '',
+  userid char(10) NOT NULL DEFAULT ''
+);
+
+CREATE INDEX userid ON list2user (userid);
+
+--
+-- Table: maillists
+--
+CREATE TABLE maillists (
+  maillistid char(10) NOT NULL DEFAULT '',
+  maillistname char(64) DEFAULT NULL,
+  address char(64) DEFAULT NULL,
+  subscribe char(255) DEFAULT NULL,
+  changed char(10) DEFAULT NULL,
+  changedby char(10) DEFAULT NULL,
+  PRIMARY KEY (maillistid)
+);
+
+--
+-- Table: messages
+--
+CREATE TABLE messages (
+  c INTEGER PRIMARY KEY NOT NULL,
+  mfrom varchar(10) NOT NULL DEFAULT '',
+  mto varchar(10) NOT NULL DEFAULT '',
+  created datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  message text NOT NULL,
+  mstatus enum(7) NOT NULL DEFAULT 'active'
+);
+
+--
+-- Table: mlas
+--
+CREATE TABLE mlas (
+  mlaid char(64) NOT NULL DEFAULT '',
+  userid char(10) DEFAULT NULL,
+  admin char(64) DEFAULT NULL,
+  comment char(255) DEFAULT NULL,
+  changed char(10) DEFAULT NULL,
+  changedby char(10) DEFAULT NULL,
+  PRIMARY KEY (mlaid)
+);
+
+--
+-- Table: mods
+--
+CREATE TABLE mods (
+  modid varchar(128) NOT NULL DEFAULT '',
+  mlstatus enum(6) NOT NULL DEFAULT 'list',
+  statd char(1) NOT NULL DEFAULT '',
+  stats char(1) NOT NULL DEFAULT '',
+  statl char(1) NOT NULL DEFAULT '',
+  stati char(1) NOT NULL DEFAULT '',
+  statp char(1) NOT NULL DEFAULT '',
+  description varchar(88) NOT NULL DEFAULT '',
+  userid varchar(10) NOT NULL DEFAULT '',
+  chapterid int(10) NOT NULL DEFAULT 0,
+  introduced varchar(10) DEFAULT NULL,
+  changed varchar(10) DEFAULT NULL,
+  changedby varchar(10) DEFAULT NULL,
+  PRIMARY KEY (modid)
+);
+
+--
+-- Table: packages
+--
+CREATE TABLE packages (
+  package varchar(128) NOT NULL DEFAULT '',
+  version varchar(16) NOT NULL DEFAULT '',
+  dist varchar(128) NOT NULL DEFAULT '',
+  file varchar(128) NOT NULL DEFAULT '',
+  filemtime varchar(10) NOT NULL DEFAULT '',
+  pause_reg varchar(10) NOT NULL DEFAULT '',
+  comment varchar(255) NOT NULL DEFAULT '',
+  status enum(7) NOT NULL DEFAULT 'index',
+  PRIMARY KEY (package)
+);
+
+--
+-- Table: perms
+--
+CREATE TABLE perms (
+  c INTEGER PRIMARY KEY NOT NULL,
+  package char(245) NOT NULL DEFAULT '',
+  userid char(10) NOT NULL DEFAULT ''
+);
+
+CREATE INDEX package ON perms (package);
+
+CREATE INDEX userid02 ON perms (userid);
+
+CREATE UNIQUE INDEX pack_user ON perms (package, userid);
+
+--
+-- Table: primeur
+--
+CREATE TABLE primeur (
+  package char(245) NOT NULL DEFAULT '',
+  userid char(10) NOT NULL DEFAULT '',
+  PRIMARY KEY (package)
+);
+
+--
+-- Table: uris
+--
+CREATE TABLE uris (
+  uriid char(255) NOT NULL DEFAULT '',
+  userid char(10) NOT NULL DEFAULT '',
+  basename char(245) NOT NULL DEFAULT '',
+  uri char(255) NOT NULL DEFAULT '',
+  mirrorit char(10) NOT NULL DEFAULT '',
+  dscheduled char(10) NOT NULL DEFAULT '',
+  dgot char(10) NOT NULL DEFAULT '',
+  dverified char(10) NOT NULL DEFAULT '',
+  nosuccesstime char(10) NOT NULL DEFAULT '',
+  nosuccesscount char(4) NOT NULL DEFAULT '',
+  mailto_p5p char(1) NOT NULL DEFAULT '',
+  changed char(10) NOT NULL DEFAULT '',
+  changedby char(10) NOT NULL DEFAULT '',
+  PRIMARY KEY (uriid)
+);
+
+CREATE INDEX uri ON uris (uri);
+
+CREATE UNIQUE INDEX useridbase ON uris (userid, basename);
+
+--
+-- Table: users
+--
+CREATE TABLE users (
+  userid char(10) NOT NULL DEFAULT '',
+  ustatus enum(7) NOT NULL DEFAULT 'unused',
+  ustatus_ch datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  email char(255) NOT NULL DEFAULT '',
+  cpan_mail_alias enum(4) NOT NULL DEFAULT 'none',
+  homepage char(255) NOT NULL DEFAULT '',
+  fullname char(255) DEFAULT NULL,
+  asciiname char(255) DEFAULT NULL,
+  isa_list char(1) NOT NULL DEFAULT '',
+  introduced char(10) NOT NULL DEFAULT '',
+  changed char(10) NOT NULL DEFAULT '',
+  changedby char(10) NOT NULL DEFAULT '',
+  PRIMARY KEY (userid)
+);
+
+COMMIT;

@@ -4,7 +4,7 @@ use warnings;
 package PAUSE::Tester;
 
 use Test::FITesque;
-use YAML::Syck;
+use YAML::XS;
 use File::Basename;
 
 sub import {
@@ -46,7 +46,7 @@ sub run {
         my $method = basename($_, '.yaml');
         map {
           [ $method, $_ ]
-        } grep { defined } YAML::Syck::LoadFile($_);
+        } grep { defined } YAML::XS::LoadFile($_);
       } <$data_dir/*.yaml>
     }
   };

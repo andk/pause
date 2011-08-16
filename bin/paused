@@ -375,7 +375,7 @@ sub woe {
     $asciiname ||= $fullname;
     $asciiname =~ s/[^\0-\177]/?/g;
     my @To;
-    my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+    my $pma = PAUSE::MailAddress->new_from_userid($userid);
     my $to  = $pma->address;
     push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
 
@@ -446,7 +446,7 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
     $asciiname ||= $fullname;
     $asciiname =~ s/[^\0-\177]/?/g;
     my @To;
-    my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+    my $pma = PAUSE::MailAddress->new_from_userid($userid);
     my $address  = $pma->address;
     push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
 
@@ -509,7 +509,7 @@ sub welcome_file {
   $asciiname ||= $fullname;
   $asciiname =~ s/[^\0-\177]/?/g;
   my $dbh = $self->{DBH};
-  my $pma = PAUSE::MailAddress->new_from_userid($userid,{dbh => $dbh});
+  my $pma = PAUSE::MailAddress->new_from_userid($userid);
   my $address  = $pma->address;
   my @To = qq{"$asciiname" <$address>};
   unless ($PAUSE::Config->{TESTHOST}) {

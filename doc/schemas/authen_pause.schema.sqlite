@@ -1,0 +1,42 @@
+-- 
+-- Created by SQL::Translator::Producer::SQLite
+-- Created on Sat Aug 13 10:46:32 2011
+-- 
+
+BEGIN TRANSACTION;
+
+--
+-- Table: abrakadabra
+--
+CREATE TABLE abrakadabra (
+  user char(16) NOT NULL DEFAULT '',
+  chpasswd char(32) NOT NULL DEFAULT '',
+  expires datetime DEFAULT NULL,
+  PRIMARY KEY (user)
+);
+
+--
+-- Table: grouptable
+--
+CREATE TABLE grouptable (
+  user char(12) NOT NULL DEFAULT '',
+  ugroup char(8) NOT NULL DEFAULT ''
+);
+
+CREATE UNIQUE INDEX user_ugroup ON grouptable (user, ugroup);
+
+--
+-- Table: usertable
+--
+CREATE TABLE usertable (
+  user char(12) NOT NULL DEFAULT '',
+  password char(13) DEFAULT NULL,
+  secretemail char(255) DEFAULT NULL,
+  forcechange tinyint(4) DEFAULT 0,
+  changed int(11) DEFAULT NULL,
+  changedby char(10) DEFAULT NULL,
+  lastvisit datetime DEFAULT NULL,
+  PRIMARY KEY (user)
+);
+
+COMMIT;

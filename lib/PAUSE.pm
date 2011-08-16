@@ -22,6 +22,7 @@ use IO::File ();
 use MD5 ();
 use Mail::Send ();
 use Sys::Hostname ();
+use Time::Piece;
 use YAML::Syck;
 
 my $USE_RECENTFILE_HOOKS = Sys::Hostname::hostname =~ /pause/;
@@ -70,6 +71,7 @@ $PAUSE::Config ||=
      FTPPUB => '/home/ftp/pub/PAUSE/',
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP => '/bin/gzip',
+     GZIP_OPTIONS => '--best --rsyncable',
      HOME => '/home/k/',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log',
      INCOMING => 'ftp://pause.perl.org/incoming/',
@@ -77,9 +79,14 @@ $PAUSE::Config ||=
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
      MLROOT => '/home/ftp/pub/PAUSE/authors/id/', # originally module list root
+     ML_CHOWN_USER => qq{UNSAFE},
+     ML_CHOWN_GROUP => qq{UNSAFE},
+     ML_MIN_INDEX_LINES => 1_000, # 02packages must be this long
+     ML_MIN_FILES => 20_000, # must be this many files to run mldistwatch
      MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
      NO_SUCCESS_BREAK => 900,
      P5P => 'release-announce@perl.org',
+     PID_DIR => "/var/run/",
      PAUSE_LOG => "/home/k/PAUSE/log/paused.log",
      PAUSE_LOG_DIR => "/home/k/PAUSE/log/",
      PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
@@ -97,7 +104,8 @@ $PAUSE::Config ||=
      TMP => '/home/ftp/tmp/',
      UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
-     CHECKSUMS_SIGNING_PROGRAM => ('gpg --homedir /home/k/PAUSE/111_sensi'.
+     CHECKSUMS_SIGNING_PROGRAM => ('gpg'),
+     CHECKSUMS_SIGNING_ARGS => ('--homedir /home/k/PAUSE/111_sensi'.
                                    'tive/gnupg-pause-batch-signing-home  '.
                                    '--clearsign --default-key '),
      CHECKSUMS_SIGNING_KEY => '450F89EC',
@@ -162,8 +170,8 @@ sub filehash {
   my($ret,$authorfile,$size,$md5,$hexdigest);
   $ret = "";
   if (substr($file,0,length($Config->{MLROOT})) eq $Config->{MLROOT}) {
-    $authorfile = "\$CPAN/authors/id/" . 
-	substr($file,length($Config->{MLROOT}));
+    $authorfile = "\$CPAN/authors/id/" .
+    substr($file,length($Config->{MLROOT}));
   } else {
     $authorfile = $file;
   }
@@ -330,8 +338,8 @@ sub gtest {
   my($buffer);
   my $gz;
   unless (
-	  $gz = Compress::Zlib::gzopen($read, "rb")
-	 ) {
+    $gz = Compress::Zlib::gzopen($read, "rb")
+  ) {
     warn("Cannot open $read: $!\n");
     return;
   }
@@ -361,7 +369,7 @@ our @common_args =
      comment => "These files are part of the CPAN mirroring concept, described in File::Rsync::Mirror::Recent",
     );
 
-sub newfile_hook ($) {
+sub newfile_hook {
   return unless $USE_RECENTFILE_HOOKS;
   my($f) = @_;
   my $rf;
@@ -387,7 +395,7 @@ sub newfile_hook ($) {
   $rf->update($f,"new");
 }
 
-sub delfile_hook ($) {
+sub delfile_hook {
   return unless $USE_RECENTFILE_HOOKS;
   my($f) = @_;
   my $rf;
@@ -411,6 +419,17 @@ sub delfile_hook ($) {
        aggregator => [qw(1d 1W Z)],
       );
   $rf->update($f,"delete");
+}
+
+sub _time_string {
+  my ($self, $s) = @_;
+  my $time = Time::Piece->new($s);
+  return join q{ }, $time->ymd, $time->hms;
+}
+
+sub _now_string {
+  my ($self) = @_;
+  return $self->_time_string(time);
 }
 
 1;

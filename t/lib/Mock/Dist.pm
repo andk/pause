@@ -5,6 +5,7 @@ package Mock::Dist;
 
 use base qw(Test::MockObject);
 use Test::More ();
+use Test::Deep ();
 
 my $null = sub {};
 
@@ -31,7 +32,7 @@ sub next_call_ok {
     $label =~ s/\n$//;
     $label =~ s/\n.+$/.../s;
   }
-  Test::More::is_deeply(
+  Test::Deep::cmp_deeply(
     [ $self->next_call ],
     [ $method => [ $self, @$args ] ],
     $label,

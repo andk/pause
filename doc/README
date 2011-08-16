@@ -220,4 +220,10 @@ repository because they are so basic stuff for any UNIX machine:
 and probably more. If you discover pieces that are important but
 missing in the repository or documentation, please let us know.
 
+=head2 Undocumented
+
+Other things that need to be setup somehow:
+
+  gpg signing key
+
 =cut
