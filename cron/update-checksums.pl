@@ -54,6 +54,7 @@ use File::Spec;
 use File::Temp;
 use Getopt::Long;
 use Hash::Util qw(lock_keys);
+use Pod::Usage;
 
 our %Opt;
 lock_keys %Opt, map { /([^=\|!]+)/ } @opt;
