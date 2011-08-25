@@ -60,7 +60,9 @@ lock_keys %Opt, map { /([^=\|!]+)/ } @opt;
 GetOptions(\%Opt,
            @opt,
           ) or pod2usage(1);
-
+if ($Opt{help}) {
+    pod2usage(1);
+}
 
 use CPAN::Checksums 1.018;
 use File::Copy qw(cp);
