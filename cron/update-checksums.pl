@@ -1,5 +1,67 @@
 #!/usr/local/bin/perl -w
 
+# use 5.010;
+use strict;
+use warnings;
+
+=head1 NAME
+
+
+
+=head1 SYNOPSIS
+
+
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--debug!>
+
+trace directories and timings etc.
+
+=item B<--help|h!>
+
+This help
+
+=item B<--max=i>
+
+stop running after that many signatures
+
+=back
+
+=head1 DESCRIPTION
+
+
+
+=cut
+
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+BEGIN {
+    push @INC, qw(       );
+}
+
+use Dumpvalue;
+use File::Basename qw(dirname);
+use File::Path qw(mkpath);
+use File::Spec;
+use File::Temp;
+use Getopt::Long;
+use Hash::Util qw(lock_keys);
+
+our %Opt;
+lock_keys %Opt, map { /([^=]+)/ } @opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(1);
+
+
 use CPAN::Checksums 1.018;
 use File::Copy qw(cp);
 use File::Find;
@@ -11,12 +73,6 @@ use strict;
 use lib "/home/k/PAUSE/lib";
 use PAUSE ();
 
-use Getopt::Long;
-our %Opt;
-GetOptions(\%Opt,
-           "max=i",
-           "debug!",
-          ) or die;
 $Opt{debug} ||= 0;
 if ($Opt{debug}) {
   warn "Debugging on. CPAN::Checksums::VERSION[$CPAN::Checksums::VERSION]";
