@@ -56,7 +56,7 @@ use Getopt::Long;
 use Hash::Util qw(lock_keys);
 
 our %Opt;
-lock_keys %Opt, map { /([^=]+)/ } @opt;
+lock_keys %Opt, map { /([^=\|!]+)/ } @opt;
 GetOptions(\%Opt,
            @opt,
           ) or pod2usage(1);
