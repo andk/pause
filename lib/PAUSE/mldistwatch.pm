@@ -163,8 +163,22 @@ sub reindex {
     $self->checkfornew($testdir);
     chdir $startdir or die "Could not chdir to '$startdir'";
     rmtree $testdir;
-    return if $self->{OPT}{pick};
-    $self->rewrite_indexes;
+    return $self->{OPT}{pick} ? $self->rewrite_module_indexes : $self->rewrite_indexes;
+}
+
+# only rewrite those indexes, which needs update after a new upload
+sub rewrite_module_indexes {
+  my $self = shift;
+  $self->rewrite02();
+  my $MLROOT = $self->mlroot;
+  chdir $MLROOT
+      or die "Couldn't chdir to $MLROOT: $!";
+  $self->rewrite01();
+  $self->rewrite06();
+  $self->verbose(1, sprintf(
+                            "Finished rewrite03 and everything at %s\n",
+                            scalar localtime
+                           ));
 }
 
 sub rewrite_indexes {
