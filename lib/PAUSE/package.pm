@@ -201,11 +201,12 @@ sub perm_check {
       # we have a package that is already known
 
       for ($package,
-            $pp->{version},
             $dist,
             $pp->{infile}) {
           $_ ||= '';
       }
+      $pp->{version} = '' unless defined $pp->{version}; # accept version 0
+
       my($p,$owner,@owner);
       while (($p,$owner) = $sth_perms->fetchrow_array) {
           push @owner, $owner; # array for debugging statement

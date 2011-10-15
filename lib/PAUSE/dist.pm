@@ -745,7 +745,7 @@ sub examine_pms {
       );
       $fio->examine_fio;
     }
-  } elsif (2==$indexingrule) { # no pmfiles but at least a yaml
+  } elsif (2==$indexingrule) { # a yaml with provides
     while (my($k,$v) = each %$provides) {
       $v->{infile} = "$v->{file}";
       my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
