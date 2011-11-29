@@ -531,10 +531,14 @@ sub rewrite02 {
         my $infile = $row[0];
         $infile =~ s/^.+:://;
         next unless $row[3];
-        next unless index($row[3],"$infile.pm")>=0
-            or $row[3]=~/VERSION/i # VERSION is Russ Allbery's idea to
-                                   # force inclusion
-                or $row[3] eq "missing in META.yml, tolerated by PAUSE indexer";
+        # 2011-11-29: dropping the following sanity check after DHUNT
+        # PDL::NetCDF 4.15: hidden sanity checks stop being plausible
+        # when everybody has forgotten them.
+
+        #next unless index($row[3],"$infile.pm")>=0
+        #    or $row[3]=~/VERSION/i # VERSION is Russ Allbery's idea to
+        #                           # force inclusion
+        #        or $row[3] eq "missing in META.yml, tolerated by PAUSE indexer";
         $row[1] =~ s/^\+//;
         $one=30;
         $two=8;
