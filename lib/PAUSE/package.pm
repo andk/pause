@@ -341,14 +341,12 @@ sub examine_pkg {
                               qq{The PAUSE indexer was not able to
         parse the following line in that file: C< $err->{line} >
 
-        Note: the indexer is running in a Safe compartement and
-        cannot provide the full functionality of perl in the
-        VERSION line. It is trying hard, but sometime it fails.
-        As a workaround, please consider writing a proper
-        META.yml that contains a 'provides' attribute (currently
-        only supported by Module::Build) or contact the CPAN
-        admins to investigate (yet another) workaround against
-        "Safe" limitations.)},
+        Note: the indexer is running in a Safe compartement and cannot
+        provide the full functionality of perl in the VERSION line. It
+        is trying hard, but sometime it fails. As a workaround, please
+        consider writing a META.yml that contains a 'provides'
+        attribute or contact the CPAN admins to investigate (yet
+        another) workaround against "Safe" limitations.)},
 
                               );
       }
