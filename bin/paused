@@ -9,7 +9,8 @@ sub mypause_daemon_inspector::loop ();
 my $VERSION = "1049";
 my $Id = qq!paused, v$VERSION!;
 
-use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/lib";
+use lib "/home/k/pause/lib",
+    "/home/k/dproj/PAUSE/GIT-ghub/lib";
 
 use DBI ();
 use Fcntl qw(:flock);
@@ -315,7 +316,7 @@ skip        =not yet verified
               $self->logge("Info: Started mldistwatch for lpath[$lpath] with pid[$pid]");
             } else {
               # child
-              exec '/home/k/PAUSE/cron/mldistwatch',
+              exec '/home/k/pause/cron/mldistwatch',
                   '--pick',
                       $lpath,
                           '--logfile',
