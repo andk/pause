@@ -32,6 +32,10 @@ This help
 
 stop running after that many signatures
 
+=item B<--sleep-per-dir=f>
+
+Sleep that amount of time in every directory we enter
+
 =back
 
 =head1 DESCRIPTION
@@ -82,7 +86,7 @@ use CPAN::Checksums 1.018;
 use File::Copy qw(cp);
 use File::Find;
 use File::Spec;
-use Time::HiRes qw(time);
+use Time::HiRes qw(sleep time);
 use YAML::Syck;
 use strict;
 
@@ -101,6 +105,7 @@ our $TESTDIR;
 # now that we know that the process is not faster when we write less
 # (2005-11-11); but lower than 1000 helps to smoothen out peaks
 $Opt{max} ||= 64;
+$Opt{"sleep-per-dir"} ||= 0.02;
 
 my $cnt = 0;
 
@@ -117,6 +122,9 @@ find(sub {
        return unless $File::Find::name =~ m|id/.|;
        return if -l;
        return unless -d;
+       if ($Opt{"sleep-per-dir"}) {
+           sleep $Opt{"sleep-per-dir"};
+       }
        local($_); # Ouch, has it bitten that the following function
                   # did something with $_. Must have been a bug in 5.00556???
 
