@@ -104,8 +104,8 @@ our $TESTDIR;
 # because of key-expiration on 2005-02-02; 1000 also seems appropriate
 # now that we know that the process is not faster when we write less
 # (2005-11-11); but lower than 1000 helps to smoothen out peaks
-$Opt{max} ||= 64;
-$Opt{"sleep-per-dir"} ||= 0.02;
+$Opt{max} ||= 128;
+$Opt{"sleep-per-dir"} ||= 0.05;
 
 my $cnt = 0;
 
