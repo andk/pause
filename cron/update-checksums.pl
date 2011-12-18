@@ -56,6 +56,19 @@ use Getopt::Long;
 use Hash::Util qw(lock_keys);
 use Pod::Usage;
 
+my $lockfile = "/var/run/PAUSE-update-checksums.LCK";
+use Fcntl qw( :flock :seek O_RDONLY O_RDWR O_CREAT );
+my $lfh;
+unless (open $lfh, "+<", $lockfile) {
+    open $lfh, ">>", $lockfile or die "Could not open lockfile: $!";
+    open $lfh, "+<", $lockfile or die "Could not open lockfile: $!";
+}
+if (flock $lfh, LOCK_EX|LOCK_NB) {
+    warn "Info: Got the lock, continuing";
+} else {
+    die "lockfile '$lockfile' locked by a different process; cannot continue";
+}
+
 our %Opt;
 lock_keys %Opt, map { /([^=\|!]+)/ } @opt;
 GetOptions(\%Opt,
