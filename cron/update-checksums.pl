@@ -105,7 +105,7 @@ our $TESTDIR;
 # now that we know that the process is not faster when we write less
 # (2005-11-11); but lower than 1000 helps to smoothen out peaks
 $Opt{max} ||= 128;
-$Opt{"sleep-per-dir"} ||= 0.25;
+$Opt{"sleep-per-dir"} ||= 0.5;
 
 my $cnt = 0;
 
