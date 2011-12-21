@@ -17,10 +17,12 @@ localityName			= Locality Name (eg, city)
 localityName_default		= Berlin
 
 0.organizationName		= Organization Name (eg, company)
-0.organizationName_default	= cacert ignores this--ak
+# cacert ignores this--ak
+0.organizationName_default	= 
 
 organizationalUnitName		= Organizational Unit Name (eg, section)
-organizationalUnitName_default	= cacert ignores this--ak
+# cacert ignores this--ak
+organizationalUnitName_default	= 
 
 commonName			= Common Name (eg, YOUR name)
 commonName_max			= 64
