@@ -2918,6 +2918,12 @@ sub request_id {
       push @errors, "Thank you for giving us a short description of
         what you're planning to contribute, but frankly, this looks a
         bit too short" if length($rationale)<10;
+      push @errors, "Please do not use HTML links in your description of
+        what you're planning to contribute" if $rationale =~ /<\s*a\s+href\s*=/ms;
+
+      my $url_count =()= $rationale =~ m{http://}gi;
+      push @errors, "Please do not include more than one URL in your description of
+        what you're planning to contribute" if $url_count > 1;
 
     } else {
 
@@ -2999,7 +3005,7 @@ sub request_id {
     }
 
     push @m, qq{<p><b>A short description of why you would like a
-          PAUSE ID:</b></p><p><small>required.</small></p><p>};
+          PAUSE ID:</b></p><p><small>required; include what you are planning to contribute; do not use HTML</small></p><p>};
 
     push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
                             rows=>8,
