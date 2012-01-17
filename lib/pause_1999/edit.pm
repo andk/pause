@@ -2921,6 +2921,10 @@ sub request_id {
       push @errors, "Please do not use HTML links in your description of
         what you're planning to contribute" if $rationale =~ /<\s*a\s+href\s*=/ms;
 
+      my $url_count =()= $rationale =~ m{http://}gi;
+      push @errors, "Please do not include more than one URL in your description of
+        what you're planning to contribute" if $url_count > 1;
+
     } else {
 
       push @errors, "You must supply a short description of what
