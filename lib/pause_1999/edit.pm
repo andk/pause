@@ -2999,7 +2999,7 @@ sub request_id {
     }
 
     push @m, qq{<p><b>A short description of why you would like a
-          PAUSE ID:</b></p><p><small>required.</small></p><p>};
+          PAUSE ID:</b></p><p><small>required; include what you are planning to contribute</small></p><p>};
 
     push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
                             rows=>8,
