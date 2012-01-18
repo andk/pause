@@ -2904,7 +2904,11 @@ sub request_id {
     # check for errors
 
     my @errors = ();
-    unless( $fullname ) {
+    if ( $fullname ) {
+      unless ($fullname =~ /[ ]/) {
+        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to @{$PAUSE::Config->{ADMINS}}.";
+      }
+    } else {
       push @errors, "You must supply a name\n";
     }
     unless( $email ) {
@@ -2972,7 +2976,7 @@ sub request_id {
     # push @m, "<table>\n";
     foreach my $arr (
                      [
-                      'Full name',
+                      'Your full name (civil name)',
                       'pause99_request_id_fullname',
                       "Unicode Characters OK"
                      ],
