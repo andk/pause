@@ -2919,9 +2919,9 @@ sub request_id {
         what you're planning to contribute, but frankly, this looks a
         bit too short" if length($rationale)<10;
       push @errors, "Please do not use HTML links in your description of
-        what you're planning to contribute" if $rationale =~ /<\s*a\s+href\s*=/ms;
+        what you're planning to contribute" if $rationale =~ /<\s*a\s+href\s*=/ims;
 
-      my $url_count =()= $rationale =~ m{http://}gi;
+      my $url_count =()= $rationale =~ m{https?://}gi;
       push @errors, "Please do not include more than one URL in your description of
         what you're planning to contribute" if $url_count > 1;
 
