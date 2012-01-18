@@ -19,6 +19,7 @@ WriteMakefile(
     CPAN::Indexer::Mirror
     Class::Singleton
     Compress::Zlib
+    Crypt::SSLeay
     Cwd
     DB_File
     DBI
