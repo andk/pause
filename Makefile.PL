@@ -79,6 +79,19 @@ rsynctest ::
 \t\$(ECHO) USER=\$(USER) RSYNC_PASSWORD=\$(RSYNC_PASSWORD) ...
 \tUSER=\$(USER) RSYNC_PASSWORD=\$(RSYNC_PASSWORD) rsync --port=8732 pause.perl.org::PAUSE/authors/02STAMP
 
+getdump:
+	rsync -P pause.perl.org::pausedata/moddump.current .
+	\@echo You need to call next: make recorddump
+
+recorddump: moddump.current
+	mysql -u root -p mod < moddump.current
+
+stoplave:
+	mysql -u root -p -e 'stop slave'
+
+startslave:
+	mysql -u root -p -e 'start slave; show slave status\\G'
+
 EOF
 
 print $fh <<'EOF' or die;
