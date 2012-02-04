@@ -834,6 +834,7 @@ sub _rewrite_tarball {
             die "Could not chmod world writeable '$wwf': $!";
         }
     }
+    chmod 0755, $testdir;
     0 == system tar => "-C", $testdir, $taropt, "-cf", $path, "." or die "Could not tar c";
 }
 
