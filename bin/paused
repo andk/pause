@@ -9,12 +9,16 @@ sub mypause_daemon_inspector::loop ();
 my $VERSION = "1049";
 my $Id = qq!paused, v$VERSION!;
 
-use lib "/home/k/pause/lib",
+use lib
+    "/home/k/pause/privatelib",
+    "/home/k/pause/lib",
     "/home/k/dproj/PAUSE/GIT-ghub/lib";
 
 use DBI ();
 use Fcntl qw(:flock);
 use File::Path ();
+use File::Spec ();
+use File::Temp ();
 use Getopt::Long;
 use HTTP::Date ();
 use HTTP::Status ();
@@ -681,12 +685,15 @@ sub verify_gzip_tar {
     my($self,$tpath,$uri,$nosuccesscount,$lpath) = @_;
     my $zcat;
     my $gzip;
+    my $taropt;
     if ($tpath =~ /\.t(ar\.)?gz$/) {
         $zcat = "/bin/zcat";
         $gzip = "/bin/gzip";
+        $taropt = "tvzf";
     } elsif ($tpath =~ /\.t(ar\.)?bz$/) {
         $zcat = "/bin/bzcat";
         $gzip = "/bin/bzip2";
+        $taropt = "tvjf";
     } else {
         # nothing I could verify
         if (rename($tpath,$lpath)) {
@@ -749,6 +756,23 @@ sub verify_gzip_tar {
             return;
         }
     }
+    if (open my $fh, "-|", tar => $taropt, $tpath) {
+        my $must_rewrite = 0;
+        while (<$fh>) {
+            if (my($dir,$ur,$uw,$ux,$gr,$gw,$gx,$or,$ow,$ox) = /^(.)(.)(.)(.)(.)(.)(.)(.)(.)(.) /) {
+                $must_rewrite = 1 if $ow eq "w";
+            }
+        }
+        close $fh or warn "Could not close: $!";
+        if ($must_rewrite) {
+            my $success = eval { _rewrite_tarball($tpath); 1; };
+            if ($success) {
+                $self->logge("Info: have rewritten tarball to eliminate world writeables");
+            } else {
+                $self->logge("Alert: Failed to rewrite: $@");
+            }
+        }
+    }
     if ( $tpath =~ m/\.Z$/ ) {
         if (-e $lpath) {
             $self->logge("Alert: Seem to have both a .Z and a .gz");
@@ -766,6 +790,51 @@ sub verify_gzip_tar {
         }
     }
     return -s $lpath;
+}
+
+sub _rewrite_tarball {
+    my($path) = @_;
+    $path = File::Spec->rel2abs($path);
+    my $testdir = File::Temp::tempdir(
+                                      "paused_rewrite_XXXX",
+                                      DIR => "/tmp",
+                                      CLEANUP => 1,
+                                     ) or die "Could not make a tmp directory";
+    my $taropt;
+    if ($path =~ /\.t(ar\.)?gz$/) {
+        $taropt = "-z";
+    } elsif ($path =~ /\.t(ar\.)?bz$/) {
+        $taropt = "-j";
+    }
+    open my $fh, "-|", tar => "-C", $testdir, $taropt, "-xvvf", $path or die "could not fork";
+    my(@ww); #world-writable
+    my(@dnx); #directories-not-xessable
+    while (<$fh>) {
+        chomp;
+        my($stat,@rest) = split " ", $_;
+        my($dir,$ur,$uw,$ux,$gr,$gw,$gx,$or,$ow,$ox) = $stat =~ /^(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)/;
+        if ($ow && $ow eq "w") {
+            push @ww, $rest[-1];
+        }
+        if ($dir && $ux && $dir eq "d" && $ux ne "x") {
+            push @dnx, $rest[-1];
+        }
+    }
+    for my $dnx (@dnx) {
+        my $d = "$testdir/$dnx";
+        my @stat = stat $d or die "Could not stat d '$d': $!";
+        unless (chmod $stat[2] | 0100, $d) {
+            die "Could not chmod directory without x '$d': $!";
+        }
+    }
+    for my $ww (@ww) {
+        my $wwf = "$testdir/$ww";
+        my @stat = stat $wwf or die "Could not stat wwf '$wwf': $!";
+        unless (chmod $stat[2] &~ 0022, $wwf) {
+            die "Could not chmod world writeable '$wwf': $!";
+        }
+    }
+    0 == system tar => "-C", $testdir, $taropt, "-cf", $path, "." or die "Could not tar c";
 }
 
 # often called as a class method!
