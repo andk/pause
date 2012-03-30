@@ -1157,7 +1157,7 @@ sub rewrite06 {
             $self->verbose(1,"Couldn't open $repfile $!\n");
         }
     } else {
-        $self->verbose(1,"No 01modules exist; won't try to read it");
+        $self->verbose(1,"No 06perms.txt exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
