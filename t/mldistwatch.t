@@ -78,4 +78,11 @@ subtest "tests for the emails we sent out" => sub {
   );
 };
 
+subtest "meagre git tests" => sub {
+  ok(
+    -e $result->tmpdir->file('git/.git/refs/heads/master'),
+    "we now have a master commit",
+  );
+};
+
 done_testing;
