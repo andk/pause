@@ -176,7 +176,7 @@ sub rewrite_indexes {
     $self->rewrite01();
     $self->rewrite03();
     $self->rewrite06();
-    $self->overwrite07();
+    $self->rewrite07();
     $self->verbose(1, sprintf(
                               "Finished rewrite03 and everything at %s\n",
                               scalar localtime
@@ -1198,7 +1198,7 @@ Date:        %s
     }
 }
 
-sub overwrite07 {
+sub rewrite07 {
     my($self) = @_;
     my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose(1,"FTP_RUN not defined");
     $fromdir .= "/mirroryaml";
