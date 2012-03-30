@@ -26,6 +26,7 @@ use File::pushd;
 use File::Spec ();
 use File::Temp 0.14 (); # begin of OO interface
 use File::Which ();
+use Git::Wrapper;
 use HTTP::Date ();
 use IPC::Cmd ();
 use JSON ();
@@ -168,15 +169,9 @@ sub reindex {
     $self->rewrite_indexes;
 }
 
-sub _reset_git_hard {
-    my $self = shift;
-    pushd( $self->gitroot );
-    system(qw(git reset --hard)) and die "error resetting git state";
-}
-
 sub rewrite_indexes {
     my $self = shift;
-    $self->_reset_git_hard;
+    $self->git->reset({ hard => 1 }) if $self->git->status->is_dirty;
     $self->rewrite02();
     my $MLROOT = $self->mlroot;
     chdir $MLROOT
@@ -189,10 +184,8 @@ sub rewrite_indexes {
                               "Finished rewrite03 and everything at %s\n",
                               scalar localtime
                              ));
-    {
-        pushd($self->gitroot);
-        system(qw(git commit -m), "indexer run at $^T, pid $$");
-    }
+
+    $self->git->commit({ m => "indexer run at $^T, pid $$" });
 }
 
 sub debug_mem {
@@ -588,6 +581,8 @@ Last-Updated: $date\n\n};
             $self->verbose(1,"Couldn't open $repfile for writing 02packages: $!\n");
         }
         close $F or die "Couldn't close: $!";
+        $self->git->add({}, '02packages.details.txt');
+
         File::Copy::copy($gitfile, $repfile) or
             $self->verbose(1,"Couldn't copy to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
@@ -1204,6 +1199,7 @@ Date:        %s
             $self->verbose(1,"Couldn't open >06...\n");
         }
         close $F or die "Couldn't close: $!";
+        $self->git->add({}, '06perms.txt');
         File::Copy::copy($gitfile, $repfile) or
             $self->verbose(1,"Couldn't copy to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
@@ -1291,6 +1287,17 @@ sub as_ds {
 
 sub gitroot {
     $PAUSE::Config->{GITROOT};
+}
+
+sub git {
+    my $self = shift;
+    return $self->{_git_wrapper} ||= Git::Wrapper->new($self->gitroot);
+}
+
+sub _do_in_gitroot {
+    my ($self, $code) = @_;
+    my $token = pushd( $self->gitroot );
+    return $code->($self);
 }
 
 sub mlroot {
