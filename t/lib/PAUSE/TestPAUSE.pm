@@ -68,12 +68,12 @@ sub test_reindex {
     GZIP                      => which('gzip'),
     GZIP_OPTIONS              => '',
     MLROOT                    => File::Spec->catdir($ml_root),
-    ML_CHOWN_GROUP => +(getgrgid($)))[0],
-    ML_CHOWN_USER  => +(getpwuid($>))[0],
+    ML_CHOWN_GROUP     => +(getgrgid($)))[0],
+    ML_CHOWN_USER      => +(getpwuid($>))[0],
     ML_MIN_FILES       => 1,
     ML_MIN_INDEX_LINES => 1,
-    MOD_DATA_SOURCE_NAME    => "$dsnbase/mod.sqlite",
-    PID_DIR            => $pid_dir,
+    MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
+    PID_DIR              => $pid_dir,
   );
 
   local $PAUSE::Config = {
