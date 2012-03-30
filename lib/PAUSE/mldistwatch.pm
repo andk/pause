@@ -22,6 +22,7 @@ use ExtUtils::Manifest;
 use Fcntl qw();
 use File::Basename ();
 use File::Copy ();
+use File::pushd;
 use File::Spec ();
 use File::Temp 0.14 (); # begin of OO interface
 use File::Which ();
@@ -167,8 +168,15 @@ sub reindex {
     $self->rewrite_indexes;
 }
 
+sub _reset_git_hard {
+    my $self = shift;
+    pushd( $self->gitroot );
+    system(qw(git reset --hard)) and die "error resetting git state";
+}
+
 sub rewrite_indexes {
     my $self = shift;
+    $self->_reset_git_hard;
     $self->rewrite02();
     my $MLROOT = $self->mlroot;
     chdir $MLROOT
@@ -1270,6 +1278,10 @@ sub as_ds {
         push @$result, \@row;
     }
     $result;
+}
+
+sub gitroot {
+    $PAUSE::Config->{MLROOT};
 }
 
 sub mlroot {

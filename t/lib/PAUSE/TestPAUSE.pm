@@ -58,6 +58,14 @@ sub test_reindex {
   my $pid_dir = File::Spec->catdir($tmpdir, 'run');
   mkdir $pid_dir;
 
+  my $git_dir = File::Spec->catdir($tmpdir, 'git');
+  mkdir $git_dir;
+
+  {
+    my $chdir_guard = pushd($git_dir);
+    system(qw(git init)) and die "error running git init";
+  }
+
   $self->deploy_schemas_at($db_root);
 
   my $dsnbase = "DBI:SQLite:dbname=$db_root";
@@ -65,6 +73,7 @@ sub test_reindex {
   my %overrides = (
     AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
     CHECKSUMS_SIGNING_PROGRAM => "\0",
+    GITROOT                   => $git_dir,
     GZIP                      => which('gzip'),
     GZIP_OPTIONS              => '',
     MLROOT                    => File::Spec->catdir($ml_root),
