@@ -6,6 +6,7 @@ use lib 't/lib';
 use Email::Sender::Transport::Test;
 $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
 
+use File::Path qw(make_path);
 use File::Spec;
 use PAUSE;
 use PAUSE::TestPAUSE;
@@ -13,9 +14,20 @@ use PAUSE::TestPAUSE;
 use Test::Deep;
 use Test::More;
 
-my $result = PAUSE::TestPAUSE->new({
+my $pause = PAUSE::TestPAUSE->new({
   author_root => 'corpus/authors',
-})->test_reindex;
+});
+
+my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
+make_path $modules_dir->stringify;
+
+{
+  my $temp_06 = $modules_dir->file(qw(06perms.txt.gz));
+  File::Copy::copy('corpus/empty.txt.gz', $temp_06->stringify)
+    or die "couldn't set up bogus 06perms: $!";
+}
+
+my $result = $pause->test_reindex;
 
 ok(
   -e $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
