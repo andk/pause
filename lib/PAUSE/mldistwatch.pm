@@ -160,7 +160,7 @@ sub reindex {
                                      ) or die "Could not make a tmp directory";
     chdir $testdir
         or die("Couldn't change to $testdir: $!");
-    $self->checkfornew($testdir);
+    $self->check_for_new($testdir);
     chdir $startdir or die "Could not chdir to '$startdir'";
     rmtree $testdir;
     return if $self->{OPT}{pick};
@@ -343,7 +343,7 @@ sub _newcountokay {
   return $count >= $MIN;
 }
 
-sub checkfornew {
+sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
     my $dbh = $self->connect;
