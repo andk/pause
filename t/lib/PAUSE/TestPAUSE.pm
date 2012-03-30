@@ -11,6 +11,7 @@ use File::Path qw(make_path);
 use File::pushd;
 use File::Temp ();
 use File::Which;
+use Path::Class;
 
 use PAUSE;
 use PAUSE::mldistwatch;
@@ -23,6 +24,18 @@ has author_root => (
   isa => 'Str',
   required => 1,
 );
+
+has _tmpdir_obj => (
+  is       => 'ro',
+  isa      => 'Defined',
+  init_arg => undef,
+  default  => sub { File::Temp->newdir; },
+);
+
+sub tmpdir {
+  my ($self) = @_;
+  return dir($self->_tmpdir_obj);
+}
 
 sub deploy_schemas_at {
   my ($self, $dir) = @_;
@@ -43,7 +56,7 @@ sub deploy_schemas_at {
 sub test_reindex {
   my ($self, $code) = @_;
 
-  my $tmpdir = File::Temp->newdir;
+  my $tmpdir = $self->tmpdir;
 
   my $cpan_root = File::Spec->catdir($tmpdir, 'cpan');
   my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
