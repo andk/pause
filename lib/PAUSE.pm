@@ -69,6 +69,7 @@ $PAUSE::Config ||=
      REPLY_TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
      DELETES_EXPIRE => 60*60*72,
      FTPPUB => '/home/ftp/pub/PAUSE/',
+     GITROOT => '/home/ftp/pub/PAUSE/PAUSE-git',
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP => '/bin/gzip',
      GZIP_OPTIONS => '--best --rsyncable',
