@@ -1196,15 +1196,16 @@ Date:        %s
     }
     if ($list ne $olist) {
         my $F;
-        if (open $F, ">:utf8", "$repfile.new") {
+        my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
+        if (open $F, ">:utf8", $gitfile) {
             print $F $header;
             print $F $list;
         } else {
             $self->verbose(1,"Couldn't open >06...\n");
         }
         close $F or die "Couldn't close: $!";
-        rename "$repfile.new", $repfile or
-            $self->verbose(1,"Couldn't rename to '$repfile': $!");
+        File::Copy::copy($gitfile, $repfile) or
+            $self->verbose(1,"Couldn't copy to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
