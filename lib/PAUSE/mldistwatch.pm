@@ -1290,7 +1290,7 @@ sub as_ds {
 }
 
 sub gitroot {
-    $PAUSE::Config->{MLROOT};
+    $PAUSE::Config->{GITROOT};
 }
 
 sub mlroot {
