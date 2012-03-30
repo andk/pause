@@ -573,15 +573,19 @@ Last-Updated: $date\n\n};
     $list .= join "", sort {lc $a cmp lc $b} @listing02;
     if ($list ne $olist) {
         my $F;
-        if (open $F, ">", "$repfile.new") {
+        my $gitfile = File::Spec->catfile(
+          $self->gitroot,
+          '02packages.details.txt',
+        );
+        if (open $F, ">", $gitfile) {
             print $F $header;
             print $F $list;
         } else {
             $self->verbose(1,"Couldn't open $repfile for writing 02packages: $!\n");
         }
         close $F or die "Couldn't close: $!";
-        rename "$repfile.new", $repfile or
-            $self->verbose(1,"Couldn't rename to '$repfile': $!");
+        File::Copy::copy($gitfile, $repfile) or
+            $self->verbose(1,"Couldn't copy to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
