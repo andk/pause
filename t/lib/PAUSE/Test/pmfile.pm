@@ -15,7 +15,7 @@ use Mock::Dist;
 use Module::Faker::Dist;
 use Path::Class ();
 use Data::Dumper;
-use YAML;
+use YAML::XS;
 
 #my $PACKAGE = Test::MockObject::Extends->new('PAUSE::package');
 my $PACKAGE = Test::MockObject->new;
