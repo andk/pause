@@ -498,6 +498,21 @@ sub empty_dir {
     $dh->close;
 }
 
+sub _install {
+  my ($self, $src) = @_;
+
+  my @hunks  = File::Spec->splitdir($src);
+  my $fn     = $hunks[-1];
+  my $MLROOT = $self->mlroot;
+  my $target = "$MLROOT/../../modules/$fn";
+  my $temp   = "$target.new";
+
+  File::Copy::copy($src, $temp) or
+      $self->verbose(1,"Couldn't copy to '$temp': $!");
+  rename $temp, $target
+      or die "error renaming $target.new to $target: $!";
+}
+
 sub rewrite02 {
     my $self = shift;
     #
@@ -583,8 +598,8 @@ Last-Updated: $date\n\n};
         close $F or die "Couldn't close: $!";
         $self->git->add({}, '02packages.details.txt');
 
-        File::Copy::copy($gitfile, $repfile) or
-            $self->verbose(1,"Couldn't copy to '$repfile': $!");
+        $self->_install($gitfile);
+
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
@@ -1200,8 +1215,7 @@ Date:        %s
         }
         close $F or die "Couldn't close: $!";
         $self->git->add({}, '06perms.txt');
-        File::Copy::copy($gitfile, $repfile) or
-            $self->verbose(1,"Couldn't copy to '$repfile': $!");
+        $self->_install($gitfile);
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
