@@ -1172,10 +1172,8 @@ sub rewrite06 {
         for my $query (@query) {
             my $sth = $dbh->prepare($query);
             $sth->execute();
-            if ($sth->rows > 0) {
-                while (my @row = $sth->fetchrow_array()) {
-                    $seen{join ",", @row[0,1]} ||= $row[2];
-                }
+            while (my @row = $sth->fetchrow_array()) {
+                $seen{join ",", @row[0,1]} ||= $row[2];
             }
             $sth->finish;
         }
