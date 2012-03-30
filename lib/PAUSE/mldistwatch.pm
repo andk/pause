@@ -1162,22 +1162,10 @@ sub rewrite06 {
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
     my @query       = (
-                qq{SELECT mods.modid,
-                          mods.userid,
-                          "m"
-                     FROM mods
-},
-                qq{SELECT primeur.package,
-                          primeur.userid,
-                          "f"
-                     FROM primeur
-},
-                qq{SELECT perms.package,
-                          perms.userid,
-                          "c"
-                     FROM perms
-},
-               );
+        qq{SELECT mods.modid, mods.userid, "m" FROM mods},
+        qq{SELECT primeur.package, primeur.userid, "f" FROM primeur},
+        qq{SELECT perms.package, perms.userid, "c" FROM perms},
+    );
 
     my %seen;
     {
