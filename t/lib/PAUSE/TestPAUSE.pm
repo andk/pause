@@ -53,8 +53,35 @@ sub deploy_schemas_at {
   }
 }
 
-sub test_reindex {
-  my ($self, $code) = @_;
+has db_root => (
+  is   => 'ro',
+  lazy => 1,
+  init_arg => undef,
+  builder => '_build_db_root',
+);
+
+sub _build_db_root {
+  my ($self) = @_;
+
+  my $tmpdir = $self->tmpdir;
+  my $db_root = File::Spec->catdir($tmpdir, 'db');
+  mkdir $db_root;
+
+  $self->deploy_schemas_at($db_root);
+
+  return $db_root;
+}
+
+has pause_config_overrides => (
+  is  => 'ro',
+  isa => 'HashRef',
+  lazy => 1,
+  init_arg => undef,
+  builder  => '_build_pause_config_overrides',
+);
+
+sub _build_pause_config_overrides {
+  my ($self) = @_;
 
   my $tmpdir = $self->tmpdir;
 
@@ -65,8 +92,7 @@ sub test_reindex {
 
   dircopy($self->author_root, $ml_root);
 
-  mkdir File::Spec->catdir($tmpdir, 'db');
-  my $db_root = File::Spec->catdir($tmpdir, 'db');
+  my $db_root = $self->db_root;
 
   my $pid_dir = File::Spec->catdir($tmpdir, 'run');
   mkdir $pid_dir;
@@ -79,11 +105,9 @@ sub test_reindex {
     system(qw(git init)) and die "error running git init";
   }
 
-  $self->deploy_schemas_at($db_root);
-
   my $dsnbase = "DBI:SQLite:dbname=$db_root";
 
-  my %overrides = (
+  my $overrides = {
     AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
     CHECKSUMS_SIGNING_PROGRAM => "\0",
     GITROOT                   => $git_dir,
@@ -96,24 +120,39 @@ sub test_reindex {
     ML_MIN_INDEX_LINES => 1,
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
-  );
+  };
+
+  return $overrides;
+}
+
+sub with_our_config {
+  my ($self, $code) = @_;
 
   local $PAUSE::Config = {
     %{ $PAUSE::Config },
-    %overrides,
+    %{ $self->pause_config_overrides },
   };
 
-  my $chdir_guard = pushd;
+  $code->($self);
+}
 
-  PAUSE::mldistwatch->new->reindex;
+sub test_reindex {
+  my ($self, $code) = @_;
 
-  $code->($tmpdir) if $code;
+  $self->with_our_config(sub {
+    my $self = shift;
+    my $chdir_guard = pushd;
 
-  return PAUSE::TestPAUSE::Result->new({
-    tmpdir => $tmpdir,
-    config_overrides => \%overrides,
-    authen_db_file   => File::Spec->catfile($db_root, 'authen.sqlite'),
-    mod_db_file      => File::Spec->catfile($db_root, 'mod.sqlite'),
+    PAUSE::mldistwatch->new->reindex;
+
+    $code->($self->tmpdir) if $code;
+
+    return PAUSE::TestPAUSE::Result->new({
+      tmpdir => $self->tmpdir,
+      config_overrides => $self->pause_config_overrides,
+      authen_db_file   => File::Spec->catfile($self->db_root, 'authen.sqlite'),
+      mod_db_file      => File::Spec->catfile($self->db_root, 'mod.sqlite'),
+    });
   });
 }
 

@@ -20,10 +20,10 @@ my $pause = PAUSE::TestPAUSE->new({
 
 my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
 make_path $modules_dir->stringify;
+my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
 
 {
-  my $temp_06 = $modules_dir->file(qw(06perms.txt.gz));
-  File::Copy::copy('corpus/empty.txt.gz', $temp_06->stringify)
+  File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
     or die "couldn't set up bogus 06perms: $!";
 }
 
@@ -64,6 +64,22 @@ subtest "tests with the parsed 02packages data" => sub {
     [ map {; methods(%$_) } @want ],
     "we built exactly the 02packages we expected",
   );
+};
+
+subtest "test 06perms.txt" => sub {
+  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
+  my $fh;
+  $pause->with_our_config(sub {
+    open $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $index_06|"
+      or die "can't open $index_06 for reading with gip: $!";
+  });
+
+  my (@header, @data);
+  while (<$fh>) {
+    push(@header, $_), next if 1../^\s*$/;
+    push @data, $_;
+  }
+  is(@data, 4, "there are 4 lines of data in 06perms");
 };
 
 # PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz
