@@ -32,6 +32,7 @@ WriteMakefile(
     File::Copy::Recursive
     File::pushd
     File::Rsync::Mirror::Recentfile
+    Git::Wrapper
     HTML::Entities
     HTTP::Date
     IPC::Cmd

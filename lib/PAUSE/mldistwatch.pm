@@ -22,9 +22,11 @@ use ExtUtils::Manifest;
 use Fcntl qw();
 use File::Basename ();
 use File::Copy ();
+use File::pushd;
 use File::Spec ();
 use File::Temp 0.14 (); # begin of OO interface
 use File::Which ();
+use Git::Wrapper;
 use HTTP::Date ();
 use IPC::Cmd ();
 use JSON ();
@@ -160,7 +162,7 @@ sub reindex {
                                      ) or die "Could not make a tmp directory";
     chdir $testdir
         or die("Couldn't change to $testdir: $!");
-    $self->checkfornew($testdir);
+    $self->check_for_new($testdir);
     chdir $startdir or die "Could not chdir to '$startdir'";
     rmtree $testdir;
     return if $self->{OPT}{pick};
@@ -169,6 +171,7 @@ sub reindex {
 
 sub rewrite_indexes {
     my $self = shift;
+    $self->git->reset({ hard => 1 }) if $self->git->status->is_dirty;
     $self->rewrite02();
     my $MLROOT = $self->mlroot;
     chdir $MLROOT
@@ -176,11 +179,13 @@ sub rewrite_indexes {
     $self->rewrite01();
     $self->rewrite03();
     $self->rewrite06();
-    $self->overwrite07();
+    $self->rewrite07();
     $self->verbose(1, sprintf(
                               "Finished rewrite03 and everything at %s\n",
                               scalar localtime
                              ));
+
+    $self->git->commit({ m => "indexer run at $^T, pid $$" });
 }
 
 sub debug_mem {
@@ -343,7 +348,7 @@ sub _newcountokay {
   return $count >= $MIN;
 }
 
-sub checkfornew {
+sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
     my $dbh = $self->connect;
@@ -493,6 +498,21 @@ sub empty_dir {
     $dh->close;
 }
 
+sub _install {
+  my ($self, $src) = @_;
+
+  my @hunks  = File::Spec->splitdir($src);
+  my $fn     = $hunks[-1];
+  my $MLROOT = $self->mlroot;
+  my $target = "$MLROOT/../../modules/$fn";
+  my $temp   = "$target.new";
+
+  File::Copy::copy($src, $temp) or
+      $self->verbose(1,"Couldn't copy to '$temp': $!");
+  rename $temp, $target
+      or die "error renaming $target.new to $target: $!";
+}
+
 sub rewrite02 {
     my $self = shift;
     #
@@ -565,15 +585,21 @@ Last-Updated: $date\n\n};
     $list .= join "", sort {lc $a cmp lc $b} @listing02;
     if ($list ne $olist) {
         my $F;
-        if (open $F, ">", "$repfile.new") {
+        my $gitfile = File::Spec->catfile(
+          $self->gitroot,
+          '02packages.details.txt',
+        );
+        if (open $F, ">", $gitfile) {
             print $F $header;
             print $F $list;
         } else {
             $self->verbose(1,"Couldn't open $repfile for writing 02packages: $!\n");
         }
         close $F or die "Couldn't close: $!";
-        rename "$repfile.new", $repfile or
-            $self->verbose(1,"Couldn't rename to '$repfile': $!");
+        $self->git->add({}, '02packages.details.txt');
+
+        $self->_install($gitfile);
+
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
@@ -1180,15 +1206,16 @@ Date:        %s
     }
     if ($list ne $olist) {
         my $F;
-        if (open $F, ">:utf8", "$repfile.new") {
+        my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
+        if (open $F, ">:utf8", $gitfile) {
             print $F $header;
             print $F $list;
         } else {
             $self->verbose(1,"Couldn't open >06...\n");
         }
         close $F or die "Couldn't close: $!";
-        rename "$repfile.new", $repfile or
-            $self->verbose(1,"Couldn't rename to '$repfile': $!");
+        $self->git->add({}, '06perms.txt');
+        $self->_install($gitfile);
         PAUSE::newfile_hook($repfile);
         0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
@@ -1198,12 +1225,12 @@ Date:        %s
     }
 }
 
-sub overwrite07 {
+sub rewrite07 {
     my($self) = @_;
     my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose(1,"FTP_RUN not defined");
     $fromdir .= "/mirroryaml";
     -d $fromdir or $self->verbose(1,"Directory '$fromdir' not found");
-    my $mlroot = $PAUSE::Config->{MLROOT}   or $self->verbose(1,"MLROOT not defined");
+    my $mlroot = $self->mlroot or $self->verbose(1,"MLROOT not defined");
     my $todir = "$mlroot/../../modules";
     -d $todir or $self->verbose(1,"Directory '$todir' not found");
     for my $exte (qw(json yml)) {
@@ -1270,6 +1297,21 @@ sub as_ds {
         push @$result, \@row;
     }
     $result;
+}
+
+sub gitroot {
+    $PAUSE::Config->{GITROOT};
+}
+
+sub git {
+    my $self = shift;
+    return $self->{_git_wrapper} ||= Git::Wrapper->new($self->gitroot);
+}
+
+sub _do_in_gitroot {
+    my ($self, $code) = @_;
+    my $token = pushd( $self->gitroot );
+    return $code->($self);
 }
 
 sub mlroot {
