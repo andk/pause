@@ -189,6 +189,10 @@ sub rewrite_indexes {
                               "Finished rewrite03 and everything at %s\n",
                               scalar localtime
                              ));
+    {
+        pushd($self->gitroot);
+        system(qw(git commit -m), "indexer run at $^T, pid $$");
+    }
 }
 
 sub debug_mem {
