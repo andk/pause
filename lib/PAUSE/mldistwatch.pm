@@ -1203,7 +1203,7 @@ sub rewrite07 {
     my $fromdir = $PAUSE::Config->{FTP_RUN} or $self->verbose(1,"FTP_RUN not defined");
     $fromdir .= "/mirroryaml";
     -d $fromdir or $self->verbose(1,"Directory '$fromdir' not found");
-    my $mlroot = $PAUSE::Config->{MLROOT}   or $self->verbose(1,"MLROOT not defined");
+    my $mlroot = $self->mlroot or $self->verbose(1,"MLROOT not defined");
     my $todir = "$mlroot/../../modules";
     -d $todir or $self->verbose(1,"Directory '$todir' not found");
     for my $exte (qw(json yml)) {
