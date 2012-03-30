@@ -1196,7 +1196,9 @@ Date:        %s
             $list .= sprintf "%s,%s\n", $k, $seen{$k};
         }
     }
-    if ($list ne $olist) {
+    if ($list eq $olist) {
+        $self->verbose(1,"06perms.txt has not changed; won't rewrite\n");
+    } else {
         my $F;
         my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
         if (open $F, ">:utf8", $gitfile) {
