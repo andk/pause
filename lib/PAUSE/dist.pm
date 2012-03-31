@@ -896,44 +896,33 @@ sub extract_readme_and_yaml {
 }
 
 # package PAUSE::dist
-sub version_from_yaml_ok {
+sub version_from_meta_ok {
   my($self) = @_;
   return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
-  my $ok = 0;
   my $c = $self->{META_CONTENT};
-  if (exists $c->{provides}) {
-    if (exists $c->{generated_by}) {
-      if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {
-        if ($v eq "0.250.0") {
-          $ok++;
-        } elsif ($v >= 0.19) {
-          if ($v < 0.26) {
-            # RSAVAGE/Javascript-SHA1-1.01.tgz had an
-            # empty provides hash. Ron did not find
-            # the reason why this happened, but let's
-            # not go overboard, 0.26 seems a good
-            # threshold from the statistics: there
-            # are not many empty provides hashes from
-            # 0.26 up.
-            if (keys %{$c->{provides}}) {
-              $ok++;
-            } else {
-              $ok = 0;
-            }
-          } else {
-            $ok++;
-          }
-        } else {
-          $ok = 0;
-        }
-      } else {
-        $ok++;
-      }
-    } else {
-      $ok++;
-    }
+
+  # If there's no provides hash, we can't get our module versions from the
+  # provides hash! -- rjbs, 2012-03-31
+  return($self->{VERSION_FROM_META_OK} = 0) unless $c->{provides};
+
+  # Some versions of Module::Build geneated an empty provides hash.  If we're
+  # *not* looking at a Module::Build-generated metafile, then it's okay.
+  my ($mb_v) = ($c->{generated_by} // '') =~ /Module::Build version ([\d\.]+)/;
+  return($self->{VERSION_FROM_META_OK} = 1) unless $mb_v;
+
+  # ??? I don't know why this is here.
+  return($self->{VERSION_FROM_META_OK} = 1) if $mb_v eq '0.250.0';
+
+  if ($mb_v >= 0.19 && $mb_v < 0.26 && ! keys %{$c->{provides}}) {
+      # RSAVAGE/Javascript-SHA1-1.01.tgz had an empty provides hash. Ron
+      # did not find the reason why this happened, but let's not go
+      # overboard, 0.26 seems a good threshold from the statistics: there
+      # are not many empty provides hashes from 0.26 up.
+      return($self->{VERSION_FROM_META_OK} = 0);
   }
-  return $self->{VERSION_FROM_META_OK} = $ok;
+
+  # We're not in the suspect range of M::B versions.  It's good to go.
+  return($self->{VERSION_FROM_META_OK} = 1);
 }
 
 # package PAUSE::dist
