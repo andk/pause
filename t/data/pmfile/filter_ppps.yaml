@@ -1,6 +1,6 @@
 -
   - ~
-  - { skip: 0, reason: "No keyword 'no_index' or 'private' in YAML_CONTENT" }
+  - { skip: 0, reason: "No keyword 'no_index' or 'private' in META_CONTENT" }
 
 -
   - { namespace: 'My::' }
