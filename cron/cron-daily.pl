@@ -520,18 +520,18 @@ sub whois {
 	for (keys %$hash) {
 	    HTML::Entities::encode($hash->{$_},'<>&');
 	}
-	print FH qq{
+	print FH qq[
 	    <dt><a href="$hash->{mlaid}"
                         >$hash->{mlaid}</a></dt><dd
                         >$hash->{comment}<p> </p></dd>
-	};
+	];
     }
-    print FH q{
+    print FH q[
         </dl></body></html>
-    };
+    ];
     close FH;
     if (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
-      report qq{copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n};
+      report qq[copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n];
       my $whois_file = "$PAUSE::Config->{MLROOT}/../00whois.html";
       xcopy '00whois.new', $whois_file;
       PAUSE::newfile_hook($whois_file);
