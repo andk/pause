@@ -1645,7 +1645,7 @@ Please contact modules\@perl.org if there are any open questions.
     # package PAUSE::dist
     sub version_from_yaml_ok {
         my($self) = @_;
-        return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
+        return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
         my $ok = 0;
         my $c = $self->{META_CONTENT};
         if (exists $c->{provides}) {
@@ -1680,7 +1680,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $ok++;
             }
         }
-        return $self->{VERSION_FROM_YAML_OK} = $ok;
+        return $self->{VERSION_FROM_META_OK} = $ok;
     }
 
     sub verbose {
@@ -1885,8 +1885,8 @@ Please contact modules\@perl.org if there are any open questions.
     # package PAUSE::pmfile
     sub version_from_yaml_ok {
         my($self) = @_;
-        return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
-        $self->{VERSION_FROM_YAML_OK} = $self->{DIO}->version_from_yaml_ok;
+        return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
+        $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_yaml_ok;
     }
 
     # package PAUSE::pmfile;

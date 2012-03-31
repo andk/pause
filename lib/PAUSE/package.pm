@@ -560,7 +560,7 @@ has the same version number and the distro has a more recent modification time.}
 
   if ($ok) {              # sanity check
 
-      if ($self->{FIO}{DIO}{VERSION_FROM_YAML_OK}) {
+      if ($self->{FIO}{DIO}{VERSION_FROM_META_OK}) {
           # nothing to argue at the moment, e.g. lib_pm.PL
       } elsif (
                 ! $pp->{simile}

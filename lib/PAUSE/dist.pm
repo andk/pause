@@ -337,7 +337,7 @@ sub mail_summary {
   my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
   my $substrdistro = substr $distro, 5;
   my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-  my $versions_from_metayaml = $self->{VERSION_FROM_YAML_OK} ? "yes" : "no";
+  my $versions_from_metayaml = $self->{VERSION_FROM_META_OK} ? "yes" : "no";
   my $yaml_module_version = $PAUSE::dist::YAML_MODULE->VERSION;
   push @m, qq[
   User: $author ($asciiname)
@@ -898,7 +898,7 @@ sub extract_readme_and_yaml {
 # package PAUSE::dist
 sub version_from_yaml_ok {
   my($self) = @_;
-  return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
+  return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
   my $ok = 0;
   my $c = $self->{META_CONTENT};
   if (exists $c->{provides}) {
@@ -933,7 +933,7 @@ sub version_from_yaml_ok {
       $ok++;
     }
   }
-  return $self->{VERSION_FROM_YAML_OK} = $ok;
+  return $self->{VERSION_FROM_META_OK} = $ok;
 }
 
 # package PAUSE::dist

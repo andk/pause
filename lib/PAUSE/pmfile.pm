@@ -174,8 +174,8 @@ sub examine_fio {
 # package PAUSE::pmfile
 sub version_from_yaml_ok {
     my($self) = @_;
-    return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
-    $self->{VERSION_FROM_YAML_OK} = $self->{DIO}->version_from_yaml_ok;
+    return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
+    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_yaml_ok;
 }
 
 # package PAUSE::pmfile;
