@@ -853,7 +853,7 @@ sub extract_readme_and_yaml {
     $self->verbose(1,"No readme in $dist\n");
   }
   my $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
-  grep !m|/t/|, grep m|/META\.yml$|, @manifind;
+             grep !m|/t/|, grep m|/META\.yml$|, @manifind;
   if (defined $yaml) {
     if (-s $yaml) {
       $self->{YAML} = $yaml;
