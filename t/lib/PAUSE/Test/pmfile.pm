@@ -117,7 +117,7 @@ sub examine_fio :Test :Plan(3) {
   $pmfile->examine_fio;
   $self->{dist}->next_call for 1..5; # skip over some irrelevant logging
 #  $self->{dist}->next_call_ok(connect => []);
-#  $self->{dist}->next_call_ok(version_from_yaml_ok => []);
+#  $self->{dist}->next_call_ok(version_from_meta_ok => []);
 #  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
 #  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in META_CONTENT");
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");

@@ -127,7 +127,7 @@ sub examine_fio {
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
 
-    unless ($self->version_from_yaml_ok) {
+    unless ($self->version_from_meta_ok) {
         $self->{VERSION} = $self->parse_version;
         if ($self->{VERSION} =~ /^\{.*\}$/) {
             # JSON error message
@@ -172,10 +172,10 @@ sub examine_fio {
 }
 
 # package PAUSE::pmfile
-sub version_from_yaml_ok {
+sub version_from_meta_ok {
     my($self) = @_;
     return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
-    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_yaml_ok;
+    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_meta_ok;
 }
 
 # package PAUSE::pmfile;
@@ -245,7 +245,7 @@ sub packages_per_pmfile {
             $ppp->{$pkg}{infile} = $pmfile;
             if ($self->simile($pmfile,$pkg)) {
                 $ppp->{$pkg}{simile} = $pmfile;
-                if ($self->version_from_yaml_ok) {
+                if ($self->version_from_meta_ok) {
                     my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
                         if (exists $provides->{$pkg}{version}) {

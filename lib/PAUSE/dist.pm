@@ -468,7 +468,7 @@ sub mail_summary {
     } else {
       warn sprintf "st[%s]", Data::Dumper::Dumper($inxst);
       if ($pmfiles > 0) {
-        if ($self->version_from_yaml_ok) {
+        if ($self->version_from_meta_ok) {
 
           push @m, qq{Nothing in this distro has been
           indexed, because according to META.yml this
@@ -710,7 +710,7 @@ sub examine_pms {
 
   my $pmfiles = $self->filter_pms;
   my($yaml,$provides,$indexingrule);
-  if (my $version_from_yaml_ok = $self->version_from_yaml_ok) {
+  if (my $version_from_meta_ok = $self->version_from_meta_ok) {
     $yaml = $self->{META_CONTENT};
     $provides = $yaml->{provides};
     if (!$indexingrule && $provides && "HASH" eq ref $provides) {

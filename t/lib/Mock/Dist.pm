@@ -12,7 +12,7 @@ my $null = sub {};
 my @NULL = qw(verbose alert connect disconnect mlroot);
 
 my %ALWAYS = (
-  version_from_yaml_ok => 1,
+  version_from_meta_ok => 1,
 );
 
 sub new {
