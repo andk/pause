@@ -88,6 +88,9 @@ sub for_authors {
   if ($error = mailrc()) {
     report $error;
   }
+  if ($error = authors()) {
+    report $error;
+  }
   my $current_excuse = "";
   my $excuse_file
     = "$PAUSE::Config->{FTPPUB}/authors/00.Directory.Is.Not.Maintained.Anymore";
@@ -592,7 +595,6 @@ sub mailrc {
       }
     }
     $r[2] ||= sprintf q{%s@cpan.org}, lc($r[0]);
-    my $state = 0;
 
     # replace fullname with asciiname if we have one
     if ($r[3]) {
@@ -634,6 +636,65 @@ sub mailrc {
     }
   } else {
 
+    # print "Endlich keine neue Version geschrieben\n";
+  }
+  PAUSE::newfile_hook($repfile);
+  return;
+}
+
+sub authors {
+  # Rewriting 02authors.txt
+
+  my $repfile = "$PAUSE::Config->{MLROOT}/../02authors.txt.gz";
+  my $list    = "";
+  my $olist   = "";
+  local ($/) = undef;
+  if (open F, "$zcat $repfile|") {
+    if ($] > 5.007) {
+      binmode F, ":utf8";
+    }
+    $olist = <F>;
+    close F;
+  }
+
+  my $authors = $Dbh->selectall_arrayref(
+    "SELECT userid, email, fullname
+                             FROM users
+                             ORDER BY userid
+    /*UNION
+    SELECT maillistid, address, maillistname
+                          FROM maillists*/"
+  );
+
+  @$authors = sort { $a->[0] cmp $b->[0] } @$authors;
+
+  for my $author (@$authors) {
+    if ($] > 5.007) {
+      require Encode;
+      for (@$author) {
+        defined && /\P{ASCII}/ && Encode::_utf8_on($_);
+
+        # Surely no one has tabs in his or her email or full name, but let's
+        # be safe!  -- rjbs, 2012-03-31
+        s/\t/ /g;
+      }
+    }
+    $author->[1] ||= sprintf q{%s@cpan.org}, lc($author->[0]);
+
+    $list .= join qq{\t}, @$author;
+  }
+
+  if ($list ne $olist) {
+    if (open F, "| $gzip -9c > $repfile") {
+      if ($] > 5.007) {
+        binmode F, ":utf8";
+      }
+      print F $list;
+      close F or return "ERROR: error closing $repfile: $!";;
+    } else {
+      return ("ERROR: Couldn't open $repfile to write: $!");
+    }
+  } else {
     # print "Endlich keine neue Version geschrieben\n";
   }
   PAUSE::newfile_hook($repfile);
