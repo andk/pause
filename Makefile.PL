@@ -46,6 +46,7 @@ WriteMakefile(
     MooseX::StrictConstructor
     Net::FTP
     Parse::CPAN::Packages
+    Path::Class
     Set::Crontab
     String::Random
     Test::Deep
