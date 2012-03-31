@@ -73,9 +73,9 @@ sub filter_ppps {
 
     # very similar code is in PAUSE::dist::filter_pms
   MANI: for my $ppp ( @ppps ) {
-        if ($self->{YAML_CONTENT}){
-            my $no_index = $self->{YAML_CONTENT}{no_index}
-                            || $self->{YAML_CONTENT}{private}; # backward compat
+        if ($self->{META_CONTENT}){
+            my $no_index = $self->{META_CONTENT}{no_index}
+                            || $self->{META_CONTENT}{private}; # backward compat
             if (ref($no_index) eq 'HASH') {
                 my %map = (
                             package => qr{\z},
@@ -105,10 +105,10 @@ sub filter_ppps {
                     }
                 }
             } else {
-                $self->verbose(1,"No keyword 'no_index' or 'private' in YAML_CONTENT");
+                $self->verbose(1,"No keyword 'no_index' or 'private' in META_CONTENT");
             }
         } else {
-            # $self->verbose(1,"no YAML_CONTENT"); # too noisy
+            # $self->verbose(1,"no META_CONTENT"); # too noisy
         }
         push @res, $ppp;
     }
@@ -160,7 +160,7 @@ sub examine_fio {
                   PMFILE => $pmfile,
                   FIO => $self,
                   USERID => $self->{USERID},
-                  YAML_CONTENT => $self->{YAML_CONTENT},
+                  META_CONTENT => $self->{META_CONTENT},
                   );
 
         $pio->examine_pkg;
@@ -246,7 +246,7 @@ sub packages_per_pmfile {
             if ($self->simile($pmfile,$pkg)) {
                 $ppp->{$pkg}{simile} = $pmfile;
                 if ($self->version_from_yaml_ok) {
-                    my $provides = $self->{DIO}{YAML_CONTENT}{provides};
+                    my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
                         if (exists $provides->{$pkg}{version}) {
                             my $v = $provides->{$pkg}{version};

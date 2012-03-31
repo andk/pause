@@ -1454,9 +1454,9 @@ Please contact modules\@perl.org if there are any open questions.
             next unless $mf =~ /\.pm$/i;
             my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
             next if $inmf =~ m!^(?:t|inc)/!;
-            if ($self->{YAML_CONTENT}){
-                my $no_index = $self->{YAML_CONTENT}{no_index}
-                               || $self->{YAML_CONTENT}{private}; # backward compat
+            if ($self->{META_CONTENT}){
+                my $no_index = $self->{META_CONTENT}{no_index}
+                               || $self->{META_CONTENT}{private}; # backward compat
                 if (ref($no_index) eq 'HASH') {
                     my %map = (
                                file => qr{\z},
@@ -1487,10 +1487,10 @@ Please contact modules\@perl.org if there are any open questions.
                     }
                 } else {
                     # noisy:
-                    # $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
+                    # $self->verbose(1,"no keyword 'no_index' or 'private' in META_CONTENT");
                 }
             } else {
-                # $self->verbose(1,"no YAML_CONTENT"); # too noisy
+                # $self->verbose(1,"no META_CONTENT"); # too noisy
             }
             push @pmfile, $mf;
         }
@@ -1534,7 +1534,7 @@ Please contact modules\@perl.org if there are any open questions.
                                          PMFILE => $pmfile,
                                          TIME => $self->{TIME},
                                          USERID => $self->{USERID},
-                                         YAML_CONTENT => $self->{YAML_CONTENT},
+                                         META_CONTENT => $self->{META_CONTENT},
                                         );
             $fio->examine_fio;
         }
@@ -1609,7 +1609,7 @@ Please contact modules\@perl.org if there are any open questions.
                 $self->{YAML} = $yaml;
                 File::Copy::copy $yaml, "$MLROOT/$sans.meta";
                 utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
-                eval { $self->{YAML_CONTENT} = YAML::LoadFile($yaml); };
+                eval { $self->{META_CONTENT} = YAML::LoadFile($yaml); };
                 if ($@) {
                     $self->verbose(1,"Error while parsing YAML: $@");
                     if ($@ =~ /msg: Unrecognized implicit value/) {
@@ -1620,15 +1620,15 @@ Please contact modules\@perl.org if there are any open questions.
 
                         my $cat = do { open my($f), $yaml or die; local $/; <$f> };
                         $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
-                        eval { $self->{YAML_CONTENT} = YAML::Load $cat; };
+                        eval { $self->{META_CONTENT} = YAML::Load $cat; };
                         if ($@) {
-                            $self->{YAML_CONTENT} = {};
+                            $self->{META_CONTENT} = {};
                             $self->{YAML} = "META.yml found but error ".
                                 "encountered while loading: $@";
                         }
 
                     } else {
-                        $self->{YAML_CONTENT} = {};
+                        $self->{META_CONTENT} = {};
                         $self->{YAML} = "META.yml found but error ".
                             "encountered while loading: $@";
                     }
@@ -1647,7 +1647,7 @@ Please contact modules\@perl.org if there are any open questions.
         my($self) = @_;
         return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
         my $ok = 0;
-        my $c = $self->{YAML_CONTENT};
+        my $c = $self->{META_CONTENT};
         if (exists $c->{provides}) {
             if (exists $c->{generated_by}) {
                 if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {
@@ -1784,9 +1784,9 @@ Please contact modules\@perl.org if there are any open questions.
 
         # very similar code is in PAUSE::dist::filter_pms
       MANI: for my $ppp ( @ppps ) {
-            if ($self->{YAML_CONTENT}){
-                my $no_index = $self->{YAML_CONTENT}{no_index}
-                               || $self->{YAML_CONTENT}{private}; # backward compat
+            if ($self->{META_CONTENT}){
+                my $no_index = $self->{META_CONTENT}{no_index}
+                               || $self->{META_CONTENT}{private}; # backward compat
                 if (ref($no_index) eq 'HASH') {
                     my %map = (
                                package => qr{\z},
@@ -1816,10 +1816,10 @@ Please contact modules\@perl.org if there are any open questions.
                         }
                     }
                 } else {
-                    $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
+                    $self->verbose(1,"no keyword 'no_index' or 'private' in META_CONTENT");
                 }
             } else {
-                # $self->verbose(1,"no YAML_CONTENT"); # too noisy
+                # $self->verbose(1,"no META_CONTENT"); # too noisy
             }
             push @res, $ppp;
         }
@@ -1871,7 +1871,7 @@ Please contact modules\@perl.org if there are any open questions.
                       PMFILE => $pmfile,
                       FIO => $self,
                       USERID => $self->{USERID},
-                      YAML_CONTENT => $self->{YAML_CONTENT},
+                      META_CONTENT => $self->{META_CONTENT},
                      );
 
             $pio->examine_pkg;
@@ -1944,7 +1944,7 @@ Please contact modules\@perl.org if there are any open questions.
                 if ($self->simile($pmfile,$pkg)) {
                     $ppp->{$pkg}{simile} = $pmfile;
                     if ($self->version_from_yaml_ok) {
-                        my $provides = $self->{DIO}{YAML_CONTENT}{provides};
+                        my $provides = $self->{DIO}{META_CONTENT}{provides};
                         if (exists $provides->{$pkg}) {
                             if (exists $provides->{$pkg}{version}) {
                                 my $v = $provides->{$pkg}{version};

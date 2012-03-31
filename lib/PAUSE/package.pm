@@ -665,8 +665,8 @@ sub checkin_into_primeur {
 
   my $userid;
   my $dio = $self->parent->parent;
-  if (exists $dio->{YAML_CONTENT}{x_authority}) {
-      $userid = $dio->{YAML_CONTENT}{x_authority};
+  if (exists $dio->{META_CONTENT}{x_authority}) {
+      $userid = $dio->{META_CONTENT}{x_authority};
       $userid =~ s/^cpan://i;
       # validate userid existing
   } else {

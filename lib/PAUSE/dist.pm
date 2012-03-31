@@ -646,9 +646,9 @@ sub filter_pms {
     next unless $mf =~ /\.pm(?:\.PL)?$/i;
     my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
     next if $inmf =~ m!^(?:t|inc)/!;
-    if ($self->{YAML_CONTENT}){
-      my $no_index = $self->{YAML_CONTENT}{no_index}
-      || $self->{YAML_CONTENT}{private}; # backward compat
+    if ($self->{META_CONTENT}){
+      my $no_index = $self->{META_CONTENT}{no_index}
+      || $self->{META_CONTENT}{private}; # backward compat
       if (ref($no_index) eq 'HASH') {
         my %map = (
           file => qr{\z},
@@ -679,10 +679,10 @@ sub filter_pms {
         }
       } else {
         # noisy:
-        # $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
+        # $self->verbose(1,"no keyword 'no_index' or 'private' in META_CONTENT");
       }
     } else {
-      # $self->verbose(1,"no YAML_CONTENT"); # too noisy
+      # $self->verbose(1,"no META_CONTENT"); # too noisy
     }
     push @pmfile, $mf;
   }
@@ -711,7 +711,7 @@ sub examine_pms {
   my $pmfiles = $self->filter_pms;
   my($yaml,$provides,$indexingrule);
   if (my $version_from_yaml_ok = $self->version_from_yaml_ok) {
-    $yaml = $self->{YAML_CONTENT};
+    $yaml = $self->{META_CONTENT};
     $provides = $yaml->{provides};
     if (!$indexingrule && $provides && "HASH" eq ref $provides) {
       $indexingrule = 2;
@@ -741,7 +741,7 @@ sub examine_pms {
         PMFILE => $pmfile,
         TIME => $self->{TIME},
         USERID => $self->{USERID},
-        YAML_CONTENT => $self->{YAML_CONTENT},
+        META_CONTENT => $self->{META_CONTENT},
       );
       $fio->examine_fio;
     }
@@ -768,7 +768,7 @@ sub examine_pms {
         PMFILE => $v->{infile},
         TIME => $self->{TIME},
         USERID => $self->{USERID},
-        YAML_CONTENT => $self->{YAML_CONTENT},
+        META_CONTENT => $self->{META_CONTENT},
       );
       my $pio = PAUSE::package
       ->new(
@@ -779,7 +779,7 @@ sub examine_pms {
         TIME => $self->{TIME},
         PMFILE => $v->{infile},
         USERID => $self->{USERID},
-        YAML_CONTENT => $self->{YAML_CONTENT},
+        META_CONTENT => $self->{META_CONTENT},
       );
       $pio->examine_pkg;
     }
@@ -861,7 +861,7 @@ sub extract_readme_and_yaml {
       utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
       PAUSE::newfile_hook("$MLROOT/$sans.meta");
       my $yamlloadfile = \&{"$YAML_MODULE\::LoadFile"};
-      eval { $self->{YAML_CONTENT} = $yamlloadfile->($yaml); };
+      eval { $self->{META_CONTENT} = $yamlloadfile->($yaml); };
       if ($@) {
         $self->verbose(1,"Error while parsing YAML: $@");
         if ($@ =~ /msg: Unrecognized implicit value/) {
@@ -873,15 +873,15 @@ sub extract_readme_and_yaml {
           my $cat = do { open my($f), $yaml or die; local $/; <$f> };
           $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
           my $yamlload     = \&{"$YAML_MODULE\::Load"};
-          eval { $self->{YAML_CONTENT} = $yamlload->($cat); };
+          eval { $self->{META_CONTENT} = $yamlload->($cat); };
           if ($@) {
-            $self->{YAML_CONTENT} = {};
+            $self->{META_CONTENT} = {};
             $self->{YAML} = "META.yml found but error ".
             "encountered while loading: $@";
           }
 
         } else {
-          $self->{YAML_CONTENT} = {};
+          $self->{META_CONTENT} = {};
           $self->{YAML} = "META.yml found but error ".
           "encountered while loading: $@";
         }
@@ -900,7 +900,7 @@ sub version_from_yaml_ok {
   my($self) = @_;
   return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
   my $ok = 0;
-  my $c = $self->{YAML_CONTENT};
+  my $c = $self->{META_CONTENT};
   if (exists $c->{provides}) {
     if (exists $c->{generated_by}) {
       if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {

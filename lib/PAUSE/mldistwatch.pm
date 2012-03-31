@@ -450,8 +450,8 @@ sub check_for_new {
 
         $dio->read_dist;
         $dio->extract_readme_and_yaml;
-        if ($dio->{YAML_CONTENT}{distribution_type}
-            && $dio->{YAML_CONTENT}{distribution_type} =~ m/^(script)$/) {
+        if ($dio->{META_CONTENT}{distribution_type}
+            && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
             next BIGLOOP;
         }
         $dio->check_blib;
