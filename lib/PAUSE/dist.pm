@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package PAUSE::dist;
-use vars qw(%CHECKSUMDONE $AUTOLOAD $YAML_MODULE);
+use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
 use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
