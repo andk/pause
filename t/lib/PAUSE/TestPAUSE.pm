@@ -128,6 +128,7 @@ sub _build_pause_config_overrides {
 sub with_our_config {
   my ($self, $code) = @_;
 
+  local $PAUSE::USE_RECENTFILE_HOOKS = 0;
   local $PAUSE::Config = {
     %{ $PAUSE::Config },
     %{ $self->pause_config_overrides },

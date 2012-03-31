@@ -25,7 +25,7 @@ use Sys::Hostname ();
 use Time::Piece;
 use YAML::Syck;
 
-my $USE_RECENTFILE_HOOKS = Sys::Hostname::hostname =~ /pause/;
+our $USE_RECENTFILE_HOOKS = Sys::Hostname::hostname =~ /pause/;
 if ($USE_RECENTFILE_HOOKS) {
   unless ($HAVE_RECENTFILE) {
     die "Did not find Recentfile library!";
