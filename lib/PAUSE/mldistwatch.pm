@@ -71,6 +71,8 @@ sub new {
                 $|=1;
                 print $fh $$, "\n";
                 select $ofh;
+            } elsif ($opt->{"fail-silently-on-concurrency-protection"}) {
+                exit;
             } else {
                 die "other mldistwatch job running, ".
                     "will not run at the same time";

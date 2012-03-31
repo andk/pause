@@ -41,6 +41,12 @@ distro is a full path
 
 do not index, only rewrite the index files
 
+=item B<--fail-silently-on-concurrency-protection!>
+
+When we fail because some other instance of this job is already
+running, we often do not want to see an error message because we are a
+cronjob. If this option is true, we exit instead.
+
 =item B<--sleep=i>
 
 time to sleep at the end of big loop
