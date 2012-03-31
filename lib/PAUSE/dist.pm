@@ -337,7 +337,7 @@ sub mail_summary {
   my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
   my $substrdistro = substr $distro, 5;
   my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-  my $versions_from_metayaml = $self->{VERSION_FROM_META_OK} ? "yes" : "no";
+  my $versions_from_metayaml = $self->version_from_meta_ok ? "yes" : "no";
   my $yaml_module_version = $PAUSE::dist::YAML_MODULE->VERSION;
   push @m, qq[
   User: $author ($asciiname)
