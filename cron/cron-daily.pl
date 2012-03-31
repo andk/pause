@@ -681,7 +681,7 @@ sub authors {
     }
     $author->[1] ||= sprintf q{%s@cpan.org}, lc($author->[0]);
 
-    $list .= join qq{\t}, @$author;
+    $list .= (join qq{\t}, @$author) . "\n";
   }
 
   if ($list ne $olist) {
