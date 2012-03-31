@@ -216,7 +216,7 @@ sub examine_dist {
   my($suffix,$skip);
   $suffix = $skip = "";
   # should use CPAN::DistnameInfo but note: "zip" not contained
-  # because special-cased in line 1525 below;
+  # because it is special-cased below
   my $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
   if ($self->isa_regular_perl($dist)) {
     my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
