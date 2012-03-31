@@ -449,7 +449,7 @@ sub check_for_new {
         }
 
         $dio->read_dist;
-        $dio->extract_readme_and_yaml;
+        $dio->extract_readme_and_meta;
         if ($dio->{META_CONTENT}{distribution_type}
             && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
             next BIGLOOP;

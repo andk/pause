@@ -710,10 +710,10 @@ sub examine_pms {
   $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
 
   my $pmfiles = $self->filter_pms;
-  my($yaml,$provides,$indexingrule);
+  my($meta,$provides,$indexingrule);
   if (my $version_from_meta_ok = $self->version_from_meta_ok) {
-    $yaml = $self->{META_CONTENT};
-    $provides = $yaml->{provides};
+    $meta = $self->{META_CONTENT};
+    $provides = $meta->{provides};
     if (!$indexingrule && $provides && "HASH" eq ref $provides) {
       $indexingrule = 2;
     }
@@ -819,7 +819,7 @@ sub read_dist {
 }
 
 # package PAUSE::dist;
-sub extract_readme_and_yaml {
+sub extract_readme_and_meta {
   my $self = shift;
   my($suffix) = $self->{SUFFIX};
   return unless $suffix;
