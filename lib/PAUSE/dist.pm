@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 package PAUSE::dist;
-use vars qw(%CHECKSUMDONE $AUTOLOAD $YAML_MODULE);
+use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
 use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
 use List::MoreUtils ();
+use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
 
 # ISA_REGULAR_PERL means a perl release for public consumption
@@ -216,7 +217,7 @@ sub examine_dist {
   my($suffix,$skip);
   $suffix = $skip = "";
   # should use CPAN::DistnameInfo but note: "zip" not contained
-  # because special-cased in line 1525 below;
+  # because it is special-cased below
   my $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
   if ($self->isa_regular_perl($dist)) {
     my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
@@ -337,17 +338,17 @@ sub mail_summary {
   my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
   my $substrdistro = substr $distro, 5;
   my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-  my $versions_from_metayaml = $self->{VERSION_FROM_YAML_OK} ? "yes" : "no";
-  my $yaml_module_version = $PAUSE::dist::YAML_MODULE->VERSION;
+  my $versions_from_meta = $self->version_from_meta_ok ? "yes" : "no";
+  my $parse_cpan_meta_version = Parse::CPAN::Meta->VERSION;
   push @m, qq[
   User: $author ($asciiname)
   Distribution file: $distrobasename
   Number of files: $nfiles
   *.pm files: $pmfiles
   README: $self->{README}
-  META.yml: $self->{YAML}
-  YAML-Parser: $PAUSE::dist::YAML_MODULE $yaml_module_version
-  META-driven index: $versions_from_metayaml
+  META-File: $self->{METAFILE}
+  META-Parser: Parse::CPAN::Meta $parse_cpan_meta_version
+  META-driven index: $versions_from_meta
   Timestamp of file: $mtime UTC
   Time of this run: $time UTC\n\n];
   my $tf = Text::Format->new(firstIndent=>0);
@@ -468,7 +469,7 @@ sub mail_summary {
     } else {
       warn sprintf "st[%s]", Data::Dumper::Dumper($inxst);
       if ($pmfiles > 0) {
-        if ($self->version_from_yaml_ok) {
+        if ($self->version_from_meta_ok) {
 
           push @m, qq{Nothing in this distro has been
           indexed, because according to META.yml this
@@ -646,9 +647,9 @@ sub filter_pms {
     next unless $mf =~ /\.pm(?:\.PL)?$/i;
     my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
     next if $inmf =~ m!^(?:t|inc)/!;
-    if ($self->{YAML_CONTENT}){
-      my $no_index = $self->{YAML_CONTENT}{no_index}
-      || $self->{YAML_CONTENT}{private}; # backward compat
+    if ($self->{META_CONTENT}){
+      my $no_index = $self->{META_CONTENT}{no_index}
+      || $self->{META_CONTENT}{private}; # backward compat
       if (ref($no_index) eq 'HASH') {
         my %map = (
           file => qr{\z},
@@ -679,10 +680,10 @@ sub filter_pms {
         }
       } else {
         # noisy:
-        # $self->verbose(1,"no keyword 'no_index' or 'private' in YAML_CONTENT");
+        # $self->verbose(1,"no keyword 'no_index' or 'private' in META_CONTENT");
       }
     } else {
-      # $self->verbose(1,"no YAML_CONTENT"); # too noisy
+      # $self->verbose(1,"no META_CONTENT"); # too noisy
     }
     push @pmfile, $mf;
   }
@@ -709,10 +710,10 @@ sub examine_pms {
   $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
 
   my $pmfiles = $self->filter_pms;
-  my($yaml,$provides,$indexingrule);
-  if (my $version_from_yaml_ok = $self->version_from_yaml_ok) {
-    $yaml = $self->{YAML_CONTENT};
-    $provides = $yaml->{provides};
+  my($meta,$provides,$indexingrule);
+  if (my $version_from_meta_ok = $self->version_from_meta_ok) {
+    $meta = $self->{META_CONTENT};
+    $provides = $meta->{provides};
     if (!$indexingrule && $provides && "HASH" eq ref $provides) {
       $indexingrule = 2;
     }
@@ -741,7 +742,7 @@ sub examine_pms {
         PMFILE => $pmfile,
         TIME => $self->{TIME},
         USERID => $self->{USERID},
-        YAML_CONTENT => $self->{YAML_CONTENT},
+        META_CONTENT => $self->{META_CONTENT},
       );
       $fio->examine_fio;
     }
@@ -768,7 +769,7 @@ sub examine_pms {
         PMFILE => $v->{infile},
         TIME => $self->{TIME},
         USERID => $self->{USERID},
-        YAML_CONTENT => $self->{YAML_CONTENT},
+        META_CONTENT => $self->{META_CONTENT},
       );
       my $pio = PAUSE::package
       ->new(
@@ -779,7 +780,7 @@ sub examine_pms {
         TIME => $self->{TIME},
         PMFILE => $v->{infile},
         USERID => $self->{USERID},
-        YAML_CONTENT => $self->{YAML_CONTENT},
+        META_CONTENT => $self->{META_CONTENT},
       );
       $pio->examine_pkg;
     }
@@ -818,7 +819,7 @@ sub read_dist {
 }
 
 # package PAUSE::dist;
-sub extract_readme_and_yaml {
+sub extract_readme_and_meta {
   my $self = shift;
   my($suffix) = $self->{SUFFIX};
   return unless $suffix;
@@ -852,88 +853,66 @@ sub extract_readme_and_yaml {
     $self->{README} = "No README found";
     $self->verbose(1,"No readme in $dist\n");
   }
+  my $json = List::Util::reduce { length $a < length $b ? $a : $b }
+             grep !m|/t/|, grep m|/META\.json$|, @manifind;
   my $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
-  grep !m|/t/|, grep m|/META\.yml$|, @manifind;
-  if (defined $yaml) {
-    if (-s $yaml) {
-      $self->{YAML} = $yaml;
-      File::Copy::copy $yaml, "$MLROOT/$sans.meta";
-      utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
+             grep !m|/t/|, grep m|/META\.yml$|, @manifind;
+
+  unless ($json || $yaml) {
+    $self->{METAFILE} = "No META.yml or META.json found";
+    $self->verbose(1,"No META.yml or META.json in $dist");
+    return;
+  }
+
+  for my $metafile ($json || $yaml) {
+    if (-s $metafile) {
+      $self->{METAFILE} = $metafile;
+      File::Copy::copy $metafile, "$MLROOT/$sans.meta";
+      utime((stat $metafile)[8,9], "$MLROOT/$sans.meta");
       PAUSE::newfile_hook("$MLROOT/$sans.meta");
-      my $yamlloadfile = \&{"$YAML_MODULE\::LoadFile"};
-      eval { $self->{YAML_CONTENT} = $yamlloadfile->($yaml); };
-      if ($@) {
-        $self->verbose(1,"Error while parsing YAML: $@");
-        if ($@ =~ /msg: Unrecognized implicit value/) {
-          # let's retry, but let's not expect that this
-          # will work. MakeMaker 6.16 had a bug that
-          # could be fixed like this, at least for
-          # Pod::Simple
-
-          my $cat = do { open my($f), $yaml or die; local $/; <$f> };
-          $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
-          my $yamlload     = \&{"$YAML_MODULE\::Load"};
-          eval { $self->{YAML_CONTENT} = $yamlload->($cat); };
-          if ($@) {
-            $self->{YAML_CONTENT} = {};
-            $self->{YAML} = "META.yml found but error ".
-            "encountered while loading: $@";
-          }
-
-        } else {
-          $self->{YAML_CONTENT} = {};
-          $self->{YAML} = "META.yml found but error ".
-          "encountered while loading: $@";
-        }
+      my $ok = eval {
+        $self->{META_CONTENT} = Parse::CPAN::Meta->load_file($metafile); 1
+      };
+      unless ($ok) {
+        $self->verbose(1,"Error while parsing $metafile: $@");
+        $self->{META_CONTENT} = {};
+        $self->{METAFILE} = "$metafile found but error "
+                          . "encountered while loading: $@";
       }
     } else {
-      $self->{YAML} = "Empty META.yml found, ignoring\n";
+      $self->{METAFILE} = "Empty $metafile found, ignoring\n";
     }
-  } else {
-    $self->{YAML} = "No META.yml found";
-    $self->verbose(1,"No META.yml in $dist");
   }
 }
 
 # package PAUSE::dist
-sub version_from_yaml_ok {
+sub version_from_meta_ok {
   my($self) = @_;
-  return $self->{VERSION_FROM_YAML_OK} if exists $self->{VERSION_FROM_YAML_OK};
-  my $ok = 0;
-  my $c = $self->{YAML_CONTENT};
-  if (exists $c->{provides}) {
-    if (exists $c->{generated_by}) {
-      if (my($v) = $c->{generated_by} =~ /Module::Build version ([\d\.]+)/) {
-        if ($v eq "0.250.0") {
-          $ok++;
-        } elsif ($v >= 0.19) {
-          if ($v < 0.26) {
-            # RSAVAGE/Javascript-SHA1-1.01.tgz had an
-            # empty provides hash. Ron did not find
-            # the reason why this happened, but let's
-            # not go overboard, 0.26 seems a good
-            # threshold from the statistics: there
-            # are not many empty provides hashes from
-            # 0.26 up.
-            if (keys %{$c->{provides}}) {
-              $ok++;
-            } else {
-              $ok = 0;
-            }
-          } else {
-            $ok++;
-          }
-        } else {
-          $ok = 0;
-        }
-      } else {
-        $ok++;
-      }
-    } else {
-      $ok++;
-    }
+  return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
+  my $c = $self->{META_CONTENT};
+
+  # If there's no provides hash, we can't get our module versions from the
+  # provides hash! -- rjbs, 2012-03-31
+  return($self->{VERSION_FROM_META_OK} = 0) unless $c->{provides};
+
+  # Some versions of Module::Build geneated an empty provides hash.  If we're
+  # *not* looking at a Module::Build-generated metafile, then it's okay.
+  my ($mb_v) = ($c->{generated_by} // '') =~ /Module::Build version ([\d\.]+)/;
+  return($self->{VERSION_FROM_META_OK} = 1) unless $mb_v;
+
+  # ??? I don't know why this is here.
+  return($self->{VERSION_FROM_META_OK} = 1) if $mb_v eq '0.250.0';
+
+  if ($mb_v >= 0.19 && $mb_v < 0.26 && ! keys %{$c->{provides}}) {
+      # RSAVAGE/Javascript-SHA1-1.01.tgz had an empty provides hash. Ron
+      # did not find the reason why this happened, but let's not go
+      # overboard, 0.26 seems a good threshold from the statistics: there
+      # are not many empty provides hashes from 0.26 up.
+      return($self->{VERSION_FROM_META_OK} = 0);
   }
-  return $self->{VERSION_FROM_YAML_OK} = $ok;
+
+  # We're not in the suspect range of M::B versions.  It's good to go.
+  return($self->{VERSION_FROM_META_OK} = 1);
 }
 
 # package PAUSE::dist

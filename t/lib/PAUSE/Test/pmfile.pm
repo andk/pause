@@ -44,7 +44,7 @@ sub new {
     DIO    => $self->{dist},
     USERID => 'FAKE',
     TIME   => time,
-    YAML_CONTENT => {},
+    META_CONTENT => {},
     VERSION => $self->fake_dist->version,
   );
   $self->{pmfile} = Test::MockObject::Extends->new($self->{pmfile});
@@ -75,7 +75,7 @@ sub dist_mock :Test :Plan(1) {
 my $ppp = 'My::Package';
 sub filter_ppps :Test :Plan(3) {
   my ($self, $no_index, $expect) = @_;
-  $self->{pmfile}{YAML_CONTENT}{no_index} = $no_index;
+  $self->{pmfile}{META_CONTENT}{no_index} = $no_index;
 
   my @res = $self->{pmfile}->filter_ppps($ppp);
   cmp_deeply(
@@ -117,16 +117,16 @@ sub examine_fio :Test :Plan(3) {
   $pmfile->examine_fio;
   $self->{dist}->next_call for 1..5; # skip over some irrelevant logging
 #  $self->{dist}->next_call_ok(connect => []);
-#  $self->{dist}->next_call_ok(version_from_yaml_ok => []);
+#  $self->{dist}->next_call_ok(version_from_meta_ok => []);
 #  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
-#  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in YAML_CONTENT");
+#  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in META_CONTENT");
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");
   $self->{dist}->verbose_ok(1, "Will check keys_ppp[My::Dist]\n");
   cmp_deeply(
-    [ @{$PACKAGE}{ qw(PACKAGE DIST FIO TIME PMFILE USERID YAML_CONTENT) } ],
+    [ @{$PACKAGE}{ qw(PACKAGE DIST FIO TIME PMFILE USERID META_CONTENT) } ],
     [
       'My::Dist', 'My-Dist', $pmfile,
-      @{$pmfile}{qw(TIME PMFILE USERID YAML_CONTENT)},
+      @{$pmfile}{qw(TIME PMFILE USERID META_CONTENT)},
     ],
     "correct package info",
   );

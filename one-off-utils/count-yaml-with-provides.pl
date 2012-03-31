@@ -283,7 +283,7 @@ Differences between the indexer and the "provides" fields by Module::Build:
 
 Implementation plan in mldistwatch:
 
-The YAML_CONTENT key is attached to the PAUSE::dist object. When we
+The META_CONTENT key is attached to the PAUSE::dist object. When we
 reach the file object with examine_fio, this object lives in
 FIO->{DIO}, the dist object.
 

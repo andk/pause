@@ -41,16 +41,6 @@ use PAUSE::mldistwatch::Constants ();
 use PAUSE::MailAddress ();
 use Safe;
 use Text::Format;
-{
-    my $HAVE_YAML = eval { require YAML; 1; };
-    my $HAVE_YAML_SYCK = eval { require YAML::Syck; 1; };
-    my $HAVE_YAML_XS = eval { require YAML::XS; 1; };
-    $PAUSE::dist::YAML_MODULE =
-        $HAVE_YAML_XS ? "YAML::XS" :
-            $HAVE_YAML_SYCK ? "YAML::Syck" :
-                $HAVE_YAML ? "YAML" :
-                    die "Found neither YAML::XS nor YAML::Syck nor YAML installed";
-}
 
 $Data::Dumper::Indent = 1;
 
@@ -449,9 +439,9 @@ sub check_for_new {
         }
 
         $dio->read_dist;
-        $dio->extract_readme_and_yaml;
-        if ($dio->{YAML_CONTENT}{distribution_type}
-            && $dio->{YAML_CONTENT}{distribution_type} =~ m/^(script)$/) {
+        $dio->extract_readme_and_meta;
+        if ($dio->{META_CONTENT}{distribution_type}
+            && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
             next BIGLOOP;
         }
         $dio->check_blib;
@@ -1157,37 +1147,23 @@ sub rewrite06 {
             $self->verbose(1,"Couldn't open $repfile $!\n");
         }
     } else {
-        $self->verbose(1,"No 01modules exist; won't try to read it");
+        $self->verbose(1,"No 06perms.txt exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
     my @query       = (
-                qq{SELECT mods.modid,
-                          mods.userid,
-                          "m"
-                     FROM mods
-},
-                qq{SELECT primeur.package,
-                          primeur.userid,
-                          "f"
-                     FROM primeur
-},
-                qq{SELECT perms.package,
-                          perms.userid,
-                          "c"
-                     FROM perms
-},
-               );
+        qq{SELECT mods.modid, mods.userid, "m" FROM mods},
+        qq{SELECT primeur.package, primeur.userid, "f" FROM primeur},
+        qq{SELECT perms.package, perms.userid, "c" FROM perms},
+    );
 
     my %seen;
     {
         for my $query (@query) {
             my $sth = $dbh->prepare($query);
             $sth->execute();
-            if ($sth->rows > 0) {
-                while (my @row = $sth->fetchrow_array()) {
-                    $seen{join ",", @row[0,1]} ||= $row[2];
-                }
+            while (my @row = $sth->fetchrow_array()) {
+                $seen{join ",", @row[0,1]} ||= $row[2];
             }
             $sth->finish;
         }
@@ -1208,7 +1184,9 @@ Date:        %s
             $list .= sprintf "%s,%s\n", $k, $seen{$k};
         }
     }
-    if ($list ne $olist) {
+    if ($list eq $olist) {
+        $self->verbose(1,"06perms.txt has not changed; won't rewrite\n");
+    } else {
         my $F;
         my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
         if (open $F, ">:utf8", $gitfile) {
