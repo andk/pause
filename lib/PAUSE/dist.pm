@@ -6,6 +6,7 @@ use vars qw(%CHECKSUMDONE $AUTOLOAD $YAML_MODULE);
 use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
 use List::MoreUtils ();
+use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
 
 # ISA_REGULAR_PERL means a perl release for public consumption
@@ -337,17 +338,17 @@ sub mail_summary {
   my $asciiname = $u->{asciiname} || $u->{fullname} || "name unknown";
   my $substrdistro = substr $distro, 5;
   my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-  my $versions_from_metayaml = $self->version_from_meta_ok ? "yes" : "no";
-  my $yaml_module_version = $PAUSE::dist::YAML_MODULE->VERSION;
+  my $versions_from_meta = $self->version_from_meta_ok ? "yes" : "no";
+  my $parse_cpan_meta_version = Parse::CPAN::Meta->VERSION;
   push @m, qq[
   User: $author ($asciiname)
   Distribution file: $distrobasename
   Number of files: $nfiles
   *.pm files: $pmfiles
   README: $self->{README}
-  META.yml: $self->{YAML}
-  YAML-Parser: $PAUSE::dist::YAML_MODULE $yaml_module_version
-  META-driven index: $versions_from_metayaml
+  META-File: $self->{METAFILE}
+  META-Parser: Parse::CPAN::Meta $parse_cpan_meta_version
+  META-driven index: $versions_from_meta
   Timestamp of file: $mtime UTC
   Time of this run: $time UTC\n\n];
   my $tf = Text::Format->new(firstIndent=>0);
@@ -852,46 +853,35 @@ sub extract_readme_and_yaml {
     $self->{README} = "No README found";
     $self->verbose(1,"No readme in $dist\n");
   }
+  my $json = List::Util::reduce { length $a < length $b ? $a : $b }
+             grep !m|/t/|, grep m|/META\.json$|, @manifind;
   my $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
              grep !m|/t/|, grep m|/META\.yml$|, @manifind;
-  if (defined $yaml) {
-    if (-s $yaml) {
-      $self->{YAML} = $yaml;
-      File::Copy::copy $yaml, "$MLROOT/$sans.meta";
-      utime((stat $yaml)[8,9], "$MLROOT/$sans.meta");
+
+  unless ($json || $yaml) {
+    $self->{METAFILE} = "No META.yml or META.json found";
+    $self->verbose(1,"No META.yml or META.json in $dist");
+    return;
+  }
+
+  for my $metafile ($json || $yaml) {
+    if (-s $metafile) {
+      $self->{METAFILE} = $metafile;
+      File::Copy::copy $metafile, "$MLROOT/$sans.meta";
+      utime((stat $metafile)[8,9], "$MLROOT/$sans.meta");
       PAUSE::newfile_hook("$MLROOT/$sans.meta");
-      my $yamlloadfile = \&{"$YAML_MODULE\::LoadFile"};
-      eval { $self->{META_CONTENT} = $yamlloadfile->($yaml); };
-      if ($@) {
-        $self->verbose(1,"Error while parsing YAML: $@");
-        if ($@ =~ /msg: Unrecognized implicit value/) {
-          # let's retry, but let's not expect that this
-          # will work. MakeMaker 6.16 had a bug that
-          # could be fixed like this, at least for
-          # Pod::Simple
-
-          my $cat = do { open my($f), $yaml or die; local $/; <$f> };
-          $cat =~ s/:(\s+)(\S+)$/:$1"$2"/mg;
-          my $yamlload     = \&{"$YAML_MODULE\::Load"};
-          eval { $self->{META_CONTENT} = $yamlload->($cat); };
-          if ($@) {
-            $self->{META_CONTENT} = {};
-            $self->{YAML} = "META.yml found but error ".
-            "encountered while loading: $@";
-          }
-
-        } else {
-          $self->{META_CONTENT} = {};
-          $self->{YAML} = "META.yml found but error ".
-          "encountered while loading: $@";
-        }
+      my $ok = eval {
+        $self->{META_CONTENT} = Parse::CPAN::Meta->load_file($metafile); 1
+      };
+      unless ($ok) {
+        $self->verbose(1,"Error while parsing $metafile: $@");
+        $self->{META_CONTENT} = {};
+        $self->{METAFILE} = "$metafile found but error "
+                          . "encountered while loading: $@";
       }
     } else {
-      $self->{YAML} = "Empty META.yml found, ignoring\n";
+      $self->{METAFILE} = "Empty $metafile found, ignoring\n";
     }
-  } else {
-    $self->{YAML} = "No META.yml found";
-    $self->verbose(1,"No META.yml in $dist");
   }
 }
 
