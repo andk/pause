@@ -4,20 +4,14 @@ use MooseX::StrictConstructor;
 
 use DBI;
 use Parse::CPAN::Packages;
-use Path::Class;
 
 use namespace::autoclean;
 
 has tmpdir => (
-  reader => '_tmpdir_obj',
+  is     => 'ro',
   isa    => 'Object',
   required => 1,
 );
-
-sub tmpdir {
-  my ($self) = @_;
-  return dir($self->_tmpdir_obj);
-}
 
 has config_overrides => (
   reader   => '_config_overrides',
