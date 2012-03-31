@@ -32,6 +32,7 @@ use IPC::Cmd ();
 use JSON ();
 use List::Util ();
 use List::MoreUtils ();
+use Path::Class;
 use PAUSE ();
 use PAUSE::dist ();
 use PAUSE::pmfile ();
@@ -171,7 +172,10 @@ sub reindex {
 
 sub rewrite_indexes {
     my $self = shift;
-    $self->git->reset({ hard => 1 }) if $self->git->status->is_dirty;
+
+    $self->git->reset({ hard => 1 })
+      if -e dir($self->gitroot)->file(qw(.git refs heads master));
+
     $self->rewrite02();
     my $MLROOT = $self->mlroot;
     chdir $MLROOT
