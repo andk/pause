@@ -2874,10 +2874,14 @@ sub request_id {
   # first time: form
   # second time with error: error message + form
   # second time without error: OK message
+  # bot debunked? => "Thank you!"
 
   my $showform = 0;
   my $regOK = 0;
 
+  if ($req->param('url')) { # debunked
+    return "Thank you!";
+  }
   my $fullname  = $req->param( 'pause99_request_id_fullname') || "";
   my $ufullname = $mgr->any2utf8($fullname);
   if ($ufullname ne $fullname) {
@@ -3014,6 +3018,8 @@ sub request_id {
     push @m, $mgr->textarea(name=>"pause99_request_id_rationale",
                             rows=>8,
                             cols=>60);
+    push @m, q{<!-- zdjela meda -->
+  <div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"></div>};
     push @m, qq{</p>};
     # push @m, "</table>\n";
 
