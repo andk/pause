@@ -658,7 +658,7 @@ sub authors {
   }
 
   my $authors = $Dbh->selectall_arrayref(
-    "SELECT userid, email, fullname
+    "SELECT userid, email, fullname, homepage
                              FROM users
                              ORDER BY userid
     /*UNION
@@ -673,11 +673,12 @@ sub authors {
       require Encode;
       for (@$author) {
         defined && /\P{ASCII}/ && Encode::_utf8_on($_);
-
-        # Surely no one has tabs in his or her email or full name, but let's
-        # be safe!  -- rjbs, 2012-03-31
-        s/\t/ /g;
       }
+
+      # Surely no one has tabs in his or her email or full name, but let's
+      # be safe!  -- rjbs, 2012-03-31
+      s/\t/ /g for @$author[0,1,2];
+      s/\t/%09/g for $author->[3];
     }
     $author->[1] ||= sprintf q{%s@cpan.org}, lc($author->[0]);
 

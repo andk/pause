@@ -645,7 +645,13 @@ sub filter_pms {
   MANI: for my $mf ( @{$self->{MANIFOUND}} ) {
     next unless $mf =~ /\.pm(?:\.PL)?$/i;
     my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
-    next if $inmf =~ m!^(?:t|inc)/!;
+
+    # skip "t" - libraries in ./t are test libraries!
+    # skip "inc" - libraries in ./inc are usually install libraries
+    # skip "local" - somebody shipped his carton setup!
+    # skip 'perl5" - somebody shipped her local::lib!
+    next if $inmf =~ m!^(?:t|inc|local|perl5)/!;
+
     if ($self->{META_CONTENT}){
       my $no_index = $self->{META_CONTENT}{no_index}
       || $self->{META_CONTENT}{private}; # backward compat
