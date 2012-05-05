@@ -2,6 +2,10 @@ use strict;
 use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
+use version (); # to get $version::STRICT
+
+BEGIN { die "Version of version.pm too low ($version::VERSION), does not define STRICT"
+            unless defined $version::STRICT }
 
 sub parent {
     my($self) = @_;
@@ -187,6 +191,7 @@ sub packages_per_pmfile {
     my $filemtime = $self->{MTIME};
     my $version = $self->{VERSION};
 
+    $DB::single++;
     open my $fh, "<", "$pmfile" or return $ppp;
 
     local $/ = "\n";
@@ -209,6 +214,7 @@ sub packages_per_pmfile {
         }
 
         my $pkg;
+        my $strict_version;
 
         if (
             $pline =~ m{
@@ -216,9 +222,10 @@ sub packages_per_pmfile {
                       \bpackage\s+
                       ([\w\:\']+)
                       \s*
-                      ( $ | [\}\;] )
+                      (?: $ | [\}\;] | ($version::STRICT) )
                     }x) {
             $pkg = $2;
+            $strict_version = $3;
             if ($pkg eq "DB"){
                 # XXX if pumpkin and perl make him comaintainer! I
                 # think I always made the pumpkins comaint on DB
@@ -260,8 +267,12 @@ sub packages_per_pmfile {
                         }
                     }
                 } else {
-                    $ppp->{$pkg}{version} ||= "";
-                    $ppp->{$pkg}{version} ||= $version;
+                    if (defined $strict_version){
+                        $ppp->{$pkg}{version} = $strict_version ;
+                    } else {
+                        $ppp->{$pkg}{version} ||= "";
+                        $ppp->{$pkg}{version} ||= $version;
+                    }
                     local($^W)=0;
                     $ppp->{$pkg}{version} =
                         $version

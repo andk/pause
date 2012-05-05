@@ -143,4 +143,37 @@ sub examine_fio :Test :Plan(3) {
   );
 }
 
+sub packages_per_pmfile :Test :Plan(3) {
+  my ($self,$pkg,$pm_content,$version) = @_;
+  # pass("playing around");
+  my $selfpmfile = $self->{pmfile};
+  my $pmfile = $self->fake_dist_dir->file('lib/My/Dist.pm')->stringify;
+  open my $fh, ">", $pmfile or die "Could not open > '$pmfile': $!";
+  print $fh $pm_content;
+  close $fh or die "Could not close > '$pmfile': $!";
+  $selfpmfile->{PMFILE} = $pmfile;
+  $selfpmfile->{MTIME} = "42";
+  $selfpmfile->{VERSION_FROM_META_OK} = 0;
+  # $selfpmfile->{VERSION} = $version;
+  my $ppp = $selfpmfile->packages_per_pmfile;
+  is ref $ppp, "HASH", "ppp is a HASH";
+  is join(" ",keys %$ppp), $pkg, "only key in ppp is '$pkg'";
+  delete $ppp->{$pkg}{pause_reg};
+  cmp_deeply(
+             $ppp->{$pkg},
+             { version => $version,
+               filemtime => 42,
+               infile => $pmfile,
+               simile => $pmfile,
+               parsed => 1,
+             },
+             "correct version in packages_per_pmfile: $version",
+            );
+}
+
 1;
+
+#Local Variables:
+#mode: cperl
+#cperl-indent-level: 2
+#End:

@@ -1,0 +1,3 @@
+- [ "My::Dist", "package My::Dist;\nour $VERSION = '1234.56';\n", "0.02" ]
+- [ "My::Dist", "package My::Dist 0.08;\nour $VERSION = '1234.56';\n", "0.08" ]
+- [ "My::Dist", "package My::Dist 0.10;\nour $VERSION = '1234.56';\n", "0.10" ]
