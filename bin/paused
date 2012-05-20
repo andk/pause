@@ -692,7 +692,7 @@ sub verify_gzip_tar {
         $gzip = "/bin/gzip";
         $taropt = "tvzf";
         $testinggzip = $zcat;
-    } elsif ($tpath =~ /\.t(ar\.)?bz$/) {
+    } elsif ($tpath =~ /\.(tbz|tar\.bz2)$/) {
         $zcat = "/bin/bzcat";
         $gzip = "/bin/bzip2";
         $taropt = "tvjf";
