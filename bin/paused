@@ -686,14 +686,17 @@ sub verify_gzip_tar {
     my $zcat;
     my $gzip;
     my $taropt;
+    my $testinggzip;
     if ($tpath =~ /\.t(ar\.)?gz$/) {
         $zcat = "/bin/zcat";
         $gzip = "/bin/gzip";
         $taropt = "tvzf";
+        $testinggzip = $zcat;
     } elsif ($tpath =~ /\.t(ar\.)?bz$/) {
         $zcat = "/bin/bzcat";
         $gzip = "/bin/bzip2";
         $taropt = "tvjf";
+        $testinggzip = $gzip;
     } else {
         # nothing I could verify
         if (rename($tpath,$lpath)) {
@@ -707,19 +710,19 @@ sub verify_gzip_tar {
     die "no executable for zcat '$zcat'" unless -x $zcat;
     die "no executable for gzip '$gzip'" unless -x $gzip;
     my($out,$err);
-    if ($tpath =~ /\.(Z|t?gz)$/){
+    if ($tpath =~ /\.(Z|t?gz|tbz|bz2)$/){
         my($child_stat) = 0;
         sleep 1;
         local $SIG{CHLD};
         my $ls = `ls -l $tpath`;
-        IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
+        IPC::Run3::run3([$testinggzip, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
         $child_stat = $?;
         if ($child_stat > 0) {
             if ($err =~ /decompression OK, trailing garbage ignored/) {
                 rename $tpath, "$tpath.crcgarbage" or $self->logge("Could not rename '$tpath': $!");
                 my $system = "$zcat $tpath.crcgarbage 2>/dev/null | $gzip -9c > $tpath";
                 system($system); # ignore return value
-                IPC::Run3::run3([$zcat, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
+                IPC::Run3::run3([$testinggzip, "-t", $tpath], undef, \$out, \$err, {return_if_system_error => 1});
                 $child_stat = $?;
             }
         } elsif ($child_stat < 0) {
@@ -733,7 +736,7 @@ sub verify_gzip_tar {
             my @To = $PAUSE::Config->{ADMIN};
 
             my $blurb = "For the resource [$uri]
- the command [$zcat -t $tpath]
+ the command [$testinggzip -t $tpath]
  returned status [$child_stat]
  and stdout[$out] and stderr[$err].
  nosuccesscount is now at [$nosuccesscount].
