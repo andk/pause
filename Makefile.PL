@@ -38,6 +38,7 @@ WriteMakefile(
     IPC::Cmd
     IPC::Run3
     JSON::XS
+    LWP::UserAgent
     MD5
     Mail::Mailer
     Mail::Send
