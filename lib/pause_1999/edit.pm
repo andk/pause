@@ -2867,6 +2867,14 @@ sub request_id {
 
   my(@m);
 
+  push @m, q{
+    <p>A PAUSE account is only required to distribute and manage Perl module
+    distributions on CPAN. You do not need a PAUSE account to submit
+    bug reports to <a href="http://rt.cpan.org/">RT</a> or participate
+    in many Perl community sites — please register a
+    <a href="http://www.bitcard.org">Bitcard</a> account instead.</p>
+  };
+
   my $req = $mgr->{CGI};
   my $r = $mgr->{R};
   $mgr->prefer_post(1);
