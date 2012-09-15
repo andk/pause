@@ -25,7 +25,7 @@ to see the version requirements in the wild.
 
 use Compress::Zlib;
 use File::Find;
-use YAML::Syck;
+use Parse::CPAN::Meta;
 
 open my $fh, "/home/ftp/pub/PAUSE/modules/02packages.details.txt.gz" or die;
 my $gz = gzopen $fh, "r";
@@ -53,7 +53,7 @@ find(
         my @stat = stat $yaml;
         my $mtime = localtime $stat[9];
         my $y;
-        eval { $y = YAML::Syck::LoadFile($yaml); };
+        eval { $y = Parse::CPAN::Meta->load_file($yaml); };
         my $status;
         if ($@) {
           $status = "yaml_error";
