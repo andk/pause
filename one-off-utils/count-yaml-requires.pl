@@ -35,7 +35,7 @@ while ($gz->gzreadline($_)) {
 our($S1,$S2);
 while ($gz->gzreadline($_)) {
   my($mod,$ver,$dist) = split " ";
-  $dist =~ s/\.(tar\.gz|tgz|zip)$//;
+  $dist =~ s/\.(tar\.gz|tgz|zip|tar.bz2|tbz)$//;
   $S1->{$dist}{$mod} = $ver;
 }
 $gz->gzclose;
