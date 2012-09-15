@@ -810,7 +810,9 @@ sub rewrite01 {
     }
     $list = qq{<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title>Modules
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Modules
 on CPAN alphabetically</title></head><body>
 <h1>CPAN\'s $count modules distributions</h1>
 <h3>in alphabetical order by modules contained in the distributions</h3>

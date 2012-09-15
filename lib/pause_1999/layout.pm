@@ -28,7 +28,7 @@ sub layout {
     }
     push @l, qq{<!DOCTYPE html
                  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-                 "DTD/xhtml1-transitional.dtd">};
+                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">};
   }
   push @l, qq{<html xmlns="http://www.w3.org/1999/xhtml"><head><title>};
   push @l, $PAUSE::Config->{TESTHOST} ? qq{pause\@home: } : qq{PAUSE: };
