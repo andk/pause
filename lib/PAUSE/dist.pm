@@ -29,6 +29,17 @@ our $ISA_REGULAR_PERL = qr{
     )
     \z
 }x;
+# But we need to refuse indexing of bleadperls too: for duallife
+# modules.
+our $ISA_BLEAD_PERL = qr{
+    /
+    perl-5\.\d*[13579]\.\d+
+    (?: \.tar\.gz
+    |   \.tar\.bz2
+    )
+    \z
+}x;
+
 
 # package PAUSE::dist
 sub DESTROY {}

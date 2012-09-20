@@ -398,20 +398,20 @@ sub update_package {
   my $distorperlok = File::Basename::basename($dist) !~ m|/perl|;
   # this dist is not named perl-something (lex ILYAZ)
 
-  my $isaperl = $self->{FIO}{DIO}->isa_regular_perl($dist);
+  my $isa_regular_perl = $self->{FIO}{DIO}->isa_regular_perl($dist);
 
-  $distorperlok ||= $isaperl;
+  $distorperlok ||= $isa_regular_perl;
   # or it is THE perl dist
 
   my($something1) = File::Basename::basename($dist) =~ m|/perl(.....)|;
   # or it is called perl-something (e.g. perl-ldap) AND...
   my($something2) = File::Basename::basename($odist) =~ m|/perl(.....)|;
   # and we compare against another perl-something AND...
-  my($oisaperl) = $self->{FIO}{DIO}->isa_regular_perl($odist);
+  my($older_isa_regular_perl) = $self->{FIO}{DIO}->isa_regular_perl($odist);
   # the file we're comparing with is not the perl dist
 
   $distorperlok ||= $something1 && $something2 &&
-      $something1 eq $something2 && !$oisaperl;
+      $something1 eq $something2 && !$older_isa_regular_perl;
 
   $self->verbose(1, "New package data: package[$package]infile[$pp->{infile}]".
                   "distorperlok[$distorperlok]oldversion[$oldversion]".
@@ -442,8 +442,8 @@ sub update_package {
 
 
   if (! $distorperlok) {
-  } elsif ($isaperl) {
-      if ($oisaperl) {
+  } elsif ($isa_regular_perl) {
+      if ($older_isa_regular_perl) {
           if (CPAN::Version->vgt($pp->{version},$oldversion)) {
               $ok++;
           } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
@@ -500,7 +500,7 @@ dist[$dist]
 oldversion[$oldversion]
 pmfile[$pmfile]
 }); # });
-      } elsif ($oisaperl) {
+      } elsif ($older_isa_regular_perl) {
           $ok++;          # new on 2002-08-01
       } else {
           # we get a different result now than we got in a previous run
