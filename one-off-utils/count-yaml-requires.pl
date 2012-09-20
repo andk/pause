@@ -11,21 +11,24 @@ so I want to see what I should test against.
 
 As usual, run
 
-sed -e 's| ./../.*||' count-yaml-requires.pl.out|sort|uniq -c
+ sed -e 's| ./../.*||' count-yaml-requires.pl.out|sort|uniq -c
 
 to get an overview of what kinds of status we encounter or
 
-perl -nale 'print $1 if /\]v\[(.*?)\]/' count-yaml-requires.pl.out|sort|uniq -c
+ perl -nale 'print $1 if /\]v\[(.*?)\]/' count-yaml-requires.pl.out|sort|uniq -c
 
 to see the version requirements in the wild.
 
-
+OR, if you edit this program, go to line 66 or so and inspect $y which
+is the hashref that contains the meta informations. Yes, I edited it,
+because there is too much copy and paste in this directory. 2012-09-15
+we measure configure_requires on Module::Build.
 
 =cut
 
 use Compress::Zlib;
 use File::Find;
-use Parse::CPAN::Meta;
+use Parse::CPAN::Meta 1.39; # load_file would require 1.42
 
 open my $fh, "/home/ftp/pub/PAUSE/modules/02packages.details.txt.gz" or die;
 my $gz = gzopen $fh, "r";
@@ -50,10 +53,21 @@ find(
         my($name) =
             $File::Find::name =~ m|([A-Z]/[A-Z][A-Z]/[A-Z][A-Z-]*[A-Z]/.+)\.meta$|;
         return unless $name and exists $S1->{$name};
+        my $glob1 = $File::Find::name;
+        $glob1 =~ s/\.meta$/.*/;
+        my($distro) = grep { ! /\.(?:meta|readme)$/ } glob $glob1;
+        my($home, $distropath) = $distro =~ m|^(.*?/authors/id/./../)(.+)|;
+
+        my $glob2 = $distropath;
+        $glob2 =~ s/\d+/[0-9]*/g;
+        $glob2 = "$home$glob2";
+        my(@glob2) = glob $glob2;
+        # XXX should check now whether we are the newest of the lot
+
         my @stat = stat $yaml;
         my $mtime = localtime $stat[9];
         my $y;
-        eval { $y = Parse::CPAN::Meta->load_file($yaml); };
+        eval { $y = Parse::CPAN::Meta::LoadFile($yaml); };
         my $status;
         if ($@) {
           $status = "yaml_error";
@@ -63,17 +77,15 @@ find(
               warn "FFn[$File::Find::name]y[$y]";
               return;
             }
-            if (exists $y->{requires}) {
-              if (ref $y->{requires} eq "HASH") {
+            if (exists $y->{configure_requires}) {
+              if (ref $y->{configure_requires} eq "HASH") {
                 $status = "HASH";
-                while (my($k,$v) = each %{$y->{requires}}) {
+                while (my($k,$v) = each %{$y->{configure_requires}}) {
+                  next unless $k eq "Module::Build";
                   printf(
-                         "k[%s]v[%s]g[%s]m[%s] %s\n",
-                         $k||"",
-                         $v||"",
-                         $y->{generated_by}||"",
-                         $mtime||"0",
-                         $name||"",
+                         "crmb %s %s\n",
+                         $v||".",
+                         $distropath||$name||"",
                         );
                 }
               } else {
@@ -87,9 +99,14 @@ find(
           }
         }
         die unless $status;
-        # printf "%s %s\n", $status, $name;
+        printf "stat %s %s\n", $status, $name;
       },
+      no_chdir => 1,
      },
      "/home/ftp/pub/PAUSE/authors/id"
 );
 
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 2
+# End:
