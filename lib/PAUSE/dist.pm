@@ -220,6 +220,11 @@ sub isa_regular_perl {
   scalar $dist =~ /$PAUSE::dist::ISA_REGULAR_PERL/;
 }
 
+sub isa_blead_perl {
+  my($self,$dist) = @_;
+  scalar $dist =~ /$PAUSE::dist::ISA_BLEAD_PERL/;
+}
+
 # package PAUSE::dist;
 sub examine_dist {
   my($self) = @_;
@@ -268,6 +273,16 @@ sub examine_dist {
       $dist =~ /TRIAL/
       ||
       $dist =~ m|/perl-\d+\.\d+\.\d+-RC\d+\.|x
+      ||
+      # 2012-09-21: stopping indexing of bleadperls entirely now; in
+      # the past the idea was that a new module in perl should reserve
+      # its namespace early but with the yearly release schedule and
+      # so many dual life modules we probably can skip it; also note
+      # that we did the indexing on bleadperls *wrong* as yesterday's
+      # 5.17.4 impressingly demonstrated. A huge amount of dual life
+      # distros got indexed for this bleadperl instead of leaving them
+      # alone.
+      $self->isa_blead_perl($dist)
     ) {
       $self->verbose(1,"Dist '$dist' is a developer release\n");
       $self->{SUFFIX} = "N/A";
