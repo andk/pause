@@ -2,7 +2,8 @@ MAILTO=k
 PATH=/usr/bin:/bin:/home/k/PAUSE/cron:/usr/local/bin
 
 09 * * * *            mldistwatch --logfile /var/log/mldistwatch.cron.log
-03,07,15,19,23,27,31,35,39,43,47,51,58,59 * * * *            mldistwatch --logfile /var/log/mldistwatch.cron.log --fail-silently-on-concurrency-protection --rewrite
+07,19,31,43,55 * * * *            mldistwatch --logfile /var/log/mldistwatch.cr
+on.log --fail-silently-on-concurrency-protection --rewrite
 12 06,14,22 * * *  update-checksums.pl
 46 * * * *            find /home/ftp/pub/PAUSE/authors/id -name 'CHECKSUMS.????'
 45 * * * *            find /home/ftp/pub/PAUSE/authors/id -name CHECKSUMS -exec perl -c {} \; 2>&1 | grep -v OK | cat
