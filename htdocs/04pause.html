@@ -15,7 +15,10 @@
   <li><a href="#duties">Your duties, the basics, traps</a></li>
   <li><a href="#namespace">Register your namespace!</a></li>
   <li><a href="#takeover">Taking over</a></li>
-  <li><a href="#conventions">Other conventions you should know about</a></li>
+  <li><a href="#readme">README</a></li>
+  <li><a href="#version">$VERSION</a></li>
+  <li><a href="#developerreleases">Developer Releases</a></li>
+  <li><a href="#indexer">Indexer</a></li>
   <li><a href="#services">Related services on PAUSE</a></li>
   <li><a href="#ssl">CACERT-ified SSL on PAUSE</a></li>
   <li><a href="#other">Other useful links</a></li>
@@ -322,10 +325,8 @@ permissions after you've tracked them down and asked nicely.</p>
 
 
 
-<h3><a id="conventions" name="conventions">Other conventions you
-should know about</a></h3>
-
-<h4>README</h4>
+<a id="conventions" name="conventions"></a><!-- older anchor name -->
+<h3><a id="readme" name="readme">README</a></h3>
 
 <p>Do not upload the <b>READMEs</b> that are integrated in your distribution
 files. PAUSE is designed to take care of unwrapping your file with tar
@@ -336,7 +337,7 @@ will change the name of the file to
 <code><i>package-name</i><b>.readme</b></code>. It should do so within
 a few hours after your upload.</p>
 
-<h4>$VERSION</h4>
+<h3><a id="version" name="version">$VERSION</a></h3>
 
 <p>Please make sure all your <code>*.pm</code> files contain a
 <b><code>$VERSION</code></b> variable that conforms to the CPAN rules, i.e.
@@ -356,7 +357,7 @@ dangerous things within that line.</p>
 want to read the <a
 href="http://search.cpan.org/perldoc?version">version</a> manpage.</p>
 
-<h4>Developer Releases</h4>
+<h3><a id="developerreleases" name="developerreleases">Developer Releases</a></h3>
 
 <p>The automatic integration of your work into several <b>indexes</b>
 and directory trees is not always what you desire. Often you want to
@@ -406,7 +407,7 @@ releases. <a href="http://cpantesters.perl.org/">Cpan testers</a> will
 test them and bug chasers will probably file bug reports in <a
 href="http://rt.cpan.org">RT</a>.</p>
 
-<h4>Indexer</h4>
+<h3><a id="indexer" name="indexer">Indexer</a></h3>
 
 <p>Any distribution that arrives at PAUSE is checked for <b>package names</b>
 contained in the distribution. A package name that arrives for the
