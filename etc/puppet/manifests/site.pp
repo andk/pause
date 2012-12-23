@@ -7,12 +7,26 @@ class pause-pkg {
 	package { rkhunter     : ensure => installed }
 	package { mon          : ensure => installed }
 	package { mysql-server : ensure => installed }
+	# we will compile our own dbd-mysql:
+	package { mysql-devel  : ensure => installed }
 	package { unzip        : ensure => installed }
 	package { git          : ensure => installed }
 }
 
+class pause-mysqld {
+        service { mysqld:
+                ensure => running,
+                enable => true
+        }
+	file { "/etc/my.cnf":
+		path => "/etc/my.cnf",
+		ensure => "/home/puppet/pause/etc/my.cnf.centos6-2012",
+	}
+}
+
 class pause {
 	include pause-pkg
+	include pause-mysqld
 }
 
 node pause2 {
