@@ -181,7 +181,7 @@ account informations. On the database side this is achieved by
 granting the privileges on the two tables, nothing else, to one user.
 The grant statement looks something like
 
-  grant delete,index,insert,select,update,lock tables on mod.* to \
+  grant delete,index,insert,select,update,lock tables on `mod`.* to \
         'xxx'@'yyy' identified by 'zzz';
 
 For replication, three additional privileges are needed: "reload,
