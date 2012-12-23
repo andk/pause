@@ -25,12 +25,17 @@ class pause-mysqld {
 }
 
 class pause-munin {
+	package { httpd         : ensure => installed }
 	file { "/etc/init.d/munin_httpd_8000":
 		owner => root,
 		group => root,
 		mode => 755,
 		source => "puppet:///files/etc/init.d/munin_httpd_8000",
 		# require => File["/etc/puppet/files"],
+		require => [
+			    Package["httpd"],
+			    Package["munin"],
+			    ],
 	}
 }
 
