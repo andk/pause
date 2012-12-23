@@ -34,10 +34,6 @@ TraceEnable off
 
 TypesConfig /etc/mime.types
 
-LoadModule php5_module modules/libphp5.so
-AddHandler php5-script .php
-AddType application/x-httpd-php .php
-AddType text/html .php
 DirectoryIndex index.html
 
 LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined                                
