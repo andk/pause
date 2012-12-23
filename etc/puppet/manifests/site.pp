@@ -26,6 +26,30 @@ class pause-mysqld {
 
 class pause-munin {
 	package { httpd         : ensure => installed }
+        file { "/var/log/munin_httpd":
+                owner => "root",
+                group => "root",
+                mode => 755,
+                ensure => directory,
+        }
+	file { "/etc/munin/httpd_8000.conf":
+                owner => "root",
+                group => "root",
+                mode  => 644,
+                source => "puppet:///files/etc/munin/httpd_8000.conf/pause2",
+                notify => Service["munin_httpd_8000"],
+        }
+        service { "munin_httpd_8000":
+                ensure  => running,
+                enable  => true,
+                require => [
+                            Package["munin"],
+                            File["/etc/init.d/munin_httpd_8000"],
+                            File["/etc/munin/httpd_8000.conf"],
+                            File["/var/log/munin_httpd"],
+                            ],
+                hasstatus => true,
+	}
 	file { "/etc/init.d/munin_httpd_8000":
 		owner => root,
 		group => root,
