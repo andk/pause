@@ -24,9 +24,24 @@ class pause-mysqld {
 	}
 }
 
+class pause-munin {
+	file { "/etc/init.d/munin_httpd_8000":
+		owner => root,
+		group => root,
+		mode => 755,
+		source => "puppet:///files/etc/init.d/munin_httpd_8000",
+		require => File["/etc/puppet/files"],
+	}
+}
+
 class pause {
+	file { "/etc/puppet/files":
+		path => "/etc/puppet/files",
+		ensure => "/home/puppet/pause/etc/puppet/files",
+	}
 	include pause-pkg
 	include pause-mysqld
+	include pause-munin
 }
 
 node pause2 {

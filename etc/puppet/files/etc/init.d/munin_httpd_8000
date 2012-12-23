@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Startup script for the Apache Web Server for munin master.
+#
+# chkconfig: 2345 85 15
+# description: httpd on port 8000 dedicated to munin server
+# processname: httpd
+# pidfile: /var/run/munin_httpd_8000.pid
+# config: /etc/munin/httpd_8000.conf
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+#[ -r /etc/sysconfig/httpd13 ] && . /etc/sysconfig/httpd13
+
+INITLOG_ARGS=""
+apachectl=/usr/sbin/apachectl
+httpd=/usr/sbin/httpd
+prog=munin_httpd_8000
+pidfile=/var/run/munin_httpd_8000.pid
+lockfile=/var/lock/subsys/munin_httpd_8000
+configfile=/etc/munin/httpd_8000.conf
+RETVAL=0
+
+start() {
+        echo -n $"Starting $prog: "
+        $httpd -f ${configfile}
+        RETVAL=$?
+        [ $[$RETVAL] -eq 0 ] && echo "[OK]" || echo "[FAILED]"
+        [ $RETVAL = 0 ] && touch ${lockfile}
+        return $RETVAL
+}
+stop() {
+        echo -n $"Stopping $prog: "
+        if [ -f "${pidfile}" ]; then
+                ps $(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g') >& /dev/null
+                if [ $[$?] -eq 0 ]; then
+                        kill -TERM $(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g')
+                        RETVAL=$?
+                else
+                        RETVAL=1;
+                        echo "No process with pid "$(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g')" was found.   "
+                fi
+        else
+                RETVAL=1;
+                echo -n "No pid file '${pidfile}' was found.   "
+        fi
+        if [ $[$RETVAL] -eq 0 ]; then
+                echo "[OK]" || echo "[FAILED]"
+                rm -f ${lockfile} ${pidfile}
+                echo "Waiting 5 seconds to let apache2 free all resources."
+                sleep 5s
+        fi
+}
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status -p ${pidfile} munin_httpd_8000
+        RETVAL=$?
+        ;;
+  restart)
+        stop
+        start
+        ;;
+  condrestart)
+        if [ -f ${pidfile} ] ; then
+                stop
+                start
+        fi
+        ;;
+  *)
+        echo $"Usage: $prog {start|stop|restart|condrestart|help}"
+        exit 1
+esac
+
+exit $RETVAL
