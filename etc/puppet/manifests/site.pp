@@ -1,7 +1,7 @@
 class pause-pkg {
 	package { munin        : ensure => installed }
 	package { zsh          : ensure => installed }
-	package { gnupg        : ensure => installed }
+	package { gnupg2       : ensure => installed }
 	package { proftpd      : ensure => installed }
 	package { chkrootkit   : ensure => installed }
 	package { rkhunter     : ensure => installed }
