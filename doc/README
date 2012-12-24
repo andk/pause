@@ -3,7 +3,7 @@
 I always compiled it myself, so I repeat that exercise. Download
 apache 1.3.xx and untar it. Then I prepare the distroprefs file for
 this apache. I'm doing all my cpan download through the cpan shell and
-collect all intricacies of modules in distorprefs files so I can
+collect all intricacies of modules in distroprefs files so I can
 forget many details in everyday work. At the time of this writing
 mod_perl 1.30 was current and it needed a patch to run with perl 5.10.
 You may need this patch too.
@@ -36,7 +36,7 @@ If it builds and tests fine install it.
 
 Next, we need to write the apache configuration. I like it to have the
 server standalone so I can run it and stop it whenever I like. The
-config I use on my laptop in in the repository as
+config I use on my laptop is in the repository as
 C<apache-conf/httpd.conf.pause.atk81>, please take it as a blueprint
 and adjust your paths and usernames, etc. Fire up the apache with
 
