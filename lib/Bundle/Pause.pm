@@ -35,6 +35,7 @@ Email::Address
 Encode::MIME::Header
 File::Rsync
 File::Rsync::Mirror::Recent
+IO::AIO
 IO::Socket::SSL
 IPC::Run3
 JSON
