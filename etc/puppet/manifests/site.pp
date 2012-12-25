@@ -74,6 +74,10 @@ class pause-munin {
 		path => "/etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain",
 		ensure => "/home/puppet/pause/apache-conf/ssl.crt/rapidssl.pause.perl.org.crt+chain",
 	}
+	file { "/etc/perlbal/perlbal.conf":
+		path => "/etc/perlbal/perlbal.conf",
+		ensure => "/home/puppet/pause/etc/perlbal/perlbal.conf.pause-us",
+	}
 	file { "/etc/munin/httpd_8000.conf":
                 owner => "root",
                 group => "root",
