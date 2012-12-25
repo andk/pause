@@ -103,16 +103,16 @@ sub as_string {
       my $activecol2 = "";
       if ($action eq $mgr->{Action}) {
 	$class = "activemenu";
-        # $activemarkerleft = "\x{21d2}&nbsp;"; # Pfeil
+        # $activemarkerleft = "\x{21d2}&#160;"; # Pfeil
 
-        $activemarkerleft = "&gt; "; # : "\x{25b6}&nbsp;"; # Dreieck
+        $activemarkerleft = "&gt; "; # : "\x{25b6}&#160;"; # Dreieck
 
         #### IE6 alert. If I send this \x{25b6} with 5.6.1, then IE6
         #### cannot display a single page, as "Gregor Mosheh, B.S."
         #### <stigmata@blackangel.net> reported.
 
-        # $activemarkerleft = "\x{266c}&nbsp;"; # 2 Sechzehntelnoten
-        # $activemarkerleft = "\x{300b}&nbsp;"; # hohes Zeichen wie ">>"
+        # $activemarkerleft = "\x{266c}&#160;"; # 2 Sechzehntelnoten
+        # $activemarkerleft = "\x{300b}&#160;"; # hohes Zeichen wie ">>"
         # $activemarkerright = "\x{21d0}";
         $activecol2 = ""; # "\x{25c0}";
       } else {

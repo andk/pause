@@ -893,7 +893,7 @@ sub write_01sorted {
 A description of the list can be found in
 <a href="01modules.index.html">01modules.index.html</a>.
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &#160;&#160;&#160;&#160;&#160;
 
 <a href="./01modules.mtime.rss"
  style="

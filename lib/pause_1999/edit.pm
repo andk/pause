@@ -333,7 +333,7 @@ push @m, qq{<p>View all pending applications for new user IDs and for modules re
   my $jx = JSON::XS->new->indent->canonical;
   for my $k (sort { $ALL{$b}{type} cmp $ALL{$a}{type} || $ALL{$b}{mtime} <=> $ALL{$a}{mtime} } keys %ALL) {
     my $esc = $mgr->escapeHTML($jx->encode($ALL{$k}{session}));
-    $esc =~ s/ /&nbsp;/g;
+    $esc =~ s/ /&#160;/g;
     $esc =~ s/\n/<br\/>/g;
     $esc =~ s/\\n/<br\/>/g;
     push @m, sprintf
@@ -2673,7 +2673,7 @@ sub add_user {
               }
               push @urow, "<td>$duserid</td>";
           } else {
-              push @urow, "<td>&nbsp;</td>";
+              push @urow, "<td>&#160;</td>";
           }
           {
               my($bold,$end_bold) = ("","");
@@ -2688,7 +2688,7 @@ sub add_user {
               if (defined($sfullname)&&length($sfullname)) {
                   push @urow, "<td>$bold$dfullname$end_bold</td>";
               } else {
-                  push @urow, "<td>&nbsp;</td>";
+                  push @urow, "<td>&#160;</td>";
               }
           }
           my $broken_spublic_email = $spublic_email;
@@ -2709,7 +2709,7 @@ sub add_user {
                   ($bold,$end_bold) = ("<b>","</b>");
                   $score++;
               }
-              push @urow, "secret&nbsp;email:&nbsp;<span style='color: $se_color'>$bold$ssecretemail$end_bold</span><br/>";
+              push @urow, "secret&#160;email:&#160;<span style='color: $se_color'>$bold$ssecretemail$end_bold</span><br/>";
           }
           if ($shomepage) {
               my($bold,$end_bold) = ("","");
@@ -2717,19 +2717,19 @@ sub add_user {
                   ($bold,$end_bold) = ("<b>","</b>");
                   $score++;
               }
-              push @urow, "homepage:&nbsp;$bold$shomepage$end_bold<br/>";
+              push @urow, "homepage:&#160;$bold$shomepage$end_bold<br/>";
           }
           if ($sintroduced) {
             my $time = scalar(gmtime($sintroduced));
-            $time =~ s/\s/\&nbsp;/g;
-            push @urow, "introduced&nbsp;on:&nbsp;$time<br/>";
+            $time =~ s/\s/\&#160;/g;
+            push @urow, "introduced&#160;on:&#160;$time<br/>";
           }
           if ($schanged) {
             my $time = scalar(gmtime($schanged));
-            $time =~ s/\s/\&nbsp;/g;
-            push @urow, "changed&nbsp;on:&nbsp;$time&nbsp;by&nbsp;$schangedby<br/>";
+            $time =~ s/\s/\&#160;/g;
+            push @urow, "changed&#160;on:&#160;$time&#160;by&#160;$schangedby<br/>";
           } else {
-            push @urow, "changed&nbsp;by:&nbsp;$schangedby<br/>";
+            push @urow, "changed&#160;by:&#160;$schangedby<br/>";
           }
           push @urow, "</tr>\n";
           my $line = join "", @urow;
@@ -2854,7 +2854,7 @@ sub hash_as_table {
   for my $k (sort keys %$rec) {
     push @m, sprintf(qq{<tr><td>%s</td><td>%s</td></tr>\n},
                      $k,
-                     $rec->{$k} || "&nbsp;"
+                     $rec->{$k} || "&#160;"
                     );
   }
   push @m, qq{</table>\n};
@@ -5140,7 +5140,7 @@ sub stat_meta {
   for my $hash (\%statd,\%stats,\%statl,\%stati,\%statp) {
     for my $k (keys %$hash) {
       $hash->{$k} = $deftype =~ /radio/ ?
-          qq{<font color="green"><b>$k</b></font>&nbsp;($hash->{$k}) } :
+          qq{<font color="green"><b>$k</b></font>&#160;($hash->{$k}) } :
               qq{$k -- $hash->{$k}};
     }
   }

@@ -83,9 +83,9 @@ $hspecial
 
     push @l, qq{when you run into problems try <a
     class="versionspecial"
-    href="https://pause.perl.org:8443/pause/authenquery">Port&nbsp;8443&nbsp;(https)</a>,
+    href="https://pause.perl.org:8443/pause/authenquery">Port&#160;8443&#160;(https)</a>,
     where perl 5.8.7 should be running (or <a class="versionspecial"
-    href="http://pause.perl.org:8000/pause/query">Port&nbsp;8000</a>
+    href="http://pause.perl.org:8000/pause/query">Port&#160;8000</a>
     if you need http).</p>};
 
   }
@@ -135,7 +135,7 @@ users get the following text:</p> $closed_text </div>};
     push @l, $mgr->instance_of("pause_1999::usermenu");
 
     push @l, qq{</td><td valign="top" bgcolor="red"\n>};
-    push @l, qq{&nbsp;};
+    push @l, qq{&#160;};
     push @l, qq{</td><td valign="top">};
     push @l, $mgr->instance_of("pause_1999::edit");
     push @l, qq{</td></tr></table>\n};
