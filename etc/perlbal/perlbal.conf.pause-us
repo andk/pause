@@ -35,8 +35,8 @@ ENABLE analysis
 
 CREATE SERVICE vhosts
   SET listen                      = 0.0.0.0:80
-  SET enable_ssl                  = off
   SET role                        = selector
+  SET enable_ssl                  = off
   SET plugins                     = vhosts
   VHOST analysis.cpantesters.org  = analysis
   VHOST *                         = pause
@@ -46,8 +46,8 @@ ENABLE vhosts
 
 CREATE SERVICE vhosts_ssl
   SET listen                      = 0.0.0.0:443
-  SET enable_ssl                  = on
   SET role                        = selector
+  SET enable_ssl                  = on
   SET plugins                     = vhosts
   # requires repository version (maybe later)
   #SET ssl_honor_cipher_order     = 1
