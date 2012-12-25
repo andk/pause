@@ -39,6 +39,8 @@ class pause-munin {
                 ensure => directory,
         }
 	file { "/var/run/httpd/deadmeat":
+		# abuse of the httpd directory, it rather belongs to
+		# the apache we built ourselves
 		owner => apache,
 		group => apache,
 		mode => 755,
