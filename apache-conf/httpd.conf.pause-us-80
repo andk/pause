@@ -1,6 +1,6 @@
 # -*- Mode: Cperl; -*-
 
-# CoreDumpDirectory /usr/local/apache/cores
+CoreDumpDirectory /opt/apache/cores
 
 ServerTokens ProductOnly
 
@@ -52,7 +52,6 @@ ExtendedStatus On
 ##############################################
 # For all Apache::Registry stuff a common root
 ##############################################
-# Alias /perl/ /usr/local/apache/perl/
 Alias /incoming /home/ftp/incoming
 Alias /pub/PAUSE /home/ftp/pub/PAUSE
 ##############################################
@@ -189,8 +188,8 @@ use vars qw(
 
 # $Location{"/"}{PerlSetupEnv} = "On";
 
-$ServerRoot = "/usr/local/apache";
-$DocumentRoot = "/usr/local/apache/htdocs";
+$ServerRoot = "/opt/apache/current";
+$DocumentRoot = "/home/puppet/pause/htdocs";
 $ServerType = "standalone";
 $PerlWarn = "On";
 
