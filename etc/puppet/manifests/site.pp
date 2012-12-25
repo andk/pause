@@ -38,9 +38,27 @@ class pause-munin {
                 mode => 755,
                 ensure => directory,
         }
-	file {" /var/run/httpd/deadmeat":
+	file { "/var/run/httpd/deadmeat":
 		owner => apache,
 		group => apache,
+		mode => 755,
+		ensure => directory,
+	}
+	file { "/home/puppet/pause-private":
+		owner => puppet,
+		group => puppet,
+		mode => 755,
+		ensure => directory,
+	}
+	file { "/home/puppet/pause-private/lib":
+		owner => puppet,
+		group => puppet,
+		mode => 755,
+		ensure => directory,
+	}
+	file { "/etc/perlbal":
+		owner => root,
+		group => root,
 		mode => 755,
 		ensure => directory,
 	}
