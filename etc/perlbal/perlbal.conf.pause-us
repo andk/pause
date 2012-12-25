@@ -44,7 +44,7 @@ CREATE SERVICE vhosts
   HEADER vhosts insert X-pause-is-SSL: 0
 ENABLE vhosts
 
-CREATE SERVICE vhosts-ssl
+CREATE SERVICE vhosts_ssl
   SET listen                      = 0.0.0.0:443
   SET enable_ssl                  = on
   SET role                        = selector
@@ -55,9 +55,9 @@ CREATE SERVICE vhosts-ssl
   SET ssl_key_file                = /etc/perlbal/servercerts/pause.perl.org-20080519.key
   SET ssl_cert_file               = /etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain
   VHOST *                         = pause
-  HEADER vhosts-ssl remove X-pause-is-SSL
-  HEADER vhosts-ssl insert X-pause-is-SSL: 1
-ENABLE vhosts-ssl
+  HEADER vhosts_ssl remove X-pause-is-SSL
+  HEADER vhosts_ssl insert X-pause-is-SSL: 1
+ENABLE vhosts_ssl
 
 # always good to keep an internal management port open:
 CREATE SERVICE mgmt
