@@ -32,6 +32,18 @@ class pause-munin {
                 mode => 755,
                 ensure => directory,
         }
+        file { "/var/log/PAUSE-httpd":
+                owner => "root",
+                group => "root",
+                mode => 755,
+                ensure => directory,
+        }
+	file {" /var/run/httpd/deadmeat":
+		owner => apache,
+		group => apache,
+		mode => 755,
+		ensure => directory,
+	}
 	file { "/etc/munin/httpd_8000.conf":
                 owner => "root",
                 group => "root",
