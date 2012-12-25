@@ -11,6 +11,7 @@ class pause-pkg {
 	package { mysql-devel  : ensure => installed }
 	package { unzip        : ensure => installed }
 	package { git          : ensure => installed }
+	# the following complains repeatedly although it is installed
 	package { "gcc-g++"    : ensure => installed }
 }
 
@@ -33,6 +34,38 @@ class pause-munin {
                 mode => 755,
                 ensure => directory,
         }
+	file { "/etc/munin/httpd_8000.conf":
+                owner => "root",
+                group => "root",
+                mode  => 644,
+                source => "puppet:///files/etc/munin/httpd_8000.conf/pause2",
+                notify => Service["munin_httpd_8000"],
+        }
+        service { "munin_httpd_8000":
+                ensure  => running,
+                enable  => true,
+                require => [
+                            Package["munin"],
+                            File["/etc/init.d/munin_httpd_8000"],
+                            File["/etc/munin/httpd_8000.conf"],
+                            File["/var/log/munin_httpd"],
+                            ],
+                hasstatus => true,
+	}
+	file { "/etc/init.d/munin_httpd_8000":
+		owner => root,
+		group => root,
+		mode => 755,
+		source => "puppet:///files/etc/init.d/munin_httpd_8000",
+		# require => File["/etc/puppet/files"],
+		require => [
+			    Package["httpd"],
+			    Package["munin"],
+			    ],
+	}
+}
+
+class pause-apache {
         file { "/var/log/PAUSE-httpd":
                 owner => "root",
                 group => "root",
@@ -47,6 +80,9 @@ class pause-munin {
 		mode => 755,
 		ensure => directory,
 	}
+}
+
+class pause-perlbal {
 	file { "/home/puppet/pause-private":
 		owner => puppet,
 		group => puppet,
@@ -79,33 +115,15 @@ class pause-munin {
 		path => "/etc/perlbal/perlbal.conf",
 		ensure => "/home/puppet/pause/etc/perlbal/perlbal.conf.pause-us",
 	}
-	file { "/etc/munin/httpd_8000.conf":
-                owner => "root",
-                group => "root",
-                mode  => 644,
-                source => "puppet:///files/etc/munin/httpd_8000.conf/pause2",
-                notify => Service["munin_httpd_8000"],
-        }
-        service { "munin_httpd_8000":
-                ensure  => running,
+	file { "/etc/init.d/PAUSE-perlbal":
+		path => "/etc/init.d/PAUSE-perlbal",
+		ensure => "/home/puppet/pause/etc/init.d/PAUSE-perlbal",
+	}
+	service { "PAUSE-perlbal":
+		ensure => running,
                 enable  => true,
                 require => [
-                            Package["munin"],
-                            File["/etc/init.d/munin_httpd_8000"],
-                            File["/etc/munin/httpd_8000.conf"],
-                            File["/var/log/munin_httpd"],
-                            ],
-                hasstatus => true,
-	}
-	file { "/etc/init.d/munin_httpd_8000":
-		owner => root,
-		group => root,
-		mode => 755,
-		source => "puppet:///files/etc/init.d/munin_httpd_8000",
-		# require => File["/etc/puppet/files"],
-		require => [
-			    Package["httpd"],
-			    Package["munin"],
+                            File["/etc/init.d/PAUSE-perlbal"],
 			    ],
 	}
 }
@@ -118,6 +136,8 @@ class pause {
 	include pause-pkg
 	include pause-mysqld
 	include pause-munin
+	include pause-apache
+	include pause-perlbal
 }
 
 node pause2 {
