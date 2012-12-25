@@ -3019,7 +3019,7 @@ sub request_id {
                             rows=>8,
                             cols=>60);
     push @m, q{<!-- zdjela meda -->
-  <div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"></div>};
+  <div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"/></div>};
     push @m, qq{</p>};
     # push @m, "</table>\n";
 
