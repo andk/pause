@@ -201,7 +201,7 @@ $TransferLog = "logs/access_log$ext";
 $PidFile = "logs/httpd.pid$ext";
 $ScoreBoardFile = "logs/apache_status$ext";
 
-my $ord_port = $SWITCH8000 ? 8000 : 80; # 80/81!!!
+my $ord_port = $SWITCH8000 ? 8000 : 81; # 80/81!!!
 $Port   =  $ord_port;
 $Listen =  $ord_port;
 $BindAddress = undef;

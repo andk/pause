@@ -44,6 +44,9 @@ List::Pairwise
 MD5
 Module::Faker::Dist
 Perlbal
+Perlbal::XS::HTTPHeaders
+Perlbal::Plugin::TrustHeader
+Perlbal::Plugin::Addheader
 Set::Crontab
 String::Random
 Sub::Uplevel

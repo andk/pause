@@ -64,6 +64,16 @@ class pause-munin {
 		mode => 755,
 		ensure => directory,
 	}
+	file { "/etc/perlbal/servercerts":
+		owner => root,
+		group => root,
+		mode => 700,
+		ensure => directory,
+	}
+	file { "/etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain":
+		path => "/etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain",
+		ensure => "/home/puppet/pause/apache-conf/ssl.crt/rapidssl.pause.perl.org.crt+chain",
+	}
 	file { "/etc/munin/httpd_8000.conf":
                 owner => "root",
                 group => "root",
