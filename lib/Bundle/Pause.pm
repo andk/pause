@@ -42,6 +42,7 @@ List::MoreUtils
 List::Pairwise
 MD5
 Module::Faker::Dist
+Perlbal
 Set::Crontab
 String::Random
 Sub::Uplevel
