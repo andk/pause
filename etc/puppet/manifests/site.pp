@@ -11,8 +11,7 @@ class pause-pkg {
 	package { mysql-devel  : ensure => installed }
 	package { unzip        : ensure => installed }
 	package { git          : ensure => installed }
-	# the following complains repeatedly although it is installed
-	package { "gcc-g++"    : ensure => installed }
+	package { "gcc-c++"    : ensure => installed }
 }
 
 class pause-mysqld {
