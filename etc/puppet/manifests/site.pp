@@ -80,8 +80,11 @@ class pause-apache {
 		ensure => directory,
 	}
 	file { "/etc/init.d/PAUSE-httpd":
-		path => "/etc/init.d/PAUSE-httpd",
-		ensure => "/home/puppet/pause/etc/init.d/PAUSE-httpd-pause-us",
+		path   => "/etc/init.d/PAUSE-httpd",
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/etc/init.d/PAUSE-httpd-pause-us",
 	}
 	file { "/opt/apache/current/conf/httpd.conf":
 		path => "/opt/apache/current/conf/httpd.conf",
