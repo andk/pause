@@ -1,48 +1,86 @@
-#!/bin/sh
+#!/bin/bash
 #
-# Startup script for the Apache Web Server
+# Startup script for PAUSE-perlbal
 #
 # chkconfig: 345 85 15
 # description: loadbalancer
 # processname: perlbal
+# pidfile: /var/run/PAUSE-perlbal.pid
 # config: /etc/perlbal/perlbal.conf
 
-
 # Source function library.
-SLEEP=1
+. /etc/rc.d/init.d/functions
 
-DAEMON=/opt/perl/current/bin/perlbal
+daemon=/opt/perl/current/bin/perlbal
+prog=perlbal
+pidfile=/var/run/PAUSE-perlbal.pid
+lockfile=/var/lock/subsys/PAUSE-perlbal
+configfile=/etc/perlbal/perlbal.conf
+RETVAL=0
+
+start() {
+        echo -n $"Starting $prog: "
+        if [ -e $pidfile ]
+                then
+                
+                if [ -d /proc/`cat $pidfile`/ ]
+                then
+
+                        echo "$daemon already running."
+                        exit 0;
+                else
+                        rm -f $pidfile
+                fi
+        fi
+
+        $daemon --config $configfile --daemon
+        RETVAL=$?
+        [ $[$RETVAL] -eq 0 ] && echo "[OK]" || echo "[FAILED]"
+        if [ $RETVAL = 0 ] ; then
+            touch ${lockfile}
+            pidof -x $daemon > ${pidfile}
+        fi
+        return $RETVAL
+}
+stop() {
+        echo -n $"Stopping $prog: "
+        if [ -f "${pidfile}" ]; then
+                ps $(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g') >& /dev/null
+                if [ $[$?] -eq 0 ]; then
+                        kill -TERM $(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g')
+                        RETVAL=$?
+                else
+                        RETVAL=1;
+                        echo "No process with pid "$(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g')" was found.   "
+                fi
+        else
+                RETVAL=1;
+                echo -n "No pid file '${pidfile}' was found.   "
+        fi
+        if [ $[$RETVAL] -eq 0 ]; then
+                echo "[OK]" || echo "[FAILED]"
+                rm -f ${lockfile} ${pidfile}
+        fi
+}
 
 # See how we were called.
 case "$1" in
   start)
-        echo -n "Starting perlbal: "
-        nice -7 $DAEMON --daemon
-        echo
-        touch /var/lock/perlbal
+        start
         ;;
   stop)
-        echo -n "Shutting down perlbal: "
-        killall perlbal
-        echo perlbal
-        rm -f /var/lock/perlbal
+        stop
         ;;
   status)
-        status perlbal
+        status -p ${pidfile} perlbal
+        RETVAL=$?
         ;;
-  restart)
-        $0 stop
-        echo Sleeping $SLEEP seconds
-        sleep $SLEEP
-        $0 start
-        ;;
-  reload)
-        echo -n "Reloading perlbal: "
-        killall -HUP perlbal
-        echo perlbal
+  restart|force_reload)
+        stop
+        start
         ;;
   *)
-        echo "Usage: $0 {start|stop|restart|reload|status}"
+        echo "Usage: $0 {start|stop|restart|force_reload|status}"
         exit 1
 esac
 
