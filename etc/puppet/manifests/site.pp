@@ -97,6 +97,7 @@ class pause-apache {
                             File["/etc/init.d/PAUSE-httpd"],
 			    File["/opt/apache/current/conf/httpd.conf"],
 			    ],
+		hasstatus => true,
 	}
 }
 
