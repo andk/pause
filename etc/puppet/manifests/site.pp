@@ -132,7 +132,10 @@ class pause-perlbal {
 	}
 	file { "/etc/init.d/PAUSE-perlbal":
 		path => "/etc/init.d/PAUSE-perlbal",
-		ensure => "/home/puppet/pause/etc/init.d/PAUSE-perlbal-pause-us",
+		owner => root,
+		group => root,
+		mode => 755,
+		source => "puppet:///files/etc/init.d/PAUSE-perlbal-pause-us",
 	}
 	service { "PAUSE-perlbal":
 		ensure => running,
