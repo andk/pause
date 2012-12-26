@@ -18,7 +18,7 @@ sub as_string {
   my @m;
   push @m, qq{<table  cellpadding="3" cellspacing="0">};
   my($encr,$class);
-  if ($mgr->myurl->scheme eq "https") {
+  if ($mgr->is_ssl) {
     $encr = 1;
     $class = "statusencr";
   } else {

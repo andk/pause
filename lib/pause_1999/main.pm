@@ -65,6 +65,7 @@ use Apache::HeavyCGI; # This is much better than only second line
                       # the errormessage of the next line would be 'No
                       # such pseudo-hash field "R" in variable $self'
 use base Apache::HeavyCGI;
+use Sys::Hostname;
 # # use Apache::URI ();
 
  # use encoding "utf-8";
@@ -121,6 +122,7 @@ DownTime
 EditOutput
 HiddenUser
 IsMailinglistRepresentative
+IsSSL
 MailMailerConstructorArgs
 MailtoAdmins
 ModDsn
@@ -344,7 +346,11 @@ sub myurl {
 
   # XXX should have additional test if we are on pause
   if ($uri->port == 81 and $PAUSE::Config->{HAVE_PERLBAL}) {
-      $uri->port(80);
+      if ($self->is_ssl($uri)) {
+          $uri->port(443);
+      } else {
+          $uri->port(80);
+      }
   }
 
   # my $port = $r->server->port || 80;
@@ -355,6 +361,22 @@ sub myurl {
   #				 $explicit_port .
   #				 $script_name);
   $self->{MYURL} = $uri;
+}
+
+# the argument $uri is important to prevent recursion between myurl
+# and is_ssl
+sub is_ssl {
+    my($self, $uri) = @_;
+    return $self->{IsSSL} if defined $self->{IsSSL};
+    my $is_ssl = 0;
+    $uri ||= $self->myurl;
+    if ($uri->scheme eq "https") {
+        $is_ssl = 1;
+    } elsif (Sys::Hostname::hostname() =~ /pause2/) {
+        my $header = $self->{R}->header_in("X-pause-is-SSL") || 0;
+        $is_ssl = !!$header;
+    }
+    return $self->{IsSSL} = $is_ssl;
 }
 
 sub file_to_user {
