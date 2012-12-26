@@ -148,6 +148,7 @@ class pause-perlbal {
                             File["/etc/init.d/PAUSE-perlbal"],
 			    File["/etc/perlbal/perlbal.conf"],
 			    ],
+		hasstatus => true,
 	}
 }
 
