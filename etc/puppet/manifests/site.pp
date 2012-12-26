@@ -80,6 +80,22 @@ class pause-apache {
 		mode => 755,
 		ensure => directory,
 	}
+	file { "/etc/init.d/PAUSE-httpd":
+		path => "/etc/init.d/PAUSE-httpd",
+		ensure => "/home/puppet/pause/etc/init.d/PAUSE-httpd-pause-us",
+	}
+	file { "/opt/apache/current/conf/httpd.conf":
+		path => "/opt/apache/current/conf/httpd.conf",
+		ensure => "/home/puppet/pause/apache-conf/httpd.conf.pause-us-80",
+	}
+	service { "PAUSE-httpd":
+		ensure => running,
+                enable  => true,
+                require => [
+                            File["/etc/init.d/PAUSE-httpd"],
+			    File["/opt/apache/current/conf/httpd.conf"],
+			    ],
+	}
 }
 
 class pause-perlbal {
@@ -117,13 +133,14 @@ class pause-perlbal {
 	}
 	file { "/etc/init.d/PAUSE-perlbal":
 		path => "/etc/init.d/PAUSE-perlbal",
-		ensure => "/home/puppet/pause/etc/init.d/PAUSE-perlbal",
+		ensure => "/home/puppet/pause/etc/init.d/PAUSE-perlbal-pause-us",
 	}
 	service { "PAUSE-perlbal":
 		ensure => running,
                 enable  => true,
                 require => [
                             File["/etc/init.d/PAUSE-perlbal"],
+			    File["/etc/perlbal/perlbal.conf"],
 			    ],
 	}
 }

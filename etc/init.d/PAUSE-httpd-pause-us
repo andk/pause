@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# Startup script for the Apache Web Server
+#
+# chkconfig: 345 85 15
+# description: Apache is a World Wide Web server.  It is used to serve \
+#	       HTML files and CGI.
+# processname: httpd
+# pidfile: /var/run/httpd.pid
+# config: /etc/httpd/conf/access.conf
+# config: /etc/httpd/conf/httpd.conf
+# config: /etc/httpd/conf/srm.conf
+
+
+# Source function library.
+SLEEP=12
+
+HTTPD8000=/please/supply/path/to/httpd8000
+# HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.19+ssl-1.42+p-5.6.1+mp-1.25
+# HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.24+ssl-1.48+p-5.7.3@17165+mp1.27
+# HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.24+ssl-1.48+p-5.7.3@17273+mp1.27
+# HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.8.0rc2+mp1.27
+# HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.8.0rc3+mp1.27
+# HTTPD8000=/usr/local/apache/bin/httpd-ap-1.3.26+ssl-1.48+p-5.6.1-2+mp-1.27
+HTTPD=/opt/apache/current/bin/httpd
+
+# HTTPD8000=/usr/local/apache/bin/httpd
+HTTPDCONF=/opt/apache/current/conf/httpd.conf
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting httpd: "
+	nice -11 $HTTPD -f $HTTPDCONF
+	echo
+	touch /var/lock/httpd
+	;;
+  startwithmax1)
+	echo -n "Starting httpd with maxrequestperchild set to 1: "
+	nice -11 $HTTPD -f $HTTPDCONF -DONE_PROCESS
+	echo
+	touch /var/lock/httpd
+	;;
+  start8000)
+	echo -n "Starting httpd8000 ($HTTPD8000): "
+	nice -11 $HTTPD8000 -f $HTTPDCONF -DSWITCH8000
+	echo
+        touch /var/lock/httpd8000
+	;;
+  Xstartgdb)
+	echo -n "Starting httpd under gdb ($HTTPD): "
+        echo -e "set args -f $HTTPDCONF -X -DONE_PROCESS\nhandle SIGPIPE pass\nhandle SIGPIPE nostop\nrun" > xstart.$$.args
+	gdb $HTTPD -x xstart.$$.args
+        rm xstart.$$.args
+	echo
+	;;
+  Xstartgdb8000)
+	echo -n "Starting httpd8000 under gdb ($HTTPD8000): "
+        echo -e "set args -f $HTTPDCONF -DSWITCH8000 -X -DONE_PROCESS\nhandle SIGPIPE pass\nhandle SIGPIPE nostop\nrun" > xstart8000.$$.args
+	gdb $HTTPD8000 -x xstart8000.$$.args
+        rm xstart8000.$$.args
+	echo
+	;;
+  XstartperlDB8000)
+	echo -n "Starting httpd8000 with perl's own -d ($HTTPD8000): "
+	$HTTPD8000 -f $HTTPDCONF -DSWITCH8000 -DPERL_DEBUG -X -DONE_PROCESS
+	echo
+	;;
+  stop)
+	echo -n "Shutting down http: "
+	PIDFILE=/usr/local/apache/logs/httpd.pid
+	[ -f "$PIDFILE" ] && {
+	    kill `cat $PIDFILE`
+	    echo -n httpd
+	}
+	echo
+	rm -f /var/lock/httpd
+	rm -f /var/run/httpd.pid
+	;;
+  stop8000)
+	echo -n "Shutting down http8000: "
+	PIDFILE=/usr/local/apache/logs/httpd.pid.8000
+	[ -f "$PIDFILE" ] && {
+	    kill `cat $PIDFILE`
+	    echo -n httpd8000
+	}
+	echo
+	rm -f /var/lock/httpd8000
+	rm -f /var/run/httpd.pid.8000
+	;;
+  status)
+	status httpd
+	;;
+  restart)
+	$0 stop
+	echo Sleeping $SLEEP seconds
+	sleep $SLEEP
+	$0 start
+	;;
+  reload)
+	echo -n "Reloading httpd: "
+	[ -f /var/run/httpd.pid ] && {
+	    kill -HUP `cat /var/run/httpd.pid`
+	    echo -n httpd
+	}
+	echo
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|status|start8000|stop8000|Xstartgdb|Xstartgdb8000}"
+	exit 1
+esac
+
+exit 0

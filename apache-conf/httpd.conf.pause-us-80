@@ -134,7 +134,7 @@ I don't understand those indents, but they do no harm anyway...
 #!perl
 
     BEGIN {
-      push @INC, "/home/puppet/pause/lib";
+        push @INC, "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
     }
 
 # $debugging
