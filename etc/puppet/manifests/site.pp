@@ -214,7 +214,7 @@ class pause-proftpd {
 		owner => root,
 		group => root,
 		mode => 640,
-		source => "puppet:///files/etc/init.d/proftpd.conf-pause-us",
+		source => "puppet:///files/etc/proftpd.conf-pause-us",
 	}
 	file { "/etc/sysconfig/proftpd":
 		owner => root,
