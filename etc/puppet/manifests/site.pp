@@ -25,6 +25,14 @@ class pause-mysqld {
 	}
 }
 
+class pause-munin-node {
+	package { "munin-node"    : ensure => installed }
+	service { "munin-node":
+                ensure  => running,
+                enable  => true,
+                hasstatus => true,
+	}
+}
 class pause-munin {
 	package { httpd         : ensure => installed }
         file { "/var/log/munin_httpd":
@@ -302,6 +310,7 @@ class pause {
 	include pause-pkg
 	include pause-mysqld
 	include pause-munin
+	include pause-munin-node
 	include pause-apache
 	include pause-perlbal
 	include pause-rsyncd
