@@ -71,7 +71,7 @@ case "$1" in
         stop
         ;;
   status)
-        status -p ${pidfile} rsync
+        status -p ${pidfile} PAUSE-rsyncd
         RETVAL=$?
         ;;
   restart|force_reload)
