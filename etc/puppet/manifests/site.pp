@@ -152,6 +152,37 @@ class pause-perlbal {
 	}
 }
 
+class pause-rsyncd {
+	include pause-rsyncd-873
+	# include pause-rsyncd-8732
+}
+class pause-rsyncd-873 {
+        file { "/etc/rsyncd.conf":
+		path => "/etc/rsyncd.conf",
+		owner => root,
+		group => root,
+		mode => 644,
+		source => "puppet:///files/etc/rsyncd.conf",
+	}
+	file { "/etc/init.d/PAUSE-rsyncd":
+		path => "/etc/init.d/PAUSE-rsyncd",
+		owner => root,
+		group => root,
+		mode => 755,
+		source => "puppet:///files/etc/init.d/PAUSE-rsyncd-pause-us",
+	}
+	service { "PAUSE-rsyncd":
+		ensure => running,
+                enable  => true,
+                require => [
+                            File["/etc/init.d/PAUSE-rsyncd"],
+			    File["/etc/rsyncd.conf"],
+			    ],
+		hasstatus => true,
+	}
+      
+}
+
 class pause {
 	# file { "/etc/puppet/files":
 	# 	path => "/etc/puppet/files",
