@@ -1,0 +1,11 @@
+# Set PROFTPD_OPTIONS to add command-line options for proftpd.
+# See proftpd(8) for a comprehensive list of what can be used.
+#
+# The following "Defines" can be used with the default configuration file:
+# -DANONYMOUS_FTP       : Enable anonymous FTP
+# -DDYNAMIC_BAN_LISTS   : Enable dynamic ban lists (mod_ban)
+# -DTLS                 : Enable TLS (mod_tls)
+#
+# For example, for anonymous FTP and dynamic ban list support:
+# PROFTPD_OPTIONS="-DANONYMOUS_FTP -DDYNAMIC_BAN_LISTS"
+PROFTPD_OPTIONS="-DANONYMOUS_FTP -DDYNAMIC_BAN_LISTS"

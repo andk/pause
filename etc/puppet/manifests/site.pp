@@ -208,6 +208,30 @@ class pause-rsyncd-8732 {
 	}
       
 }
+class pause-proftpd {
+	file { "/etc/proftpd.conf":
+		path => "/etc/proftpd.conf",
+		owner => root,
+		group => root,
+		mode => 640,
+		source => "puppet:///files/etc/init.d/proftpd.conf-pause-us",
+	}
+	file { "/etc/sysconfig/proftpd":
+		owner => root,
+		group => root,
+		mode => 644,
+		source => "puppet:///files/etc/sysconfig/proftpd-pause-us",
+	}
+	service { "proftpd":
+		ensure => running,
+                enable  => true,
+                require => [
+                            File["/etc/sysconfig/proftpd"],
+			    File["/etc/proftpd.conf"],
+			    ],
+		hasstatus => true,		
+	}
+}
 
 class pause {
 	# file { "/etc/puppet/files":
@@ -220,6 +244,7 @@ class pause {
 	include pause-apache
 	include pause-perlbal
 	include pause-rsyncd
+	include pause-proftpd
 }
 
 node pause2 {
