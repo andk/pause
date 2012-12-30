@@ -162,7 +162,7 @@ class pause-rsyncd-873 {
 		owner => root,
 		group => root,
 		mode => 644,
-		source => "puppet:///files/etc/rsyncd.conf",
+		source => "puppet:///files/etc/rsyncd.conf-pause-us",
 	}
 	file { "/etc/init.d/PAUSE-rsyncd":
 		path => "/etc/init.d/PAUSE-rsyncd",
