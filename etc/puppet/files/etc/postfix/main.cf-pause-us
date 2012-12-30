@@ -110,10 +110,10 @@ myorigin = $myhostname
 #
 # Note: you need to stop/start Postfix when this parameter changes.
 #
-#inet_interfaces = all
+inet_interfaces = all
 #inet_interfaces = $myhostname
 #inet_interfaces = $myhostname, localhost
-inet_interfaces = localhost
+#inet_interfaces = localhost
 
 # Enable IPv4, and IPv6 if supported
 inet_protocols = all
@@ -161,7 +161,7 @@ inet_protocols = all
 #
 # See also below, section "REJECTING MAIL FOR UNKNOWN LOCAL USERS".
 #
-mydestination = $myhostname, pause.$mydomain, pause2.$mydomain, localhost
+mydestination = $myhostname, pause.$mydomain, pause2.$mydomain, localhost.$mydomain, localhost
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain,
 #	mail.$mydomain, www.$mydomain, ftp.$mydomain
