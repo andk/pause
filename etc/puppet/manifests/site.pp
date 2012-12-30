@@ -193,6 +193,7 @@ class pause {
 	include pause-munin
 	include pause-apache
 	include pause-perlbal
+	include pause-rsyncd
 }
 
 node pause2 {
