@@ -209,6 +209,12 @@ class pause-rsyncd-8732 {
       
 }
 class pause-proftpd {
+	file { "/home/ftp/incoming":
+		owner => "ftp",
+		group => "ftp",
+		mode => 755,
+		ensure => directory,
+	}
 	file { "/etc/proftpd.conf":
 		path => "/etc/proftpd.conf",
 		owner => root,
