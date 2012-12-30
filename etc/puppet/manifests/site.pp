@@ -233,18 +233,6 @@ class pause-proftpd {
 		mode => 755,
 		ensure => directory,
 	}
-	file { "/var/ftp/incoming":
-		ensure => "/home/ftp/tmp",
-	}
-	file { "/var/ftp/pub":
-		ensure => "/home/ftp/tmp",
-	}
-	file { "/var/ftp/run":
-		ensure => "/home/ftp/tmp",
-	}
-	file { "/var/ftp/tmp":
-		ensure => "/home/ftp/tmp",
-	}
 	file { "/etc/proftpd.conf":
 		path => "/etc/proftpd.conf",
 		owner => root,
