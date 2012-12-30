@@ -262,6 +262,22 @@ class pause-proftpd {
 		hasstatus => true,		
 	}
 }
+class pause-postfix {
+	file { "/etc/aliases":
+		owner => "root",
+		group => "root",
+		mode => 644,
+		source => "puppet:///files/etc/aliases-pause-us",
+	}
+	file { "/etc/postfix/main.cf":
+		owner => "root",
+		group => "root",
+		mode => 644,
+		source => "puppet:///files/etc/postfix/main.cf-pause-us",
+	}
+	# XXX service ...
+	# XXX subscribe ...
+}
 
 class pause {
 	# file { "/etc/puppet/files":
@@ -275,6 +291,7 @@ class pause {
 	include pause-perlbal
 	include pause-rsyncd
 	include pause-proftpd
+	include pause-postfix
 }
 
 node pause2 {
