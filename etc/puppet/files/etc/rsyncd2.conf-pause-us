@@ -1,0 +1,11 @@
+max connections = 16
+log file = /var/log/rsyncd2
+pid file = /var/run/PAUSE-rsyncd2.pid
+transfer logging = true
+use chroot = true
+port = 8732
+
+[PAUSE]
+    path = /home/ftp/pub/PAUSE
+    auth users = *
+    secrets file = /etc/rsyncd.passwd
