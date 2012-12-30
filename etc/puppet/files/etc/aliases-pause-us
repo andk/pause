@@ -93,4 +93,13 @@ support:	postmaster
 decode:		root
 
 # Person who should get root's mail
-#root:		marc
+root:		andreas.koenig.5c1c1wmb@franz.ak.mind.de
+upload:		andreas.koenig.5c1c1wmb@franz.ak.mind.de
+koenig:		andreas.koenig.5c1c1wmb@franz.ak.mind.de
+a.koenig:	andreas.koenig.5c1c1wmb@franz.ak.mind.de
+andreas.koenig:	andreas.koenig.5c1c1wmb@franz.ak.mind.de
+pause:		andreas.koenig.5c1c1wmb@franz.ak.mind.de
+logcheck:	andreas.koenig.5c1c1wmb@franz.ak.mind.de
+
+# Mailinglists
+security: andk@cpan.org, kstar@cpan.org, bdfoy@cpan.org, jv@cpan.org, gbarr@cpan.org, smueller@cpan.org, adamk@cpan.org, dagolden@cpan.org, abh@cpan.org

@@ -73,14 +73,14 @@ mail_owner = postfix
 # other configuration parameters.
 #
 #myhostname = host.domain.tld
-#myhostname = virtual.domain.tld
+myhostname = pause.perl.org
 
 # The mydomain parameter specifies the local internet domain name.
 # The default is to use $myhostname minus the first component.
 # $mydomain is used as a default value for many other configuration
 # parameters.
 #
-#mydomain = domain.tld
+mydomain = develooper.com
 
 # SENDING MAIL
 # 
@@ -95,7 +95,7 @@ mail_owner = postfix
 # myorigin also specifies the default domain name that is appended
 # to recipient addresses that have no @domain part.
 #
-#myorigin = $myhostname
+myorigin = $myhostname
 #myorigin = $mydomain
 
 # RECEIVING MAIL
@@ -161,7 +161,7 @@ inet_protocols = all
 #
 # See also below, section "REJECTING MAIL FOR UNKNOWN LOCAL USERS".
 #
-mydestination = $myhostname, localhost.$mydomain, localhost
+mydestination = $myhostname, pause.$mydomain, pause2.$mydomain, localhost
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain,
 #	mail.$mydomain, www.$mydomain, ftp.$mydomain

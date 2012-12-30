@@ -275,8 +275,23 @@ class pause-postfix {
 		mode => 644,
 		source => "puppet:///files/etc/postfix/main.cf-pause-us",
 	}
-	# XXX service ...
-	# XXX subscribe ...
+        exec { subscribe-aliases:
+                command => "/usr/bin/newaliases",
+                logoutput => true,
+                refreshonly => true,
+                subscribe => File["/etc/aliases"]
+        }
+        exec { subscribe-postfix:
+                command => "/etc/init.d/postfix reload",
+                logoutput => true,
+                refreshonly => true,
+                subscribe => File["/etc/postfix/main.cf"]
+        }
+        service { "postfix":
+		ensure => running,
+		enable => true,
+		hasstatus => true,		
+	}
 }
 
 class pause {
