@@ -209,6 +209,12 @@ class pause-rsyncd-8732 {
       
 }
 class pause-proftpd {
+	# what we did manually: we made /var/ftp a symlink to
+	# /home/ftp . Since centos6 makes /var/ftp the home directory
+	# of the user ftp and we did not want to question this but we
+	# did not have a tradition of putting the whole CPAN into the
+	# var partition, this seemed like the lowest impact manual
+	# tweak. --akoenig 2012-12-30
 	file { "/home/ftp/incoming":
 		owner => "ftp",
 		group => "ftp",
