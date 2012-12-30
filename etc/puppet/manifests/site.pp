@@ -212,8 +212,38 @@ class pause-proftpd {
 	file { "/home/ftp/incoming":
 		owner => "ftp",
 		group => "ftp",
+		mode => 331,
+		ensure => directory,
+	}
+	file { "/home/ftp/pub":
+		owner => "root",
+		group => "ftp",
+		mode => 6555,
+		ensure => directory,
+	}
+	file { "/home/ftp/run":
+		owner => "ftp",
+		group => "ftp",
 		mode => 755,
 		ensure => directory,
+	}
+	file { "/home/ftp/tmp":
+		owner => "ftp",
+		group => "ftp",
+		mode => 755,
+		ensure => directory,
+	}
+	file { "/var/ftp/incoming":
+		ensure => "/home/ftp/tmp",
+	}
+	file { "/var/ftp/pub":
+		ensure => "/home/ftp/tmp",
+	}
+	file { "/var/ftp/run":
+		ensure => "/home/ftp/tmp",
+	}
+	file { "/var/ftp/tmp":
+		ensure => "/home/ftp/tmp",
 	}
 	file { "/etc/proftpd.conf":
 		path => "/etc/proftpd.conf",
