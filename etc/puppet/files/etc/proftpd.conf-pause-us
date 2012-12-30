@@ -252,15 +252,14 @@ LogFormat			auth	"%v [%P] %h %t \"%r\" %s"
       DenyAll
     </Limit>
 
-    # An upload directory that allows storing files but not retrieving
-    # or creating directories.
-    <Directory incoming/*>
-      AllowOverwrite		no
-      <Limit READ RMD DELE MKD>
+    # An upload directory that allows storing and retrieving files but
+    # not creating directories:
+    <Directory /incoming/*>
+      AllowOverwrite           no
+      <Limit RMD DELE MKD>
         DenyAll
       </Limit>
-
-      <Limit STOR>
+      <Limit STOR CWD>
         AllowAll
       </Limit>
     </Directory>

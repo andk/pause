@@ -218,7 +218,7 @@ class pause-proftpd {
 	file { "/home/ftp/pub":
 		owner => "root",
 		group => "ftp",
-		mode => 6555,
+		mode => 755,
 		ensure => directory,
 	}
 	file { "/home/ftp/run":
