@@ -303,11 +303,11 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 
                       },
            email_for_admin => {
-                               verb => "Look up private email address",
+                               verb => "Look up the forward email address",
                                priv => "admin",
                                cat => "01usr/01look",
 
-                               desc => "Admins can read a private email address",
+                               desc => "Admins can look where email should go",
                               },
            select_user => {
 			     verb => "Select User/Action",
