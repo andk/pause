@@ -73,8 +73,8 @@ $PAUSE::Config ||=
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP => '/bin/gzip',
      GZIP_OPTIONS => '--best --rsyncable',
-     HOME => '/home/k/',
-     HTTP_ERRORLOG => '/usr/local/apache/logs/error_log',
+     HOME => $IS_PAUSE_US ? '/home/puppet/' : '/home/k/',
+     HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
      INCOMING => 'ftp://pause.perl.org/incoming/',
      INCOMING_LOC => '/home/ftp/incoming/',
      MAXRETRIES => 16,
@@ -88,8 +88,8 @@ $PAUSE::Config ||=
      NO_SUCCESS_BREAK => 900,
      P5P => 'release-announce@perl.org',
      PID_DIR => "/var/run/",
-     PAUSE_LOG => "/home/k/PAUSE/log/paused.log",
-     PAUSE_LOG_DIR => "/home/k/PAUSE/log/",
+     PAUSE_LOG => $IS_PAUSE_US ? "home/puppet/pause-var/log/paused.log" : "/home/k/PAUSE/log/paused.log",
+     PAUSE_LOG_DIR => $IS_PAUSE_US ? "home/puppet/pause-var/log" : "/home/k/PAUSE/log/",
      PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
      PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
      RUNDATA => "/usr/local/apache/rundata/pause_1999",
@@ -97,20 +97,22 @@ $PAUSE::Config ||=
                                  # 2004-12-xx we frequently see >20 minutes
                                  # 2006-05-xx 7-9 minutes observed
      SLEEP => 75,
-     # path to repository without "/trunk"
-     SVNPATH => "/home/SVN/repos",
-     # path to where we find the svn binaries
-     SVNBIN => "/usr/bin",
      TIMEOUT => 60*60,
      TMP => '/home/ftp/tmp/',
      UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
      CHECKSUMS_SIGNING_PROGRAM => ('gpg'),
-     CHECKSUMS_SIGNING_ARGS => ('--homedir /home/k/PAUSE/111_sensi'.
-                                   'tive/gnupg-pause-batch-signing-home  '.
-                                   '--clearsign --default-key '),
+     CHECKSUMS_SIGNING_ARGS => $IS_PAUSE_US
+     ? ('--homedir /home/andreas/111_sensi'.
+        'tive/gnupg-pause-batch-signing-home  '.
+        '--clearsign --default-key ')
+     : ('--homedir /home/k/PAUSE/111_sensi'.
+        'tive/gnupg-pause-batch-signing-home  '.
+        '--clearsign --default-key '),
      CHECKSUMS_SIGNING_KEY => '450F89EC',
-     BATCH_SIG_HOME => '/home/k/PAUSE/111_sensitive/gnupg-pause-batch-signing-home',
+     BATCH_SIG_HOME => $IS_PAUSE_US
+     ? '/home/andreas/111_sensitive/gnupg-pause-batch-signing-home'
+     : '/home/k/PAUSE/111_sensitive/gnupg-pause-batch-signing-home',
      MIN_MTIME_CHECKSUMS => (time - 60*60*24*365.25), # max one year old
      HAVE_PERLBAL => 1,
     };
