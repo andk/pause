@@ -1187,7 +1187,9 @@ sub show_document {
       my $f = pause_1999::saxfilter01->new(Handler => $w);
       my $p = XML::SAX::ParserFactory->parser(Handler => $f);
       $p->parse_string($html_in);
-      shift @html_out if $html_out[0] =~ /^<\?/; # remove the XML Declaration
+      while ($html_out[0] =~ /^<[\?\!]/){ # remove XML Declaration, DOCTYPE
+        shift @html_out;
+      }
       push @m, join "", @html_out;
     } else {
       my $html = $html_in;
