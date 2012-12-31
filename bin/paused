@@ -320,11 +320,12 @@ skip        =not yet verified
               $self->logge("Info: Started mldistwatch for lpath[$lpath] with pid[$pid]");
             } else {
               # child
-              exec '/home/k/pause/cron/mldistwatch',
-                  '--pick',
-                      $lpath,
-                          '--logfile',
-                              '/var/log/mldistwatch.log';
+              exec $^X,
+                  $PAUSE::Config->{MLDISTWATCHPATH},
+                      '--pick',
+                          $lpath,
+                              '--logfile',
+                                  '/var/log/mldistwatch.log';
             }
           } else {
             $self->logge("Alert: could not fork for mldistwatch: $!");
