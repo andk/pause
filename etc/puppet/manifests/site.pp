@@ -87,6 +87,14 @@ class pause-apache {
 		mode => 755,
 		ensure => directory,
 	}
+	file { "/usr/local/apache/rundata/pause_1999":
+		# abuse of an arbitrary /usr/local place, it rather
+		# belonges in something like /var/lib/pause/
+		owner => apache,
+		group => apache,
+		mode => 755,
+		ensure => directory,
+	}
 	file { "/etc/init.d/PAUSE-httpd":
 		path   => "/etc/init.d/PAUSE-httpd",
 		owner  => root,
