@@ -345,12 +345,19 @@ sub myurl {
   warn sprintf "DEBUG: uri[%s]location[%s]", $uri, $r->location;
 
   # XXX should have additional test if we are on pause
-  if ($uri->port == 81 and $PAUSE::Config->{HAVE_PERLBAL}) {
+  if (( $uri->port == 81 || $uri->port == 12081 )
+      and $PAUSE::Config->{HAVE_PERLBAL}
+     ) {
       if ($self->is_ssl($uri)) {
           $uri->port(443);
+          $uri->scheme("https");
       } else {
           $uri->port(80);
+          $uri->scheme("http");
       }
+      my $hh = $Hhostname;
+      $hh =~ s/:\d+//;
+      $uri->hostname($hh);
   }
 
   # my $port = $r->server->port || 80;

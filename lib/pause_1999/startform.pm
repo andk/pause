@@ -10,8 +10,14 @@ sub as_string {
   my pause_1999::main $mgr = shift;
   my @m;
   my $myurl = $mgr->myurl;
-  my $me = $myurl->can("unparse") ? $myurl->unparse : $myurl->as_string;
+  my $can_unparse = $myurl->can("unparse");
+  my $me = $can_unparse ? $myurl->unparse : $myurl->as_string;
   $me =~ s/\?.*//; # unparse keeps the querystring which breaks XHTML
+
+  # since we have a perlbal that does the https for us, we can easily
+  # have a wrong scheme in this $me and a wrong hostname, e.g.
+  # action="http://pause.perl.org:443/pause/authenquery"
+  warn "DEBUG: can_unparse[$can_unparse]me[$me]";
 
   my $enctype;
   my $method;
