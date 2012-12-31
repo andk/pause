@@ -76,6 +76,7 @@ $PAUSE::Config ||=
      HOME => $IS_PAUSE_US ? '/home/puppet/' : '/home/k/',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
      INCOMING => $IS_PAUSE_US ? 'ftp://localhost/incoming/' : 'ftp://pause.perl.org/incoming/',
+     MLDISTWATCHPATH => $IS_PAUSE_US ? '/home/puppet/pause/cron/mldistwatch' : '/home/k/pause/cron/mldistwatch',
      INCOMING_LOC => '/home/ftp/incoming/',
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
