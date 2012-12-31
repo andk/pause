@@ -302,6 +302,13 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 				 list.",
 
                       },
+           email_for_admin => {
+                               verb => "Look up private email address",
+                               priv => "admin",
+                               cat => "01usr/01look",
+
+                               desc => "Admins can read a private email address",
+                              },
            select_user => {
 			     verb => "Select User/Action",
 			     priv => "admin",
