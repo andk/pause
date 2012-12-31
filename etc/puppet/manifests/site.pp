@@ -252,7 +252,8 @@ class pause-proftpd {
 	file { "/home/ftp/incoming":
 		owner => "ftp",
 		group => "ftp",
-		mode => 331,
+		mode => 777, # this was actually necessary to allow apache to write here
+		             # seems quite stupid.
 		ensure => directory,
 	}
 	file { "/home/ftp/pub":
