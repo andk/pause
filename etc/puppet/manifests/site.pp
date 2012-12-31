@@ -95,6 +95,24 @@ class pause-apache {
 		mode => 755,
 		ensure => directory,
 	}
+	file { "/usr/local/apache/rundata":
+		owner => apache,
+		group => apache,
+		mode => 755,
+		ensure => directory,
+	}
+	file { "/usr/local/apache":
+		owner => apache,
+		group => apache,
+		mode => 755,
+		ensure => directory,
+	}
+	file { "/usr/local":
+		owner => root,
+		group => root,
+		mode => 755,
+		ensure => directory,
+	}
 	file { "/etc/init.d/PAUSE-httpd":
 		path   => "/etc/init.d/PAUSE-httpd",
 		owner  => root,
