@@ -31,7 +31,7 @@ if ($USE_RECENTFILE_HOOKS) {
     die "Did not find Recentfile library!";
   }
 }
-
+our $IS_PAUSE_US = Sys::Hostname::hostname =~ /pause2/ ? 1 : 0;
 
 use strict;
 use vars qw(@ISA @EXPORT_OK $VERSION $Config);
@@ -155,15 +155,23 @@ it does not work if the user does not supply credentials at all.
 If current time is after the last downtime event plus scheduled
 downtime, then we're back to normal operation.
 
+Hint: I like to use date to determine a timestamp in the future
+
+   % date +%s --date="Mon Dec 31 15:00:00 UTC 2012"
+
 =back
 
 =cut
 
 sub downtimeinfo {
-  return +{
-           downtime => 1197317508,
-           willlast => 0,
-          };
+  return $IS_PAUSE_US ? +{
+                          downtime => 1197317508,
+                          willlast => 0,
+                         }
+      : +{
+          downtime => 1356966000,
+          willlast => 3600,
+         };
 }
 
 sub filehash {
