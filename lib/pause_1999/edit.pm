@@ -5642,7 +5642,8 @@ sub email_for_admin {
   } else {
     for my $id (sort keys %ALL) {
       my($mail) = $ALL{$id};
-      push @m, "<tr><td>$id</td><td>$mail</td></tr>\n";
+      my $esc_mail = $mgr->escapeHTML($mail);
+      push @m, "<tr><td>$id</td><td>$esc_mail</td></tr>\n";
     }
     push @m, "</table>";
     my $href = sprintf("authenquery?ACTION=email_for_admin;OF=YAML");
