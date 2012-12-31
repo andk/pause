@@ -13,7 +13,7 @@ gmtime instead of localtime.
 
 =cut
 
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/PAUSE/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 use PAUSE ();
 use File::Compare qw(compare);
 use strict;

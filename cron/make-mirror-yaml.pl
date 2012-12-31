@@ -6,7 +6,7 @@ use CPAN::Indexer::Mirror 0.05; # atomic writes
 use File::Path qw(mkpath);
 use LWP::UserAgent;
 
-use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/wc/lib";
+use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/wc/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 use PAUSE;
 
 die "FTP_RUN not defined" unless defined $PAUSE::Config->{FTP_RUN};

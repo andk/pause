@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 
-use lib "/home/k/pause/lib";
+use lib "/home/k/pause/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 use PAUSE ();
 
 $ENV{LANG} = "C";

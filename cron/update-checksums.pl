@@ -46,7 +46,7 @@ Sleep that amount of time in every directory we enter
 
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 BEGIN {
     push @INC, qw(       );
 }
@@ -90,7 +90,7 @@ use Time::HiRes qw(sleep time);
 use YAML::Syck;
 use strict;
 
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/PAUSE/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 use PAUSE ();
 
 $Opt{debug} ||= 0;

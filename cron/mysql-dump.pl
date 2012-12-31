@@ -18,7 +18,7 @@ use strict;
 
 our $Id = q$Id$;
 
-use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/privatelib", "/home/k/dproj/PAUSE/GIT-ghub/lib";
+use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/privatelib", "/home/k/dproj/PAUSE/GIT-ghub/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 use PAUSE ();
 my @m=gmtime;
 $m[5]+=1900;

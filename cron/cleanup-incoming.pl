@@ -2,7 +2,7 @@
 
 my $Id = q$Id$;
 
-use lib "/home/k/PAUSE/lib";
+use lib "/home/k/PAUSE/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
 use PAUSE ();
 use DBI;
 use File::Spec;
