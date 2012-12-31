@@ -1588,11 +1588,6 @@ filename[%s]. </p>
       href="http://blog.usarundbrief.com/?p=36">in his
       blog</a></td></tr>\n};
 
-  push @m, qq{<tr><td bgcolor="#ffff80"><b>FTP PUT + Confirmation via
-      form:</b> After you have transferred the file to the incoming
-      directory on $server: Click the filename.</td></tr>\n};
-
-
   push @m, qq{</table>\n <blockquote><b>Please,</b> make sure your filename
       contains a version number. For security reasons you will never
       be able to upload a file with the same name again (not even
@@ -1671,54 +1666,6 @@ filename[%s]. </p>
   push @m, "\n<br />";
   push @m, qq{<input type="submit" name="SUBMIT_pause99_add_uri_uri"
  value=' Upload this URL ' /></td></tr>\n};
-
-  # FROM FTP/INCOMING
-
-  push @m, qq{<tr><td bgcolor="#ffff80">If <b>you have already
-      uploaded</b> the file to PAUSE, click here, which file is
-      yours<br />};
-
-  require DirHandle;
-  my $dh = DirHandle->new;
-  $dh->open($PAUSE::Config->{INCOMING_LOC});
-  my @incom = ();
-  my %incom = ();
-  my $sth = $dbh->prepare("SELECT userid, uri, dgot FROM uris WHERE uri=?");
-  for ($dh->read) {
-    next if /^\./;
-    next if /[^\w\-\.\@\+]/; # filter illegal filenames, they might
-                             # disturb the XHTML (and do worse anyway)
-    next unless -f "$PAUSE::Config->{INCOMING_LOC}/$_";
-    push @incom, $_;
-    my $size = -s "$PAUSE::Config->{INCOMING_LOC}/$_";
-    my $upldby = "";
-    $sth->execute($_);
-    if ($sth->rows > 0) {
-      my(@users);
-      while (my($userid,$uri,$dgot) = $mgr->fetchrow($sth, "fetchrow_array")) {
-        push @users, $userid if $userid && $dgot && $dgot>$now-86400*3;
-      }
-      $upldby = sprintf "; %s", join(", ", @users) if @users;
-    }
-    $incom{$_} = sprintf " <tt>%s <small>[%db%s]</small></tt>\n", $_, $size, $upldby;
-  }
-  $dh->close;
-  if (@incom) {
-    push @m, ($mgr->radio_group(
-				name =>"pause99_add_uri_upload",
-				values => [sort @incom],
-				labels => \%incom,
-				linebreak => 'true',
-				default => '/',
-			       ));
-  } else {
-    push @m, ("\nNo files found in incoming directory\n");
-  }
-
-  push @m, "<br />";
-
-  push @m, qq{<input type="submit" name="SUBMIT_pause99_add_uri_upload"
- value="Upload the checked file" /></td></tr>\n};
 
   # END OF UPLOAD OPTIONS
 
