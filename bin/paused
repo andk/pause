@@ -24,6 +24,7 @@ use HTTP::Date ();
 use HTTP::Status ();
 use IO::File ();
 use IPC::Run3 ();
+use List::Util qw(first);
 use LWP ();
 use MD5 ();
 use Mail::Send ();
@@ -694,8 +695,8 @@ sub verify_gzip_tar {
         $taropt = "tvzf";
         $testinggzip = $zcat;
     } elsif ($tpath =~ /\.(tbz|tar\.bz2)$/) {
-        $zcat = "/bin/bzcat";
-        $gzip = "/bin/bzip2";
+        $zcat = first { -x $_ } "/bin/bzcat", "/usr/bin/bzcat";
+        $gzip = first { -x $_ } "/bin/bzip2", "/usr/bin/bzip2";
         $taropt = "tvjf";
         $testinggzip = $gzip;
     } else {
