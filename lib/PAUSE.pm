@@ -145,7 +145,7 @@ if ($@) {
     # privatelib; cannot warn every minute warn "Could not find or
     # read PrivatePAUSE.pm; will try to work without";
   } else {
-    warn $@;
+    warn "Warning (continuing anyway): $@";
   }
 }
 
