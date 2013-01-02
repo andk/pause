@@ -379,6 +379,7 @@ sub whois {
             generated-by='%s'>
 },
     scalar(gmtime),
+    $0,
   );
   open FH, ">00whois.new" or return "Error: Can't open 00whois.new: $!";
   if ($] > 5.007) {
