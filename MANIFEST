@@ -15,7 +15,6 @@ bin/stats_for_neilb.pl
 cron/cleanup-incoming.pl
 cron/cron-daily.pl
 cron/CRONTAB.ROOT
-cron/funet-broken.pl
 cron/gmls-lR.pl
 cron/mail-stats.pl
 cron/mirror_wget_rsync.sh
