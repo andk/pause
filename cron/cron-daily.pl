@@ -1,8 +1,7 @@
 #!/usr/local/bin/perl -w
 
-my $Id = q$Id$;
-
-use lib "/home/k/PAUSE/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
 use File::Basename ();
@@ -26,13 +25,12 @@ $TIME[4]++;
 $TIME[5] += 1900;
 my $TIME = sprintf "%02d" x 5, @TIME[ 5, 4, 3, 2, 1 ];
 
-my $zcat = "/bin/zcat";
+my $zcat = PAUSE::abs_zcat();
 die "no executable zcat" unless -x $zcat;
-my $gzip = "/bin/gzip";
+my $gzip = PAUSE::abs_gzip();
 die "no executable gzip" unless -x $gzip;
 
 sub report;
-report "Running $Id\n";
 
 my (@blurb, %fields);
 unless (
@@ -381,7 +379,6 @@ sub whois {
             generated-by='%s'>
 },
     scalar(gmtime),
-    $Id,
   );
   open FH, ">00whois.new" or return "Error: Can't open 00whois.new: $!";
   if ($] > 5.007) {
