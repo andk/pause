@@ -270,8 +270,7 @@ sub packages_per_pmfile {
                     if (defined $strict_version){
                         $ppp->{$pkg}{version} = $strict_version ;
                     } else {
-                        $ppp->{$pkg}{version} ||= "";
-                        $ppp->{$pkg}{version} ||= $version;
+                        $ppp->{$pkg}{version} = defined $version ? $version : "";
                     }
                     local($^W)=0;
                     $ppp->{$pkg}{version} =
