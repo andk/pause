@@ -67,6 +67,9 @@ $PAUSE::Config ||=
      AUTHEN_PASSWORD_FLD => "password",
      AUTHEN_USER_FLD => "user",
      AUTHEN_USER_TABLE => "usertable",
+     AUTHEN_BACKUP_DIR => $IS_PAUSE_US
+     ? '/home/puppet/pause-var/backup'
+     : '/home/k/PAUSE/111_sensitive/backup',
      CPAN_TESTERS => qq(cpan-uploads\@perl.org), # cpan-uploads is a mailing list, BINGOS relies on it
      TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
      REPLY_TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
