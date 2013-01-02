@@ -98,6 +98,7 @@ $PAUSE::Config ||=
      INCOMING_LOC => '/home/ftp/incoming/',
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
+     MIRRORED_BY_URL => "ftp://ftp.funet.fi/pub/languages/perl/CPAN/MIRRORED.BY",
      MLROOT => '/home/ftp/pub/PAUSE/authors/id/', # originally module list root
      ML_CHOWN_USER => qq{UNSAFE},
      ML_CHOWN_GROUP => qq{UNSAFE},
