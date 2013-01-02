@@ -18,7 +18,7 @@ cron/CRONTAB.ROOT
 cron/gmls-lR.pl
 cron/mldistwatch
 cron/mysql-dump.pl
-cron/publish-crontab.sh
+cron/publish-crontab.pl
 cron/restart-httpd
 cron/rm_stale_links
 cron/run_mirrors.sh
