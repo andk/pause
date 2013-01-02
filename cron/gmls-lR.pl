@@ -13,15 +13,11 @@ gmtime instead of localtime.
 
 =cut
 
-use lib "/home/k/PAUSE/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 use File::Compare qw(compare);
 use strict;
-use vars qw($Id);
-
-$Id = q$Id: gmls-lR.pl,v 1.25 1998/05/25 15:25:29 k Exp k $;
-
-# warn join "\n", "Running $Id", scalar localtime, "";
 
 chdir $PAUSE::Config->{FTPPUB} or die "Could not chdir to $PAUSE::Config->{FTPPUB}: $!";
 mkdir "indexes", 0755 unless -d "indexes";
