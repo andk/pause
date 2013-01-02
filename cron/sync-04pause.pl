@@ -1,11 +1,12 @@
 #!/usr/local/bin/perl
 
-use lib "/home/k/pause/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
 $ENV{LANG} = "C";
-my $target = "/home/ftp/pub/PAUSE/modules/";
-open my $fh, "-|", "rsync -av /home/k/pause/htdocs/0*.html $target" or die "Could not fork: $!";
+my $target = "$PAUSE::Config->{FTPPUB}/modules/";
+open my $fh, "-|", "rsync -av $FindBin::Bin/../htdocs/0*.html $target" or die "Could not fork: $!";
 while (<$fh>) {
     next if /^building file list/;
     next if /^sent\s.+received/;
