@@ -16,7 +16,6 @@ cron/cleanup-incoming.pl
 cron/cron-daily.pl
 cron/CRONTAB.ROOT
 cron/gmls-lR.pl
-cron/mirror_wget_rsync.sh
 cron/mldistwatch
 cron/mysql-dump.pl
 cron/publish-crontab.sh
