@@ -16,18 +16,17 @@ After extended-insert:
 
 use strict;
 
-our $Id = q$Id$;
-
-use lib "/home/k/PAUSE/lib", "/home/k/dproj/PAUSE/GIT-ghub/privatelib", "/home/k/dproj/PAUSE/GIT-ghub/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 my @m=gmtime;
 $m[5]+=1900;
 $m[4]++;
 my $D = sprintf "%04d%02d%02d%02d%02dGMT",@m[5,4,3,2,1];
-my $BZIP = "/usr/local/bin/bzip2";
-$BZIP = "/usr/bin/bzip2" unless -x $BZIP;
-$BZIP = "/bin/bzip2" unless -x $BZIP;
+my $BZIP = PAUSE::abs_bzip2();
 die "where is BZIP" unless -x $BZIP;
+use File::Path ();
+use File::Basename ();
 
 my $Struct = [
               {backupdir => "$PAUSE::Config->{FTPPUB}/PAUSE-data",
@@ -36,7 +35,7 @@ my $Struct = [
                cfg_pw => "MOD_DATA_SOURCE_PW",
                master => 1,
               },
-              {backupdir => "/home/k/PAUSE/111_sensitive/backup",
+              {backupdir => $PAUSE::Config->{AUTHEN_BACKUP_DIR},
                cfg_dsn => "AUTHEN_DATA_SOURCE_NAME",
                cfg_user => "AUTHEN_DATA_SOURCE_USER",
                cfg_pw => "AUTHEN_DATA_SOURCE_PW",
@@ -44,13 +43,13 @@ my $Struct = [
 ];
 for my $struct (@$Struct) {
   my $backup_dir = $struct->{backupdir};
+  File::Path::mkpath File::Basename::dirname $backup_dir;
   my($dbi,$dbengine,$db) = split /:/, $PAUSE::Config->{$struct->{cfg_dsn}};
   die "Script would not work for $dbengine" unless $dbengine =~ /mysql/i;
   my $user = $PAUSE::Config->{$struct->{cfg_user}};
   my $password = $PAUSE::Config->{$struct->{cfg_pw}};
   for my $var ($db,$user,$password) {
-    die q$Id$
-        if $var =~ /[\'\"\;]/;
+    die "suspicious variable var[$var]" if $var =~ /[\'\"\;]/;
   }
   my $master_data = "";
   if ($struct->{master}) {
