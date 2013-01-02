@@ -47,7 +47,6 @@ links:
     /usr/lib/mon/mon.d/paused.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/paused.monitor
     /usr/lib/mon/mon.d/rsyncd.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rsyncd.monitor
     /usr/lib/mon/mon.d/rsyncd2.monitor   ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rsyncd2.monitor
-    /usr/lib/mon/mon.d/sm-mta.monitor    ->! ../../../../home/k/PAUSE/etc/mon/mon.d/sm-mta.monitor
     /usr/lib/mon/mon.d/3ware_cli.monitor ->! ../../../../home/k/PAUSE/etc/mon/mon.d/3ware_cli.monitor
     /usr/lib/mon/mon.d/rersyncrecent.monitor ->! ../../../../home/k/PAUSE/etc/mon/mon.d/rersyncrecent.monitor
 
