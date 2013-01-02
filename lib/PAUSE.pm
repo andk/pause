@@ -12,6 +12,7 @@ it. Before you *use* a function here, please ask about its status.
 
 # nono for non-CGI: use CGI::Switch ();
 
+use File::Basename ();
 use Compress::Zlib ();
 use DBI ();
 use Exporter;
@@ -45,11 +46,12 @@ $VERSION = "1.005";
 # really variables we cannot publish. Will separate harmless variables
 # from the secret ones and put them here in the future.
 
-my(@pauselib) = grep m!(/PAUSE|\.\.|/SVN)/lib!, @INC;
-for (@pauselib) {
-  s|/lib|/privatelib|;
+my($pauselib) = File::Basename::dirname __FILE__;
+for ($pauselib) {
+  s|pause/lib|pause-private/lib|        # pause2.develooper.com has pause/ and pause-private/
+      or s|/lib|/privatelib|;           # pause.fiz-chemie.de has lib/ and privatelib/
 }
-push @INC, @pauselib;
+push @INC, $pauselib;
 $PAUSE::Config ||=
     {
      # previously also used for ftp password; still used in Error as
