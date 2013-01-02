@@ -43,7 +43,7 @@ my $Struct = [
 ];
 for my $struct (@$Struct) {
   my $backup_dir = $struct->{backupdir};
-  File::Path::mkpath File::Basename::dirname $backup_dir;
+  File::Path::mkpath $backup_dir;
   my($dbi,$dbengine,$db) = split /:/, $PAUSE::Config->{$struct->{cfg_dsn}};
   die "Script would not work for $dbengine" unless $dbengine =~ /mysql/i;
   my $user = $PAUSE::Config->{$struct->{cfg_user}};
