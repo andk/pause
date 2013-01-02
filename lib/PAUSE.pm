@@ -49,9 +49,20 @@ $VERSION = "1.005";
 # from the secret ones and put them here in the future.
 
 my($pauselib) = File::Basename::dirname Cwd::abs_path __FILE__;
-for ($pauselib) {
-  s|pause/lib|pause-private/lib|        # pause2.develooper.com has pause/ and pause-private/
-      or s|/lib|/privatelib|;           # pause.fiz-chemie.de has lib/ and privatelib/
+{
+  my $try = $pauselib;
+  $try =~ s|pause/lib|pause-private/lib|; # pause2.develooper.com has pause/ and pause-private/
+  if (-e $try) {
+    $pauselib = $try;
+  } else {
+    $try = $pauselib;
+    $try =~ s|/lib|/privatelib|;           # pause.fiz-chemie.de has lib/ and privatelib/
+    if (-e $try) {
+      $pauselib = $try;
+    } else {
+      die "did not find private directory";
+    }
+  }
 }
 push @INC, $pauselib;
 $PAUSE::Config ||=
