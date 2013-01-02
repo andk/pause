@@ -13,13 +13,11 @@ on the floor:-(
 
 =cut
 
-use lib "/home/k/PAUSE/lib", "/home/puppet/pause-private/lib", "/home/puppet/pause/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
 use strict;
-use vars qw($Id);
-
-$Id = q$Id: rm_stale_links 385 2003-07-25 19:50:38Z k $;
 
 use File::Find;
 use File::Spec;
