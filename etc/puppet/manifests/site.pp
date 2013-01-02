@@ -137,9 +137,9 @@ class pause-apache {
 
 class pause-perlbal {
 	file { "/home/puppet/pause-private":
-		owner => puppet,
-		group => puppet,
-		mode => 755,
+		owner => root,
+		group => root,
+		mode => 700,
 		ensure => directory,
 	}
 	file { "/home/puppet/pause-private/lib":
