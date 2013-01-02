@@ -14,6 +14,7 @@ it. Before you *use* a function here, please ask about its status.
 
 use File::Basename ();
 use Compress::Zlib ();
+use Cwd ();
 use DBI ();
 use Exporter;
 use Fcntl qw(:flock);
@@ -47,7 +48,7 @@ $VERSION = "1.005";
 # really variables we cannot publish. Will separate harmless variables
 # from the secret ones and put them here in the future.
 
-my($pauselib) = File::Basename::dirname __FILE__;
+my($pauselib) = File::Basename::dirname Cwd::abs_path __FILE__;
 for ($pauselib) {
   s|pause/lib|pause-private/lib|        # pause2.develooper.com has pause/ and pause-private/
       or s|/lib|/privatelib|;           # pause.fiz-chemie.de has lib/ and privatelib/
