@@ -20,6 +20,7 @@ use Fcntl qw(:flock);
 my $HAVE_RECENTFILE = eval {require File::Rsync::Mirror::Recentfile; 1;};
 use File::Spec ();
 use IO::File ();
+use List::Util ();
 use MD5 ();
 use Mail::Send ();
 use Sys::Hostname ();
@@ -297,6 +298,11 @@ sub owner_of_module {
     }
     return;
 }
+
+sub abs_zcat { "/bin/zcat" }
+sub abs_gzip { "/bin/gzip" }
+sub abs_bzcat { List::Util::first { -x $_ } "/bin/bzcat", "/usr/bin/bzcat" }
+sub abs_bzip2 { List::Util::first { -x $_ } "/bin/bzip2", "/usr/bin/bzip2" }
 
 sub gzip {
   my($read,$write) = @_;
