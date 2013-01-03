@@ -32,6 +32,7 @@ DBD::mysql
 DBI
 DB_File::Lock
 Email::Address
+Email::MIME
 Encode::MIME::Header
 File::Rsync
 File::Rsync::Mirror::Recent
@@ -57,6 +58,7 @@ Time::Duration
 Time::HiRes
 Time::Period
 Unicode::String -- Apache::HeavyCGI
+V
 XML::Parser
 XML::SAX::Expat
 XML::SAX::Writer
