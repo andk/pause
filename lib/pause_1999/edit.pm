@@ -3056,9 +3056,9 @@ $blurbcopy
 </pre>
 <hr noshade="noshade" />
 }; #};
-    my $header = {
-                  Subject => $subject
-                 };
+    $header = {
+               Subject => $subject
+              };
     warn "To[@to]Subject[$header->{Subject}]";
     $mgr->send_mail_multi(\@to,$header,$blurb);
   }
