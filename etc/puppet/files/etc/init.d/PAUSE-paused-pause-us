@@ -10,6 +10,7 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+daemon=/home/puppet/pause/bin/paused
 prog=PAUSE-paused
 pidfile=/var/run/paused.pid
 lockfile=/var/lock/subsys/PAUSE-paused
@@ -17,7 +18,7 @@ RETVAL=0
 
 start() {
         echo -n $"Starting $prog: "
-        /etc/init.d/${prog} --pidfile=${pidfile}
+        ${daemon} --pidfile=${pidfile}
         RETVAL=$?
         [ $[$RETVAL] -eq 0 ] && echo "[OK]" || echo "[FAILED]"
         [ $RETVAL = 0 ] && touch ${lockfile}
