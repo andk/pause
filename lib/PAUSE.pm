@@ -89,7 +89,6 @@ $PAUSE::Config ||=
      FTPPUB => '/home/ftp/pub/PAUSE/',
      GITROOT => '/home/ftp/pub/PAUSE/PAUSE-git',
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
-     GZIP => '/bin/gzip',
      GZIP_OPTIONS => '--best --rsyncable',
      HOME => $IS_PAUSE_US ? '/home/puppet/' : '/home/k/',
      CRONPATH => $IS_PAUSE_US ? '/home/puppet/pause/cron' : '/home/k/pause/cron',

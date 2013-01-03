@@ -521,9 +521,10 @@ sub rewrite02 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
+    our $GZIP = PAUSE::abs_gzip();
     if (
         -f "$repfile.gz" and
-        open my $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+        open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
        ) {
         while (<$fh>) {
             next if 1../^$/;
@@ -596,7 +597,7 @@ Last-Updated: $date\n\n};
         $self->_install($gitfile);
 
         PAUSE::newfile_hook($repfile);
-        0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
+        0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
@@ -1032,9 +1033,10 @@ sub rewrite03 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
+    our $GZIP = PAUSE::abs_gzip();
     if (-f "$repfile.gz") {
         if (
-          open my $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+          open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
         ) {
           if ($] > 5.007) {
               require Encode;
@@ -1115,7 +1117,7 @@ Date:        %s
         rename "$repfile.new", $repfile or
             $self->verbose(1,"Couldn't rename to '$repfile': $!");
         PAUSE::newfile_hook($repfile);
-        0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
+        0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");
@@ -1135,9 +1137,10 @@ sub rewrite06 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
+    our $GZIP = PAUSE::abs_gzip();
     if (-f "$repfile.gz") {
         if (
-            open my $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $repfile.gz|"
+            open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
            ) {
             while (<$fh>) {
                 next if 1../^\s*$/;
@@ -1200,7 +1203,7 @@ Date:        %s
         $self->git->add({}, '06perms.txt');
         $self->_install($gitfile);
         PAUSE::newfile_hook($repfile);
-        0==system "$PAUSE::Config->{GZIP} $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
+        0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $self->verbose(1,"Couldn't gzip for some reason");
         rename "$repfile.gz.new", "$repfile.gz" or
             $self->verbose(1,"Couldn't rename to '$repfile.gz': $!");

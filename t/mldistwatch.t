@@ -69,8 +69,9 @@ subtest "tests with the parsed 02packages data" => sub {
 subtest "test 06perms.txt" => sub {
   my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
   my $fh;
+  our $GZIP = PAUSE::abs_gzip();
   $pause->with_our_config(sub {
-    open $fh, "$PAUSE::Config->{GZIP} --stdout --uncompress $index_06|"
+    open $fh, "$GZIP --stdout --uncompress $index_06|"
       or die "can't open $index_06 for reading with gip: $!";
   });
 
@@ -114,3 +115,8 @@ subtest "meagre git tests" => sub {
 };
 
 done_testing;
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# End:
