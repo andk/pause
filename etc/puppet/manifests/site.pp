@@ -343,6 +343,14 @@ class pause-limits {
 		source => "puppet:///files/etc/security/limits.conf-pause-us",
 	}
 }
+class pause-iptables {
+	file { "/etc/sysconfig/iptables":
+		owner  => root,
+		group  => root,
+		mode   => 644,
+		source => "puppet:///files/etc/sysconfig/iptables-pause-us",
+	}
+}
 class pause {
 	# file { "/etc/puppet/files":
 	# 	path => "/etc/puppet/files",
@@ -359,6 +367,7 @@ class pause {
 	include pause-postfix
 	include pause-paused
 	include pause-limits
+	include pause-iptables
 }
 
 node pause2 {
