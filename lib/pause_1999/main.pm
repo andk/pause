@@ -355,8 +355,13 @@ sub myurl {
           $uri->port(80);
           $uri->scheme("http");
       }
-      my $hh = $Hhostname;
-      $hh =~ s/:\d+//;
+      my($hh,$hport);
+      if ($Hhostname =~ /([^:]+):(\d+)/) {
+          ($hh,$hport) = ($1,$2);
+          $uri->port($hport);
+      } else {
+          $hh = $Hhostname;
+      }
       $uri->hostname($hh);
   }
 
