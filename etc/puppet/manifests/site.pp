@@ -335,6 +335,14 @@ class pause-paused {
 		source => "puppet:///files/etc/init.d/PAUSE-paused-pause-us",
 	}
 }
+class pause-limits {
+	file { "/etc/security/limits.conf":
+		owner  => root,
+		group  => root,
+		mode   => 644,
+		source => "puppet:///files/etc/security/limits.conf-pause-us",
+	}
+}
 class pause {
 	# file { "/etc/puppet/files":
 	# 	path => "/etc/puppet/files",
@@ -350,6 +358,7 @@ class pause {
 	include pause-proftpd
 	include pause-postfix
 	include pause-paused
+	include pause-limits
 }
 
 node pause2 {
