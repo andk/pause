@@ -137,18 +137,18 @@ $PAUSE::Config ||=
      HAVE_PERLBAL => 1,
     };
 
-
-eval { require PrivatePAUSE; };
-if ($@) {
-  if ($0 =~ /^(stamp|-e)$/) {
-    # PAUSE.pm is used in the timestamp cronjob without access to
-    # privatelib; cannot warn every minute warn "Could not find or
-    # read PrivatePAUSE.pm; will try to work without";
-  } else {
-    warn "Warning (continuing anyway): $@";
+unless ($INC{"PrivatePAUSE.pm"}) { # reload within apache
+  eval { require PrivatePAUSE; };
+  if ($@) {
+    if ($0 =~ /^(stamp|-e)$/) {
+      # PAUSE.pm is used in the timestamp cronjob without access to
+      # privatelib; cannot warn every minute warn "Could not find or
+      # read PrivatePAUSE.pm; will try to work without";
+    } else {
+      warn "Warning (continuing anyway): $@";
+    }
   }
 }
-
 
 =pod
 
