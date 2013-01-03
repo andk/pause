@@ -5945,7 +5945,7 @@ decision.</li>
   if ($blurb) {
     my $eta;
     {
-      my $ctf = "/home/k/PAUSE/cron/CRONTAB.ROOT"; # crontabfile
+      my $ctf = "$PAUSE::Config->{CRONPATH}/CRONTAB.ROOT"; # crontabfile
       unless (-f $ctf) {
         $ctf = "/tmp/crontab.root";
       }

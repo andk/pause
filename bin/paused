@@ -319,7 +319,7 @@ skip        =not yet verified
             } else {
               # child
               exec $^X,
-                  $PAUSE::Config->{MLDISTWATCHPATH},
+                  "$PAUSE::Config->{CRONPATH}/mldistwatch",
                       '--pick',
                           $lpath,
                               '--logfile',
