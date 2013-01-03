@@ -1,0 +1,34 @@
+
+package=defaults
+	compress_excl+|\.sig|\.html$|^\.notar$|-z|\.tgz$|\.taz$|\.tar.Z|\.arc$|\.zip$|\.lzh$|\.zoo$|\.exe$|\.lha$|\.zom$|\.gif$|\.jpeg$|\.jpg$|\.mpeg$|\.au$|read.*me|index|\.message|info|faq|gzip|compress|\.png$|(^|/)\.\.?$
+	compress_patt=.
+	compress_prog=gzip
+	delete_excl=((^|/)\.(mirror|notar)|\.meta)$
+        mode_copy=false
+	dir_mode=0755
+	do_deletes=true
+	exclude_patt=(^|/)(\.mirror|core$|\.cap|\.in\..*\.$|MIRROR.LOG|#.*#|\.FSP|\.cache|\.zipped|\.notar|\.message|lost+found/|.*[~ ])
+	file_mode=0644
+#	follow_local_symlinks=.
+# from jost krieger:
+	get_newer=yes
+# from jost krieger:
+	get_size_change=yes
+	group=0
+	hostname=pause.perl.org
+	local_dir=/home/ftp/pub/PAUSE/
+	local_ignore=.*(readme|CHECKSUMS)$
+	mail_prog=/home/puppet/pause/bin/mirrormail.pl
+	mail_to=k
+	max_days=60
+	max_delete_files=50%
+	max_delete_dirs=50%
+        name_mappings=s:\.\./:__/:g
+	remote_password=k@pause.perl.org
+	update_log=
+	user=0
+#	passive_ftp=true
+# trying with squid...NOPE
+#	proxy=true
+#	proxy_ftp_port=3128
+#	proxy_gateway=localhost

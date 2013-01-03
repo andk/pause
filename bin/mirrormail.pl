@@ -14,14 +14,12 @@ an alert.
 
 =cut
 
-use lib "/home/k/PAUSE/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 use strict;
 use Mail::Send;
 use DBI;
-use vars qw($Id);
-
-$Id = q$Id$;
 
 my $subject;
 my $do_send         = 0; # not for symlinks only
@@ -45,7 +43,7 @@ $report = "The mirror program running on PAUSE triggered this email.
 Please complain if it is not appropriate for some reason.
 
 Thanks,
-$Id\n\n";
+\n\n";
 
 for my $line (split /\n/, $stdin) {
   if ( $line =~ m{

@@ -23,7 +23,7 @@ cron/restart-httpd
 cron/rm_stale_links
 cron/run_mirrors.sh
 cron/svn-dump.pl
-cron/sync-04pause.sh
+cron/sync-04pause.pl
 cron/sync-incoming.sh
 cron/update-checksums.pl
 doc/authen_pause.schema.txt
