@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+
+# scheduled for demise as soon as the pause2.develooper.com has taken over
+
 use strict;
 our $D;
 {
