@@ -142,12 +142,12 @@ class pause-perlbal {
 		mode => 700,
 		ensure => directory,
 	}
-	file { "/home/puppet/pause-private/lib":
-		owner => puppet,
-		group => puppet,
-		mode => 755,
-		ensure => directory,
-	}
+	# file { "/home/puppet/pause-private/lib":
+	# 	owner => puppet,
+	# 	group => puppet,
+	# 	mode => 755,
+	# 	ensure => directory,
+	# }
 	file { "/etc/perlbal":
 		owner => root,
 		group => root,

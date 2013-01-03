@@ -51,16 +51,16 @@ $VERSION = "1.005";
 my($pauselib) = File::Basename::dirname Cwd::abs_path __FILE__;
 {
   my $try = $pauselib;
-  $try =~ s|pause/lib|pause-private/lib|; # pause2.develooper.com has pause/ and pause-private/
-  if (-e $try) {
-    $pauselib = $try;
+  $try =~ s|pause/lib|pause-private|; # pause2.develooper.com has pause/ and pause-private/
+  if (-e $try) { # pause-private is accessible for apache, lib not
+    $pauselib = "$try/lib";
   } else {
     $try = $pauselib;
     $try =~ s|/lib|/privatelib|;           # pause.fiz-chemie.de has lib/ and privatelib/
     if (-e $try) {
       $pauselib = $try;
     } else {
-      die "did not find private directory";
+      die "Alert: did not find private directory pauselib[$pauselib] try[$try]";
     }
   }
 }
