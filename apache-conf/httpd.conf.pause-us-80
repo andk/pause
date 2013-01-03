@@ -113,7 +113,6 @@ Alias /pub/PAUSE /home/ftp/pub/PAUSE
                             pause_1999::startform \
                             pause_1999::userstatus \
                             PAUSE \
-                            PrivatePAUSE \
 "
 <Perl>
 
