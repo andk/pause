@@ -2,7 +2,6 @@
 package PAUSE::mldistwatch;
 
 use strict;
-use lib "/home/k/pause/lib";
 use version 0.47; # 0.46 had leading whitespace and ".47" problems
 
 use CPAN (); # only for CPAN::Version
