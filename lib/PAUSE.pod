@@ -13,20 +13,13 @@ and enables their owners to upload their work into that directory themselves.
 Here is an overview of PAUSE's structure:
 
     apache-conf/       Apache Configuration
-    apache-perl/
-        user/          User CGI scripts (mod_perl to be precise)
-        admin/         Admin CGI scripts (mod_perl to be precise)
-    authen/            User Password
+    apache-perl/       Legacy from the very first pause
     bin/               scripts, mainly paused, the pause daemon
-    cron/              cronjobs, mostly symlinked into /etc/cron.jobs
-    doc/               :-/
+    cron/              cronjobs
+    doc/               doc
     htdocs/            symlinked to Apache's document root
     lib/               PAUSE.pm and such
-    log/               paused.log, the rather verbose output of paused
-    man/               empty
     mirror/            mirror configuration, symlinked to /usr/local/mirror
-    rc/                boot script
-    src/               empty 
 
 The two core scripts are F<bin/paused> and F<cron/mldistwatch>. Both would
 need to be broken down into reusable and maintainable code.
@@ -39,7 +32,7 @@ contains some frequently used routines.
 The following file has been excluded from the repository for obvious
 reasons:
 
-    privatelib/PrivatePAUSE.pm
+    PrivatePAUSE.pm
 
 PrivatePAUSE.pm contains only the usernames and passwords of the mysql
 users that own the two databases. See below for "Database schema".
@@ -50,43 +43,25 @@ section about user management.
 
 =head2 File system layout
 
-On PAUSE the files live in /home/k/PAUSE and the following symlinks
-make sure that installed programs find their configuration:
+(last time updated: 2012-01-03)
 
-(last time updated: 2003-08-03)
+If you have an older installation of PAUSE you probably want to know:
+/home/k is gone, cfengine is gone; puppet is supposed to replace
+cfengine, but in a way that the master and the client must run on
+localhost because we often take files directly from the repo.
 
-  /usr/local/apache/conf            -> ../../../home/k/PAUSE/apache-conf
-  /usr/local/apache/htdocs          -> ../../../home/k/PAUSE/htdocs/
-  /usr/local/apache/perl            -> ../../../home/k/PAUSE/apache-perl
-  /etc/apache2/apache2.conf         -> /home/k/PAUSE/apache-svn-conf/httpd.conf
-  /etc/apache2/mods-available/ssl.conf -> /home/k/PAUSE/apache-svn-conf/ssl.conf
-  /etc/rsyncd.conf                  -> /home/k/PAUSE/etc/rsyncd.conf
-  /etc/proftpd.conf                 -> /home/k/PAUSE/etc/proftpd.conf
-  /etc/mon/mon.cf                   -> /home/k/PAUSE/etc/mon/mon.cf
-  /etc/mysql/my.cnf                 -> /home/k/PAUSE/etc/my.cnf
-  /usr/lib/mon/mon.d/paused.monitor -> /home/k/PAUSE/etc/mon/mon.d/paused.monitor
+Debian is gone, centos6 replaces it.
 
 [ MISSING documentation:
 
   /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
-  /etc/security/limits.conf -> /home/k/PAUSE/etc/security/limits.conf
 
 ]
 
-(XXX integrate indexscripts.pl with the help of kstar)
-
 =head2 Cronjob table for PAUSE
 
-  02 02 * * 7 /etc/cron.jobs/restart-httpd
-  03 03,15 * * * /etc/cron.jobs/msql-dump.sh
-  17 4 * * * /etc/cron.jobs/cron-daily.pl
-  22 1,5,9,13,17,21 * * * /etc/cron.jobs/mldistwatch
-  30 * * * * /etc/cron.jobs/rm_stale_links
-  31 * * * * /etc/cron.jobs/gmls-lR.pl
-  37 * * * * /etc/cron.jobs/sync-franz-put.sh
-  0-59/3 * * * * /etc/cron.jobs/diskwatch -m k / 75000 /M 150000
-  53 0,6,12,18 * * * /etc/cron.jobs/run_mirrors.sh
-  48 * * * * /usr/bin/perl /usr/local/mirror/mirror -p MICB /usr/local/mirror/mymirror.config > /dev/null
+The repository has a file CRONTAB.ROOT which is usually quite in sync
+with the real pause.
 
 =head2 External programs needed to run PAUSE
 
@@ -97,12 +72,12 @@ make sure that installed programs find their configuration:
   proftpd
   mysqld
   rsync (runs as daemon)
-  subversion (optional)
   gpg
   unzip
+  zsh
 
-At the time of this writing (2003-07-25), all perl scripts were
-running under 5.8.0.
+At the time of this writing (2012-01-03), all perl scripts were
+running under 5.16.2.
 
 =head2 Database schema
 
@@ -121,20 +96,15 @@ follow the advice in the mysql manual about how to secure mysql in
 general. E.g. C<--skip-networking> and root user password are a must,
 etc.
 
-PAUSE is running processes as user root, nobody, SVN, ftp, and UNSAFE.
-The user "k" in the group "k" owns the working copy of the repository
-and all the sensitive files. Group "k" must contain all users who
-should be able to read sensitive data. So at least "nobody" (who runs
-the webserver) must be in that group. Sensitive directories and files
-must be group-readable and must not be world readable. The SSL data
-for the webservers should not even be readable by that group, only by
-root who starts the webservers.
+PAUSE is running processes as user root, apache, ftp, and
+pause-unsafe. The user "puppet" in the group "puppet" owns the working
+copy of the repository and all the sensitive files. There are no
+members in the group puppet. The SSL data for the webservers and the
+passwords for accessing the DB are only readable by root who starts
+the webservers and runs the cronjobs.
 
-This setup must ensure that the user UNSAFE cannot read the database
-account informations. On the database side this is achieved by
-granting delete,index,insert,select,update privileges on the two
-tables, nothing else, to one user. This is the user whose access codes
-are stored in PrivatePAUSE.pm. The root password to mysql is not
+This setup must ensure that the user apuse-unsafe cannot read the
+database account informations. The root password to mysql is not
 needed by any script, so can be stored offline.
 
 =head2 Other security considerations
@@ -156,8 +126,8 @@ As always, there are things we didn't bother to integrate into the
 repository because they are so basic stuff for any UNIX machine:
 
   logrotate
-  xntpd
-  sendmail
+  xntpd/ntpd
+  sendmail/postfix
 
 and probably more. If you discover pieces that are important but
 missing in the repository or documentation, please let us know.
@@ -168,7 +138,7 @@ Andreas Koenig E<lt>andreas.koenig@anima.deE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 1995 - 2004 by Andreas Koenig E<lt>andreas.koenig@anima.deE<gt>
+Copyright 1995 - 2012 by Andreas Koenig E<lt>andk@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

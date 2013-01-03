@@ -1,3 +1,7 @@
+=head1 Other places with docs
+
+PAUSE.pod
+
 =head1 HOW TO SET UP A PRIVATE PAUSE APACHE
 
 I always compiled it myself, so I repeat that exercise. Download
@@ -73,7 +77,8 @@ interfaces:
 
 And finally we must make these databases available to the perl.
 
-  mkdir privatelib/
+  mkdir -p ../pause-private/lib
+  mkdir privatelib/    # old pause
 
 Edit C<privatelib/PrivatePAUSE.pm> and enter something like this:
 
