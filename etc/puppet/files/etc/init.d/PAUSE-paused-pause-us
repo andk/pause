@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Startup script for the PAUSE daemon paused
+#
+# chkconfig: 345 85 15
+# description: runs the Perl Authors Upload Server
+# processname: PAUSE-paused
+# pidfile: /var/run/paused.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+prog=PAUSE-paused
+pidfile=/var/run/paused.pid
+lockfile=/var/lock/subsys/PAUSE-paused
+RETVAL=0
+
+start() {
+        echo -n $"Starting $prog: "
+        /etc/init.d/${prog} --pidfile=${pidfile}
+        RETVAL=$?
+        [ $[$RETVAL] -eq 0 ] && echo "[OK]" || echo "[FAILED]"
+        [ $RETVAL = 0 ] && touch ${lockfile}
+        return $RETVAL
+}
+stop() {
+        echo -n $"Stopping $prog: "
+        if [ -f "${pidfile}" ]; then
+                ps $(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g') >& /dev/null
+                if [ $[$?] -eq 0 ]; then
+                        kill -TERM $(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g')
+                        RETVAL=$?
+                else
+                        RETVAL=1;
+                        echo "No process with pid "$(cat "${pidfile}" | head -n 1 | sed -r -e 's/^([\d]+)/\1/g')" was found.   "
+                fi
+        else
+                RETVAL=1;
+                echo -n "No pid file '${pidfile}' was found.   "
+        fi
+        if [ $[$RETVAL] -eq 0 ]; then
+                echo "[OK]" || echo "[FAILED]"
+                rm -f ${lockfile} ${pidfile}
+        fi
+}
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+	status -p ${pidfile} PAUSE-paused
+        RETVAL=$?
+        ;;
+  restart)
+        stop
+        start
+        ;;
+  condrestart)
+        if [ -f ${pidfile} ] ; then
+                stop
+                start
+        fi
+        ;;
+  *)
+        echo $"Usage: $prog {start|stop|restart|condrestart|help}"
+        exit 1
+esac
+
+exit $RETVAL

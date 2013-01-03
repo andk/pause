@@ -327,7 +327,14 @@ class pause-postfix {
 		hasstatus => true,		
 	}
 }
-
+class pause-paused {
+	file { "/etc/init.d/PAUSE-paused":
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/etc/init.d/PAUSE-paused-pause-us",
+	}
+}
 class pause {
 	# file { "/etc/puppet/files":
 	# 	path => "/etc/puppet/files",
@@ -342,6 +349,7 @@ class pause {
 	include pause-rsyncd
 	include pause-proftpd
 	include pause-postfix
+	include pause-paused
 }
 
 node pause2 {
