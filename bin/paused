@@ -9,10 +9,9 @@ sub mypause_daemon_inspector::loop ();
 my $VERSION = "1049";
 my $Id = qq!paused, v$VERSION!;
 
-use lib
-    "/home/k/pause/privatelib",
-    "/home/k/pause/lib",
-    "/home/k/dproj/PAUSE/GIT-ghub/lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use PAUSE ();
 
 use DBI ();
 use Fcntl qw(:flock);
@@ -27,7 +26,6 @@ use IPC::Run3 ();
 use LWP ();
 use MD5 ();
 use Mail::Send ();
-use PAUSE ();
 use PAUSE::MailAddress ();
 use POSIX ":sys_wait_h";
 use URI::URL ();
