@@ -46,7 +46,7 @@ stop() {
         if [ $[$RETVAL] -eq 0 ]; then
                 echo "[OK]" || echo "[FAILED]"
                 rm -f ${lockfile} ${pidfile}
-                echo "Waiting 5 seconds to let apache2 free all resources."
+                echo "Waiting 5 seconds to let ${prog} free all resources."
                 sleep 5s
         fi
 }
