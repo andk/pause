@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 #
 # Startup script for the PAUSE daemon paused
 #
@@ -10,15 +10,15 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-daemon=/home/puppet/pause/bin/paused
 prog=PAUSE-paused
-pidfile=/var/run/paused.pid
+pidfile=/var/run/PAUSE-paused.pid
 lockfile=/var/lock/subsys/PAUSE-paused
+daemon=(/opt/perl/current/bin/perl /home/puppet/pause/bin/paused --pidfile=${pidfile})
 RETVAL=0
 
 start() {
         echo -n $"Starting $prog: "
-        ${daemon} --pidfile=${pidfile}
+        ${daemon} &
         RETVAL=$?
         [ $[$RETVAL] -eq 0 ] && echo "[OK]" || echo "[FAILED]"
         [ $RETVAL = 0 ] && touch ${lockfile}
