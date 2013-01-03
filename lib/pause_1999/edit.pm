@@ -2928,36 +2928,52 @@ sub request_id {
     my $alt = 0;
     # push @m, "<table>\n";
     foreach my $arr (
-                     [
-                      'Your full name (civil name)',
-                      'pause99_request_id_fullname',
-                      "Unicode Characters OK"
-                     ],
-                     [
-                      'Email',
-                      'pause99_request_id_email',
-                      'required, otherwise we cannot send you the password'
-                     ],
-                     [
-                      'Web site',
-                      'pause99_request_id_homepage',
-                      'optional'
-                     ],
-                     [
-                      'Desired ID',
-                      'pause99_request_id_userid',
+                     {
+                      topic => 'Your full name (civil name)',
+                      fname => 'pause99_request_id_fullname',
 
-                      "3-9 characters matching [A-Z], please",
+                      fcomment => "Unicode Characters OK.",
+                      footnote => "Note: PAUSE has been developed in a
+      time when it was more common than today that people have names
+      consisting of at least a first name and a second name, like
+      <i>Ben Cartwright</i> or <i>Tony Nelson</i>, you get the idea.
+      This field is considered to be filled with both names, separated
+      by a space. This trivial expectation was then coded into the
+      server side sanity check of this form and it turned out to be a
+      super efficient spam protection because bots often did not try
+      to enter a space in the middle of the field. It was about the
+      year 2003 when people started to complain that they had tried
+      <i>Peter</i> and it did not work. Poor Peter, please remember
+      you <b>do</b> have a second name.",
 
-                     ],
+                     },
+                     {
+                      topic => 'Email',
+                      fname => 'pause99_request_id_email',
+                      fcomment => 'required, otherwise we cannot send you the password',
+                     },
+                     {
+                      topic => 'Web site',
+                      fname => 'pause99_request_id_homepage',
+                      fcomment => 'optional'
+                     },
+                     {
+                      topic => 'Desired ID',
+                      fname => 'pause99_request_id_userid',
+                      fcomment => "3-9 characters matching [A-Z], please",
+
+                     },
                     ) {
       $alt ^= 1;
       my $altname = $alt ? "alternate1" : "alternate2";
-      push @m, qq{<div class="$altname"><p><b>$arr->[0]</b></p><p>};
-      if (my $note = $arr->[2]) {
+      push @m, qq{<div class="$altname"><p><b>$arr->{topic}</b></p><p>};
+      if (my $note = $arr->{fcomment}) {
         push @m, qq{<small>$note</small></p><p>};
       }
-      push @m, $mgr->textfield( name => $arr->[1], size => 32 );
+      push @m, $mgr->textfield( name => $arr->{fname}, size => 32 );
+      if (my $note = $arr->{footnote}) {
+        push @m, qq{</p><div style='font-size:0.75em'>$note</div><p>};
+      }
       push @m, "</p></div>";
     }
 
