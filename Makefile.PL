@@ -19,7 +19,6 @@ WriteMakefile(
     CPAN::Indexer::Mirror
     Class::Singleton
     Compress::Zlib
-    Crypt::SSLeay
     Cwd
     DB_File
     DBI
@@ -35,6 +34,7 @@ WriteMakefile(
     Git::Wrapper
     HTML::Entities
     HTTP::Date
+    IO::Socket::SSL
     IPC::Cmd
     IPC::Run3
     JSON::XS
