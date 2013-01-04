@@ -44,9 +44,10 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 use Filesys::Df;
-
+use strict;
+my(@failures);
 foreach (@ARGV) {
-    ($path, $minavail) = split (/:/, $_, 2);
+    my($path, $minavail) = split (/:/, $_, 2);
 
     # ($fs_type, $fs_desc, $used, $avail, $fused, $favail)
     my($ref) = df ($path);
@@ -57,11 +58,11 @@ foreach (@ARGV) {
     }
 
     if ($minavail =~ /(\d+(\.\d+)?)%/o) {
-    	$minavail = int(($used + $avail) * $1 / 100);
+    	$minavail = int(($ref->{used} + $ref->{bavail}) * $1 / 100);
     }
 
     if ($ref->{bavail} < $minavail) {
-    	push (@failures, sprintf ("%1.1fGB free on %s", $avail / 1024 / 1024,
+    	push (@failures, sprintf ("%5.3fGB free on %s", $ref->{bavail} / 1024 / 1024,
 	    $path));
     }
 }

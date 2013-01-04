@@ -10,6 +10,19 @@
 # /usr/share/doc/mon/README.hints, /usr/share/doc/mon/README.monitors
 # and /usr/share/doc/mon/examples/mon.cf.
 
+cfbasedir   = /etc/mon
+pidfile     = /var/run/mon.pid
+statedir    = /var/lib/mon/state.d
+logdir      = /var/lib/mon/log.d
+dtlogfile   = /var/lib/mon/log.d/downtime.log
+alertdir    = /usr/lib64/mon/alert.d
+mondir      = /usr/lib64/mon/mon.d
+maxprocs    = 20
+histlength  = 100
+randstart   = 60s
+authtype    = pam
+userfile    = /etc/mon/userfile
+
 hostgroup pausepartitions / /home /tmp /var
 
 hostgroup paused localhost
@@ -20,8 +33,6 @@ hostgroup rsyncd2 localhost
 
 hostgroup rersyncrecent authors modules
 
-# Monitor free disk space on the server
-#
 watch pausepartitions
     service freespace
 	interval 1m
@@ -31,8 +42,6 @@ watch pausepartitions
 	    alertevery 3h
             upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 
-# Monitor PAUSE daemon running
-#
 watch paused
     service paused
 	interval 1h
