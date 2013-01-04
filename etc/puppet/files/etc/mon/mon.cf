@@ -36,7 +36,7 @@ hostgroup rersyncrecent authors modules
 watch pausepartitions
     service freespace
 	interval 1m
-	monitor freespace.monitor /:1000000 /home:2000000 /tmp:500000 /var:1000000
+	monitor freespace.monitor /:1000000 /home:2000000 /tmp:250000 /var:1000000
 	period wd {Sun-Sat}
 	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 	    alertevery 3h
