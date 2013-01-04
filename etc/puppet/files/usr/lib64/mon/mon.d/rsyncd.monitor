@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+#
+use strict;
+open P, "rsync localhost:: |";
+my $running;
+while (<P>){
+  next unless m{ ^ PAUSE | authors | modules | scripts }x;
+  $running++;
+}
+close P or die "Could not close P";
+unless ($running >= 4){
+  print "Some rsync target missing\n";
+  exit 1;
+}

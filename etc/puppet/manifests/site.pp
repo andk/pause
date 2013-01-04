@@ -405,6 +405,52 @@ class pause-iptables {
 		source => "puppet:///files/etc/sysconfig/iptables-pause-us",
 	}
 }
+class pause-mon {
+	file { "/usr/lib64/mon/mon.d/freespace.monitor":
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/usr/lib64/mon/mon.d/freespace.monitor",
+	}
+	file { "/usr/lib64/mon/mon.d/paused.monitor":
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/usr/lib64/mon/mon.d/paused.monitor",
+	}
+	file { "/usr/lib64/mon/mon.d/rsyncd.monitor":
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/usr/lib64/mon/mon.d/rsyncd.monitor",
+	}
+	file { "/usr/lib64/mon/mon.d/rsyncd2.monitor":
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/usr/lib64/mon/mon.d/rsyncd2.monitor",
+	}
+	file { "/usr/lib64/mon/mon.d/rersyncrecent.monitor":
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/usr/lib64/mon/mon.d/rersyncrecent.monitor",
+	}
+	file { "/etc/mon/mon.cf":
+		owner  => root,
+		group  => root,
+		mode   => 644,
+		source => "puppet:///files/etc/mon/mon.cf",
+	}
+	service { "mon":
+		ensure => running,
+                enable  => true,
+                require => [
+                            File["/etc/mon/mon.cf"],
+			    ],
+		hasstatus => true,		
+	}
+}
 class pause {
 	# file { "/etc/puppet/files":
 	# 	path => "/etc/puppet/files",
@@ -422,6 +468,7 @@ class pause {
 	include pause-paused
 	include pause-limits
 	include pause-iptables
+	include pause-mon
 }
 
 node pause2 {

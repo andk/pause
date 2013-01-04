@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $aumu = shift or die "Usage: ... <modules|authors>";
+
+open my $fh, "/opt/perl/current/bin/perl /opt/perl/current/bin/rrr-fsck -n --verbose /home/ftp/pub/PAUSE/$aumu/RECENT.recent 2>&1 |" or die "could not fork: $!";
+
+my $ret = 0;
+while (<$fh>) {
+    if ($ret){
+        print;
+        next;
+    }
+    next unless my($what,$n) = /^(not\s.+?):\s+(\d+)/;
+    next if $n == 0;
+    $ret = 1;
+    print;
+}
+exit $ret;
+
+__END__
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# End:

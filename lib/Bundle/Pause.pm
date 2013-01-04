@@ -38,6 +38,7 @@ Email::Sender::Simple
 Encode::MIME::Header
 File::Rsync
 File::Rsync::Mirror::Recent
+Filesys::DiskSpace
 Git::Wrapper
 IO::AIO
 IO::Socket::SSL

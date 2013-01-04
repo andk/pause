@@ -1,0 +1,69 @@
+# $Id: mon.cf,v 1.3 1999/09/29 16:08:16 roderick Exp $
+#
+# /etc/mon/mon.cf, configuration file for mon
+#
+# Run `/etc/init.d/mon reload' after editing this file in order for your
+# changes to take effect.
+
+# There is no default configuration for mon.  The docs most useful
+# for setting up your /etc/mon/mon.cf file are the mon(1) man page,
+# /usr/share/doc/mon/README.hints, /usr/share/doc/mon/README.monitors
+# and /usr/share/doc/mon/examples/mon.cf.
+
+hostgroup pausepartitions / /home /tmp /var
+
+hostgroup paused localhost
+
+hostgroup rsyncd localhost
+
+hostgroup rsyncd2 localhost
+
+hostgroup rersyncrecent authors modules
+
+# Monitor free disk space on the server
+#
+watch pausepartitions
+    service freespace
+	interval 1m
+	monitor freespace.monitor /:1000000 /home:2000000 /tmp:500000 /var:1000000
+	period wd {Sun-Sat}
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+	    alertevery 3h
+            upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+
+# Monitor PAUSE daemon running
+#
+watch paused
+    service paused
+	interval 1h
+	monitor paused.monitor
+	period wd {Sun-Sat}
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+	    alertevery 3h
+
+watch rsyncd
+    service basic
+	interval 1h
+	monitor rsyncd.monitor
+	period wd {Sun-Sat}
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+	    alertevery 3h
+
+watch rsyncd2
+    service basic
+	interval 1h
+	monitor rsyncd2.monitor
+	period wd {Sun-Sat}
+	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+	    alertevery 2h
+
+watch rersyncrecent
+    service basic
+        description missings on disk or index
+        interval 1h
+        monitor rersyncrecent.monitor
+        period wd {Su-Sa}
+            alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+            upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
+            alertevery 12h
+            comp_alerts
