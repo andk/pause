@@ -148,6 +148,7 @@ class pause-apache {
         /etc/init.d/PAUSE-httpd reload;
     endscript
 }",
+	}
 }
 
 class pause-perlbal {
