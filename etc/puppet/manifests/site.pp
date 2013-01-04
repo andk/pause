@@ -367,6 +367,21 @@ class pause-paused {
 		mode   => 755,
 		source => "puppet:///files/etc/init.d/PAUSE-paused-pause-us",
 	}
+	file { "/etc/logrotate.d/mldistwatch":
+		owner   => root,
+		group   => root,
+		mode    => 644,
+		content => "/var/log/mldistwatch*log {
+    daily
+    rotate 365
+    compress
+    delaycompress
+    notifempty
+    missingok
+    sharedscripts
+    dateext
+}\n",
+	}
 }
 class pause-limits {
 	file { "/etc/security/limits.conf":
