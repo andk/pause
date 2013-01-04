@@ -33,6 +33,7 @@ DBI
 DB_File::Lock
 Email::Address
 Email::MIME
+Email::Sender::Simple
 Encode::MIME::Header
 File::Rsync
 File::Rsync::Mirror::Recent
