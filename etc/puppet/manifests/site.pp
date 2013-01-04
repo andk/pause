@@ -74,10 +74,7 @@ class pause-munin {
 
 class pause-apache {
         file { "/var/log/PAUSE-httpd":
-                owner => "root",
-                group => "root",
-                mode => 755,
-                ensure => directory,
+                ensure => "/opt/apache/current/logs",
         }
 	file { "/var/run/httpd/deadmeat":
 		# abuse of the httpd directory, it rather belongs to
@@ -133,6 +130,24 @@ class pause-apache {
 			    ],
 		hasstatus => true,
 	}
+	file { "/etc/logrotate.d/PAUSE-httpd":
+		owner   => root,
+		group   => root,
+		mode    => 644,
+		content => "/var/log/PAUSE-httpd/*log {
+# will change to weekly when it works
+    daily
+    rotate 365
+    compress
+    delaycompress
+    notifempty
+    missingok
+    sharedscripts
+    dateext
+    postrotate
+        /etc/init.d/PAUSE-httpd reload;
+    endscript
+}",
 }
 
 class pause-perlbal {
