@@ -147,7 +147,7 @@ class pause-apache {
     postrotate
         /etc/init.d/PAUSE-httpd reload;
     endscript
-}",
+}\n",
 	}
 }
 
@@ -230,7 +230,7 @@ class pause-rsyncd-873 {
 			    ],
 		hasstatus => true,
 	}
-      
+	include pause-rsyncd-logrotate
 }
 class pause-rsyncd-8732 {
         file { "/etc/rsyncd2.conf":
@@ -256,8 +256,25 @@ class pause-rsyncd-8732 {
 			    ],
 		hasstatus => true,
 	}
-      
+	include pause-rsyncd-logrotate      
 }
+class pause-rsyncd-logrotate {
+	file { "/etc/logrotate.d/PAUSE-rsyncd":
+		owner   => root,
+		group   => root,
+		mode    => 644,
+		content => "/var/log/rsyncd /var/log/rsyncd2 {
+# will change to weekly when it works
+    weekly
+    rotate 365
+    compress
+    delaycompress
+    notifempty
+    missingok
+    dateext
+}\n",
+	}
+}	
 class pause-proftpd {
 	# what we did manually: we made /var/ftp a symlink to
 	# /home/ftp . Since centos6 makes /var/ftp the home directory
