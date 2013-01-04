@@ -66,4 +66,3 @@ watch rersyncrecent
             alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
             upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
             alertevery 12h
-            comp_alerts
