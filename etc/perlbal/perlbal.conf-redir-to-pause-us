@@ -1,4 +1,4 @@
-XS enable headers
+# XS enable headers
 LOAD TrustHeader
 LOAD vhosts
 
