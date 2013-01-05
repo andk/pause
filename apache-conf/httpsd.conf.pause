@@ -40,7 +40,7 @@ AddHandler server-parsed .shtml
 UserDir disabled
 UserDir enabled jwied
 
-<IfModule apache_ssl.c>
+<IfModule apache_ssl_xxx.c>
 
   <IfDefine SWITCH8000>
     Port 8443
