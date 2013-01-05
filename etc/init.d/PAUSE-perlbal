@@ -11,7 +11,7 @@
 # Source function library.
 SLEEP=1
 
-DAEMON=/usr/local/perl-5.10.1/bin/perlbal
+DAEMON=/usr/local/perl-5.12.0-RC5/bin/perlbal
 
 # See how we were called.
 case "$1" in
