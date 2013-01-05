@@ -195,8 +195,8 @@ sub downtimeinfo {
                           willlast => 0,
                          }
       : +{
-          downtime => 1356966000,
-          willlast => 7200,
+          downtime => 1357374600,
+          willlast => 5400,
          };
 }
 
