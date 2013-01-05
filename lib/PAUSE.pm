@@ -191,8 +191,8 @@ Hint: I like to use date to determine a timestamp in the future
 
 sub downtimeinfo {
   return $IS_PAUSE_US ? +{
-                          downtime => 1197317508,
-                          willlast => 0,
+                          downtime => 1357374600,
+                          willlast => 5400,
                          }
       : +{
           downtime => 1357374600,
