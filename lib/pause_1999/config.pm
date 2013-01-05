@@ -35,7 +35,7 @@ maintainance for about $willlast_dur. Estimated time of opening is in
 $expr.</p><p class="motd">Sorry for the inconvenience and Thanks for
 your patience.</p>};
 
-    if ($user eq "ANDK") { # would prefer a check of the admin role here
+    if ($user && $user eq "ANDK") { # would prefer a check of the admin role here
       $r->notes("CLOSED", $closed_text);
     } else {
       $r->content_type("text/html");
