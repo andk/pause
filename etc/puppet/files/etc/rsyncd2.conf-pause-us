@@ -1,4 +1,4 @@
-max connections = 16
+max connections = 32
 log file = /var/log/rsyncd2
 pid file = /var/run/PAUSE-rsyncd2.pid
 transfer logging = true
