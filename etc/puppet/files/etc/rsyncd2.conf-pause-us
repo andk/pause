@@ -1,9 +1,10 @@
-max connections = 32
+max connections = 24
 log file = /var/log/rsyncd2
 pid file = /var/run/PAUSE-rsyncd2.pid
 transfer logging = true
 use chroot = true
 port = 8732
+timeout = 1200
 
 [PAUSE]
     path = /home/ftp/pub/PAUSE
