@@ -1601,9 +1601,8 @@ filename[%s]. </p>
       topmost README file as, say, Foo-Bar-3.14.readme into your
       directory. <b>Hint:</b> if you're looking for an even more
       convenient way to upload files than this form, you can try the
-      <code>cpan-upload</code> script in <a
-      href="ftp://ftp.cpan.org/pub/CPAN/authors/id/N/NE/NEILB/scripts/">Neil
-      Bowers' directory</a>.</p>
+      <a href="http://search.cpan.org/dist/cpan-upload-http/">cpan-upload-http</a> script.
+      </p>
 
 }; #};
 
