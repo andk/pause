@@ -667,6 +667,7 @@ sub rewrite01 {
     my(%seen);
 
     my(%usercache,%userdircache,$i);
+    my(@symlinklog);
     while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
         my %pkg = (rootpack => $pkg, dist => $pkgdist);
         $pkg{rootpack} =~ s/:.*//;
@@ -759,28 +760,46 @@ sub rewrite01 {
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../authors/id/$pkg{dist}",
                                   "../../modules/by-module/$pkg{rootpack}".
-                                  "/$pkg{filenameonly}");
+                                  "/$pkg{filenameonly}",
+                                  \@symlinklog,
+                                 );
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../authors/id/$pkg{readme}",
                                   "../../modules/by-module/$pkg{rootpack}".
-                                  "/$pkg{readmefn}")
+                                  "/$pkg{readmefn}",
+                                  \@symlinklog,
+                                 )
                 if -f $pkg{readme};
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../authors/id/$userdir",
-                                  "../../modules/by-module/$pkg{rootpack}/$pkg{userid}");
+                                  "../../modules/by-module/$pkg{rootpack}/$pkg{userid}",
+                                  \@symlinklog,
+                                 );
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../../authors/id/$pkg{dist}",
                                   "../../modules/by-category/$pkg{chapter}".
-                                  "/$pkg{rootpack}/$pkg{filenameonly}");
+                                  "/$pkg{rootpack}/$pkg{filenameonly}",
+                                  \@symlinklog,
+                                 );
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../../authors/id/$pkg{readme}",
                                   "../../modules/by-category/$pkg{chapter}".
-                                  "/$pkg{rootpack}/$pkg{readmefn}")
+                                  "/$pkg{rootpack}/$pkg{readmefn}",
+                                  \@symlinklog,
+                                 )
                 if -f $pkg{readme};
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../../authors/id/$userdir",
                                   "../../modules/by-category/$pkg{chapter}".
-                                  "/$pkg{rootpack}/$pkg{userid}");
+                                  "/$pkg{rootpack}/$pkg{userid}",
+                                  \@symlinklog,
+                                 );
+        }
+    }
+    $self->verbose(1,sprintf "cared about %d symlinks", scalar @symlinklog);
+    {
+        if (open my $fh, ">", "/var/run/mldistwatch-modules-symlinks.yaml") {
+            print $fh YAML::Syck::Dump(\@symlinklog);
         }
     }
     $list = qq{<?xml version="1.0" encoding="UTF-8"?>
@@ -1228,7 +1247,7 @@ sub rewrite07 {
 }
 
 sub chdir_ln_chdir {
-    my($self,$postdir,$from,$to) = @_;
+    my($self,$postdir,$from,$to,$log) = @_;
     chdir $postdir or die "Couln't chdir to $postdir";
     my($dir) = File::Basename::dirname($to);
     mkpath $dir;
@@ -1244,6 +1263,7 @@ sub chdir_ln_chdir {
         return;
     }
     $to = File::Basename::basename($to);
+    push @$log, { postdir => $postdir, from => $from, to => $to };
     if (-l $to) {
         my($foundlink) = readlink $to or die "Couldn't read link $to in $dir";
         if ($foundlink eq $from) {
