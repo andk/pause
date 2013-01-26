@@ -29,6 +29,12 @@ Spits out noise about used memory
 
 This help
 
+=item B<--symlinkinventory!>
+
+If set, we recalculate the symlinks below
+modules/by-{modules,category}, otherwise we only care for new
+symlinks.
+
 =item B<--skip-locking!>
 
 skip locking (e.g. reindex if already indexed)

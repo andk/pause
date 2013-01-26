@@ -668,24 +668,24 @@ sub rewrite01 {
 
     my(%usercache,%userdircache,$i);
     my(@symlinklog);
-    while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
+ PACKAGE: while (my($pkg,$pkgdist) = $sth->fetchrow_array) {
         my %pkg = (rootpack => $pkg, dist => $pkgdist);
         $pkg{rootpack} =~ s/:.*//;
         # We don't want to list perl distribution
-        next if $pkg{dist} =~ m|/perl-?5|;
+        next PACKAGE if $pkg{dist} =~ m|/perl-?5|;
         if ($seen{$pkg{dist},$pkg{rootpack}}++) {
-            next;
+            next PACKAGE;
         }
         if ($firstlevel{$pkg{rootpack}}) {
             #print "01 will have: $pkg{rootpack}/$pkg{dist}\n";
         } else {
-            next;
+            next PACKAGE;
         }
 
         $i++;
         @pkg{qw/size mtime/} =
             (stat "$MLROOT/$pkg{dist}")[7,9];
-        next unless defined $pkg{size}; # somebody removed it while we were running
+        next PACKAGE unless defined $pkg{size}; # somebody removed it while we were running
         $count++ unless $count{$pkg{dist}}++;
         $pkg{size} =
             $pkg{size} > 700000 ?
@@ -755,7 +755,11 @@ sub rewrite01 {
                 "by-module/$pkg{rootpack}/$pkg{filenameonly}";
             my $bycat = "$MLROOT/../../modules/".
                 "by-category/$pkg{chapter}/$pkg{rootpack}/$pkg{filenameonly}";
-            next if -e $bymod and -e $bycat;
+            if ($self->{OPT}{symlinkinventory}) {
+                # maybe once a day is enough
+            } else {
+                next PACKAGE if -e $bymod and -e $bycat;
+            }
 
             $self->chdir_ln_chdir($MLROOT,
                                   "../../../authors/id/$pkg{dist}",
@@ -798,7 +802,9 @@ sub rewrite01 {
     }
     $self->verbose(1,sprintf "cared about %d symlinks", scalar @symlinklog);
     {
-        if (open my $fh, ">", "/var/run/mldistwatch-modules-symlinks.yaml") {
+        if ($self->{OPT}{symlinkinventory}
+            and
+            open my $fh, ">", "/var/run/mldistwatch-modules-symlinks.yaml") {
             print $fh YAML::Syck::Dump(\@symlinklog);
         }
     }
