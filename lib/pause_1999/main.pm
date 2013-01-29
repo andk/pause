@@ -247,7 +247,7 @@ sub can_utf8 {
       $self->{CAN_UTF8} = $major >= 1 && $minor >= 1;
       warn "CAN_UTF8[$self->{CAN_UTF8}]protocol[$protocol]uagent[$uagent]";
   }
-  $self->{CAN_UTF8};
+  $self->{CAN_UTF8} = 1;
 }
 
 sub uagent {
