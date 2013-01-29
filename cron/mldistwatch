@@ -31,9 +31,9 @@ This help
 
 =item B<--symlinkinventory!>
 
-If set, we recalculate the symlinks below
+If set, we recalculate all symlinks below
 modules/by-{modules,category}, otherwise we only care for new
-symlinks.
+symlinks. Inefficient, expensive run: on 2013-01-26 it took 75 minutes
 
 =item B<--skip-locking!>
 
