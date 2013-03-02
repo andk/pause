@@ -52,19 +52,7 @@ package in packages  package in primeur
 
 sub verbose {
   my($self,$level,@what) = @_;
-  my $parent = $self->parent;
-  if ($parent) {
-      require Scalar::Util;
-      if (Scalar::Util::blessed($parent)) {
-          $parent->verbose($level,@what);
-      } else {
-          require Carp;
-          Carp::cluck("Could not find a sane parent[$parent] to log level[$level]what[@what]");
-      }
-  } else {
-      require Carp;
-      Carp::cluck("Could not find a parent to log level[$level]what[@what]");
-  }
+  PAUSE->log($self, $level, @what);
 }
 
 sub parent {

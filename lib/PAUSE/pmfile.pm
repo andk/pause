@@ -3,6 +3,7 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
+use PAUSE ();
 
 BEGIN { die "Version of version.pm too low ($version::VERSION), does not define STRICT"
             unless defined $version::STRICT }
@@ -16,8 +17,7 @@ sub DESTROY {}
 
 sub verbose {
     my($self,$level,@what) = @_;
-    my $main = $self->{DIO};
-    $main->verbose($level,@what);
+    PAUSE->log($self, $level, @what);
 }
 
 # package PAUSE::pmfile;

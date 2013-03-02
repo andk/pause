@@ -6,6 +6,7 @@ use vars qw(%CHECKSUMDONE $AUTOLOAD);
 use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
 use List::MoreUtils ();
+use PAUSE ();
 use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
 
@@ -950,8 +951,7 @@ sub version_from_meta_ok {
 # package PAUSE::dist
 sub verbose {
   my($self,$level,@what) = @_;
-  my $main = $self->{MAIN};
-  $main->verbose($level,@what);
+  PAUSE->log($self, $level, @what);
 }
 
 # package PAUSE::dist
