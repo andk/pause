@@ -194,7 +194,7 @@ subtest "case mismatch" => sub {
     my $cpan_root = File::Spec->catdir($tmpdir, 'cpan');
     my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
     make_path( File::Spec->catdir($cpan_root, 'modules') );
-    dircopy('corpus/mld/002/authors', $ml_root);
+    dircopy('corpus/mld/003/authors', $ml_root);
   }
 
   my $result = $pause->test_reindex;
@@ -221,7 +221,7 @@ subtest "case mismatch" => sub {
       $pkg_rows,
       [ map {; superhashof($_) } @want ],
       "we db-inserted exactly the dists we expected to",
-    );
+    ) or diag explain($pkg_rows);
   };
 
   subtest "tests with the parsed 02packages data" => sub {
