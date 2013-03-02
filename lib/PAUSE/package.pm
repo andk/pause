@@ -95,12 +95,11 @@ sub give_regdowner_perms {
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   local($dbh->{RaiseError}) = 0;
-  my $sth_mods = $dbh->prepare("SELECT userid
-                                FROM   mods
-                                WHERE  modid = ?");
   # warn "Going to execute [SELECT userid FROM mods WHERE modid = '$package']";
-  $sth_mods->execute($package) or die "FAILED";
-  if ($sth_mods->rows>0) { # make sure we regard the owner as the owner
+  my ($sth_mods) = $dbh->selectrow_hashref("SELECT userid
+                                FROM   mods
+                                WHERE  modid = ?", undef, $package);
+  if ($sth_mods) { # make sure we regard the owner as the owner
       my($mods_userid) = $sth_mods->fetchrow_array;
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
@@ -150,12 +149,13 @@ sub perm_check {
       return 1;           # P2.1, P3.0
   }
 
-  my($is_primeur) = $dbh->prepare(qq{SELECT package, userid
+  my($is_primeur) = $dbh->selectrow_hashref(qq{SELECT package, userid
                                     FROM   primeur
-                                    WHERE  package = ? AND userid = ?}
+                                    WHERE  package = ? AND userid = ?},
+                                    undef,
+                                    $package, $userid
                                   );
-  $is_primeur->execute($package,$userid);
-  if ($is_primeur->rows) {
+  if ($is_primeur) {
 
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
@@ -168,16 +168,18 @@ sub perm_check {
       return 1;           # P2.1, P3.0
   }
 
-  my($has_primeur) = $dbh->prepare(qq{SELECT package
+  my($has_primeur) = $dbh->selectrow_hashref(qq{SELECT package
                                     FROM  primeur
-                                    WHERE package = ?});
-  $has_primeur->execute($package);
-  if ($has_primeur->rows == 0) {
-      my($has_owner) = $dbh->prepare(qq{SELECT modid
+                                    WHERE package = ?},
+                                    undef,
+                                $package);
+  if ($has_primeur) {
+      my($has_owner) = $dbh->selectrow_hashref(qq{SELECT modid
                                   FROM mods
-                                  WHERE modid = ?});
-      $has_owner->execute($package);
-      if ($has_owner->rows == 0) {
+                                  WHERE modid = ?},
+                              undef,
+                              $package);
+      if ($has_owner) {
           # package has neither owner in mods nor maintainer in primeur
           local($dbh->{RaiseError}) = 0;
           my $ret = $dbh->do($ins_perms);
@@ -190,13 +192,12 @@ sub perm_check {
       }
   }
 
-  my($sth_perms) = $dbh->prepare(qq{SELECT package, userid
+  my($auth_ids) = $dbh->selectall_arrayref(qq{SELECT package, userid
                                     FROM   perms
-                                    WHERE  package = ?}
-                                );
-  $sth_perms->execute($package);
-
-  if ($sth_perms->rows) {
+                                    WHERE  package = ?},
+                                undef,
+                                $package);
+  if (@$auth_ids) {
 
       # we have a package that is already known
 
@@ -208,9 +209,7 @@ sub perm_check {
       $pp->{version} = '' unless defined $pp->{version}; # accept version 0
 
       my($p,$owner,@owner);
-      while (($p,$owner) = $sth_perms->fetchrow_array) {
-          push @owner, $owner; # array for debugging statement
-      }
+      @owner = map { $_[1] } @$auth_ids;
       if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
           # seems ok: perl is always right
       } elsif (! grep { $_ eq $userid } @owner) {
