@@ -49,7 +49,6 @@ use DB_File;
 use Fcntl qw(O_RDWR O_CREAT);
 use File::Find;
 use File::Path qw(rmtree mkpath);
-our $Id = "PAUSE version $PAUSE::VERSION";
 our $MAINTAIN_SYMLINKTREE = 1;
 
 use Fcntl qw(:flock);
@@ -123,7 +122,7 @@ sub verbose {
     unless (exists $self->{INTRODUCED}) {
         my $now = scalar localtime;
         require Data::Dumper;
-        unshift @what, "Running $0, $Id, $now",
+        unshift @what, "Running $0, $PAUSE::Id, $now",
             Data::Dumper->new([$self],[qw()])->Indent(1)->Useqq(1)->Dump;
         $self->{INTRODUCED} = undef;
     }
@@ -475,7 +474,7 @@ sub check_for_new {
                   content_type => 'text/plain',
                   encoding     => 'quoted-printable',
                 },
-                body_str => join(qq{\n\n}, "Not indexed.\n\n\t$Id", $alert),
+                body_str => join(qq{\n\n}, "Not indexed.\n\n\t$PAUSE::Id", $alert),
             );
 
             sendmail($email);
@@ -575,7 +574,7 @@ URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
 Description:  Package names found in directory \$CPAN/authors/id/
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
-Written-By:   $Id
+Written-By:   $PAUSE::Id
 Line-Count:   $numlines
 Last-Updated: $date\n\n};
 
@@ -1101,7 +1100,7 @@ Modcount:    %d
 Written-By:  %s
 Date:        %s
 
-}, 0+@$modlist_data, $Id, $date;
+}, 0+@$modlist_data, $PAUSE::Id, $date;
 
     $list = qq!
     package CPAN::Modulelist;
@@ -1212,7 +1211,7 @@ Line-Count:  %d
 Written-By:  %s
 Date:        %s
 
-}, scalar keys %seen, $Id, $date;
+}, scalar keys %seen, $PAUSE::Id, $date;
 
     {
         for my $k (sort keys %seen) {
