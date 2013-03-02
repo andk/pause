@@ -64,7 +64,9 @@ my($pauselib) = File::Basename::dirname Cwd::abs_path __FILE__;
     }
   }
 }
+
 push @INC, $pauselib;
+
 $PAUSE::Config ||=
     {
      # previously also used for ftp password; still used in Error as
@@ -82,6 +84,8 @@ $PAUSE::Config ||=
      AUTHEN_BACKUP_DIR => $IS_PAUSE_US
      ? '/home/puppet/pause-var/backup'
      : '/home/k/PAUSE/111_sensitive/backup',
+     BZCAT_PATH => (List::Util::first { -x $_ } ("/bin/bzcat", "/usr/bin/bzcat" )),
+     BZIP2_PATH => (List::Util::first { -x $_ } ("/bin/bzip2", "/usr/bin/bzip2" )),
      CPAN_TESTERS => qq(cpan-uploads\@perl.org), # cpan-uploads is a mailing list, BINGOS relies on it
      TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
      REPLY_TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
@@ -90,6 +94,7 @@ $PAUSE::Config ||=
      GITROOT => '/home/ftp/pub/PAUSE/PAUSE-git',
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP_OPTIONS => '--best --rsyncable',
+     GZIP_PATH => (List::Util::first { -x $_ } ("/bin/gzip", "/usr/bin/gzip" )),
      HOME => $IS_PAUSE_US ? '/home/puppet/' : '/home/k/',
      CRONPATH => $IS_PAUSE_US ? '/home/puppet/pause/cron' : '/home/k/pause/cron',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
@@ -134,6 +139,7 @@ $PAUSE::Config ||=
      : '/home/k/PAUSE/111_sensitive/gnupg-pause-batch-signing-home',
      MIN_MTIME_CHECKSUMS => (time - 60*60*24*365.25), # max one year old
      HAVE_PERLBAL => 1,
+     ZCAT_PATH  => (List::Util::first { -x $_ } ("/bin/zcat", "/usr/bin/zcat" )),
     };
 
 unless ($INC{"PrivatePAUSE.pm"}) { # reload within apache
@@ -318,11 +324,6 @@ sub owner_of_module {
     }
     return;
 }
-
-sub abs_zcat  { List::Util::first { -x $_ } "/bin/zcat", "/usr/bin/zcat" }
-sub abs_gzip  { List::Util::first { -x $_ } "/bin/gzip", "/usr/bin/gzip" }
-sub abs_bzcat { List::Util::first { -x $_ } "/bin/bzcat", "/usr/bin/bzcat" }
-sub abs_bzip2 { List::Util::first { -x $_ } "/bin/bzip2", "/usr/bin/bzip2" }
 
 sub gzip {
   my($read,$write) = @_;

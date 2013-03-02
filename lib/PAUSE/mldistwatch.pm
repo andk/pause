@@ -521,7 +521,7 @@ sub rewrite02 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    our $GZIP = PAUSE::abs_gzip();
+    our $GZIP = $PAUSE::Config->{GZIP_PATH};
     if (
         -f "$repfile.gz" and
         open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
@@ -1058,7 +1058,7 @@ sub rewrite03 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    our $GZIP = PAUSE::abs_gzip();
+    our $GZIP = $PAUSE::Config->{GZIP_PATH};
     if (-f "$repfile.gz") {
         if (
           open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
@@ -1167,7 +1167,7 @@ sub rewrite06 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    our $GZIP = PAUSE::abs_gzip();
+    our $GZIP = $PAUSE::Config->{GZIP_PATH};
     if (-f "$repfile.gz") {
         if (
             open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
