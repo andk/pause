@@ -15,7 +15,7 @@ use Test::Deep;
 use Test::More;
 
 my $pause = PAUSE::TestPAUSE->new({
-  author_root => 'corpus/authors',
+  author_root => 'corpus/mld/001/authors',
 });
 
 my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
