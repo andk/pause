@@ -90,6 +90,7 @@ sub alert {
 
 # package PAUSE::package;
 # return value nonsensical
+# XXX needs case check
 sub give_regdowner_perms {
   my $self = shift;
   my $dbh = $self->connect;
@@ -124,6 +125,9 @@ sub give_regdowner_perms {
 # but if the package is not yet known in the perms table this makes
 # him co-maintainer AND returns 1
 
+# these checks should be case-insensitive, so a user having permission
+# on Foo is the same as having it on foo
+
 # package PAUSE::package;
 sub perm_check {
   my $self = shift;
@@ -149,6 +153,7 @@ sub perm_check {
       return 1;           # P2.1, P3.0
   }
 
+  # is uploader authorized for this package? --> case sensitive
   my($is_primeur) = $dbh->selectrow_hashref(qq{SELECT package, userid
                                     FROM   primeur
                                     WHERE  package = ? AND userid = ?},
@@ -168,6 +173,7 @@ sub perm_check {
       return 1;           # P2.1, P3.0
   }
 
+  # does this package already primary maintainer? -> case insensitive
   my($has_primeur) = $dbh->selectrow_hashref(qq{SELECT package
                                     FROM  primeur
                                     WHERE package = ?},
@@ -192,6 +198,7 @@ sub perm_check {
       }
   }
 
+  # package has any authorized maintainers? --> case insensitive
   my($auth_ids) = $dbh->selectall_arrayref(qq{SELECT package, userid
                                     FROM   perms
                                     WHERE  package = ?},
