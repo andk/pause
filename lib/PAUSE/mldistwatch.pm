@@ -1326,12 +1326,6 @@ sub git {
     return $self->{_git_wrapper} ||= Git::Wrapper->new($self->gitroot);
 }
 
-sub _do_in_gitroot {
-    my ($self, $code) = @_;
-    my $token = pushd( $self->gitroot );
-    return $code->($self);
-}
-
 sub mlroot {
     my $self = shift;
     return $self->{MLROOT} if defined $self->{MLROOT};
