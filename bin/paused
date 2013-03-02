@@ -687,13 +687,13 @@ sub verify_gzip_tar {
     my $taropt;
     my $testinggzip;
     if ($tpath =~ /\.t(ar\.)?gz$/) {
-        $zcat = PAUSE::abs_zcat();
-        $gzip = PAUSE::abs_gzip();
+        $zcat = $PAUSE::Config->{ZCAT_PATH};
+        $gzip = $PAUSE::Config->{GZIP_PATH};
         $taropt = "tvzf";
         $testinggzip = $zcat;
     } elsif ($tpath =~ /\.(tbz|tar\.bz2)$/) {
-        $zcat = PAUSE::abs_bzcat();
-        $gzip = PAUSE::abs_bzip2();
+        $zcat = $PAUSE::Config->{BZCAT_PATH};
+        $gzip = $PAUSE::Config->{BZIP2_PATH};
         $taropt = "tvjf";
         $testinggzip = $gzip;
     } else {

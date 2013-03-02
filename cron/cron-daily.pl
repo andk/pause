@@ -25,9 +25,9 @@ $TIME[4]++;
 $TIME[5] += 1900;
 my $TIME = sprintf "%02d" x 5, @TIME[ 5, 4, 3, 2, 1 ];
 
-my $zcat = PAUSE::abs_zcat();
+my $zcat = $PAUSE::Config->{ZCAT_PATH};
 die "no executable zcat" unless -x $zcat;
-my $gzip = PAUSE::abs_gzip();
+my $gzip = $PAUSE::Config->{GZIP_PATH};
 die "no executable gzip" unless -x $gzip;
 
 sub report;
