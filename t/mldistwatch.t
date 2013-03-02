@@ -15,9 +15,9 @@ use PAUSE::TestPAUSE;
 use Test::Deep;
 use Test::More;
 
-my $pause = PAUSE::TestPAUSE->new({
-  author_root => 'corpus/mld/001/authors',
-});
+my $pause = PAUSE::TestPAUSE->new;
+
+$pause->import_author_root('corpus/mld/001/authors');
 
 my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
 make_path $modules_dir->stringify;
@@ -120,15 +120,7 @@ subtest "first indexing" => sub {
 Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "reindexing" => sub {
-  {
-    # XXX: put this all into a TestPAUSE method for update_contents or
-    # something -- rjbs, 2013-03-02
-    my $tmpdir = $pause->tmpdir;
-    my $cpan_root = File::Spec->catdir($tmpdir, 'cpan');
-    my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
-    make_path( File::Spec->catdir($cpan_root, 'modules') );
-    dircopy('corpus/mld/002/authors', $ml_root);
-  }
+  $pause->import_author_root('corpus/mld/002/authors');
 
   my $result = $pause->test_reindex;
 
@@ -187,15 +179,7 @@ subtest "reindexing" => sub {
 };
 
 subtest "case mismatch" => sub {
-  {
-    # XXX: put this all into a TestPAUSE method for update_contents or
-    # something -- rjbs, 2013-03-02
-    my $tmpdir = $pause->tmpdir;
-    my $cpan_root = File::Spec->catdir($tmpdir, 'cpan');
-    my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
-    make_path( File::Spec->catdir($cpan_root, 'modules') );
-    dircopy('corpus/mld/003/authors', $ml_root);
-  }
+  $pause->import_author_root('corpus/mld/003/authors');
 
   my $result = $pause->test_reindex;
 

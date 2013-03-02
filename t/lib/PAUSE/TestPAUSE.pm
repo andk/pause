@@ -19,12 +19,6 @@ use PAUSE::TestPAUSE::Result;
 
 use namespace::autoclean;
 
-has author_root => (
-  is  => 'ro',
-  isa => 'Str',
-  required => 1,
-);
-
 has _tmpdir_obj => (
   is       => 'ro',
   isa      => 'Defined',
@@ -72,6 +66,14 @@ sub _build_db_root {
   return $db_root;
 }
 
+sub import_author_root {
+  my ($self, $author_root) = @_;
+
+  my $cpan_root = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
+  dircopy($author_root, $ml_root);
+}
+
 has pause_config_overrides => (
   is  => 'ro',
   isa => 'HashRef',
@@ -89,8 +91,6 @@ sub _build_pause_config_overrides {
   my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
 
   make_path( File::Spec->catdir($cpan_root, 'modules') );
-
-  dircopy($self->author_root, $ml_root);
 
   my $db_root = $self->db_root;
 
