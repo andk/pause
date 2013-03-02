@@ -376,7 +376,7 @@ sub update_package {
   # we come here only for packages that have opack and package
 
   my $self = shift;
-  my $sth_pack = shift;
+  my $row = shift;
 
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
@@ -386,7 +386,10 @@ sub update_package {
   my $fio = $self->{FIO};
 
 
-  my($opack,$oldversion,$odist,$ofilemtime,$ofile) = $sth_pack->fetchrow_array;
+  my($opack,$oldversion,$odist,$ofilemtime,$ofile) = @$row{
+    qw( package version dist filemtime file )
+  };
+
   $self->verbose(1,"Old package data: opack[$opack]oldversion[$oldversion]".
                   "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]\n");
   my $MLROOT = $self->mlroot;
@@ -693,19 +696,22 @@ sub checkin {
 
   $self->checkin_into_primeur; # called in void context!
 
-  my $sth_pack = $dbh->prepare(qq{SELECT package, version, dist,
-                                    filemtime, file
-                              FROM packages
-                              WHERE package = ?});
+  my $row = $dbh->selectrow_hashref(
+    qq{
+      SELECT package, version, dist, filemtime, file
+      FROM packages
+      WHERE package = ?
+    },
+    undef,
+    $package
+  );
 
-  $sth_pack->execute($package);
 
-
-  if ($sth_pack->rows) {
+  if ($row) {
 
       # We know this package from some time ago
 
-      $self->update_package($sth_pack);
+      $self->update_package($row);
 
   } else {
 
