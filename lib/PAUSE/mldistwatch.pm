@@ -521,7 +521,7 @@ sub rewrite02 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    our $GZIP = PAUSE::abs_gzip();
+    our $GZIP = $PAUSE::Config->{GZIP_PATH};
     if (
         -f "$repfile.gz" and
         open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
@@ -1058,7 +1058,7 @@ sub rewrite03 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    our $GZIP = PAUSE::abs_gzip();
+    our $GZIP = $PAUSE::Config->{GZIP_PATH};
     if (-f "$repfile.gz") {
         if (
           open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
@@ -1080,10 +1080,16 @@ sub rewrite03 {
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
-    my $sth = $dbh->prepare(qq{SELECT modid, statd, stats, statl,
-                                    stati, statp, description, userid, chapterid
-                             FROM mods WHERE mlstatus = "list"});
+    my $sth = $dbh->prepare(qq{
+        SELECT modid, statd, stats, statl,
+            stati, statp, description, userid, chapterid
+        FROM mods WHERE mlstatus = "list"
+        ORDER BY modid
+    });
     $sth->execute;
+
+    my $modlist_data = $self->as_ds($sth);
+
     my $header = sprintf qq{File:        03modlist.data
 Description: These are the data that are published in the module
         list, but they may be more recent than the latest posted
@@ -1094,9 +1100,9 @@ Modcount:    %d
 Written-By:  %s
 Date:        %s
 
-}, $sth->rows, $Id, $date;
+}, 0+@$modlist_data, $Id, $date;
 
-    $list = qq{
+    $list = qq!
     package CPAN::Modulelist;
     # Usage: print Data::Dumper->new([CPAN::Modulelist->data])->Dump or similar
     # cannot 'use strict', because we normally run under Safe
@@ -1113,12 +1119,11 @@ Date:        %s
       \$result;
 
     }
-  };
-
+!;
 
     $list .= Data::Dumper->new([
                                 $sth->{NAME},
-                                $self->as_ds($sth)
+                                $modlist_data,
                                ],
                                ["CPAN::Modulelist::cols",
                                 "CPAN::Modulelist::data"]
@@ -1162,7 +1167,7 @@ sub rewrite06 {
     my $list = "";
     my $olist = "";
     local($/) = "\n";
-    our $GZIP = PAUSE::abs_gzip();
+    our $GZIP = $PAUSE::Config->{GZIP_PATH};
     if (-f "$repfile.gz") {
         if (
             open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"

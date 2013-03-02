@@ -21,6 +21,7 @@ WriteMakefile(
     Compress::Zlib
     Cwd
     DB_File
+    DBD::SQLite
     DBI
     DBIx::RunSQL
     Devel::Peek
@@ -31,6 +32,7 @@ WriteMakefile(
     File::Copy::Recursive
     File::pushd
     File::Rsync::Mirror::Recentfile
+    File::Which
     Git::Wrapper
     HTML::Entities
     HTTP::Date
@@ -38,6 +40,7 @@ WriteMakefile(
     IPC::Cmd
     IPC::Run3
     JSON::XS
+    LWP::UserAgent
     MD5
     Mail::Mailer
     Mail::Send
@@ -51,6 +54,7 @@ WriteMakefile(
     String::Random
     Test::Deep
     Test::FITesque::Fixture
+    Test::MockObject
     Text::Format
     Text::Metaphone
     Text::Unidecode
