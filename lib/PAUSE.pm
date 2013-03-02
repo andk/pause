@@ -37,12 +37,13 @@ if ($USE_RECENTFILE_HOOKS) {
 our $IS_PAUSE_US = Sys::Hostname::hostname =~ /pause2/ ? 1 : 0;
 
 use strict;
-use vars qw(@ISA @EXPORT_OK $VERSION $Config);
+use vars qw(@ISA @EXPORT_OK $VERSION $Config $Id);
 
 @ISA = qw(Exporter); ## no critic
 @EXPORT_OK = qw(urecord);
 
 $VERSION = "1.005";
+$Id = "PAUSE version $PAUSE::VERSION";
 
 # for Configuration Variable we use PrivatePAUSE.pm, because these are
 # really variables we cannot publish. Will separate harmless variables
