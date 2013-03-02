@@ -217,7 +217,7 @@ sub perm_check {
       $pp->{version} = '' unless defined $pp->{version}; # accept version 0
 
       my($p,$owner,@owner);
-      @owner = map { $_[1] } @$auth_ids;
+      @owner = map { $_->[1] } @$auth_ids;
       if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
           # seems ok: perl is always right
       } elsif (! grep { $_ eq $userid } @owner) {

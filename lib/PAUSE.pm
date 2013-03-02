@@ -304,6 +304,7 @@ sub user_is {
   return $ret;
 }
 
+# must be case-insensitive
 sub owner_of_module {
     my($m, $dbh) = @_;
     $dbh ||= dbh();
@@ -313,14 +314,11 @@ sub owner_of_module {
                    FROM mods where modid = ?},
                  primeur => qq{SELECT package,
                           userid
-                   FROM primeur where package = ?},
+                   FROM primeur where LOWER(package) = LOWER(?)},
                 );
     for my $table (qw(mods primeur)) {
-        my $sth = $dbh->prepare($query{$table});
-        $sth->execute($m);
-        if ($sth->rows >= 1) {
-            return $sth->fetchrow_array; # ascii guaranteed
-        }
+        my $owner = $dbh->selectrow_arrayref($query{$table}, undef, $m);
+        return $owner->[0] if $owner;
     }
     return;
 }
