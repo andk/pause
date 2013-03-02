@@ -319,8 +319,8 @@ sub owner_of_module {
     return;
 }
 
-sub abs_zcat { "/bin/zcat" }
-sub abs_gzip { "/bin/gzip" }
+sub abs_zcat  { List::Util::first { -x $_ } "/bin/zcat", "/usr/bin/zcat" }
+sub abs_gzip  { List::Util::first { -x $_ } "/bin/gzip", "/usr/bin/gzip" }
 sub abs_bzcat { List::Util::first { -x $_ } "/bin/bzcat", "/usr/bin/bzcat" }
 sub abs_bzip2 { List::Util::first { -x $_ } "/bin/bzip2", "/usr/bin/bzip2" }
 
