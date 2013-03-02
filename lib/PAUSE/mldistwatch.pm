@@ -113,28 +113,8 @@ sub sleep {
 }
 
 sub verbose {
-    my($self,$level,@what) = @_;
-    unless (@what) {
-        @what = ("warning: verbose called without \@what: ", $level);
-        $level = 1;
-    }
-    return if $level > $self->{VERBOSE};
-    unless (exists $self->{INTRODUCED}) {
-        my $now = scalar localtime;
-        require Data::Dumper;
-        unshift @what, "Running $0, $PAUSE::Id, $now",
-            Data::Dumper->new([$self],[qw()])->Indent(1)->Useqq(1)->Dump;
-        $self->{INTRODUCED} = undef;
-    }
-    push @what, "\n" unless $what[-1] =~ m{\n$};
-    my $logfh;
-    if (my $logfile = $self->{OPT}{logfile}) {
-        open $logfh, ">>", $logfile or die;
-        unshift @what, scalar localtime;
-    } else {
-        $logfh = *STDOUT;
-    }
-    print $logfh @what;
+    my ($self, $level, @what) = @_;
+    PAUSE->log($self, $level, @what);
 }
 
 sub reindex {

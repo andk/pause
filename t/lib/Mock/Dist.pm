@@ -39,9 +39,4 @@ sub next_call_ok {
   );
 }
 
-sub verbose_ok {
-  my ($self, $level, @what) = @_;
-  $self->next_call_ok(verbose => [ $level, @what ]);
-}
-
 1;

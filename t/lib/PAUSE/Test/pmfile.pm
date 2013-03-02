@@ -73,9 +73,12 @@ sub dist_mock :Test :Plan(1) {
 }
 
 my $ppp = 'My::Package';
-sub filter_ppps :Test :Plan(3) {
+sub filter_ppps :Test :Plan(2) {
   my ($self, $no_index, $expect) = @_;
   $self->{pmfile}{META_CONTENT}{no_index} = $no_index;
+
+  my @verbose;
+  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
 
   my @res = $self->{pmfile}->filter_ppps($ppp);
   cmp_deeply(
@@ -90,38 +93,55 @@ sub filter_ppps :Test :Plan(3) {
               ? "Skipping ppp[$ppp] $reason"
               : "NOT skipping ppp[$ppp] $reason";
     }
-    $self->{dist}->next_call_ok(verbose => [ 1, $reason ]);
-    $self->{dist}->next_call_ok(verbose => [ 1, "Result of filter_ppps: res[@res]" ]);
+
+    cmp_deeply(
+        \@verbose,
+        [
+            [1, $reason],
+            [1, "Result of filter_ppps: res[@res]"],
+        ]
+    );
   } else {
-    ok( ! $self->{dist}->called('verbose'), "no verbose() call");
-    ok(1, "dummy");
+    ok(!@verbose, "no verbose() call");
     $self->{dist}->clear;
   }
 }
 
 sub simile :Test :Plan(2) {
   my ($self, $file, $package, $ret) = @_;
+
+  my @verbose;
+  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+
   my $label = "$file and $package are "
     . ($ret ? "" : "not ") . "similes";
   ok( $self->{pmfile}->simile($file, $package) == $ret, $label );
   $file =~ s/\.pm$//;
-  $self->{dist}->verbose_ok(
-    1, "Result of simile(): file[$file] package[$package] ret[$ret]\n"
+  cmp_deeply(
+      shift(@verbose),
+      [1, "Result of simile(): file[$file] package[$package] ret[$ret]\n"],
   );
 }
 
 sub examine_fio :Test :Plan(3) {
   my ($self) = @_;
   my $pmfile = $self->{pmfile};
+
+  my @verbose = ();
+  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+
   $pmfile->{PMFILE} = $self->fake_dist_dir->file('lib/My/Dist.pm')->stringify;
   $pmfile->examine_fio;
-  $self->{dist}->next_call for 1..5; # skip over some irrelevant logging
+  shift @verbose for 1..3; # skip over some irrelevant logging
 #  $self->{dist}->next_call_ok(connect => []);
 #  $self->{dist}->next_call_ok(version_from_meta_ok => []);
 #  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
 #  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in META_CONTENT");
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");
-  $self->{dist}->verbose_ok(1, "Will check keys_ppp[My::Dist]\n");
+  cmp_deeply(
+      shift(@verbose),
+      [1, "Will check keys_ppp[My::Dist]\n"],
+  );
   cmp_deeply(
     [ @{$PACKAGE}{ qw(PACKAGE DIST FIO TIME PMFILE USERID META_CONTENT) } ],
     [
