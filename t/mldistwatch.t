@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use 5.10.1;
 use lib 't/lib';
 
 use Email::Sender::Transport::Test;
@@ -28,11 +29,40 @@ my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
     or die "couldn't set up bogus 06perms: $!";
 }
 
+sub file_updated_ok {
+  my ($filename, $desc) = @_;
+  state %last_value;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  unless (-e $filename) {
+    return fail("$desc: $filename not updated");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  my $old = $last_value{ $filename };
+
+  unless (defined $old) {
+    $last_value{$filename} = "$dev,$ino";
+    return pass("$desc: $filename updated");
+  }
+
+  my $ok = ok(
+    $old ne "$dev,$ino",
+    "$desc: $filename updated",
+  );
+
+  $last_value{$filename} = "$dev,$ino";
+  return $ok;
+}
+
 subtest "first indexing" => sub {
   my $result = $pause->test_reindex;
 
-  ok(
-    -e $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
   );
 
@@ -124,8 +154,9 @@ subtest "reindexing" => sub {
 
   my $result = $pause->test_reindex;
 
-  ok(
-    -e $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
   );
 
@@ -183,8 +214,9 @@ subtest "case mismatch" => sub {
 
   my $result = $pause->test_reindex;
 
-  ok(
-    -e $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
   );
 
