@@ -176,16 +176,17 @@ sub perm_check {
   # does this package already primary maintainer? -> case insensitive
   my($has_primeur) = $dbh->selectrow_hashref(qq{SELECT package
                                     FROM  primeur
-                                    WHERE package = ?},
+                                    WHERE LOWER(package) = LOWER(?)},
                                     undef,
                                 $package);
-  if ($has_primeur) {
+  if (! $has_primeur) {
+    # does this package exist in mods? -> case insensitive
       my($has_owner) = $dbh->selectrow_hashref(qq{SELECT modid
                                   FROM mods
                                   WHERE modid = ?},
                               undef,
                               $package);
-      if ($has_owner) {
+      if (! $has_owner) {
           # package has neither owner in mods nor maintainer in primeur
           local($dbh->{RaiseError}) = 0;
           my $ret = $dbh->do($ins_perms);
@@ -201,7 +202,7 @@ sub perm_check {
   # package has any authorized maintainers? --> case insensitive
   my($auth_ids) = $dbh->selectall_arrayref(qq{SELECT package, userid
                                     FROM   perms
-                                    WHERE  package = ?},
+                                    WHERE  LOWER(package) = LOWER(?)},
                                 undef,
                                 $package);
   if (@$auth_ids) {
