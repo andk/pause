@@ -202,16 +202,19 @@ subtest "reindexing" => sub {
   );
 };
 
+Email::Sender::Simple->default_transport->clear_deliveries;
+
 subtest "case mismatch" => sub {
   $pause->import_author_root('corpus/mld/003/authors');
 
   my $result = $pause->test_reindex;
 
-  file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  # XXX: Actually, need file_not_updated_ok! -- rjbs, 2013-03-02
+  #  file_updated_ok(
+  #    $result->tmpdir
+  #           ->file(qw(cpan modules 02packages.details.txt.gz)),
+  #    "our indexer indexed",
+  #  );
 
   package_list_ok(
     $result,
@@ -225,7 +228,8 @@ subtest "case mismatch" => sub {
 
   email_ok(
     [
-      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' },
+      { subject => 'Upload Permission or Version mismatch' },
     ],
   );
 };
