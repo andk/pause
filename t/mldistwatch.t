@@ -57,6 +57,32 @@ sub file_updated_ok {
   return $ok;
 }
 
+sub package_list_ok {
+  my ($result, $want) = @_;
+
+  my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
+    'SELECT * FROM packages ORDER BY package, version',
+    { Slice => {} },
+  );
+
+  cmp_deeply(
+    $pkg_rows,
+    [ map {; superhashof($_) } @$want ],
+    "we db-inserted exactly the dists we expected to",
+  ) or diag explain($pkg_rows);
+
+
+  my $p = $result->packages_data;
+
+  my @packages = sort { $a->package cmp $b->package } $p->packages;
+
+  cmp_deeply(
+    \@packages,
+    [ map {; methods(%$_) } @$want ],
+    "we built exactly the 02packages we expected",
+  );
+}
+
 subtest "first indexing" => sub {
   my $result = $pause->test_reindex;
 
@@ -73,30 +99,7 @@ subtest "first indexing" => sub {
     { package => 'Y',              version => 2       },
   );
 
-  subtest "tests with the data in the modules db" => sub {
-    my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-      'SELECT * FROM packages ORDER BY package, version',
-      { Slice => {} },
-    );
-
-    cmp_deeply(
-      $pkg_rows,
-      [ map {; superhashof($_) } @want ],
-      "we db-inserted exactly the dists we expected to",
-    );
-  };
-
-  subtest "tests with the parsed 02packages data" => sub {
-    my $p = $result->packages_data;
-
-    my @packages = sort { $a->package cmp $b->package } $p->packages;
-
-    cmp_deeply(
-      \@packages,
-      [ map {; methods(%$_) } @want ],
-      "we built exactly the 02packages we expected",
-    );
-  };
+  package_list_ok($result, \@want);
 
   subtest "test 06perms.txt" => sub {
     my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
@@ -167,30 +170,7 @@ subtest "reindexing" => sub {
     { package => 'Y',              version => 2       },
   );
 
-  subtest "tests with the data in the modules db" => sub {
-    my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-      'SELECT * FROM packages ORDER BY package, version',
-      { Slice => {} },
-    );
-
-    cmp_deeply(
-      $pkg_rows,
-      [ map {; superhashof($_) } @want ],
-      "we db-inserted exactly the dists we expected to",
-    );
-  };
-
-  subtest "tests with the parsed 02packages data" => sub {
-    my $p = $result->packages_data;
-
-    my @packages = sort { $a->package cmp $b->package } $p->packages;
-
-    cmp_deeply(
-      \@packages,
-      [ map {; methods(%$_) } @want ],
-      "we built exactly the 02packages we expected",
-    );
-  };
+  package_list_ok($result, \@want);
 
   subtest "tests for the emails we sent out" => sub {
     my @deliveries = sort {
@@ -227,30 +207,7 @@ subtest "case mismatch" => sub {
     { package => 'Y',              version => 2       },
   );
 
-  subtest "tests with the data in the modules db" => sub {
-    my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-      'SELECT * FROM packages ORDER BY package, version',
-      { Slice => {} },
-    );
-
-    cmp_deeply(
-      $pkg_rows,
-      [ map {; superhashof($_) } @want ],
-      "we db-inserted exactly the dists we expected to",
-    ) or diag explain($pkg_rows);
-  };
-
-  subtest "tests with the parsed 02packages data" => sub {
-    my $p = $result->packages_data;
-
-    my @packages = sort { $a->package cmp $b->package } $p->packages;
-
-    cmp_deeply(
-      \@packages,
-      [ map {; methods(%$_) } @want ],
-      "we built exactly the 02packages we expected",
-    );
-  };
+  package_list_ok($result, \@want);
 
   subtest "tests for the emails we sent out" => sub {
     my @deliveries = sort {
