@@ -180,7 +180,8 @@ sub rewrite_indexes {
                               scalar localtime
                              ));
 
-    $self->git->commit({ m => "indexer run at $^T, pid $$" });
+    $self->git->commit({ m => "indexer run at $^T, pid $$" })
+        if $self->git->status->is_dirty;
 }
 
 sub debug_mem {
