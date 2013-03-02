@@ -83,6 +83,54 @@ sub package_list_ok {
   );
 }
 
+sub perm_list_ok {
+  my ($result, $want) = @_;
+
+  my $index_06 = $result->tmpdir->subdir(qw(cpan modules))
+                 ->file(qw(06perms.txt.gz));
+
+  my $fh;
+  our $GZIP = $PAUSE::Config->{GZIP_PATH};
+  $pause->with_our_config(sub {
+    open $fh, "$GZIP --stdout --uncompress $index_06|"
+      or die "can't open $index_06 for reading with gip: $!";
+  });
+
+  my (@header, @data);
+  while (<$fh>) {
+    push(@header, $_), next if 1../^\s*$/;
+    push @data, $_;
+  }
+
+  # simple is() for now to check for line count
+  is(@data, @$want, "there are right number of lines in 06perms");
+}
+
+sub email_ok {
+  my ($want) = @_;
+
+  my @deliveries = sort {
+    $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
+  } Email::Sender::Simple->default_transport->deliveries;
+
+  Email::Sender::Simple->default_transport->clear_deliveries;
+
+  subtest "emails sent during this run" => sub {
+    is(@deliveries, @$want, "as many emails as expected");
+  };
+
+  for my $test (@$want) {
+    my $delivery = shift @deliveries;
+    if ($test->{subject}) {
+      is(
+        $delivery->{email}->get_header('Subject'),
+        $test->{subject},
+        "Got email: $test->{subject}",
+      );
+    }
+  }
+}
+
 subtest "first indexing" => sub {
   my $result = $pause->test_reindex;
 
@@ -92,55 +140,29 @@ subtest "first indexing" => sub {
     "our indexer indexed",
   );
 
-  my @want = (
-    { package => 'Bug::Gold',      version => '9.001' },
-    { package => 'Hall::MtKing',   version => '0.01'  },
-    { package => 'XForm::Rollout', version => '1.00'  },
-    { package => 'Y',              version => 2       },
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.00'  },
+      { package => 'Y',              version => 2       },
+    ],
   );
 
-  package_list_ok($result, \@want);
+  perm_list_ok(
+    $result,
+    [ undef, undef, undef, undef ],
+  );
 
-  subtest "test 06perms.txt" => sub {
-    my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
-    my $fh;
-    our $GZIP = $PAUSE::Config->{GZIP_PATH};
-    $pause->with_our_config(sub {
-      open $fh, "$GZIP --stdout --uncompress $index_06|"
-        or die "can't open $index_06 for reading with gip: $!";
-    });
-
-    my (@header, @data);
-    while (<$fh>) {
-      push(@header, $_), next if 1../^\s*$/;
-      push @data, $_;
-    }
-    is(@data, 4, "there are 4 lines of data in 06perms");
-  };
-
-  # PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz
-  # PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz
-  # PAUSE indexer report XYZZY/Hall-MtKing-0.01.tar.gz
-  # PAUSE indexer report XYZZY/Y-2.tar.gz
-
-  subtest "tests for the emails we sent out" => sub {
-    my @deliveries = sort {
-      $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
-    } Email::Sender::Simple->default_transport->deliveries;
-
-    my @subj_want = (
-      'PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz',
-      'PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz',
-      'PAUSE indexer report XYZZY/Hall-MtKing-0.01.tar.gz',
-      'PAUSE indexer report XYZZY/Y-2.tar.gz',
-    );
-
-    is_deeply(
-      [ map {; $_->{email}->get_header('Subject') } @deliveries ],
-      \@subj_want,
-      "we sent mail with the right subjects",
-    );
-  };
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz' },
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz' },
+      { subject => 'PAUSE indexer report XYZZY/Hall-MtKing-0.01.tar.gz' },
+      { subject => 'PAUSE indexer report XYZZY/Y-2.tar.gz' },
+    ],
+  );
 
   subtest "meagre git tests" => sub {
     ok(
@@ -163,30 +185,21 @@ subtest "reindexing" => sub {
     "our indexer indexed",
   );
 
-  my @want = (
-    { package => 'Bug::Gold',      version => '9.001' },
-    { package => 'Hall::MtKing',   version => '0.01'  },
-    { package => 'XForm::Rollout', version => '1.01'  },
-    { package => 'Y',              version => 2       },
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
+      { package => 'Y',              version => 2       },
+    ],
   );
 
-  package_list_ok($result, \@want);
-
-  subtest "tests for the emails we sent out" => sub {
-    my @deliveries = sort {
-      $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
-    } Email::Sender::Simple->default_transport->deliveries;
-
-    my @subj_want = (
-      'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz',
-    );
-
-    is_deeply(
-      [ map {; $_->{email}->get_header('Subject') } @deliveries ],
-      \@subj_want,
-      "we sent mail with the right subjects",
-    );
-  };
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
+    ],
+  );
 };
 
 subtest "case mismatch" => sub {
@@ -200,30 +213,21 @@ subtest "case mismatch" => sub {
     "our indexer indexed",
   );
 
-  my @want = (
-    { package => 'Bug::Gold',      version => '9.001' },
-    { package => 'Hall::MtKing',   version => '0.01'  },
-    { package => 'XForm::Rollout', version => '1.01'  },
-    { package => 'Y',              version => 2       },
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
+      { package => 'Y',              version => 2       },
+    ],
   );
 
-  package_list_ok($result, \@want);
-
-  subtest "tests for the emails we sent out" => sub {
-    my @deliveries = sort {
-      $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
-    } Email::Sender::Simple->default_transport->deliveries;
-
-    my @subj_want = (
-      'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz',
-    );
-
-    is_deeply(
-      [ map {; $_->{email}->get_header('Subject') } @deliveries ],
-      \@subj_want,
-      "we sent mail with the right subjects",
-    );
-  };
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
+    ],
+  );
 };
 
 done_testing;
