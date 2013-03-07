@@ -41,6 +41,7 @@ WriteMakefile(
     IPC::Run3
     JSON::XS
     LWP::UserAgent
+    LWP::Protocol::https
     MD5
     Mail::Mailer
     Mail::Send
