@@ -222,7 +222,7 @@ sub packages_per_pmfile {
                       \bpackage\s+
                       ([\w\:\']+)
                       \s*
-                      (?: $ | [\}\;] | ($version::STRICT) )
+                      (?: $ | [\}\;] | \s+($version::STRICT) )
                     }x) {
             $pkg = $2;
             $strict_version = $3;
