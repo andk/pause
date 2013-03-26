@@ -2730,6 +2730,12 @@ sub add_user {
 				       value=>"  Insert with metaphone care  "),
 			  $mgr->submit(name=>"SUBMIT_pause99_add_user_Definitely",
 				       value=>"  Insert most definitely  "));
+
+  my $delete_link = sprintf(
+      qq{<p>If this is a bad request: <a href="authenquery?ACTION=manage_id_requests;subaction=delete;USERID=%s">Delete the ID request</a></p>},
+      $userid,
+  );
+
   push(@m,
        qq{<h3>Add a user or mailinglist</h3>},
        $submit_butts,
@@ -2773,7 +2779,9 @@ sub add_user {
                       rows=>6,
                       cols=>60),
        qq{<br />},
-       $submit_butts
+       $submit_butts,
+       qq{<br />},
+       $delete_link,
       );
 
   @m;
