@@ -12,6 +12,7 @@ PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron
 * * * * *               date -u +"\%s \%a \%b \%e \%T \%Z \%Y" > /home/ftp/tmp/02STAMP && mv /home/ftp/tmp/02STAMP /home/ftp/pub/PAUSE/authors/02STAMP && /opt/perl/current/bin/perl -I /home/puppet/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/authors/02STAMP
 08 * * * *              date -u +"\%s \%FT\%TZ" > /home/ftp/tmp/02STAMPm && mv /home/ftp/tmp/02STAMPm /home/ftp/pub/PAUSE/modules/02STAMP && /opt/perl/current/bin/perl -I /home/puppet/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/modules/02STAMP
 05 * * * *              perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log
+04 7 * * 6              perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log --symlinkinventory
 17,29,41,53 * * * *     perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log --fail-silently-on-concurrency-protection --rewrite
 12 06,14,22 * * *       perl /home/puppet/pause/cron/update-checksums.pl
 29 * * * *              perl /home/puppet/pause/cron/cleanup-incoming.pl
