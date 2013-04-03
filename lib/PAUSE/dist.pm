@@ -674,10 +674,11 @@ sub filter_pms {
     my($inmf) = $mf =~ m!^[^/]+/(.+)!; # go one directory down
 
     # skip "t" - libraries in ./t are test libraries!
+    # skip "xt" - libraries in ./xt are author test libraries!
     # skip "inc" - libraries in ./inc are usually install libraries
     # skip "local" - somebody shipped his carton setup!
     # skip 'perl5" - somebody shipped her local::lib!
-    next if $inmf =~ m!^(?:t|inc|local|perl5)/!;
+    next if $inmf =~ m!^(?:x?t|inc|local|perl5)/!;
 
     if ($self->{META_CONTENT}){
       my $no_index = $self->{META_CONTENT}{no_index}
