@@ -60,8 +60,10 @@ sub file_updated_ok {
 sub package_list_ok {
   my ($result, $want) = @_;
 
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
   my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-    'SELECT * FROM packages ORDER BY package, version',
+    'SELECT * FROM packages ORDER BY LOWER(package), version',
     { Slice => {} },
   );
 
@@ -74,13 +76,13 @@ sub package_list_ok {
 
   my $p = $result->packages_data;
 
-  my @packages = sort { $a->package cmp $b->package } $p->packages;
+  my @packages = sort { lc($a->package) cmp lc($b->package) } $p->packages;
 
   cmp_deeply(
     \@packages,
     [ map {; methods(%$_) } @$want ],
     "we built exactly the 02packages we expected",
-  );
+  ) or diag explain(\@packages);
 }
 
 sub perm_list_ok {
@@ -204,7 +206,7 @@ subtest "reindexing" => sub {
 
 Email::Sender::Simple->default_transport->clear_deliveries;
 
-subtest "case mismatch" => sub {
+subtest "case mismatch, unauthorized for original" => sub {
   $pause->import_author_root('corpus/mld/003/authors');
 
   my $result = $pause->test_reindex;
@@ -230,6 +232,36 @@ subtest "case mismatch" => sub {
     [
       { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' },
       { subject => 'Upload Permission or Version mismatch' },
+    ],
+  );
+};
+
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "case mismatch, authorized for original" => sub {
+  $pause->import_author_root('corpus/mld/004/authors');
+
+  my $result = $pause->test_reindex;
+
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "our indexer indexed",
+  );
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'xform::rollout', version => '2.00'  },
+      { package => 'Y',              version => 2       },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
     ],
   );
 };

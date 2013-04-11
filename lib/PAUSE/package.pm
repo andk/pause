@@ -588,11 +588,12 @@ has the same version number and the distro has a more recent modification time.}
 
   if ($ok) {
 
-      my $query = qq{UPDATE packages SET version = ?, dist = ?, file = ?,
-filemtime = ?, pause_reg = ? WHERE package = ?};
-      $self->verbose(1,"Updating package: [$query]$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
+      my $query = qq{UPDATE packages SET package = ?, version = ?, dist = ?, file = ?,
+filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
+      $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
       $dbh->do($query,
                 undef,
+                $package,
                 $pp->{version},
                 $dist,
                 $pp->{infile},
@@ -707,7 +708,7 @@ sub checkin {
     qq{
       SELECT package, version, dist, filemtime, file
       FROM packages
-      WHERE package = ?
+      WHERE LOWER(package) = LOWER(?)
     },
     undef,
     $package
