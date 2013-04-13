@@ -186,6 +186,12 @@ subtest "first indexing" => sub {
     "our indexer indexed",
   );
 
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 03modlist.data.gz)),
+    "our indexer indexed",
+  );
+
   package_list_ok(
     $result,
     [
