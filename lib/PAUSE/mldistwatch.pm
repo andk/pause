@@ -1074,53 +1074,25 @@ sub rewrite03 {
         $self->verbose(1,"No 03modlists exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
-    my $dbh = $self->connect;
-    my $sth = $dbh->prepare(qq{SELECT modid, statd, stats, statl,
-                                    stati, statp, description, userid, chapterid
-                             FROM mods WHERE mlstatus = "list"
-                             ORDER BY modid});
-    $sth->execute;
-    my $cols = $sth->{NAME};
-    my $data = $self->as_ds($sth);
+
     my $header = sprintf qq{File:        03modlist.data
-Description: These are the data that are published in the module
-        list, but they may be more recent than the latest posted
-        modulelist. Over time we\'ll make sure that these data
-        can be used to print the whole part two of the
-        modulelist. Currently this is not the case.
+Description: This was once the "registered module list" but has been retired.
+        No replacement is planned.
 Modcount:    %d
 Written-By:  %s
 Date:        %s
 
-}, 0+@$data, $PAUSE::Id, $date;
+}, 0, $PAUSE::Id, $date;
 
     $list = qq{
     package CPAN::Modulelist;
-    # Usage: print Data::Dumper->new([CPAN::Modulelist->data])->Dump or similar
-    # cannot 'use strict', because we normally run under Safe
-    # use strict;
 
     sub data {
-      my \$result = {};
-      my \$primary = "modid";
-      for (\@\$CPAN::Modulelist::data){
-        my %hash;
-        \@hash{\@\$CPAN::Modulelist::cols} = \@\$_;
-        \$result->{\$hash{\$primary}} = \\%hash;
-      }
-      \$result;
-
+      return {};
     }
-  };
 
-
-    $list .= Data::Dumper->new([
-                                $cols,
-                                $data,
-                               ],
-                               ["CPAN::Modulelist::cols",
-                                "CPAN::Modulelist::data"]
-                              )->Dump;
+    1;
+};
 
     $list =~ s/^\s+//gm;
 
