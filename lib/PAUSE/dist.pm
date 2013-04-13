@@ -31,14 +31,16 @@ our $ISA_REGULAR_PERL = qr{
 }x;
 # But we need to refuse indexing of bleadperls too: for duallife
 # modules.
-our $ISA_BLEAD_PERL = qr{
-    /
-    perl-5\.\d*[13579]\.\d+
-    (?: \.tar\.gz
-    |   \.tar\.bz2
-    )
-    \z
-}x;
+# 2013-04-14: no longer used, but left commented out in case we change
+# our minds -- xdg, 2013-04-14
+##our $ISA_BLEAD_PERL = qr{
+##    /
+##    perl-5\.\d*[13579]\.\d+
+##    (?: \.tar\.gz
+##    |   \.tar\.bz2
+##    )
+##    \z
+##}x;
 
 
 # package PAUSE::dist
@@ -220,10 +222,11 @@ sub isa_regular_perl {
   scalar $dist =~ /$PAUSE::dist::ISA_REGULAR_PERL/;
 }
 
-sub isa_blead_perl {
-  my($self,$dist) = @_;
-  scalar $dist =~ /$PAUSE::dist::ISA_BLEAD_PERL/;
-}
+# Commented out this function just like $ISA_BLEAD_PERL
+##sub isa_blead_perl {
+##  my($self,$dist) = @_;
+##  scalar $dist =~ /$PAUSE::dist::ISA_BLEAD_PERL/;
+##}
 
 # package PAUSE::dist;
 sub examine_dist {
@@ -272,8 +275,6 @@ sub examine_dist {
       ||
       $dist =~ /TRIAL/
       ||
-      $dist =~ m|/perl-\d+\.\d+\.\d+-RC\d+\.|x
-      ||
       # 2012-09-21: stopping indexing of bleadperls entirely now; in
       # the past the idea was that a new module in perl should reserve
       # its namespace early but with the yearly release schedule and
@@ -282,7 +283,11 @@ sub examine_dist {
       # 5.17.4 impressingly demonstrated. A huge amount of dual life
       # distros got indexed for this bleadperl instead of leaving them
       # alone.
-      $self->isa_blead_perl($dist)
+      #
+      # 2013-04-14: anything that isn't a regular perl, but looks like
+      # a perl distribution should not be indexed.  This includes
+      # blead perls, a "perl-6" malicious distribution, etc.
+      $dist =~ m|/perl-\d+|x
     ) {
       $self->verbose(1,"Dist '$dist' is a developer release\n");
       $self->{SUFFIX} = "N/A";
