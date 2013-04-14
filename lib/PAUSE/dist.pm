@@ -742,6 +742,20 @@ sub filter_pms {
   \@pmfile;
 }
 
+my %GRANDFATHERED_DIST_PKG;
+sub _package_governing_permission {
+  my $self = shift;
+
+  my $d = CPAN::DistnameInfo->new($self->{DIST});
+  my $dist_name = $d->dist;
+  my $main_pkg  = $GRANDFATHERED_DIST_PKG{ $dist_name };
+  unless ($main_pkg) {
+    ($main_pkg = $dist_name) =~ s/-/::/g;
+  }
+
+  return $main_pkg;
+}
+
 # package PAUSE::dist;
 sub examine_pms {
   my $self = shift;
