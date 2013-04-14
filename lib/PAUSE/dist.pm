@@ -229,6 +229,68 @@ sub isa_regular_perl {
 ##  scalar $dist =~ /$PAUSE::dist::ISA_BLEAD_PERL/;
 ##}
 
+# should use CPAN::DistnameInfo but note: "zip" not contained
+# because it is special-cased below
+my $SUFFQR = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
+
+sub _examine_regular_perl {
+  my ($self) = @_;
+  my ($suffix, $skip);
+
+  my $dist = $self->{DIST};
+
+  my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
+  use DBI;
+  my $adbh = DBI->connect(
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
+  ) or die $DBI::errstr;
+  my $query = "SELECT * FROM grouptable
+  WHERE user= ?
+    AND ugroup='pumpking'";
+  my $sth = $adbh->prepare($query);
+  $sth->execute($u);
+  if ($sth->rows > 0){
+    $skip = 0;
+    $self->verbose(1,"Perl dist $dist from trusted user $u");
+  } else {
+    $skip = 1;
+    $self->verbose(1,"*** ALERT: Perl dist $dist from untrusted user $u. Skip set to [$skip]\n");
+  }
+  $sth->finish;
+  $adbh->disconnect;
+  if ($dist =~ $SUFFQR) {
+    $suffix = $1;
+  } else {
+    $self->verbose(1,"A perl distro ($dist) with an unusual suffix!\n");
+    $self->alert("A perl distro ($dist) with an unusual suffix!");
+  }
+  unless ($skip) {
+    $skip = 1 unless $self->untar;
+  }
+
+  return ($suffix, $skip);
+}
+
+sub isa_dev_version {
+  my ($self) = @_;
+  my $dist = $self->{DIST};
+
+  # 2012-09-21: stopping indexing of bleadperls entirely now; in
+  # the past the idea was that a new module in perl should reserve
+  # its namespace early but with the yearly release schedule and
+  # so many dual life modules we probably can skip it; also note
+  # that we did the indexing on bleadperls *wrong* as yesterday's
+  # 5.17.4 impressingly demonstrated. A huge amount of dual life
+  # distros got indexed for this bleadperl instead of leaving them
+  # alone.
+  return( $dist =~ /\d\.\d+_\d/
+        || $dist =~ /TRIAL/
+        || $dist =~ m|/perl-\d+\.\d+\.\d+-RC\d+\.|x
+        || $self->isa_blead_perl($dist));
+}
+
 # package PAUSE::dist;
 sub examine_dist {
   my($self) = @_;
@@ -236,92 +298,49 @@ sub examine_dist {
   my $MLROOT = $self->mlroot;
   my($suffix,$skip);
   $suffix = $skip = "";
-  # should use CPAN::DistnameInfo but note: "zip" not contained
-  # because it is special-cased below
-  my $suffqr = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
+
   if ($self->isa_regular_perl($dist)) {
-    my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
-    use DBI;
-    my $adbh = DBI->connect(
-      $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
-      $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
-      $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
-    ) or die $DBI::errstr;
-    my $query = "SELECT * FROM grouptable
-    WHERE user= ?
-      AND ugroup='pumpking'";
-    my $sth = $adbh->prepare($query);
-    $sth->execute($u);
-    if ($sth->rows > 0){
-      $skip = 0;
-      $self->verbose(1,"Perl dist $dist from trusted user $u");
-    } else {
-      $skip = 1;
-      $self->verbose(1,"*** ALERT: Perl dist $dist from untrusted user $u. Skip set to [$skip]\n");
-    }
-    $sth->finish;
-    $adbh->disconnect;
-    if ($dist =~ $suffqr) {
-      $suffix = $1;
-    } else {
-      $self->verbose(1,"A perl distro ($dist) with an unusual suffix!\n");
-      $self->alert("A perl distro ($dist) with an unusual suffix!");
-    }
-    unless ($skip) {
-      $skip = 1 unless $self->untar;
-    }
-  } else {                # ! isa_regular_perl
-    if (
-      $dist =~ /\d\.\d+_\d/
-      ||
-      $dist =~ /TRIAL/
-      ||
-      # 2012-09-21: stopping indexing of bleadperls entirely now; in
-      # the past the idea was that a new module in perl should reserve
-      # its namespace early but with the yearly release schedule and
-      # so many dual life modules we probably can skip it; also note
-      # that we did the indexing on bleadperls *wrong* as yesterday's
-      # 5.17.4 impressingly demonstrated. A huge amount of dual life
-      # distros got indexed for this bleadperl instead of leaving them
-      # alone.
-      #
-      # 2013-04-14: anything that isn't a regular perl, but looks like
-      # a perl distribution should not be indexed.  This includes
-      # blead perls, a "perl-6" malicious distribution, etc.
-      $dist =~ m|/perl-\d+|x
-    ) {
-      $self->verbose(1,"Dist '$dist' is a developer release\n");
-      $self->{SUFFIX} = "N/A";
-      $self->{SKIP}   = 1;
-      return;
-    }
-    if ($dist =~ $suffqr) {
-      $suffix = $1;
-      $skip = 1 unless $self->untar;
-    } elsif ($dist =~ /\.pm\.(Z|gz)$/) {
-      # By not setting suffix we prohibit extracting README
-      my $file = File::Basename::basename($dist);
-      File::Copy::copy "$MLROOT/$dist", $file;
-      my $willunzip = $file;
-      $willunzip =~ s/\.(Z|gz)$//;
-      unless (PAUSE::gunzip($file,$willunzip)) {
-        $self->verbose(1,"Failed gunzip on $file\n");
-      }
-    } elsif ($dist =~ /\.zip$/) {
-      $suffix = "zip";
-      my $unzipbin = $self->{UNZIPBIN};
-      my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
-      unless (system($system)==0) {
-        $self->verbose(1,
-          "Some error occurred during unzippping. ".
-          "Let's read unzip -t:\n");
-        system("$unzipbin -t $MLROOT/$dist");
-      }
-    } else {
-      $self->verbose(1,"File '$dist' does not resemble a distribution");
-      $skip = 1;
-    }
+    ($suffix, $skip) = $self->_examine_regular_perl;
+    $self->{SUFFIX} = $suffix;
+    $self->{SKIP}   = $skip;
+    return;
   }
+
+  if ($self->isa_dev_version) {
+    # ! isa_regular_perl
+    $self->verbose(1,"Dist '$dist' is a developer release\n");
+    $self->{SUFFIX} = "N/A";
+    $self->{SKIP}   = 1;
+    return;
+  }
+
+  if ($dist =~ $SUFFQR) {
+    $suffix = $1;
+    $skip = 1 unless $self->untar;
+  } elsif ($dist =~ /\.pm\.(Z|gz)$/) {
+    # By not setting suffix we prohibit extracting README
+    my $file = File::Basename::basename($dist);
+    File::Copy::copy "$MLROOT/$dist", $file;
+    my $willunzip = $file;
+    $willunzip =~ s/\.(Z|gz)$//;
+    unless (PAUSE::gunzip($file,$willunzip)) {
+      $self->verbose(1,"Failed gunzip on $file\n");
+    }
+  } elsif ($dist =~ /\.zip$/) {
+    $suffix = "zip";
+    my $unzipbin = $self->{UNZIPBIN};
+    my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
+    unless (system($system)==0) {
+      $self->verbose(1,
+        "Some error occurred during unzippping. ".
+        "Let's read unzip -t:\n");
+      system("$unzipbin -t $MLROOT/$dist");
+    }
+  } else {
+    $self->verbose(1,"File '$dist' does not resemble a distribution");
+    $skip = 1;
+  }
+
   $self->{SUFFIX} = $suffix;
   $self->{SKIP}   = $skip;
 }
