@@ -386,6 +386,34 @@ subtest "perl-\\d should not get indexed" => sub {
   );
 };
 
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "case mismatch, authorized for original, desc. version" => sub {
+  $pause->import_author_root('corpus/mld/006-distname/authors');
+
+  my $result = $pause->test_reindex;
+
+  # file_not_updated_ok
+  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'xform::rollout', version => '2.00'  },
+      { package => 'Y',              version => 2       },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz' },
+      { subject => 'Upload Permission or Version mismatch' },
+    ],
+  );
+};
+
 sub refused_upload_test {
   my ($code) = @_;
 
