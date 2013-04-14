@@ -318,14 +318,9 @@ sub examine_dist {
     $suffix = $1;
     $skip = 1 unless $self->untar;
   } elsif ($dist =~ /\.pm\.(Z|gz)$/) {
-    # By not setting suffix we prohibit extracting README
-    my $file = File::Basename::basename($dist);
-    File::Copy::copy "$MLROOT/$dist", $file;
-    my $willunzip = $file;
-    $willunzip =~ s/\.(Z|gz)$//;
-    unless (PAUSE::gunzip($file,$willunzip)) {
-      $self->verbose(1,"Failed gunzip on $file\n");
-    }
+    $self->verbose(1,"Dist '$dist' is a single-.pm-file upload\n");
+    $suffix = "N/A";
+    $skip   = 1;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
     my $unzipbin = $self->{UNZIPBIN};
