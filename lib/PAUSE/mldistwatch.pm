@@ -454,13 +454,12 @@ sub check_for_new {
 
           my $main_pkg = $dio->_package_governing_permission;
 
-          if (1) { # user has permissions
+          if ($self->_userid_has_permissions_on_package($userid, $main_pkg)) {
             $dbh->commit;
           } else {
-            # if ($main_pkg has permissions and $userid is not in them) {
-            #   $dio->alert(
-            #     "Uploading user has no permissions on package $main_pkg"
-            #   );
+            $dio->alert(
+              "Uploading user has no permissions on package $main_pkg"
+            );
             $dio->{NO_DISTNAME_PERMISSION} = 1;
             $dbh->rollback;
           }
@@ -496,6 +495,32 @@ sub check_for_new {
             sendmail($email);
         }
     }
+}
+
+sub _userid_has_permissions_on_package {
+  my ($self, $userid, $package) = @_;
+
+  my $dbh = $self->connect;
+
+  my ($has_perms) = $dbh->selectrow_array(
+    qq{
+      SELECT COUNT(*) FROM perms
+      WHERE userid = ? AND LOWER(package) = LOWER(?)
+    },
+    undef,
+    $userid, $package,
+  );
+
+  my ($has_primary) = $dbh->selectrow_array(
+    qq{
+      SELECT COUNT(*) FROM primeur
+      WHERE userid = ? AND LOWER(package) = LOWER(?)
+    },
+    undef,
+    $userid, $package,
+  );
+
+  return($has_perms || $has_primary);
 }
 
 sub empty_dir {
