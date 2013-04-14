@@ -1,0 +1,11 @@
+---
+name: Bug-Gold
+version: 10.001
+abstract: the Bug-Gold dist
+author:
+  - OPRIME <OPRIME@cpan.local>
+generated_by: Module::Faker version 
+license: unknown
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
