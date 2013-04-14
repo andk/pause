@@ -441,7 +441,30 @@ sub check_for_new {
         $dio->check_blib;
         $dio->check_multiple_root;
         $dio->check_world_writable;
-        $dio->examine_pms;      # will switch user
+
+        # START XACT
+        {
+          my $dbh = $self->connect;
+          unless ($dbh->begin_work) {
+            $self->verbose("Couldn't begin transaction!");
+            next BIGLOOP;
+          }
+
+          $dio->examine_pms;      # will switch user
+
+          my $main_pkg = $dio->_package_governing_permission;
+
+          if (1) { # user has permissions
+            $dbh->commit;
+          } else {
+            # if ($main_pkg has permissions and $userid is not in them) {
+            #   $dio->alert(
+            #     "Uploading user has no permissions on package $main_pkg"
+            #   );
+            $dio->{NO_DISTNAME_PERMISSION} = 1;
+            $dbh->rollback;
+          }
+        }
 
         $dio->mail_summary;
         $self->sleep;
