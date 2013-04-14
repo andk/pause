@@ -770,6 +770,82 @@ sub _package_governing_permission {
   return $main_pkg;
 }
 
+sub _index_by_files {
+  my ($self, $pmfiles, $provides) = @_;
+  my $dist = $self->{DIST};
+
+  my $binary_dist;
+  # ftp://ftp.funet.fi/pub/CPAN/modules/05bindist.convention.html
+  $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
+
+  for my $pmfile (@$pmfiles) {
+    if ($binary_dist) {
+      next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
+      # package would be
+      # better
+    } elsif ($pmfile =~ m|/blib/|) {
+      $self->alert("Still a blib directory detected:
+        dist[$dist]pmfile[$pmfile]
+        ");
+      next;
+    }
+
+    $self->chown_unsafe;
+
+    my $fio = PAUSE::pmfile->new(
+      DIO => $self,
+      PMFILE => $pmfile,
+      TIME => $self->{TIME},
+      USERID => $self->{USERID},
+      META_CONTENT => $self->{META_CONTENT},
+    );
+    $fio->examine_fio;
+  }
+}
+
+sub _index_by_meta {
+  my ($self, $pmfiles, $provides) = @_;
+  my $dist = $self->{DIST};
+
+  while (my($k,$v) = each %$provides) {
+    $v->{infile} = "$v->{file}";
+    my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
+    if (@stat) {
+      $v->{filemtime} = $stat[9];
+    } else {
+      $v->{filemtime} = 0;
+    }
+    unless (defined $v->{version}) {
+      # 2009-09-23 get a bugreport due to
+      # RKITOVER/MooseX-Types-0.20.tar.gz not
+      # setting version for MooseX::Types::Util
+      $v->{version} = "undef";
+    }
+    # going from a distro object to a package object
+    # is only possible via a file object
+    my $fio = PAUSE::pmfile->new
+    (
+      DIO => $self,
+      PMFILE => $v->{infile},
+      TIME => $self->{TIME},
+      USERID => $self->{USERID},
+      META_CONTENT => $self->{META_CONTENT},
+    );
+    my $pio = PAUSE::package
+    ->new(
+      PACKAGE => $k,
+      DIST => $dist,
+      FIO => $fio,
+      PP => $v,
+      TIME => $self->{TIME},
+      PMFILE => $v->{infile},
+      USERID => $self->{USERID},
+      META_CONTENT => $self->{META_CONTENT},
+    );
+    $pio->examine_pkg;
+  }
+}
+
 # package PAUSE::dist;
 sub examine_pms {
   my $self = shift;
@@ -784,85 +860,23 @@ sub examine_pms {
   # could_not_untar
   my $dist = $self->{DIST};
 
-  my $binary_dist;
-  # ftp://ftp.funet.fi/pub/CPAN/modules/05bindist.convention.html
-  $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
-
   my $pmfiles = $self->filter_pms;
-  my($meta,$provides,$indexingrule);
+  my ($meta, $provides, $indexing_method);
+
   if (my $version_from_meta_ok = $self->version_from_meta_ok) {
     $meta = $self->{META_CONTENT};
     $provides = $meta->{provides};
-    if (!$indexingrule && $provides && "HASH" eq ref $provides) {
-      $indexingrule = 2;
+    if ($provides && "HASH" eq ref $provides) {
+      $indexing_method = '_index_by_meta';
     }
   }
-  if (!$indexingrule && @$pmfiles) { # examine files
-    $indexingrule = 1;
+
+  if (! $indexing_method && @$pmfiles) { # examine files
+    $indexing_method = '_index_by_files';
   }
-  if (0) {
-  } elsif (1==$indexingrule) { # examine files
-    for my $pmfile (@$pmfiles) {
-      if ($binary_dist) {
-        next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
-        # package would be
-        # better
-      } elsif ($pmfile =~ m|/blib/|) {
-        $self->alert("Still a blib directory detected:
-          dist[$dist]pmfile[$pmfile]
-          ");
-        next;
-      }
 
-      $self->chown_unsafe;
-
-      my $fio = PAUSE::pmfile->new(
-        DIO => $self,
-        PMFILE => $pmfile,
-        TIME => $self->{TIME},
-        USERID => $self->{USERID},
-        META_CONTENT => $self->{META_CONTENT},
-      );
-      $fio->examine_fio;
-    }
-  } elsif (2==$indexingrule) { # a yaml with provides
-    while (my($k,$v) = each %$provides) {
-      $v->{infile} = "$v->{file}";
-      my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
-      if (@stat) {
-        $v->{filemtime} = $stat[9];
-      } else {
-        $v->{filemtime} = 0;
-      }
-      unless (defined $v->{version}) {
-        # 2009-09-23 get a bugreport due to
-        # RKITOVER/MooseX-Types-0.20.tar.gz not
-        # setting version for MooseX::Types::Util
-        $v->{version} = "undef";
-      }
-      # going from a distro object to a package object
-      # is only possible via a file object
-      my $fio = PAUSE::pmfile->new
-      (
-        DIO => $self,
-        PMFILE => $v->{infile},
-        TIME => $self->{TIME},
-        USERID => $self->{USERID},
-        META_CONTENT => $self->{META_CONTENT},
-      );
-      my $pio = PAUSE::package
-      ->new(
-        PACKAGE => $k,
-        DIST => $dist,
-        FIO => $fio,
-        PP => $v,
-        TIME => $self->{TIME},
-        PMFILE => $v->{infile},
-        USERID => $self->{USERID},
-        META_CONTENT => $self->{META_CONTENT},
-      );
-      $pio->examine_pkg;
-    }
+  if ($indexing_method) {
+    $self->$indexing_method($pmfiles, $provides);
   } else {
     $self->alert("Does this work out elsewhere? Neither yaml nor pmfiles indexing in dist[$dist]???");
   }
