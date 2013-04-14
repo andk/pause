@@ -756,7 +756,12 @@ sub filter_pms {
   \@pmfile;
 }
 
-my %GRANDFATHERED_DIST_PKG;
+# This hash maps dist names to the package used to check for permission to
+# upload the dist. -- rjbs, 2013-04-14
+my %GRANDFATHERED_DIST_PKG = (
+  'CGI.pm' => 'CGI',
+);
+
 sub _package_governing_permission {
   my $self = shift;
 
