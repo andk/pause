@@ -330,7 +330,17 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 
   email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]->{email}->as_string,
+              qr/name can only be used/,
+              "email looks right",
+            );
+          }
+        ],
+      },
       { subject => 'Upload Permission or Version mismatch' },
     ],
   );
