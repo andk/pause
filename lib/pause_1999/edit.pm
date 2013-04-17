@@ -2447,6 +2447,10 @@ If you need any further information, please visit
   \$CPAN/modules/04pause.html.
 If this doesn't answer your questions, contact modules\@perl.org.
 
+Before uploading your first module, we strongly encourage you to discuss
+your module idea on PrePAN at http://prepan.org/ to get feedback from
+experienced Perl developers.
+
 Thank you for your prospective contributions,
 The Pause Team
 };
