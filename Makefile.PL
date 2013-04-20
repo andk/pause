@@ -42,6 +42,7 @@ WriteMakefile(
     JSON::XS
     LWP::UserAgent
     LWP::Protocol::https
+    LWP::UserAgent
     MD5
     Mail::Mailer
     Mail::Send
