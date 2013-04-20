@@ -567,7 +567,6 @@ sub mailrc {
   #
 
   my $repfile = "$PAUSE::Config->{MLROOT}/../01mailrc.txt.gz";
-  my $list    = "";
   my $olist   = "";
   local ($/) = undef;
   if (open F, "$zcat $repfile|") {
@@ -577,6 +576,8 @@ sub mailrc {
     $olist = <F>;
     close F;
   }
+
+  my @list;
   my $stu = $Dbh->prepare(
     "SELECT userid, fullname, email, asciiname
                              FROM users
@@ -605,7 +606,7 @@ sub mailrc {
       warn $@ if $@;
     }
     $r[1] =~ s/"/'/g;
-    $list .= sprintf qq{alias %-10s "%s <%s>"\n}, @r[ 0 .. 2 ];
+    push @list, sprintf qq{alias %-10s "%s <%s>"\n}, @r[ 0 .. 2 ];
   }
   $stu = $Dbh->prepare(
     "SELECT maillistid, maillistname, address
@@ -620,8 +621,10 @@ sub mailrc {
       }
     }
     next unless $r[2];
-    $list .= sprintf qq{alias %-6s "%s <%s>"\n}, @r[ 0 .. 2 ];
+    push @list, sprintf qq{alias %-6s "%s <%s>"\n}, @r[ 0 .. 2 ];
   }
+
+  my $list = join("", sort @list );
   if ($list ne $olist) {
     if (open F, "| $gzip -9c > $repfile") {
       if ($] > 5.007) {
