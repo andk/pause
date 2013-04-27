@@ -89,7 +89,7 @@ sub give_regdowner_perms {
                                 FROM   mods
                                 WHERE  modid = ?", undef, $package);
   if ($sth_mods) { # make sure we regard the owner as the owner
-      my($mods_userid) = $sth_mods->fetchrow_array;
+      my($mods_userid) = $sth_mods->{userid};
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
       my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
