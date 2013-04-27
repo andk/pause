@@ -24,6 +24,7 @@ PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron
 21 */6 * * *            perl /home/puppet/pause/cron/rm_stale_links
 23 07,13,19,01 * * *    run_mirrors.sh
 22 * * * *              perl /home/puppet/pause/cron/sync-04pause.pl
+03 07,13,18,01 * * *    cd /home/ftp/pub/PAUSE/PAUSE-git && (git gc && git push -u origin master) >> /var/log/git-gc-push.out
 
 7 3,9 * * * perl /home/kstar/cron/indexscripts.pl    >/dev/null 2>&1
 7 2   * * 0 perl /home/kstar/cron/indexscripts.pl -f
