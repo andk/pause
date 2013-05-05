@@ -1060,6 +1060,12 @@ sub rewrite03 {
     } else {
         $self->verbose(1,"No 03modlists exist; won't try to read it");
     }
+
+    my @cols = qw(
+      modid statd stats statl
+      stati statp description userid chapterid
+    );
+
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
     my $sth = $dbh->prepare(qq{
@@ -1104,7 +1110,7 @@ Date:        %s
 !;
 
     $list .= Data::Dumper->new([
-                                $sth->{NAME},
+                                \@cols,
                                 $modlist_data,
                                ],
                                ["CPAN::Modulelist::cols",
