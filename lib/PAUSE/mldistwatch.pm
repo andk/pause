@@ -1066,6 +1066,8 @@ sub rewrite03 {
                                     stati, statp, description, userid, chapterid
                              FROM mods WHERE mlstatus = "list"});
     $sth->execute;
+    my $cols = $sth->{NAME};
+    my $data = $self->as_ds($sth);
     my $header = sprintf qq{File:        03modlist.data
 Description: These are the data that are published in the module
         list, but they may be more recent than the latest posted
@@ -1076,7 +1078,7 @@ Modcount:    %d
 Written-By:  %s
 Date:        %s
 
-}, $sth->rows, $PAUSE::Id, $date;
+}, 0+@$data, $PAUSE::Id, $date;
 
     $list = qq{
     package CPAN::Modulelist;
@@ -1099,8 +1101,8 @@ Date:        %s
 
 
     $list .= Data::Dumper->new([
-                                $sth->{NAME},
-                                $self->as_ds($sth)
+                                $cols,
+                                $data,
                                ],
                                ["CPAN::Modulelist::cols",
                                 "CPAN::Modulelist::data"]
