@@ -1064,7 +1064,8 @@ sub rewrite03 {
     my $dbh = $self->connect;
     my $sth = $dbh->prepare(qq{SELECT modid, statd, stats, statl,
                                     stati, statp, description, userid, chapterid
-                             FROM mods WHERE mlstatus = "list"});
+                             FROM mods WHERE mlstatus = "list"
+                             ORDER BY modid});
     $sth->execute;
     my $cols = $sth->{NAME};
     my $data = $self->as_ds($sth);
