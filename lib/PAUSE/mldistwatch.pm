@@ -1062,16 +1062,10 @@ sub rewrite03 {
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
-    my $sth = $dbh->prepare(qq{
-        SELECT modid, statd, stats, statl,
-            stati, statp, description, userid, chapterid
-        FROM mods WHERE mlstatus = "list"
-        ORDER BY modid
-    });
+    my $sth = $dbh->prepare(qq{SELECT modid, statd, stats, statl,
+                                    stati, statp, description, userid, chapterid
+                             FROM mods WHERE mlstatus = "list"});
     $sth->execute;
-
-    my $modlist_data = $self->as_ds($sth);
-
     my $header = sprintf qq{File:        03modlist.data
 Description: These are the data that are published in the module
         list, but they may be more recent than the latest posted
@@ -1082,9 +1076,9 @@ Modcount:    %d
 Written-By:  %s
 Date:        %s
 
-}, 0+@$modlist_data, $PAUSE::Id, $date;
+}, $sth->rows, $PAUSE::Id, $date;
 
-    $list = qq!
+    $list = qq{
     package CPAN::Modulelist;
     # Usage: print Data::Dumper->new([CPAN::Modulelist->data])->Dump or similar
     # cannot 'use strict', because we normally run under Safe
@@ -1101,11 +1095,12 @@ Date:        %s
       \$result;
 
     }
-!;
+  };
+
 
     $list .= Data::Dumper->new([
                                 $sth->{NAME},
-                                $modlist_data,
+                                $self->as_ds($sth)
                                ],
                                ["CPAN::Modulelist::cols",
                                 "CPAN::Modulelist::data"]
