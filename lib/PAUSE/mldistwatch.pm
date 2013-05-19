@@ -798,7 +798,7 @@ on CPAN alphabetically</title></head><body>
 <h3>in alphabetical order by modules contained in the distributions</h3>
 <i>} .
     scalar gmtime() .
-        qq{ GMT</i>
+        qq{ UTC</i>
 
 <p>The list contains modules distribution files on CPAN for modules that
 are <b>not</b> included in the perl standard distribution but

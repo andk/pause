@@ -120,7 +120,7 @@ sub handler {
     if ( $cookie =~ /logout/ ) {
       warn "WATCH: cookie[$cookie]";
       $r->err_header_out("Set-Cookie",
-                         "logout; path=$uri; expires=Sat, 01-Oct-1974 00:00:00 GMT",
+                         "logout; path=$uri; expires=Sat, 01-Oct-1974 00:00:00 UTC",
                         );
       $r->note_basic_auth_failure;
       return AUTH_REQUIRED;
@@ -132,7 +132,7 @@ sub handler {
       $logout = $1;
       warn "WATCH: logout[$logout]";
       if ($logout =~ /^1/) {
-        $r->err_header_out("Set-Cookie","logout; path=$uri; expires=Sat, 01-Oct-2027 00:00:00 GMT");
+        $r->err_header_out("Set-Cookie","logout; path=$uri; expires=Sat, 01-Oct-2027 00:00:00 UTC");
         $r->header_out("Location",$uri);
         return MOVED;
       } elsif ($logout =~ /^2/) { # badname

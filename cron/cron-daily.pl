@@ -375,7 +375,7 @@ sub whois {
   my $xml = sprintf(
     qq{<?xml version="1.0" encoding="UTF-8"?>
 <cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
-            last-generated='%s GMT'
+            last-generated='%s UTC'
             generated-by='%s'>
 },
     scalar(gmtime),
@@ -393,7 +393,7 @@ sub whois {
 <body>
   <h3>People, <a href="#mailinglists">Mailinglists</a> And
   <a href="#mlarchives">Mailinglist Archives</a> </h3>
-<i>generated on $now GMT by $PAUSE::Config->{ADMIN}</i>
+<i>generated on $now UTC by $PAUSE::Config->{ADMIN}</i>
 <pre xml:space="preserve">
 };
 

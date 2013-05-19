@@ -1320,7 +1320,7 @@ sub change_passwd {
                                   qq{Password update on PAUSE:
 
 %s (%s) visited the
-password changer on PAUSE at %s GMT
+password changer on PAUSE at %s UTC
 and changed the password for %s (%s).
 
 No action is required, but it would be a good idea if somebody
@@ -1930,7 +1930,7 @@ Reason:</b></p><p>$errmsg</p>
           my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
           for my $k (qw(changed dgot dverified)) {
             if ($rec->{$k}) {
-              $rec->{$k} .= sprintf " [%s GMT]", scalar gmtime $rec->{$k};
+              $rec->{$k} .= sprintf " [%s UTC]", scalar gmtime $rec->{$k};
             }
           }
           my $as_table = $self->hash_as_table($rec);
@@ -4360,7 +4360,7 @@ sub add_mod {
       warn "ALERT: could not find chaptertitle";
     }
 
-    my $gmtime = gmtime($time) . " GMT";
+    my $gmtime = gmtime($time) . " UTC";
 
     # as string
     # 	sprintf "%-$Modlist::GLOBAL->{WIDTH_COL1WRITE}s%s%s%s%s %-45s%-${filler}s %s", @{$self}[2..9]; # 15/16
@@ -4898,7 +4898,7 @@ sub apply_mod {
       warn "ALERT: could not find chaptertitle";
     }
 
-    my $gmtime = gmtime($time) . " GMT";
+    my $gmtime = gmtime($time) . " UTC";
 
     my($mdirname,$mbasename) = $modid =~ /^(.+::)([^:]+)$/;
     $mdirname ||= "";
@@ -6007,7 +6007,7 @@ decision.</li>
             my $fut = $now + $i * 60;
             my $fum = int $fut % 3600 / 60;
             next unless $sc->contains($fum);
-            $eta = gmtime( $fut + $PAUSE::Config->{RUNTIME_MLDISTWATCH} ) . " GMT";
+            $eta = gmtime( $fut + $PAUSE::Config->{RUNTIME_MLDISTWATCH} ) . " UTC";
             last;
           }
         }
