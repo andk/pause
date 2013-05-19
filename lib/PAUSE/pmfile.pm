@@ -275,9 +275,9 @@ sub packages_per_pmfile {
                     local($^W)=0;
                     $ppp->{$pkg}{version} =
                         $version
-                            if $version
+                            if ($version||0)
                                 > $ppp->{$pkg}{version} ||
-                                    $version
+                                    ($version||"")
                                         gt $ppp->{$pkg}{version};
                 }
             } else {        # not simile
