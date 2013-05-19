@@ -24,7 +24,7 @@ use HTTP::Status ();
 use IO::File ();
 use IPC::Run3 ();
 use LWP ();
-use MD5 ();
+use Digest::MD5 ();
 use Mail::Send ();
 use PAUSE::MailAddress ();
 use POSIX ":sys_wait_h";
@@ -498,7 +498,7 @@ sub welcome_file {
 
   $hash->{dgot} = $self->{NOW};
   $self->logge("Info: Got $hash->{uriid} (size $size)");
-  my $md5 = MD5->new;
+  my $md5 = Digest::MD5->new;
   my $handle = IO::File->new;
   unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
     die "open $PAUSE::Config->{MLROOT}$hash->{uriid}: $!";

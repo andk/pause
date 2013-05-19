@@ -43,7 +43,7 @@ WriteMakefile(
     LWP::UserAgent
     LWP::Protocol::https
     LWP::UserAgent
-    MD5
+    Digest::MD5
     Mail::Mailer
     Mail::Send
     Module::Faker::Dist

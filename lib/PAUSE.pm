@@ -22,7 +22,7 @@ my $HAVE_RECENTFILE = eval {require File::Rsync::Mirror::Recentfile; 1;};
 use File::Spec ();
 use IO::File ();
 use List::Util ();
-use MD5 ();
+use Digest::MD5 ();
 use Mail::Send ();
 use Sys::Hostname ();
 use Time::Piece;
@@ -237,7 +237,7 @@ sub filehash {
     $authorfile = $file;
   }
   $size = -s $file;
-  $md5 = MD5->new;
+  $md5 = Digest::MD5->new;
   local *HANDLE;
   unless ( open HANDLE, "< $file\0" ){
     $ret .= "An error occurred, couldn't open $file: $!"

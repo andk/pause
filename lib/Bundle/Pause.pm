@@ -48,7 +48,7 @@ JSON
 JSON::XS
 List::MoreUtils
 List::Pairwise
-MD5
+Digest::MD5
 Module::Faker::Dist
 MooseX::StrictConstructor
 Parse::CPAN::Packages
@@ -89,7 +89,6 @@ IO::Pipe 1.04
 IO::Seekable 1.04
 MIME::Base64 1.07
 LWP 5.01
-MD5 1.7
 MIME::QuotedPrint 1.09
 MIME::Base64
 Text::Format
