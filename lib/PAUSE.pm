@@ -343,7 +343,7 @@ sub owner_of_module {
                 );
     for my $table (qw(mods primeur)) {
         my $owner = $dbh->selectrow_arrayref($query{$table}, undef, $m);
-        return $owner->[0] if $owner;
+        return $owner->[1] if $owner;
     }
     return;
 }
