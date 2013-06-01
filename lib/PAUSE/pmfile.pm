@@ -313,6 +313,9 @@ sub packages_per_pmfile {
         while (<FH>) {
             $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
             next if $inpod || /^\s*#/;
+            last if (/\b__(?:END|DATA)__\b/
+                and $parsefile !~ /\.PL$/   # PL files may well have code after __DATA__
+            );
             chop;
             # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
             next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
