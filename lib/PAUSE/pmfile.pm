@@ -313,6 +313,7 @@ sub packages_per_pmfile {
         while (<FH>) {
             $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
             next if $inpod || /^\s*#/;
+            last if /\b__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare
             chop;
             # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
             next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
