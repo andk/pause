@@ -69,7 +69,7 @@ with the real pause.
   perl
   mirror (the good old one)
   mon
-  proftpd
+  proftpd (update 2013: ftp is not any more supported)
   mysqld
   rsync (runs as daemon)
   gpg
@@ -84,9 +84,9 @@ running under 5.16.2.
 See F<doc/mod.schema.txt> and F<doc/authen_pause.schema.txt> for schema
 of PAUSE's two databases.
 
-A dump of the mod database is produced every few hours and available for
-download in the ftp area. A dump of the authen_pause database is -- of
-course -- not available.
+A dump of the mod database is produced every few hours and available
+for download in the rsync area (pause.perl.org::pausedata). A dump of
+the authen_pause database is -- of course -- not available.
 
 =head2 User management
 
@@ -96,7 +96,7 @@ follow the advice in the mysql manual about how to secure mysql in
 general. E.g. C<--skip-networking> and root user password are a must,
 etc.
 
-PAUSE is running processes as user root, apache, ftp, and
+PAUSE is running processes as user root, apache, and
 pause-unsafe. The user "puppet" in the group "puppet" owns the working
 copy of the repository and all the sensitive files. There are no
 members in the group puppet. The SSL data for the webservers and the
