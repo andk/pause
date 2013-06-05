@@ -23,7 +23,7 @@ my @m=gmtime;
 $m[5]+=1900;
 $m[4]++;
 my $D = sprintf "%04d%02d%02d%02d%02dGMT",@m[5,4,3,2,1];
-my $BZIP = $Config::PAUSE->{BZIP2_PATH};
+my $BZIP = $PAUSE::Config->{BZIP2_PATH};
 die "where is BZIP" unless -x $BZIP;
 use File::Path ();
 use File::Basename ();
