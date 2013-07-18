@@ -6203,8 +6203,8 @@ sub share_perms {
                  />
         </td>
         <td valign="top">
-          2.1 Pass primary maintainership status to somebody else
-          (giving it up at the same time)
+          2.1 Transfer primary maintainership status to somebody else
+          (you become co-maintainer)
         </td>
       </tr>
 
@@ -6216,8 +6216,8 @@ sub share_perms {
                  />
         </td>
         <td valign="top">
-          2.2 Give up primary maintainership status (without
-          transfering it)
+          2.2 Give up primary maintainership status (abandoning it without
+          transfering it to someone else)
         </td>
       </tr>
 
@@ -6249,7 +6249,7 @@ sub share_perms {
                  value="Select"
                  />
         </td>
-        <td valign="top">3.2 Remove co-maintainer</td>
+        <td valign="top">3.2 Remove a co-maintainer</td>
       </tr>
 
       <tr> <td colspan="3">4. You are co-maintainer</td> </tr>
