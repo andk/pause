@@ -28,6 +28,8 @@ use Digest::MD5 ();
 use Mail::Send ();
 use PAUSE::MailAddress ();
 use POSIX ":sys_wait_h";
+use Path::Tiny;
+use File::pushd qw/pushd/;
 use URI::URL ();
 
 use strict;
@@ -837,7 +839,13 @@ sub _rewrite_tarball {
         }
     }
     chmod 0755, $testdir;
-    0 == system tar => "-C", $testdir, $taropt, "-cf", $path, "." or die "Could not tar c";
+    my $rc;
+    {
+        my $wd = pushd( $testdir );
+        my @children = path(".")->children;
+        $rc = 0 == system tar => $taropt, "-cf", $path, @children or die "Could not tar c";
+    }
+    return $rc;
 }
 
 # often called as a class method!
