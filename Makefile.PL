@@ -52,6 +52,7 @@ WriteMakefile(
     Net::FTP
     Parse::CPAN::Packages
     Path::Class
+    Path::Tiny
     Set::Crontab
     String::Random
     Test::Deep
