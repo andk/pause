@@ -207,7 +207,7 @@ sub packages_per_pmfile {
 
         $pline =~ s/\#.*//;
         next if $pline =~ /^\s*$/;
-        if ($pline =~ /\b__(?:END|DATA)__\b/
+        if ($pline =~ /\b__(?:DATA)__\b/
             and $pmfile !~ /\.PL$/   # PL files may well have code after __DATA__
             ){
             last PLINE;
