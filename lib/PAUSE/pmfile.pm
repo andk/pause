@@ -207,7 +207,7 @@ sub packages_per_pmfile {
 
         $pline =~ s/\#.*//;
         next if $pline =~ /^\s*$/;
-        if ($pline =~ /\b__(?:END|DATA)__\b/
+        if ($pline =~ /^__(?:END|DATA)__\b/
             and $pmfile !~ /\.PL$/   # PL files may well have code after __DATA__
             ){
             last PLINE;
@@ -313,7 +313,7 @@ sub packages_per_pmfile {
         while (<FH>) {
             $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
             next if $inpod || /^\s*#/;
-            last if /\b__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare
+            last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
             chop;
             # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
             next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
