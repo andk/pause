@@ -575,26 +575,61 @@ has the same version number and the distro has a more recent modification time.}
   }
 
   if ($ok) {
+      my $query = qq{SELECT package, version, dist from  packages WHERE LOWER(package) = LOWER(?)};
+      my($pkg_recs) = $dbh->selectall_arrayref($query,undef,$package);
+      if (@$pkg_recs > 1) {
+          my $rec0 = join "|", @{$pkg_recs->[0]};
+          my $rec1 = join "|", @{$pkg_recs->[1]};
+          $self->index_status
+              ($package,
+               "undef",
+               $pp->{infile},
+               PAUSE::mldistwatch::Constants::EDBCONFLICT,
+               qq{Indexing failed because of conflicting record for
+($rec0) vs ($rec1).
+Please report the case to the PAUSE admins.},
+              );
+          $ok = 0;
+      }
+  }
+
+  if ($ok) {
 
       my $query = qq{UPDATE packages SET package = ?, version = ?, dist = ?, file = ?,
 filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
       $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
-      $dbh->do($query,
-                undef,
-                $package,
-                $pp->{version},
-                $dist,
-                $pp->{infile},
-                $pp->{filemtime},
-                $self->{TIME},
-                $package,
+      my $rows_affected = eval { $dbh->do
+                                     ($query,
+                                      undef,
+                                      $package,
+                                      $pp->{version},
+                                      $dist,
+                                      $pp->{infile},
+                                      $pp->{filemtime},
+                                      $self->{TIME},
+                                      $package,
+                                     );
+                             };
+      if ($rows_affected) { # expecting only "1" can happen
+          $self->index_status
+              ($package,
+               $pp->{version},
+               $pp->{infile},
+               PAUSE::mldistwatch::Constants::OK,
+               "indexed",
               );
-      $self->index_status($package,
-                          $pp->{version},
-                          $pp->{infile},
-                          PAUSE::mldistwatch::Constants::OK,
-                          "indexed",
-                          );
+      } else {
+          my $dbherrstr = $dbh->errstr;
+          $self->index_status
+              ($package,
+               "undef",
+               $pp->{infile},
+               PAUSE::mldistwatch::Constants::EDBERR,
+               qq{The PAUSE indexer could not store the indexing
+result in the DB due the following error: C< $dbherrstr >.
+Please report the case to the PAUSE admins.},
+              );
+      }
 
   }
 

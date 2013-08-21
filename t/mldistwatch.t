@@ -346,6 +346,34 @@ subtest "perl-\\d should not get indexed" => sub {
   );
 };
 
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "perl-\\d should not get indexed" => sub {
+  $pause->import_author_root('corpus/mld/007/authors');
+
+  my $result = $pause->test_reindex;
+
+  # file_not_updated_ok
+  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report OPRIME/Bug-Gold-9.002.tar.gz' },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:

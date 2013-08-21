@@ -5,6 +5,8 @@ package PAUSE::mldistwatch::Constants;
 # constants used for index_status:
 use constant EDUALOLDER => 50; # pumpkings only
 use constant EDUALYOUNGER => 30; # pumpkings only
+use constant EDBERR => 25;
+use constant EDBCONFLICT => 23;
 use constant EOPENFILE => 21;
 use constant EMISSPERM => 20;
 use constant EPARSEVERSION => 10;
@@ -14,14 +16,16 @@ use constant EVERFALLING => 2;
 use constant OK => 1;
 
 our $heading = {
-  EMISSPERM() => "Permission missing",
+  EDBCONFLICT() => "Conflicting record found in index",
+  EDBERR() => "Database error",
   EDUALOLDER() => "An older dual-life module stays reference",
   EDUALYOUNGER() => "Dual-life module stays reference",
-  EVERFALLING() => "Decreasing version number",
+  EMISSPERM() => "Permission missing",
   EMTIMEFALLING() => "Decreasing mtime on a file (category to be deprecated)",
   EOLDRELEASE() => "Release seems outdated",
-  EPARSEVERSION() => "Version parsing problem",
   EOPENFILE() => "Problem while reading the distribtion",
+  EPARSEVERSION() => "Version parsing problem",
+  EVERFALLING() => "Decreasing version number",
   OK() => "Successfully indexed",
 };
 
