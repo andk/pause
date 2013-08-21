@@ -13,7 +13,7 @@ use File::Spec;
 use PAUSE;
 use PAUSE::TestPAUSE;
 
-use Test::Deep;
+use Test::Deep qw(cmp_deeply superhashof methods);
 use Test::More;
 
 my $pause = PAUSE::TestPAUSE->new;
@@ -63,7 +63,7 @@ sub package_list_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
   my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-    'SELECT * FROM packages ORDER BY LOWER(package), version',
+    'SELECT * FROM packages ORDER BY package, version',
     { Slice => {} },
   );
 
@@ -76,7 +76,7 @@ sub package_list_ok {
 
   my $p = $result->packages_data;
 
-  my @packages = sort { lc($a->package) cmp lc($b->package) } $p->packages;
+  my @packages = sort { $a->package cmp $b->package } $p->packages;
 
   cmp_deeply(
     \@packages,
@@ -172,6 +172,32 @@ subtest "first indexing" => sub {
       "we now have a master commit",
     );
   };
+
+};
+
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "add historic content" => sub {
+  $DB::single=1;
+  my $result = $pause->test_reindex;
+  my $dbh = $result->connect_mod_db;
+  $dbh->do("INSERT INTO packages ('package','version','dist','status','file') VALUES ('Bug::gold','0.001','O/OP/OPRIME/Bug-gold-0.001.tar.gz','index','notexists')");
+  my $time = time;
+  $dbh->do("INSERT INTO distmtimes ('dist','distmtime') VALUES ('O/OP/OPRIME/Bug-gold-0.001.tar.gz','$time')");
+  open my $fh, ">", $pause->tmpdir->file(qw(cpan authors id O OP OPRIME Bug-gold-0.001.tar.gz)) or die "Could not open: $!";
+  print $fh qq<fake tarball>;
+  close $fh or die "Could not close: $!";
+  $result = $pause->test_reindex;
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.00'  },
+      { package => 'Y',              version => 2       },
+    ]
+  );
 };
 
 Email::Sender::Simple->default_transport->clear_deliveries;
@@ -191,6 +217,7 @@ subtest "reindexing" => sub {
     $result,
     [
       { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
@@ -222,6 +249,7 @@ subtest "case mismatch, unauthorized for original" => sub {
     $result,
     [
       { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
@@ -253,9 +281,10 @@ subtest "case mismatch, authorized for original" => sub {
     $result,
     [
       { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'xform::rollout', version => '2.00'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
@@ -280,9 +309,10 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
     $result,
     [
       { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'xform::rollout', version => '2.00'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
@@ -308,9 +338,10 @@ subtest "perl-\\d should not get indexed" => sub {
     $result,
     [
       { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'xform::rollout', version => '2.00'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 };
