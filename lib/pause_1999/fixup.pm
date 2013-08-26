@@ -40,6 +40,10 @@ sub handler {
       $colonport = "";
     }
     my $proto = $port == 443 ? "https" : "http";
+    my $is_ssl = $r->header_in("X-pause-is-SSL") || 0;
+    if ($is_ssl) {
+      $proto = "https";
+    }
     my $server = $r->server->server_hostname;
     my $redir = "$proto://$server$colonport$location/query";
     $r->header_out("Location",$redir);
