@@ -13,7 +13,7 @@ sub handler {
     my $scheme = $port == 443 ? "https" : "http";
     my $is_ssl = $r->header_in("X-pause-is-SSL") || 0;
     if ($is_ssl) {
-        $proto = "https";
+        $scheme = "https";
     }
     if ($the_request =~ m|^GET /\?|) {
       my $args = $r->args;
