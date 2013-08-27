@@ -902,7 +902,7 @@ sub extract_readme_and_meta {
     return;
   }
 
-  # META.json located only in a subdirectory should not be preceded
+  # META.json located only in a subdirectory should not precede
   # META.yml located in the top directory. (eg. Test::Module::Used 0.2.4)
   if ($json && $yaml && length($json) > length($yaml) + 1) {
     $json = '';
