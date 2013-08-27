@@ -11,6 +11,10 @@ sub handler {
     my $server = $r->server->server_hostname;
     my $port = $r->server->port || 80;
     my $scheme = $port == 443 ? "https" : "http";
+    my $is_ssl = $r->header_in("X-pause-is-SSL") || 0;
+    if ($is_ssl) {
+        $proto = "https";
+    }
     if ($the_request =~ m|^GET /\?|) {
       my $args = $r->args;
       # warn "Returning SERVER_ERROR: the_request[$the_request]uri[$uri]args[$args]";
