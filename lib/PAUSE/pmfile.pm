@@ -219,6 +219,7 @@ sub packages_per_pmfile {
         if (
             $pline =~ m{
                       (.*)
+                      (?<![*\$\\@%&]) # no sigils
                       \bpackage\s+
                       ([\w\:\']+)
                       \s*
