@@ -52,7 +52,7 @@ $Id = "PAUSE version $PAUSE::VERSION";
 my($pauselib) = File::Basename::dirname Cwd::abs_path __FILE__;
 {
   my $try = $pauselib;
-  $try =~ s|pause/lib|pause-private|; # pause2.develooper.com has pause/ and pause-private/
+  $try =~ s|pause/(?:blib/)?lib|pause-private|; # pause2.develooper.com has pause/ and pause-private/
   if (-e $try) { # pause-private is accessible for apache, lib not
     $pauselib = "$try/lib";
   } else {
