@@ -749,7 +749,8 @@ sub examine_pms {
   $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
 
   my $pmfiles = $self->filter_pms;
-  my($meta,$provides,$indexingrule);
+  my($meta,$provides);
+  my $indexingrule = 0;
   if (my $version_from_meta_ok = $self->version_from_meta_ok) {
     $meta = $self->{META_CONTENT};
     $provides = $meta->{provides};
