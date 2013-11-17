@@ -256,7 +256,7 @@ sub packages_per_pmfile {
                 if ($self->version_from_meta_ok) {
                     my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
-                        if (exists $provides->{$pkg}{version}) {
+                        if (defined $provides->{$pkg}{version}) {
                             my $v = $provides->{$pkg}{version};
                             if ($v =~ /[_\s]/){   # ignore developer releases and "You suck!"
                                 next PLINE;
