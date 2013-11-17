@@ -787,6 +787,8 @@ sub examine_pms {
     }
   } elsif (2==$indexingrule) { # a yaml with provides
     while (my($k,$v) = each %$provides) {
+      next if ref $v ne ref {};
+      next if !defined $v->{file} or $v->{file} eq '';
       $v->{infile} = "$v->{file}";
       my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
       if (@stat) {
