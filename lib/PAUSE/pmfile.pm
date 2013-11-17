@@ -317,7 +317,7 @@ sub packages_per_pmfile {
             last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
             chop;
             # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
-            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
             my $current_parsed_line = $_;
             my $eval = qq{
           package ExtUtils::MakeMaker::_version;
