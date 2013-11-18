@@ -366,8 +366,9 @@ sub xcopy ($$) {
 sub whois {
   my (@row);
   my $stu = $Dbh->prepare(
-    "SELECT userid, fullname, email,
-    isa_list, homepage, asciiname FROM users ORDER BY fullname"
+    "SELECT userid,   fullname, email,
+            isa_list, homepage, asciiname,
+            introduced  FROM users ORDER BY fullname"
   );
   $stu->execute;
 
@@ -460,6 +461,8 @@ sub whois {
         if $row[2];
       $xml .= qq{  <homepage>} . escapeHTML($row[4]) . qq{</homepage>\n}
         if $row[4];
+      $xml .= qq{  <introduced>} . $row[6] . qq{</introduced>\n}
+        if $row[6];
 
       $xml .= $xml_has_cpandir;
       $xml .= qq{ </cpanid>\n};
@@ -468,7 +471,7 @@ sub whois {
 
   my $stm = $Dbh->prepare(
     "SELECT maillistid, maillistname,
-    address, subscribe FROM maillists ORDER BY maillistid"
+            address,    subscribe      FROM maillists ORDER BY maillistid"
   );
   $stm->execute;
   print FH q{
