@@ -76,7 +76,8 @@ sub parameter {
 		       "select_ml_action",
 		       "edit_ml",
 		       "edit_mod",
-                       "reset_version"
+                       "reset_version",
+                       "show_ml_repr",
 		      ) {
 	$allow_action{$command} = undef;
 	push @allow_submit, $command;

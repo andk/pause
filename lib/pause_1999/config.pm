@@ -337,10 +337,11 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 			    },
            show_ml_repr => {
                             verb => "Show Mailinglist Reps",
-                            priv => "admin",
+                            priv => "mlrepr",
                             cat => "09root/04",
 
-			      desc => "Admins can lookup who is
+			      desc => "Admins and the representatives themselves
+                                      can lookup who is
 				      elected to be representative of
 				      a mailing list.",
 
