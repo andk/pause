@@ -34,17 +34,9 @@ sub as_string {
   my $version = $mgr->version;
   qq{<table width="100%">
       <tr>
-       <td rowspan="2" valign="top">
-        <div class="xexplain">The PAUSE is sponsored by</div><br />
-        <a href="http://www.fiz-chemie.de/">
-         <img src="//www.fiz-chemie.de/fileadmin/template/img/logos/FIZ_Logo_4c.gif" border="0"
-              alt="FIZ Chemie Berlin Logo"
-              width="252" height="60" align="left" />
-        </a>
-       </td>
+       <td>&#160;</td>
        <td width="100%" valign="top" align="center"><div class="xexplain">Rev: $version</div></td>
-       <td colspan="2" valign="top">$validator_comment
-       </td>
+       <td valign="top">$validator_comment</td>
       </tr>
       <tr>
        <td width="100%"></td>
