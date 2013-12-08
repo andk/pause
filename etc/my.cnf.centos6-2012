@@ -32,7 +32,9 @@ max_heap_table_size     = 32M
 thread_cache_size       = 4
 innodb_buffer_pool_size = 250M
 table_cache             = 64
-slow_query_log_file	= /var/log/mysql/mysql-slow.log
+log_slow_queries        = ON
+slow_query_log_file     = /var/log/mysql/slow-query-log
+long_query_time         = 1
 
 server-id		= 2
 log-bin			= /var/log/mysql/mysql-bin.log

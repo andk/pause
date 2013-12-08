@@ -19,6 +19,12 @@ class pause-mysqld {
                 ensure => running,
                 enable => true
         }
+        file { "/var/log/mysql":
+                owner => "mysql",
+                group => "mysql",
+                mode => 700,
+                ensure => directory,
+        }
 	file { "/etc/my.cnf":
 		path => "/etc/my.cnf",
 		ensure => "/home/puppet/pause/etc/my.cnf.centos6-2012",
