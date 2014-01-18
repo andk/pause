@@ -143,7 +143,7 @@ class pause-apache {
 		content => "/var/log/PAUSE-httpd/*log {
 # will change to weekly when it works
     daily
-    rotate 365
+    rotate 180
     compress
     delaycompress
     notifempty
