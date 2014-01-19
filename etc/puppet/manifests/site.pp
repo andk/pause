@@ -38,6 +38,25 @@ class pause-munin-node {
                 enable  => true,
                 hasstatus => true,
 	}
+	file { "/etc/logrotate.d/munin_httpd_8000":
+		owner   => root,
+		group   => root,
+		mode    => 644,
+		content => "/var/log/munin_httpd/*_8000.log {
+    weekly
+    rotate 180
+    compress
+    delaycompress
+    notifempty
+    missingok
+    sharedscripts
+    dateext
+    postrotate
+        /etc/init.d/munin_httpd_8000 reload;
+    endscript
+}
+",
+	}
 }
 class pause-munin {
 	package { httpd         : ensure => installed }
@@ -141,7 +160,6 @@ class pause-apache {
 		group   => root,
 		mode    => 644,
 		content => "/var/log/PAUSE-httpd/*log {
-# will change to weekly when it works
     daily
     rotate 180
     compress
@@ -270,9 +288,8 @@ class pause-rsyncd-logrotate {
 		group   => root,
 		mode    => 644,
 		content => "/var/log/rsyncd /var/log/rsyncd2 {
-# will change to weekly when it works
-    weekly
-    rotate 365
+    daily
+    rotate 180
     compress
     delaycompress
     notifempty
@@ -379,7 +396,7 @@ class pause-paused {
 		mode    => 644,
 		content => "/var/log/mldistwatch*log {
     daily
-    rotate 365
+    rotate 180
     compress
     delaycompress
     notifempty
