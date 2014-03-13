@@ -190,30 +190,41 @@ sub perm_check {
       }
       $pp->{version} = '' unless defined $pp->{version}; # accept version 0
 
-      my($p,$owner,@owner);
-      @owner = map { $_->[1] } @$auth_ids;
+      my @owners      = map  { $_->[1] } @$auth_ids;
+      my @owned       = grep { $_->[1] eq $userid  } @$auth_ids;
+      my @owned_exact = grep { $_->[0] eq $package } @owned;
+
       if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
           # seems ok: perl is always right
-      } elsif (! grep { $_ eq $userid } @owner) {
+      } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
           my $owner = eval { PAUSE::owner_of_module($package, $dbh) }
                     // "unknown";
+
+          my $not_owner = qq{Not indexed because permission missing.
+Current registered primary maintainer is $owner.
+Hint: you can always find the legitimate maintainer(s) on PAUSE under
+"View Permissions".};
+
+          # XXX: display canonical case -- rjbs, 2014-03-13
+          my $case_bad  = qq{Not indexed because of case mismatch.};
+
+          my $message = @owned ? $case_bad : $not_owner;
+          my $error   = @owned ? "case mismatch" : "not owner";
 
           $self->index_status($package,
                               $pp->{version},
                               $pp->{infile},
                               PAUSE::mldistwatch::Constants::EMISSPERM,
-                              qq{Not indexed because permission missing.
-Current registered primary maintainer is $owner.
-Hint: you can always find the legitimate maintainer(s) on PAUSE under "View Permissions".},
+                              $message,
                               );
-          $self->alert(qq{not owner:
+          $self->alert(qq{$error:
 package[$package]
 version[$pp->{version}]
 file[$pp->{infile}]
 dist[$dist]
 userid[$userid]
-owners[@owner]
+owners[@owners]
 owner[$owner]
 });
           return;         # early return

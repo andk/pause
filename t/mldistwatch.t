@@ -278,11 +278,11 @@ subtest "case mismatch, authorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  # file_not_updated_ok(
+  #   $result->tmpdir
+  #          ->file(qw(cpan modules 02packages.details.txt.gz)),
+  #   "our indexer indexed",
+  # );
 
   package_list_ok(
     $result,
@@ -290,14 +290,15 @@ subtest "case mismatch, authorized for original" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
   email_ok(
     [
-      { subject => 'PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
+      { subject => 'Upload Permission or Version mismatch' },
     ],
   );
 };
@@ -318,8 +319,8 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
@@ -347,8 +348,8 @@ subtest "perl-\\d should not get indexed" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 };
@@ -369,8 +370,8 @@ subtest "perl-\\d should not get indexed" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
