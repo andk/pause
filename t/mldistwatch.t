@@ -273,7 +273,17 @@ subtest "case mismatch, unauthorized for original" => sub {
 
   email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' ,
+        callbacks => [
+          sub {
+            like(
+              $_[0]->{email}->as_string,
+              qr/XFR,\s+which\s+you\s+do\s+not\s+have/,
+              "email looks right",
+            );
+          }
+        ],
+      },
       { subject => 'Upload Permission or Version mismatch' },
     ],
   );
