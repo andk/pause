@@ -196,7 +196,9 @@ sub perm_check {
           # seems ok: perl is always right
       } elsif (! grep { $_ eq $userid } @owner) {
           # we must not index this and we have to inform somebody
-          my $owner = eval { PAUSE::owner_of_module($package, $dbh) };
+          my $owner = eval { PAUSE::owner_of_module($package, $dbh) }
+                    // "unknown";
+
           $self->index_status($package,
                               $pp->{version},
                               $pp->{infile},
