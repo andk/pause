@@ -115,8 +115,8 @@ sub _build_pause_config_overrides {
     MLROOT                    => File::Spec->catdir($ml_root),
     ML_CHOWN_GROUP     => +(getgrgid($)))[0],
     ML_CHOWN_USER      => +(getpwuid($>))[0],
-    ML_MIN_FILES       => 1,
-    ML_MIN_INDEX_LINES => 1,
+    ML_MIN_FILES       => 0,
+    ML_MIN_INDEX_LINES => 0,
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
 
