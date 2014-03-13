@@ -119,6 +119,8 @@ sub _build_pause_config_overrides {
     ML_MIN_INDEX_LINES => 1,
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
+
+    ($ENV{TEST_VERBOSE} ? () : (LOG_CALLBACK => sub { })),
   };
 
   return $overrides;
