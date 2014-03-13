@@ -64,6 +64,34 @@ sub file_updated_ok {
   return $ok;
 }
 
+sub file_not_updated_ok {
+  my ($filename, $desc) = @_;
+  state %last_value;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $old = $last_value{ $filename };
+
+  unless (-e $filename) {
+    return fail("$desc: $filename deleted") if $old;
+    return pass("$desc: $filename not created (thus not updated)");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  unless (defined $old) {
+    $last_value{$filename} = "$dev,$ino";
+    return fail("$desc: $filename updated");
+  }
+
+  my $ok = ok(
+    $old eq "$dev,$ino",
+    "$desc: $filename not updated",
+  );
+
+  return $ok;
+}
+
 sub package_list_ok {
   my ($result, $want) = @_;
 
