@@ -334,12 +334,12 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 
   email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz',
+      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz',
         callbacks => [
           sub {
             like(
               $_[0]->{email}->as_string,
-              qr/name can only be used/,
+              qr/has\s+a\s+higher\s+version/,
               "email looks right",
             );
           }
@@ -402,7 +402,7 @@ subtest "perl-\\d should not get indexed" => sub {
 
 Email::Sender::Simple->default_transport->clear_deliveries;
 
-subtest "case mismatch, authorized for original, desc. version" => sub {
+subtest "case mismatch, authorized for original, desc. version (take II)" => sub {
   $pause->import_author_root('corpus/mld/006-distname/authors');
 
   my $result = $pause->test_reindex;
