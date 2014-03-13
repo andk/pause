@@ -414,15 +414,16 @@ subtest "case mismatch, authorized for original, desc. version (take II)" => sub
     $result,
     [
       { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'xform::rollout', version => '2.00'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
   email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz' },
       { subject => 'Upload Permission or Version mismatch' },
     ],
   );
