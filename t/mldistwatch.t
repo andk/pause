@@ -118,6 +118,8 @@ sub perm_list_ok {
 sub email_ok {
   my ($want) = @_;
 
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
   my @deliveries = sort {
     $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
   } Email::Sender::Simple->default_transport->deliveries;
@@ -125,7 +127,8 @@ sub email_ok {
   Email::Sender::Simple->default_transport->clear_deliveries;
 
   subtest "emails sent during this run" => sub {
-    is(@deliveries, @$want, "as many emails as expected");
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is(@deliveries, @$want, "as many emails as expected: " . @$want);
   };
 
   for my $test (@$want) {
@@ -139,6 +142,7 @@ sub email_ok {
     }
 
     for (@{ $test->{callbacks} || [] }) {
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
       $_->($delivery);
     }
   }
