@@ -32,7 +32,7 @@ sub __connect {
     'dbi:SQLite:dbname=' . $file,
     undef,
     undef,
-  ) or die "can't connect to db at $file: $DBI::errstr";
+  ) || die "can't connect to db at $file: $DBI::errstr";
 }
 
 sub connect_authen_db {
