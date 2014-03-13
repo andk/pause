@@ -129,6 +129,24 @@ sub perm_check {
   my $ins_perms = "INSERT INTO perms (package, userid) VALUES ".
       "('$package', '$userid')";
 
+  # package has any authorized maintainers? --> case insensitive
+  my($auth_ids) = $dbh->selectall_arrayref(qq{
+    SELECT package, userid
+    FROM   primeur
+    WHERE  LOWER(package) = LOWER(?)
+    UNION
+    SELECT package, userid
+    FROM   perms
+    WHERE  LOWER(package) = LOWER(?)
+    UNION
+    SELECT modid, userid
+    FROM   mods
+    WHERE  LOWER(modid) = LOWER(?)
+    },
+    undef,
+    ($package) x 3,
+  );
+
   if ($self->{FIO}{DIO} && $self->{FIO}{DIO}->isa_regular_perl($dist)) {
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
@@ -161,38 +179,6 @@ sub perm_check {
       return 1;           # P2.1, P3.0
   }
 
-  # does this package already primary maintainer? -> case insensitive
-  my($has_primeur) = $dbh->selectrow_hashref(qq{SELECT package
-                                    FROM  primeur
-                                    WHERE LOWER(package) = LOWER(?)},
-                                    undef,
-                                $package);
-  if (! $has_primeur) {
-    # does this package exist in mods? -> case insensitive
-      my($has_owner) = $dbh->selectrow_hashref(qq{SELECT modid
-                                  FROM mods
-                                  WHERE modid = ?},
-                              undef,
-                              $package);
-      if (! $has_owner) {
-          # package has neither owner in mods nor maintainer in primeur
-          local($dbh->{RaiseError}) = 0;
-          my $ret = $dbh->do($ins_perms);
-          my $err = "";
-          $err = $dbh->errstr unless defined $ret;
-          $ret ||= "";
-          $self->verbose(1,"Got unowned package: insperms[$ins_perms]ret[$ret]err[$err]\n");
-
-          return 1;       # P2.2, P3.0
-      }
-  }
-
-  # package has any authorized maintainers? --> case insensitive
-  my($auth_ids) = $dbh->selectall_arrayref(qq{SELECT package, userid
-                                    FROM   perms
-                                    WHERE  LOWER(package) = LOWER(?)},
-                                undef,
-                                $package);
   if (@$auth_ids) {
 
       # we have a package that is already known

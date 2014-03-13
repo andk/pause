@@ -16,18 +16,25 @@ use PAUSE::TestPAUSE;
 use Test::Deep qw(cmp_deeply superhashof methods);
 use Test::More;
 
-my $pause = PAUSE::TestPAUSE->new;
+sub init_test_pause {
+  my $pause = PAUSE::TestPAUSE->new;
 
-$pause->import_author_root('corpus/mld/001/authors');
+  my $authors_dir = $pause->tmpdir->subdir(qw(cpan authors id));
+  make_path $authors_dir->stringify;
 
-my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
-make_path $modules_dir->stringify;
-my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
+  my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
+  make_path $modules_dir->stringify;
+  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
 
-{
-  File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
-    or die "couldn't set up bogus 06perms: $!";
+  {
+    File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
+      or die "couldn't set up bogus 06perms: $!";
+  }
+  return $pause;
 }
+
+my $pause = init_test_pause;
+$pause->import_author_root('corpus/mld/001/authors');
 
 sub file_updated_ok {
   my ($filename, $desc) = @_;
@@ -373,6 +380,63 @@ subtest "perl-\\d should not get indexed" => sub {
     ],
   );
 };
+
+sub refused_upload_test {
+  my ($code) = @_;
+
+  sub {
+    my $pause = init_test_pause;
+
+    my $db_file = File::Spec->catfile($pause->db_root, 'mod.sqlite');
+    my $dbh = DBI->connect(
+      'dbi:SQLite:dbname=' . $db_file,
+      undef,
+      undef,
+    ) or die "can't connect to db at $db_file: $DBI::errstr";
+
+    $code->($dbh);
+    $pause->import_author_root('corpus/mld/001/authors');
+    my $result = $pause->test_reindex;
+
+    package_list_ok(
+      $result,
+      [
+        { package => 'Hall::MtKing',   version => '0.01'  },
+        { package => 'XForm::Rollout', version => '1.00'  },
+        { package => 'Y',              version => 2       },
+      ],
+    );
+
+    my $file = $pause->tmpdir->subdir(qw(cpan modules))->file('06perms.txt');
+    system("cat $file");
+  };
+};
+
+subtest "cannot steal a library when primeur+perms exist" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+  $dbh->do("INSERT INTO perms   (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
+subtest "cannot steal a library when only primeur exists" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
+subtest "cannot steal a library when only perms exist" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO perms (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
+subtest "cannot steal a library when only mods exist" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO mods (modid, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
 
 done_testing;
 

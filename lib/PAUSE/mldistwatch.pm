@@ -547,7 +547,7 @@ sub rewrite02 {
     my $numlines = @listing02;
 
     die "Absurd small number of lines"
-      unless $numlines > $PAUSE::Config->{ML_MIN_INDEX_LINES};
+      unless $numlines >= $PAUSE::Config->{ML_MIN_INDEX_LINES};
 
     my $header = qq{File:         02packages.details.txt
 URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
