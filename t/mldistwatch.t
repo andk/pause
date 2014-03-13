@@ -381,6 +381,63 @@ subtest "perl-\\d should not get indexed" => sub {
   );
 };
 
+sub refused_upload_test {
+  my ($code) = @_;
+
+  sub {
+    my $pause = init_test_pause;
+
+    my $db_file = File::Spec->catfile($pause->db_root, 'mod.sqlite');
+    my $dbh = DBI->connect(
+      'dbi:SQLite:dbname=' . $db_file,
+      undef,
+      undef,
+    ) or die "can't connect to db at $db_file: $DBI::errstr";
+
+    $code->($dbh);
+    $pause->import_author_root('corpus/mld/001/authors');
+    my $result = $pause->test_reindex;
+
+    package_list_ok(
+      $result,
+      [
+        { package => 'Hall::MtKing',   version => '0.01'  },
+        { package => 'XForm::Rollout', version => '1.00'  },
+        { package => 'Y',              version => 2       },
+      ],
+    );
+
+    my $file = $pause->tmpdir->subdir(qw(cpan modules))->file('06perms.txt');
+    system("cat $file");
+  };
+};
+
+subtest "cannot steal a library when primeur+perms exist" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+  $dbh->do("INSERT INTO perms   (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
+subtest "cannot steal a library when only primeur exists" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
+subtest "cannot steal a library when only perms exist" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO perms (package, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
+subtest "cannot steal a library when only mods exist" => refused_upload_test(sub {
+  my ($dbh) = @_;
+  $dbh->do("INSERT INTO mods (modid, userid) VALUES ('Bug::Gold','ATRION')")
+    or die "couldn't insert!";
+});
+
 done_testing;
 
 # Local Variables:
