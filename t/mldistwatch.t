@@ -16,18 +16,25 @@ use PAUSE::TestPAUSE;
 use Test::Deep qw(cmp_deeply superhashof methods);
 use Test::More;
 
-my $pause = PAUSE::TestPAUSE->new;
+sub init_test_pause {
+  my $pause = PAUSE::TestPAUSE->new;
 
-$pause->import_author_root('corpus/mld/001/authors');
+  my $authors_dir = $pause->tmpdir->subdir(qw(cpan authors id));
+  make_path $authors_dir->stringify;
 
-my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
-make_path $modules_dir->stringify;
-my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
+  my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
+  make_path $modules_dir->stringify;
+  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
 
-{
-  File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
-    or die "couldn't set up bogus 06perms: $!";
+  {
+    File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
+      or die "couldn't set up bogus 06perms: $!";
+  }
+  return $pause;
 }
+
+my $pause = init_test_pause;
+$pause->import_author_root('corpus/mld/001/authors');
 
 sub file_updated_ok {
   my ($filename, $desc) = @_;
