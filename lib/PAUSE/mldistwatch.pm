@@ -425,10 +425,17 @@ sub check_for_new {
 
         $dio->read_dist;
         $dio->extract_readme_and_meta;
+
         if ($dio->{META_CONTENT}{distribution_type}
             && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
             next BIGLOOP;
         }
+
+        if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
+            # META.json / META.yml declares it's not stable; do not index!
+            next BIGLOOP;
+        }
+
         $dio->check_blib;
         $dio->check_multiple_root;
         $dio->check_world_writable;
