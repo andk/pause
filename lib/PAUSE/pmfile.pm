@@ -446,6 +446,7 @@ sub parse_version {
                                         '*Exporter::',
                                         '*DynaLoader::']);
             $comp->share_from('version', ['&qv']);
+            $comp->permit(":base_math");
             # $comp->permit("require"); # no strict!
             {
                 no strict;
