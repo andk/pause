@@ -464,6 +464,18 @@ subtest "do not index if meta has release_status <> stable" => sub {
 
   email_ok(
     [
+      {
+        subject => 'Failed: PAUSE indexer report RJBS/fewer-0.202.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->get_body,
+              qr/META release_status is not stable/,
+              "skip report includes expected text",
+            );
+          }
+        ],
+      },
       { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
     ],
   );
