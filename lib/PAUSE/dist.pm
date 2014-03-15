@@ -312,7 +312,7 @@ sub examine_dist {
   if ($dist =~ $SUFFQR) {
     $suffix = $1;
     $skip = 1 unless $self->untar;
-  } elsif ($dist =~ /\.pm\.(Z|gz)$/) {
+  } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
     $self->verbose(1,"Dist '$dist' is a single-.pm-file upload\n");
     $suffix = "N/A";
     $skip   = 1;
