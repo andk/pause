@@ -423,6 +423,7 @@ sub parse_version {
             # warn ">>>>>>>>read v[$v]<<<<<<<<";
             close $kid;
         } else {
+            $self->connect->{InactiveDestroy} = 1;
             my($gnam,$gpw,$gid,$gmem) = getgrnam($PAUSE::Config->{ML_CHOWN_GROUP});
             die "Could not determine GID of $PAUSE::Config->{ML_CHOWN_GROUP}" unless $gid;
             my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) =

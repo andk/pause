@@ -238,7 +238,7 @@ sub connect {
                            {
                             RaiseError => 1 }
                           ) or die $DBI::errstr;
-    $dbh->{InactiveDestroy} = 1;
+    # $dbh->{InactiveDestroy} = 1;
     $self->{DBH} = $dbh;
 }
 
