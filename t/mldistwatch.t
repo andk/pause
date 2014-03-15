@@ -442,6 +442,32 @@ subtest "cannot steal a library when only mods exist" => refused_upload_test(sub
     or die "couldn't insert!";
 });
 
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "do not index if meta has release_status <> stable" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/002/authors');
+  $pause->import_author_root('corpus/mld/unstable/authors');
+
+  my $result = $pause->test_reindex;
+
+  # file_not_updated_ok
+  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'XForm::Rollout', version => '1.01'  },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
