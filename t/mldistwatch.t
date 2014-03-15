@@ -137,6 +137,10 @@ sub email_ok {
         "Got email: $test->{subject}",
       );
     }
+
+    for (@{ $test->{callbacks} || [] }) {
+      $_->($delivery);
+    }
   }
 }
 
