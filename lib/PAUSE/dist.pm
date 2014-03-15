@@ -387,7 +387,19 @@ sub mail_summary {
 
   my $status_over_all;
 
-  if (0) {
+  if (my $err = $self->{SKIP_REPORT}) {
+    push @m, $tf->format( PAUSE::mldistwatch::Constants::heading($err) ),
+             qq{\n\n};
+    $status_over_all = "Failed";
+  }
+
+  if ($self->{NO_DISTNAME_PERMISSION}) {
+    my $pkg = $self->_package_governing_permission;
+    push @m, $tf->format(qq[This distribution name can only be used
+      by users with permission for the package $pkg, which you
+      do not have.]);
+    push @m, qq{\n\n};
+    $status_over_all = "Failed";
   } elsif ($self->{HAS_MULTIPLE_ROOT}) {
 
     push @m, $tf->format(qq[The distribution does not unpack
@@ -499,7 +511,7 @@ sub mail_summary {
       }
     } else {
       warn sprintf "st[%s]", Data::Dumper::Dumper($inxst);
-      if ($pmfiles > 0) {
+      if ($pmfiles > 0 || $self->{SKIP_REPORT}) {
         if ($self->version_from_meta_ok) {
 
           push @m, qq{Nothing in this distro has been
