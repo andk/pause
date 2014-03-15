@@ -764,7 +764,7 @@ sub _package_governing_permission {
   my $dist_name = $d->dist;
   my $main_pkg  = $GRANDFATHERED_DIST_PKG{ $dist_name };
   unless ($main_pkg) {
-    ($main_pkg = $dist_name) =~ s/-/::/g;
+    ($main_pkg = $dist_name) =~ s/[-+]+/::/g;
   }
 
   return $main_pkg;
