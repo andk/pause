@@ -861,12 +861,11 @@ sub examine_pms {
   return if $self->{HAS_BLIB};
   return if $self->{HAS_MULTIPLE_ROOT};
   return if $self->{HAS_WORLD_WRITABLE};
-  return if $self->{COULD_NOT_UNTAR}; # XXX not yet reached, we
-  # need to re-examine what
-  # happens without SKIP.
-  # Currently SKIP shadows
-  # the event of
-  # could_not_untar
+
+  # XXX not yet reached, we need to re-examine what happens without SKIP.
+  # Currently SKIP shadows the event of could_not_untar
+  return if $self->{COULD_NOT_UNTAR};
+
   my $dist = $self->{DIST};
 
   my $pmfiles = $self->filter_pms;
