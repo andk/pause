@@ -11,12 +11,14 @@ use constant EOPENFILE => 21;
 use constant EMISSPERM => 20;
 use constant EPARSEVERSION => 10;
 use constant EMETAUNSTABLE => 6;
+use constant EBAREPMFILE => 5;
 use constant EOLDRELEASE => 4;
 use constant EMTIMEFALLING => 3; # deprecated after rev 478
 use constant EVERFALLING => 2;
 use constant OK => 1;
 
 our $heading = {
+  EBAREPMFILE() => "Bare .pm files are not indexed",
   EDBCONFLICT() => "Conflicting record found in index",
   EDBERR() => "Database error",
   EDUALOLDER() => "An older dual-life module stays reference",

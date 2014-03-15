@@ -1,0 +1,5 @@
+MANIFEST
+lib/Bug/Gold.pm
+Makefile.PL
+META.yml
+t/00-nop.t

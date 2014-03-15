@@ -410,7 +410,6 @@ sub parse_version {
         # solution to escape @s and \
     }
     my($v);
-    $self->disconnect; # no guarantee that the connection survives the fork!
 
     {
 

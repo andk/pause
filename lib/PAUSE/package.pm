@@ -274,6 +274,18 @@ sub mlroot {
   $fio->mlroot;
 }
 
+sub _pkg_name_insane {
+    # XXX should be tested
+    my $self = shift;
+
+    my $package = $self->{PACKAGE};
+    return $package !~ /^\w[\w\:\']*\w?\z/
+        || $package !~ /\w\z/
+        || $package =~ /:/ && $package !~ /::/
+        || $package =~ /\w:\w/
+        || $package =~ /:::/;
+}
+
 # package PAUSE::package;
 sub examine_pkg {
   my $self = shift;
@@ -286,17 +298,7 @@ sub examine_pkg {
 
   # should they be cought earlier? Maybe.
   # but as an ultimate sanity check suggested by Richard Soderberg
-  # XXX should be in a separate sub and be tested
-  if ($package !~ /^\w[\w\:\']*\w?\z/
-      ||
-      $package !~ /\w\z/
-      ||
-      $package =~ /:/ && $package !~ /::/
-      ||
-      $package =~ /\w:\w/
-      ||
-      $package =~ /:::/
-      ){
+  if ($self->_pkg_name_insane) {
       $self->verbose(1,"Package[$package] did not pass the ultimate sanity check");
       delete $self->{FIO};    # circular reference
       return;

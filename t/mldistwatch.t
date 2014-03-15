@@ -36,31 +36,60 @@ sub init_test_pause {
 my $pause = init_test_pause;
 $pause->import_author_root('corpus/mld/001/authors');
 
+my %LAST_FILE_IDENT;
 sub file_updated_ok {
   my ($filename, $desc) = @_;
-  state %last_value;
+  $desc = defined $desc ? "$desc: " : q{};
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
   unless (-e $filename) {
-    return fail("$desc: $filename not updated");
+    return fail("$desc$filename not updated");
   }
 
   my ($dev, $ino) = stat $filename;
 
-  my $old = $last_value{ $filename };
+  my $old = $LAST_FILE_IDENT{ $filename };
 
   unless (defined $old) {
-    $last_value{$filename} = "$dev,$ino";
-    return pass("$desc: $filename updated");
+    $LAST_FILE_IDENT{$filename} = "$dev,$ino";
+    return pass("$desc$filename updated (created)");
   }
 
   my $ok = ok(
     $old ne "$dev,$ino",
-    "$desc: $filename updated",
+    "$desc$filename updated",
   );
 
-  $last_value{$filename} = "$dev,$ino";
+  $LAST_FILE_IDENT{$filename} = "$dev,$ino";
+  return $ok;
+}
+
+sub file_not_updated_ok {
+  my ($filename, $desc) = @_;
+  $desc = defined $desc ? "$desc: " : q{};
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $old = $LAST_FILE_IDENT{ $filename };
+
+  unless (-e $filename) {
+    return fail("$desc$filename deleted") if $old;
+    return pass("$desc$filename not created (thus not updated)");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  unless (defined $old) {
+    $LAST_FILE_IDENT{$filename} = "$dev,$ino";
+    return fail("$desc$filename updated (created)");
+  }
+
+  my $ok = ok(
+    $old eq "$dev,$ino",
+    "$desc$filename not updated",
+  );
+
   return $ok;
 }
 
@@ -118,6 +147,8 @@ sub perm_list_ok {
 sub email_ok {
   my ($want) = @_;
 
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
   my @deliveries = sort {
     $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
   } Email::Sender::Simple->default_transport->deliveries;
@@ -125,7 +156,8 @@ sub email_ok {
   Email::Sender::Simple->default_transport->clear_deliveries;
 
   subtest "emails sent during this run" => sub {
-    is(@deliveries, @$want, "as many emails as expected");
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is(@deliveries, @$want, "as many emails as expected: " . @$want);
   };
 
   for my $test (@$want) {
@@ -139,6 +171,7 @@ sub email_ok {
     }
 
     for (@{ $test->{callbacks} || [] }) {
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
       $_->($delivery);
     }
   }
@@ -249,12 +282,10 @@ subtest "case mismatch, unauthorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  # XXX: Actually, need file_not_updated_ok! -- rjbs, 2013-03-02
-  #  file_updated_ok(
-  #    $result->tmpdir
-  #           ->file(qw(cpan modules 02packages.details.txt.gz)),
-  #    "our indexer indexed",
-  #  );
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
 
   package_list_ok(
     $result,
@@ -269,7 +300,17 @@ subtest "case mismatch, unauthorized for original" => sub {
 
   email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' ,
+        callbacks => [
+          sub {
+            like(
+              $_[0]->{email}->as_string,
+              qr/XFR,\s+which\s+you\s+do\s+not\s+have/,
+              "email looks right",
+            );
+          }
+        ],
+      },
       { subject => 'Upload Permission or Version mismatch' },
     ],
   );
@@ -314,8 +355,10 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 
   my $result = $pause->test_reindex;
 
-  # file_not_updated_ok
-  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
 
   package_list_ok(
     $result,
@@ -330,7 +373,17 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 
   email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]->{email}->as_string,
+              qr/has\s+a\s+higher\s+version/,
+              "email looks right",
+            );
+          }
+        ],
+      },
       { subject => 'Upload Permission or Version mismatch' },
     ],
   );
@@ -343,8 +396,10 @@ subtest "perl-\\d should not get indexed" => sub {
 
   my $result = $pause->test_reindex;
 
-  # file_not_updated_ok
-  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
 
   package_list_ok(
     $result,
@@ -365,8 +420,10 @@ subtest "perl-\\d should not get indexed" => sub {
 
   my $result = $pause->test_reindex;
 
-  # file_not_updated_ok
-  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
 
   package_list_ok(
     $result,
@@ -382,6 +439,57 @@ subtest "perl-\\d should not get indexed" => sub {
   email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/Bug-Gold-9.002.tar.gz' },
+    ],
+  );
+};
+
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "case mismatch, authorized for original, desc. version (take II)" => sub {
+  $pause->import_author_root('corpus/mld/006-distname/authors');
+
+  my $result = $pause->test_reindex;
+
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'Bug::Gold',      version => '9.001' },
+      { package => 'Bug::gold',      version => '0.001' },
+      { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
+      { package => 'Y',              version => 2       },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz' },
+      { subject => 'Upload Permission or Version mismatch' },
+    ],
+  );
+};
+
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "do not index bare .pm but report rejection" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/dot-pm/authors');
+
+  my $result = $pause->test_reindex;
+
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
+
+  email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report OPRIME/Matrix.pm.gz' },
     ],
   );
 };
