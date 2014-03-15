@@ -108,7 +108,7 @@ sub new {
 
 sub sleep {
     my($self) = @_;
-    my $sleep = $self->{OPT}{sleep} ||= 1;
+    my $sleep = $self->{OPT}{sleep} //= 1;
     sleep $sleep;
 }
 
