@@ -316,6 +316,7 @@ sub examine_dist {
     $self->verbose(1,"Dist '$dist' is a single-.pm-file upload\n");
     $suffix = "N/A";
     $skip   = 1;
+    $self->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
     my $unzipbin = $self->{UNZIPBIN};
