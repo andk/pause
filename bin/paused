@@ -780,7 +780,7 @@ sub verify_gzip_tar {
         }
     }
 
-    if ($self->is_perl6_tarball($tpath) {
+    if ($self->is_perl6_tarball($tpath)) {
         $lpath = $self->get_perl6_lpath($PAUSE::Config->{MLROOT}, $uriid);
     }
 
