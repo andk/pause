@@ -359,7 +359,7 @@ sub mail_summary {
   my $time = gmtime;
   my $MLROOT = $self->mlroot;
   my $mtime = gmtime((stat "$MLROOT/$distro")[9]);
-  my $nfiles = scalar @{$self->{MANIFOUND}};
+  my $nfiles = scalar @{ $self->{MANIFOUND} // [] };
   my $pmfiles = grep /\.pm$/, @{$self->{MANIFOUND}};
   my $dbh = $self->connect;
   my $sth = $dbh->prepare("SELECT asciiname, fullname
