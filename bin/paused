@@ -880,8 +880,9 @@ sub is_perl6_tarball {
 sub get_perl6_lpath {
   my ($self, $mlroot, $uriid) = @_;
   # enforce the Perl6 subdirectory to not mess with Perl5 distributions
-  if ($uriid =~ m,^([^/]+/[^/]+/[^/]+)/(.*/)?([^/]+)$,) {
-    my ($path, $file) = ("$mlroot$1/Perl6", $3);
+  if ($uriid =~ m,^([^/]+/[^/]+/[^/]+)/(.+)$,) {
+    my ($path, $file) = ("$mlroot$1", $2);
+    $path .= '/Perl6' unless $file =~ m,^Perl6/,i;
     File::Path::mkpath($path);
     return "$path/$file"
   } else {
