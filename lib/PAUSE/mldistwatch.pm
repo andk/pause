@@ -416,6 +416,10 @@ sub check_for_new {
         if ($dio->skip){
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
+
+            if ($dio->{SKIP_REPORT}) {
+              $dio->mail_summary;
+            }
             next BIGLOOP;
         }
 
