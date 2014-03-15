@@ -461,8 +461,8 @@ subtest "case mismatch, authorized for original, desc. version (take II)" => sub
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
