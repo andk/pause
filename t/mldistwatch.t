@@ -409,7 +409,6 @@ sub refused_upload_test {
     );
 
     my $file = $pause->tmpdir->subdir(qw(cpan modules))->file('06perms.txt');
-    system("cat $file");
   };
 };
 
