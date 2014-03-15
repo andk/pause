@@ -881,10 +881,12 @@ sub get_perl6_lpath {
   my ($self, $mlroot, $uriid) = @_;
   # enforce the Perl6 subdirectory to not mess with Perl5 distributions
   if ($uriid =~ m,^([^/]+/[^/]+/[^/]+)/(.+)$,) {
-    my ($path, $file) = ("$mlroot$1", $2);
-    $path .= '/Perl6' unless $file =~ m,^Perl6/,i;
+    my ($path, $subpath) = ("$mlroot$1", $2);
+    # make sure we don't end up with duplicate Perl6/Perl6 or Perl6/perl6 folders.
+    $subpath =~ s,^Perl6/,,i;
+    $path   .= '/Perl6';
     File::Path::mkpath($path);
-    return "$path/$file"
+    return "$path/$subpath"
   } else {
     # this directory has already been made
     return "$mlroot$uriid"
