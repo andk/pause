@@ -474,6 +474,26 @@ subtest "case mismatch, authorized for original, desc. version (take II)" => sub
   );
 };
 
+Email::Sender::Simple->default_transport->clear_deliveries;
+
+subtest "do not index bare .pm but report rejection" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/dot-pm/authors');
+
+  my $result = $pause->test_reindex;
+
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
+
+  email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report OPRIME/Matrix.pm.gz' },
+    ],
+  );
+};
+
 sub refused_upload_test {
   my ($code) = @_;
 
