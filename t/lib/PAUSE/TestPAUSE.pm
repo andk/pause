@@ -145,7 +145,7 @@ sub test_reindex {
     my $self = shift;
     my $chdir_guard = pushd;
 
-    PAUSE::mldistwatch->new->reindex;
+    PAUSE::mldistwatch->new({ sleep => 0 })->reindex;
 
     $code->($self->tmpdir) if $code;
 
