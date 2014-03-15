@@ -858,7 +858,6 @@ sub _rewrite_tarball {
 sub is_perl6_tarball {
   my ($self, $tpath) = @_;
   my $taropt;
-  my $testinggzip;
   if ($tpath =~ /\.t(ar\.)?gz$/) {
     $taropt = "tzf";
   } elsif ($tpath =~ /\.(tbz|tar\.bz2)$/) {
@@ -870,7 +869,7 @@ sub is_perl6_tarball {
   my $is_perl6 = 0;
   if (open my $fh, "-|", tar => $taropt, $tpath) {
     while (<$fh>) {
-      $is_perl6 = 1 if m,/META6.json$,
+      $is_perl6 = 1 if m,^META6.json$,
     }
     close $fh or warn "Could not close: $!";
   }
