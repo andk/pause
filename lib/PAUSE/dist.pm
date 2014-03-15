@@ -520,7 +520,9 @@ sub mail_summary {
         $Lstatus = $status;
       }
     } else {
-      warn sprintf "st[%s]", (Data::Dumper::Dumper($inxst) =~ s/\v+\z//r);
+      $self->verbose(1,
+        sprintf "st[%s]\n", (Data::Dumper::Dumper($inxst) =~ s/\v+\z//r)
+      );
       if ($pmfiles > 0 || $self->{SKIP_REPORT}) {
         if ($self->version_from_meta_ok) {
 
