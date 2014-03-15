@@ -433,6 +433,8 @@ sub check_for_new {
 
         if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
             # META.json / META.yml declares it's not stable; do not index!
+            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
+            $dio->mail_summary;
             next BIGLOOP;
         }
 
