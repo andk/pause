@@ -364,8 +364,16 @@ sub mail_summary {
   my $author = PAUSE::dir2user($distro);
   my @m;
 
-  push @m, "The following report has been written by the PAUSE namespace indexer.
-  Please contact modules\@perl.org if there are any open questions.\n";
+  push @m,
+    "The following report has been written by the PAUSE namespace indexer.\n",
+    "Please contact modules\@perl.org if there are any open questions.\n";
+
+  if ($self->has_indexing_warnings) {
+    push @m,
+      "\nWARNING:  Some irregularities were found while indexing your\n",
+        "          distribution.  See below for more details.\n";
+  }
+
   my $time = gmtime;
   my $MLROOT = $self->mlroot;
   my $mtime = gmtime((stat "$MLROOT/$distro")[9]);
@@ -514,15 +522,17 @@ sub mail_summary {
         # magic words, see also report02() around line 573, same wording there,
         # exception prompted by JOESUF/libapreq2-2.12.tar.gz
         $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
-        push @m, sprintf("     module: %s
-          version: %s
-          in file: %s
-          status: %s\n",
-          $p,
-          $inxst->{$p}{version},
-          $inxst->{$p}{infile},
-          $verb_status,
-        );
+        push @m, sprintf("     module : %s\n",  $p);
+
+        if (my @warnings = $self->indexing_warnings_for_package($p)) {
+          push @m, map {;
+                 sprintf("     WARNING: %s\n", $_) } @warnings;
+        }
+
+        push @m, sprintf("     version: %s\n", $inxst->{$p}{version});
+        push @m, sprintf("     in file: %s\n", $inxst->{$p}{infile});
+        push @m, sprintf("     status : %s\n",  $verb_status);
+
         $Lstatus = $status;
       }
     } else {
@@ -596,6 +606,26 @@ sub index_status {
     status => $status,
     verb_status => $verb_status,
   };
+}
+
+sub add_indexing_warning {
+  my($self,$pack,$warning) = @_;
+
+  push @{ $self->{INDEX_WARNINGS}{$pack} }, $warning;
+  return;
+}
+
+sub indexing_warnings_for_package {
+  my($self,$pack) = @_;
+  return @{ $self->{INDEX_WARNINGS}{$pack} // [] };
+}
+
+sub has_indexing_warnings {
+  my ($self) = @_;
+  my $i;
+  my $warnings = $self->{INDEX_WARNINGS};
+
+  @$_ && return 1 for values %$warnings;
 }
 
 # package PAUSE::dist;
