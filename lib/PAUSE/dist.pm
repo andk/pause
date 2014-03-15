@@ -382,13 +382,19 @@ sub mail_summary {
   my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
   my $versions_from_meta = $self->version_from_meta_ok ? "yes" : "no";
   my $parse_cpan_meta_version = Parse::CPAN::Meta->VERSION;
+
+  # This can occur when, for example, the "distribution" is Foo.pm.gz — of
+  # course then there is no README or META.*! -- rjbs, 2014-03-15
+  my $readme   = $self->{README} // "(none)";
+  my $metafile = $self->{METAFILE} // "(none)";
+
   push @m, qq[
   User: $author ($asciiname)
   Distribution file: $distrobasename
   Number of files: $nfiles
   *.pm files: $pmfiles
-  README: $self->{README}
-  META-File: $self->{METAFILE}
+  README: $readme
+  META-File: $metafile
   META-Parser: Parse::CPAN::Meta $parse_cpan_meta_version
   META-driven index: $versions_from_meta
   Timestamp of file: $mtime UTC
