@@ -441,7 +441,29 @@ sub check_for_new {
         $dio->check_blib;
         $dio->check_multiple_root;
         $dio->check_world_writable;
-        $dio->examine_pms;      # will switch user
+
+        # START XACT
+        {
+          my $dbh = $self->connect;
+          unless ($dbh->begin_work) {
+            $self->verbose("Couldn't begin transaction!");
+            next BIGLOOP;
+          }
+
+          $dio->examine_pms;      # will switch user
+
+          my $main_pkg = $dio->_package_governing_permission;
+
+          if ($self->_userid_has_permissions_on_package($userid, $main_pkg)) {
+            $dbh->commit;
+          } else {
+            $dio->alert(
+              "Uploading user has no permissions on package $main_pkg"
+            );
+            $dio->{NO_DISTNAME_PERMISSION} = 1;
+            $dbh->rollback;
+          }
+        }
 
         $dio->mail_summary;
         $self->sleep;
@@ -473,6 +495,32 @@ sub check_for_new {
             sendmail($email);
         }
     }
+}
+
+sub _userid_has_permissions_on_package {
+  my ($self, $userid, $package) = @_;
+
+  my $dbh = $self->connect;
+
+  my ($has_perms) = $dbh->selectrow_array(
+    qq{
+      SELECT COUNT(*) FROM perms
+      WHERE userid = ? AND LOWER(package) = LOWER(?)
+    },
+    undef,
+    $userid, $package,
+  );
+
+  my ($has_primary) = $dbh->selectrow_array(
+    qq{
+      SELECT COUNT(*) FROM primeur
+      WHERE userid = ? AND LOWER(package) = LOWER(?)
+    },
+    undef,
+    $userid, $package,
+  );
+
+  return($has_perms || $has_primary);
 }
 
 sub empty_dir {
