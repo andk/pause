@@ -277,7 +277,7 @@ sub isa_dev_version {
   my ($self) = @_;
   my $dist = $self->{DIST};
 
-  return $dist =~ /\d\.\d+_\d/ || $dist =~ /TRIAL/;
+  return $dist =~ /\d\.\d+_\d/ || $dist =~ /-TRIAL[0-9]*$SUFFQR/;
 }
 
 # package PAUSE::dist;
