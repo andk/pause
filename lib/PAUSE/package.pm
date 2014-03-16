@@ -315,6 +315,19 @@ sub examine_pkg {
       return;
   }
 
+  # Check that package name matches case of file name
+  {
+    my (undef, $module) = split m{/lib/}, $self->{PMFILE}, 2;
+    $module = $module =~ s{\.pm\z}{}r =~ s{/}{::}gr;
+
+    if (lc $module eq lc $package && $module ne $package) {
+      warn "/// $self->{PMFILE} vs. $module vs. $package\n";
+      $self->add_indexing_warning(
+        "Capitalization of package ($package) does not match filename!",
+      );
+    }
+  }
+
   # Parser problem
 
   if ($pp->{version} && $pp->{version} =~ /^\{.*\}$/) { # JSON parser error
@@ -646,6 +659,17 @@ sub index_status {
       $dio = $self->{DIO};
   }
   $dio->index_status(@_);
+}
+
+sub add_indexing_warning {
+  my($self) = shift;
+  my $dio;
+  if (my $fio = $self->{FIO}) {
+      $dio = $fio->{DIO};
+  } else {
+      $dio = $self->{DIO};
+  }
+  $dio->add_indexing_warning($self->{PACKAGE}, $_[0]);
 }
 
 # package PAUSE::package;
