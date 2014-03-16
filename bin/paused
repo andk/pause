@@ -879,14 +879,13 @@ sub is_perl6_tarball {
 sub get_perl6_lpath {
   my ($self, $mlroot, $uriid) = @_;
   # enforce the Perl6 subdirectory to not mess with Perl5 distributions
-  if ($uriid =~ m,^([^/]+/[^/]+/[^/]+)/(.+)$,) {
-    my ($path, $subpath) = ($1, $2);
+  if ($uriid =~ m,^([^/]+/[^/]+/[^/]+)/(.*/)(.+)$,) {
+    my ($path, $subpath, $file) = ($1, $2 || 'Perl6/', $3);
     # make sure we don't end up with duplicate Perl6/Perl6 or Perl6/perl6 folders.
-    $subpath =~ s,^Perl6/,,i;
-    $path   .= '/Perl6';
-    File::Path::mkpath("$mlroot$path");
-    $self->{URIRECORD}{uriid} = "$path/$subpath";
-    return "$mlroot$path/$subpath";
+    $subpath =~ s,^Perl6/Perl6/,Perl6/,i;
+    File::Path::mkpath("$mlroot$path/$subpath");
+    $self->{URIRECORD}{uriid} = "$path/$subpath$file";
+    return "$mlroot$path/$subpath$file";
   } else {
     # this directory has already been made
     return "$mlroot$uriid"
