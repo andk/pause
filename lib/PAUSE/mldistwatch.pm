@@ -123,6 +123,9 @@ sub reindex {
     my $MLROOT = $self->mlroot;
     chdir $MLROOT
         or die "Couldn't chdir to $MLROOT";
+
+    $self->connect;
+
     $self->init_all();
     $self->verbose(2,"Registering new users\n");
     $self->set_ustatus_to_active();
@@ -138,6 +141,8 @@ sub reindex {
     rmtree $testdir;
     return if $self->{OPT}{pick};
     $self->rewrite_indexes;
+
+    $self->disconnect;
 }
 
 sub rewrite_indexes {
@@ -247,11 +252,6 @@ sub disconnect {
     return unless $self->{DBH};
     $self->{DBH}->disconnect;
     delete $self->{DBH};
-}
-
-sub DESTROY {
-    my $self = shift;
-    $self->disconnect;
 }
 
 sub init_all {
