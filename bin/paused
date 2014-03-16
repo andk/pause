@@ -885,8 +885,8 @@ sub get_perl6_lpath {
     $subpath =~ s,^Perl6/,,i;
     $path   .= '/Perl6';
     File::Path::mkpath("$mlroot$path");
-    $self->{URIRECORD}{uriid} = $path/$subpath;
-    return "$mlroot$path/$subpath"
+    $self->{URIRECORD}{uriid} = "$path/$subpath";
+    return "$mlroot$path/$subpath";
   } else {
     # this directory has already been made
     return "$mlroot$uriid"
