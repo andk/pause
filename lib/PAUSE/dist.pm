@@ -510,8 +510,7 @@ sub mail_summary {
           my $heading =
           PAUSE::mldistwatch::Constants::heading($status) ||
           "UNKNOWN (status=$status)";
-          push @m, sprintf "Status: %s
-          %s\n\n", $heading, "="x(length($heading)+8);
+          push @m, sprintf "Status: %s\n%s\n\n", $heading, "="x(length($heading)+8);
         }
         my $tf13 = Text::Format->new(
           bodyIndent => 13,
