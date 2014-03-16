@@ -321,7 +321,7 @@ sub examine_pkg {
     $module = $module =~ s{\.pm\z}{}r =~ s{/}{::}gr;
 
     if (lc $module eq lc $package && $module ne $package) {
-      warn "/// $self->{PMFILE} vs. $module vs. $package\n";
+      # warn "/// $self->{PMFILE} vs. $module vs. $package\n";
       $self->add_indexing_warning(
         "Capitalization of package ($package) does not match filename!",
       );
