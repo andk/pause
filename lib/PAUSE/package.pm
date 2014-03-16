@@ -318,13 +318,15 @@ sub examine_pkg {
   # Check that package name matches case of file name
   {
     my (undef, $module) = split m{/lib/}, $self->{PMFILE}, 2;
-    $module = $module =~ s{\.pm\z}{}r =~ s{/}{::}gr;
+    if ($module) {
+      $module = $module =~ s{\.pm\z}{}r =~ s{/}{::}gr;
 
-    if (lc $module eq lc $package && $module ne $package) {
-      # warn "/// $self->{PMFILE} vs. $module vs. $package\n";
-      $self->add_indexing_warning(
-        "Capitalization of package ($package) does not match filename!",
-      );
+      if (lc $module eq lc $package && $module ne $package) {
+        # warn "/// $self->{PMFILE} vs. $module vs. $package\n";
+        $self->add_indexing_warning(
+          "Capitalization of package ($package) does not match filename!",
+        );
+      }
     }
   }
 
