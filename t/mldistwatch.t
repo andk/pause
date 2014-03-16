@@ -641,6 +641,29 @@ subtest "warn when pkg and module match only case insensitively" => sub {
   );
 };
 
+subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/pkg-block/authors');
+
+  my $result = $pause->test_reindex;
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'Pkg::Name',             version => '1.000' },
+      { package => 'Pkg::NameBlock',        version => '1.000' },
+      { package => 'Pkg::NameVersion',      version => '1.000' },
+      { package => 'Pkg::NameVersionBlock', version => '1.000' },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report RJBS/Pkg-Name-1.000.tar.gz' },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
