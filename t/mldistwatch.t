@@ -588,6 +588,47 @@ subtest "do not index if meta has release_status <> stable" => sub {
   );
 };
 
+subtest "warn when pkg and module match only case insensitively" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/002/authors');
+  $pause->import_author_root('corpus/mld/pkg-mod-case/authors');
+
+  my $result = $pause->test_reindex;
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'Fewer',          version => '0.202' },
+      { package => 'More',           version => '0.202' },
+      { package => 'XForm::Rollout', version => '1.01'  },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
+      { subject => 'PAUSE indexer report RJBS/fewer-0.202.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->get_body,
+              qr/Capitalization of package \(Fewer\)/,
+              "warning about Fewer v. fewer",
+            );
+          },
+          sub {
+            like(
+              $_[0]{email}->get_body,
+              qr/Capitalization of package \(More\)/,
+              "warning about More v. more",
+            );
+          },
+        ]
+      },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
