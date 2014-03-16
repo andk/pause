@@ -277,7 +277,7 @@ subtest "reindexing" => sub {
 
 Email::Sender::Simple->default_transport->clear_deliveries;
 
-subtest "case mismatch, unauthorized for original" => sub {
+subtest "distname/pkgname permission mismatch" => sub {
   $pause->import_author_root('corpus/mld/003/authors');
 
   my $result = $pause->test_reindex;
@@ -323,11 +323,11 @@ subtest "case mismatch, authorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  # file_not_updated_ok(
-  #   $result->tmpdir
-  #          ->file(qw(cpan modules 02packages.details.txt.gz)),
-  #   "our indexer indexed",
-  # );
+  file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "our indexer indexed",
+  );
 
   package_list_ok(
     $result,
@@ -411,11 +411,13 @@ subtest "perl-\\d should not get indexed" => sub {
       { package => 'Y',              version => 2       },
     ],
   );
+
+  # TODO: send a report saying 'no perl-X allowed'
 };
 
 Email::Sender::Simple->default_transport->clear_deliveries;
 
-subtest "perl-\\d should not get indexed" => sub {
+subtest "don't allow upload on permissions case conflict" => sub {
   $pause->import_author_root('corpus/mld/007/authors');
 
   my $result = $pause->test_reindex;
@@ -445,7 +447,7 @@ subtest "perl-\\d should not get indexed" => sub {
 
 Email::Sender::Simple->default_transport->clear_deliveries;
 
-subtest "case mismatch, authorized for original, desc. version (take II)" => sub {
+subtest "distname/pkgname permission check" => sub {
   $pause->import_author_root('corpus/mld/006-distname/authors');
 
   my $result = $pause->test_reindex;
@@ -494,7 +496,7 @@ subtest "do not index bare .pm but report rejection" => sub {
   );
 };
 
-sub refused_upload_test {
+sub refused_index_test {
   my ($code) = @_;
 
   sub {
@@ -524,7 +526,7 @@ sub refused_upload_test {
   };
 };
 
-subtest "cannot steal a library when primeur+perms exist" => refused_upload_test(sub {
+subtest "cannot steal a library when primeur+perms exist" => refused_index_test(sub {
   my ($dbh) = @_;
   $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
@@ -532,19 +534,19 @@ subtest "cannot steal a library when primeur+perms exist" => refused_upload_test
     or die "couldn't insert!";
 });
 
-subtest "cannot steal a library when only primeur exists" => refused_upload_test(sub {
+subtest "cannot steal a library when only primeur exists" => refused_index_test(sub {
   my ($dbh) = @_;
   $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
 });
 
-subtest "cannot steal a library when only perms exist" => refused_upload_test(sub {
+subtest "cannot steal a library when only perms exist" => refused_index_test(sub {
   my ($dbh) = @_;
   $dbh->do("INSERT INTO perms (package, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
 });
 
-subtest "cannot steal a library when only mods exist" => refused_upload_test(sub {
+subtest "cannot steal a library when only mods exist" => refused_index_test(sub {
   my ($dbh) = @_;
   $dbh->do("INSERT INTO mods (modid, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
@@ -555,12 +557,22 @@ Email::Sender::Simple->default_transport->clear_deliveries;
 subtest "do not index if meta has release_status <> stable" => sub {
   my $pause = init_test_pause;
   $pause->import_author_root('corpus/mld/002/authors');
-  $pause->import_author_root('corpus/mld/unstable/authors');
 
   my $result = $pause->test_reindex;
 
-  # file_not_updated_ok
-  #   $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+  file_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
+
+  $pause->import_author_root('corpus/mld/unstable/authors');
+
+  $result = $pause->test_reindex;
+
+  file_not_updated_ok(
+    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    "did not reindex",
+  );
 
   package_list_ok(
     $result,
