@@ -316,6 +316,13 @@ sub packages_per_pmfile {
             next if $inpod || /^\s*#/;
             last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
             chop;
+
+            if (my ($ver) = /package \s+ \S+ \s+ (\S+) \s* [;{]/x) {
+              # XXX: should handle this better if version is bogus -- rjbs,
+              # 2014-03-16
+              return $ver if version::is_lax($ver);
+            }
+
             # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
             next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
             my $current_parsed_line = $_;
