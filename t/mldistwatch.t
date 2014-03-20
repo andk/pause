@@ -664,6 +664,34 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
   );
 };
 
+subtest "check various forms of version" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/bad-version/authors');
+  my $result = $pause->test_reindex;
+
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "our indexer indexed",
+  );
+
+  package_list_ok(
+    $result,
+    [
+      # { package => 'VVVVVV::Bogus',   version => '9.001' },
+      { package => 'VVVVVV::Dev',     version => '0.01'  },
+      { package => 'VVVVVV::Lax',     version => '1.00'  },
+      { package => 'VVVVVV::VString', version => 2       },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
