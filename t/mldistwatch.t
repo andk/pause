@@ -675,13 +675,20 @@ subtest "check various forms of version" => sub {
     "our indexer indexed",
   );
 
+  # VVVVVV          - just fine!  index it
+  # VVVVVV::Bogus   - utterly busted, give up
+  # VVVVVV::Dev     - has an underscore!  do not index
+  # VVVVVV::Lax     - just fine!  index it
+  # VVVVVV::VString - version.pm can't handle what we pull out of it
+
   package_list_ok(
     $result,
     [
-      # { package => 'VVVVVV::Bogus',   version => '9.001' },
-      { package => 'VVVVVV::Dev',     version => '0.01'  },
-      { package => 'VVVVVV::Lax',     version => '1.00'  },
-      { package => 'VVVVVV::VString', version => 2       },
+      { package => 'VVVVVV',          version => '6.666'  },
+      # { package => 'VVVVVV::Bogus',   version => '6.666june6' },
+      # { package => 'VVVVVV::Dev',     version => '6.66_6'     },
+      { package => 'VVVVVV::Lax',     version => '6.006006'  },
+      # { package => 'VVVVVV::VString', version => 'v6.6.6'    },
     ],
   );
 
