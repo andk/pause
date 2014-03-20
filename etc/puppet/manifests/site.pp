@@ -44,7 +44,7 @@ class pause-munin-node {
 		mode    => 644,
 		content => "/var/log/munin_httpd/*_8000.log {
     weekly
-    rotate 180
+    rotate 150
     compress
     delaycompress
     notifempty
@@ -161,7 +161,7 @@ class pause-apache {
 		mode    => 644,
 		content => "/var/log/PAUSE-httpd/*log {
     daily
-    rotate 180
+    rotate 150
     compress
     delaycompress
     notifempty
@@ -289,7 +289,7 @@ class pause-rsyncd-logrotate {
 		mode    => 644,
 		content => "/var/log/rsyncd /var/log/rsyncd2 {
     daily
-    rotate 180
+    rotate 150
     compress
     delaycompress
     notifempty
@@ -396,7 +396,7 @@ class pause-paused {
 		mode    => 644,
 		content => "/var/log/mldistwatch*log {
     daily
-    rotate 180
+    rotate 150
     compress
     delaycompress
     notifempty
