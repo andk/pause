@@ -493,6 +493,13 @@ not indexing seems okay.},
                               );
           }
       }
+  } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
+      $self->index_status($package,
+                          $pp->{version},
+                          $pmfile,
+                          PAUSE::mldistwatch::Constants::EBADVERSION,
+                          qq{Not indexed because VERSION [$pp->{version}] is not a valid "lax version" string.},
+      );
   } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
       # higher VERSION here
       $self->verbose(1, "Package '$package' has newer version ".

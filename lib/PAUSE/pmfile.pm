@@ -132,7 +132,13 @@ sub examine_fio {
     $self->{MTIME} = $filemtime;
 
     unless ($self->version_from_meta_ok) {
-        $self->{VERSION} = $self->parse_version;
+        my $version;
+        unless (eval { $version = $self->parse_version; 1 }) {
+          $self->verbose(1, "error with version in $pmfile: $@");
+          return;
+        }
+
+        $self->{VERSION} = $version;
         if ($self->{VERSION} =~ /^\{.*\}$/) {
             # JSON error message
         } elsif ($self->{VERSION} =~ /[_\s]/){   # ignore developer releases and "You suck!"
@@ -260,9 +266,13 @@ sub packages_per_pmfile {
                             my $v = $provides->{$pkg}{version};
                             if ($v =~ /[_\s]/){   # ignore developer releases and "You suck!"
                                 next PLINE;
-                            } else {
-                                $ppp->{$pkg}{version} = $self->normalize_version($v);
                             }
+
+                            unless (eval { $version = $self->normalize_version($v); 1 }) {
+                              $self->verbose(1, "error with version in $pmfile: $@");
+                              next;
+                            }
+                            $ppp->{$pkg}{version} = $version;
                         } else {
                             $ppp->{$pkg}{version} = "undef";
                         }

@@ -664,6 +664,41 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
   );
 };
 
+subtest "check various forms of version" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/bad-version/authors');
+  my $result = $pause->test_reindex;
+
+  file_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "our indexer indexed",
+  );
+
+  # VVVVVV          - just fine!  index it
+  # VVVVVV::Bogus   - utterly busted, give up
+  # VVVVVV::Dev     - has an underscore!  do not index
+  # VVVVVV::Lax     - just fine!  index it
+  # VVVVVV::VString - version.pm can't handle what we pull out of it
+
+  package_list_ok(
+    $result,
+    [
+      { package => 'VVVVVV',          version => '6.666'  },
+      # { package => 'VVVVVV::Bogus',   version => '6.666june6' },
+      # { package => 'VVVVVV::Dev',     version => '6.66_6'     },
+      { package => 'VVVVVV::Lax',     version => '6.006006'  },
+      # { package => 'VVVVVV::VString', version => 'v6.6.6'    },
+    ],
+  );
+
+  email_ok(
+    [
+      { subject => 'PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
