@@ -216,6 +216,9 @@ sub untar {
 }
 
 # package PAUSE::dist;
+sub perl_major_version { shift->{PERL_MAJOR_VERSION} }
+
+# package PAUSE::dist;
 sub skip { shift->{SKIP} }
 
 sub isa_regular_perl {
@@ -330,6 +333,11 @@ sub examine_dist {
   } else {
     $self->verbose(1,"File '$dist' does not resemble a distribution");
     $skip = 1;
+  }
+
+  $self->{PERL_MAJOR_VERSION} = 5;
+  if (-d "$MLROOT/$dist" && -e "$MLROOT/$dist/META6.json") {
+    $self->{PERL_MAJOR_VERSION} = 6;
   }
 
   $self->{SUFFIX} = $suffix;
