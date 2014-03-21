@@ -193,7 +193,11 @@ sub untar {
       $self->{COULD_NOT_UNTAR}++;
       return;
     }
+    if (m:^META6\.json$/:) {
+        $self->{PERL_MAJOR_VERSION} = 6
+    }
   }
+  $self->{PERL_MAJOR_VERSION} = 5 unless defined $self->{PERL_MAJOR_VERSION};
   unless (close TARTEST) {
     $self->verbose(1,"Could not untar $dist!\n");
     $self->alert("\nCould not untar $dist!\n");
@@ -214,6 +218,9 @@ sub untar {
   $self->verbose(1,"Untarred '$MLROOT/$dist'\n");
   return 1;
 }
+
+# package PAUSE::dist;
+sub perl_major_version { shift->{PERL_MAJOR_VERSION} }
 
 # package PAUSE::dist;
 sub skip { shift->{SKIP} }
