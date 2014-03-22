@@ -451,18 +451,23 @@ sub check_for_new {
             next BIGLOOP;
           }
 
-          $dio->examine_pms;      # will switch user
-
-          my $main_pkg = $dio->_package_governing_permission;
-
-          if ($self->_userid_has_permissions_on_package($userid, $main_pkg)) {
+          if ($dio->perl_major_version == 6) {
+            # XXX do something sensible for Perl6
             $dbh->commit;
           } else {
-            $dio->alert(
-              "Uploading user has no permissions on package $main_pkg"
-            );
-            $dio->{NO_DISTNAME_PERMISSION} = 1;
-            $dbh->rollback;
+            $dio->examine_pms;      # will switch user
+
+            my $main_pkg = $dio->_package_governing_permission;
+
+            if ($self->_userid_has_permissions_on_package($userid, $main_pkg)) {
+              $dbh->commit;
+            } else {
+              $dio->alert(
+                "Uploading user has no permissions on package $main_pkg"
+              );
+              $dio->{NO_DISTNAME_PERMISSION} = 1;
+              $dbh->rollback;
+            }
           }
         }
 
