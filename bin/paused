@@ -704,7 +704,7 @@ sub verify_gzip_tar {
         # nothing I could verify
         if (rename($tpath,$lpath)) {
             $self->logge("Info: renamed '$tpath' to '$lpath'");
-            return -s $lpath;
+            return $lpath;
         } else {
             $self->logge("Alert: could not rename '$tpath' to '$lpath'");
             return;
