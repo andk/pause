@@ -990,10 +990,17 @@ sub extract_readme_and_meta {
     $self->{README} = "No README found";
     $self->verbose(1,"No readme in $dist\n");
   }
-  my $json = List::Util::reduce { length $a < length $b ? $a : $b }
-             grep !m|/t/|, grep m|/META\.json$|, @manifind;
-  my $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
-             grep !m|/t/|, grep m|/META\.yml$|, @manifind;
+  my ($json, $yaml);
+  if ($self->perl_major_version == 6) {
+    $json = List::Util::reduce { length $a < length $b ? $a : $b }
+            grep !m|/t/|, grep m|/META6\.json$|, @manifind;
+  }
+  else {
+    $json = List::Util::reduce { length $a < length $b ? $a : $b }
+            grep !m|/t/|, grep m|/META\.json$|, @manifind;
+    $yaml = List::Util::reduce { length $a < length $b ? $a : $b }
+            grep !m|/t/|, grep m|/META\.yml$|, @manifind;
+  }
 
   unless ($json || $yaml) {
     $self->{METAFILE} = "No META.yml or META.json found";
