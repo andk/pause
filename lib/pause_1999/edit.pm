@@ -6287,6 +6287,7 @@ sub share_perms_scrl_1 {
   my $sql = qq{SELECT modid
               FROM mods
               WHERE userid=?
+              AND mlstatus='list'
               ORDER BY modid};
   my @bind = $userid;
   my $sth = $dbh->prepare($sql);
@@ -6919,6 +6920,7 @@ sub all_pmods_not_mmods {
   $sth2->finish;
   $sth2 = $db->prepare(qq{SELECT modid
                              FROM mods
+                             AND mlstatus='list'
                              WHERE userid=?});
   $sth2->execute($u->{userid});
   while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
