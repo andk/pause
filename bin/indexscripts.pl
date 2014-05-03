@@ -89,6 +89,9 @@ my $SCRIPT_TMP  = "/home/kstar/etc/tmp";            # Scratchpad
 my $SCRIPT_ROOT = defined($opt_D) ? $opt_D : $$PAUSE::Config{FTPPUB};
 my $SCRIPT_TOC  = "$SCRIPT_ROOT/scripts/";
 my $SCRIPT_DB   = "/home/kstar/etc/SCRIPT_DB";      # Data::Dumper output
+use File::Path qw(make_path);
+use File::Basename qw(dirname);
+make_path dirname $SCRIPT_DB;
 
 
 my (%KNOWN_KEYS) = (
