@@ -102,10 +102,10 @@ startslave:
 	mysql -u root -p -e 'start slave; show slave status\\G'
 
 doc/mod.schema.txt:
-	mysqldump -u root -p mod          --quote-names=false --no-data > $@
+	mysqldump -u root -p mod          --quote-names=false --no-data > \$\@
 
 doc/authen_pause.schema.txt:
-	mysqldump -u root -p authen_pause --quote-names=false --no-data > $@
+	mysqldump -u root -p authen_pause --quote-names=false --no-data > \$\@
 
 EOF
 
