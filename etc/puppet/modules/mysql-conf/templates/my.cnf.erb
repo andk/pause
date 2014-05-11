@@ -1,0 +1,61 @@
+[client]
+port            = 3306
+socket          = /var/lib/mysql/mysql.sock
+
+[mysqld_safe]
+err-log		= /var/log/mysqld.log
+socket		= /var/lib/mysql/mysql.sock
+nice		= 0
+
+[mysqld]
+# symbolic-links=0
+user		= mysql
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/lib/mysql/mysql.sock
+port		= 3306
+general_log_file= /var/log/mysqld.log
+basedir		= /usr
+datadir		= /var/lib/mysql
+tmpdir		= /tmp
+language	= /usr/share/mysql/english
+max-connections = 1000
+skip-external-locking
+bind-address            = <%= @mysql_listen_address %>
+key_buffer		= 16M
+max_allowed_packet	= 16M
+thread_stack		= 128K
+query_cache_limit	= 1048576
+query_cache_size        = 16777216
+query_cache_type        = 1
+tmp_table_size          = 32M
+max_heap_table_size     = 32M
+thread_cache_size       = 4
+innodb_file_per_table
+innodb_flush_log_at_trx_commit
+innodb_buffer_pool_size = <%= @mysql_innodb_buffer_pool_size %>
+table_cache             = 64
+log_slow_queries        = ON
+slow_query_log_file     = /var/log/mysql/slow-query-log
+long_query_time         = 1
+
+server-id		= 2
+log-bin			= /var/log/mysql/mysql-bin.log
+expire-logs-days        = 5
+max_binlog_size		= 104857600
+binlog-do-db		= mod
+log-warnings            = 2
+log-slave-updates
+slave_compressed_protocol
+relay-log=relay-bin
+
+sql-mode="NO_ENGINE_SUBSTITUTION"
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet      = 16M
+
+[mysql]
+
+[isamchk]
+key_buffer              = 16M

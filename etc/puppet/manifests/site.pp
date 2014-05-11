@@ -17,7 +17,8 @@ class pause-pkg {
 class pause-mysqld {
         service { mysqld:
                 ensure => running,
-                enable => true
+		enable => true,
+		require => File["mysql_my_cnf"],
         }
         file { "/var/log/mysql":
                 owner => "mysql",
@@ -25,10 +26,7 @@ class pause-mysqld {
                 mode => 700,
                 ensure => directory,
         }
-	file { "/etc/my.cnf":
-		path => "/etc/my.cnf",
-		ensure => "/home/puppet/pause/etc/my.cnf.centos6-2012",
-	}
+	include mysql-conf
 }
 
 class pause-munin-node {
@@ -329,6 +327,12 @@ class pause-proftpd {
 		mode => 755,
 		ensure => directory,
 	}
+	file { "/home/ftp":
+		owner => "root",
+		group => "root",
+		mode => 755,
+		ensure => directory,
+	}
 	file { "/etc/proftpd.conf":
 		path => "/etc/proftpd.conf",
 		owner => root,
@@ -495,6 +499,14 @@ class pause {
 }
 
 node pause2 {
+	$mysql_listen_address = "10.0.100.191"
+	$mysql_innodb_buffer_pool_size = "4G"
+	include pause
+}
+
+node pause-pps {
+	$mysql_listen_address = "127.0.0.1"
+	$mysql_innodb_buffer_pool_size = "250M"
 	include pause
 }
 
