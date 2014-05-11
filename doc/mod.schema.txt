@@ -19,7 +19,6 @@
 -- Table structure for table `applymod`
 --
 
-DROP TABLE IF EXISTS applymod;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE applymod (
@@ -43,7 +42,6 @@ CREATE TABLE applymod (
 -- Table structure for table `chapters`
 --
 
-DROP TABLE IF EXISTS chapters;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE chapters (
@@ -57,7 +55,6 @@ CREATE TABLE chapters (
 -- Table structure for table `deletes`
 --
 
-DROP TABLE IF EXISTS deletes;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE deletes (
@@ -72,7 +69,6 @@ CREATE TABLE deletes (
 -- Table structure for table `distmtimes`
 --
 
-DROP TABLE IF EXISTS distmtimes;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE distmtimes (
@@ -89,7 +85,6 @@ CREATE TABLE distmtimes (
 -- Table structure for table `list2user`
 --
 
-DROP TABLE IF EXISTS list2user;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE list2user (
@@ -103,7 +98,6 @@ CREATE TABLE list2user (
 -- Table structure for table `maillists`
 --
 
-DROP TABLE IF EXISTS maillists;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE maillists (
@@ -121,7 +115,6 @@ CREATE TABLE maillists (
 -- Table structure for table `messages`
 --
 
-DROP TABLE IF EXISTS messages;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE messages (
@@ -139,7 +132,6 @@ CREATE TABLE messages (
 -- Table structure for table `mlas`
 --
 
-DROP TABLE IF EXISTS mlas;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE mlas (
@@ -157,7 +149,6 @@ CREATE TABLE mlas (
 -- Table structure for table `mods`
 --
 
-DROP TABLE IF EXISTS mods;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE mods (
@@ -182,7 +173,6 @@ CREATE TABLE mods (
 -- Table structure for table `packages`
 --
 
-DROP TABLE IF EXISTS packages;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE packages (
@@ -202,7 +192,6 @@ CREATE TABLE packages (
 -- Table structure for table `perms`
 --
 
-DROP TABLE IF EXISTS perms;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE perms (
@@ -213,14 +202,13 @@ CREATE TABLE perms (
   UNIQUE KEY pack_user (package,userid),
   KEY package (package),
   KEY userid (userid)
-) ENGINE=InnoDB AUTO_INCREMENT=284763 DEFAULT CHARSET=latin1 PACK_KEYS=1;
+) ENGINE=InnoDB AUTO_INCREMENT=287406 DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `primeur`
 --
 
-DROP TABLE IF EXISTS primeur;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE primeur (
@@ -234,7 +222,6 @@ CREATE TABLE primeur (
 -- Table structure for table `uris`
 --
 
-DROP TABLE IF EXISTS uris;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE uris (
@@ -261,7 +248,6 @@ CREATE TABLE uris (
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS users;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE users (
@@ -290,4 +276,4 @@ CREATE TABLE users (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-11 13:03:24
+-- Dump completed on 2014-05-11 18:13:45
