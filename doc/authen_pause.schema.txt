@@ -1,60 +1,76 @@
--- MySQL dump 9.11
+-- MySQL dump 10.13  Distrib 5.1.73, for redhat-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: authen_pause
 -- ------------------------------------------------------
--- Server version	4.0.24_Debian-10sarge1-log
+-- Server version	5.1.73-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Table structure for table `abrakadabra`
 --
 
+DROP TABLE IF EXISTS abrakadabra;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE abrakadabra (
-  user char(16) NOT NULL default '',
-  chpasswd char(32) NOT NULL default '',
-  expires datetime default NULL,
-  PRIMARY KEY  (user)
-) ;
-
---
--- Dumping data for table `abrakadabra`
---
--- WHERE:  1=0
-
+  `user` char(16) NOT NULL DEFAULT '',
+  chpasswd char(32) NOT NULL DEFAULT '',
+  expires datetime DEFAULT NULL,
+  PRIMARY KEY (`user`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `grouptable`
 --
 
+DROP TABLE IF EXISTS grouptable;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE grouptable (
-  user char(12) binary NOT NULL default '',
-  ugroup char(8) binary NOT NULL default '',
-  UNIQUE KEY user_ugroup (user,ugroup)
-) ;
-
---
--- Dumping data for table `grouptable`
---
--- WHERE:  1=0
-
+  `user` char(12) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+  ugroup char(12) NOT NULL DEFAULT '',
+  UNIQUE KEY user_ugroup (`user`,ugroup)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `usertable`
 --
 
+DROP TABLE IF EXISTS usertable;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE usertable (
-  user char(12) binary NOT NULL default '',
-  password char(13) default NULL,
-  secretemail char(255) default NULL,
-  forcechange tinyint(4) default '0',
-  changed int(11) default NULL,
-  changedby char(10) default NULL,
-  lastvisit datetime default NULL,
-  PRIMARY KEY  (user)
-) ;
+  `user` char(12) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+  `password` char(13) DEFAULT NULL,
+  secretemail char(255) DEFAULT NULL,
+  forcechange tinyint(4) DEFAULT '0',
+  `changed` int(11) DEFAULT NULL,
+  changedby char(10) DEFAULT NULL,
+  lastvisit datetime DEFAULT NULL,
+  PRIMARY KEY (`user`),
+  KEY usertable_password (`password`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
---
--- Dumping data for table `usertable`
---
--- WHERE:  1=0
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-
+-- Dump completed on 2014-05-11 13:03:30
