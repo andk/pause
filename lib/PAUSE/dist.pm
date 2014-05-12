@@ -1119,5 +1119,82 @@ sub set_indexed {
   $rows_affected > 0;
 }
 
+# package PAUSE::dist
+sub p6_dist_meta_ok {
+  my $self = shift;
+  my $c    = $self->{META_CONTENT};
+  $c &&
+  $c->{name} &&
+  $c->{version} &&
+  $c->{version} =~ /^v\d+/ &&
+  $c->{description}
+}
+
+# package PAUSE::dist
+sub p6_index_dist {
+  my $self   = shift;
+  my $dbh    = $self->connect;
+  my $dist   = $self->{DIST};
+  my $MLROOT = $self->mlroot;
+  my $userid = $self->{USERID} or die;
+  my $c      = $self->{META_CONTENT};
+
+  local($dbh->{RaiseError}) = 0;
+  local($dbh->{PrintError}) = 0;
+
+  my $p6dists    = "INSERT INTO p6dists (name, auth, ver, tarball) VALUES (?,?,?,?)";
+  my $p6provides = "INSERT INTO p6provides (name, tarball) VALUES (?,?)";
+  my $p6binaries = "INSERT INTO p6binaries (name, tarball) VALUES (?,?)";
+
+  ###
+  # Index distribution itself.
+  my @args = ($c->{name}, $userid, $c->{version}, $dist);
+  my $ret  = $dbh->do($p6dists, @args);
+  push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+  $self->verbose(1,
+    sprintf("Inserted into p6dists name[%s]auth[%s]ver[%s]tarball[%s]ret[%s]err[%s]\n", @args));
+  return "ERROR in dist $dist: " . $dbh->errstr unless $ret;
+
+  ###
+  # Index provides section. This section is allowed to be empty or absent, in case this
+  # distribution is about binaries or shared files.
+  for my $namespace (keys %{$c->{provides} // {}}) {
+    @args = ($namespace, $dist);
+    $ret  = $dbh->do($p6provides, @args);
+    push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+    $self->verbose(1,
+      sprintf("Inserted into p6provides name[%s]tarball[%s]ret[%s]err[%s]\n", @args));
+  }
+  return "ERROR in dist $dist: " . $dbh->errstr unless $ret;
+
+  ###
+  # Index binaries. We need to scan the archives content for this.
+  local *TARTEST;
+  my $tarbin = $self->{TARBIN};
+  my $tar_opt = "tzf";
+  if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
+    $tar_opt = "tjf";
+  }
+  open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
+  while (<TARTEST>) {
+    if (m:^bin/([^/]+)$:) {
+      @args = ($1, $dist);
+      $ret  = $dbh->do($p6binaries, @args);
+      push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+      $self->verbose(1,
+        sprintf("Inserted into p6binaries name[%s]tarball[%s]ret[%s]err[%s]\n", @args));
+    }
+  }
+  unless (close TARTEST) {
+    $self->verbose(1,"Could not untar $dist!\n");
+    $self->alert("\nCould not untar $dist!\n");
+    $self->{COULD_NOT_UNTAR}++;
+    return "ERROR: Could not untar $dist!";
+  }
+  return "ERROR in dist $dist: " . $dbh->errstr unless $ret;
+
+  return 0; # Success!
+}
+
 1;
 

@@ -452,8 +452,18 @@ sub check_for_new {
           }
 
           if ($dio->perl_major_version == 6) {
-            # XXX do something sensible for Perl6
-            $dbh->commit;
+            if ($dio->p6_dist_meta_ok) {
+              if (my $err = $dio->p6_index_dist) {
+                $dio->alert($err);
+                $dbh->rollback;
+              } else {
+                $dbh->commit;
+              }
+            }
+            else {
+              $dio->alert("Meta information of Perl 6 dist $dist is invalid");
+              $dbh->rollback;
+            }
           } else {
             $dio->examine_pms;      # will switch user
 
