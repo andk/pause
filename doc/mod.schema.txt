@@ -193,6 +193,7 @@ CREATE TABLE p6dists (
   auth varchar(255) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
   ver varchar(255) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
   tarball varchar(255) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+  indexed_at datetime DEFAULT NULL,
   PRIMARY KEY (`name`,auth,ver,tarball)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -243,7 +244,7 @@ CREATE TABLE perms (
   UNIQUE KEY pack_user (package,userid),
   KEY package (package),
   KEY userid (userid)
-) ENGINE=InnoDB AUTO_INCREMENT=287406 DEFAULT CHARSET=latin1 PACK_KEYS=1;
+) ENGINE=InnoDB AUTO_INCREMENT=295236 DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -317,4 +318,4 @@ CREATE TABLE users (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-11 18:40:13
+-- Dump completed on 2014-05-16 17:38:32
