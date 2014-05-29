@@ -205,4 +205,34 @@ CREATE TABLE users (
   PRIMARY KEY (userid)
 );
 
+--
+-- Table: p6dists
+--
+CREATE TABLE IF NOT EXISTS `p6dists` (
+  `name` char(255) NOT NULL DEFAULT '',
+  `auth` char(255) NOT NULL DEFAULT '',
+  `ver` char(255) NOT NULL DEFAULT '',
+  `tarball` char(255) NOT NULL DEFAULT '',
+  `indexed_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`name`,`auth`,`tarball`)
+);
+
+--
+-- Table: p6binaries
+--
+CREATE TABLE IF NOT EXISTS `p6binaries` (
+  `name` char(255) NOT NULL DEFAULT '',
+  `tarball` char(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`name`,`tarball`)
+);
+
+--
+-- Table: p6provides
+--
+CREATE TABLE IF NOT EXISTS `p6provides` (
+  `name` char(255) NOT NULL DEFAULT '',
+  `tarball` char(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`name`,`tarball`)
+);
+
 COMMIT;
