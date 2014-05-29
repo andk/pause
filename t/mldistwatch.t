@@ -121,6 +121,23 @@ sub package_list_ok {
   ) or diag explain(\@packages);
 }
 
+sub p6dists_ok {
+  my ($result, $want) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
+    'SELECT * FROM p6dists ORDER BY name, ver',
+    { Slice => {} },
+  );
+
+  cmp_deeply(
+    $pkg_rows,
+    [ map {; superhashof($_) } @$want ],
+    "we db-inserted exactly the dists we expected to",
+  ) or diag explain($pkg_rows);
+}
+
 sub perm_list_ok {
   my ($result, $want) = @_;
 
@@ -701,6 +718,19 @@ subtest "check various forms of version" => sub {
   email_ok(
     [
       { subject => 'PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
+    ],
+  );
+};
+
+subtest "check perl6 distribution indexing" => sub {
+  my $pause = init_test_pause;
+  $pause->import_author_root('corpus/mld/perl6/authors');
+  my $result = $pause->test_reindex;
+
+  p6dists_ok(
+    $result,
+    [
+      { name => 'Inline', ver => 'v1.1' },
     ],
   );
 };
