@@ -37,9 +37,7 @@ This help
 
 =head1 DESCRIPTION
 
-Batch processing of modules in the mods table into primeur. On the
-first implementation we only support --byuser=user and refuse to run
-without this option.
+Batch processing of modules in the mods table into primeur.
 
 =cut
 
