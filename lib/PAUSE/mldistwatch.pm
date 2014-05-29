@@ -481,7 +481,7 @@ sub check_for_new {
           }
         }
 
-        $dio->mail_summary;
+        $dio->mail_summary unless $dio->perl_major_version == 6;
         $self->sleep;
         $dio->set_indexed;
 
