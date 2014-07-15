@@ -610,7 +610,7 @@ has the same version number and the distro has a more recent modification time.}
                PAUSE::mldistwatch::Constants::EDBCONFLICT,
                qq{Indexing failed because of conflicting record for
 ($rec0) vs ($rec1).
-Please report the case to the PAUSE admins.},
+Please report the case to the PAUSE admins at modules\@perl.org.},
               );
           $ok = 0;
       }
@@ -650,7 +650,7 @@ filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
                PAUSE::mldistwatch::Constants::EDBERR,
                qq{The PAUSE indexer could not store the indexing
 result in the DB due the following error: C< $dbherrstr >.
-Please report the case to the PAUSE admins.},
+Please report the case to the PAUSE admins at modules\@perl.org.},
               );
       }
 
