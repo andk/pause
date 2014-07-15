@@ -1016,7 +1016,7 @@ maintainer
 
     my(%seen);
     for my $l (
-               sort {$b->[10] <=> lc $a->[10] # mtime
+               sort {$b->[10] <=> $a->[10] # mtime
                  } @$listing
               ) {
         next if $seen{$l->[4]}++; # dist
