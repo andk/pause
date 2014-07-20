@@ -99,7 +99,7 @@ $PAUSE::Config ||=
      HOME => $IS_PAUSE_US ? '/home/puppet/' : '/home/k/',
      CRONPATH => $IS_PAUSE_US ? '/home/puppet/pause/cron' : '/home/k/pause/cron',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
-     INCOMING => $IS_PAUSE_US ? 'ftp://localhost/incoming/' : 'ftp://pause.perl.org/incoming/',
+     INCOMING => $IS_PAUSE_US ? 'http://localhost/incoming/' : 'http://pause.perl.org/incoming/',
      INCOMING_LOC => '/home/ftp/incoming/',
      LOG_CALLBACK => sub {
        # $entity: entity from which to grab log configuration
