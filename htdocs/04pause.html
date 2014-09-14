@@ -16,6 +16,8 @@
   <li><a href="#before">Before you upload</a></li>
   <li><a href="#comparison">PAUSE vs. CPAN vs. search engines</a></li>
   <li><a href="#takeover">Taking over</a></li>
+  <li><a href="#add-comaintainer">Giving co-maintaner rights</a></li>
+  <li><a href="#set-primary-maintainer">Transfer ownership - set primary maintainer</a></li>
   <li><a href="#readme">README</a></li>
   <li><a href="#version">$VERSION</a></li>
   <li><a href="#developerreleases">Developer Releases</a></li>
@@ -298,6 +300,53 @@ to see them taken care of and will assign (primary or) co-maintenance
 permissions after you've tracked them down and asked nicely.</p>
 
 <p>Good luck and thanks for stepping up.</p>
+
+<h3><a id="add-comaintainer" name="add-comaintainer">Add co-maintainer</a></h3>
+
+<p>
+Other people can always upload modules with the same name as the module you uploaded but PAUSE will
+only index the modules that <b>primary maintainer</b>, or one of the designated <b>co-maintainers</b>
+have uploaded. If you were the first to upload a module, you automatically became the <b>primary maintainer</b>.
+</p>
+<p>
+If you would like to allow other people to upload official versions of a certain module you can give them
+<b>co-maintainer status</b>. You do that using the followng steps:
+<ol>
+  <li>Visiting the <a href="https://pause.perl.org/pause/authenquery?ACTION=share_perms">Change Permissions</a> menu item</li>
+  <li>Click on the 3.1 select button. (No need selecting module names here)</li>
+  <li>In the new page select the modules for which you want to set the co-maintainer bit.
+      (Remember, you have to give co-maintainer bit for every module in a distribution, in order to let the other person upload that distribution.)</li>
+  <li>Type in the PAUSE id of the designated co-maintainer</li>
+  <li>Click on the button <b>Make Co-Maintainer</b></li>
+</ol>
+
+After that you can let the other person know in e-mail or some other communication channel. PAUSE itself won't
+notify the new co-maintainer.
+</p>
+<p>
+Remember, you can set several people as co-maintainers, and as long as you don't give up your Primary maintainer status you can always
+revoke the co-maintainer rights of anyone by selecting the 3.2 button.
+</p>
+
+<h3><a id="set-primary-maintainer" name="set-primary-maintainer">Transfer ownership - set primary maintainer</a></h3>
+
+<p>
+If you want to give up control of one of your modules you can set another PAUSE user to become the <b>Primary maintainer</b> of
+a module of yours. After doing this the other person will have the right to add/remove co-maintainers and to change who is the
+<b>primary maintainer</b>.
+</p>
+<p>
+In order to do this you have to follow the following steps:
+<ol>
+  <li>Visit the <a href="https://pause.perl.org/pause/authenquery?ACTION=share_perms">Change Permissiosn</a> menu item</li>
+  <li>Cick on 2.1 (no need to select any names yet)</li>
+  <li>In the new page select the names of the modules you'd like to transfer. (Remember, in order to transfer the right to upload a distribution, you need to transfer the
+      rights to every module in that distribution.)</li>
+  <li>Type in the PAUSE ID of the designated new <b>primary maintainer</b></li>
+  <li>Click on <b>Pass Maintainership Status</b></li>
+</ol>
+</p>
+
 
 <a id="conventions" name="conventions"></a><!-- older anchor name -->
 <h3><a id="readme" name="readme">README</a></h3>
