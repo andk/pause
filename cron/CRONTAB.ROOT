@@ -11,13 +11,13 @@ PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron
 * * * * *               recentfile-aggregate.sh
 * * * * *               date -u +"\%s \%a \%b \%e \%T \%Z \%Y" > /home/ftp/tmp/02STAMP && mv /home/ftp/tmp/02STAMP /home/ftp/pub/PAUSE/authors/02STAMP && /opt/perl/current/bin/perl -I /home/puppet/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/authors/02STAMP
 08 * * * *              date -u +"\%s \%FT\%TZ" > /home/ftp/tmp/02STAMPm && mv /home/ftp/tmp/02STAMPm /home/ftp/pub/PAUSE/modules/02STAMP && /opt/perl/current/bin/perl -I /home/puppet/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/modules/02STAMP
-05 * * * *              perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log
+52 * * * *              perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log
 04 7 * * 6              perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log --symlinkinventory
 17,29,41,53 * * * *     perl /home/puppet/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log --fail-silently-on-concurrency-protection --rewrite
 12 06,14,22 * * *       perl /home/puppet/pause/cron/update-checksums.pl
 29 * * * *              perl /home/puppet/pause/cron/cleanup-incoming.pl
 */3 * * * *              perl /home/puppet/pause/cron/cleanup-apachecores.pl
-59 06,18 * * *          perl /home/puppet/pause/cron/cron-daily.pl
+59 * * * *              perl /home/puppet/pause/cron/cron-daily.pl
 37 05 * * *             perl /home/puppet/pause/cron/gmls-lR.pl
 47 07,13,19,01 * * *    perl /home/puppet/pause/cron/mysql-dump.pl
 19 * * * *              perl /home/puppet/pause/cron/make-mirror-yaml.pl
@@ -26,7 +26,14 @@ PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron
 23 07,13,19,01 * * *    run_mirrors.sh
 22 * * * *              perl /home/puppet/pause/cron/sync-04pause.pl
 03 07,13,18,01 * * *    cd /home/ftp/pub/PAUSE/PAUSE-git && (git gc && git push -u origin master) >> /var/log/git-gc-push.out
-4,19,34,49 * * * *      zsh /home/puppet/pause/cron/assert-paused-running.zsh
+4,11,19,26,34,42,49,56 * * * *      zsh /home/puppet/pause/cron/assert-paused-running.zsh
+18 * * * *              perl /home/puppet/pause/cron/cron-p6daily.pl
 
-7 3,9 * * * perl /home/kstar/cron/indexscripts.pl    >/dev/null 2>&1
-7 2   * * 0 perl /home/kstar/cron/indexscripts.pl -f
+#7 3,9 * * * perl /home/kstar/cron/indexscripts.pl    >/dev/null 2>&1
+#7 2   * * 0 perl /home/kstar/cron/indexscripts.pl -f
+
+#>19:47:02 root@pause2:/home/puppet/pause# PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron perl -Ilib -c bin/indexscripts.pl
+#bin/indexscripts.pl syntax OK
+
+46 0,6,12,18 * * * perl -I/home/puppet/pause/lib /home/puppet/pause/bin/indexscripts.pl    >/home/puppet/pause/bin/indexscripts.pl.out 2>&1
+7 2   * * 0 perl -I/home/puppet/pause/lib /home/puppet/pause/bin/indexscripts.pl -f
