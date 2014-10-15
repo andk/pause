@@ -409,6 +409,11 @@ class pause-paused {
     dateext
 }\n",
 	}
+        service { "crond":
+		ensure => running,
+		enable => true,
+		hasstatus => true,		
+	}
 }
 class pause-limits {
 	file { "/etc/security/limits.conf":
