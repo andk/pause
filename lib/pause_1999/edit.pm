@@ -5757,20 +5757,24 @@ sub peek_perms {
                 qq{SELECT mods.modid,
                           mods.userid,
                           users.fullname,
-                          "modulelist"
+                          "modulelist",
+                          mods.userid
                    FROM mods LEFT JOIN users ON mods.userid=users.userid
 },
                 qq{SELECT primeur.package,
                           primeur.userid,
                           users.fullname,
-                          "first-come"
+                          "first-come",
+                          primeur.userid
                    FROM primeur LEFT JOIN users ON primeur.userid=users.userid
 },
                 qq{SELECT perms.package,
                           perms.userid,
                           users.fullname,
-                          "co-maint"
+                          "co-maint",
+                          primeur.userid
                    FROM perms LEFT JOIN users ON perms.userid=users.userid
+                              LEFT JOIN primeur ON perms.package=primeur.package
 },
                );
 
@@ -5827,7 +5831,9 @@ sub peek_perms {
     if (@res) {
       for my $row (@res) {
         # add the owner on column 4
-        $row->[4] = $self->owner_of_module($mgr,$row->[0]);
+        # will already be set except for co-maint modules where the
+        # owner is in the modlist but not first-come
+        $row->[4] ||= $self->owner_of_module($mgr,$row->[0]);
       }
       my @column_names = qw(module userid fullname type owner);
       my $output_format = $cgi->param("OF");
