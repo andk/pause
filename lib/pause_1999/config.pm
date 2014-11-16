@@ -160,29 +160,6 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 
                            },
 
-           # USER/MODULES
-
-           apply_mod => {
-                         verb => "Register Namespace",
-                         priv => "user",
-                         cat => "User/02Modules/01reg",
-
-                         desc => "Propose a new module to be added to
-                            the long module list",
-
-                        },
-           edit_mod => {
-                        verb => "Edit Module Metadata",
-                        priv => "user",
-                        cat => "User/02Modules/02",
-
-                        desc => "When your module is in the module
-			  list, you can edit the description and the
-			  DSLI status that are stored about it in the
-			  database.",
-
-			 },
-
            # User/Permissions
 
            peek_perms => {
@@ -260,19 +237,6 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 
 
            # ADMIN+mlrep+modlistmaint
-
-
-           add_mod => {
-
-                       verb => "Register a Module",
-                       priv => "modmaint",
-                       cat => "02mods/02",
-
-                       desc => "Register a new module in the database
-                         to be added to the module list. In
-                         development.",
-
-                      },
 
 
            add_user => {
@@ -378,12 +342,10 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
           ActiveColor        => "#bbffbb",
           AllowAdminTakeover => [qw(
  add_uri
- apply_mod
  change_passwd
  delete_files
  edit_cred
  edit_ml
- edit_mod
  edit_uris
  reindex
  reset_version
@@ -391,7 +353,6 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
  dele_message
  )],
           AllowMlreprTakeover => [qw(
-edit_mod
 edit_ml
 reset_version
 share_perms
