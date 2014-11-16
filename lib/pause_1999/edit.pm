@@ -6128,10 +6128,10 @@ sub share_perms {
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
   push @m, qq{<input type="hidden" name="lsw" value="1" />}; # let submit win
 
-  my $scrolling_list_1 = $self->share_perms_scrl_1($mgr,$u->{userid});
-  my $scrolling_list_2 = $self->share_perms_scrl_2($mgr,$u);
-  my $scrolling_list_3 = $self->share_perms_scrl_3($mgr,$u);
-  my $scrolling_list_4 = $self->share_perms_scrl_4($mgr,$u);
+  my $scrolling_list_mod = $self->share_perms_scrl_mod($mgr,$u->{userid});
+  my $scrolling_list_remove_primary = $self->share_perms_scrl_remove_primary($mgr,$u);
+  my $scrolling_list_make_comaintainer = $self->share_perms_scrl_make_comaintainer($mgr,$u);
+  my $scrolling_list_remove_maintainer = $self->share_perms_scrl_remove_maintainer($mgr,$u);
 
   unless ($subaction) {
 
@@ -6180,7 +6180,7 @@ sub share_perms {
       </tr>
 
       <tr>
-        <td valign="top">$scrolling_list_1</td>
+        <td valign="top">$scrolling_list_mod</td>
         <td align="right" valign="top">
           <input type="submit"
                  name="pause99_edit_mod_2"
@@ -6196,7 +6196,7 @@ sub share_perms {
       <tr><td colspan="3">2. You are primary maintainer:</td></tr>
 
       <tr>
-        <td rowspan="2">$scrolling_list_2</td>
+        <td rowspan="2">$scrolling_list_remove_primary</td>
         <td align="right" valign="top">
           <input type="submit"
                  name="weaksubmit_pause99_share_perms_movepr"
@@ -6230,7 +6230,7 @@ sub share_perms {
       </tr>
 
       <tr>
-        <td rowspan="2">$scrolling_list_3</td>
+        <td rowspan="2">$scrolling_list_make_comaintainer</td>
         <td align="right"
             valign="top">
           <input type="submit"
@@ -6256,7 +6256,7 @@ sub share_perms {
       <tr> <td colspan="3">4. You are co-maintainer</td> </tr>
 
       <tr>
-        <td valign="top">$scrolling_list_4</td>
+        <td valign="top">$scrolling_list_remove_maintainer</td>
         <td align="right"
             valign="top"><input type="submit"
             name="weaksubmit_pause99_share_perms_remome" value="Select"
@@ -6281,7 +6281,7 @@ sub share_perms {
   @m;
 }
 
-sub share_perms_scrl_1 {
+sub share_perms_scrl_mod {
   my($self,$mgr,$userid) = @_;
   my $dbh = $mgr->connect;
   my $sql = qq{SELECT modid
@@ -6307,7 +6307,7 @@ sub share_perms_scrl_1 {
                       );
 }
 
-sub share_perms_scrl_2 {
+sub share_perms_scrl_remove_primary {
   my($self,$mgr,$u) = @_;
   my $dbh = $mgr->connect;
 
@@ -6324,7 +6324,7 @@ sub share_perms_scrl_2 {
                       );
 }
 
-sub share_perms_scrl_3 {
+sub share_perms_scrl_make_comaintainer {
   my($self,$mgr,$u) = @_;
   my $dbh = $mgr->connect;
 
@@ -6344,7 +6344,7 @@ sub share_perms_scrl_3 {
                       );
 }
 
-sub share_perms_scrl_4 {
+sub share_perms_scrl_remove_maintainer {
   my($self,$mgr,$u) = @_;
   my $dbh = $mgr->connect;
 
