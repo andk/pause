@@ -496,6 +496,29 @@ sub _now_string {
   return $self->_time_string(time);
 }
 
+sub user_has_pumpking_bit {
+  my ($self, $user) = @_;
+
+  use DBI;
+  my $adbh = DBI->connect(
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
+  ) or die $DBI::errstr;
+  my $query = "SELECT * FROM grouptable
+  WHERE user= ?
+    AND ugroup='pumpking'";
+  my $sth = $adbh->prepare($query);
+  $sth->execute($user);
+
+  my $ok = $sth->rows > 0;
+
+  $sth->finish;
+  $adbh->disconnect;
+
+  return $ok;
+}
+
 1;
 
 # Local Variables:
