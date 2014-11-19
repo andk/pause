@@ -1152,9 +1152,11 @@ sub p6_index_dist {
   # Index distribution itself.
   my @args = ($c->{name}, $userid, $c->{version}, $dist, PAUSE->_now_string);
   my $ret  = $dbh->do($p6dists, undef, @args);
+  pop @args; # we do not use the "now string" in the sprintf below
   push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
   $self->verbose(1,
     sprintf("Inserted into p6dists name[%s]auth[%s]ver[%s]tarball[%s]ret[%s]err[%s]\n", @args));
+
   return "ERROR in dist $dist: " . $dbh->errstr unless $ret;
 
   ###
