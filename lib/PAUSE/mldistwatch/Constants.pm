@@ -5,6 +5,7 @@ package PAUSE::mldistwatch::Constants;
 # constants used for index_status:
 use constant EDUALOLDER => 50; # pumpkings only
 use constant EDUALYOUNGER => 30; # pumpkings only
+use constant EDISTNAMEPERM => 26;
 use constant EDBERR => 25;
 use constant EDBCONFLICT => 23;
 use constant EOPENFILE => 21;
@@ -25,6 +26,7 @@ our $heading = {
   EDBERR() => "Database error",
   EDUALOLDER() => "An older dual-life module stays reference",
   EDUALYOUNGER() => "Dual-life module stays reference",
+  EDISTNAMEPERM() => "No permissions for distribution name",
   EMISSPERM() => "Permission missing",
   EMTIMEFALLING() => "Decreasing mtime on a file (category to be deprecated)",
   EOLDRELEASE() => "Release seems outdated",
