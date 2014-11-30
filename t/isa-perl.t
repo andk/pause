@@ -1,3 +1,5 @@
+use lib 't/lib';
+use TestSetup;
 my $tests;
 BEGIN { $tests = 0 }
 use Test::More;
