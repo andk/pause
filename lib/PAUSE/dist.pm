@@ -1065,7 +1065,7 @@ sub version_from_meta_ok {
   # provides hash! -- rjbs, 2012-03-31
   return($self->{VERSION_FROM_META_OK} = 0) unless $c->{provides};
 
-  # Some versions of Module::Build geneated an empty provides hash.  If we're
+  # Some versions of Module::Build generated an empty provides hash.  If we're
   # *not* looking at a Module::Build-generated metafile, then it's okay.
   my ($mb_v) = ($c->{generated_by} // '') =~ /Module::Build version ([\d\.]+)/;
   return($self->{VERSION_FROM_META_OK} = 1) unless $mb_v;
@@ -1220,4 +1220,148 @@ sub p6_index_dist {
 }
 
 1;
+__END__
 
+=head1 NAME
+
+PAUSE::dist - Class representing one distribution
+
+=head1 SYNOPSIS
+
+  my $dio = PAUSE::dist->new(
+    MAIN   => $self,
+    DIST   => $dist,
+    DBH    => $dbh,
+    ALERT  => "",
+    TIME   => $time,
+    TARBIN => $self->{TARBIN},
+    UNZIPBIN  => $self->{UNZIPBIN},
+    PICK   => $self->{PICK},
+    'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
+  );
+
+=head1 DESCRIPTION
+
+Encapsulates operations on a distro, either in the database, in a
+(possibly compressed archive), or unpacked on disk.
+
+=head2 Methods
+
+=head3 new
+
+Constructor.
+
+=head3 examine_dist
+
+Does these checks:
+
+  $dio->isa_regular_perl
+  $dio->isa_dev_version
+  $dist =~ m|/perl-\d+|
+
+Then unpacks the distro into a local directory.
+
+=head3 read_dist
+
+Reads the distro's F<MANIFEST>.
+
+=head3 extract_readme_and_meta
+
+Copies the shortest-named README file, and metadata files, out to
+top-level as F<$distroname.readme> et al.
+
+=head3 filter_pms
+
+Goes through all F<*.pm> files, removing test and install libs, and
+applying the metadata's C<no_index> rules. Returns ref to array with
+filenames.
+
+=head3 version_from_meta_ok
+
+Can the version be got from the metadata?
+
+=head3 check_blib
+
+=head3 check_multiple_root
+
+=head3 check_world_writable
+
+Check various aspects of the distro.
+
+=head3 examine_pms
+
+Calls L<filter_pms>, L<version_from_meta_ok>, and then an index method.
+
+=head3 ignoredist
+
+Whether is really a distro vs a F<*.readme>.
+
+=head3 mtime_ok
+
+Whether the distro has changed since "last time".
+
+=head3 delete_goner
+
+Delete database entry for this distro.
+
+=head3 writechecksum
+
+=head3 alert
+
+=head3 untar
+
+=head3 perl_major_version
+
+Is this a distro for Perl 5 or 6?
+
+=head3 skip
+
+Accessor method. True if perl distro from non-pumpking or a dev release.
+
+=head3 isa_regular_perl
+
+=head3 _examine_regular_perl
+
+=head3 isa_dev_version
+
+=head3 connect
+
+=head3 disconnect
+
+=head3 mlroot
+
+=head3 mail_summary
+
+=head3 index_status
+
+=head3 add_indexing_warning
+
+=head3 indexing_warnings_for_package
+
+=head3 has_indexing_warnings
+
+=head3 _package_governing_permission
+
+The package used to determine whether the uploader may upload this distro.
+
+=head3 _index_by_files
+
+=head3 _index_by_meta
+
+=head3 chown_unsafe
+
+=head3 verbose
+
+=head3 lock
+
+=head3 set_indexed
+
+Insert this distro into the database.
+
+=head3 p6_dist_meta_ok
+
+Is the metadata for this Perl 6 distro good?
+
+=head3 p6_index_dist
+
+Index this Perl 6 distro.

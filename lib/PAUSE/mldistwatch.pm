@@ -1393,38 +1393,30 @@ The paused daemon immediately triggers I<small> mldistwatch runs.
 The purpose of the C<--pick> parameter is to focus on the indexing of
 one or more distros. When the C<--pick=distro> parameter is given
 (which may be given multiple times), writing of the C<0*> files is
-skipped. No find() is taking place. Inexistant distros are not removed
+skipped. No find() takes place. Non-existent distros are not removed
 from the database.
 
-=head1 OVERVIEW
+=head2 Checks done on distributions before entering them in CPAN
 
-So we have distfilechecks, directorychecks and contentfilechecks.
-Contentchecks have two parts, files and namespaces (packages). And we
-have some sort of a scheduler that keeps track of what we have to do.
+The following methods are called on each L<PAUSE::dist> object in order
+to check its validity for indexing:
 
-Classes contained in the script:
+  $dio->ignoredist # must return false
+  $dio->examine_dist; # checks for perl, developer, version, etc. and untars
+  $dio->skip # must return false
+  $dio->read_dist;
+  $dio->extract_readme_and_meta;
+  $dio->check_blib;
+  $dio->check_multiple_root;
+  $dio->check_world_writable;
+  $dio->examine_pms;
 
- PAUSE::mldistwatch       we could call it main. One object does all the
-                          work
+Then the C<_userid_has_permissions_on_package> method is called to
+check permissions.
 
- PAUSE::mldistwatch::Constants
-                          constants used for PAUSE::dist::index_status()
+=head1 SEE ALSO
 
- PAUSE::dist              each distro we find is an object of this class
-
- PAUSE::pmfile            each *.pm file in each distro is one object of
-                          this class
-
- PAUSE::package           each package statement per pm-file is an object
-                          of this class
-
-
-The methods alert() and verbose() exist in all classes. Only the two
-in PAUSE::mldistwatch do something for real, the others just pass
-their arguments up in the "stack" of objects. Similarly index_status
-passes arguments up till they reach the PAUSE::dist object. From there
-they are harvested in the mail_summary() method that sends a report to
-the owner of the package
+L<PAUSE>
 
 =cut
 
