@@ -96,8 +96,9 @@ WriteMakefile(
                              keywords => ['CPAN','perl','perl authors upload server'],
                             }) : ()),
              );
-open my $fh, ">>", "Makefile" or die;
-print $fh <<EOF;
+
+sub MY::postamble {
+  <<EOF;
 cpanshell ::
 \t\$(PERL) -MCPAN -e shell
 
@@ -124,11 +125,9 @@ doc/mod.schema.txt:
 doc/authen_pause.schema.txt:
 	mysqldump -u root -p authen_pause --quote-names=false --no-data --skip-add-drop-table > \$\@
 
-EOF
-
-print $fh <<'EOF' or die;
 htdocs/namingmodules.html: htdocs/namingmodules.pod
-	-[ -r $@ ] && chmod +w $@
-	-$(PERL) -MPod::Xhtml -e 'Pod::Xhtml->new->parse_from_file(\*ARGV)' htdocs/namingmodules.pod > $@
+	-[ -r \$\@ ] && chmod +w \$\@
+	-\$(PERL) -MPod::Xhtml -e 'Pod::Xhtml->new->parse_from_file(\*ARGV)' htdocs/namingmodules.pod > \$\@
 
 EOF
+}
