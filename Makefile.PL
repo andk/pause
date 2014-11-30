@@ -113,7 +113,7 @@ getdump:
 recorddump: moddump.current
 	mysql -u root -p mod < moddump.current
 
-stoplave:
+stopslave:
 	mysql -u root -p -e 'stop slave'
 
 startslave:
