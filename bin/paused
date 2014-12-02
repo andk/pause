@@ -924,25 +924,24 @@ sub timestamp { # Efficiently generate a time stamp for log files
 # package mypause_daemon_inspector
 sub writeback {
   my($self,$hash,$hash_orig,$dbh) = @_;
-  my(@v,$v);
+  my(@v,@queryparams);
   for (qw[dgot dverified ddeleted uriid
 	  nosuccesstime nosuccesscount]) {
-    push @v, "$_='$hash->{$_}'" if $hash->{$_} ne $hash_orig->{$_};
+    next if $hash->{$_} eq $hash_orig->{$_};
+    push @v, "$_=?";
+    push @queryparams, $hash->{$_};
   }
   return 0 unless @v;
-  my $query = "UPDATE uris SET ";
-  $query .= join ", ", @v;
-  ($v = $hash_orig->{uriid}) =~ s/'/\\'/g;
-  my $whereclause .= " WHERE uriid='$v'";
-  $query .= $whereclause;
+  my $query = "UPDATE uris SET " . join(", ", @v) . " WHERE uriid=?";
+  push @queryparams, $hash_orig->{uriid};
   # $self->logge("Info: Going to $query");
-  $dbh->do($query) or $self->logge("Alert: $DBI::errstr: $query");
+  $dbh->do($query, undef, @queryparams) or $self->logge("Alert: $DBI::errstr: $query/(@queryparams)");
   if ($DBI::errstr =~ /Non unique key|Duplicate/i) {
-    my $dquery = "DELETE FROM uris $whereclause";
-    $self->logge("Debug: Non-uniq-Error; trying: $dquery");
-    $dbh->do($dquery) or $self->logge("Debug: $DBI::errstr: $dquery");
-    $self->logge("Debug: retry now: $query");
-    $dbh->do($query) or $self->logge("Alert: $DBI::errstr: $query");
+    my $dquery = "DELETE FROM uris WHERE uriid=?";
+    $self->logge("Debug: Non-uniq-Error; trying: $dquery/$hash_orig->{uriid}");
+    $dbh->do($dquery, undef, $hash_orig->{uriid}) or $self->logge("Debug: $DBI::errstr: $dquery");
+    $self->logge("Debug: retry now: $dquery/$hash_orig->{uriid}");
+    $dbh->do($dquery, undef, $hash_orig->{uriid}) or $self->logge("Alert: $DBI::errstr: $dquery");
   }
   return 1;
 }

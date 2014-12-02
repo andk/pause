@@ -126,8 +126,8 @@ sub perm_check {
 
   my($userid) = $self->{USERID};
 
-  my $ins_perms = "INSERT INTO perms (package, userid) VALUES ".
-      "('$package', '$userid')";
+  my $ins_perms = "INSERT INTO perms (package, userid) VALUES (?, ?)";
+  my @ins_params = ($package, $userid);
 
   # package has any authorized maintainers? --> case insensitive
   my($auth_ids) = $dbh->selectall_arrayref(qq{
@@ -150,11 +150,11 @@ sub perm_check {
   if ($self->{FIO}{DIO} && $self->{FIO}{DIO}->isa_regular_perl($dist)) {
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
-      my $ret = $dbh->do($ins_perms);
+      my $ret = $dbh->do($ins_perms, undef, @ins_params);
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      # print "(primeur)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
+      # print "(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n";
 
       return 1;           # P2.1, P3.0
   }
@@ -170,11 +170,11 @@ sub perm_check {
 
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
-      my $ret = $dbh->do($ins_perms);
+      my $ret = $dbh->do($ins_perms, undef, @ins_params);
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      # print "(primeur)ins_perms[$ins_perms]ret[$ret]err[$err]\n";
+      # print "(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n";
 
       return 1;           # P2.1, P3.0
   }
@@ -235,11 +235,11 @@ owner[$owner]
       # package has no existence in perms yet, so this guy is OK
 
       local($dbh->{RaiseError}) = 0;
-      my $ret = $dbh->do($ins_perms);
+      my $ret = $dbh->do($ins_perms, undef, @ins_params);
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      $self->verbose(1,"Package is new: (uploader)ins_perms[$ins_perms]ret[$ret]err[$err]\n");
+      $self->verbose(1,"Package is new: (uploader)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
 
   }
   $self->verbose(1,sprintf( # just for debugging

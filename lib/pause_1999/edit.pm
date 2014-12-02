@@ -877,6 +877,7 @@ sub edit_cred {
 	  #	}
 	  #	next if $mgr->{User}{$field} eq $s;
 
+	  # not ?-ising this as rely on quote() method
 	  push @set, "$field = " . $dbh->quote($s);
 	  $mb = sprintf($mailsprintf1,
                         $field,
@@ -901,9 +902,10 @@ sub edit_cred {
       }
       if (@set) {
 
+	my @query_params = ($now, $mgr->{User}{userid}, $u->{userid});
 	my $sql = "UPDATE $table SET " . ####
-	    join(", ", @set, "changed = '$now', changedby='$mgr->{User}{userid}'") .
-		" WHERE $column = '$u->{userid}'"; ####
+	    join(", ", @set, "changed = ?, changedby=?") .
+		" WHERE $column = ?"; ####
 	my $mailblurb = qq{Record update in the PAUSE users database:
 
 };
@@ -919,7 +921,7 @@ The Pause
 };
 	# warn "sql[$sql]mailblurb[$mailblurb]";
 	# die;
-	if ($dbh->do($sql)) {
+	if ($dbh->do($sql, undef, @query_params)) {
 	  push @m, qq{The new data are registered in table $table.<hr />};
 	  $nu = $self->active_user_record($mgr,$u->{userid});
 	  if ($nu->{userid} && $nu->{userid} eq $mgr->{User}{userid}) {
@@ -1806,20 +1808,19 @@ href="mailto:},
           $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!
 	 ) {
 	# Overwriting allowed
-	my $dele_query = "DELETE FROM uris WHERE uriid = '$uriid'";
-	$dbh->do($dele_query);
+	$dbh->do("DELETE FROM uris WHERE uriid = ?", undef, $uriid);
       }
-      my $query = qq{INSERT INTO uris
+      my $query = q{INSERT INTO uris
                             (uriid,     userid,
                              basename,
                              uri,
 		             changedby, changed)
-                     VALUES ('$uriid', '$u->{userid}',
-                             '$filename',
-                             '$uri',
-                             '$mgr->{User}{userid}', '$now')};
+                     VALUES (?, ?, ?, ?, ?, ?)};
+      my @query_params = (
+	$uriid, $u->{userid}, $filename, $uri, $mgr->{User}{userid}, $now
+      );
       #display query
-      my $cp = $mgr->escapeHTML($query);
+      my $cp = $mgr->escapeHTML("$query/(@query_params)");
       push @m, qq{<h3>Submitting query</h3>};
       if ($mgr->{UseModuleSet} eq "patchedCGI") {
         warn "patchedCGI not supported anymore";
@@ -1857,7 +1858,7 @@ href="mailto:},
 	push @m, "Resulting SQL: ", $cp;
       }
       local($dbh->{RaiseError}) = 0;
-      if ($dbh->do($query)) {
+      if ($dbh->do($query, undef, @query_params)) {
 	$$success .= qq{
 
 The request is now entered into the database where the PAUSE daemon
@@ -2069,9 +2070,10 @@ sub delete_files {
 	$blurb .= "WARNING: CHECKSUMS not erasable: $userhome/$f\n";
 	next;
       }
-      my $sql = "INSERT INTO deletes
-                 VALUES ('$userhome/$f', '$time', '$mgr->{User}{userid}')";
-      $dbh->do($sql) or next;
+      $dbh->do(
+	"INSERT INTO deletes VALUES (?, ?, ?)", undef,
+	"$userhome/$f", $time, "$mgr->{User}{userid}"
+      ) or next;
 
       $blurb .= "\$CPAN/authors/id/$userhome/$f\n";
 
@@ -2080,16 +2082,20 @@ sub delete_files {
       my $readme = $f;
       $readme =~ s/(\.tar.gz|\.zip)$/.readme/;
       if ($readme ne $f && -f $readme) {
-	$sql = qq{INSERT INTO deletes
-                  VALUES ('$userhome/$readme','$time','$mgr->{User}{userid}')};
-	$dbh->do($sql) or next;
+	$dbh->do(
+	  q{INSERT INTO deletes VALUES (?,?,?)}, undef,
+	  "$userhome/$readme", $time, $mgr->{User}{userid},
+	) or next;
 	$blurb .= "\$CPAN/authors/id/$userhome/$readme\n";
       }
     }
   } elsif ($req->param('SUBMIT_pause99_delete_files_undelete')) {
     foreach my $f ($req->param('pause99_delete_files_FILE')) {
-      my $sql = "DELETE FROM deletes WHERE deleteid = '$userhome/$f'";
-      $dbh->do($sql) or warn sprintf "FAILED Query: %s: %s", $sql, $DBI::errstr;
+      my $sql = "DELETE FROM deletes WHERE deleteid = ?";
+      $dbh->do(
+	$sql, undef,
+	"$userhome/$f"
+      ) or warn sprintf "FAILED Query: %s/: %s", $sql, "$userhome/$f", $DBI::errstr;
     }
   }
   if ($blurb) {
@@ -2147,9 +2153,9 @@ glory is collected on http://history.perl.org/backpan/});
       $sth = $dbh->prepare(qq{SELECT deleteid, changed
                               FROM deletes
                               WHERE deleteid
-                              LIKE '$userhome/%'})           #}
+                              LIKE ?})           #}
       and
-      $sth->execute
+      $sth->execute("$userhome/%")
       and
       $sth->rows
      ) {
@@ -2227,9 +2233,9 @@ sub show_files {
       $sth = $dbh->prepare(qq{SELECT deleteid, changed
                               FROM deletes
                               WHERE deleteid
-                              LIKE '$userhome/%'})
+                              LIKE ?})
       and
-      $sth->execute
+      $sth->execute("$userhome/%")
       and
       $sth->rows
      ) {
@@ -4604,9 +4610,9 @@ sub _add_mod_hint {
     } else {
       $sth = $dbh->prepare(qq{SELECT chapterid
                               FROM   mods
-                              WHERE  modid LIKE '$root\::%'});
+                              WHERE  modid LIKE ?});
 
-      $sth->execute;
+      $sth->execute("$root\::%");
       $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
     }
 
@@ -4771,8 +4777,8 @@ sub apply_mod {
       warn "root[$root]";
       $sth = $dbh->prepare("SELECT chapterid
                             FROM   mods
-                            WHERE  modid = '$root' OR modid LIKE '$root\::%'");
-      $sth->execute;
+                            WHERE  modid = ? OR modid LIKE ?");
+      $sth->execute($root, "$root\::%");
       my(%appr);
       if ($sth->rows) {
         while (my $chid = $mgr->fetchrow($sth, "fetchrow_array")) {

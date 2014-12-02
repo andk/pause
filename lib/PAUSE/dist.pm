@@ -80,8 +80,8 @@ sub delete_goner {
     return;
   }
   my $dbh = $self->connect;
-  $dbh->do("DELETE FROM packages WHERE dist='$dist'");
-  $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
+  $dbh->do("DELETE FROM packages WHERE dist=?", undef, $dist);
+  $dbh->do("DELETE FROM distmtimes WHERE dist=?", undef, $dist);
 }
 
 # package PAUSE::dist;
@@ -114,12 +114,12 @@ sub mtime_ok {
   unless ($otherts){ # positive $otherts means it was alive last time
     # Hahaha: he didn't think of the programmer who wants to
     # introduce locking:
-    # $dbh->do("DELETE FROM distmtimes WHERE dist='$dist'");
+    # $dbh->do("DELETE FROM distmtimes WHERE dist=?", undef, $dist);
 
     local($dbh->{RaiseError}) = 0;
     # this may fail if we have a race condition, but we'll
     # decide later if this is the case:
-    $dbh->do("INSERT INTO distmtimes (dist) VALUES ('$dist')");
+    $dbh->do("INSERT INTO distmtimes (dist) VALUES (?)", undef, $dist);
   }
   my $MLROOT = $self->mlroot;
   my $mtime = (stat "$MLROOT/$dist")[9];
@@ -1082,10 +1082,11 @@ sub lock {
   my $dbh = $self->connect;
   my $rows_affected = $dbh->do(
     "UPDATE distmtimes SET indexing_at=?
-    WHERE dist='$dist'
+    WHERE dist=?
       AND indexing_at IS NULL",
     undef,
     PAUSE->_now_string,
+    $dist,
   );
   return 1 if $rows_affected > 0;
   my $sth = $dbh->prepare("SELECT * FROM distmtimes WHERE dist=?");
@@ -1112,9 +1113,10 @@ sub set_indexed {
   my $dist = $self->{DIST};
   my $dbh = $self->connect;
   my $rows_affected = $dbh->do(
-    "UPDATE distmtimes SET indexed_at=?  WHERE dist='$dist'",
+    "UPDATE distmtimes SET indexed_at=?  WHERE dist=?",
     undef,
     PAUSE->_now_string,
+    $dist,
   );
   $rows_affected > 0;
 }
