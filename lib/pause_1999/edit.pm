@@ -55,9 +55,9 @@ sub parameter {
 		     "change_passwd",
 		     "delete_files",
 		     "edit_cred",
-		     "edit_mod",
+		     # "edit_mod",
 		     "edit_uris",
-		     "apply_mod",
+		     # "apply_mod",
                      "pause_logout",
                      "peek_perms",
                      "reindex",
@@ -75,7 +75,7 @@ sub parameter {
       for my $command (
 		       "select_ml_action",
 		       "edit_ml",
-		       "edit_mod",
+		       # "edit_mod",
                        "reset_version",
                        "show_ml_repr",
 		      ) {
@@ -85,7 +85,7 @@ sub parameter {
     }
 
     # Only Modulelist Maintainers
-    if (exists $mgr->{UserGroups}{modmaint}) {
+    if (0 && exists $mgr->{UserGroups}{modmaint}) {
       for my $command (
 		       "add_mod",
                        "apply_mod",
@@ -117,8 +117,8 @@ sub parameter {
 		       "edit_ml",
 		       "select_user",
 		       "show_ml_repr",
-                       "add_mod", # all admins may maintain the module list for now
-                       "apply_mod",
+                       # "add_mod", # all admins may maintain the module list for now
+                       # "apply_mod",
                        "check_xhtml",
                        "coredump",
                        "dele_message",
