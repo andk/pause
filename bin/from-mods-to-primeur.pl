@@ -83,7 +83,7 @@ for my $userid (@{$Opt{byuser}}) {
     }
 }
 unless (@mods){
-    warn "Arguments expected";
+    warn "Arguments expected, got none";
     pod2usage(1);
 }
 @mods = uniq @mods;
@@ -100,6 +100,11 @@ MOD: for my $modid (@mods) {
     my $mv_userid;
     while (my($mlstatus,$userid) = $sth2->fetchrow_array) {
         if ($mlstatus eq "list") {
+            $mv_userid = $userid;
+            $wantmove=1;
+        } elsif ($mlstatus eq "delete") {
+            # delete turned out to be the same case as list when bdfoy
+            # tried to give an adoptme module away (Math::FFT)
             $mv_userid = $userid;
             $wantmove=1;
         } else {
