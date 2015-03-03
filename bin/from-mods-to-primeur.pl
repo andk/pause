@@ -132,7 +132,7 @@ MOD: for my $modid (@mods) {
         }
         if ($can_remove) {
             if ($Opt{"dry-run"}) {
-                warn "Would now set mlstatus fo $modid in mods to delete";
+                warn "Would now set mlstatus for $modid in mods to delete";
             } else {
                 $sth3->execute($modid);
             }

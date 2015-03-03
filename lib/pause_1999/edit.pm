@@ -5709,17 +5709,16 @@ sub peek_perms {
             user ID is registered for or all user IDs registered for a
             module, as appropriate.</p>
 
-            <p>Registration comes in one of
-            three types: type <b>modulelist</b> is the registration in
-            the module list (as "blessed" by the module list
-            maintainers; often months behind). Type <b>first-come</b>
-            is the automatic registration on a first-come-first-serve
-            basis that happens on the initial upload. And type
-            <b>co-maint</b> is the registration as co-maintainer which
-            means that the primary maintainer of the namespace has
-            granted permission to upload this module to other
-            userid(s). Per namespace there can only be one primary
-            maintainer (userid in the <b>modulelist</b> or the
+            <p>Registration comes in one of three types: type
+            <b>modulelist</b> is the registration in the old module
+            list (like first-come with metadata). Type
+            <b>first-come</b> is the automatic registration on a
+            first-come-first-serve basis that happens on the initial
+            upload. And type <b>co-maint</b> is the registration as
+            co-maintainer which means that the primary maintainer of
+            the namespace has granted permission to upload this module
+            to other userid(s). Per namespace there can only be one
+            primary maintainer (userid in the <b>modulelist</b> or the
             <b>first-come</b> category) and any number of userids in
             the <b>co-maint</b> category. Being registered in any of
             the categories means that a user is able not only to
