@@ -5880,12 +5880,12 @@ sub peek_perms {
                                <td>%s</td>
                                <td>%s</td>
 },
-                           $row->[0],
-                           $row->[0],
-                           $row->[1],
-                           $row->[1],
-                           $row->[2],
-                           $row->[3],
+                           $mgr->escapeHTML($row->[0]),
+                           $mgr->escapeHTML($row->[0]),
+                           $mgr->escapeHTML($row->[1]),
+                           $mgr->escapeHTML($row->[1]),
+                           $mgr->escapeHTML($row->[2]),
+                           $mgr->escapeHTML($row->[3]),
                            );
           push @m, qq{</tr>};
       }
