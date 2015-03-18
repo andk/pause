@@ -5761,21 +5761,18 @@ sub peek_perms {
     my @query       = (
                 qq{SELECT mods.modid,
                           mods.userid,
-                          users.fullname,
                           "modulelist",
                           mods.userid
                    FROM mods LEFT JOIN users ON mods.userid=users.userid
 },
                 qq{SELECT primeur.package,
                           primeur.userid,
-                          users.fullname,
                           "first-come",
                           primeur.userid
                    FROM primeur LEFT JOIN users ON primeur.userid=users.userid
 },
                 qq{SELECT perms.package,
                           perms.userid,
-                          users.fullname,
                           "co-maint",
                           primeur.userid
                    FROM perms LEFT JOIN users ON perms.userid=users.userid
@@ -5840,7 +5837,7 @@ sub peek_perms {
         # owner is in the modlist but not first-come
         $row->[4] ||= $self->owner_of_module($mgr,$row->[0]);
       }
-      my @column_names = qw(module userid fullname type owner);
+      my @column_names = qw(module userid type owner);
       my $output_format = $cgi->param("OF");
       if ($output_format){
         my @hres;
@@ -5873,8 +5870,6 @@ sub peek_perms {
         $a->[2] cmp $b->[2]
             ||
         $a->[3] cmp $b->[3]
-            ||
-        $a->[4] cmp $b->[4]
       } @res) {
           push @m, qq{<tr>};
           # pause99_peek_perms_by=m&pause99_peek_perms_query=PerlIO&pause99_peek_perms_sub=+Submit+
@@ -5884,7 +5879,6 @@ sub peek_perms {
                                <td><a href="authenquery?pause99_peek_perms_by=a&amp;pause99_peek_perms_query=%s&amp;pause99_peek_perms_sub=1">%s</a></td>
                                <td>%s</td>
                                <td>%s</td>
-                               <td>%s</td>
 },
                            $row->[0],
                            $row->[0],
@@ -5892,7 +5886,6 @@ sub peek_perms {
                            $row->[1],
                            $row->[2],
                            $row->[3],
-                           $row->[4],
                            );
           push @m, qq{</tr>};
       }
