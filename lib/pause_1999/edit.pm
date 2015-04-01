@@ -6356,8 +6356,9 @@ sub share_perms_scrl_remove_maintainer {
   my @all_mods = sort keys %$all_mods;
   my %labels;
   for my $m (@all_mods) {
-    my $owner = $self->owner_of_module($mgr,$m);
-    $labels{$m} = sprintf "%s => %s", $m, $owner||"?";
+    # get the owner for modlist modules that don't have first-come
+    my $owner = $all_mods->{$m} || $self->owner_of_module($mgr,$m) || '?';
+    $labels{$m} = "$m => $owner";
   }
   my $n = scalar @all_mods;
   return "--NONE--" unless $n;
@@ -6941,12 +6942,13 @@ sub all_cmods {
   my $u = shift;
   my $db = $mgr->connect;
   my(%all_mods);
-  my $sth2 = $db->prepare(qq{SELECT package
-                             FROM perms
+  my $sth2 = $db->prepare(qq{SELECT perms.package, primeur.userid
+                             FROM perms LEFT JOIN primeur
+                               ON perms.package = primeur.package
                              WHERE userid=?});
   $sth2->execute($u->{userid});
-  while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
-    $all_mods{$id} = undef;
+  while (my($id, $owner) = $mgr->fetchrow($sth2, "fetchrow_array")) {
+    $all_mods{$id} = $owner;
   }
   $sth2->finish;
   \%all_mods;
