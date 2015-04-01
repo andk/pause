@@ -5832,10 +5832,10 @@ sub peek_perms {
     }
     if (@res) {
       for my $row (@res) {
-        # add the owner on column 4
+        # add the owner on column 3
         # will already be set except for co-maint modules where the
         # owner is in the modlist but not first-come
-        $row->[4] ||= $self->owner_of_module($mgr,$row->[0]);
+        $row->[3] ||= $self->owner_of_module($mgr,$row->[0]);
       }
       my @column_names = qw(module userid type owner);
       my $output_format = $cgi->param("OF");
