@@ -6945,7 +6945,7 @@ sub all_cmods {
   my $sth2 = $db->prepare(qq{SELECT perms.package, primeur.userid
                              FROM perms LEFT JOIN primeur
                                ON perms.package = primeur.package
-                             WHERE userid=?});
+                             WHERE primeur.userid=?});
   $sth2->execute($u->{userid});
   while (my($id, $owner) = $mgr->fetchrow($sth2, "fetchrow_array")) {
     $all_mods{$id} = $owner;
