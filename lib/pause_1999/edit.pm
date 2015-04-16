@@ -1236,8 +1236,9 @@ sub tail_logfile {
   join "", @m;
 }
 
-sub salt () {
-  randchar(2);
+sub hash_password {
+  my ($pw) = @_;
+  crypt($pw, randchar(2));
 }
 
 my(@saltset) = (qw(. /), 0..9, "A".."Z", "a".."z");
@@ -1269,7 +1270,7 @@ sub change_passwd {
       if (my $pw2 = $req->param("pause99_change_passwd_pw2")) {
 	if ($pw1 eq $pw2) {
 	  # create a new crypted password, store it, report
-	  my $pwenc = crypt($pw1,salt());
+	  my $pwenc = hash_password($pw1);
 	  my $dbh = $mgr->authen_connect;
 	  my $sql = qq{UPDATE $PAUSE::Config->{AUTHEN_USER_TABLE}
                        SET $PAUSE::Config->{AUTHEN_PASSWORD_FLD} = ?,
@@ -2376,7 +2377,7 @@ Description: };
                        ) VALUES (
                        ?,?,?,?,?,?
                        )};
-        my $pwenc = crypt($onetime,salt());
+        my $pwenc = hash_password($onetime);
         my $dbh = $mgr->authen_connect;
         local($dbh->{RaiseError}) = 0;
         my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
