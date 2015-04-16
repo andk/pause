@@ -424,14 +424,34 @@ sub mail_summary {
     $status_over_all = "Failed";
   }
 
+  # NO_DISTNAME_PERMISSION must not hide other problem messages, so
+  # we fix up any "OK" status records to reflect the permission
+  # problem and let the rest of the report run as usual
   if ($self->{NO_DISTNAME_PERMISSION}) {
     my $pkg = $self->_package_governing_permission;
     push @m, $tf->format(qq[This distribution name can only be used
       by users with permission for the package $pkg, which you
-      do not have.]);
-    push @m, qq{\n\n};
+      do not have. No modules will be indexed.]);
+    push @m, qq{\n\nFurther details on the indexing attempt follow.\n\n};
     $status_over_all = "Failed";
-  } elsif ($self->{HAS_MULTIPLE_ROOT}) {
+
+    my $inxst = $self->{INDEX_STATUS};
+    if ($inxst && ref $inxst && %$inxst) {
+      for my $p ( keys %$inxst ) {
+          next unless
+            $inxst->{$p}{status} == PAUSE::mldistwatch::Constants::OK;
+          $inxst->{$p}{status} = PAUSE::mldistwatch::Constants::EDISTNAMEPERM;
+          $inxst->{$p}{verb_status} =
+            "Not indexed; $author not authorized for this distribution name";
+      }
+    }
+    else {
+        # some other problem prevented any modules from having status
+        # recorded, we don't have to do anything
+    }
+  }
+
+  if ($self->{HAS_MULTIPLE_ROOT}) {
 
     push @m, $tf->format(qq[The distribution does not unpack
       into a single directory and is therefore not being
