@@ -232,8 +232,8 @@ sub handler {
       $dbh->disconnect;
       return OK;
     } else {
-      warn sprintf "crypt_pw[%s]crypt_got[%s]user[%s]uri[%s]auth_required[%d]",
-	  $crypt_pw, $crypt_got, $user_record->{user}, $r->uri, AUTH_REQUIRED;
+      warn sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
+	  $crypt_pw, $user_record->{user}, $r->uri, AUTH_REQUIRED;
     }
   }
 
