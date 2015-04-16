@@ -8,6 +8,7 @@ use Apache::Table ();
 use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use File::Find qw(find);
+use PAUSE::Crypt;
 use POSIX ();
 use URI::Escape;
 use Text::Format;
@@ -1236,20 +1237,6 @@ sub tail_logfile {
   join "", @m;
 }
 
-sub salt () {
-  randchar(2);
-}
-
-my(@saltset) = (qw(. /), 0..9, "A".."Z", "a".."z");
-
-sub randchar ($) {
-  local($^W) = 0; #we get a bogus warning here
-  my($count) = @_;
-  my $str = "";
-  $str .= $saltset[int(rand(64))] while $count--;
-  $str;
-}
-
 sub change_passwd {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
@@ -1269,7 +1256,7 @@ sub change_passwd {
       if (my $pw2 = $req->param("pause99_change_passwd_pw2")) {
 	if ($pw1 eq $pw2) {
 	  # create a new crypted password, store it, report
-	  my $pwenc = crypt($pw1,salt());
+	  my $pwenc = PAUSE::Crypt::hash_password($pw1);
 	  my $dbh = $mgr->authen_connect;
 	  my $sql = qq{UPDATE $PAUSE::Config->{AUTHEN_USER_TABLE}
                        SET $PAUSE::Config->{AUTHEN_PASSWORD_FLD} = ?,
@@ -2376,7 +2363,7 @@ Description: };
                        ) VALUES (
                        ?,?,?,?,?,?
                        )};
-        my $pwenc = crypt($onetime,salt());
+        my $pwenc = PAUSE::Crypt::hash_password($onetime);
         my $dbh = $mgr->authen_connect;
         local($dbh->{RaiseError}) = 0;
         my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});

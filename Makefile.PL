@@ -19,6 +19,7 @@ WriteMakefile(
     CPAN::Indexer::Mirror
     Class::Singleton
     Compress::Zlib
+    Crypt::Eksblowfish::Bcrypt
     Cwd
     DB_File
     DBD::SQLite
