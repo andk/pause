@@ -5,6 +5,7 @@ use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
 use Apache::Table ();
+use Crypt::Eksblowfish::Bcrypt qw( bcrypt en_base64 );
 use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use File::Find qw(find);
@@ -1238,7 +1239,8 @@ sub tail_logfile {
 
 sub hash_password {
   my ($pw) = @_;
-  crypt($pw, randchar(2));
+
+  my $hash = bcrypt($pw, '$2$10$' . en_base64( randchar(16) ));
 }
 
 my(@saltset) = (qw(. /), 0..9, "A".."Z", "a".."z");
