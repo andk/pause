@@ -7,7 +7,7 @@ use Crypt::Eksblowfish::Bcrypt qw( bcrypt en_base64 );
 sub hash_password {
   my ($pw) = @_;
 
-  my $hash = bcrypt($pw, '$2$10$' . en_base64( _randchar(16) ));
+  my $hash = bcrypt($pw, '$2$12$' . en_base64( _randchar(16) ));
 }
 
 my(@saltset) = (qw(. /), 0..9, "A".."Z", "a".."z");
