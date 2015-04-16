@@ -7,6 +7,7 @@ use Crypt::Eksblowfish::Bcrypt qw( bcrypt en_base64 );
 sub hash_password {
   my ($pw) = @_;
 
+  $pw = substr $pw, 0, 72;
   my $hash = bcrypt($pw, '$2$12$' . en_base64( _randchar(16) ));
 }
 
@@ -28,6 +29,7 @@ sub password_verify {
     return $crypt_got eq $crypt_pw;
   }
 
+  my $pw = substr $sent_pw, 0, 72;
   my ($crypt_got) = bcrypt($sent_pw, $crypt_pw);
   return $crypt_got eq $crypt_pw;
 }
