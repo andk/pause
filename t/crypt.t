@@ -26,4 +26,19 @@ ok(
   "we can verify newly-generated bcrypt password",
 );
 
+ok(
+  ! PAUSE::Crypt::password_verify('bogus', $crypt),
+  "we reject bad pw against crypt hash",
+);
+
+ok(
+  ! PAUSE::Crypt::password_verify('bogus', $bcrypt),
+  "we reject bad pw against bcrypt hash",
+);
+
+ok(
+  ! PAUSE::Crypt::password_verify('bogus', $new_hash),
+  "we reject bad pw against new hash",
+);
+
 done_testing;
