@@ -2,6 +2,7 @@ package pause_1999::authen_user;
 use pause_1999::main;
 use Apache ();
 use Apache::Constants qw( AUTH_REQUIRED MOVED OK SERVER_ERROR );
+use Crypt::Eksblowfish::Bcrypt qw( bcrypt );
 use base 'Class::Singleton';
 use PAUSE ();
 use strict;
@@ -237,7 +238,13 @@ sub handler {
 
 sub password_verify {
   my ($sent_pw, $crypt_pw) = @_;
-  my ($crypt_got) = crypt($sent_pw, $crypt_pw);
+
+  if (length $crypt_pw > 13) {
+    my ($crypt_got) = crypt($sent_pw, $crypt_pw);
+    return $crypt_got eq $crypt_pw;
+  }
+
+  my ($crypt_got) = bcrypt($sent_pw, $crypt_pw);
   return $crypt_got eq $crypt_pw;
 }
 
