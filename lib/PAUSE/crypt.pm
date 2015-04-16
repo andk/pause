@@ -23,7 +23,7 @@ sub _randchar ($) {
 sub password_verify {
   my ($sent_pw, $crypt_pw) = @_;
 
-  if (length $crypt_pw > 13) {
+  if (length $crypt_pw == 13) {
     my ($crypt_got) = crypt($sent_pw, $crypt_pw);
     return $crypt_got eq $crypt_pw;
   }
@@ -35,13 +35,13 @@ sub password_verify {
 sub maybe_upgrade_stored_hash {
   my ($arg) = @_;
 
-  return if length $crypt_pw > 13; # already bcrypt
+  return if length $arg->{old_hash} > 13; # already bcrypt
 
   return; # we're not ready to do this for real yet
 
   my $new_hash = hash_password($arg->{password});
 
-  $dbh->do(
+  $arg->{dbh}->do(
     "UPDATE usertable SET password=? where user=?",
     +{},
     $new_hash,
