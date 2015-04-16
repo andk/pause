@@ -816,18 +816,11 @@ sub filter_pms {
   \@pmfile;
 }
 
-# This hash maps dist names to the package used to check for permission to
-# upload the dist. -- rjbs, 2013-04-14
-my %GRANDFATHERED_DIST_PKG = (
-  'CGI.pm' => 'CGI',
-);
-
 sub _package_governing_permission {
   my $self = shift;
 
   my $d = CPAN::DistnameInfo->new($self->{DIST});
   my $dist_name = $d->dist;
-  my $main_pkg  = $GRANDFATHERED_DIST_PKG{ $dist_name };
   unless ($main_pkg) {
     ($main_pkg = $dist_name) =~ s/[-+]+/::/g;
   }
