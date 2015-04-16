@@ -217,6 +217,12 @@ sub handler {
   my $crypt_pw  = $user_record->{$attr->{pwd_field}};
   if ($crypt_pw) {
     if (PAUSE::Crypt::password_verify($sent_pw, $crypt_pw)) {
+      PAUSE::Crypt::maybe_upgrade_stored_hash({
+        password => $sent_pw,
+        old_hash => $crypt_pw,
+        dbh      => $dbh,
+        username => $user_record->{user},
+      });
       $r->pnotes("usersecrets", $user_record);
       $dbh->do
           ("UPDATE usertable SET lastvisit=NOW() where user=?",

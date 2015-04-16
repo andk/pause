@@ -32,4 +32,21 @@ sub password_verify {
   return $crypt_got eq $crypt_pw;
 }
 
+sub maybe_upgrade_stored_hash {
+  my ($arg) = @_;
+
+  return if length $crypt_pw > 13; # already bcrypt
+
+  return; # we're not ready to do this for real yet
+
+  my $new_hash = hash_password($arg->{password});
+
+  $dbh->do(
+    "UPDATE usertable SET password=? where user=?",
+    +{},
+    $new_hash,
+    $arg->{username},
+  );
+}
+
 1;
