@@ -1366,12 +1366,12 @@ The Pause
  proceed.</p>};
 
     push @m, $mgr->password_field(name=>"pause99_change_passwd_pw1",
-				  maxlength=>8,
-				  size=>8);
+				  maxlength=>72,
+				  size=>16);
     push @m, qq{\n};
     push @m, $mgr->password_field(name=>"pause99_change_passwd_pw2",
-				  maxlength=>8,
-				  size=>8);
+				  maxlength=>72,
+				  size=>16);
     push @m, qq{\n};
     push @m, qq{<input type="submit" name="pause99_change_passwd_sub"
     value="Submit" />};
