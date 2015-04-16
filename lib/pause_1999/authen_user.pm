@@ -215,8 +215,7 @@ sub handler {
 
   my $crypt_pw  = $user_record->{$attr->{pwd_field}};
   if ($crypt_pw) {
-    my($crypt_got) = crypt($sent_pw,$crypt_pw);
-    if ($crypt_got eq $crypt_pw){
+    if (password_verify($sent_pw, $crypt_pw)) {
       $r->pnotes("usersecrets", $user_record);
       $dbh->do
           ("UPDATE usertable SET lastvisit=NOW() where user=?",
@@ -234,6 +233,12 @@ sub handler {
   $dbh->disconnect;
   $r->note_basic_auth_failure;
   return AUTH_REQUIRED;
+}
+
+sub password_verify {
+  my ($sent_pw, $crypt_pw) = @_;
+  my ($crypt_got) = crypt($sent_pw, $crypt_pw);
+  return $crypt_got eq $crypt_pw;
 }
 
 1;
