@@ -831,8 +831,8 @@ sub DESTROY {
 sub session {
   my $self = shift;
   return $self->{Session} if defined $self->{Session};
-  my $cgi = $self->{CGI};
-  my $sid = $cgi->param('USERID'); # may fail
+  my $req = $self->{REQ};
+  my $sid = $req->param('USERID'); # may fail
   my %session;
   require Apache::Session::Counted;
   # XXX date string into CounterFile!
