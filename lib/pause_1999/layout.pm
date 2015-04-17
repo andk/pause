@@ -1,7 +1,7 @@
 #!/usr/bin/perl -- -*- Mode: cperl; coding: utf-8; -*-
 package pause_1999::layout;
 use base 'Class::Singleton';
-use Apache::HeavyCGI::Layout;
+use PAUSE::HeavyCGI::Layout;
 use pause_1999::main;
 use strict;
 our $VERSION = "994";
@@ -144,7 +144,7 @@ users get the following text:</p> $closed_text </div>};
   push @l, qq{<hr noshade="noshade" />};
   push @l, $mgr->instance_of("pause_1999::speedlinkgif");
   push @l, qq{</body></html>\n};
-  Apache::HeavyCGI::Layout->new(@l);
+  PAUSE::HeavyCGI::Layout->new(@l);
 }
 
 1;

@@ -167,7 +167,7 @@ sub parameter {
       $param = $req->param("ACTION","change_passwd"); # override
 
     } else {
-      die  Apache::HeavyCGI::Exception->new(ERROR => "You tried to authenticate the
+      die  PAUSE::HeavyCGI::Exception->new(ERROR => "You tried to authenticate the
 parameter ABRA=$param, but the database doesn't know about this token.");
     }
     $allow_action{"mailpw"} = undef;
@@ -251,7 +251,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
   # warn "action[$action]";
   # warn sprintf "param[%s]", join ":", $mgr->{CGI}->param;
   if ($action) { # delegate to a subroutine
-    die Apache::HeavyCGI::Exception->new(ERROR => "Unanticipated Error on Server.
+    die PAUSE::HeavyCGI::Exception->new(ERROR => "Unanticipated Error on Server.
 Please report to the administrator what you were trying to do")
 	unless $self->can($action);
     my @action_result = $self->$action($mgr);
@@ -497,7 +497,7 @@ sub active_user_record {
                           $sth1->rows,
                           $sth1->rows,
                          ));
-      die Apache::HeavyCGI::Exception
+      die PAUSE::HeavyCGI::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
  at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
@@ -536,7 +536,7 @@ sub active_user_record {
           warn "Watch: privilege escalation";
 	  $u = $hiddenuser_h1; # no secrets for a mailinglist
 	} else {
-	  die Apache::HeavyCGI::Exception
+	  die PAUSE::HeavyCGI::Exception
 	      ->new(ERROR =>
 		    sprintf(
 			    qq[Action '%s' seems not to be supported
@@ -595,7 +595,7 @@ sub active_user_record {
       my $dbh1 = $mgr->connect;
       my $sth1 = $dbh1->prepare("SELECT * FROM users WHERE userid=?");
       $sth1->execute($mgr->{User}{userid});
-      die Apache::HeavyCGI::Exception
+      die PAUSE::HeavyCGI::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
  at $PAUSE::Config->{ADMIN} and help them identify what's going on. Thanks!")
@@ -1268,7 +1268,7 @@ sub change_passwd {
 	  my $rc = $dbh->do($sql,undef,
 			    $pwenc,0,time,$mgr->{User}{userid},$u->{userid});
 	  warn "rc[$rc]";
-	  die Apache::HeavyCGI::Exception
+	  die PAUSE::HeavyCGI::Exception
 	      ->new(ERROR =>
 		    sprintf qq[Could not set password: '%s'], $dbh->errstr
 		   ) unless $rc;
@@ -1289,13 +1289,13 @@ sub change_passwd {
 			   $mgr->{User}{userid},
 			   $u->{userid}
 			  );
-	    die Apache::HeavyCGI::Exception
+	    die PAUSE::HeavyCGI::Exception
 		->new(ERROR =>
 		      sprintf qq[Could not insert user record: '%s'], $dbh->errstr
 		     ) unless $rc;
 	  }
           for my $anon ($mgr->{User}, $u) {
-            die Apache::HeavyCGI::Exception
+            die PAUSE::HeavyCGI::Exception
                 ->new(ERROR => "Panic: unknown user") unless $anon->{userid};
             next if $anon->{fullname};
             $r->log_error("Unknown fullname for $anon->{userid}!");
@@ -1343,15 +1343,15 @@ The Pause
           my $header = {Subject => "Password Update"};
           $mgr->send_mail_multi(\@to, $header, $mailblurb);
 	} else {
-	  die Apache::HeavyCGI::Exception
+	  die PAUSE::HeavyCGI::Exception
               ->new(ERROR => "The two passwords didn't match.");
 	}
       } else {
-	die Apache::HeavyCGI::Exception
+	die PAUSE::HeavyCGI::Exception
             ->new(ERROR => "You need to fill in the same password in both fields.");
       }
     } else {
-      die Apache::HeavyCGI::Exception
+      die PAUSE::HeavyCGI::Exception
           ->new(ERROR => "Please fill in the form with passwords.");
     }
   } else {
@@ -1389,7 +1389,7 @@ sub add_uri {
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
   my @m;
   my $u = $self->active_user_record($mgr);
-  die Apache::HeavyCGI::Exception
+  die PAUSE::HeavyCGI::Exception
       ->new(ERROR =>
             "Unidentified error happened, please write to the PAUSE admins
  at $PAUSE::Config->{ADMIN} and help them identifying what's going on. Thanks!")
@@ -1457,7 +1457,7 @@ sub add_uri {
 	    warn "h1[$h1]filename[$filename]";
 	    push @m, $h1;
 	  } else {
-	    die Apache::HeavyCGI::Exception
+	    die PAUSE::HeavyCGI::Exception
 		->new(ERROR =>
 		      "Couldn't copy file '$filename' to '$to': $!");
 	  }
@@ -1478,12 +1478,12 @@ filename[%s]. </p>
             $req->param("pause99_add_uri_httpupload",$filename);
           }
 	} else {
-	  die Apache::HeavyCGI::Exception
+	  die PAUSE::HeavyCGI::Exception
 	      ->new(ERROR =>
 		    "uploaded file was zero sized");
 	}
       } else {
-	die Apache::HeavyCGI::Exception
+	die PAUSE::HeavyCGI::Exception
 	    ->new(ERROR =>
 		  "Could not create an upload object. DEBUG: upl[$upl]");
       }
@@ -1507,7 +1507,7 @@ filename[%s]. </p>
 	  $uri = $filename;
 	  push @m, qq{<h3>File successfully copied to '$to'</h3>};
 	} else {
-	  die Apache::HeavyCGI::Exception
+	  die PAUSE::HeavyCGI::Exception
 	      ->new(ERROR =>
 		    "Couldn't copy file '$filename' to '$to': $!");
 	}
@@ -1740,7 +1740,7 @@ sub add_uri_continue_with_uri {
 
 
     if ($@) {
-      die Apache::HeavyCGI::Exception
+      die PAUSE::HeavyCGI::Exception
 	  ->new(ERROR => [qq{
 Sorry, <b>$uri</b> could not be recognized as an uri (},
 			  $@,
@@ -1756,7 +1756,7 @@ href="mailto:},
 
       if ($filename eq "CHECKSUMS") {
         # userid DERHAAG demonstrated that it could be uploaded on 2002-04-26
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR => "Files with the name CHECKSUMS cannot be
                             uploaded to CPAN, they are reserved for
                             CPAN's internals.");
@@ -1784,7 +1784,7 @@ href="mailto:},
       }
 
       if ( length $uriid > 255 ) {
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR => "Path name too long: $uriid is longer than
                 255 characters.");
       }
@@ -2034,7 +2034,7 @@ sub delete_files {
   }
 
   # NONO, this is nothing we should die from:
-  #      die Apache::HeavyCGI::Exception
+  #      die PAUSE::HeavyCGI::Exception
   #	  ->new(ERROR => [qq{No files found in authors/id/$userhome}]);
 
 
@@ -2337,7 +2337,7 @@ Description: };
       my @qbind2 = ($maillistid,    $maillistname,
                     $subscribe,     $changed, $mgr->{User}{userid}, $email);
       unless ($dbh->do($query,undef,@qbind2)) {
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
  Reason:</b></p><p>$DBI::errstr</p>}]);
       }
@@ -2367,7 +2367,7 @@ Description: };
         my $dbh = $mgr->authen_connect;
         local($dbh->{RaiseError}) = 0;
         my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR =>
                   [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
                    qq{<p>This is very unfortunate as we have no option to rollback.}.
@@ -3118,10 +3118,10 @@ sub mailpw {
     $param = uc($param);
     unless ($param =~ /^[A-Z\-]+$/) {
       if ($param =~ /@/) {
-        die Apache::HeavyCGI::Exception->new(ERROR =>
+        die PAUSE::HeavyCGI::Exception->new(ERROR =>
                                              qq{Please supply a userid, not an email address.});
       }
-      die Apache::HeavyCGI::Exception->new(ERROR =>
+      die PAUSE::HeavyCGI::Exception->new(ERROR =>
                                            sprintf qq{A userid of <i>%s</i>
  is not allowed, please retry with a valid userid. Nothing done.}, $mgr->escapeHTML($param));
     }
@@ -3143,7 +3143,7 @@ sub mailpw {
         $u = $self->active_user_record($mgr,$param);
       };
       if ($@) {
-        die Apache::HeavyCGI::Exception->new(ERROR =>
+        die PAUSE::HeavyCGI::Exception->new(ERROR =>
                                              qq{Cannot find a userid
                                              of <i>$param</i>, please
                                              retry with a valid
@@ -3156,13 +3156,13 @@ sub mailpw {
                                  VALUES (?,   ?,          1,          ?)};
 
         $authen_dbh->do($sql,{},$u->{userid},$u->{email},time)
-            or die Apache::HeavyCGI::Exception->new(ERROR =>
+            or die PAUSE::HeavyCGI::Exception->new(ERROR =>
                                                     qq{The userid of <i>$param</i>
  is too old for this interface. Please get in touch with administration.});
 
         $rec->{secretemail} = $u->{email};
       } else {
-        die Apache::HeavyCGI::Exception->new(ERROR =>
+        die PAUSE::HeavyCGI::Exception->new(ERROR =>
                                              qq{A userid of <i>$param</i>
  is not known, please retry with a valid userid.});
       }
@@ -3201,7 +3201,7 @@ sub mailpw {
         } else {
           $duration = sprintf "%d seconds", $PAUSE::Config->{ABRA_EXPIRATION};
         }
-	die Apache::HeavyCGI::Exception->new
+	die PAUSE::HeavyCGI::Exception->new
             (
              ERROR => sprintf(
                               qq{A token for <i>$param</i> that allows
@@ -3212,7 +3212,7 @@ sub mailpw {
                              ),
             );
       } else {
-	die Apache::HeavyCGI::Exception->new(ERROR => $authen_dbh->errstr);
+	die PAUSE::HeavyCGI::Exception->new(ERROR => $authen_dbh->errstr);
       }
 
       # TUT: a bit complicated only because we switched back and forth
@@ -3778,7 +3778,7 @@ mlstatus
             }
             my $nu = $self->active_user_record($mgr, $param, {checkonly => 1});
 
-            die Apache::HeavyCGI::Exception
+            die PAUSE::HeavyCGI::Exception
                 ->new(ERROR => sprintf("Unknown user[%s]",
                                        $param,
                                       )) unless
@@ -5799,7 +5799,7 @@ sub peek_perms {
       } elsif ($by eq "a") {
         $where = qq{WHERE $fmap->{userid}=?};
       } else {
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR => "Illegal parameter for pause99_peek_perms_by");
       }
       $query .= $where;
@@ -6381,7 +6381,7 @@ sub share_perms_remocos {
       if (@sel) {
         for my $sel (@sel) {
           my($selmod,$otheruser) = $sel =~ /^(\S+)\s--\s(\S+)$/;
-          die Apache::HeavyCGI::Exception
+          die PAUSE::HeavyCGI::Exception
               ->new(ERROR => "You do not seem to be owner of $selmod")
                   unless exists $all_mods->{$selmod};
           unless (exists $all_comaints->{$sel}) {
@@ -6500,7 +6500,7 @@ sub share_perms_remome {
         local($db->{RaiseError}) = 0;
         my $sth = $db->prepare("DELETE FROM perms WHERE package=? AND userid=?");
         for my $selmod (@selmods) {
-          die Apache::HeavyCGI::Exception
+          die PAUSE::HeavyCGI::Exception
               ->new(ERROR => "You do not seem to be co-maintainer of $selmod")
                   unless exists $all_mods->{$selmod};
           my $ret = $sth->execute($selmod,$u->{userid});
@@ -6588,7 +6588,7 @@ sub share_perms_makeco {
                                  FROM users
                                  WHERE userid=?");
         $sth1->execute($other_user);
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR => sprintf(
                                    "%s is not a valid userid.",
                                    $mgr->escapeHTML($other_user),
@@ -6599,7 +6599,7 @@ sub share_perms_makeco {
         my $sth = $db->prepare("INSERT INTO perms (package,userid)
                             VALUES (?,?)");
         for my $selmod (@selmods) {
-          die Apache::HeavyCGI::Exception
+          die PAUSE::HeavyCGI::Exception
               ->new(ERROR => "You do not seem to be maintainer of $selmod")
                   unless exists $all_mods->{$selmod};
           my $ret = $sth->execute($selmod,$other_user);
@@ -6695,7 +6695,7 @@ sub share_perms_remopr {
         local($db->{RaiseError}) = 0;
         my $sth = $db->prepare("DELETE FROM primeur WHERE userid=? AND package=?");
         for my $selmod (@selmods) {
-          die Apache::HeavyCGI::Exception
+          die PAUSE::HeavyCGI::Exception
               ->new(ERROR => "You do not seem to be maintainer of $selmod")
                   unless exists $all_mods->{$selmod};
           my $ret = $sth->execute($u->{userid},$selmod);
@@ -6781,7 +6781,7 @@ sub share_perms_movepr {
                                  FROM users
                                  WHERE userid=?");
         $sth1->execute($other_user);
-        die Apache::HeavyCGI::Exception
+        die PAUSE::HeavyCGI::Exception
             ->new(ERROR => sprintf(
                                    "%s is not a valid userid.",
                                    $mgr->escapeHTML($other_user),
@@ -6791,7 +6791,7 @@ sub share_perms_movepr {
         local($db->{RaiseError}) = 0;
         my $sth = $db->prepare("UPDATE primeur SET userid=? WHERE package=?");
         for my $selmod (@selmods) {
-          die Apache::HeavyCGI::Exception
+          die PAUSE::HeavyCGI::Exception
               ->new(ERROR => "You do not seem to be maintainer of $selmod")
                   unless exists $all_mods->{$selmod};
           my $ret = $sth->execute($other_user,$selmod);

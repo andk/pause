@@ -1,4 +1,4 @@
-package Apache::HeavyCGI::Layout;
+package PAUSE::HeavyCGI::Layout;
 use 5.005;
 
 use strict;
@@ -22,12 +22,12 @@ sub new {
 }
 
 sub content {
-  my Apache::HeavyCGI::Layout $self = shift;
+  my PAUSE::HeavyCGI::Layout $self = shift;
   @{$self->{CONTENT}};
 }
 
 sub prejoin { #make the array shorter
-  my Apache::HeavyCGI::Layout $self = shift;
+  my PAUSE::HeavyCGI::Layout $self = shift;
   return if $self->{PREJOINED};
   my $a = $self->{CONTENT};
   my($i) = 0;
@@ -42,8 +42,8 @@ sub prejoin { #make the array shorter
 }
 
 sub as_string {
-  my Apache::HeavyCGI::Layout $self = shift;
-  my Apache::HeavyCGI $mgr = shift;
+  my PAUSE::HeavyCGI::Layout $self = shift;
+  my PAUSE::HeavyCGI $mgr = shift;
   my @m;
   for my $chunk ($self->content) {
     if (ref $chunk and $chunk->can("as_string")) {
@@ -60,11 +60,11 @@ sub as_string {
 
 =head1 NAME
 
-Apache::HeavyCGI::Layout - Represent a page layout in an array
+PAUSE::HeavyCGI::Layout - Represent a page layout in an array
 
 =head1 SYNOPSIS
 
- my $layout = Apache::HeavyCGI::Layout->new(@array);
+ my $layout = PAUSE::HeavyCGI::Layout->new(@array);
 
  $layout->prejoin;  # make the array more compact
 

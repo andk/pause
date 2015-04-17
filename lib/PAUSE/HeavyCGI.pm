@@ -1,15 +1,15 @@
-package Apache::HeavyCGI;
+package PAUSE::HeavyCGI;
 use 5.005; # for fields support and package-named exceptions
 use Apache::Constants qw(:common);
-use Apache::HeavyCGI::Date;
-use Apache::HeavyCGI::Exception;
+use PAUSE::HeavyCGI::Date;
+use PAUSE::HeavyCGI::Exception;
 use strict;
 use vars qw($VERSION $DEBUG);
 
 $VERSION = "0.013302";
 
 sub can_gzip {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   return $self->{CAN_GZIP} if defined $self->{CAN_GZIP};
   my $acce = $self->{R}->header_in('Accept-Encoding') || "";
   return $self->{CAN_GZIP} = 0 unless $acce;
@@ -17,7 +17,7 @@ sub can_gzip {
 }
 
 sub can_png {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   return $self->{CAN_PNG} if defined $self->{CAN_PNG};
   my $acce = $self->{R}->header_in("Accept") || "";
   return $self->{CAN_PNG} = 0 unless $acce;
@@ -25,7 +25,7 @@ sub can_png {
 }
 
 sub can_utf8 {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   return $self->{CAN_UTF8} if defined $self->{CAN_UTF8};
 
   # From chapter 14.2. HTTP/1.1
@@ -52,7 +52,7 @@ sub can_utf8 {
 }
 
 sub deliver {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   my $r = $self->{R};
   # warn "Going to send_http_header";
   $r->send_http_header;
@@ -69,11 +69,11 @@ sub handler {
 }
 
 sub dispatch {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   $self->init;
   eval { $self->prepare; };
   if ($@) {
-    if (UNIVERSAL::isa($@,"Apache::HeavyCGI::Exception")) {
+    if (UNIVERSAL::isa($@,"PAUSE::HeavyCGI::Exception")) {
       if ($@->{ERROR}) {
 	warn "\$\@ ERROR[$@->{ERROR}]";
 	$@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR};
@@ -100,16 +100,16 @@ sub dispatch {
 }
 
 sub expires {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   my($set) = @_;
-  $set = Apache::HeavyCGI::Date->new(unix => $set)
+  $set = PAUSE::HeavyCGI::Date->new(unix => $set)
       if defined($set) and not ref($set); # allow setting to a number
   $self->{EXPIRES} = $set if defined $set;
   return $self->{EXPIRES}; # even if not defined $self->{EXPIRES};
 }
 
 sub finish {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
 
   my $r = $self->{R};
   my $content_type = "text/html";
@@ -146,29 +146,29 @@ sub instance_of {
 }
 
 sub layout {
-  my Apache::HeavyCGI $self = shift;
-  require Apache::HeavyCGI::Layout;
+  my PAUSE::HeavyCGI $self = shift;
+  require PAUSE::HeavyCGI::Layout;
   my @l;
-  push @l, qq{<html><head><title>Apache::HeavyCGI default page</title>
+  push @l, qq{<html><head><title>PAUSE::HeavyCGI default page</title>
 </head><body><pre>};
-  push @l, $self->instance_of("Apache::HeavyCGI::Debug");
+  push @l, $self->instance_of("PAUSE::HeavyCGI::Debug");
   push @l, qq{</pre></body></html>};
-  Apache::HeavyCGI::Layout->new(@l);
+  PAUSE::HeavyCGI::Layout->new(@l);
 }
 
 sub last_modified {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   my($set) = @_;
-  $set = Apache::HeavyCGI::Date->new(unix => $set)
+  $set = PAUSE::HeavyCGI::Date->new(unix => $set)
       if defined($set) and not ref($set); # allow setting to a number
   $self->{LAST_MODIFIED} = $set if defined $set;
   return $self->{LAST_MODIFIED} if defined $self->{LAST_MODIFIED};
   $self->{LAST_MODIFIED} =
-      Apache::HeavyCGI::Date->new(unix => $self->time);
+      PAUSE::HeavyCGI::Date->new(unix => $self->time);
 }
 
 sub myurl {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   return $self->{MYURL} if defined $self->{MYURL};
   require URI::URL;
   my $r = $self->{R} or
@@ -199,7 +199,7 @@ sub new {
 }
 
 sub prepare {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   if (my $ep = $self->{EXECUTION_PLAN}) {
     $ep->walk($self);
   } else {
@@ -208,7 +208,7 @@ sub prepare {
 }
 
 sub serverroot_url {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   return $self->{SERVERROOT_URL} if $self->{SERVERROOT_URL};
   require URI::URL;
   my $r = $self->{R} or
@@ -226,12 +226,12 @@ sub serverroot_url {
 }
 
 sub time {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   $self->{TIME} ||= time;
 }
 
 sub today {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   return $self->{TODAY} if defined $self->{TODAY};
   my(@time) = localtime($self->time);
   $time[4]++;
@@ -461,7 +461,7 @@ sub text_pw_field {
 }
 
 sub uri_escape {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   my $string = shift;
   return "" unless defined $string;
   require URI::Escape;
@@ -471,7 +471,7 @@ sub uri_escape {
 }
 
 sub uri_escape_light {
-  my Apache::HeavyCGI $self = shift;
+  my PAUSE::HeavyCGI $self = shift;
   require URI::Escape;
   URI::Escape::uri_escape(shift,q{<>#%"; \/\?:&=+,\$}); #"
 }
@@ -480,11 +480,11 @@ sub uri_escape_light {
 
 =head1 NAME
 
-Apache::HeavyCGI - Framework to run complex CGI tasks on an Apache server
+PAUSE::HeavyCGI - Framework to run complex CGI tasks on an Apache server
 
 =head1 SYNOPSIS
 
- use Apache::HeavyCGI;
+ use PAUSE::HeavyCGI;
 
 =head1 WARNING UNSUPPORTED ALPHA CODE RELEASED FOR DEMO ONLY
 
@@ -505,17 +505,17 @@ PURPOSES ONLY.
 
 =head1 DESCRIPTION
 
-The Apache::HeavyCGI framework is intended to provide a couple of
+The PAUSE::HeavyCGI framework is intended to provide a couple of
 simple tricks that make it easier to write complex CGI solutions. It
 has been developed on a site that runs all requests through a single
 mod_perl handler that in turn uses CGI.pm or Apache::Request as the
-query interface. So Apache::HeavyCGI is -- as the name implies -- not
+query interface. So PAUSE::HeavyCGI is -- as the name implies -- not
 merely for multi-page CGI scripts (for which there are other
 solutions), but it is for the integration of many different pages into
 a single solution. The many different pages can then conveniently
 share common tasks.
 
-The approach taken by Apache::HeavyCGI is a components-driven one with
+The approach taken by PAUSE::HeavyCGI is a components-driven one with
 all components being pure perl. So if you're not looking for yet
 another embedded perl solution, and aren't intimidated by perl, please
 read on.
@@ -540,7 +540,7 @@ re-examined and possibly changed.
 
 Inheritance provokes namespace conflicts. Besides this, I see little
 reason why one should favor inheritance over a B<using> relationship.
-The current implementation of Apache::HeavyCGI is very closely coupled
+The current implementation of PAUSE::HeavyCGI is very closely coupled
 with the Apache class anyway, so we could do inheritance too. No big
 deal I suppose. The downside of the current way of doing it is that we
 have to write
@@ -553,7 +553,7 @@ C<$obj->{CGI}>, and C<$obj> itself.
 
 =head2 Composing applications
 
-Apache::HeavyCGI takes an approach that is more ambitious for handling
+PAUSE::HeavyCGI takes an approach that is more ambitious for handling
 complex tasks. The underlying model for the production of a document
 is that of a puzzle. An HTML (or XML or SGML or whatever) page is
 regarded as a sequence of static and dynamic parts, each of which has
@@ -587,7 +587,7 @@ Additionally we can say that some header related data SHOULD be
 processed very early because they might result in a shortcut that
 saves us a lot of processing.
 
-Consequently, Apache::HeavyCGI divides the tasks to be done for a
+Consequently, PAUSE::HeavyCGI divides the tasks to be done for a
 request into four phases and distributes the four phases among an
 arbitrary number of modules. Which modules are participating in the
 creation of a page is the design decision of the programmer.
@@ -595,7 +595,7 @@ creation of a page is the design decision of the programmer.
 The perl model that maps (at least IMHO) ideally to this task
 description is an object oriented approach that identifies a couple of
 phases by method names and a couple of components by class names. To
-create an application with Apache::HeavyCGI, the programmer specifies
+create an application with PAUSE::HeavyCGI, the programmer specifies
 the names of all classes that are involved. All classes are singleton
 classes, i.e. they have no identity of their own but can be used to do
 something useful by working on an object that is passed to them.
@@ -604,7 +604,7 @@ found on CPAN. As such, the classes can only have a single instance
 which can be found by calling the C<< CLASS->instance >> method. We'll
 call these objects after the mod_perl convention I<handlers>.
 
-Every request maps to exactly one Apache::HeavyCGI object. The
+Every request maps to exactly one PAUSE::HeavyCGI object. The
 programmer uses the methods of this object by subclassing. The
 HeavyCGI constructor creates objects of the AVHV type (pseudo-hashes).
 
@@ -616,7 +616,7 @@ L<fields>.
 
 *** Note: after 0.0133 this was changed to be an ordinary hash. ***
 
-An Apache::HeavyCGI object usually is constructed with the
+An PAUSE::HeavyCGI object usually is constructed with the
 C<new> method and after that the programmer calls the C<dispatch>
 method on this object. HeavyCGI will then perform various
 initializations and then ask all nominated handlers in turn to perform
@@ -626,14 +626,14 @@ method can be determined at compile time of the handler. If this is
 true, it is possible to create an execution plan at compile time that
 determines the sequence of calls such that no runtime is lost to check
 method availability. Such an execution plan can be created with the
-L<Apache::HeavyCGI::ExePlan> module. All of the called methods will
+L<PAUSE::HeavyCGI::ExePlan> module. All of the called methods will
 get the HeavyCGI request object passed as the second parameter.
 
 There are no fixed rules as to what has to happen within the C<header>
 and C<parameter> method. As a rule of thumb it is recommended to
 determine and set the object attributes LAST_MODIFIED and EXPIRES (see
 below) within the header() method. It is also recommended to inject
-the L<Apache::HeavyCGI::IfModified> module as the last header handler,
+the L<PAUSE::HeavyCGI::IfModified> module as the last header handler,
 so that the application can abort early with an Not Modified header. I
 would recommend that in the header phase you do as little as possible
 parameter processing except for those parameters that are related to
@@ -644,11 +644,11 @@ the last modification date of the generated page.
 Sometimes you want to stop calling the handlers, because you think
 that processing the request is already done. In that case you can do a
 
- die Apache::HeavyCGI::Exception->new(HTTP_STATUS => status);
+ die PAUSE::HeavyCGI::Exception->new(HTTP_STATUS => status);
 
 at any point within prepare() and the specified status will be
 returned to the Apache handler. This is useful for example for the
-Apache::HeavyCGI::IfModified module which sends the response headers
+PAUSE::HeavyCGI::IfModified module which sends the response headers
 and then dies with HTTP_STATUS set to Apache::Constants::DONE.
 Redirectors presumably would set up their headers and set it to
 Apache::Constants::HTTP_MOVED_TEMPORARILY.
@@ -656,7 +656,7 @@ Apache::Constants::HTTP_MOVED_TEMPORARILY.
 Another task for Perl exceptions are errors: In case of an error
 within the prepare loop, all you need to do is
 
- die Apache::HeavyCGI::Exception->new(ERROR=>[array_of_error_messages]);
+ die PAUSE::HeavyCGI::Exception->new(ERROR=>[array_of_error_messages]);
 
 The error is caught at the end of the prepare loop and the anonymous
 array that is being passed to $@ will then be appended to
@@ -670,10 +670,10 @@ set up the object that is able to characterize the complete
 application and its status. No changes to the object should happen
 from now on.
 
-In the next phase Apache::HeavyCGI will ask this object to perform the
+In the next phase PAUSE::HeavyCGI will ask this object to perform the
 C<layout> method that has the duty to generate an
-Apache::HeavyCGI::Layout (or compatible) object. Please read more
-about this object in L<Apache::HeavyCGI::Layout>. For our HeavyCGI
+PAUSE::HeavyCGI::Layout (or compatible) object. Please read more
+about this object in L<PAUSE::HeavyCGI::Layout>. For our HeavyCGI
 object it is only relevant that this Layout object can compose itself
 as a string in the as_string() method. As a layout object can be
 composed as an abstraction of a layout and independent of
@@ -708,14 +708,14 @@ head2 Summing up
                                         | sub handler {...} |
  +--------------------+                 | (sub init {...})  |
  |Your::Class         |---defines------>|                   |
- |ISA Apache::HeavyCGI|                 | sub layout {...}  |
+ |ISA PAUSE::HeavyCGI|                 | sub layout {...}  |
  +--------------------+                 | sub finish {...}  |
                                         +-------------------+
 
                                         +-------------------+
                                         | sub new {...}     |
  +--------------------+                 | sub dispatch {...}|
- |Apache::HeavyCGI    |---defines------>| sub prepare {...} |
+ |PAUSE::HeavyCGI    |---defines------>| sub prepare {...} |
  +--------------------+                 | sub deliver {...} |
                                         +-------------------+
 
@@ -736,12 +736,12 @@ head2 Summing up
  +----------------------------+----------------------------------------+----+
  |                            |        $self->init     (does nothing)  | ?? |
  |                            |        $self->prepare  (see below)     |    |
- |Apache::HeavyCGI::dispatch()| calls  $self->layout   (sets up layout)| ** |
+ |PAUSE::HeavyCGI::dispatch()| calls  $self->layout   (sets up layout)| ** |
  |                            |        $self->finish   (headers and    | ** |
  |                            |                         gross content) |    |
  |                            |        $self->deliver  (delivers)      | ?? |
  +----------------------------+----------------------------------------+----+
- |Apache::HeavyCGI::prepare() | calls HANDLER->instance->header($self) | ** |
+ |PAUSE::HeavyCGI::prepare() | calls HANDLER->instance->header($self) | ** |
  |                            | and HANDLER->instance->parameter($self)| ** |
  |                            | on all of your nominated handlers      |    |
  +----------------------------+----------------------------------------+----+
@@ -754,7 +754,7 @@ be treated like a HASH, but all attributes that are being used must be
 predeclared at compile time with a C<use fields> clause.
 
 The convention regarding attributes is as simple as it can be:
-uppercase attributes are reserved for the Apache::HeavyCGI class, all
+uppercase attributes are reserved for the PAUSE::HeavyCGI class, all
 other attribute names are at your disposition if you write a subclass.
 
 The following attributes are currently defined. The module author's
@@ -810,7 +810,7 @@ response to the user.
 
 =item EXECUTION_PLAN
 
-Object of type L<Apache::HeavyCGI::ExePlan>. It is recommended to
+Object of type L<PAUSE::HeavyCGI::ExePlan>. It is recommended to
 compute the object at startup time and always pass the same execution
 plan into the constructor.
 
@@ -818,7 +818,7 @@ plan into the constructor.
 
 Optional Attribute set by the expires() method. If set, HeavyCGI will
 send an Expires header. The EXPIRES attribute needs to contain an
-L<Apache::HeavyCGI::Date> object.
+L<PAUSE::HeavyCGI::Date> object.
 
 =item HANDLER
 
@@ -833,7 +833,7 @@ HANDLER->instance->parameter($self) on all of your nominated handlers.
 Optional Attribute set by the last_modified() method. If set, HeavyCGI
 will send a Last-Modified header of the specified time, otherwise it
 sends a Last-Modified header of the current time. The attribute needs
-to contain an L<Apache::HeavyCGI::Date> object.
+to contain an L<PAUSE::HeavyCGI::Date> object.
 
 =item MYURL
 
@@ -862,7 +862,7 @@ Unused.
 
 The time when this request started set by the time() method. Please
 note, that the time() system call is considerable faster than the
-method call to Apache::HeavyCGI::time. The advantage of calling using
+method call to PAUSE::HeavyCGI::time. The advantage of calling using
 the TIME attribute is that it is self-consistent (remains the same
 during a request).
 
@@ -877,7 +877,7 @@ on the time() method.
 
 =head2 Performance
 
-Don't expect Apache::HeavyCGI to serve 10 million page impressions a
+Don't expect PAUSE::HeavyCGI to serve 10 million page impressions a
 day. The server I have developed it for is a double processor machine
 with 233 MHz, and each request is handled by about 30 different
 handlers: a few trigonometric, database, formatting, and recoding

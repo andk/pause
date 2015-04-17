@@ -56,12 +56,12 @@ sub header {
         } else {
           $error = "User '$u' not known";
         }
-        die Apache::HeavyCGI::Exception->new(ERROR => $error);
+        die PAUSE::HeavyCGI::Exception->new(ERROR => $error);
       } else {
         $mgr->{User} = $mgr->fetchrow($sth, "fetchrow_hashref");
       }
     } else {
-      die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
+      die PAUSE::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
     }
     $sth->finish;
 
@@ -84,7 +84,7 @@ sub header {
 	$mgr->{UserGroups}{$rec->{ugroup}} = undef;
       }
     } else {
-      die Apache::HeavyCGI::Exception->new(ERROR => $dbh2->errstr);
+      die PAUSE::HeavyCGI::Exception->new(ERROR => $dbh2->errstr);
     }
     $sth->finish;
 
@@ -93,7 +93,7 @@ sub header {
               FROM list2user
               WHERE userid=?};
     $sth = $dbh->prepare($sql);
-    $sth->execute($u) or die Apache::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
+    $sth->execute($u) or die PAUSE::HeavyCGI::Exception->new(ERROR => $dbh->errstr);
     if ($sth->rows > 0) {
       $mgr->{UserGroups}{mlrepr} = undef; # is a virtual group
       $mgr->{IsMailinglistRepresentative} = {};

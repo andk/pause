@@ -1,11 +1,11 @@
-package Apache::HeavyCGI::Debug;
+package PAUSE::HeavyCGI::Debug;
 use base 'Class::Singleton';
 use Data::Dumper;
 use strict;
 
 sub as_string {
-  my Apache::HeavyCGI::Debug $self = shift;
-  my Apache::HeavyCGI $mgr = shift;
+  my PAUSE::HeavyCGI::Debug $self = shift;
+  my PAUSE::HeavyCGI $mgr = shift;
 
   # An AVHV is ugly to look at, so we convert to an HASH
 
@@ -22,12 +22,12 @@ sub as_string {
 
 =head1 NAME
 
-Apache::HeavyCGI::Debug - inspect the Pseudohash as Hash with Data::Dumper
+PAUSE::HeavyCGI::Debug - inspect the Pseudohash as Hash with Data::Dumper
 
 =head1 SYNOPSIS
 
  push @layout, "<BR><PRE>",
-               $self->instance_of("Apache::HeavyCGI::Debug"),
+               $self->instance_of("PAUSE::HeavyCGI::Debug"),
                "</PRE><BR>\n";
 
 =head1 DESCRIPTION

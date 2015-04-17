@@ -1,4 +1,4 @@
-package Apache::HeavyCGI::IfModified;
+package PAUSE::HeavyCGI::IfModified;
 use strict;
 use base 'Class::Singleton';
 
@@ -8,8 +8,8 @@ $VERSION = sprintf "%d.%03d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/;
 use HTTP::Date ();
 
 sub header {
-  my Apache::HeavyCGI::IfModified $self = shift;
-  my Apache::HeavyCGI $mgr = shift;
+  my PAUSE::HeavyCGI::IfModified $self = shift;
+  my PAUSE::HeavyCGI $mgr = shift;
 
   my $now = $mgr->time;
   my $r   = $mgr->{R};
@@ -42,13 +42,13 @@ sub header {
 
 =head1 NAME
 
-Apache::HeavyCGI::IfModified - Within Apache::HeavyCGI return 304
+PAUSE::HeavyCGI::IfModified - Within PAUSE::HeavyCGI return 304
 
 =head1 SYNOPSIS
 
- require Apache::HeavyCGI::IfModified;
+ require PAUSE::HeavyCGI::IfModified;
  push @{$mgr->{HANDLER}},
-     "Apache::HeavyCGI::IfModified"; # $mgr is an Apache::HeavyCGI object
+     "PAUSE::HeavyCGI::IfModified"; # $mgr is an PAUSE::HeavyCGI object
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,7 @@ Last-Modified header, it will use an If-Modified-Since header and if
 we carefully determine our own Last-Modified time, we can spare a lot
 of processing by returning a Not Modified response instead of working.
 
-IfModified should be one of the last handlers in any Apache::HeavyCGI
+IfModified should be one of the last handlers in any PAUSE::HeavyCGI
 environment, at least it must be processed after all the handlers that
 might set the LAST_MODIFIED date.
 

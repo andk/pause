@@ -60,11 +60,11 @@ the new perl.
 
 
 package pause_1999::main;
-use Apache::HeavyCGI; # This is much better than only second line
-                      # alone. If Apache::HeavyCGI is not available,
+use PAUSE::HeavyCGI; # This is much better than only second line
+                      # alone. If PAUSE::HeavyCGI is not available,
                       # the errormessage of the next line would be 'No
                       # such pseudo-hash field "R" in variable $self'
-use base Apache::HeavyCGI;
+use base PAUSE::HeavyCGI;
 use Sys::Hostname;
 # # use Apache::URI ();
 
@@ -161,7 +161,7 @@ sub dispatch {
   }
   eval { $self->prepare; };
   if ($@) {
-    if (UNIVERSAL::isa($@,"Apache::HeavyCGI::Exception")) {
+    if (UNIVERSAL::isa($@,"PAUSE::HeavyCGI::Exception")) {
       if ($@->{ERROR}) {
         require Carp;
 	$@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR};
@@ -282,7 +282,7 @@ sub database_alert {
     $self->send_mail($header,$mess);
     open my $fh, ">", $tsf or warn "Could not open $tsf: $!";
   }
-  die Apache::HeavyCGI::Exception->new(ERROR => qq{
+  die PAUSE::HeavyCGI::Exception->new(ERROR => qq{
 Sorry, the PAUSE Database currently seems unavailable.<br />
 Administration has been notified.<br />
 Please try again later.
@@ -307,7 +307,7 @@ sub authen_connect {
 # breaks by setting it back to the previous state.
 
 # # sub myurl {
-# #   my Apache::HeavyCGI $self = shift;
+# #   my PAUSE::HeavyCGI $self = shift;
 # #   return $self->{MYURL} if defined $self->{MYURL};
 # #   my $r = $self->{R};
 # #   my $myurl = $r->parsed_uri;
