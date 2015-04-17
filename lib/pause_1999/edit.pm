@@ -1401,7 +1401,7 @@ sub add_uri {
 
   if ($req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
       || $req->param("SUBMIT_pause99_add_uri_httpupload")) {
-    my $upl = $req->upload;
+    my $upl = $req->upload('pause_add_uri_httpupload');
     unless ($upl->size) {
       warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
       $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
@@ -1442,12 +1442,12 @@ sub add_uri {
 	  $filename =~ s(.*:)()gs;      # no colon
 	  $filename =~ s/[^A-Za-z0-9_\-\.\@\+]//g; # only ASCII-\w and - . @ + allowed
 	  my $to = "$PAUSE::Config->{INCOMING_LOC}/$filename";
-	  my $fhi = $upl->fh;
+	  # my $fhi = $upl->fh;
 	  require File::Copy;
 	  if (-f $to && -s _ == 0) { # zero sized files are a common problem
 	    unlink $to;
 	  }
-	  if (File::Copy::copy($fhi, $to)){
+	  if (File::Copy::copy($upl->path, $to)){
 	    $uri = $filename;
 	    # Got an empty $to in the HTML page, so for debugging..
 	    my $h1 = qq{<h3>File successfully copied to '$to'</h3>};
