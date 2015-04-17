@@ -66,7 +66,7 @@ sub deliver {
 
 sub handler {
   warn "The handler of the request hasn't defined a handler subroutine.";
-  __PACKAGE__->new( R => shift )->dispatch;
+  __PACKAGE__->new( REQ => shift )->dispatch;
 }
 
 sub dispatch {
