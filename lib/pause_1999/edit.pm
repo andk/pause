@@ -1386,7 +1386,7 @@ sub add_uri {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $debug_table = $req->parms;
+  my $debug_table = $req->parameters; # XXX: $r->parms
   warn sprintf "DEBUG: req[%s]", join(":",%$debug_table);
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
   my @m;
@@ -1823,10 +1823,10 @@ href="mailto:},
         warn "patchedCGI not supported anymore";
 	my @debug = "DEBUGGING patched CGI:\n";
 	push @debug, scalar localtime;
-	my %headers_in = $r->headers_in;
-	for my $h (keys %headers_in) {
+	my %headers = %{ $req->headers }; # XXX: or maybe use header_field_names
+	for my $h (keys %headers) {
           next if $h =~ /Authorization/; # security!
-	  push @debug, sprintf " %s: %s\n", $h, $headers_in{$h};
+	  push @debug, sprintf " %s: %s\n", $h, $headers{$h};
 	}
 	for ($req->param) {
 	  push @debug, " $_: ";
@@ -2868,7 +2868,7 @@ sub request_id {
                "userid[%s]Valid_Userid[%s]args[%s]",
                $userid,
                $Valid_Userid,
-               scalar($r->args)||"",
+               scalar($req->query_parameters)||"",
               );
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
