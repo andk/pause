@@ -47,7 +47,7 @@ sub can_utf8 {
     }
     return $self->{CAN_UTF8};
   }
-  my $protocol = $self->{R}->protocol || "";
+  my $protocol = $self->{REQ}->protocol || "";
   my($major,$minor) = $protocol =~ m|HTTP/(\d+)\.(\d+)|;
   $self->{CAN_UTF8} = $major >= 1 && $minor >= 1;
 }
@@ -172,14 +172,14 @@ sub myurl {
   my PAUSE::HeavyCGI $self = shift;
   return $self->{MYURL} if defined $self->{MYURL};
   require URI::URL;
-  my $r = $self->{R} or
+  my $req = $self->{REQ} or
       return URI::URL->new("http://localhost");
   my $script_name = substr(
 			   $r->uri,
 			   0,
 			   length($r->uri)-length($r->path_info)
 			  );
-  my $port = $r->server->port || 80;
+  my $port = $req->port || 80;
   my $protocol = $port == 443 ? "https" : "http";
   my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";
   $self->{MYURL} = URI::URL->new(
@@ -212,10 +212,10 @@ sub serverroot_url {
   my PAUSE::HeavyCGI $self = shift;
   return $self->{SERVERROOT_URL} if $self->{SERVERROOT_URL};
   require URI::URL;
-  my $r = $self->{R} or
+  my $req = $self->{REQ} or
       return URI::URL->new("http://localhost");
   my $host   = $r->server->server_hostname;
-  my $port = $r->server->port || 80;
+  my $port = $req->port || 80;
   my $protocol = $port == 443 ? "https" : "http";
   my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";
   $self->{SERVERROOT_URL} = URI::URL->new(
