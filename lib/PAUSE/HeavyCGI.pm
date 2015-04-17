@@ -5,6 +5,7 @@ use PAUSE::HeavyCGI::Date;
 use PAUSE::HeavyCGI::Exception;
 use strict;
 use vars qw($VERSION $DEBUG);
+use Log::Contextual qw(:log);
 
 $VERSION = "0.013302";
 
@@ -88,7 +89,7 @@ sub dispatch {
       if ($self->{ERRORS_TO_BROWSER}) {
 	push @{$self->{ERROR}}, " ", $@;
       } else {
-	$self->{R}->log_error($@);
+	log_error { $@ };
 	return HTTP_INTERNAL_SERVER_ERROR;
       }
     }

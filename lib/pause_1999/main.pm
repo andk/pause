@@ -89,6 +89,7 @@ use HTML::Entities;
 use String::Random ();
 use Fcntl qw(O_RDWR);
 use Time::HiRes ();
+use Log::Contextual qw(:log);
 
 {
   %entity2char = %HTML::Entities::entity2char;
@@ -176,7 +177,7 @@ sub dispatch {
       if ($self->{ERRORS_TO_BROWSER}) {
 	push @{$self->{ERROR}}, " ", $@;
       } else {
-	$self->{R}->log_error($@);
+	log_error { $@ };
 	return HTTP_INTERNAL_SERVER_ERROR;
       }
     }
@@ -429,7 +430,7 @@ sub send_mail {
   my $mailer = Mail::Mailer->new(@args);
 
   my $r = $self->{R};
-  my @hdebug = %$header; $r->log_error(sprintf("hdebug[%s]", join "|", @hdebug));
+  my @hdebug = %$header; log_error { sprintf("hdebug[%s]", join "|", @hdebug) };
   $header->{From}                        ||= $self->{OurEmailFrom};
   $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
 
