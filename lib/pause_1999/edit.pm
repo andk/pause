@@ -1535,7 +1535,7 @@ filename[%s]. </p>
                                                   # XHTML
   }
   # my $myurl = $mgr->myurl;
-  my $server = $r->server->server_hostname;
+  my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
   my $dbh = $mgr->connect;
 
 
@@ -1735,13 +1735,13 @@ into $her directory. The request used the following parameters:});
 
 sub add_uri_continue_with_uri {
   my($self,$mgr,$uri,$success,$didit) = @_;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $u = $self->active_user_record($mgr);
   my $userhome = PAUSE::user2dir($u->{userid});
   my $dbh = $mgr->connect;
   my $now = time;
   my $r = $mgr->{R};
-  my $server = $r->server->server_hostname;
+  my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
   my @m;
     push @m, "\n\n<blockquote class='actionresponse'>\n",
      "<!-- start of response to user's action -->\n\n",
@@ -2056,7 +2056,7 @@ sub delete_files {
   my $time = time;
   my $blurb = "";
   # my $myurl = $mgr->myurl;
-  my $server = $r->server->server_hostname;
+  my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
   if ($req->param('SUBMIT_pause99_delete_files_delete')) {
 
     foreach my $f ($req->param('pause99_delete_files_FILE')) {
@@ -4384,7 +4384,7 @@ sub add_mod {
     my $ml_entry = sprintf(("%s%-".$modwidth."s %s%s%s%s%s %-44s %s\n"),
         $mdirname, $mbasename, $statd, $stats, $statl, $stati, $statp,
             $description, $userid);
-    my $server = $r->server->server_hostname;
+    my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
 
     my $comment = $req->param("pause99_add_mod_comment") || "";
     if ($comment) {
@@ -4917,7 +4917,7 @@ sub apply_mod {
     my $ml_entry = sprintf(("%s%-".$modwidth."s %s%s%s%s%s %-44s %s\n"),
         $mdirname, $mbasename, $statd, $stats, $statl, $stati, $statp,
             $description, $applying_userid);
-    my $server = $r->server->server_hostname;
+    my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
 
     my $rationale = $req->param("pause99_apply_mod_rationale") || "";
     if ($rationale) {
@@ -5956,7 +5956,7 @@ decision.</li>
   }
 
   my $blurb;
-  my $server = $r->server->server_hostname;
+  my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
   if ($req->param('SUBMIT_pause99_reindex_delete')) {
 
     my $sql = "DELETE FROM distmtimes
