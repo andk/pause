@@ -174,19 +174,7 @@ sub myurl {
   require URI::URL;
   my $req = $self->{REQ} or
       return URI::URL->new("http://localhost");
-  my $script_name = substr(
-			   $r->uri,
-			   0,
-			   length($r->uri)-length($r->path_info)
-			  );
-  my $port = $req->port || 80;
-  my $protocol = $port == 443 ? "https" : "http";
-  my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";
-  $self->{MYURL} = URI::URL->new(
-				 "$protocol://" .
-				 $req->env->{SERVER_NAME} .  # XXX: $r->server->server_hostname
-				 $explicit_port .
-				 $script_name);
+  $self->{MYURL} = URI::URL->new($req->base);
 }
 
 sub new {
