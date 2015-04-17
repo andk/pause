@@ -453,7 +453,6 @@ sub active_user_record {
                                                # harmless (mailpw)
 
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   if ($hidden_user) {
     require Carp;
     Carp::cluck("hidden_user[$hidden_user] passed in as argument with hidden_user_ok[$hidden_user_ok]");
@@ -1164,7 +1163,6 @@ sub show_document {
   my $mgr = shift;
   my $doc = shift || "04pause.html";
   my $rewrite = shift || 0;
-  my $r = $mgr->{R};
   my $dir = $FindBin::Bin;
   my @m;
   # push @m, sprintf "DEBUG: %s %s<br />", $dir, -e $dir ? "exists" : "doesn't exist. ";
@@ -1243,7 +1241,6 @@ sub change_passwd {
   my $mgr = shift;
   $mgr->prefer_post(1);
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
@@ -1386,7 +1383,6 @@ sub add_uri {
   my $req = $mgr->{REQ};
   my $debug_table = $req->parms;
   warn sprintf "DEBUG: req[%s]", join(":",%$debug_table);
-  my $r = $mgr->{R};
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
   my @m;
   my $u = $self->active_user_record($mgr);
@@ -1729,7 +1725,6 @@ sub add_uri_continue_with_uri {
   my $userhome = PAUSE::user2dir($u->{userid});
   my $dbh = $mgr->connect;
   my $now = time;
-  my $r = $mgr->{R};
   my $server = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname
   my @m;
     push @m, "\n\n<blockquote class='actionresponse'>\n",
@@ -2012,7 +2007,6 @@ sub delete_files {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
   $mgr->prefer_post(1);
@@ -2189,7 +2183,6 @@ sub show_files {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
   $mgr->prefer_post(1);
@@ -2511,7 +2504,6 @@ sub add_user {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my @m;
 
   my $dbh = $mgr->connect;
@@ -2792,7 +2784,6 @@ sub usertable {
   my $mgr = shift;
   my $userid = shift;
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my $dbh = $mgr->connect;
   my $sql = "SELECT * FROM users WHERE userid=?";
   my $sth = $dbh->prepare($sql);
@@ -2831,7 +2822,6 @@ sub request_id {
   };
 
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   $mgr->prefer_post(1);
 
   # first time: form
@@ -4149,7 +4139,6 @@ sub add_mod {
   my $mgr = shift;
   my(@m);
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
 
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
@@ -4628,7 +4617,6 @@ sub apply_mod {
   my(@m);
   my $req = $mgr->{REQ};
   $mgr->{CAN_GZIP} = 0; # for debugging
-  my $r = $mgr->{R};
   my $u = $self->active_user_record($mgr);
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
   if ($mgr->{User}{userid} ne $u->{userid}) {
@@ -5902,7 +5890,6 @@ sub reindex {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
@@ -6991,7 +6978,6 @@ sub coredump {
   chdir "/usr/local/apache/cores" or die "Couldn't chdir: $!";
   warn "**************>>>>>>>>>>     strace -p $$\n";
   sleep 10;
-  my $r = $mgr->{R};
   require Cwd;
   my $cwd = Cwd::cwd();
   require BSD::Resource;
@@ -7150,7 +7136,6 @@ sub reset_version {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
