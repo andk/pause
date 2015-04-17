@@ -430,7 +430,7 @@ sub send_mail {
   my $mailer = Mail::Mailer->new(@args);
 
   my $r = $self->{R};
-  my @hdebug = %$header; log_error { sprintf("hdebug[%s]", join "|", @hdebug) };
+  my @hdebug = %$header; # log_error { sprintf("hdebug[%s]", join "|", @hdebug) }; XXX: weird errors
   $header->{From}                        ||= $self->{OurEmailFrom};
   $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
 
