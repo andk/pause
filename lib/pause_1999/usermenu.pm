@@ -10,7 +10,7 @@ sub as_string {
   my $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $user = $req->session->{user}; # XXX: $r->connection->user
+  my $user = $req->user;
   my $myurl = $mgr->myurl;
   my $server = $myurl->can("host") ? $myurl->host : $myurl->hostname;
   if (my $port = $myurl->port) {
