@@ -516,6 +516,10 @@ sub check_for_new {
 sub _userid_has_permissions_on_package {
   my ($self, $userid, $package) = @_;
 
+  if ($package eq 'perl') {
+    return PAUSE->user_has_pumpking_bit($userid);
+  }
+
   my $dbh = $self->connect;
 
   my ($has_perms) = $dbh->selectrow_array(

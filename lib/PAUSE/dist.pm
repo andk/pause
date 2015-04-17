@@ -247,26 +247,17 @@ sub _examine_regular_perl {
   my $dist = $self->{DIST};
 
   my($u) = PAUSE::dir2user($dist); # =~ /([A-Z][^\/]+)/; # XXX dist2user
-  use DBI;
-  my $adbh = DBI->connect(
-    $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
-    $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
-    $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
-  ) or die $DBI::errstr;
-  my $query = "SELECT * FROM grouptable
-  WHERE user= ?
-    AND ugroup='pumpking'";
-  my $sth = $adbh->prepare($query);
-  $sth->execute($u);
-  if ($sth->rows > 0){
+
+  my $has_pumpking_bit = PAUSE->user_has_pumpking_bit($u);
+
+  if ($has_pumpking_bit){
     $skip = 0;
     $self->verbose(1,"Perl dist $dist from trusted user $u");
   } else {
     $skip = 1;
     $self->verbose(1,"*** ALERT: Perl dist $dist from untrusted user $u. Skip set to [$skip]\n");
   }
-  $sth->finish;
-  $adbh->disconnect;
+
   if ($dist =~ $SUFFQR) {
     $suffix = $1;
   } else {
