@@ -1,4 +1,4 @@
-package Apache::HeavyCGI::Date;
+package PAUSE::HeavyCGI::Date;
 use 5.005;
 use strict;
 
@@ -47,11 +47,11 @@ sub http {
 
 =head1 NAME
 
-Apache::HeavyCGI::Date - represent a date as both unix time and HTTP time
+PAUSE::HeavyCGI::Date - represent a date as both unix time and HTTP time
 
 =head1 SYNOPSIS
 
- my $date = Apache::HeavyCGI::Date->new;
+ my $date = PAUSE::HeavyCGI::Date->new;
 
  $date->unix(time);   # set
  print $date->unix;   # get

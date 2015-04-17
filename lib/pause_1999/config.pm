@@ -1,7 +1,7 @@
 #!/usr/bin/perl -- -*- Mode: cperl;  -*-
 package pause_1999::config;
 use pause_1999::main;
-use Apache::HeavyCGI::ExePlan;
+use PAUSE::HeavyCGI::ExePlan;
 use Apache::Request;
 use strict;
 use PAUSE ();
@@ -11,7 +11,7 @@ $VERSION = "949";
 
 # Tell the system which packages want to see the headers or the
 # parameters.
-$Exeplan = Apache::HeavyCGI::ExePlan->new(
+$Exeplan = PAUSE::HeavyCGI::ExePlan->new(
 					  CLASSES => [qw(
 pause_1999::authen_user
 pause_1999::edit

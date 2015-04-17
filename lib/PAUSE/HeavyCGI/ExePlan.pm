@@ -1,5 +1,5 @@
-package Apache::HeavyCGI::ExePlan;
-use Apache::HeavyCGI; # want only the instance_of method
+package PAUSE::HeavyCGI::ExePlan;
+use PAUSE::HeavyCGI; # want only the instance_of method
 use strict;
 # use fields qw(PLAN DEBUG FUNCTIONAL WATCHVARIABLE);
 
@@ -22,7 +22,7 @@ sub new {
       my($obj,$subr);
       eval { $obj = $class->instance; };
       if ($@) {
-	$obj = Apache::HeavyCGI->instance_of($class);
+	$obj = PAUSE::HeavyCGI->instance_of($class);
       }
       next unless $subr = $obj->can($method);
       if ($functional) {
@@ -42,8 +42,8 @@ sub new {
 }
 
 sub walk {
-  my Apache::HeavyCGI::ExePlan $self = shift;
-  my Apache::HeavyCGI $application = shift;
+  my PAUSE::HeavyCGI::ExePlan $self = shift;
+  my PAUSE::HeavyCGI $application = shift;
   if ($self->{WATCHVARIABLE}) {
     require Data::Dumper;
   }
@@ -87,12 +87,12 @@ __END__
 
 =head1 NAME
 
-Apache::HeavyCGI::ExePlan - Creates an execution plan for Apache::HeavyCGI
+PAUSE::HeavyCGI::ExePlan - Creates an execution plan for PAUSE::HeavyCGI
 
 =head1 SYNOPSIS
 
- use Apache::HeavyCGI::ExePlan;
- my $plan = Apache::HeavyCGI::ExePlan->new(
+ use PAUSE::HeavyCGI::ExePlan;
+ my $plan = PAUSE::HeavyCGI::ExePlan->new(
     METHODS => ["header", "parameter"],
     CLASSES => ["my_application::foo", "my_application::bar", ... ],
     DEBUG    => 1,
@@ -146,7 +146,7 @@ trigger a warning.
 =item WATCHVARIABLE
 
 Name of a member variable. Defaults to C<undef>. By setting
-WATCHVARIABLE you can watch a member variable of the Apache::HeavyCGI
+WATCHVARIABLE you can watch a member variable of the PAUSE::HeavyCGI
 object on entering/exiting each call to each class/method pair. Only
 changes of the variable trigger a warning.
 
