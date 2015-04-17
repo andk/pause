@@ -473,11 +473,11 @@ sub update_package {
                                   $pp->{infile},
                                   PAUSE::mldistwatch::Constants::EDUALOLDER,
 
-                                  qq{Not indexed because $ofile
-seems to have a dual life in $odist. Although the other package is at
-version [$oldversion], the indexer lets the other dist continue to be
-the reference version, shadowing the one in the core. Maybe harmless,
-maybe needs resolving.},
+                                  qq{Not indexed because package $opack
+in file $ofile seems to have a dual life in $odist. Although the other
+package is at version [$oldversion], the indexer lets the other dist
+continue to be the reference version, shadowing the one in the core.
+Maybe harmless, maybe needs resolving.},
 
                               );
           } else {
@@ -486,9 +486,9 @@ maybe needs resolving.},
                                   $pp->{infile},
                                   PAUSE::mldistwatch::Constants::EDUALYOUNGER,
 
-                                  qq{Not indexed because $ofile
-has a dual life in $odist. The other version is at $oldversion, so
-not indexing seems okay.},
+                                  qq{Not indexed because package $opack
+in file $ofile has a dual life in $odist. The other version is at
+$oldversion, so not indexing seems okay.},
 
                               );
           }
