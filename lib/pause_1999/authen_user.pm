@@ -21,9 +21,8 @@ user record early and this seems an appropriate place.
 sub header {
   my pause_1999::authen_user $self = shift;
   my $mgr = shift;
-  my $r = $mgr->{R};
-  if (my $u = $r->connection->user) {
-
+  my $req = $mgr->{REQ};
+  if (my $u = $req->session->{user}) { # XXX: $r->connection->user
     #This is a database application with nearly all users having write access
     #Write access means expiration any moment
     my $headers = $r->headers_out;
