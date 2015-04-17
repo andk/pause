@@ -465,19 +465,19 @@ sub active_user_record {
   {
     my $uc_hidden_user = uc $hidden_user;
     unless ($uc_hidden_user eq $hidden_user) {
-      $r->log_error("Warning: Had to uc the hidden_user $hidden_user");
+      log_error { "Warning: Had to uc the hidden_user $hidden_user" };
       $hidden_user = $uc_hidden_user;
     }
   }
   my $u = {};
-  $r->log_error(sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]where[%s]",
+  log_error { sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]where[%s]",
                         $mgr->{User}{userid},
                         $hidden_user,
                         join(":", keys %{$mgr->{UserGroups}}),
                         join(":", caller),
                         __FILE__.":".__LINE__,
                        )
-               );
+               };
   if (
       $hidden_user
       &&
@@ -1299,7 +1299,7 @@ sub change_passwd {
             die PAUSE::HeavyCGI::Exception
                 ->new(ERROR => "Panic: unknown user") unless $anon->{userid};
             next if $anon->{fullname};
-            $r->log_error("Unknown fullname for $anon->{userid}!");
+            log_error { "Unknown fullname for $anon->{userid}!" };
           }
 
 	  push @m, "New password stored and enabled. Be prepared that
@@ -6999,7 +6999,7 @@ sub coredump {
   my $cwd = Cwd::cwd();
   require BSD::Resource;
   my($nowsoft,$nowhard) = BSD::Resource::getrlimit(BSD::Resource::RLIMIT_CORE());
-  $r->log_error("UID[$<]EUID[$>]cwd[$cwd]nowsoft[$nowsoft]nowhard[$nowhard]");
+  log_error {"UID[$<]EUID[$>]cwd[$cwd]nowsoft[$nowsoft]nowhard[$nowhard]"};
   CORE::dump;
 }
 

@@ -6,9 +6,16 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Plack::Builder;
 use Plack::Request;
+use Log::Contextual::SimpleLogger;
 
 # preload stuff
 use pause_1999::config;
+
+my $logger = Log::Contextual::SimpleLogger->new({
+    ident => 'pause',
+    to_stderr => 1,
+    debug => 1,
+});
 
 my $app = sub {
     my $req = Plack::Request->new(shift);
@@ -17,5 +24,6 @@ my $app = sub {
 
 builder {
     # enable Session, Auth, Log, etc with better config
+    enable 'Log::Contextual', logger => $logger;
     $app;
 };
