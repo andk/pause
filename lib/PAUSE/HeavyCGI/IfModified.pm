@@ -15,7 +15,7 @@ sub header {
   my $req = $mgr->{REQ};
 
   my $last_modified = $mgr->last_modified;
-  $r->header_out('Date', HTTP::Date::time2str($now));
+  $mgr->{RES}->header('Date', HTTP::Date::time2str($now));
 
   if (my $ifmodisi = $req->header('If-Modified-Since')) {
     # warn "Got ifmodisi[$ifmodisi]";

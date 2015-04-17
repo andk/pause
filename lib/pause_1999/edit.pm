@@ -1631,7 +1631,7 @@ filename[%s]. </p>
 
   if ($tryupload) {
     $mgr->need_multipart(1);
-    $r->header_out("Accept","*");
+    $mgr->{RES}->header("Accept","*");
 
     push @m, qq{<tr><td bgcolor="#e0ffff">If <b>your browser can handle
         file upload</b>, enter the filename here and I'll transfer it
@@ -5580,17 +5580,16 @@ sub who_pumpkin {
     }
     $sth->finish;
   };
-  my $output_format = $cgi->param("OF");
+  my $output_format = $req->param("OF");
   if ($output_format){
     if ($output_format eq "YAML") {
       require YAML::Syck;
       local $YAML::Syck::ImplicitUnicode = 1;
       my $dump = YAML::Syck::Dump(\@hres);
       my $edump = Encode::encode_utf8($dump);
-      my $r = $mgr->{R};
-      $r->content_type("text/plain; charset=utf8");
-      $r->send_http_header;
-      $r->print($edump);
+      my $res = $mgr->{RES};
+      $res->content_type("text/plain; charset=utf8");
+      $res->body($edump);
       return $mgr->{DONE} = HTTP_OK;
     } else {
       die "not supported OF=$output_format"
@@ -5661,10 +5660,9 @@ sub email_for_admin {
       local $YAML::Syck::ImplicitUnicode = 1;
       my $dump = YAML::Syck::Dump(\%ALL);
       my $edump = Encode::encode_utf8($dump);
-      my $r = $mgr->{R};
-      $r->content_type("text/plain; charset=utf8");
-      $r->send_http_header;
-      $r->print($edump);
+      my $res = $mgr->{RES};
+      $res->content_type("text/plain; charset=utf8");
+      $res->body($edump);
       return $mgr->{DONE} = HTTP_OK;
     } else {
       die "not supported OF=$output_format"
@@ -5837,10 +5835,9 @@ sub peek_perms {
           local $YAML::Syck::ImplicitUnicode = 1;
           my $dump = YAML::Syck::Dump(\@hres);
           my $edump = Encode::encode_utf8($dump);
-          my $r = $mgr->{R};
-          $r->content_type("text/plain; charset=utf8");
-          $r->send_http_header;
-          $r->print($edump);
+          my $res = $mgr->{RES};
+          $res->content_type("text/plain; charset=utf8");
+          $res->body($edump);
           return $mgr->{DONE} = HTTP_OK;
         } else {
           die "not supported OF=$output_format"
