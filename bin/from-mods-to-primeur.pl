@@ -127,8 +127,8 @@ MOD: for my $modid (@mods) {
                 warn "Would now try to insert $modid/$mv_userid into primeur; this may cause can_remove to be set and cause a delete of $modid in mods";
             } else {
                 $sth5->execute($modid,$mv_userid);
-                $can_remove = 1;
             }
+            $can_remove = 1;
         }
         if ($can_remove) {
             if ($Opt{"dry-run"}) {
