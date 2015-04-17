@@ -45,7 +45,7 @@ your patience.</p>};
 CLOSED</title></head><body> <h1>Closed for Maintainance</h1>
 $closed_text <p>Andreas Koenig</p></body> </html>});
 
-      return Apache::Constants::OK;
+      return HTTP_OK;
     }
   }
   my $self = pause_1999::main->

@@ -1,7 +1,7 @@
 package pause_1999::authen_user;
 use pause_1999::main;
 use Apache ();
-use Apache::Constants qw( AUTH_REQUIRED MOVED OK SERVER_ERROR );
+use HTTP::Status qw(:constants);
 use base 'Class::Singleton';
 use PAUSE ();
 use PAUSE::Crypt;
@@ -124,7 +124,7 @@ sub handler {
                          "logout; path=$uri; expires=Sat, 01-Oct-1974 00:00:00 UTC",
                         );
       $r->note_basic_auth_failure;
-      return AUTH_REQUIRED;
+      return HTTP_UNAUTHORIZED;
     }
   }
   if ($args) {
@@ -135,7 +135,7 @@ sub handler {
       if ($logout =~ /^1/) {
         $r->err_header_out("Set-Cookie","logout; path=$uri; expires=Sat, 01-Oct-2027 00:00:00 UTC");
         $r->header_out("Location",$uri);
-        return MOVED;
+        return HTTP_MOVED_PERMANENTLY;
       } elsif ($logout =~ /^2/) { # badname
         my $port   = $r->server->port || 80;
         my $scheme = $port == 443 ? "https" : "http";
@@ -143,16 +143,16 @@ sub handler {
         my $redir = "$scheme://baduser:badpass\@$server:$port$uri";
         warn "redir[$redir]";
         $r->header_out("Location",$redir);
-        return MOVED;
+        return HTTP_MOVED_PERMANENTLY;
       } elsif ($logout =~ /^3/) { # cancelnote
         $r->note_basic_auth_failure();
-        return AUTH_REQUIRED;
+        return HTTP_UNAUTHORIZED;
       }
     }
   }
 
 
-  return OK unless $r->is_initial_req; #only the first internal request
+  return HTTP_OK unless $r->is_initial_req; #only the first internal request
   my($res, $sent_pw) = $r->get_basic_auth_pw;
 
   # warn "res[$res]sent_pw[$sent_pw]";
@@ -179,8 +179,8 @@ sub handler {
     my $redir = $r->uri;
     $redir =~ s/authen//;
     $r->connection->user("-");
-    $r->custom_response(SERVER_ERROR, $redir);
-    return SERVER_ERROR;
+    $r->custom_response(HTTP_INTERNAL_SERVER_ERROR, $redir);
+    return HTTP_INTERNAL_SERVER_ERROR;
   }
 
   # generate statement
@@ -196,14 +196,14 @@ sub handler {
     $r->log_reason("can not prepare statement: $DBI::errstr",
 		   $r->uri);
     $dbh->disconnect;
-    return SERVER_ERROR;
+    return HTTP_INTERNAL_SERVER_ERROR;
   }
   for my $user (@try_user){
     unless ($sth->execute($user)) {
       $r->log_reason(" can not execute statement: $DBI::errstr",
 		     $r->uri);
       $dbh->disconnect;
-      return SERVER_ERROR;
+      return HTTP_INTERNAL_SERVER_ERROR;
     }
 
     if ($sth->rows == 1){
@@ -230,16 +230,16 @@ sub handler {
            $user_record->{user},
           );
       $dbh->disconnect;
-      return OK;
+      return HTTP_OK;
     } else {
       warn sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
-	  $crypt_pw, $user_record->{user}, $r->uri, AUTH_REQUIRED;
+	  $crypt_pw, $user_record->{user}, $r->uri, HTTP_UNAUTHORIZED;
     }
   }
 
   $dbh->disconnect;
   $r->note_basic_auth_failure;
-  return AUTH_REQUIRED;
+  return HTTP_UNAUTHORIZED;
 }
 
 1;
