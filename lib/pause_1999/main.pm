@@ -154,8 +154,8 @@ WillLast
 sub dispatch {
   my $self = shift;
   $self->init;
-  my $r = $self->{R};
-  warn sprintf "DEBUG: uri[%s]location[%s]", $r->uri, $r->location;
+  my $req = $self->{REQ};
+  warn sprintf "DEBUG: uri[%s]location[%s]", $req->request_uri, ''; # $r->location;
   if ($r->uri =~ m|^/pause/query/|) { # path info?
       warn "Warning: killing this request, it has a path_info, only bots have them";
       return HTTP_NOT_FOUND;
@@ -195,8 +195,8 @@ sub layout {
 
 sub can_gzip {
   my $self = shift;
-  my $r = $self->{R};
-  my $remote = $r->get_remote_host;
+  my $req = $self->{REQ};
+  # my $remote = $r->get_remote_host; <-- is not used now
   # Just for debugging, because Netscape doesn't show source on gzipped pages
   # if ($remote =~ /^62\.104\.4/ and $r->server->server_hostname =~ /^ak-/) {
   #   return $self->{CAN_GZIP} = 0;
@@ -350,7 +350,7 @@ sub myurl {
 
   my $rpath = $uri->rpath;
   $uri->path($rpath);
-  warn sprintf "DEBUG: uri[%s]location[%s]", $uri, $r->location;
+  warn sprintf "DEBUG: uri[%s]location[%s]", $uri, ""; # $r->location;
 
   # XXX should have additional test if we are on pause
   if (( $uri->port == 81 || $uri->port == 12081 )
@@ -484,7 +484,7 @@ sub finish {
 
   if ($self->can_utf8) {
   } else {
-    warn sprintf "DEBUG: using Unicode::String uri[%s]gmtime[%s]", $self->{R}->uri, scalar gmtime();
+    warn sprintf "DEBUG: using Unicode::String uri[%s]gmtime[%s]", $self->{REQ}->uri, scalar gmtime();
     my $ustr = Unicode::String::utf8($self->{CONTENT});
     $self->{CONTENT} = $ustr->latin1;
     $self->{CHARSET} = "ISO-8859-1";
