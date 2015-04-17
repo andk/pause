@@ -182,7 +182,7 @@ sub dispatch {
       }
     }
   }
-  return $self->{DONE} if $self->{DONE}; # backwards comp now, will go away
+  return $self->{RES}->finalize if $self->{DONE}; # backwards comp now, will go away
   $self->{CONTENT} = $self->layout->as_string($self);
   $self->finish;
   $self->deliver;

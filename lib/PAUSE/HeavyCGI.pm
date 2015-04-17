@@ -54,13 +54,13 @@ sub can_utf8 {
 
 sub deliver {
   my PAUSE::HeavyCGI $self = shift;
-  my $r = $self->{R};
+  my $req = $self->{REQ};
+  my $res = $self->{RES};
   # warn "Going to send_http_header";
-  $r->send_http_header;
-  return OK if $r->method eq "HEAD";
+  return $res->finalize if $req->method eq "HEAD";
   # warn "Going to print content";
-  $r->print($self->{CONTENT});
-  DONE; # we've sent the headers and the body, apache shouldn't talk
+  $res->body($self->{CONTENT});
+  $res->finalize; # we've sent the headers and the body, apache shouldn't talk
         # to the browser anymore
 }
 
@@ -112,23 +112,23 @@ sub expires {
 sub finish {
   my PAUSE::HeavyCGI $self = shift;
 
-  my $r = $self->{R};
+  my $res = $self->{RES};
   my $content_type = "text/html";
   $content_type .= "; charset=$self->{CHARSET}" if defined $self->{CHARSET};
-  $r->content_type($content_type);
+  $res->content_type($content_type);
 
   eval { require Compress::Zlib; };
   $self->{CAN_GZIP} = 0 if $@; # we cannot compress anyway :-)
 
   if ($self->can_gzip) {
-    $r->header_out('Content-Encoding', 'gzip');
+    $res->header('Content-Encoding', 'gzip');
     $self->{CONTENT} = Compress::Zlib::memGzip($self->{CONTENT});
   }
 
-  $r->header_out('Vary', join ", ", 'accept-encoding');
-  $r->header_out('Expires', $self->expires->http) if $self->expires;
-  $r->header_out('Last-Modified',$self->last_modified->http);
-  $r->header_out('Content-Length', length($self->{CONTENT}));
+  $res->header('Vary', join ", ", 'accept-encoding');
+  $res->header('Expires', $self->expires->http) if $self->expires;
+  $res->header('Last-Modified',$self->last_modified->http);
+  $res->header('Content-Length', length($self->{CONTENT}));
 }
 
 sub init {
