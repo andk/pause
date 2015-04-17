@@ -243,7 +243,7 @@ sub can_utf8 {
       # solutions for non-utf-8 browsers do not work anymore.
       # Disabling completely for now. May need reconsidering, but
       # maybe UTF-8 works everywhere now...
-      my $protocol = $self->{R}->protocol || "";
+      my $protocol = $self->{REQ}->protocol || "";
       my($major,$minor) = $protocol =~ m|HTTP/(\d+)\.(\d+)|;
       $self->{CAN_UTF8} = $major >= 1 && $minor >= 1;
       warn "CAN_UTF8[$self->{CAN_UTF8}]protocol[$protocol]uagent[$uagent]";

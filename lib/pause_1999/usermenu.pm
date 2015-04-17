@@ -33,7 +33,7 @@ sub as_string {
   my $activecolor = $mgr->{ActiveColor};
   unless ($user) {
     push @m, qq{<tr><td class="menuitem">};
-    if ($mgr->{R}->server->port == 8000) {
+    if ($mgr->{REQ}->port == 8000) {
       $server =~ s/:8000/:8443/ or $server .= ":8443";
     }
     my $schema = "https";
