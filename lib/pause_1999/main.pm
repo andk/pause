@@ -325,11 +325,10 @@ sub authen_connect {
 sub myurl {
   my $self = shift;
   return $self->{MYURL} if defined $self->{MYURL};
-  use Apache::URI;
   use URI::URL;
-  my $r = $self->{R} or
+  my $req = $self->{REQ} or
       return URI::URL->new("http://localhost");
-  my $uri = Apache::URI->parse($r);
+  my $uri = $req->base;
 
   # use Data::Dumper;
   # warn "subprocess_env[".Data::Dumper::Dumper(scalar $r->subprocess_env)."]";
@@ -344,12 +343,12 @@ sub myurl {
   #### work OK.
 
   my $Hhostname = $req->header('Host');
-  my $hostname = $uri->hostname();
+  my $hostname = $uri->host();
   warn "hostname[$hostname]Hhostname[$Hhostname]";
   # $uri->hostname($Hhostname); # contains :8443!!!!!
 
-  my $rpath = $uri->rpath;
-  $uri->path($rpath);
+  # my $rpath = $uri->rpath;
+  # $uri->path($rpath);
   warn sprintf "DEBUG: uri[%s]location[%s]", $uri, ""; # $r->location;
 
   # XXX should have additional test if we are on pause
@@ -370,7 +369,7 @@ sub myurl {
       } else {
           $hh = $Hhostname;
       }
-      $uri->hostname($hh);
+      $uri->host($hh);
   }
 
   # my $port = $r->server->port || 80;
