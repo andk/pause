@@ -156,7 +156,7 @@ sub dispatch {
   $self->init;
   my $req = $self->{REQ};
   warn sprintf "DEBUG: uri[%s]location[%s]", $req->request_uri, ''; # $r->location;
-  if ($r->uri =~ m|^/pause/query/|) { # path info?
+  if ($req->request_uri =~ m|^/pause/query/|) { # path info?
       warn "Warning: killing this request, it has a path_info, only bots have them";
       return HTTP_NOT_FOUND;
   }
