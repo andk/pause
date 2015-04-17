@@ -4,7 +4,6 @@ package pause_1999::edit;
 use base 'Class::Singleton';
 use pause_1999::main;
 use strict;
-use Apache::Table ();
 use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use File::Find qw(find);
