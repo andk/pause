@@ -1,6 +1,5 @@
 package pause_1999::authen_user;
 use pause_1999::main;
-use Apache ();
 use HTTP::Status qw(:constants);
 use base 'Class::Singleton';
 use PAUSE ();
