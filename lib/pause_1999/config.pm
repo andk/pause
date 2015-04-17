@@ -2,7 +2,6 @@
 package pause_1999::config;
 use pause_1999::main;
 use PAUSE::HeavyCGI::ExePlan;
-use Apache::Request;
 use strict;
 use PAUSE ();
 use HTTP::Status qw(:constants);
@@ -20,7 +19,7 @@ pause_1999::usermenu
 )]);
 
 sub handler {
-  my($r) = shift;
+  my($req) = shift;
   my $dti = PAUSE::downtimeinfo();
   my $downtime = $dti->{downtime};
   my $willlast = $dti->{willlast};
@@ -368,7 +367,7 @@ share_perms
 	    ModDsn       => $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
 	    ModDsnPasswd => $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 	    ModDsnUser   => $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-	    R       => $r,
+	    REQ       => $req,
 	    RootURL => "/pause",
             SessionDataDir => "$PAUSE::Config->{RUNDATA}/session/sdata",
             SessionCounterDir => "$PAUSE::Config->{RUNDATA}/session/cnt",
@@ -401,18 +400,6 @@ share_perms
 
   }
 
-  if ($self->{UseModuleSet} eq "patchedCGI") {
-    warn "patchedCGI not supported anymore";
-    require CGI;
-    $self->{CGI} = CGI->new;
-  } elsif ($self->{UseModuleSet} eq "ApReq") {
-    my $req = Apache::Request->new($r);
-    my $rc = $req->parse;
-    # warn "rc[$rc]";
-    $self->{CGI} = $req;
-  } else {
-    die "Illegal value for UseModuleSet: $self->{UseModuleSet}";
-  }
   $self->{OurEmailFrom} = "\"Perl Authors Upload Server\" <$PAUSE::Config->{UPLOAD}>";
   # warn "Debug: OurEmailFrom=UPLOAD[$self->{OurEmailFrom}]";
   my(@time) = gmtime; # sec,min,hour,day,month,year
