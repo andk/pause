@@ -10,7 +10,7 @@ sub as_string {
   my $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  my $user = $req->session->{user}; # XXX: $r->connection->user
+  my $user = $req->user;
   my $server = $mgr->myurl->can("host") ? $mgr->myurl->host : $mgr->myurl->hostname;
   # $r->log_error(sprintf "Watch: server[%s]at[%s]line[%d]", $server, __FILE__, __LINE__);
   my $activecolor = $mgr->{ActiveColor};
