@@ -23,7 +23,7 @@ sub handler {
   my $dti = PAUSE::downtimeinfo();
   my $downtime = $dti->{downtime};
   my $willlast = $dti->{willlast};
-  my $user = $r->connection->user;
+  my $user = $req->session->{user}; # XXX: $r->connection->user
   if (time >= $downtime && time < $downtime + $willlast) {
     use Time::Duration;
     my $delta = $downtime + $willlast - time;
@@ -377,7 +377,7 @@ share_perms
 
 	   );
 
-  if ($r->connection->user) {
+  if ($req->session->{user}) { # XXX: $r->connection->user
     $self->{QueryURL} = "authenquery";
 
     ############# Main Switch for experimental CGI Patch #############
