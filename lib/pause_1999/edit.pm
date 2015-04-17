@@ -12,6 +12,7 @@ use PAUSE::Crypt;
 use POSIX ();
 use URI::Escape;
 use Text::Format;
+use HTTP::Status qw(:constants);
 eval {require Time::Duration};
 our $HAVE_TIME_DURATION = !$@;
 
@@ -5604,7 +5605,7 @@ sub who_pumpkin {
       $r->content_type("text/plain; charset=utf8");
       $r->send_http_header;
       $r->print($edump);
-      return $mgr->{DONE} = Apache::Constants::DONE;
+      return $mgr->{DONE} = HTTP_OK;
     } else {
       die "not supported OF=$output_format"
     }
@@ -5678,7 +5679,7 @@ sub email_for_admin {
       $r->content_type("text/plain; charset=utf8");
       $r->send_http_header;
       $r->print($edump);
-      return $mgr->{DONE} = Apache::Constants::DONE;
+      return $mgr->{DONE} = HTTP_OK;
     } else {
       die "not supported OF=$output_format"
     }
@@ -5854,7 +5855,7 @@ sub peek_perms {
           $r->content_type("text/plain; charset=utf8");
           $r->send_http_header;
           $r->print($edump);
-          return $mgr->{DONE} = Apache::Constants::DONE;
+          return $mgr->{DONE} = HTTP_OK;
         } else {
           die "not supported OF=$output_format"
         }

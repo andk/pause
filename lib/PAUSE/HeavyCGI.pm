@@ -1,6 +1,6 @@
 package PAUSE::HeavyCGI;
 use 5.005; # for fields support and package-named exceptions
-use Apache::Constants qw(:common);
+use HTTP::Status qw(:constants);
 use PAUSE::HeavyCGI::Date;
 use PAUSE::HeavyCGI::Exception;
 use strict;
@@ -89,7 +89,7 @@ sub dispatch {
 	push @{$self->{ERROR}}, " ", $@;
       } else {
 	$self->{R}->log_error($@);
-	return SERVER_ERROR;
+	return HTTP_INTERNAL_SERVER_ERROR;
       }
     }
   }

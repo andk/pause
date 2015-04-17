@@ -83,7 +83,7 @@ use vars qw($VERSION %entity2char $DO_UTF8);
 $VERSION = "854";
 
 $DO_UTF8 = 1;
-use Apache::Constants qw(:common);
+use HTTP::Status qw(:constants);
 require Unicode::String;
 use HTML::Entities;
 use String::Random ();
@@ -157,7 +157,7 @@ sub dispatch {
   warn sprintf "DEBUG: uri[%s]location[%s]", $r->uri, $r->location;
   if ($r->uri =~ m|^/pause/query/|) { # path info?
       warn "Warning: killing this request, it has a path_info, only bots have them";
-      return NOT_FOUND;
+      return HTTP_NOT_FOUND;
   }
   eval { $self->prepare; };
   if ($@) {
@@ -177,7 +177,7 @@ sub dispatch {
 	push @{$self->{ERROR}}, " ", $@;
       } else {
 	$self->{R}->log_error($@);
-	return SERVER_ERROR;
+	return HTTP_INTERNAL_SERVER_ERROR;
       }
     }
   }
