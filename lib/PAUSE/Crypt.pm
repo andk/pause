@@ -39,8 +39,6 @@ sub maybe_upgrade_stored_hash {
 
   return if length $arg->{old_hash} > 13; # already bcrypt
 
-  return; # we're not ready to do this for real yet
-
   my $new_hash = hash_password($arg->{password});
 
   $arg->{dbh}->do(
