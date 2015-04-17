@@ -11,7 +11,7 @@ $VERSION = "0.013302";
 sub can_gzip {
   my PAUSE::HeavyCGI $self = shift;
   return $self->{CAN_GZIP} if defined $self->{CAN_GZIP};
-  my $acce = $self->{R}->header_in('Accept-Encoding') || "";
+  my $acce = $self->{REQ}->header('Accept-Encoding') || "";
   return $self->{CAN_GZIP} = 0 unless $acce;
   $self->{CAN_GZIP} = $acce =~ /\bgzip\b/;
 }
@@ -19,7 +19,7 @@ sub can_gzip {
 sub can_png {
   my PAUSE::HeavyCGI $self = shift;
   return $self->{CAN_PNG} if defined $self->{CAN_PNG};
-  my $acce = $self->{R}->header_in("Accept") || "";
+  my $acce = $self->{REQ}->header("Accept") || "";
   return $self->{CAN_PNG} = 0 unless $acce;
   $self->{CAN_PNG} = $acce =~ m|image/png|i;
 }
@@ -37,7 +37,7 @@ sub can_utf8 {
   ##   an error response with the 406 (not acceptable) status code, though
   ##   the sending of an unacceptable response is also allowed.
 
-  my $acce = $self->{R}->header_in("Accept-Charset") || "";
+  my $acce = $self->{REQ}->header("Accept-Charset") || "";
   if (defined $acce){
     if ($acce =~ m|\butf-8\b|i){
       $self->{CAN_UTF8} = 1;
