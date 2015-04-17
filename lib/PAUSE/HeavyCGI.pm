@@ -248,7 +248,7 @@ sub checkbox {
   my $value;
   defined($value = $arg{value}) or ($value = "on");
   my $checked;
-  my @sel = $self->{CGI}->param($name);
+  my @sel = $self->{REQ}->param($name);
   if (@sel) {
     for my $s (@sel) {
       if ($s eq $value) {
@@ -271,7 +271,7 @@ sub checkbox_group {
   my($self,%arg) = @_;
 
   my $name = $arg{name};
-  my @sel = $self->{CGI}->param($name);
+  my @sel = $self->{REQ}->param($name);
   unless (@sel) {
     if (exists $arg{default}) {
       my $default = $arg{default};
@@ -332,7 +332,7 @@ sub radio_group {
   my $name = $arg{name};
   my $value;
   my $checked;
-  my $sel = $self->{CGI}->param($name);
+  my $sel = $self->{REQ}->param($name);
   my $haslabels = exists $arg{labels};
   my $values = $arg{values} or Carp::croak "radio_group called without values";
   defined($checked = $arg{checked})
@@ -376,7 +376,7 @@ sub scrolling_list {
   my $multiple = $arg{multiple} ? q{ multiple="multiple"} : "";
   my $haslabels = exists $arg{labels};
   my $name = $arg{name};
-  my @sel = $self->{CGI}->param($name);
+  my @sel = $self->{REQ}->param($name);
   if (!@sel && exists $arg{default} && defined $arg{default}) {
     my $d = $arg{default};
     @sel = ref $d ? @$d : $d;
@@ -410,7 +410,7 @@ sub submit {
 # pause_1999::main
 sub textarea {
   my($self,%arg) = @_;
-  my $req = $self->{CGI};
+  my $req = $self->{REQ};
   my $name = $arg{name} || "";
   my $val  = $req->param($name) || $arg{default} || $arg{value} || "";
   my($r)   = exists $arg{rows} ? qq{ rows="$arg{rows}"} : '';
@@ -432,7 +432,7 @@ sub text_pw_field {
   my $name = $arg{name} || "";
   my $fieldtype = $arg{FIELDTYPE};
 
-  my $req = $self->{CGI};
+  my $req = $self->{REQ};
   my $val;
   if ($fieldtype eq "FILE") {
     if ($req->can("upload")) {

@@ -523,7 +523,7 @@ sub text_pw_field {
   my $name = $arg{name} || "";
   my $fieldtype = $arg{FIELDTYPE};
 
-  my $req = $self->{CGI};
+  my $req = $self->{REQ};
   my $val;
   if ($fieldtype eq "FILE") {
     if ($req->can("upload")) {
@@ -584,7 +584,7 @@ sub checkbox {
   my $value;
   defined($value = $arg{value}) or ($value = "on");
   my $checked;
-  my @sel = $self->{CGI}->param($name);
+  my @sel = $self->{REQ}->param($name);
   if (@sel) {
     for (@sel) {
       if ($_ eq $value) {
@@ -609,7 +609,7 @@ sub radio_group {
   my $name = $arg{name};
   my $value;
   my $checked;
-  my $sel = $self->{CGI}->param($name);
+  my $sel = $self->{REQ}->param($name);
   my $haslabels = exists $arg{labels};
   my $values = $arg{values} or Carp::croak "radio_group called without values";
   defined($checked = $arg{checked})
@@ -647,7 +647,7 @@ sub checkbox_group {
   my($self,%arg) = @_;
 
   my $name = $arg{name};
-  my @sel = $self->{CGI}->param($name);
+  my @sel = $self->{REQ}->param($name);
   unless (@sel) {
     if (exists $arg{default}) {
       my $default = $arg{default};
@@ -692,7 +692,7 @@ sub scrolling_list {
   my $haslabels = exists $arg{labels};
   my $name = $arg{name};
   # warn "name[$name]CGI[$self->{CGI}]";
-  my @sel = $self->{CGI}->param($name);
+  my @sel = $self->{REQ}->param($name);
   if (!@sel && exists $arg{default} && defined $arg{default}) {
     my $d = $arg{default};
     @sel = ref $d ? @$d : $d;
@@ -731,7 +731,7 @@ sub escapeHTML {
 sub can_multipart {
   my $self = shift;
   return $self->{CanMultipart} if defined $self->{CanMultipart};
-  my $req = $self->{CGI};
+  my $req = $self->{REQ};
   my $can = $req->param('CAN_MULTIPART'); # no guessing, no special casing
   $can = 1 unless defined $can; # default
   $self->{CanMultipart} = $can;
@@ -803,7 +803,7 @@ sub decode_highbit_entities {
 
 sub textarea {
   my($self,%arg) = @_;
-  my $req = $self->{CGI};
+  my $req = $self->{REQ};
   my $name = $arg{name} || "";
   my $val  = $req->param($name) || $arg{default} || $arg{value} || "";
   my($r)   = exists $arg{rows} ? qq{ rows="$arg{rows}"} : '';

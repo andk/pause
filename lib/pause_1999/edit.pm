@@ -28,7 +28,7 @@ our $strict_chapterid = 1;
 sub parameter {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my($param,@allow_submit,%allow_action);
 
   # What is allowed here is allowed to anybody
@@ -250,7 +250,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
   }
   $action = $mgr->{Action};
   # warn "action[$action]";
-  # warn sprintf "param[%s]", join ":", $mgr->{CGI}->param;
+  # warn sprintf "param[%s]", join ":", $mgr->{REQ}->param;
   if ($action) { # delegate to a subroutine
     die PAUSE::HeavyCGI::Exception->new(ERROR => "Unanticipated Error on Server.
 Please report to the administrator what you were trying to do")
@@ -276,7 +276,7 @@ sub manage_id_requests { # was reject_id_request
   my $self = shift;
   my $mgr = shift;
   return unless exists $mgr->{UserGroups}{admin};
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my @m;
   my %ALL;
   my $delete;
@@ -452,7 +452,7 @@ sub active_user_record {
                                                # is authenticated or
                                                # harmless (mailpw)
 
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   if ($hidden_user) {
     require Carp;
@@ -615,7 +615,7 @@ sub active_user_record {
 sub edit_cred {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my($u,$nu); # user, newuser
   my @m = "\n";
   $u = $self->active_user_record($mgr);
@@ -990,7 +990,7 @@ sub select_user {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   $mgr->prefer_post(0);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   if (my $action = $req->param("ACTIONREQ")) {
     if (
 	$self->can($action)
@@ -1045,7 +1045,7 @@ should be.
 sub select_ml_action {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $dbh = $mgr->connect;
   if (my $action = $req->param("ACTIONREQ")) {
     if (
@@ -1214,8 +1214,8 @@ sub show_document {
 sub tail_logfile {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $cgi = $mgr->{CGI};
-  my $tail = $cgi->param("pause99_tail_logfile_1") || 5000;
+  my $req = $mgr->{REQ};
+  my $tail = $req->param("pause99_tail_logfile_1") || 5000;
   my($file) = $PAUSE::Config->{PAUSE_LOG};
   if ($PAUSE::Config->{TESTHOST}) {
     $file = "/usr/local/apache/logs/error_log"; # for testing
@@ -1242,7 +1242,7 @@ sub change_passwd {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   $mgr->prefer_post(1);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
@@ -1383,7 +1383,7 @@ The Pause
 sub add_uri {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $debug_table = $req->parms;
   warn sprintf "DEBUG: req[%s]", join(":",%$debug_table);
   my $r = $mgr->{R};
@@ -2011,7 +2011,7 @@ sub wrappar {
 sub delete_files {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
@@ -2188,7 +2188,7 @@ glory is collected on http://history.perl.org/backpan/});
 sub show_files {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
@@ -2270,7 +2270,7 @@ sub scheduled {
 
 sub add_user_doit {
   my($self,$mgr,$userid,$fullname,$dont_clear) = @_;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $T = time;
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
@@ -2510,7 +2510,7 @@ sub get_secretemail {
 sub add_user {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my @m;
 
@@ -2791,7 +2791,7 @@ sub usertable {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my $userid = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my $dbh = $mgr->connect;
   my $sql = "SELECT * FROM users WHERE userid=?";
@@ -2830,7 +2830,7 @@ sub request_id {
     <a href="http://www.bitcard.org">Bitcard</a> account instead.</p>
   };
 
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   $mgr->prefer_post(1);
 
@@ -3100,7 +3100,7 @@ sub mailpw {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m,$param,$email);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   # TUT: We reach this point in the code only if the Querystring
   # specified ACTION=mailpw or something equivalent. The parameter ABRA
@@ -3327,7 +3327,7 @@ Excerpt from a mail:<pre>
 </pre>
 };
 
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $selectedid = "";
   my $selectedrec = {};
   my $u = $self->active_user_record($mgr);
@@ -3523,7 +3523,7 @@ sub edit_mod {
   my $mgr = shift;
   $mgr->prefer_post(0);
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $selectedid = "";
   my $selectedrec = {};
   my $u = $self->active_user_record($mgr);
@@ -3648,7 +3648,7 @@ sub edit_mod {
 sub _edit_mod_selected {
   my($self,$mgr,$to,$selectedrec,$u,$is_only_one) = @_;
   my @m;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my @to = @$to;
   my $dbh = $mgr->connect;
   push @m, qq{<h3>Record for $selectedrec->{modid}</h3><p>More
@@ -3892,7 +3892,7 @@ sub edit_uris {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $selectedid = "";
   my $selectedrec = {};
   if (my $param = $req->param("pause99_edit_uris_3")) { # upper selectbox
@@ -4148,7 +4148,7 @@ sub add_mod {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
 
   my $dbh = $mgr->connect;
@@ -4543,7 +4543,7 @@ $blurbcopy
 sub _add_mod_hint {
     my($self, $mgr, $wanted, $dbh, $hints) = @_;
     my($dsli,@desc);
-    my $req = $mgr->{CGI};
+    my $req = $mgr->{REQ};
     ($wanted->{modid},$dsli,@desc) = split /\s+/, $req->param("pause99_add_mod_modid");
 
     my $userid = pop @desc;
@@ -4626,7 +4626,7 @@ sub apply_mod {
   my $mgr = shift;
   $mgr->prefer_post(1);
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   $mgr->{CAN_GZIP} = 0; # for debugging
   my $r = $mgr->{R};
   my $u = $self->active_user_record($mgr);
@@ -5445,7 +5445,7 @@ sub user_meta {
 sub check_xhtml {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my @m;
   my $dir = "/var/run/httpd/deadmeat";
   if (my $file = $req->param("pause99_check_xhtml_look")) {
@@ -5560,7 +5560,7 @@ sub WAIT::Filter::pause99_edit_users_utflc_20010505 {
 sub who_pumpkin {
   my $self = shift;
   my $mgr = shift;
-  my $cgi = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my @m;
 
@@ -5609,7 +5609,7 @@ sub who_pumpkin {
 sub email_for_admin {
   my $self = shift;
   my $mgr = shift;
-  my $cgi = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my @m;
   my %ALL;
@@ -5654,7 +5654,7 @@ sub email_for_admin {
     $sth2->finish;
     $sth3->finish;
   };
-  my $output_format = $cgi->param("OF");
+  my $output_format = $req->param("OF");
   if ($output_format){
     if ($output_format eq "YAML") {
       require YAML::Syck;
@@ -5687,7 +5687,7 @@ sub email_for_admin {
 sub peek_perms {
   my $self = shift;
   my $mgr = shift;
-  my $cgi = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my @m;
 
@@ -5721,11 +5721,11 @@ sub peek_perms {
             can be corrected.--Thank you!</p><p>};
 
 
-  unless ($cgi->param("pause99_peek_perms_query")) {
-    $cgi->param("pause99_peek_perms_query", $mgr->{User}{userid});
+  unless ($req->param("pause99_peek_perms_query")) {
+    $req->param("pause99_peek_perms_query", $mgr->{User}{userid});
   }
-  unless ($cgi->param("pause99_peek_perms_by")) {
-    $cgi->param("pause99_peek_perms_by","a");
+  unless ($req->param("pause99_peek_perms_by")) {
+    $req->param("pause99_peek_perms_by","a");
   }
 
   push @m, $mgr->scrolling_list('name' => 'pause99_peek_perms_by',
@@ -5744,8 +5744,8 @@ sub peek_perms {
   push @m, qq{<input type="submit" name="pause99_peek_perms_sub" value="Submit" />
               </p>};
 
-  if (my $qterm = $cgi->param("pause99_peek_perms_query")) {
-    my $by = $cgi->param("pause99_peek_perms_by");
+  if (my $qterm = $req->param("pause99_peek_perms_query")) {
+    my $by = $req->param("pause99_peek_perms_by");
     my @query       = (
                 qq{SELECT mods.modid,
                           mods.userid,
@@ -5826,7 +5826,7 @@ sub peek_perms {
         $row->[3] ||= $self->owner_of_module($mgr,$row->[0]);
       }
       my @column_names = qw(module userid type owner);
-      my $output_format = $cgi->param("OF");
+      my $output_format = $req->param("OF");
       if ($output_format){
         my @hres;
         for my $row (@res) {
@@ -5880,8 +5880,8 @@ sub peek_perms {
       my $href = sprintf("authenquery?pause99_peek_perms_by=%s;".
                          "pause99_peek_perms_query=%s;pause99_peek_perms_sub=1;".
                          "OF=YAML",
-                         $cgi->param("pause99_peek_perms_by"),
-                         URI::Escape::uri_escape($cgi->param("pause99_peek_perms_query"),'\W'),
+                         $req->param("pause99_peek_perms_by"),
+                         URI::Escape::uri_escape($req->param("pause99_peek_perms_query"),'\W'),
                         );
       push @m, qq{</table><a href="$href" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
@@ -5904,7 +5904,7 @@ sub owner_of_module {
 sub reindex {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
@@ -6096,7 +6096,7 @@ sub share_perms {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   $mgr->prefer_post(1); # because the querystring can get too long
 
@@ -6364,7 +6364,7 @@ sub share_perms_remocos {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my $u = $self->active_user_record($mgr);
 
@@ -6484,7 +6484,7 @@ sub share_perms_remome {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my $u = $self->active_user_record($mgr);
   my $db = $mgr->connect;
@@ -6562,7 +6562,7 @@ sub share_perms_makeco {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my $u = $self->active_user_record($mgr);
   # warn "u->userid[%s]", $u->{userid};
@@ -6671,7 +6671,7 @@ sub share_perms_remopr {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my $u = $self->active_user_record($mgr);
 
@@ -6760,7 +6760,7 @@ sub share_perms_movepr {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
   my(@m);
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my $u = $self->active_user_record($mgr);
 
@@ -7018,7 +7018,7 @@ sub dele_message {
   <i>Delete</i>.</p>};
 
   my $dbh = $mgr->connect;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $sth = $dbh->prepare("SELECT * FROM messages where mfrom=? AND mstatus='active'
  ORDER BY created desc");
   $sth->execute($mgr->{User}{userid});
@@ -7083,7 +7083,7 @@ sub post_message {
   <i>Submit</i>.</p><hr />};
 
   my $dbh = $mgr->connect;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
 
   my $mto = $req->param('pause99_post_message_mto');
   $mto = uc $mto;
@@ -7152,7 +7152,7 @@ sub post_message {
 sub reset_version {
   my pause_1999::edit $self = shift;
   my $mgr = shift;
-  my $req = $mgr->{CGI};
+  my $req = $mgr->{REQ};
   my $r = $mgr->{R};
   my @m;
   my $u = $self->active_user_record($mgr);
