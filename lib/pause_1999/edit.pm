@@ -1915,7 +1915,7 @@ from the indexer a little later (usually within 1 hour).
 
       } else {
 	my $errmsg = $dbh->errstr;
-        $r->status(406);
+        $mgr->{RES}->status(406);
 	push @m, (qq{
 
 <p><b>Could not enter the URL into the database.
@@ -1923,7 +1923,7 @@ Reason:</b></p><p>$errmsg</p>
 
 });
 	if ($errmsg =~ /non\s+unique\s+key|Duplicate/i) {
-          $r->status(409);
+          $mgr->{RES}->status(409);
           my $sth = $dbh->prepare("SELECT * FROM uris WHERE uriid=?");
           $sth->execute($uriid);
           my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
