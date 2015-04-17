@@ -11,6 +11,7 @@ use PAUSE::Crypt;
 use POSIX ();
 use URI::Escape;
 use Text::Format;
+use Log::Contextual qw(:log);
 use HTTP::Status qw(:constants);
 eval {require Time::Duration};
 our $HAVE_TIME_DURATION = !$@;
