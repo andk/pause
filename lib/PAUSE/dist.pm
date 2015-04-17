@@ -821,9 +821,7 @@ sub _package_governing_permission {
 
   my $d = CPAN::DistnameInfo->new($self->{DIST});
   my $dist_name = $d->dist;
-  unless ($main_pkg) {
-    ($main_pkg = $dist_name) =~ s/[-+]+/::/g;
-  }
+  (my $main_pkg = $dist_name) =~ s/[-+]+/::/g;
 
   return $main_pkg;
 }
