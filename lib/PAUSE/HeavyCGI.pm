@@ -184,7 +184,7 @@ sub myurl {
   my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";
   $self->{MYURL} = URI::URL->new(
 				 "$protocol://" .
-				 $r->server->server_hostname .
+				 $req->env->{SERVER_NAME} .  # XXX: $r->server->server_hostname
 				 $explicit_port .
 				 $script_name);
 }
@@ -214,7 +214,7 @@ sub serverroot_url {
   require URI::URL;
   my $req = $self->{REQ} or
       return URI::URL->new("http://localhost");
-  my $host   = $r->server->server_hostname;
+  my $host   = $req->env->{SERVER_NAME}; # XXX: $r->server->server_hostname;
   my $port = $req->port || 80;
   my $protocol = $port == 443 ? "https" : "http";
   my $explicit_port = ($port == 80 || $port == 443) ? "" : ":$port";
