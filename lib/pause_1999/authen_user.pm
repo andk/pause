@@ -105,7 +105,7 @@ sub header {
     $mgr->{UserSecrets} = $r->pnotes("usersecrets");
     if ( $mgr->{UserSecrets}{forcechange} ) {
       $mgr->{Action} = "change_passwd"; # ueberschreiben
-      $mgr->{CGI}->param(ACTION=>"change_passwd"); # faelschen
+      $mgr->{REQ}->param(ACTION=>"change_passwd"); # faelschen
     }
   }
 }
