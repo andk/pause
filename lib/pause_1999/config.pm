@@ -5,6 +5,7 @@ use PAUSE::HeavyCGI::ExePlan;
 use Apache::Request;
 use strict;
 use PAUSE ();
+use HTTP::Status qw(:constants);
 use vars qw( $Exeplan );
 use vars qw($VERSION);
 $VERSION = "949";
