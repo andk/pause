@@ -38,14 +38,14 @@ your patience.</p>};
     if ($user && $user eq "ANDK") { # would prefer a check of the admin role here
       $r->notes("CLOSED", $closed_text);
     } else {
-      $r->content_type("text/html");
-      $r->send_http_header;
+      my $res = $req->new_response(HTTP_OK);
+      $res->content_type("text/html");
 
-      $r->print(qq{<html> <head><title>PAUSE
+      $res->body(qq{<html> <head><title>PAUSE
 CLOSED</title></head><body> <h1>Closed for Maintainance</h1>
 $closed_text <p>Andreas Koenig</p></body> </html>});
 
-      return HTTP_OK;
+      return $res;
     }
   }
   my $self = pause_1999::main->
@@ -368,6 +368,7 @@ share_perms
 	    ModDsnPasswd => $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 	    ModDsnUser   => $PAUSE::Config->{MOD_DATA_SOURCE_USER},
 	    REQ       => $req,
+	    RES       => $req->new_response(HTTP_OK),
 	    RootURL => "/pause",
             SessionDataDir => "$PAUSE::Config->{RUNDATA}/session/sdata",
             SessionCounterDir => "$PAUSE::Config->{RUNDATA}/session/cnt",
