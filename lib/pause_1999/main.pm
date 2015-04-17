@@ -216,7 +216,7 @@ sub can_utf8 {
   ##   an error response with the 406 (not acceptable) status code, though
   ##   the sending of an unacceptable response is also allowed.
 
-  my $acce = $self->{R}->header_in("Accept-Charset");
+  my $acce = $self->{REQ}->header("Accept-Charset");
   if (defined $acce){
     if ($acce =~ m|\butf-8\b|i){
       $self->{CAN_UTF8} = 1;
@@ -253,7 +253,7 @@ sub can_utf8 {
 sub uagent {
   my $self = shift;
   return $self->{UserAgent} if defined $self->{UserAgent};
-  $self->{UserAgent} = $self->{R}->header_in('User-Agent');
+  $self->{UserAgent} = $self->{REQ}->header('User-Agent');
 }
 
 sub connect {
@@ -342,7 +342,7 @@ sub myurl {
   #### On. You don't need it anyway, because $uri->scheme seems to
   #### work OK.
 
-  my $Hhostname = $r->headers_in->get('Host');
+  my $Hhostname = $req->header('Host');
   my $hostname = $uri->hostname();
   warn "hostname[$hostname]Hhostname[$Hhostname]";
   # $uri->hostname($Hhostname); # contains :8443!!!!!
@@ -392,7 +392,7 @@ sub is_ssl {
     if ($uri->scheme eq "https") {
         $is_ssl = 1;
     } elsif (Sys::Hostname::hostname() =~ /pause2/) {
-        my $header = $self->{R}->header_in("X-pause-is-SSL") || 0;
+        my $header = $self->{REQ}->header("X-pause-is-SSL") || 0;
         $is_ssl = !!$header;
     }
     return $self->{IsSSL} = $is_ssl;

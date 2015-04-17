@@ -12,12 +12,12 @@ sub header {
   my PAUSE::HeavyCGI $mgr = shift;
 
   my $now = $mgr->time;
-  my $r   = $mgr->{R};
+  my $req = $mgr->{REQ};
 
   my $last_modified = $mgr->last_modified;
   $r->header_out('Date', HTTP::Date::time2str($now));
 
-  if (my $ifmodisi = $r->header_in('If-Modified-Since')) {
+  if (my $ifmodisi = $req->header('If-Modified-Since')) {
     # warn "Got ifmodisi[$ifmodisi]";
     $ifmodisi =~ s/\;.*//;
     my $ret;
