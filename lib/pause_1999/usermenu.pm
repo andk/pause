@@ -9,8 +9,8 @@ our $VERSION = "854";
 sub as_string {
   my $self = shift;
   my $mgr = shift;
-  my $r = $mgr->{R};
-  my $user = $r->connection->user;
+  my $req = $mgr->{REQ};
+  my $user = $req->session->{user}; # XXX: $r->connection->user
   my $myurl = $mgr->myurl;
   my $server = $myurl->can("host") ? $myurl->host : $myurl->hostname;
   if (my $port = $myurl->port) {

@@ -9,8 +9,8 @@ our $VERSION = "946";
 sub as_string {
   my $self = shift;
   my $mgr = shift;
-  my $r = $mgr->{R};
-  my $user = $r->connection->user;
+  my $req = $mgr->{REQ};
+  my $user = $req->session->{user}; # XXX: $r->connection->user
   my $server = $mgr->myurl->can("host") ? $mgr->myurl->host : $mgr->myurl->hostname;
   # $r->log_error(sprintf "Watch: server[%s]at[%s]line[%d]", $server, __FILE__, __LINE__);
   my $activecolor = $mgr->{ActiveColor};
