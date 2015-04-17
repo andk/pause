@@ -1170,10 +1170,10 @@ sub show_document {
   my $doc = shift || "04pause.html";
   my $rewrite = shift || 0;
   my $r = $mgr->{R};
-  my $dir = $r->document_root;
+  my $dir = $FindBin::Bin;
   my @m;
   # push @m, sprintf "DEBUG: %s %s<br />", $dir, -e $dir ? "exists" : "doesn't exist. ";
-  for my $subdir ("pause", "pause/../htdocs", "pause/..", "") {
+  for my $subdir ("htdocs", "pause", "pause/../htdocs", "pause/..", "") {
     my $file = "$dir/$subdir/$doc";
     next unless -f $file;
     push @m, qq{<hr noshade="noshade" />};
