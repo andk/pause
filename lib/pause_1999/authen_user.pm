@@ -24,9 +24,9 @@ sub header {
   if (my $u = $req->session->{user}) { # XXX: $r->connection->user
     #This is a database application with nearly all users having write access
     #Write access means expiration any moment
-    my $headers = $r->headers_out;
-    $headers->{'Pragma'} = $headers->{'Cache-control'} = 'no-cache';
-    $r->no_cache(1);
+    my $headers = $mgr->{RES}->headers;
+    $headers->header('Pragma', 'no-cache'); $headers->header('Cache-control', 'no-cache');
+    # XXX: $res->no_cache(1);
     # This is annoying when we ask for the who-is-who list and it
     # hasn't changed since the last time, but for most cases it's
     # safer to expire
