@@ -102,7 +102,7 @@ sub header {
       }
     }
 
-    $mgr->{UserSecrets} = $r->pnotes("usersecrets");
+    $mgr->{UserSecrets} = $req->{pnotes}{usersecrets};
     if ( $mgr->{UserSecrets}{forcechange} ) {
       $mgr->{Action} = "change_passwd"; # ueberschreiben
       $mgr->{REQ}->param(ACTION=>"change_passwd"); # faelschen
