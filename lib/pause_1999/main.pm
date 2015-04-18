@@ -89,7 +89,6 @@ use HTML::Entities;
 use String::Random ();
 use Fcntl qw(O_RDWR);
 use Time::HiRes ();
-use Log::Contextual qw(:log);
 
 {
   %entity2char = %HTML::Entities::entity2char;
@@ -177,7 +176,7 @@ sub dispatch {
       if ($self->{ERRORS_TO_BROWSER}) {
 	push @{$self->{ERROR}}, " ", $@;
       } else {
-	log_error { $@ };
+	$req->logger->({level => 'error', message => $@ });
 	return HTTP_INTERNAL_SERVER_ERROR;
       }
     }
@@ -428,7 +427,7 @@ sub send_mail {
   warn "constructing mailer with args[@args]";
   my $mailer = Mail::Mailer->new(@args);
 
-  my @hdebug = %$header; # log_error { sprintf("hdebug[%s]", join "|", @hdebug) }; XXX: weird errors
+  my @hdebug = %$header; $self->{REQ}->logger({level => 'error', message => sprintf("hdebug[%s]", join "|", @hdebug) });
   $header->{From}                        ||= $self->{OurEmailFrom};
   $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
 

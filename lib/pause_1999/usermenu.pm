@@ -21,12 +21,12 @@ sub as_string {
   }
 
   if (0) {
-    log_error {sprintf(
+    $req->logger->({level => 'error', message => sprintf(
                           "Watch: server[%s]at[%s]line[%d]",
                           $server,
                           __FILE__,
                           __LINE__,
-                         )};
+                         )});
   }
   my @m;
   push @m, qq{<table width="155" cellspacing="1" cellpadding="0">};
