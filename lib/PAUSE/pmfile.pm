@@ -139,9 +139,21 @@ sub examine_fio {
         }
 
         $self->{VERSION} = $version;
+
+        my $dist_is_perl = $self->{DIO}->isa_regular_perl($self->{DIO}{DIST});
+
         if ($self->{VERSION} =~ /^\{.*\}$/) {
             # JSON error message
-        } elsif ($self->{VERSION} =~ /[_\s]/){   # ignore developer releases and "You suck!"
+        } elsif ($self->{VERSION} =~ /[_\s]/ && ! $dist_is_perl) {
+            # If the pmfile seems to be a dev version, we skip it... but not if
+            # it's in perl.  Historical example:  perl-5.18.0 contains POSIX
+            # 1.32, but perl-5.20.0 contains 1.38_03.  We would then skip the
+            # new one, leaving some packages pointing at an older version of
+            # perl.
+            #
+            # We don't need to account for single- versus dual-life, because
+            # the check for dual-life packages still applies elsewhere.
+            # -- rjbs, 2015-04-18
             delete $self->{DIO};    # circular reference
             return;
         }
@@ -283,7 +295,8 @@ sub packages_per_pmfile {
                     } else {
                         $ppp->{$pkg}{version} = defined $version ? $version : "";
                     }
-                    local($^W)=0;
+                    no warnings 'numeric';
+
                     $ppp->{$pkg}{version} =
                         $version
                             if ($version||0)
