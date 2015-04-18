@@ -19,6 +19,24 @@ use PAUSE::TestPAUSE::Result;
 
 use namespace::autoclean;
 
+sub init_new {
+  my ($class) = @_;
+  my $self = $class->new;
+
+  my $authors_dir = $self->tmpdir->subdir(qw(cpan authors id));
+  make_path $authors_dir->stringify;
+
+  my $modules_dir = $self->tmpdir->subdir(qw(cpan modules));
+  make_path $modules_dir->stringify;
+  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
+
+  {
+    File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
+      or die "couldn't set up bogus 06perms: $!";
+  }
+  return $self;
+}
+
 has _tmpdir_obj => (
   is       => 'ro',
   isa      => 'Defined',
@@ -166,17 +184,87 @@ sub test_reindex {
     my $self = shift;
     my $chdir_guard = pushd;
 
+    my @stray_mail = Email::Sender::Simple->default_transport->deliveries;
+
+    die "stray mail in test mail trap before reindex" if @stray_mail;
+
     PAUSE::mldistwatch->new({ sleep => 0 })->reindex;
 
     $code->($self->tmpdir) if $code;
+
+    my @deliveries = Email::Sender::Simple->default_transport->deliveries;
+
+    Email::Sender::Simple->default_transport->clear_deliveries;
 
     return PAUSE::TestPAUSE::Result->new({
       tmpdir => $self->tmpdir,
       config_overrides => $self->pause_config_overrides,
       authen_db_file   => File::Spec->catfile($self->db_root, 'authen.sqlite'),
       mod_db_file      => File::Spec->catfile($self->db_root, 'mod.sqlite'),
+      deliveries       => \@deliveries,
     });
   });
+}
+
+has _file_index => (
+  is      => 'ro',
+  default => sub {  {}  },
+);
+
+sub file_updated_ok {
+  my ($self, $filename, $desc) = @_;
+  $desc = defined $desc ? "$desc: " : q{};
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  unless (-e $filename) {
+    return Test::More::fail("$desc$filename not updated");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  my $old = $self->_file_index->{ $filename };
+
+  unless (defined $old) {
+    $self->_file_index->{$filename} = "$dev,$ino";
+    return Test::More::pass("$desc$filename updated (created)");
+  }
+
+  my $ok = Test::More::ok(
+    $old ne "$dev,$ino",
+    "$desc$filename updated",
+  );
+
+  $self->_file_index->{$filename} = "$dev,$ino";
+  return $ok;
+}
+
+sub file_not_updated_ok {
+  my ($self, $filename, $desc) = @_;
+  $desc = defined $desc ? "$desc: " : q{};
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $old = $self->_file_index->{ $filename };
+
+  unless (-e $filename) {
+    return Test::More::fail("$desc$filename deleted") if $old;
+    return Test::More::pass("$desc$filename not created (thus not updated)");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  unless (defined $old) {
+    $self->_file_index->{$filename} = "$dev,$ino";
+    return Test::More::fail("$desc$filename updated (created)");
+  }
+
+  my $ok = Test::More::ok(
+    $old eq "$dev,$ino",
+    "$desc$filename not updated",
+  );
+
+  return $ok;
 }
 
 1;
