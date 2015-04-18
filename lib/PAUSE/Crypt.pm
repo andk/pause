@@ -14,7 +14,6 @@ sub hash_password {
 my(@saltset) = (qw(. /), 0..9, "A".."Z", "a".."z");
 
 sub _randchar ($) {
-  local($^W) = 0; #we get a bogus warning here
   my($count) = @_;
   my $str = "";
   $str .= $saltset[int(rand(64))] while $count--;

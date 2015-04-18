@@ -505,15 +505,13 @@ sub user_has_pumpking_bit {
     $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
     $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
   ) or die $DBI::errstr;
-  my $query = "SELECT * FROM grouptable
-  WHERE user= ?
-    AND ugroup='pumpking'";
-  my $sth = $adbh->prepare($query);
-  $sth->execute($user);
 
-  my $ok = $sth->rows > 0;
+  my ($ok) = $adbh->selectrow_array(
+    "SELECT COUNT(*) FROM grouptable WHERE user= ? AND ugroup='pumpking'",
+    undef,
+    $user,
+  );
 
-  $sth->finish;
   $adbh->disconnect;
 
   return $ok;

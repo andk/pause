@@ -6,7 +6,7 @@ use autodie;
 
 use DBI;
 use DBIx::RunSQL;
-use File::Copy::Recursive qw(dircopy);
+use File::Copy::Recursive qw(fcopy dircopy);
 use File::Path qw(make_path);
 use File::pushd;
 use File::Temp ();
@@ -74,6 +74,23 @@ sub import_author_root {
   dircopy($author_root, $ml_root);
 }
 
+sub upload_author_file {
+  my ($self, $author, $file) = @_;
+
+  $author = uc $author;
+  my $cpan_root  = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $author_dir = File::Spec->catdir(
+    $cpan_root,
+    qw(authors id),
+    (substr $author, 0, 1),
+    (substr $author, 0, 2),
+    $author,
+  );
+
+  make_path( $author_dir );
+  fcopy($file, $author_dir);
+}
+
 has pause_config_overrides => (
   is  => 'ro',
   isa => 'HashRef',
@@ -120,7 +137,11 @@ sub _build_pause_config_overrides {
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
 
-    ($ENV{TEST_VERBOSE} ? () : (LOG_CALLBACK => sub { })),
+    LOG_CALLBACK       => $ENV{TEST_VERBOSE}
+                        ? sub { my (undef, undef, @what) = @_;
+                                push @what, "\n" unless $what[-1] =~ m{\n$};
+                                print STDERR @what;  }
+                        : sub { },
   };
 
   return $overrides;
