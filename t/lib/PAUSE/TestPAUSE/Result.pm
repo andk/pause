@@ -119,5 +119,42 @@ sub perm_list_ok {
   is(@data, @$want, "there are right number of lines in 06perms");
 }
 
+has deliveries => (
+  isa => 'ArrayRef',
+  required => 1,
+  traits   => [ 'Array' ],
+  handles  => { deliveries => 'elements' },
+);
+
+sub email_ok {
+  my ($self, $want) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my @deliveries = sort {
+    $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
+  } $self->deliveries;
+
+  subtest "emails sent during this run" => sub {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is(@deliveries, @$want, "as many emails as expected: " . @$want);
+  };
+
+  for my $test (@$want) {
+    my $delivery = shift @deliveries;
+    if ($test->{subject}) {
+      is(
+        $delivery->{email}->get_header('Subject'),
+        $test->{subject},
+        "Got email: $test->{subject}",
+      );
+    }
+
+    for (@{ $test->{callbacks} || [] }) {
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
+      $_->($delivery);
+    }
+  }
+}
 
 1;

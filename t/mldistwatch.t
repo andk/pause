@@ -19,39 +19,6 @@ use Test::More;
 my $pause = PAUSE::TestPAUSE->init_new;
 $pause->import_author_root('corpus/mld/001/authors');
 
-sub email_ok {
-  my ($want) = @_;
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  my @deliveries = sort {
-    $a->{email}->get_header('Subject') cmp $b->{email}->get_header('Subject')
-  } Email::Sender::Simple->default_transport->deliveries;
-
-  Email::Sender::Simple->default_transport->clear_deliveries;
-
-  subtest "emails sent during this run" => sub {
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    is(@deliveries, @$want, "as many emails as expected: " . @$want);
-  };
-
-  for my $test (@$want) {
-    my $delivery = shift @deliveries;
-    if ($test->{subject}) {
-      is(
-        $delivery->{email}->get_header('Subject'),
-        $test->{subject},
-        "Got email: $test->{subject}",
-      );
-    }
-
-    for (@{ $test->{callbacks} || [] }) {
-      local $Test::Builder::Level = $Test::Builder::Level + 1;
-      $_->($delivery);
-    }
-  }
-}
-
 subtest "first indexing" => sub {
   my $result = $pause->test_reindex;
 
@@ -80,7 +47,7 @@ subtest "first indexing" => sub {
     [ undef, undef, undef, undef ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz' },
       { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz' },
@@ -145,7 +112,7 @@ subtest "reindexing" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
     ],
@@ -174,7 +141,7 @@ subtest "distname/pkgname permission mismatch" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report UMAGNUS/XFR-2.000.tar.gz' ,
         callbacks => [
@@ -215,7 +182,7 @@ subtest "case mismatch, authorized for original" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
       { subject => 'Upload Permission or Version mismatch' },
@@ -245,7 +212,7 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz',
         callbacks => [
@@ -310,7 +277,7 @@ subtest "don't allow upload on permissions case conflict" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/Bug-Gold-9.002.tar.gz' },
     ],
@@ -339,7 +306,7 @@ subtest "distname/pkgname permission check" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz' },
       { subject => 'Upload Permission or Version mismatch' },
@@ -360,7 +327,7 @@ subtest "do not index bare .pm but report rejection" => sub {
     "did not reindex",
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/Matrix.pm.gz' },
     ],
@@ -451,6 +418,12 @@ subtest "do not index if meta has release_status <> stable" => sub {
 
   my $result = $pause->test_reindex;
 
+  $result->email_ok(
+    [
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
+    ],
+  );
+
   $pause->file_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
@@ -471,7 +444,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       {
         subject => 'Failed: PAUSE indexer report RJBS/fewer-0.202.tar.gz',
@@ -485,7 +458,6 @@ subtest "do not index if meta has release_status <> stable" => sub {
           }
         ],
       },
-      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
     ],
   );
 };
@@ -505,7 +477,7 @@ subtest "warn when pkg and module match only case insensitively" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
       { subject => 'PAUSE indexer report RJBS/fewer-0.202.tar.gz',
@@ -545,7 +517,7 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'PAUSE indexer report RJBS/Pkg-Name-1.000.tar.gz' },
     ],
@@ -579,7 +551,7 @@ subtest "check various forms of version" => sub {
     ],
   );
 
-  email_ok(
+  $result->email_ok(
     [
       { subject => 'PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
     ],

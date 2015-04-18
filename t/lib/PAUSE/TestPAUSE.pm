@@ -184,15 +184,24 @@ sub test_reindex {
     my $self = shift;
     my $chdir_guard = pushd;
 
+    my @stray_mail = Email::Sender::Simple->default_transport->deliveries;
+
+    die "stray mail in test mail trap before reindex" if @stray_mail;
+
     PAUSE::mldistwatch->new({ sleep => 0 })->reindex;
 
     $code->($self->tmpdir) if $code;
+
+    my @deliveries = Email::Sender::Simple->default_transport->deliveries;
+
+    Email::Sender::Simple->default_transport->clear_deliveries;
 
     return PAUSE::TestPAUSE::Result->new({
       tmpdir => $self->tmpdir,
       config_overrides => $self->pause_config_overrides,
       authen_db_file   => File::Spec->catfile($self->db_root, 'authen.sqlite'),
       mod_db_file      => File::Spec->catfile($self->db_root, 'mod.sqlite'),
+      deliveries       => \@deliveries,
     });
   });
 }
