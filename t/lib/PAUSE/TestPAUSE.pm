@@ -19,6 +19,24 @@ use PAUSE::TestPAUSE::Result;
 
 use namespace::autoclean;
 
+sub init_new {
+  my ($class) = @_;
+  my $self = $class->new;
+
+  my $authors_dir = $self->tmpdir->subdir(qw(cpan authors id));
+  make_path $authors_dir->stringify;
+
+  my $modules_dir = $self->tmpdir->subdir(qw(cpan modules));
+  make_path $modules_dir->stringify;
+  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
+
+  {
+    File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
+      or die "couldn't set up bogus 06perms: $!";
+  }
+  return $self;
+}
+
 has _tmpdir_obj => (
   is       => 'ro',
   isa      => 'Defined',

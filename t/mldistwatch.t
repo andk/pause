@@ -16,24 +16,7 @@ use PAUSE::TestPAUSE;
 use Test::Deep qw(cmp_deeply superhashof methods);
 use Test::More;
 
-sub init_test_pause {
-  my $pause = PAUSE::TestPAUSE->new;
-
-  my $authors_dir = $pause->tmpdir->subdir(qw(cpan authors id));
-  make_path $authors_dir->stringify;
-
-  my $modules_dir = $pause->tmpdir->subdir(qw(cpan modules));
-  make_path $modules_dir->stringify;
-  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
-
-  {
-    File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
-      or die "couldn't set up bogus 06perms: $!";
-  }
-  return $pause;
-}
-
-my $pause = init_test_pause;
+my $pause = PAUSE::TestPAUSE->init_new;
 $pause->import_author_root('corpus/mld/001/authors');
 
 sub package_list_ok {
@@ -445,7 +428,7 @@ subtest "distname/pkgname permission check" => sub {
 Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "do not index bare .pm but report rejection" => sub {
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/dot-pm/authors');
 
   my $result = $pause->test_reindex;
@@ -467,7 +450,7 @@ subtest "do not index bare .pm but report rejection" => sub {
   plan skip_all => "this test only run when perl-5.20.2.tar.gz found"
     unless -e 'perl-5.20.2.tar.gz';
 
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
 
   my $initial_result = $pause->test_reindex;
 
@@ -487,7 +470,7 @@ sub refused_index_test {
   my ($code) = @_;
 
   sub {
-    my $pause = init_test_pause;
+    my $pause = PAUSE::TestPAUSE->init_new;
 
     my $db_file = File::Spec->catfile($pause->db_root, 'mod.sqlite');
     my $dbh = DBI->connect(
@@ -542,7 +525,7 @@ subtest "cannot steal a library when only mods exist" => refused_index_test(sub 
 Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "do not index if meta has release_status <> stable" => sub {
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/002/authors');
 
   my $result = $pause->test_reindex;
@@ -588,7 +571,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
 };
 
 subtest "warn when pkg and module match only case insensitively" => sub {
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/002/authors');
   $pause->import_author_root('corpus/mld/pkg-mod-case/authors');
 
@@ -629,7 +612,7 @@ subtest "warn when pkg and module match only case insensitively" => sub {
 };
 
 subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/pkg-block/authors');
 
   my $result = $pause->test_reindex;
@@ -652,7 +635,7 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
 };
 
 subtest "check various forms of version" => sub {
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/bad-version/authors');
   my $result = $pause->test_reindex;
 
@@ -687,7 +670,7 @@ subtest "check various forms of version" => sub {
 };
 
 subtest "check perl6 distribution indexing" => sub {
-  my $pause = init_test_pause;
+  my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/perl6/authors');
   my $result = $pause->test_reindex;
 
