@@ -8,6 +8,9 @@ CREATE POOL pause81
 CREATE POOL catalyst
   POOL catalyst ADD 217.199.168.174:3000
 
+CREATE POOL qah2015_pool
+  POOL catalyst ADD 127.0.0.1:5000
+
 CREATE SERVICE pause
   SET role                        = reverse_proxy
   SET plugins                     = trustheader
@@ -25,6 +28,7 @@ CREATE SERVICE pause
   SET buffer_size                 = 2048k
 ENABLE pause
 
+# dated:
 CREATE SERVICE analysis
   SET role                        = reverse_proxy
   SET pool                        = catalyst
@@ -32,6 +36,14 @@ CREATE SERVICE analysis
   SET persist_client_timeout      = 300
   SET enable_reproxy              = off
 ENABLE analysis
+
+CREATE SERVICE plackperl
+  SET role                        = reverse_proxy
+  SET pool                        = qah2015_pool
+  SET trusted_upstream_proxies    = 0.0.0.0/0
+  SET persist_client_timeout      = 300
+  SET enable_reproxy              = off
+ENABLE plackperl
 
 CREATE SERVICE vhosts
   SET listen                      = 0.0.0.0:80
@@ -63,6 +75,7 @@ CREATE SERVICE vhosts_ssl
 
   SET ssl_key_file                = /etc/perlbal/servercerts/pause.perl.org-20080519.key
   SET ssl_cert_file               = /etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain
+  VHOST pause2.develooper.com.    = plackperl
   VHOST *                         = pause
   HEADER vhosts_ssl remove X-pause-is-SSL
   HEADER vhosts_ssl insert X-pause-is-SSL: 1
