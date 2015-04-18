@@ -5,6 +5,7 @@ use base 'Class::Singleton';
 use PAUSE ();
 use PAUSE::Crypt;
 use strict;
+use Log::Contextual qw(:all);
 our $VERSION = "1052";
 
 =comment
@@ -109,54 +110,52 @@ sub header {
 }
 
 sub handler {
-  my($r) = @_;
+  my($req) = @_;
 
   my $cookie;
-  my $uri = $r->uri || "";
-  my $args = $r->args || "";
+  my $uri = $req->request_uri || "";
+  my $args = $req->query_parameters;
   warn "WATCH: uri[$uri]args[$args]";
-  if ($cookie = $r->header_in("Cookie")) {
+  if ($cookie = $req->header('Cookie')) {
     if ( $cookie =~ /logout/ ) {
       warn "WATCH: cookie[$cookie]";
-      $r->err_header_out("Set-Cookie",
-                         "logout; path=$uri; expires=Sat, 01-Oct-1974 00:00:00 UTC",
-                        );
-      $r->note_basic_auth_failure;
-      return HTTP_UNAUTHORIZED;
+      my $res = _basic_auth_failure($req);
+      $res->cookies->{logout} = {
+        path => $uri,
+        expires => "Sat, 01-Oct-1974 00:00:00 UTC",
+      };
+      return $res;
     }
   }
   if ($args) {
     my $logout;
-    if ( $args =~ s/logout=(.*)// ) {
-      $logout = $1;
+    if ( my $logout = $args->get('logout') ) {
       warn "WATCH: logout[$logout]";
       if ($logout =~ /^1/) {
-        $r->err_header_out("Set-Cookie","logout; path=$uri; expires=Sat, 01-Oct-2027 00:00:00 UTC");
-        $r->header_out("Location",$uri);
-        return HTTP_MOVED_PERMANENTLY;
+        my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
+        $res->cookies->{logout} = {
+            path => $uri,
+            expires => "Sat, 01-Oct-2027 00:00:00 UTC",
+        };
+        $res->header("Location",$uri);
+        return $res;
       } elsif ($logout =~ /^2/) { # badname
-        my $port   = $r->server->port || 80;
-        my $scheme = $port == 443 ? "https" : "http";
-        my $server = $r->server->server_hostname;
-        my $redir = "$scheme://baduser:badpass\@$server:$port$uri";
+        my $redir = $req->uri;
+        $redir->userinfo('baduser:badpass');
         warn "redir[$redir]";
-        $r->header_out("Location",$redir);
-        return HTTP_MOVED_PERMANENTLY;
+        my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
+        $res->header("Location",$redir);
+        return $res;
       } elsif ($logout =~ /^3/) { # cancelnote
-        $r->note_basic_auth_failure();
-        return HTTP_UNAUTHORIZED;
+        return  HTTP_UNAUTHORIZED;
       }
     }
   }
+  # return HTTP_OK unless $r->is_initial_req; #only the first internal request
 
-
-  return HTTP_OK unless $r->is_initial_req; #only the first internal request
-  my($res, $sent_pw) = $r->get_basic_auth_pw;
-
-  # warn "res[$res]sent_pw[$sent_pw]";
-
-  return $res if $res; #decline if not Basic
-  my $user_sent = $r->connection->user;
+  my $auth = $req->env->{HTTP_AUTHORIZATION} or return HTTP_UNAUTHORIZED;
+  return HTTP_UNAUTHORIZED unless $auth =~ /^Basic (.*)$/i; #decline if not Basic
+  my($user_sent, $sent_pw) = split /:/, (MIME::Base64::decode($1) || ":"), 2;
 
   my $attr = {
 	      data_source      => $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
@@ -172,13 +171,11 @@ sub handler {
   unless ($dbh = DBI->connect($attr->{data_source},
 			      $attr->{username},
 			      $attr->{password})) {
-    $r->log_reason(" db connect error with $attr->{data_source}",
-		   $r->uri);
-    my $redir = $r->uri;
+    log_error { " db connect error with $attr->{data_source} ".$req->request_uri };
+    my $redir = $req->request_uri;
     $redir =~ s/authen//;
-    $r->connection->user("-");
-    $r->custom_response(HTTP_INTERNAL_SERVER_ERROR, $redir);
-    return HTTP_INTERNAL_SERVER_ERROR;
+    delete $req->env->{REMOTE_USER};
+    return $req->new_response(HTTP_INTERNAL_SERVER_ERROR, undef, $redir);
   }
 
   # generate statement
@@ -191,22 +188,20 @@ sub handler {
   # prepare statement
   my $sth;
   unless ($sth = $dbh->prepare($statement)) {
-    $r->log_reason("can not prepare statement: $DBI::errstr",
-		   $r->uri);
+    log_error { "can not prepare statement: $DBI::errstr". $req->request_uri };
     $dbh->disconnect;
-    return HTTP_INTERNAL_SERVER_ERROR;
+    return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
   }
   for my $user (@try_user){
     unless ($sth->execute($user)) {
-      $r->log_reason(" can not execute statement: $DBI::errstr",
-		     $r->uri);
+      log_error {" can not execute statement: $DBI::errstr" . $req->request_uri };
       $dbh->disconnect;
-      return HTTP_INTERNAL_SERVER_ERROR;
+      return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
     }
 
     if ($sth->rows == 1){
       $user_record = pause_1999::main::->fetchrow($sth, "fetchrow_hashref");
-      $r->connection->user($user);
+      $req->env->{REMOTE_USER} = $user;
       last;
     }
   }
@@ -221,7 +216,7 @@ sub handler {
         dbh      => $dbh,
         username => $user_record->{user},
       });
-      $r->pnotes("usersecrets", $user_record);
+      $req->env->{pnotes}{usersecrets} = $user_record;
       $dbh->do
           ("UPDATE usertable SET lastvisit=NOW() where user=?",
            +{},
@@ -231,12 +226,11 @@ sub handler {
       return HTTP_OK;
     } else {
       warn sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
-	  $crypt_pw, $user_record->{user}, $r->uri, HTTP_UNAUTHORIZED;
+	  $crypt_pw, $user_record->{user}, $req->request_uri, HTTP_UNAUTHORIZED;
     }
   }
 
   $dbh->disconnect;
-  $r->note_basic_auth_failure;
   return HTTP_UNAUTHORIZED;
 }
 
