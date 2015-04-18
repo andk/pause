@@ -112,7 +112,7 @@ sub handler {
   my($req) = @_;
 
   my $cookie;
-  my $uri = $req->request_uri || "";
+  my $uri = $req->path || "";
   my $args = $req->query_parameters;
   warn "WATCH: uri[$uri]args[$args]";
   if ($cookie = $req->header('Cookie')) {
@@ -170,8 +170,8 @@ sub handler {
   unless ($dbh = DBI->connect($attr->{data_source},
 			      $attr->{username},
 			      $attr->{password})) {
-    $req->logger->({level => 'error', message => " db connect error with $attr->{data_source} ".$req->request_uri });
-    my $redir = $req->request_uri;
+    $req->logger->({level => 'error', message => " db connect error with $attr->{data_source} ".$req->path });
+    my $redir = $req->path;
     $redir =~ s/authen//;
     delete $req->env->{REMOTE_USER};
     return $req->new_response(HTTP_INTERNAL_SERVER_ERROR, undef, $redir);
@@ -187,13 +187,13 @@ sub handler {
   # prepare statement
   my $sth;
   unless ($sth = $dbh->prepare($statement)) {
-    $req->logger->({level => 'error', message => "can not prepare statement: $DBI::errstr". $req->request_uri });
+    $req->logger->({level => 'error', message => "can not prepare statement: $DBI::errstr". $req->path });
     $dbh->disconnect;
     return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
   }
   for my $user (@try_user){
     unless ($sth->execute($user)) {
-      $req->logger->({level => 'error', message => " can not execute statement: $DBI::errstr" . $req->request_uri });
+      $req->logger->({level => 'error', message => " can not execute statement: $DBI::errstr" . $req->path });
       $dbh->disconnect;
       return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -225,7 +225,7 @@ sub handler {
       return HTTP_OK;
     } else {
       warn sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
-	  $crypt_pw, $user_record->{user}, $req->request_uri, HTTP_UNAUTHORIZED;
+	  $crypt_pw, $user_record->{user}, $req->path, HTTP_UNAUTHORIZED;
     }
   }
 
