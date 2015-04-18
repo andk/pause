@@ -536,7 +536,8 @@ subtest "do not index bare .pm but report rejection" => sub {
 
   my $result = $pause->test_reindex;
 
-  diag $result->tmpdir;
+  my $packages = $result->packages_data;
+  ok($packages->package("POSIX"), "we index POSIX in a dev version");
   scalar <STDIN>;
 };
 
