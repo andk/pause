@@ -82,4 +82,42 @@ sub package_list_ok {
   ) or diag explain(\@packages);
 }
 
+sub p6dists_ok {
+  my ($self, $want) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $pkg_rows = $self->connect_mod_db->selectall_arrayref(
+    'SELECT * FROM p6dists ORDER BY name, ver',
+    { Slice => {} },
+  );
+
+  cmp_deeply(
+    $pkg_rows,
+    [ map {; superhashof($_) } @$want ],
+    "we db-inserted exactly the dists we expected to",
+  ) or diag explain($pkg_rows);
+}
+
+sub perm_list_ok {
+  my ($self, $want) = @_;
+
+  my $index_06 = $self->tmpdir->subdir(qw(cpan modules))
+                 ->file(qw(06perms.txt.gz));
+
+  our $GZIP = $PAUSE::Config->{GZIP_PATH};
+  open my $fh, "$GZIP --stdout --uncompress $index_06|"
+    or die "can't open $index_06 for reading with gip: $!";
+
+  my (@header, @data);
+  while (<$fh>) {
+    push(@header, $_), next if 1../^\s*$/;
+    push @data, $_;
+  }
+
+  # simple is() for now to check for line count
+  is(@data, @$want, "there are right number of lines in 06perms");
+}
+
+
 1;

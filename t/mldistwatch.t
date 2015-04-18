@@ -19,46 +19,6 @@ use Test::More;
 my $pause = PAUSE::TestPAUSE->init_new;
 $pause->import_author_root('corpus/mld/001/authors');
 
-sub p6dists_ok {
-  my ($result, $want) = @_;
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-    'SELECT * FROM p6dists ORDER BY name, ver',
-    { Slice => {} },
-  );
-
-  cmp_deeply(
-    $pkg_rows,
-    [ map {; superhashof($_) } @$want ],
-    "we db-inserted exactly the dists we expected to",
-  ) or diag explain($pkg_rows);
-}
-
-sub perm_list_ok {
-  my ($result, $want) = @_;
-
-  my $index_06 = $result->tmpdir->subdir(qw(cpan modules))
-                 ->file(qw(06perms.txt.gz));
-
-  my $fh;
-  our $GZIP = $PAUSE::Config->{GZIP_PATH};
-  $pause->with_our_config(sub {
-    open $fh, "$GZIP --stdout --uncompress $index_06|"
-      or die "can't open $index_06 for reading with gip: $!";
-  });
-
-  my (@header, @data);
-  while (<$fh>) {
-    push(@header, $_), next if 1../^\s*$/;
-    push @data, $_;
-  }
-
-  # simple is() for now to check for line count
-  is(@data, @$want, "there are right number of lines in 06perms");
-}
-
 sub email_ok {
   my ($want) = @_;
 
@@ -116,8 +76,7 @@ subtest "first indexing" => sub {
     ],
   );
 
-  perm_list_ok(
-    $result,
+  $result->perm_list_ok(
     [ undef, undef, undef, undef ],
   );
 
@@ -632,8 +591,7 @@ subtest "check perl6 distribution indexing" => sub {
   $pause->import_author_root('corpus/mld/perl6/authors');
   my $result = $pause->test_reindex;
 
-  p6dists_ok(
-    $result,
+  $result->p6dists_ok(
     [
       { name => 'Inline', ver => 'v1.1' },
     ],
