@@ -538,7 +538,6 @@ subtest "do not index bare .pm but report rejection" => sub {
 
   my $packages = $result->packages_data;
   ok($packages->package("POSIX"), "we index POSIX in a dev version");
-  scalar <STDIN>;
 };
 
 sub refused_index_test {
