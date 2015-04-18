@@ -120,6 +120,7 @@ sub handler {
       warn "WATCH: cookie[$cookie]";
       my $res = _basic_auth_failure($req);
       $res->cookies->{logout} = {
+        value => '',
         path => $uri,
         expires => "Sat, 01-Oct-1974 00:00:00 UTC",
       };
@@ -133,6 +134,7 @@ sub handler {
       if ($logout =~ /^1/) {
         my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
         $res->cookies->{logout} = {
+            value => '',
             path => $uri,
             expires => "Sat, 01-Oct-2027 00:00:00 UTC",
         };
