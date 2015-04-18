@@ -22,14 +22,9 @@ my $app = sub {
     pause_1999::config::handler($req);
 };
 
-sub authen_cb {
-    my ($user, $pass, $env) = @_;
-    return 1;
-}
-
 builder {
     # enable Session, Auth, Log, etc with better config
     enable 'Log::Contextual', logger => $logger;
-    enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} 'Auth::Basic', authenticator => \&authen_cb;
+    enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} '+PAUSE::Middleware::Auth::Basic';
     $app;
 };
