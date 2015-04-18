@@ -137,7 +137,11 @@ sub _build_pause_config_overrides {
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
 
-    ($ENV{TEST_VERBOSE} ? () : (LOG_CALLBACK => sub { })),
+    LOG_CALLBACK       => $ENV{TEST_VERBOSE}
+                        ? sub { my (undef, undef, @what) = @_;
+                                push @what, "\n" unless $what[-1] =~ m{\n$};
+                                print STDERR @what;  }
+                        : sub { },
   };
 
   return $overrides;
