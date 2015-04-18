@@ -41,7 +41,6 @@ WriteMakefile(
     LWP::UserAgent
     LWP::Protocol::https
     LWP::UserAgent
-    Log::Contextual
     Digest::MD5
     Mail::Mailer
     Mail::Send
@@ -53,7 +52,6 @@ WriteMakefile(
     Path::Class
     Path::Tiny
     Plack
-    Plack::Middleware::Log::Contextual
     Set::Crontab
     String::Random
     Test::Deep

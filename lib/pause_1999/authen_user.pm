@@ -5,7 +5,6 @@ use base 'Class::Singleton';
 use PAUSE ();
 use PAUSE::Crypt;
 use strict;
-use Log::Contextual qw(:all);
 our $VERSION = "1052";
 
 =comment
@@ -171,7 +170,7 @@ sub handler {
   unless ($dbh = DBI->connect($attr->{data_source},
 			      $attr->{username},
 			      $attr->{password})) {
-    log_error { " db connect error with $attr->{data_source} ".$req->request_uri };
+    $req->logger->({level => 'error', message => " db connect error with $attr->{data_source} ".$req->request_uri });
     my $redir = $req->request_uri;
     $redir =~ s/authen//;
     delete $req->env->{REMOTE_USER};
@@ -188,13 +187,13 @@ sub handler {
   # prepare statement
   my $sth;
   unless ($sth = $dbh->prepare($statement)) {
-    log_error { "can not prepare statement: $DBI::errstr". $req->request_uri };
+    $req->logger->({level => 'error', message => "can not prepare statement: $DBI::errstr". $req->request_uri });
     $dbh->disconnect;
     return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
   }
   for my $user (@try_user){
     unless ($sth->execute($user)) {
-      log_error {" can not execute statement: $DBI::errstr" . $req->request_uri };
+      $req->logger->({level => 'error', message => " can not execute statement: $DBI::errstr" . $req->request_uri });
       $dbh->disconnect;
       return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
     }
