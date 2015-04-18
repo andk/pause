@@ -6,7 +6,7 @@ use autodie;
 
 use DBI;
 use DBIx::RunSQL;
-use File::Copy::Recursive qw(dircopy);
+use File::Copy::Recursive qw(fcopy dircopy);
 use File::Path qw(make_path);
 use File::pushd;
 use File::Temp ();
@@ -72,6 +72,23 @@ sub import_author_root {
   my $cpan_root = File::Spec->catdir($self->tmpdir, 'cpan');
   my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
   dircopy($author_root, $ml_root);
+}
+
+sub upload_author_file {
+  my ($self, $author, $file) = @_;
+
+  $author = uc $author;
+  my $cpan_root  = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $author_dir = File::Spec->catdir(
+    $cpan_root,
+    qw(authors id),
+    (substr $author, 0, 1),
+    (substr $author, 0, 2),
+    $author,
+  );
+
+  make_path( $author_dir );
+  fcopy($file, $author_dir);
 }
 
 has pause_config_overrides => (
