@@ -65,8 +65,6 @@ subtest "first indexing" => sub {
 
 };
 
-Email::Sender::Simple->default_transport->clear_deliveries;
-
 subtest "add historic content" => sub {
   $DB::single=1;
   my $result = $pause->test_reindex;
@@ -88,8 +86,6 @@ subtest "add historic content" => sub {
     ]
   );
 };
-
-Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "reindexing" => sub {
   $pause->import_author_root('corpus/mld/002/authors');
@@ -118,8 +114,6 @@ subtest "reindexing" => sub {
     ],
   );
 };
-
-Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "distname/pkgname permission mismatch" => sub {
   $pause->import_author_root('corpus/mld/003/authors');
@@ -159,8 +153,6 @@ subtest "distname/pkgname permission mismatch" => sub {
   );
 };
 
-Email::Sender::Simple->default_transport->clear_deliveries;
-
 subtest "case mismatch, authorized for original" => sub {
   $pause->import_author_root('corpus/mld/004/authors');
 
@@ -189,8 +181,6 @@ subtest "case mismatch, authorized for original" => sub {
     ],
   );
 };
-
-Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "case mismatch, authorized for original, desc. version" => sub {
   $pause->import_author_root('corpus/mld/005/authors');
@@ -230,8 +220,6 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
   );
 };
 
-Email::Sender::Simple->default_transport->clear_deliveries;
-
 subtest "perl-\\d should not get indexed" => sub {
   $pause->import_author_root('corpus/mld/006/authors');
 
@@ -254,8 +242,6 @@ subtest "perl-\\d should not get indexed" => sub {
 
   # TODO: send a report saying 'no perl-X allowed'
 };
-
-Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "don't allow upload on permissions case conflict" => sub {
   $pause->import_author_root('corpus/mld/007/authors');
@@ -284,8 +270,6 @@ subtest "don't allow upload on permissions case conflict" => sub {
   );
 };
 
-Email::Sender::Simple->default_transport->clear_deliveries;
-
 subtest "distname/pkgname permission check" => sub {
   $pause->import_author_root('corpus/mld/006-distname/authors');
 
@@ -313,8 +297,6 @@ subtest "distname/pkgname permission check" => sub {
     ],
   );
 };
-
-Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "do not index bare .pm but report rejection" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
@@ -409,8 +391,6 @@ subtest "cannot steal a library when only mods exist" => refused_index_test(sub 
   $dbh->do("INSERT INTO mods (modid, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
 });
-
-Email::Sender::Simple->default_transport->clear_deliveries;
 
 subtest "do not index if meta has release_status <> stable" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
