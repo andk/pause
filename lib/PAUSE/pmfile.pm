@@ -283,7 +283,8 @@ sub packages_per_pmfile {
                     } else {
                         $ppp->{$pkg}{version} = defined $version ? $version : "";
                     }
-                    local($^W)=0;
+                    no warnings 'numeric';
+
                     $ppp->{$pkg}{version} =
                         $version
                             if ($version||0)
