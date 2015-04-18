@@ -21,7 +21,7 @@ sub header {
   my pause_1999::authen_user $self = shift;
   my $mgr = shift;
   my $req = $mgr->{REQ};
-  if (my $u = $req->session->{user}) { # XXX: $r->connection->user
+  if (my $u = $req->user) {
     #This is a database application with nearly all users having write access
     #Write access means expiration any moment
     my $headers = $mgr->{RES}->headers;
