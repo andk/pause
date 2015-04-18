@@ -19,34 +19,6 @@ use Test::More;
 my $pause = PAUSE::TestPAUSE->init_new;
 $pause->import_author_root('corpus/mld/001/authors');
 
-sub package_list_ok {
-  my ($result, $want) = @_;
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  my $pkg_rows = $result->connect_mod_db->selectall_arrayref(
-    'SELECT * FROM packages ORDER BY package, version',
-    { Slice => {} },
-  );
-
-  cmp_deeply(
-    $pkg_rows,
-    [ map {; superhashof($_) } @$want ],
-    "we db-inserted exactly the dists we expected to",
-  ) or diag explain($pkg_rows);
-
-
-  my $p = $result->packages_data;
-
-  my @packages = sort { $a->package cmp $b->package } $p->packages;
-
-  cmp_deeply(
-    \@packages,
-    [ map {; methods(%$_) } @$want ],
-    "we built exactly the 02packages we expected",
-  ) or diag explain(\@packages);
-}
-
 sub p6dists_ok {
   my ($result, $want) = @_;
 
@@ -135,8 +107,7 @@ subtest "first indexing" => sub {
     "our indexer indexed",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
@@ -181,8 +152,7 @@ subtest "add historic content" => sub {
   print $fh qq<fake tarball>;
   close $fh or die "Could not close: $!";
   $result = $pause->test_reindex;
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -206,8 +176,7 @@ subtest "reindexing" => sub {
     "our indexer indexed",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -236,8 +205,7 @@ subtest "distname/pkgname permission mismatch" => sub {
     "did not reindex",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -278,8 +246,7 @@ subtest "case mismatch, authorized for original" => sub {
     "our indexer indexed",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -309,8 +276,7 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
     "did not reindex",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -350,8 +316,7 @@ subtest "perl-\\d should not get indexed" => sub {
     "did not reindex",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -376,8 +341,7 @@ subtest "don't allow upload on permissions case conflict" => sub {
     "did not reindex",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -406,8 +370,7 @@ subtest "distname/pkgname permission check" => sub {
     "did not reindex",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
@@ -483,8 +446,7 @@ sub refused_index_test {
     $pause->import_author_root('corpus/mld/001/authors');
     my $result = $pause->test_reindex;
 
-    package_list_ok(
-      $result,
+    $result->package_list_ok(
       [
         { package => 'Hall::MtKing',   version => '0.01'  },
         { package => 'XForm::Rollout', version => '1.00'  },
@@ -544,8 +506,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
     "did not reindex",
   );
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'XForm::Rollout', version => '1.01'  },
     ],
@@ -577,8 +538,7 @@ subtest "warn when pkg and module match only case insensitively" => sub {
 
   my $result = $pause->test_reindex;
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Fewer',          version => '0.202' },
       { package => 'More',           version => '0.202' },
@@ -617,8 +577,7 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
 
   my $result = $pause->test_reindex;
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'Pkg::Name',             version => '1.000' },
       { package => 'Pkg::NameBlock',        version => '1.000' },
@@ -651,8 +610,7 @@ subtest "check various forms of version" => sub {
   # VVVVVV::Lax     - just fine!  index it
   # VVVVVV::VString - version.pm can't handle what we pull out of it
 
-  package_list_ok(
-    $result,
+  $result->package_list_ok(
     [
       { package => 'VVVVVV',          version => '6.666'  },
       # { package => 'VVVVVV::Bogus',   version => '6.666june6' },
