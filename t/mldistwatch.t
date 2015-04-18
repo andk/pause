@@ -7,13 +7,10 @@ use lib 't/lib';
 use Email::Sender::Transport::Test;
 $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
 
-use File::Copy::Recursive qw(dircopy);
-use File::Path qw(make_path);
 use File::Spec;
 use PAUSE;
 use PAUSE::TestPAUSE;
 
-use Test::Deep qw(cmp_deeply superhashof methods);
 use Test::More;
 
 my $pause = PAUSE::TestPAUSE->init_new;
@@ -316,8 +313,7 @@ subtest "do not index bare .pm but report rejection" => sub {
   );
 };
 
-# XXX
-subtest "do not index bare .pm but report rejection" => sub {
+subtest "should index single-life dev vers. modules in perl dist" => sub {
   plan skip_all => "this test only run when perl-5.20.2.tar.gz found"
     unless -e 'perl-5.20.2.tar.gz';
 
