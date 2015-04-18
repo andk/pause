@@ -328,7 +328,7 @@ sub myurl {
   use URI::URL;
   my $req = $self->{REQ} or
       return URI::URL->new("http://localhost");
-  my $uri = $req->base;
+  my $uri = $req->uri;
 
   # use Data::Dumper;
   # warn "subprocess_env[".Data::Dumper::Dumper(scalar $r->subprocess_env)."]";
