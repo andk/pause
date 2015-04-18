@@ -118,7 +118,7 @@ sub handler {
   if ($cookie = $req->header('Cookie')) {
     if ( $cookie =~ /logout/ ) {
       warn "WATCH: cookie[$cookie]";
-      my $res = _basic_auth_failure($req);
+      my $res = $req->new_response(HTTP_UNAUTHORIZED);
       $res->cookies->{logout} = {
         value => '',
         path => $uri,
