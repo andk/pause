@@ -36,63 +36,6 @@ sub init_test_pause {
 my $pause = init_test_pause;
 $pause->import_author_root('corpus/mld/001/authors');
 
-my %LAST_FILE_IDENT;
-sub file_updated_ok {
-  my ($filename, $desc) = @_;
-  $desc = defined $desc ? "$desc: " : q{};
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  unless (-e $filename) {
-    return fail("$desc$filename not updated");
-  }
-
-  my ($dev, $ino) = stat $filename;
-
-  my $old = $LAST_FILE_IDENT{ $filename };
-
-  unless (defined $old) {
-    $LAST_FILE_IDENT{$filename} = "$dev,$ino";
-    return pass("$desc$filename updated (created)");
-  }
-
-  my $ok = ok(
-    $old ne "$dev,$ino",
-    "$desc$filename updated",
-  );
-
-  $LAST_FILE_IDENT{$filename} = "$dev,$ino";
-  return $ok;
-}
-
-sub file_not_updated_ok {
-  my ($filename, $desc) = @_;
-  $desc = defined $desc ? "$desc: " : q{};
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  my $old = $LAST_FILE_IDENT{ $filename };
-
-  unless (-e $filename) {
-    return fail("$desc$filename deleted") if $old;
-    return pass("$desc$filename not created (thus not updated)");
-  }
-
-  my ($dev, $ino) = stat $filename;
-
-  unless (defined $old) {
-    $LAST_FILE_IDENT{$filename} = "$dev,$ino";
-    return fail("$desc$filename updated (created)");
-  }
-
-  my $ok = ok(
-    $old eq "$dev,$ino",
-    "$desc$filename not updated",
-  );
-
-  return $ok;
-}
-
 sub package_list_ok {
   my ($result, $want) = @_;
 
@@ -197,13 +140,13 @@ sub email_ok {
 subtest "first indexing" => sub {
   my $result = $pause->test_reindex;
 
-  file_updated_ok(
+  $pause->file_updated_ok(
     $result->tmpdir
            ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
   );
 
-  file_updated_ok(
+  $pause->file_updated_ok(
     $result->tmpdir
            ->file(qw(cpan modules 03modlist.data.gz)),
     "our indexer indexed",
@@ -274,7 +217,7 @@ subtest "reindexing" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_updated_ok(
+  $pause->file_updated_ok(
     $result->tmpdir
            ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
@@ -305,7 +248,7 @@ subtest "distname/pkgname permission mismatch" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -346,7 +289,7 @@ subtest "case mismatch, authorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir
            ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
@@ -378,7 +321,7 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -419,7 +362,7 @@ subtest "perl-\\d should not get indexed" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -445,7 +388,7 @@ subtest "don't allow upload on permissions case conflict" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -475,7 +418,7 @@ subtest "distname/pkgname permission check" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -507,7 +450,7 @@ subtest "do not index bare .pm but report rejection" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -604,7 +547,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
 
   my $result = $pause->test_reindex;
 
-  file_updated_ok(
+  $pause->file_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -613,7 +556,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
 
   $result = $pause->test_reindex;
 
-  file_not_updated_ok(
+  $pause->file_not_updated_ok(
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
@@ -713,7 +656,7 @@ subtest "check various forms of version" => sub {
   $pause->import_author_root('corpus/mld/bad-version/authors');
   my $result = $pause->test_reindex;
 
-  file_updated_ok(
+  $pause->file_updated_ok(
     $result->tmpdir
            ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",

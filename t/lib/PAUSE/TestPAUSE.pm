@@ -179,4 +179,65 @@ sub test_reindex {
   });
 }
 
+has _file_index => (
+  is      => 'ro',
+  default => sub {  {}  },
+);
+
+sub file_updated_ok {
+  my ($self, $filename, $desc) = @_;
+  $desc = defined $desc ? "$desc: " : q{};
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  unless (-e $filename) {
+    return Test::More::fail("$desc$filename not updated");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  my $old = $self->_file_index->{ $filename };
+
+  unless (defined $old) {
+    $self->_file_index->{$filename} = "$dev,$ino";
+    return Test::More::pass("$desc$filename updated (created)");
+  }
+
+  my $ok = Test::More::ok(
+    $old ne "$dev,$ino",
+    "$desc$filename updated",
+  );
+
+  $self->_file_index->{$filename} = "$dev,$ino";
+  return $ok;
+}
+
+sub file_not_updated_ok {
+  my ($self, $filename, $desc) = @_;
+  $desc = defined $desc ? "$desc: " : q{};
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $old = $self->_file_index->{ $filename };
+
+  unless (-e $filename) {
+    return Test::More::fail("$desc$filename deleted") if $old;
+    return Test::More::pass("$desc$filename not created (thus not updated)");
+  }
+
+  my ($dev, $ino) = stat $filename;
+
+  unless (defined $old) {
+    $self->_file_index->{$filename} = "$dev,$ino";
+    return Test::More::fail("$desc$filename updated (created)");
+  }
+
+  my $ok = Test::More::ok(
+    $old eq "$dev,$ino",
+    "$desc$filename not updated",
+  );
+
+  return $ok;
+}
+
 1;
