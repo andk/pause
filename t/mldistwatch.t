@@ -519,6 +519,27 @@ subtest "do not index bare .pm but report rejection" => sub {
   );
 };
 
+# XXX
+subtest "do not index bare .pm but report rejection" => sub {
+  plan skip_all => "this test only run when perl-5.20.2.tar.gz found"
+    unless -e 'perl-5.20.2.tar.gz';
+
+  my $pause = init_test_pause;
+
+  my $initial_result = $pause->test_reindex;
+
+  my $dbh = $initial_result->connect_authen_db;
+  die "couldn't make OPRIME a pumpking"
+    unless $dbh->do("INSERT INTO grouptable (user, ugroup) VALUES ('OPRIME', 'pumpking')");
+
+  $pause->upload_author_file('OPRIME', 'perl-5.20.2.tar.gz');
+
+  my $result = $pause->test_reindex;
+
+  diag $result->tmpdir;
+  scalar <STDIN>;
+};
+
 sub refused_index_test {
   my ($code) = @_;
 
