@@ -110,7 +110,7 @@ work. The estimated downtime is $willlast_dur.</p>}; #};
                                       # here, it currently is always
                                       # ANDK
 
-    my $closed_text = $mgr->{REQ}->{notes}{CLOSED};
+    my $closed_text = $mgr->{REQ}->env->{'psgix.notes'}{CLOSED};
 
     push @l, qq{<div align="center"> <p class="motd">Hi $user, you
 see the site now <b>but it is closed for maintainance</b>.
