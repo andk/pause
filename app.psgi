@@ -15,6 +15,14 @@ my $logger = Log::Dispatch->new(outputs => [
     ['Screen', min_level => 'debug'],
 ]);
 
+use BSD::Resource ();
+#BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CPU(),
+#                         60*10, 60*10);
+#BSD::Resource::setrlimit(BSD::Resource::RLIMIT_DATA(),
+#                         40*1024*1024, 40*1024*1024);
+BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CORE(),
+                         40*1024*1024, 40*1024*1024);
+
 my $app = sub {
     my $req = Plack::Request->new(shift);
     my $res = pause_1999::config::handler($req);
