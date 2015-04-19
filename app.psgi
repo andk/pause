@@ -32,5 +32,6 @@ builder {
         404 => '',
         403 => '',
     ;
+    enable 'ServerStatus::Tiny', path => '/status';
     $app;
 };
