@@ -11,6 +11,7 @@ use Log::Dispatch; # or better to use ::Config?
 # preload stuff
 use pause_1999::config;
 use pause_1999::index;
+use pause_1999::fixup;
 use perl_pause::disabled2;
 
 my $logger = Log::Dispatch->new(outputs => [
@@ -32,7 +33,9 @@ my $pause_app = sub {
         return perl_pause::disabled2::handler($req);
     }
 
-    my $res = pause_1999::config::handler($req);
+    my $res =
+        pause_1999::fixup::handler($req) //
+        pause_1999::config::handler($req);
     return $res if ref $res;
     [$res =~ /^\d+$/ ? $res : 500, [], [$res]];
 };
