@@ -17,7 +17,9 @@ my $logger = Log::Dispatch->new(outputs => [
 
 my $app = sub {
     my $req = Plack::Request->new(shift);
-    pause_1999::config::handler($req);
+    my $res = pause_1999::config::handler($req);
+    return $res if ref $res;
+    [$res =~ /^\d+$/ ? $res : 500, [], [$res]];
 };
 
 builder {
@@ -25,5 +27,10 @@ builder {
     enable 'LogDispatch', logger => $logger;
     enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
     enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} '+PAUSE::Middleware::Auth::Basic';
+    enable 'ErrorDocument',
+        500 => '',
+        404 => '',
+        403 => '',
+    ;
     $app;
 };
