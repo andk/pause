@@ -1400,7 +1400,7 @@ sub add_uri {
 
   if ($req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
       || $req->param("SUBMIT_pause99_add_uri_httpupload")) {
-    my $upl = $req->upload('pause_add_uri_httpupload');
+    my $upl = $req->upload('pause99_add_uri_httpupload');
     unless ($upl->size) {
       warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
       $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
