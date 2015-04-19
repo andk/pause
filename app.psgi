@@ -34,7 +34,7 @@ my $pause_app = sub {
     }
 
     my $res =
-        pause_1999::fixup::handler($req) //
+#        pause_1999::fixup::handler($req) //
         pause_1999::config::handler($req);
     return $res if ref $res;
     [$res =~ /^\d+$/ ? $res : 500, [], [$res]];
@@ -50,7 +50,8 @@ my $index_app = sub {
 builder {
     enable 'LogDispatch', logger => $logger;
     enable 'AccessLog::Timed', format => 'combined';
-    enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
+    enable 'ReverseProxy';
+#    enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
 #    enable 'ErrorDocument',
 #        500 => '',
 #        404 => '',
@@ -63,5 +64,5 @@ builder {
         $pause_app;
     };
 
-    mount '/' => builder { $index_app };
+#    mount '/' => builder { $index_app };
 };
