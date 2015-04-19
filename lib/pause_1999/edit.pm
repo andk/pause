@@ -164,7 +164,7 @@ sub parameter {
       # TUT: Let's pretend they requested change_passwd. I guess, if we
       # would drop that line, it would still work, but I like redundant
       # coding in such cases
-      $param = $req->param("ACTION","change_passwd"); # override
+      $param = $req->parameters->set("ACTION","change_passwd"); # override
 
     } else {
       die  PAUSE::HeavyCGI::Exception->new(ERROR => "You tried to authenticate the
@@ -208,7 +208,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
       if (
 	  $param = $req->param("pause99_$action\_1")
 	 ) {
-	$req->param("pause99_$action\_sub", $param); # why?
+	$req->parameters->set("pause99_$action\_sub", $param); # why?
 	$mgr->{Action} = $action;
 	last ACTION;
       }
@@ -219,7 +219,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
 
       my(@partial) = grep /^pause99_\Q$action\E_/, $req->param;
     PART: for my $partial (@partial) {
-	$req->param("pause99_$action\_sub", $partial); # why not $mgr->{ActionComment}?
+	$req->parameters->set("pause99_$action\_sub", $partial); # why not $mgr->{ActionComment}?
 	$mgr->{Action} = $action;
 	last PART;
       }
@@ -788,7 +788,7 @@ sub edit_cred {
           # set asciiname to empty if it equals fullname
           my $wantfullname = $req->param("pause99_edit_cred_fullname");
           if ($wantfullname eq $wantasciiname) {
-            $req->param("pause99_edit_cred_asciiname", "");
+            $req->parameters->set("pause99_edit_cred_asciiname", "");
           }
         }
       } else {
@@ -798,7 +798,7 @@ sub edit_cred {
           require Text::Unidecode;
           $wantfullname = $mgr->any2utf8($wantfullname);
           $wantasciiname = Text::Unidecode::unidecode($wantfullname);
-          $req->param("pause99_edit_cred_asciiname", $wantasciiname);
+          $req->parameters->set("pause99_edit_cred_asciiname", $wantasciiname);
         }
       }
     }
@@ -850,7 +850,7 @@ sub edit_cred {
           if ( $u->{"ustatus"} eq "active" ) {
             next;
           } elsif (!$req->param($form_field)) {
-            $req->param($form_field,"unused");
+            $req->parameters->set($form_field,"unused");
           }
         }
 	# $s is the value they entered
@@ -861,7 +861,7 @@ sub edit_cred {
         $s =~ s/^\s+//;
         $s =~ s/\s+\z//;
         if ($s ne $s_raw) {
-          $req->param($form_field,$s);
+          $req->parameters->set($form_field,$s);
         }
 	$nu->{$field} = $s;
         $u->{$field} = "" unless defined $u->{$field};
@@ -872,7 +872,7 @@ sub edit_cred {
 	  # No UTF8 running before we have the system walking
 	  #	my $utf = $mgr->formfield_as_utf8($s);
 	  #	unless ( $s eq $utf ) {
-	  #	  $req->param($form_field, $utf);
+	  #	  $req->parameters->set($form_field, $utf);
 	  #	  $s = $utf;
 	  #	}
 	  #	next if $mgr->{User}{$field} eq $s;
@@ -993,7 +993,7 @@ sub select_user {
     if (
 	$self->can($action)
        ) {
-      $req->param("ACTION",$action);
+      $req->parameters->set("ACTION",$action);
       $mgr->{Action} = $action;
       return $self->$action($mgr);
     } else {
@@ -1051,7 +1051,7 @@ sub select_ml_action {
 	&&
         grep { $_ eq $action } @{$mgr->{AllowMlreprTakeover}}
        ) {
-      $req->param("ACTION",$action);
+      $req->parameters->set("ACTION",$action);
       $mgr->{Action} = $action;
       return $self->$action($mgr);
     } else {
@@ -1403,8 +1403,8 @@ sub add_uri {
     my $upl = $req->upload('pause99_add_uri_httpupload');
     unless ($upl->size) {
       warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
-      $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
-      $req->param("SUBMIT_pause99_add_uri_httpupload","");
+      $req->parameters->set("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
+      $req->parameters->set("SUBMIT_pause99_add_uri_httpupload","");
     }
   }
   if (!   $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
@@ -1414,9 +1414,9 @@ sub add_uri {
      ) {
     # no submit button
     if ($req->param("pause99_add_uri_uri")) {
-      $req->param("SUBMIT_pause99_add_uri_uri", "2ndguess");
+      $req->parameters->set("SUBMIT_pause99_add_uri_uri", "2ndguess");
     } elsif ($req->param("pause99_add_uri_upload")) {
-      $req->param("SUBMIT_pause99_add_uri_upload", "2ndguess");
+      $req->parameters->set("SUBMIT_pause99_add_uri_upload", "2ndguess");
     }
   }
 
@@ -1471,7 +1471,7 @@ filename[%s]. </p>
                              $dv->stringify($upl->filename),
                              $dv->stringify($filename)
                             );
-            $req->param("pause99_add_uri_httpupload",$filename);
+            $req->parameters->set("pause99_add_uri_httpupload",$filename);
           }
 	} else {
 	  die PAUSE::HeavyCGI::Exception
@@ -1513,13 +1513,13 @@ filename[%s]. </p>
     }
   } elsif ( $req->param("SUBMIT_pause99_add_uri_uri") ) {
     $uri = $req->param("pause99_add_uri_uri");
-    $req->param("pause99_add_uri_httpupload",""); # I saw spurious
+    $req->parameters->set("pause99_add_uri_httpupload",""); # I saw spurious
                                                   # nonsense in the
                                                   # field that broke
                                                   # XHTML
   } elsif ( $req->param("SUBMIT_pause99_add_uri_upload") ) {
     $uri = $req->param("pause99_add_uri_upload");
-    $req->param("pause99_add_uri_httpupload",""); # I saw spurious
+    $req->parameters->set("pause99_add_uri_httpupload",""); # I saw spurious
                                                   # nonsense in the
                                                   # field that broke
                                                   # XHTML
@@ -2473,7 +2473,7 @@ Subject: $subject\n};
       warn "Info: clearing all fields";
       for my $field (qw(userid fullname email homepage subscribe memo)) {
         my $param = "pause99_add_user_$field";
-        $req->param($param,"");
+        $req->parameters->set($param,"");
       }
     }
 
@@ -2512,7 +2512,7 @@ sub add_user {
     my $session = $mgr->session;
     my $s = $session->{APPLY};
     for my $a (keys %$s) {
-      $req->param("pause99_add_user_$a", $s->{$a});
+      $req->parameters->set("pause99_add_user_$a" => $s->{$a});
       warn "retrieving from session a[$a]s(a)[$s->{$a}]";
     }
   }
@@ -2531,7 +2531,7 @@ sub add_user {
 
     }
 
-    $req->param("pause99_add_user_userid", $userid) if $userid;
+    $req->parameters->set("pause99_add_user_userid", $userid) if $userid;
     my $doit = 0;
     my $dont_clear;
     my $fullname_raw = $req->param('pause99_add_user_fullname');
@@ -2539,7 +2539,7 @@ sub add_user {
     $fullname = $mgr->any2utf8($fullname_raw);
     warn "fullname[$fullname]fullname_raw[$fullname_raw]";
     if ($fullname ne $fullname_raw) {
-      $req->param("pause99_add_user_fullname",$fullname);
+      $req->parameters->set("pause99_add_user_fullname",$fullname);
       my $debug = $req->param("pause99_add_user_fullname");
       warn "debug[$debug]fullname[$fullname]";
     }
@@ -2837,7 +2837,7 @@ sub request_id {
   my $fullname  = $req->param( 'pause99_request_id_fullname') || "";
   my $ufullname = $mgr->any2utf8($fullname);
   if ($ufullname ne $fullname) {
-    $req->param("pause99_request_id_fullname", $ufullname);
+    $req->parameters->set("pause99_request_id_fullname", $ufullname);
     $fullname = $ufullname;
   }
   my $email     = $req->param( 'pause99_request_id_email') || "";
@@ -2846,7 +2846,7 @@ sub request_id {
   my $rationale = $req->param("pause99_request_id_rationale") || "";
   my $urat = $mgr->any2utf8($rationale);
   if ($urat ne $rationale) {
-    $req->param("pause99_request_id_rationale", $urat);
+    $req->parameters->set("pause99_request_id_rationale", $urat);
     $rationale = $urat;
   }
   warn sprintf(
@@ -2893,7 +2893,7 @@ sub request_id {
     }
     if ( $userid ) {
       $userid = uc $userid;
-      $req->param('pause99_request_id_userid', $userid);
+      $req->parameters->set('pause99_request_id_userid', $userid);
       my $db = $mgr->connect;
       my $sth = $db->prepare("SELECT userid FROM users WHERE userid=?");
       $sth->execute($userid);
@@ -3326,7 +3326,7 @@ Excerpt from a mail:<pre>
     $selectedid = $param;
   } elsif ($param = $req->param("HIDDENNAME")) {
     $selectedid = $param;
-    $req->param("pause99_edit_ml_3",$param);
+    $req->parameters->set("pause99_edit_ml_3",$param);
   }
   warn sprintf(
 	       "selectedid[%s]IsMR[%s]",
@@ -3449,7 +3449,7 @@ Excerpt from a mail:<pre>
       my $fieldtype = $meta{$field}{type};
       my $fieldname = "pause99_edit_ml_$field";
       if ($force_sel){
-	$req->param($fieldname, $selectedrec->{$field}||"");
+	$req->parameters->set($fieldname, $selectedrec->{$field}||"");
       } elsif ($update_sel) {
 	my $param = $req->param($fieldname);
 	if ($param ne $selectedrec->{$field}) {
@@ -3750,12 +3750,12 @@ mlstatus
             $selectedrec->{$field} !~ /^\d*$/;
       }
       if ($force_sel) {
-	$req->param($fieldname, $selectedrec->{$field}||"");
+	$req->parameters->set($fieldname, $selectedrec->{$field}||"");
       } elsif ($update_sel) {
 	my $param = $req->param($fieldname);
         my $uparam = $mgr->any2utf8($param);
         if ($uparam ne $param) {
-          $req->param($fieldname,$uparam);
+          $req->parameters->set($fieldname,$uparam);
           $param = $uparam;
         }
 	if ($param ne $selectedrec->{$field}) {
@@ -3764,7 +3764,7 @@ mlstatus
             my $ucparam = uc $param;
             unless ($ucparam eq $param) {
               $param = $ucparam;
-              $req->param($fieldname, $param);
+              $req->parameters->set($fieldname, $param);
             }
             my $nu = $self->active_user_record($mgr, $param, {checkonly => 1});
 
@@ -3840,7 +3840,7 @@ mlstatus
 	}
       } elsif ($is_only_one) {
         # as if they had selected it already
-	$req->param($fieldname, $selectedrec->{$field}||"");
+	$req->parameters->set($fieldname, $selectedrec->{$field}||"");
       }
       push @m_modrec, $mgr->$fieldtype(
 				       'name' => $fieldname,
@@ -4028,7 +4028,7 @@ changedby
       my $fieldtype = $meta{$field}{type};
       my $fieldname = "pause99_edit_uris_$field";
       if ($force_sel) {
-	$req->param($fieldname, $selectedrec->{$field}||"");
+	$req->parameters->set($fieldname, $selectedrec->{$field}||"");
       } elsif ($update_sel && $fieldtype) {
 	my $param = $req->param($fieldname);
 	if ($param ne $selectedrec->{$field}) {
@@ -4165,7 +4165,7 @@ sub add_mod {
     my $session = $mgr->session;
     my $s = $session->{APPLY};
     for my $a (keys %$s) {
-      $req->param("pause99_add_mod_$a", $s->{$a});
+      $req->parameters->set("pause99_add_mod_$a", $s->{$a});
       warn "retrieving from session a[$a]s(a)[$s->{$a}]";
     }
   }
@@ -4190,7 +4190,7 @@ sub add_mod {
     unless (length($modid)) {
       push @errors, qq{The module name is missing.};
     }
-    # $req->param("pause99_add_mod_modid", $modid) if $modid;
+    # $req->parameters->set("pause99_add_mod_modid", $modid) if $modid;
 
     my($chapterid) = $req->param('pause99_add_mod_chapterid');
     warn "chapterid[$chapterid]";
@@ -4203,31 +4203,31 @@ sub add_mod {
     warn "chapterid[$chapterid]";
 
     my($statd) = $req->param('pause99_add_mod_statd');
-    $req->param('pause99_add_mod_statd',$statd='?') unless $statd;
+    $req->parameters->set('pause99_add_mod_statd',$statd='?') unless $statd;
     unless ($meta{statd}{args}{labels}{$statd}) {
       push @errors, qq{The D status of the DSLIP [$statd] is not known.};
     }
 
     my($stats) = $req->param('pause99_add_mod_stats');
-    $req->param('pause99_add_mod_stats',$stats='?') unless $stats;
+    $req->parameters->set('pause99_add_mod_stats',$stats='?') unless $stats;
     unless ($meta{stats}{args}{labels}{$stats}) {
       push @errors, qq{The S status of the DSLIP [$stats] is not known.};
     }
 
     my($statl) = $req->param('pause99_add_mod_statl');
-    $req->param('pause99_add_mod_statl',$statl='?') unless $statl;
+    $req->parameters->set('pause99_add_mod_statl',$statl='?') unless $statl;
     unless ($meta{statl}{args}{labels}{$statl}) {
       push @errors, qq{The L status of the DSLIP [$statl] is not known.};
     }
 
     my($stati) = $req->param('pause99_add_mod_stati');
-    $req->param('pause99_add_mod_stati',$stati='?') unless $stati;
+    $req->parameters->set('pause99_add_mod_stati',$stati='?') unless $stati;
     unless ($meta{stati}{args}{labels}{$stati}) {
       push @errors, qq{The I status of the DSLIP [$stati] is not known.};
     }
 
     my($statp) = $req->param('pause99_add_mod_statp');
-    $req->param('pause99_add_mod_statp',$statp='?') unless $statp;
+    $req->parameters->set('pause99_add_mod_statp',$statp='?') unless $statp;
     unless ($meta{statp}{args}{labels}{$statp}) {
       # XXX for the first few weeks we allow statp to be empty
       # push @errors, qq{The P status of the DSLIP [$statp] is not known.};
@@ -4237,7 +4237,7 @@ sub add_mod {
     my($description) = $req->param('pause99_add_mod_description')||"";
     my $ud = $mgr->any2utf8($description);
     if ($ud ne $description) {
-      $req->param('pause99_add_mod_description',$ud);
+      $req->parameters->set('pause99_add_mod_description',$ud);
       $description = $ud;
     }
     $description =~ s/^\s+//;
@@ -4248,7 +4248,7 @@ sub add_mod {
     } elsif (not length($description)) {
       push @errors, qq{The description is missing.};
     }
-    $req->param("pause99_add_mod_description", $description) if $description;
+    $req->parameters->set("pause99_add_mod_description", $description) if $description;
 
     my($userid) = $req->param('pause99_add_mod_userid');
     unless ($meta{userid}{args}{labels}{$userid}) {
@@ -4463,11 +4463,11 @@ $blurbcopy
       # triggered later on. I would believe.
       if ($req->param($param)){
         if ($param =~ /_chapterid$/) {
-          $req->param($param,"");
+          $req->parameters->set($param,"");
         } elsif ($param =~ /_stat.$/) {
-          $req->param($param,"?");
+          $req->parameters->set($param,"?");
         } else {
-          $req->param($param,"");
+          $req->parameters->set($param,"");
         }
       }
     }
@@ -4593,20 +4593,20 @@ sub _add_mod_hint {
     }
 
     warn "chapterid[$chapterid]";
-    $req->param("pause99_add_mod_modid",$wanted->{modid});
+    $req->parameters->set("pause99_add_mod_modid",$wanted->{modid});
     my(@dsli) = $dsli =~ /(.?)(.?)(.?)(.?)(.?)/;
-    $req->param("pause99_add_mod_statd",$dsli[0]||"?");
-    $req->param("pause99_add_mod_stats",$dsli[1]||"?");
-    $req->param("pause99_add_mod_statl",$dsli[2]||"?");
-    $req->param("pause99_add_mod_stati",$dsli[3]||"?");
-    $req->param("pause99_add_mod_statp",$dsli[4]||"?");
+    $req->parameters->set("pause99_add_mod_statd",$dsli[0]||"?");
+    $req->parameters->set("pause99_add_mod_stats",$dsli[1]||"?");
+    $req->parameters->set("pause99_add_mod_statl",$dsli[2]||"?");
+    $req->parameters->set("pause99_add_mod_stati",$dsli[3]||"?");
+    $req->parameters->set("pause99_add_mod_statp",$dsli[4]||"?");
     my $description = join " ", @desc;
     $description ||= "";
-    $req->param("pause99_add_mod_description",$description);
+    $req->parameters->set("pause99_add_mod_description",$description);
     $chapterid ||= "";
     warn "chapterid[$chapterid]";
-    $req->param("pause99_add_mod_chapterid",$chapterid);
-    $req->param("pause99_add_mod_userid",$userid);
+    $req->parameters->set("pause99_add_mod_chapterid",$chapterid);
+    $req->parameters->set("pause99_add_mod_userid",$userid);
 }
 
 sub apply_mod {
@@ -4798,31 +4798,31 @@ sub apply_mod {
     }
 
     my($statd) = $req->param('pause99_apply_mod_statd');
-    $req->param('pause99_apply_mod_statd',$statd='?') unless $statd;
+    $req->parameters->set('pause99_apply_mod_statd',$statd='?') unless $statd;
     if ($statd eq '?') {
       push @errors, qq{The D status of the DSLIP [$statd] is not known.};
     }
 
     my($stats) = $req->param('pause99_apply_mod_stats');
-    $req->param('pause99_apply_mod_stats',$stats='?') unless $stats;
+    $req->parameters->set('pause99_apply_mod_stats',$stats='?') unless $stats;
     if ($stats eq '?') {
       push @errors, qq{The S status of the DSLIP [$stats] is not known.};
     }
 
     my($statl) = $req->param('pause99_apply_mod_statl');
-    $req->param('pause99_apply_mod_statl',$statl='?') unless $statl;
+    $req->parameters->set('pause99_apply_mod_statl',$statl='?') unless $statl;
     if ($statl eq "?") {
       push @errors, qq{The L status of the DSLIP [$statl] is not known.};
     }
 
     my($stati) = $req->param('pause99_apply_mod_stati');
-    $req->param('pause99_apply_mod_stati',$stati='?') unless $stati;
+    $req->parameters->set('pause99_apply_mod_stati',$stati='?') unless $stati;
     if ($stati eq "?") {
       push @errors, qq{The I status of the DSLIP [$stati] is not known.};
     }
 
     my($statp) = $req->param('pause99_apply_mod_statp');
-    $req->param('pause99_apply_mod_statp',$statp='?') unless $statp;
+    $req->parameters->set('pause99_apply_mod_statp',$statp='?') unless $statp;
     if ($statp eq "?") {
       push @errors, qq{The P status of the DSLIP [$statp] is not known.};
     }
@@ -4831,7 +4831,7 @@ sub apply_mod {
     my($description) = $req->param('pause99_apply_mod_description')||"";
     my $ud = $mgr->any2utf8($description);
     if ($ud ne $description) {
-      $req->param('pause99_apply_mod_description',$ud);
+      $req->parameters->set('pause99_apply_mod_description',$ud);
       $description = $ud;
     }
     $description =~ s/^\s+//;
@@ -4842,7 +4842,7 @@ sub apply_mod {
     } elsif (not length($description)) {
       push @errors, qq{The description is missing.};
     }
-    $req->param("pause99_apply_mod_description", $description) if $description;
+    $req->parameters->set("pause99_apply_mod_description", $description) if $description;
 
     goto FORMULAR2 if @errors;
 
@@ -5033,9 +5033,9 @@ $blurbcopy
       # triggered later on. I would believe.
       if ($req->param($param)){
         if ($param =~ /chapterid/) {
-          $req->param($param,"");
+          $req->parameters->set($param,"");
         } else {
-          $req->param($param,"");
+          $req->parameters->set($param,"");
         }
       }
     }
@@ -5707,10 +5707,10 @@ sub peek_perms {
 
 
   unless ($req->param("pause99_peek_perms_query")) {
-    $req->param("pause99_peek_perms_query", $mgr->{User}{userid});
+    $req->parameters->set("pause99_peek_perms_query", $mgr->{User}{userid});
   }
   unless ($req->param("pause99_peek_perms_by")) {
-    $req->param("pause99_peek_perms_by","a");
+    $req->parameters->set("pause99_peek_perms_by","a");
   }
 
   push @m, $mgr->scrolling_list('name' => 'pause99_peek_perms_by',
@@ -6414,7 +6414,7 @@ sub share_perms_remocos {
   if (@all == 1) {
     # selectboxes with only ine option to select look confusing and
     # better be preselected:
-    $req->param("pause99_share_perms_remocos_tuples",$all[0]);
+    $req->parameters->set("pause99_share_perms_remocos_tuples",$all[0]);
   }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_remocos_tuples",
@@ -6525,7 +6525,7 @@ sub share_perms_remome {
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
   if (@all_mods == 1) {
-    $req->param("pause99_share_perms_remome_m",$all_mods[0]);
+    $req->parameters->set("pause99_share_perms_remome_m",$all_mods[0]);
   }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_remome_m",
@@ -6628,7 +6628,7 @@ sub share_perms_makeco {
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
   if (@all_mods == 1) {
-    $req->param("pause99_share_perms_makeco_m",$all_mods[0]);
+    $req->parameters->set("pause99_share_perms_makeco_m",$all_mods[0]);
   }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_makeco_m",
@@ -6724,7 +6724,7 @@ sub share_perms_remopr {
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
   if (@all_mods == 1) {
-    $req->param("pause99_share_perms_pr_m",$all_mods[0]);
+    $req->parameters->set("pause99_share_perms_pr_m",$all_mods[0]);
   }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_pr_m",
@@ -6824,7 +6824,7 @@ sub share_perms_movepr {
 
   push @m, qq{<p>Select one or more namespaces:</p><p>};
   if (@all_mods == 1) {
-    $req->param("pause99_share_perms_pr_m",$all_mods[0]);
+    $req->parameters->set("pause99_share_perms_pr_m",$all_mods[0]);
   }
   push @m, $mgr->scrolling_list(
 				'name' => "pause99_share_perms_pr_m",
@@ -7108,7 +7108,7 @@ sub post_message {
  <a href="?ACTION=edit_cred&amp;HIDDENNAME=%s">%s</a> posted.},
           ($mgr->escapeHTML($mto))x2;
       for my $f (qw(mto mess)) {
-        $req->param("pause99_post_message_$f","");
+        $req->parameters->set("pause99_post_message_$f","");
       }
     }
   }
