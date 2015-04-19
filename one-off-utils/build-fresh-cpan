@@ -12,7 +12,10 @@ use PAUSE::TestPAUSE;
 
 my ($opt, $usage) = describe_options(
   '%c %o [USER:]DISTFILE...',
-  [ 'dir=s', 'target directory; by default uses a tempdir' ],
+  [ 'dir=s',      'target directory; by default uses a tempdir' ],
+  [ 'verbose|v',  'print logs to STDERR as it goes'             ],
+  [ 'shell!',     'run a shell in the directory; default: true',
+                  { default => 1 } ],
 );
 
 $usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
@@ -34,6 +37,7 @@ $pause->pause_config_overrides->{LOG_CALLBACK} = sub {
   my (undef, undef, @what) = @_;
   push @what, "\n" unless $what[-1] =~ m{\n$};
   print {$log_fh} @what;
+  print STDERR @what if $opt->verbose;
 };
 
 my $just_reindexed;
@@ -57,7 +61,7 @@ $pause->test_reindex unless $just_reindexed;
 
 close $log_fh or warn "error closing $dir/pause.log: $!";
 
-{
+if ($opt->shell) {
   my $chdir_guard = pushd($dir);
   system($ENV{SHELL});
 }
