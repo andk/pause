@@ -113,7 +113,7 @@ sub handler {
 
   my $cookie;
   my $uri = $req->path || "";
-  my $args = $req->query_parameters;
+  my $args = $req->uri->query;
   warn "WATCH: uri[$uri]args[$args]";
   if ($cookie = $req->header('Cookie')) {
     if ( $cookie =~ /logout/ ) {
@@ -129,7 +129,7 @@ sub handler {
   }
   if ($args) {
     my $logout;
-    if ( my $logout = $args->get('logout') ) {
+    if ( my $logout = $req->query_parameters->get('logout') ) {
       warn "WATCH: logout[$logout]";
       if ($logout =~ /^1/) {
         my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
