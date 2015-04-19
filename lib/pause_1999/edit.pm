@@ -2867,7 +2867,7 @@ sub request_id {
                "userid[%s]Valid_Userid[%s]args[%s]",
                $userid,
                $Valid_Userid,
-               scalar($req->query_parameters)||"",
+               scalar($req->uri->query)||"",
               );
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
