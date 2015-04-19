@@ -23,6 +23,7 @@ my $app = sub {
 builder {
     # enable Session, Auth, Log, etc with better config
     enable 'LogDispatch', logger => $logger;
+    enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
     enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} '+PAUSE::Middleware::Auth::Basic';
     $app;
 };
