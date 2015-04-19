@@ -36,7 +36,7 @@ sub handler {
     return HTTP_NOT_FOUND unless $uri eq "/" || $uri eq "/index.html";
     my(%redir) = (
                   "/" => "query",
-                  "/index.html" => "query?ACTION=pause_news",
+                  "/index.html" => "query?ACTION=pause_05news",
                  );
     # $r->internal_redirect_handler("/query");
     $redir_to = sprintf "%s://%s/pause/%s", $scheme, $server, $redir{$uri};
