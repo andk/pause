@@ -10,6 +10,7 @@ use Log::Dispatch; # or better to use ::Config?
 
 # preload stuff
 use pause_1999::config;
+use perl_pause::disabled2;
 
 my $logger = Log::Dispatch->new(outputs => [
     ['Screen', min_level => 'debug'],
@@ -25,6 +26,11 @@ BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CORE(),
 
 my $app = sub {
     my $req = Plack::Request->new(shift);
+
+    if (-f "/etc/PAUSE.CLOSED") {
+        return perl_pause::disabled2::handler($req);
+    }
+
     my $res = pause_1999::config::handler($req);
     return $res if ref $res;
     [$res =~ /^\d+$/ ? $res : 500, [], [$res]];
