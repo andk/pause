@@ -141,7 +141,8 @@ sub handler {
         $res->header("Location",$uri);
         return $res;
       } elsif ($logout =~ /^2/) { # badname
-        my $redir = $req->uri;
+        my $redir = $req->base;
+        $redir->path($req->uri->path);
         $redir->userinfo('baduser:badpass');
         warn "redir[$redir]";
         my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
