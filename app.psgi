@@ -6,17 +6,15 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Plack::Builder;
 use Plack::Request;
-use Log::Dispatch; # or better to use ::Config?
+use Log::Dispatch::Config;
+
+Log::Dispatch::Config->configure("etc/plack_log.conf");
 
 # preload stuff
 use pause_1999::config;
 use pause_1999::index;
 use pause_1999::fixup;
 use perl_pause::disabled2;
-
-my $logger = Log::Dispatch->new(outputs => [
-    ['Screen', min_level => 'debug'],
-]);
 
 use BSD::Resource ();
 #BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CPU(),
@@ -48,7 +46,7 @@ my $index_app = sub {
 };
 
 builder {
-    enable 'LogDispatch', logger => $logger;
+    enable 'LogDispatch', logger => Log::Dispatch::Config->instance;
     enable 'AccessLog::Timed', format => 'combined';
     enable 'ReverseProxy';
 #    enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
