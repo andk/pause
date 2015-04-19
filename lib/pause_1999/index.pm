@@ -33,7 +33,7 @@ sub handler {
     #my $host = $r->server->server_hostname;
     #my $args = $r->args;
     #warn "index-uri[$uri]host[$host]args[$args]";
-    do { warn "UNKNOWN"; return HTTP_NOT_FOUND } unless $uri eq "/" || $uri eq "/index.html";
+    return HTTP_NOT_FOUND unless $uri eq "/" || $uri eq "/index.html";
     my(%redir) = (
                   "/" => "query",
                   "/index.html" => "query?ACTION=pause_news",
