@@ -50,7 +50,7 @@ CREATE TABLE grouptable (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE usertable (
   `user` char(12) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
-  `password` char(13) DEFAULT NULL,
+  `password` varchar(60) DEFAULT NULL,
   secretemail char(255) DEFAULT NULL,
   forcechange tinyint(4) DEFAULT '0',
   `changed` int(11) DEFAULT NULL,
