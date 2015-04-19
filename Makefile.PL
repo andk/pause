@@ -19,6 +19,7 @@ WriteMakefile(
     Crypt::Eksblowfish::Bcrypt
     Cwd
     DB_File
+    DBD::mysql
     DBD::SQLite
     DBI
     DBIx::RunSQL
