@@ -4,19 +4,24 @@ use warnings;
 use lib 'lib';
 use lib 't/lib';
 
+use File::pushd;
 use File::Temp ();
+use Getopt::Long::Descriptive;
 use Path::Class;
 use PAUSE::TestPAUSE;
 
-use Email::Sender::Transport::Test;
-$ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
+my ($opt, $usage) = describe_options(
+  '%c %o [USER:]DISTFILE...',
+  [ 'dir=s', 'target directory; by default uses a tempdir' ],
+);
 
-my $dist = shift;
-die "usage: index-one-dist DIST DIR\n" unless $dist and -e $dist;
+$usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
+  unless my @uploads = @ARGV;
 
-my $dir  = shift;
+my $dir = $opt->dir;
+my $tmpdir;
 unless ($dir) {
-  my $tmpdir = File::Temp->newdir;
+  $tmpdir = File::Temp->newdir;
   $dir = "$tmpdir";
 }
 
@@ -31,9 +36,30 @@ $pause->pause_config_overrides->{LOG_CALLBACK} = sub {
   print {$log_fh} @what;
 };
 
-$pause->upload_author_file(LOCAL => $dist);
+my $just_reindexed;
 
-my $result = $pause->test_reindex;
+UPLOAD: for my $upload (@uploads) {
+  if ($upload eq '-') {
+    $pause->test_reindex;
+    $just_reindexed = 1;
+    next UPLOAD;
+  }
 
-chdir $dir;
-system($ENV{SHELL});
+  my ($user, $distfile) = split /:/, $upload, 2;
+  ($user, $distfile) = (LOCAL => $user) unless defined $distfile;
+
+  $pause->upload_author_file($user => $distfile);
+  print {$log_fh} ">>>> Just uploaded $user/$distfile\n";
+  $just_reindexed = 0;
+}
+
+$pause->test_reindex unless $just_reindexed;
+
+close $log_fh or warn "error closing $dir/pause.log: $!";
+
+{
+  my $chdir_guard = pushd($dir);
+  system($ENV{SHELL});
+}
+
+1;
