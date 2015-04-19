@@ -56,6 +56,7 @@ WriteMakefile(
     Plack
     Plack::Middleware::Auth::Basic
     Plack::Middleware::ReverseProxy
+    Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
     String::Random
     Test::Deep
