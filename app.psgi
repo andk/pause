@@ -26,6 +26,7 @@ builder {
     # enable Session, Auth, Log, etc with better config
     mount '/pause' => builder {
         enable 'LogDispatch', logger => $logger;
+        enable 'AccessLog::Timed', format => 'combined';
         enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
         enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} '+PAUSE::Middleware::Auth::Basic';
         enable 'ErrorDocument',
