@@ -743,6 +743,8 @@ sub need_multipart {
 }
 
 sub prefer_post {
+  return 1; # Because we should always prefer post now
+
   my $self = shift;
   my $set = shift;
   $self->{PreferPost} = $set if defined $set;
