@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use lib 't/lib';
+
+use File::Temp ();
+use Path::Class;
+use PAUSE::TestPAUSE;
+
+use Email::Sender::Transport::Test;
+$ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
+
+my $dist = shift;
+die "usage: index-one-dist DIST DIR\n" unless $dist and -e $dist;
+
+my $dir  = shift;
+unless ($dir) {
+  my $tmpdir = File::Temp->newdir;
+  $dir = "$tmpdir";
+}
+
+my $pause = PAUSE::TestPAUSE->init_new({ tmpdir => dir($dir) });
+
+open my $log_fh, '>', "$dir/pause.log"
+  or die "can't open $dir/pause.log for writing: $!\n";
+
+$pause->pause_config_overrides->{LOG_CALLBACK} = sub {
+  my (undef, undef, @what) = @_;
+  push @what, "\n" unless $what[-1] =~ m{\n$};
+  print {$log_fh} @what;
+};
+
+$pause->upload_author_file(LOCAL => $dist);
+
+my $result = $pause->test_reindex;
+
+chdir $dir;
+system($ENV{SHELL});
