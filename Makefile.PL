@@ -38,6 +38,7 @@ WriteMakefile(
     IPC::Cmd
     IPC::Run3
     JSON::XS
+    Log::Dispatch
     LWP::UserAgent
     LWP::Protocol::https
     LWP::UserAgent
@@ -52,6 +53,8 @@ WriteMakefile(
     Path::Class
     Path::Tiny
     Plack
+    Plack::Middleware::Auth::Basic
+    Plack::Middleware::ReverseProxy
     Set::Crontab
     String::Random
     Test::Deep
@@ -59,12 +62,16 @@ WriteMakefile(
     Test::MockObject
     Text::Format
     Text::Metaphone
+    Text::Soundex
     Text::Unidecode
+    Time::Duration
     Time::HiRes
     URI::Escape
     URI::URL
     Unicode::Collate
     Unicode::String
+    XML::LibXML
+    XML::Parser
     XML::SAX::Base
     XML::SAX::Writer
     YAML::XS
