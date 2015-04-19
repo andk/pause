@@ -20,8 +20,8 @@ use PAUSE::TestPAUSE::Result;
 use namespace::autoclean;
 
 sub init_new {
-  my ($class) = @_;
-  my $self = $class->new;
+  my ($class, @arg) = @_;
+  my $self = $class->new(@arg);
 
   my $authors_dir = $self->tmpdir->subdir(qw(cpan authors id));
   make_path $authors_dir->stringify;
