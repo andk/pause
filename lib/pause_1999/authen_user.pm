@@ -100,7 +100,7 @@ sub header {
       }
     }
 
-    $mgr->{UserSecrets} = $req->{pnotes}{usersecrets};
+    $mgr->{UserSecrets} = $req->env->{'psgix.pnotes'}{usersecrets};
     if ( $mgr->{UserSecrets}{forcechange} ) {
       $mgr->{Action} = "change_passwd"; # ueberschreiben
       $mgr->{REQ}->param(ACTION=>"change_passwd"); # faelschen
@@ -218,7 +218,7 @@ sub handler {
         dbh      => $dbh,
         username => $user_record->{user},
       });
-      $req->env->{pnotes}{usersecrets} = $user_record;
+      $req->env->{'psgix.pnotes'}{usersecrets} = $user_record;
       $dbh->do
           ("UPDATE usertable SET lastvisit=NOW() where user=?",
            +{},

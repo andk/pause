@@ -36,7 +36,7 @@ $expr.</p><p class="motd">Sorry for the inconvenience and Thanks for
 your patience.</p>};
 
     if ($user && $user eq "ANDK") { # would prefer a check of the admin role here
-      $req->{notes}{CLOSED} = $closed_text;
+      $req->env->{'psgix.notes'}{CLOSED} = $closed_text;
     } else {
       my $res = $req->new_response(HTTP_OK);
       $res->content_type("text/html");
