@@ -28,6 +28,24 @@ CREATE SERVICE pause
   SET buffer_size                 = 2048k
 ENABLE pause
 
+CREATE SERVICE plackperl
+  SET role                        = reverse_proxy
+  SET plugins                     = trustheader
+  SET pool                        = qah2015_pool
+  SET trusted_upstream_proxies    = 0.0.0.0/0
+  SET persist_client              = on
+  SET persist_client_idle_timeout = 30
+  SET idle_timeout                = 180
+  SET persist_backend             = on
+  SET max_backend_uses            = 0
+  SET backend_persist_cache       = 2
+  SET verify_backend              = on
+  SET enable_reproxy              = off
+  # SET trusted_upstream_proxies    = 0.0.0.0/0
+  SET connect_ahead               = 2
+  SET buffer_size                 = 2048k
+ENABLE plackperl
+
 # dated:
 CREATE SERVICE analysis
   SET role                        = reverse_proxy
@@ -36,14 +54,6 @@ CREATE SERVICE analysis
   SET persist_client_timeout      = 300
   SET enable_reproxy              = off
 ENABLE analysis
-
-CREATE SERVICE plackperl
-  SET role                        = reverse_proxy
-  SET pool                        = qah2015_pool
-  SET trusted_upstream_proxies    = 0.0.0.0/0
-  SET persist_client_timeout      = 300
-  SET enable_reproxy              = off
-ENABLE plackperl
 
 CREATE SERVICE vhosts
   SET listen                      = 0.0.0.0:80
