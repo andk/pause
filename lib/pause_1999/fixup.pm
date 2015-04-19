@@ -37,7 +37,7 @@ sub handler {
     my $redir = $req->base;
     my $is_ssl = $req->header("X-pause-is-SSL") || 0;
     if ($is_ssl) {
-      $redir->schema("https");
+      $redir->scheme("https");
     }
     $redir->path("$location/query");
     my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
