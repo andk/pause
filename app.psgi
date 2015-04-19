@@ -51,11 +51,11 @@ builder {
     enable 'LogDispatch', logger => $logger;
     enable 'AccessLog::Timed', format => 'combined';
     enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
-    enable 'ErrorDocument',
-        500 => '',
-        404 => '',
-        403 => '',
-    ;
+#    enable 'ErrorDocument',
+#        500 => '',
+#        404 => '',
+#        403 => '',
+#    ;
     enable 'ServerStatus::Tiny', path => '/status';
 
     mount '/pause' => builder {
