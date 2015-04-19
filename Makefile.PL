@@ -40,6 +40,7 @@ WriteMakefile(
     IPC::Run3
     JSON::XS
     Log::Dispatch
+    Log::Dispatch::Config
     LWP::UserAgent
     LWP::Protocol::https
     LWP::UserAgent
