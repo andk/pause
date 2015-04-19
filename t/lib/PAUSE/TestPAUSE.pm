@@ -40,14 +40,16 @@ sub init_new {
 has _tmpdir_obj => (
   is       => 'ro',
   isa      => 'Defined',
+  lazy     => 1,
   init_arg => undef,
   default  => sub { File::Temp->newdir; },
 );
 
-sub tmpdir {
-  my ($self) = @_;
-  return dir($self->_tmpdir_obj);
-}
+has tmpdir => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub { dir($_[0]->_tmpdir_obj) },
+);
 
 sub deploy_schemas_at {
   my ($self, $dir) = @_;
