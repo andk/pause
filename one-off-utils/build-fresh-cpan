@@ -12,14 +12,23 @@ use PAUSE::TestPAUSE;
 
 my ($opt, $usage) = describe_options(
   '%c %o [USER:]DISTFILE...',
-  [ 'dir=s',      'target directory; by default uses a tempdir' ],
-  [ 'verbose|v',  'print logs to STDERR as it goes'             ],
-  [ 'shell!',     'run a shell in the directory; default: true',
-                  { default => 1 } ],
+  [ 'dir=s',        'target directory; by default uses a tempdir' ],
+  [ 'verbose|v',    'print logs to STDERR as it goes'             ],
+  [ 'shell!',       'run a shell in the directory; default: true',
+                    { default => 1 } ],
+  [ 'dists-from=s', 'program to run to get dist names'            ],
+  [ 'each',         'index after each' ],
 );
 
-$usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
-  unless my @uploads = @ARGV;
+my @uploads;
+if ($opt->dists_from) {
+  my $cmd = $opt->dists_from;
+  @uploads = `$cmd`;
+  chomp @uploads;
+} else {
+  $usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
+    unless @uploads = @ARGV;
+}
 
 my $dir = $opt->dir;
 my $tmpdir;
@@ -49,11 +58,14 @@ UPLOAD: for my $upload (@uploads) {
     next UPLOAD;
   }
 
+  $pause->test_reindex if $opt->each;
+
   my ($user, $distfile) = split /:/, $upload, 2;
   ($user, $distfile) = (LOCAL => $user) unless defined $distfile;
 
   $pause->upload_author_file($user => $distfile);
   print {$log_fh} ">>>> Just uploaded $user/$distfile\n";
+  print {*STDERR} ">>>> Just uploaded $user/$distfile\n" if $opt->verbose;
   $just_reindexed = 0;
 }
 
