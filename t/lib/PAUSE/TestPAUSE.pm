@@ -6,6 +6,7 @@ use autodie;
 
 use DBI;
 use DBIx::RunSQL;
+use Email::Sender::Transport::Test;
 use File::Copy::Recursive qw(fcopy dircopy);
 use File::Path qw(make_path);
 use File::pushd;
@@ -185,6 +186,9 @@ sub test_reindex {
   $self->with_our_config(sub {
     my $self = shift;
     my $chdir_guard = pushd;
+
+    Email::Sender::Simple->reset_default_transport;
+    local $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
 
     my @stray_mail = Email::Sender::Simple->default_transport->deliveries;
 
