@@ -34,7 +34,7 @@ my $pause_app = sub {
     }
 
     my $res =
-#        pause_1999::fixup::handler($req) //
+        pause_1999::fixup::handler($req) //
         pause_1999::config::handler($req);
     return $res if ref $res;
     [$res =~ /^\d+$/ ? $res : 500, [], [$res]];
@@ -64,5 +64,5 @@ builder {
         $pause_app;
     };
 
-#    mount '/' => builder { $index_app };
+    mount '/' => builder { $index_app };
 };
