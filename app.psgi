@@ -61,7 +61,7 @@ builder {
 
     # Static files should not be served by application server actually.
     # This is only for testing/developing.
-    enable 'Static', path => qr{\.(js|css|gif|jpg|png|html|pod)$}, root => "$FindBin::Bin/htdocs";
+    enable 'Static', path => qr{(?<!index)\.(js|css|gif|jpg|png|pod|html)$}, root => "$FindBin::Bin/htdocs";
 
     mount '/pause' => builder {
         enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} '+PAUSE::Middleware::Auth::Basic';
