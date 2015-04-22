@@ -957,9 +957,16 @@ sub chown_unsafe {
 # package PAUSE::dist;
 sub read_dist {
   my $self = shift;
-  my(@manifind) = sort keys %{ExtUtils::Manifest::manifind()};
-  my $manifound = @manifind;
+
+  my @manifind;
+  my $ok = eval { @manifind = sort keys %{ExtUtils::Manifest::manifind()}; 1 };
   $self->{MANIFOUND} = \@manifind;
+  unless ($ok) {
+    $self->verbose(1,"Errors in manifind: $@");
+    return;
+  }
+
+  my $manifound = @manifind;
   my $dist = $self->{DIST};
   unless (@manifind){
     $self->verbose(1,"NO FILES! in dist $dist?");
