@@ -8,7 +8,7 @@ use Plack::Builder;
 use Plack::Request;
 use Log::Dispatch::Config;
 
-Log::Dispatch::Config->configure("etc/plack_log.conf");
+Log::Dispatch::Config->configure("etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
 
 # preload stuff
 use pause_1999::config;
