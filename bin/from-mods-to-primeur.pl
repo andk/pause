@@ -98,7 +98,8 @@ MOD: for my $modid (@mods) {
     }
     my $wantmove = 0;
     my $mv_userid;
-    while (my($mlstatus,$userid) = $sth2->fetchrow_array) {
+    my($mlstatus,$userid) = $sth2->fetchrow_array;
+    if ($mlstatus) {
         if ($mlstatus eq "list") {
             $mv_userid = $userid;
             $wantmove=1;
@@ -131,9 +132,12 @@ MOD: for my $modid (@mods) {
             $can_remove = 1;
         }
         if ($can_remove) {
-            if ($Opt{"dry-run"}) {
+            if ($mlstatus eq "delete") {
+                warn "mlstatus already 'delete' for $modid in mods table";
+            } elsif ($Opt{"dry-run"}) {
                 warn "Would now set mlstatus for $modid in mods to delete";
             } else {
+                warn "Setting mlstatus for $modid in mods to delete";
                 $sth3->execute($modid);
             }
         }

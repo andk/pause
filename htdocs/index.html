@@ -6,11 +6,17 @@
       <dd>
         <ul>
           <li>
-            During QA Hackathon in Berlin, Kenichi Ishigaki plackified
-            pause. The result is reachable at
-            https://pause2.develooper.com/ for testing. We will start
-            to make it the default in the next days, depending on
-            reports coming in.
+            During QA Hackathon in Berlin (#perlqah2015), Kenichi
+            Ishigaki plackified pause. The result is reachable at <a
+            href="https://pause2.develooper.com/">https://pause2.develooper.com/</a>
+            for testing. We will start to make it the default in the
+            next days, depending on reports coming in. First positive
+            report of a working upload script came from Slaven Rezić:
+<pre>
+env PERL_LWP_SSL_VERIFY_HOSTNAME=0 \
+    CPAN_UPLOADER_UPLOAD_URI=https://pause2.develooper.com/pause/authenquery \
+    cpan-upload Image-Info-1.38.tar.gz
+</pre>
           </li>
         </ul>
       </dd>
