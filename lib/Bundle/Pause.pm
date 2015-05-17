@@ -29,6 +29,7 @@ CPAN::Indexer::Mirror
 Class::Singleton -- lexikon
 Compress::Zlib
 Convert::BER
+Crypt::Eksblowfish::Bcrypt
 DBD::mysql
 DBI
 DBIx::RunSQL
