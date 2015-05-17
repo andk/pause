@@ -57,6 +57,10 @@ database. Let's start with the "mod" database:
   rsync -vaP pause::pausedata/moddump.current.bz2 .
   bzcat moddump.current.bz2 | mysql -uroot -p mod
 
+You can also fetch the dump from
+http://pause.perl.org/pub/PAUSE/PAUSE-data/moddump.current.bz2 but
+this will require PAUSE authentication.
+
 Then the authentication database.
 
   mysqladmin -uroot -p create authen_pause
