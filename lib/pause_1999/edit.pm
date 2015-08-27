@@ -1609,7 +1609,13 @@ filename[%s]. </p>
                 subdirectory levels is allowed, they all will be
                 created on the fly if they don't exist yet. Only sane
                 directory names are allowed and the number of
-                characters for the whole path is limited.</p>};
+                characters for the whole path is limited.</p><p>
+                <b>NOTE</b>:  To upload a Perl6 distribution a target
+                directory whose top level subdirectory is "Perl6" must
+                be specified.  In addition, a Perl6 distribution must
+                contain a META6.json.  Pause will only consider it a
+                Perl6 dist if these two conditions are satisfied.
+                </p>};
 
 
     push @m, qq{<div align="center">};
@@ -1779,7 +1785,9 @@ href="mailto:},
         $subdir =~ s|/$||;
         $subdir =~ s|/+|/|g;
       }
+      my $is_perl6 = 0;
       if (defined $subdir && length $subdir) {
+        $is_perl6 = 1 if $subdir =~ /^Perl6\b/;
         $uriid = "$userhome/$subdir/$filename";
       }
 
@@ -1801,10 +1809,11 @@ href="mailto:},
                             (uriid,     userid,
                              basename,
                              uri,
-		             changedby, changed)
-                     VALUES (?, ?, ?, ?, ?, ?)};
+		             changedby, changed, is_perl6)
+                     VALUES (?, ?, ?, ?, ?, ?, ?)};
       my @query_params = (
-	$uriid, $u->{userid}, $filename, $uri, $mgr->{User}{userid}, $now
+	$uriid, $u->{userid}, $filename, $uri, $mgr->{User}{userid}, $now,
+    $is_perl6
       );
       #display query
       my $cp = $mgr->escapeHTML("$query/(@query_params)");

@@ -280,8 +280,9 @@ CREATE TABLE uris (
   mailto_p5p char(1) NOT NULL DEFAULT '',
   `changed` char(10) NOT NULL DEFAULT '',
   changedby char(10) NOT NULL DEFAULT '',
+  is_perl6 tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (uriid),
-  UNIQUE KEY useridbase (userid,basename),
+  UNIQUE KEY useridbaseis_perl6 (userid,basename,is_perl6),
   KEY uri (uri)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
