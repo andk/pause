@@ -665,9 +665,7 @@ sub getit {
     $self->logge("Alert: no mirror: RC_NOT_MODIFIED for $tpath");
     return;
   } elsif ($response->is_success) {
-      # We are reassigning $lpath, because it will change when we hit a Perl6 distribution
-      $lpath = $self->verify_gzip_tar($tpath,$uri,$nosuccesscount,$lpath,$uriid);
-      if (my $size = -s $lpath) {
+      if (my $size = $self->verify_gzip_tar($tpath,$uri,$nosuccesscount,$lpath)) {
           PAUSE::newfile_hook($lpath);
           return $size;
       } else {
@@ -685,7 +683,7 @@ sub getit {
 }
 
 sub verify_gzip_tar {
-    my($self,$tpath,$uri,$nosuccesscount,$lpath,$uriid) = @_;
+    my($self,$tpath,$uri,$nosuccesscount,$lpath) = @_;
     my $zcat;
     my $gzip;
     my $taropt;
@@ -779,11 +777,6 @@ sub verify_gzip_tar {
             }
         }
     }
-
-    if ($self->is_perl6_tarball($tpath)) {
-        $lpath = $self->get_perl6_lpath($PAUSE::Config->{MLROOT}, $uriid);
-    }
-
     if ( $tpath =~ m/\.Z$/ ) {
         if (-e $lpath) {
             $self->logge("Alert: Seem to have both a .Z and a .gz");
@@ -800,7 +793,7 @@ sub verify_gzip_tar {
             return;
         }
     }
-    return $lpath;
+    return -s $lpath;
 }
 
 sub _rewrite_tarball {
@@ -853,43 +846,6 @@ sub _rewrite_tarball {
         $rc = 0 == system tar => $taropt, "-cf", $path, @children or die "Could not tar c";
     }
     return $rc;
-}
-
-sub is_perl6_tarball {
-  my ($self, $tpath) = @_;
-  my $taropt;
-  if ($tpath =~ /\.t(ar\.)?gz$/) {
-    $taropt = "tzf";
-  } elsif ($tpath =~ /\.(tbz|tar\.bz2)$/) {
-    $taropt = "tjf";
-  } else {
-    # nothing I could verify
-    return 0
-  }
-  my $is_perl6 = 0;
-  if (open my $fh, "-|", tar => $taropt, $tpath) {
-    while (<$fh>) {
-      $is_perl6 = 1 if m,^META6.json$,
-    }
-    close $fh or warn "Could not close: $!";
-  }
-  return $is_perl6
-}
-
-sub get_perl6_lpath {
-  my ($self, $mlroot, $uriid) = @_;
-  # enforce the Perl6 subdirectory to not mess with Perl5 distributions
-  if ($uriid =~ m,^([^/]+/[^/]+/[^/]+)/(.*?)([^/]+)$,) {
-    my ($path, $subpath, $file) = ($1, "Perl6/$2", $3);
-    # make sure we don't end up with duplicate Perl6/Perl6 or Perl6/perl6 folders.
-    $subpath =~ s,^Perl6/Perl6/,Perl6/,i;
-    File::Path::mkpath("$mlroot$path/$subpath");
-    $self->{URIRECORD}{uriid} = "$path/$subpath$file";
-    return "$mlroot$path/$subpath$file";
-  } else {
-    # this directory has already been made
-    return "$mlroot$uriid"
-  }
 }
 
 # often called as a class method!
