@@ -193,7 +193,7 @@ sub untar {
       $self->{COULD_NOT_UNTAR}++;
       return;
     }
-    if (m:^META6\.json$:m) {
+    if (m:^[^/]+/META6\.json$:) {
         $self->{PERL_MAJOR_VERSION} = 6
     }
   }
