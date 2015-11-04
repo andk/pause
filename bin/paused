@@ -31,6 +31,7 @@ use POSIX ":sys_wait_h";
 use Path::Tiny;
 use File::pushd ();
 use URI::URL ();
+use CPAN::DistnameInfo;
 
 use strict;
 use vars qw(%Opt);
@@ -535,9 +536,21 @@ has entered CPAN as
   file: \$CPAN/authors/id/$hash->{uriid}
   size: $size bytes
    md5: $hexdigest
-
-No action is required on your part
 };
+
+  my $di = CPAN::DistnameInfo->new($hash->{uriid});
+  my $distname = $di->dist if $di;
+  if ($distname) {
+    $blurb .= qq{
+CPAN Testers will start reporting results in an hour or so:
+
+  http://matrix.cpantesters.org/?dist=$distname
+
+};
+  }
+  else {
+    $blurb .= "\nNo action is required on your part\n\n";
+  }
 
   $userid = PAUSE::dir2user($hash->{uriid});
   $sth2->execute($hash->{changedby});
