@@ -1130,7 +1130,6 @@ sub p6_dist_meta_ok {
   $c &&
   $c->{name} &&
   $c->{version} &&
-  $c->{version} =~ /^v\d+/ &&
   $c->{description}
 }
 
