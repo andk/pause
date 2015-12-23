@@ -22,7 +22,7 @@ use constant OK => 1;
 
 our $heading = {
   EBADVERSION() => "Version string is not a valid 'lax version' string",
-  ELONGVERSION() => "Version string is exceeds maximum allowed length of 16b",
+  ELONGVERSION() => "Version string exceeds maximum allowed length of 16b",
   EBAREPMFILE() => "Bare .pm files are not indexed",
   EDBCONFLICT() => "Conflicting record found in index",
   EDBERR() => "Database error",

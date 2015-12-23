@@ -252,6 +252,39 @@ subtest "check various forms of version" => sub {
   );
 };
 
+subtest "check overlong versions" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->import_author_root('corpus/mld/long-version/authors');
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  my $etoolong = sub {
+    like(
+      $_[0]{email}->get_body,
+      qr/Version string exceeds maximum allowed length/,
+      "email contains ELONGVERSION string",
+    );
+  };
+
+  $result->email_ok(
+    [
+      {
+        subject  => 'Failed: PAUSE indexer report RJBS/VTooLong-1.2345678901234567.tar.gz',
+        callbacks => [ $etoolong ],
+      },
+      {
+        subject   => 'Upload Permission or Version mismatch',
+        callbacks => [ $etoolong ],
+      },
+    ],
+  );
+};
+
 subtest "check perl6 distribution indexing" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/perl6/authors');
