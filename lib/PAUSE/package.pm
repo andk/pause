@@ -691,6 +691,24 @@ sub insert_into_package {
   my $pmfile = $self->{PMFILE};
   my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg) VALUES (?,?,?,?,?,?) };
   $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
+
+  if (length $pp->{version} > 16) {
+    my $errno = PAUSE::mldistwatch::Constants::ELONGVERSION;
+    my $error = PAUSE::mldistwatch::Constants::heading($errno);
+    $self->index_status($package,
+                        $pp->{version},
+                        $pp->{infile},
+                        $errno,
+                        $error,
+                        );
+          $self->alert(qq{$error:
+package[$package]
+version[$pp->{version}]
+file[$pp->{infile}]
+dist[$dist]
+});
+    return;
+  }
   $dbh->do($query,
             undef,
             $package,
