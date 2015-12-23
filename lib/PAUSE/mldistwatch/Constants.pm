@@ -10,6 +10,7 @@ use constant EDBERR => 25;
 use constant EDBCONFLICT => 23;
 use constant EOPENFILE => 21;
 use constant EMISSPERM => 20;
+use constant ELONGVERSION => 13;
 use constant EBADVERSION => 12;
 use constant EPARSEVERSION => 10;
 use constant EMETAUNSTABLE => 6;
@@ -21,6 +22,7 @@ use constant OK => 1;
 
 our $heading = {
   EBADVERSION() => "Version string is not a valid 'lax version' string",
+  ELONGVERSION() => "Version string is exceeds maximum allowed length of 16b",
   EBAREPMFILE() => "Bare .pm files are not indexed",
   EDBCONFLICT() => "Conflicting record found in index",
   EDBERR() => "Database error",
