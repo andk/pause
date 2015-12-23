@@ -193,7 +193,7 @@ sub untar {
       $self->{COULD_NOT_UNTAR}++;
       return;
     }
-    if (m:^[^/]+/META6\.json$:m) {
+    if (m!^(?:[^/]+/)?META6\.json$!m) {
         $self->{PERL_MAJOR_VERSION} = 6
     }
   }
@@ -1130,6 +1130,7 @@ sub p6_dist_meta_ok {
   $c &&
   $c->{name} &&
   $c->{version} &&
+  $c->{version} =~ /^v\d+/ &&
   $c->{description}
 }
 
