@@ -292,7 +292,7 @@ subtest "check perl6 distribution indexing" => sub {
 
   $result->p6dists_ok(
     [
-      { name => 'Inline', ver => 'v1.1' },
+      { name => 'Inline', ver => '1.1' },
     ],
   );
 };
