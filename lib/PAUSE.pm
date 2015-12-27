@@ -261,7 +261,6 @@ sub log {
 sub dbh {
   my($db) = shift || "mod";
   my $dsn = $PAUSE::Config->{uc($db)."_DATA_SOURCE_NAME"};
-  warn "DEBUG: dsn[$dsn]";
   my $dbh = DBI->connect(
                $dsn,
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_USER"},
