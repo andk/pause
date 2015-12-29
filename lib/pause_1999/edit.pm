@@ -950,8 +950,13 @@ The Pause
 	}
       }
     } # end of quid loop
-
-    unless ($saw_a_change) {
+    if ($saw_a_change) {
+      # expire temporary token to free mailpw for immediate use
+      my $sql = sprintf qq{DELETE FROM abrakadabra
+              WHERE user = ?};
+      my $dbh = $mgr->authen_connect();
+      $dbh->do($sql,undef,$u->{userid});
+    } else {
       push @m, qq{No change seen, nothing done.<hr />};
     }
   }
