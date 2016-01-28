@@ -6187,14 +6187,11 @@ sub share_perms {
       <tr>
         <td valign="top">$scrolling_list_mod</td>
         <td align="right" valign="top">
-          <input type="submit"
-                 name="pause99_edit_mod_2"
-                 value="Select" />
         </td>
         <td valign="top">
-          By clicking select you enter the <i>Edit Module Metadata</i>
-          page where you can choose a new owner or edit other module
-          status data.
+          <i>Module Metadata</i> has been removed from PAUSE and
+          is no longer editable.  Please contact a PAUSE administrator to
+          choose a new owner.
         </td>
       </tr>
 
