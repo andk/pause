@@ -58,11 +58,13 @@ if ($Opt{help}) {
 }
 use Time::HiRes qw(sleep);
 
+my $i = 0;
 while (<DATA>) {
     chomp;
     my $m = $_;
     my $t = scalar localtime;
-    warn printf "%s: %s\n", $t, $m;
+    $i++;
+    warn sprintf "(%d) %s: %s\n", $i, $t, $m;
     0 == system "/opt/perl/current/bin/perl", "-Iprivatelib", "-Ilib", "bin/from-mods-to-primeur.pl", $m or die "Alert: $t: Problem while running from-mods-to-primeur for '$m'";
     sleep 0.08;
 }
