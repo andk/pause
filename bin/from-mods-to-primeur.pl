@@ -109,7 +109,7 @@ MOD: for my $modid (@mods) {
         }
     }
     if ($mlstatus) {
-        if ($mlstatus =~ /^(list|delete|from-perms)$/) {
+        if ($mlstatus =~ /^(list|delete|from-perms|hide)$/) {
             $mv_userid = $userid;
             $wantmove=1;
         } else {
