@@ -75,7 +75,7 @@ while (<DATA>) {
     my $t = scalar localtime;
     $i++;
     warn sprintf "(%d) %s: %s\n", $i, $t, $m;
-    0 == system "/opt/perl/current/bin/perl", "-Iprivatelib", "-Ilib", "bin/from-mods-to-primeur.pl", $m or die "Alert: $t: Problem while running from-mods-to-primeur for '$m'";
+    0 == system "/opt/perl/current/bin/perl", "-Iprivatelib", "-Ilib", "bin/from-mods-to-primeur.pl", @dry_run, $m or die "Alert: $t: Problem while running from-mods-to-primeur for '$m'";
     sleep 0.08;
 }
 
