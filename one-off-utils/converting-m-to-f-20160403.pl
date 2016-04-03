@@ -20,6 +20,10 @@ use warnings;
 
 my @opt = <<'=back' =~ /B<--(\S+)>/g;
 
+=item B<--dry-run|n!>
+
+Run the from-mods-to-primeur.pl with the --dry-run option.
+
 =item B<--help|h!>
 
 This help
@@ -57,6 +61,9 @@ GetOptions(\%Opt,
 if ($Opt{help}) {
     pod2usage(0);
 }
+$Opt{"dry-run"} //= 0;
+my @dry_run;
+push @dry_run, "--dry-run" if $Opt{"dry-run"};
 use Time::HiRes qw(sleep);
 
 my $i = 0;
