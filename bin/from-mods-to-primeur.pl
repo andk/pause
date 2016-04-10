@@ -122,16 +122,16 @@ MOD: for my $modid (@mods) {
         my $can_remove = 0;
         if (@$rows) {
             if ($rows->[0][0] eq $mv_userid) {
-                warn "$modid/$mv_userid already in primeur";
+                warn "modid=$modid,user=$mv_userid already in primeur";
                 $can_remove = 1;
             } else {
-                warn "primeur occupied by $modid/$rows->[0][0], cannot move";
+                warn "primeur occupied by modid=$modid,user=$rows->[0][0]; cannot move";
             }
         } else {
             if ($Opt{"dry-run"}) {
-                warn "Would now try to insert $modid/$mv_userid into primeur; this may cause can_remove to be set and cause a delete of $modid in mods\n";
+                warn "Would now try to insert modid=$modid,user=$mv_userid into primeur; this will cause can_remove to be set and cause a delete of $modid in mods\n";
             } else {
-                warn "Inserting $modid/$mv_userid into primeur\n";
+                warn "Inserting modid=$modid,user=$mv_userid into primeur\n";
                 $sth5->execute($modid,$mv_userid);
             }
             $can_remove = 1;
