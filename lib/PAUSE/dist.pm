@@ -428,6 +428,13 @@ sub mail_summary {
 
     my $inxst = $self->{INDEX_STATUS};
     if ($inxst && ref $inxst && %$inxst) {
+      unless ($inxst->{$pkg}) {
+        # Perhaps they forgot a pm file matching the dist name
+        push @m, $tf->format(qq{\n\nYou appear to be missing a .pm file
+           containing a package matching the dist name ($pkg). Adding this
+           may solve your issue.}) . "\n";
+      }
+
       for my $p ( keys %$inxst ) {
           next unless
             $inxst->{$p}{status} == PAUSE::mldistwatch::Constants::OK;
