@@ -193,6 +193,13 @@ like CPAN(.pm), CPANPLUS and cpanminus:
 </pre>
 
 <p>
+In the spirit of <i>security by visibility</i>, PAUSE sends an
+immediate email to your secret email address about the upload and, if
+your upload is a regular (not developer) module distribution, a few
+minutes later an email about the indexing process.
+</p>
+
+<p>
 CPAN search engines like <a href="http://metacpan.org">metacpan.org</a> and
 <a href="http://search.cpan.org/">search.cpan.org</a> use these indexes
 and other heuristics to allow Perl developers to find modules that
@@ -338,7 +345,7 @@ a module of yours. After doing this the other person will have the right to add/
 <p>
 In order to do this you have to follow the following steps:
 <ol>
-  <li>Visit the <a href="https://pause.perl.org/pause/authenquery?ACTION=share_perms">Change Permissiosn</a> menu item</li>
+  <li>Visit the <a href="https://pause.perl.org/pause/authenquery?ACTION=share_perms">Change Permissions</a> menu item</li>
   <li>Cick on 2.1 (no need to select any names yet)</li>
   <li>In the new page select the names of the modules you'd like to transfer. (Remember, in order to transfer the right to upload a distribution, you need to transfer the
       rights to every module in that distribution.)</li>
@@ -514,7 +521,7 @@ your editor.</p>
 <h3><a id="other" name="other"></a>Other useful links</h3>
 
 <p>You have forgotten how you're supposed to package your software?
-Maybe <a href="http://search.cpan.org/perldoc?perlnewmod">the
+Maybe <a href="http://perldoc.perl.org/perlnewmod.html">the
 perlnewmod manpage</a> can help you.</p>
 
 <p>A real FAQ is about how to adopt or take over a module from

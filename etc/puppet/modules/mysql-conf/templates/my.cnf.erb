@@ -33,6 +33,7 @@ thread_cache_size       = 4
 innodb_file_per_table
 innodb_flush_log_at_trx_commit
 innodb_buffer_pool_size = <%= @mysql_innodb_buffer_pool_size %>
+innodb_lock_wait_timeout= 300
 table_cache             = 64
 log_slow_queries        = ON
 slow_query_log_file     = /var/log/mysql/slow-query-log

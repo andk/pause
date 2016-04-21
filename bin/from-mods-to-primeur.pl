@@ -37,7 +37,7 @@ This help
 
 =head1 DESCRIPTION
 
-Batch processing of modules in the mods table into primeur.
+Batch processing of modules either in the mods table or in the perms table into primeur.
 
 =cut
 
@@ -91,25 +91,29 @@ my $sth2 = $dbh->prepare("select mlstatus,userid from mods where modid=?");
 my $sth3 = $dbh->prepare("update mods set mlstatus='delete' where modid=?");
 my $sth4 = $dbh->prepare("select userid from primeur where package=?");
 my $sth5 = $dbh->prepare("insert into primeur (package,userid) values (?,?)");
+my $sth6 = $dbh->prepare("select userid from perms where package=?");
 MOD: for my $modid (@mods) {
-    $sth2->execute($modid);
-    unless ($sth2->rows >= 1) {
-        warn "Found no record for $modid, skipping";
-    }
     my $wantmove = 0;
-    my $mv_userid;
-    my($mlstatus,$userid) = $sth2->fetchrow_array;
+    my($mv_userid, $mlstatus, $userid);
+    $sth2->execute($modid);
+    if ($sth2->rows >= 1) {
+        ($mlstatus, $userid) = $sth2->fetchrow_array;
+    } else {
+        warn "Warning: $modid not in mods, trying perms instead\n";
+        $sth6->execute($modid);
+        if ($sth6->rows >= 1) {
+            ($userid) = $sth6->fetchrow_array;
+            $mlstatus = 'from-perms';
+        } else {
+            warn "Warning: Found no record for $modid, skipping\n";
+        }
+    }
     if ($mlstatus) {
-        if ($mlstatus eq "list") {
-            $mv_userid = $userid;
-            $wantmove=1;
-        } elsif ($mlstatus eq "delete") {
-            # delete turned out to be the same case as list when bdfoy
-            # tried to give an adoptme module away (Math::FFT)
+        if ($mlstatus =~ /^(list|delete|from-perms|hide)$/) {
             $mv_userid = $userid;
             $wantmove=1;
         } else {
-            warn "Will not move to primeur: $modid (mlstatus=$mlstatus)\n";
+            warn "Warning: Will not move to primeur: $modid (mlstatus=$mlstatus)\n";
         }
     }
     if ($wantmove) {
@@ -118,22 +122,25 @@ MOD: for my $modid (@mods) {
         my $can_remove = 0;
         if (@$rows) {
             if ($rows->[0][0] eq $mv_userid) {
-                warn "$modid/$mv_userid already in primeur";
+                warn "modid=$modid,user=$mv_userid already in primeur";
                 $can_remove = 1;
             } else {
-                warn "primeur occupied by $modid/$rows->[0][0], cannot move";
+                warn "primeur occupied by modid=$modid,user=$rows->[0][0]; cannot move";
             }
         } else {
             if ($Opt{"dry-run"}) {
-                warn "Would now try to insert $modid/$mv_userid into primeur; this may cause can_remove to be set and cause a delete of $modid in mods";
+                warn "Would now try to insert modid=$modid,user=$mv_userid into primeur; this will cause can_remove to be set and cause a delete of $modid in mods\n";
             } else {
+                warn "Inserting modid=$modid,user=$mv_userid into primeur\n";
                 $sth5->execute($modid,$mv_userid);
             }
             $can_remove = 1;
         }
         if ($can_remove) {
             if ($mlstatus eq "delete") {
-                warn "mlstatus already 'delete' for $modid in mods table";
+                warn "mlstatus already 'delete' for $modid in mods table\n";
+            } elsif ($mlstatus eq "from-perms") {
+                warn "mlstatus was not in mods, for $modid nothing left to do in mods table\n";
             } elsif ($Opt{"dry-run"}) {
                 warn "Would now set mlstatus for $modid in mods to delete";
             } else {
@@ -141,6 +148,8 @@ MOD: for my $modid (@mods) {
                 $sth3->execute($modid);
             }
         }
+    } else {
+        warn "Warning: no reason found to change anything for modid '$modid'; maybe try: insert into primeur (package,userid) values ('$modid','...')\n";
     }
 }
 

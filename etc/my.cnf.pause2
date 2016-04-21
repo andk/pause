@@ -108,7 +108,7 @@ skip-bdb
 # ssl-ca=/etc/mysql/cacert.pem
 # ssl-cert=/etc/mysql/server-cert.pem
 # ssl-key=/etc/mysql/server-key.pem
-
+innodb_lock_wait_timeout= 150
 
 
 [mysqldump]

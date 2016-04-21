@@ -261,14 +261,20 @@ sub log {
 sub dbh {
   my($db) = shift || "mod";
   my $dsn = $PAUSE::Config->{uc($db)."_DATA_SOURCE_NAME"};
-  warn "DEBUG: dsn[$dsn]";
-  DBI->connect(
+  my $dbh = DBI->connect(
                $dsn,
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_USER"},
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_PW"},
                { RaiseError => 1 }
               )
       or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
+
+  if ($dsn =~ /^DBI:mysql:/) {
+    $dbh->do("SET sql_mode='STRICT_TRANS_TABLES'")
+      or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
+  }
+
+  return $dbh;
 }
 
 sub urecord {

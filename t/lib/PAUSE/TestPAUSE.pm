@@ -6,6 +6,7 @@ use autodie;
 
 use DBI;
 use DBIx::RunSQL;
+use Email::Sender::Transport::Test;
 use File::Copy::Recursive qw(fcopy dircopy);
 use File::Path qw(make_path);
 use File::pushd;
@@ -20,8 +21,8 @@ use PAUSE::TestPAUSE::Result;
 use namespace::autoclean;
 
 sub init_new {
-  my ($class) = @_;
-  my $self = $class->new;
+  my ($class, @arg) = @_;
+  my $self = $class->new(@arg);
 
   my $authors_dir = $self->tmpdir->subdir(qw(cpan authors id));
   make_path $authors_dir->stringify;
@@ -40,14 +41,16 @@ sub init_new {
 has _tmpdir_obj => (
   is       => 'ro',
   isa      => 'Defined',
+  lazy     => 1,
   init_arg => undef,
   default  => sub { File::Temp->newdir; },
 );
 
-sub tmpdir {
-  my ($self) = @_;
-  return dir($self->_tmpdir_obj);
-}
+has tmpdir => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub { dir($_[0]->_tmpdir_obj) },
+);
 
 sub deploy_schemas_at {
   my ($self, $dir) = @_;
@@ -183,6 +186,9 @@ sub test_reindex {
   $self->with_our_config(sub {
     my $self = shift;
     my $chdir_guard = pushd;
+
+    Email::Sender::Simple->reset_default_transport;
+    local $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
 
     my @stray_mail = Email::Sender::Simple->default_transport->deliveries;
 

@@ -382,6 +382,28 @@ sub examine_pkg {
   delete $self->{FIO};    # circular reference
 }
 
+sub _version_ok {
+  my($self, $pp, $package, $dist) = @_;
+  if (length $pp->{version} > 16) {
+    my $errno = PAUSE::mldistwatch::Constants::ELONGVERSION;
+    my $error = PAUSE::mldistwatch::Constants::heading($errno);
+    $self->index_status($package,
+                        $pp->{version},
+                        $pp->{infile},
+                        $errno,
+                        $error,
+                        );
+          $self->alert(qq{$error:
+package[$package]
+version[$pp->{version}]
+file[$pp->{infile}]
+dist[$dist]
+});
+    return;
+  }
+  return 1;
+}
+
 # package PAUSE::package;
 sub update_package {
   # we come here only for packages that have opack and package
@@ -616,6 +638,8 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
       }
   }
 
+  return unless $self->_version_ok($pp, $package, $dist);
+
   if ($ok) {
 
       my $query = qq{UPDATE packages SET package = ?, version = ?, dist = ?, file = ?,
@@ -691,6 +715,8 @@ sub insert_into_package {
   my $pmfile = $self->{PMFILE};
   my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg) VALUES (?,?,?,?,?,?) };
   $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
+
+  return unless $self->_version_ok($pp, $package, $dist);
   $dbh->do($query,
             undef,
             $package,

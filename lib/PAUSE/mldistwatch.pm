@@ -236,14 +236,7 @@ SET ustatus='active', ustatus_ch=? WHERE ustatus<>'nologin' AND userid=?");
 sub connect {
     my $self = shift;
     return $self->{DBH} if $self->{DBH};
-    my $dbh = DBI->connect(
-                           $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-                           $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-                           $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-                           {
-                            RaiseError => 1 }
-                          ) or die $DBI::errstr;
-    # $dbh->{InactiveDestroy} = 1;
+    my $dbh = PAUSE::dbh("mod");
     $self->{DBH} = $dbh;
 }
 
