@@ -52,6 +52,30 @@ has tmpdir => (
   default => sub { dir($_[0]->_tmpdir_obj) },
 );
 
+has email_sender_transport => (
+  is      => 'rw',
+  lazy    => 1,
+  default => sub { 'Test' },
+  trigger => sub {
+    my ($self, $new) = @_;
+
+    if ($new ne 'Test') {
+      # Wrap whatever transport they use so we still get deliveries
+      $ENV{EMAIL_SENDER_TRANSPORT_transport_class} = $new;
+
+      $self->email_sender_transport_real('KeepDeliveries');
+    } else {
+      $self->email_sender_transport_real('Test');
+    }
+  },
+);
+
+has email_sender_transport_real => (
+  is      => 'rw',
+  isa     => 'Str',
+  default => 'Test',
+);
+
 sub deploy_schemas_at {
   my ($self, $dir) = @_;
 
@@ -188,7 +212,7 @@ sub test_reindex {
     my $chdir_guard = pushd;
 
     Email::Sender::Simple->reset_default_transport;
-    local $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
+    local $ENV{EMAIL_SENDER_TRANSPORT} = $self->email_sender_transport_real;
 
     my @stray_mail = Email::Sender::Simple->default_transport->deliveries;
 

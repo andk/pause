@@ -37,7 +37,12 @@ unless ($dir) {
   $dir = "$tmpdir";
 }
 
-my $pause = PAUSE::TestPAUSE->init_new({ tmpdir => dir($dir) });
+$ENV{EMAIL_SENDER_TRANSPORT_transport_arg_dir} = "$dir/maildir";
+
+my $pause = PAUSE::TestPAUSE->init_new({
+  tmpdir                 => dir($dir),
+  email_sender_transport => 'Maildir',
+});
 
 open my $log_fh, '>', "$dir/pause.log"
   or die "can't open $dir/pause.log for writing: $!\n";
