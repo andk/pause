@@ -37,11 +37,12 @@ unless ($dir) {
   $dir = "$tmpdir";
 }
 
-$ENV{EMAIL_SENDER_TRANSPORT_transport_arg_dir} = "$dir/maildir";
-
 my $pause = PAUSE::TestPAUSE->init_new({
   tmpdir                 => dir($dir),
   email_sender_transport => 'Maildir',
+  email_sender_transport_args => {
+    dir => "$dir/Maildir", # Capital M to keep rjbs happy
+  },
 });
 
 open my $log_fh, '>', "$dir/pause.log"
