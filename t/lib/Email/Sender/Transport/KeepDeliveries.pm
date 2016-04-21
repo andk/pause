@@ -2,6 +2,18 @@ package Email::Sender::Transport::KeepDeliveries;
 use Moo;
 extends 'Email::Sender::Transport::Wrapper';
 
+# Wrap whatever transport that the user wants to really use, and provide a
+# passthrough interface to Email::Sender::Transport::Test, which will also
+# be given each message to 'send'.
+#
+# Usage:
+#
+#   $ENV{EMAIL_SENDER_TRANSPORT} = 'KeepDeliveries';
+#
+#   $ENV{EMAIL_SENDER_TRANSPORT_transport_class} = 'Maildir';
+#   $ENV{EMAIL_SENDER_TRANSPORT_transport_arg_dir} = 'some-mail-dir';
+#   ... other args as necessary
+
 use Email::Sender::Transport::Test;
 
 has 'test' => (
@@ -14,12 +26,6 @@ has 'test' => (
     shift_deliveries
     clear_deliveries
   ) ],
-);
-
-has 'transport_class' => (
-  is       => 'ro',
-  required => 1,
-  init_arg => 'transport',
 );
 
 around send_email => sub {
