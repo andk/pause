@@ -524,6 +524,9 @@ sub welcome_file {
           $hash->{'mailto_p5p'}==1;
   }
 
+  my $basename = $hash->{basename};
+  my ($fc) = $hash->{basename} =~ /^(.)/;
+
   my $blurb = "The URL";
   $blurb = "The uploaded file" if $hash->{uri} !~ m,/,;
   $blurb .= qq{
@@ -537,6 +540,12 @@ has entered CPAN as
    md5: $hexdigest
 
 No action is required on your part
+
+CPAN Testers should start automatically testing your upload very soon.
+
+You can check for results at:
+
+  http://cpantesters.org/distro/$fc/$basename.html
 };
 
   $userid = PAUSE::dir2user($hash->{uriid});
