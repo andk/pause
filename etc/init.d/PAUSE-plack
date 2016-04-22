@@ -4,16 +4,16 @@ use strict;
 use FindBin;
 use Daemon::Control;
 
-my $name = 'bbbike';
-my $psgi = "$FindBin::RealBin/../cgi/bbbike.psgi";
+my $name = 'PAUSE-plack';
+my $psgi = "$FindBin::RealBin/../cgi/PAUSE-plack.psgi";
 (my $starman = $^X) =~ s{/perl[^/]*$}{/starman};
 
 exit My::Daemon::Control->new({
     name        => $name,
     lsb_start   => '$syslog $remote_fs',
     lsb_stop    => '$syslog',
-    lsb_sdesc   => 'BBBike',
-    lsb_desc    => 'BBBike web program',
+    lsb_sdesc   => 'PAUSE-Plack',
+    lsb_desc    => 'PAUSE-Plack web program',
 
     program     => $starman,
     program_args => [
@@ -64,8 +64,8 @@ __END__
 
 As root:
 
-    ./bbbike.psgi-init get_init_file > /etc/init.d/bbbike
-    chmod 755 /etc/init.d/bbbike
-    update-rc.d bbbike defaults
+    ./PAUSE-plack.psgi-init get_init_file > /etc/init.d/PAUSE-plack
+    chmod 755 /etc/init.d/PAUSE-plack
+    update-rc.d PAUSE-plack defaults
 
 =cut
