@@ -65,10 +65,12 @@ WriteMakefile(
     Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
     String::Random
+    Test::Aggregate
     Test::Deep
     Test::FITesque::Fixture
     Test::MockObject
     Test::mysqld
+    Test::WWW::Mechanize::PSGI
     Text::Format
     Text::Metaphone
     Text::Soundex
@@ -79,6 +81,7 @@ WriteMakefile(
     URI::URL
     Unicode::Collate
     Unicode::String
+    WWW::Mechanize::Boilerplate
     XML::LibXML
     XML::Parser
     XML::SAX::Base

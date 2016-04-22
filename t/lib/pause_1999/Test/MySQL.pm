@@ -8,6 +8,18 @@ use File::Temp qw/tempfile/;
 
 $SIG{INT} = sub { die "caught SIGINT, shutting down mysql\n" };
 
+=head2 SYNOPSIS
+
+ my $db
+   = pause_1999::Test::MySQL->new( schemas => ['doc/mod.schema.txt'] );
+
+ my $dbh = $db->dbh;
+
+ # Drop straight in to the mysql console:
+ $dbh->debug_console
+
+=cut
+
 # These are the only caller-configurable parts
 
 # SQL to load at instantiation

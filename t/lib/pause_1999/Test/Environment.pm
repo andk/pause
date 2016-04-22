@@ -3,8 +3,34 @@ package pause_1999::Test::Environment;
 use Moose;
 use Plack::Util;
 use Plack::Test;
+use Test::WWW::Mechanize::PSGI;
+
+=head1 SYNOPSIS
+
+Set up a whole web environment ready to go. Currently supports:
+
+my ( $env, $author ) = pause_1999::Test::Environment->new_with_author(
+    username  => 'ANDK',
+    asciiname => 'Andreas K',
+);
+
+You now have databases:
+
+ $env->authen_db->dbh
+
+A user in C<$author> and in the DB
+
+And a site model:
+
+  $env->site_model( $author )
+      ->change_passwd
+      ->change_passwd__submit( 'moo', 'moo' );
+
+=cut
+
 use pause_1999::Test::MySQL;
 use pause_1999::Test::Config;
+use pause_1999::Test::SiteModel;
 use pause_1999::Test::Fixtures::Author;
 
 has 'authen_db' => (
@@ -43,6 +69,11 @@ sub _build_mod_db {
     return $db;
 }
 
+has 'plack_app' => (
+    is => 'ro',
+    default => sub { Plack::Util::load_psgi 'app.psgi' },
+);
+
 has 'plack_test' => (
     is => 'ro',
     lazy_build => 1,
@@ -50,8 +81,7 @@ has 'plack_test' => (
 
 sub _build_plack_test {
     my $self = shift;
-    my $app  = Plack::Util::load_psgi 'app.psgi';
-    return Plack::Test->create($app);
+    return Plack::Test->create($self->plack_app);
 }
 
 sub new_with_author {
@@ -66,5 +96,11 @@ sub new_with_author {
     return ( $self, $author );
 }
 
+sub site_model {
+    my ( $self, $author ) = @_;
+    my $mech = Test::WWW::Mechanize::PSGI->new( app => $self->plack_app );
+    $mech->credentials( $author->username, $author->password );
+    return pause_1999::Test::SiteModel->new( mech => $mech );
+}
 
 1;
