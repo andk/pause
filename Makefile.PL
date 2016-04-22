@@ -65,7 +65,7 @@ WriteMakefile(
     Test::Deep
     Test::FITesque::Fixture
     Test::MockObject
-    Test::mysql
+    Test::mysqld
     Text::Format
     Text::Metaphone
     Text::Soundex
