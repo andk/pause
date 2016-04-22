@@ -25,6 +25,7 @@ use IO::File ();
 use IPC::Run3 ();
 use LWP ();
 use Digest::MD5 ();
+use Digest::SHA1 ();
 use Mail::Send ();
 use PAUSE::MailAddress ();
 use POSIX ":sys_wait_h";
@@ -141,6 +142,7 @@ sub send {
 
 package mypause_daemon_inspector;
 
+use Fcntl qw(SEEK_SET);
 use List::Util qw(max);
 
 # package mypause_daemon_inspector
@@ -501,13 +503,17 @@ sub welcome_file {
   $hash->{dgot} = $self->{NOW};
   $self->logge("Info: Got $hash->{uriid} (size $size)");
   my $md5 = Digest::MD5->new;
+  my $sha1 = Digest::SHA1->new;
   my $handle = IO::File->new;
   unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
     die "open $PAUSE::Config->{MLROOT}$hash->{uriid}: $!";
   }
   $md5->addfile($handle);
+  $handle->seek(SEEK_SET, 0);
+  $sha1->addfile($handle);
   $handle->close;
   my $hexdigest = $md5->hexdigest;
+  my $sha1hexdigest = $sha1->hexdigest;
   my($userid) = PAUSE::dir2user($hash->{uriid});
   my $sth2 = $self->{STH2};
   $sth2->execute($userid) or warn;
@@ -535,6 +541,7 @@ has entered CPAN as
   file: \$CPAN/authors/id/$hash->{uriid}
   size: $size bytes
    md5: $hexdigest
+  sha1: $sha1hexdigest
 
 No action is required on your part
 };
