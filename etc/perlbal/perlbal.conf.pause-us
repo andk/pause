@@ -86,7 +86,7 @@ CREATE SERVICE vhosts_ssl
   SET ssl_key_file                = /etc/perlbal/servercerts/pause.perl.org-20080519.key
   SET ssl_cert_file               = /etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain
   VHOST pause2.develooper.com     = plackperl
-  VHOST *                         = pause
+  VHOST *                         = plackperl
   HEADER vhosts_ssl remove X-pause-is-SSL
   HEADER vhosts_ssl insert X-pause-is-SSL: 1
 ENABLE vhosts_ssl
