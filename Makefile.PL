@@ -31,10 +31,12 @@ WriteMakefile(
     File::Copy::Recursive
     File::pushd
     File::Rsync::Mirror::Recentfile
+    File::Temp
     File::Which
     Git::Wrapper
     HTML::Entities
     HTTP::Date
+    HTTP::Request::Common
     IO::Socket::SSL
     IPC::Cmd
     IPC::Run3
@@ -63,6 +65,7 @@ WriteMakefile(
     Test::Deep
     Test::FITesque::Fixture
     Test::MockObject
+    Test::mysql
     Text::Format
     Text::Metaphone
     Text::Soundex
