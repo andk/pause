@@ -2,6 +2,18 @@ package pause_1999::Test::Fixtures::Author;
 
 use Moose;
 
+# Create a simple user
+
+=head1 SYNOPSIS
+
+    my $author = pause_1999::Test::Fixtures::Author->new(
+        environment => $self,
+        username => 'ANDK',
+        asciiname => 'Andreas',
+    );
+
+=cut
+
 has 'environment' => (
     is       => 'ro',
     isa      => 'pause_1999::Test::Environment',

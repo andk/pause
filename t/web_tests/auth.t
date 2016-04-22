@@ -22,7 +22,7 @@ my $author_fullname = $author->fullname;
 # Before logging in we should have no last-seen, and the password should be
 # old-style crypted
 {
-    my $user_data = user_data( $author->username );
+    my $user_data = user_data( $env, $author->username );
     is( $user_data->{'lastvisit'}, undef, "User has never been seen" );
     is( $user_data->{'password'},
         $author->password_crypted, "Oldstyle crypt() password" );
@@ -54,7 +54,7 @@ for (
 # Get the user's data from auth database
 
 {
-    my $user_data = user_data( $author->username );
+    my $user_data = user_data( $env, $author->username );
     my @time_pieces = reverse split( /\D/, $user_data->{'lastvisit'} );
     $time_pieces[4] -= 1;
     my $last_seen_epoch = timelocal(@time_pieces);
@@ -70,7 +70,7 @@ for (
 # Should have update last_seen
 
 sub user_data {
-    my $user = shift;
+    my ( $env, $user ) = @_;
     my $user_data_st
         = $env->authen_dbh->prepare("SELECT * FROM usertable WHERE user = ?");
     $user_data_st->execute($user);
