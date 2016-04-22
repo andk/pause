@@ -1,17 +1,17 @@
 #!/usr/bin/perl -- -*- Mode: cperl;  -*-
 package pause_1999::config;
 use pause_1999::main;
-use Apache::HeavyCGI::ExePlan;
-use Apache::Request;
+use PAUSE::HeavyCGI::ExePlan;
 use strict;
 use PAUSE ();
+use HTTP::Status qw(:constants);
 use vars qw( $Exeplan );
 use vars qw($VERSION);
 $VERSION = "949";
 
 # Tell the system which packages want to see the headers or the
 # parameters.
-$Exeplan = Apache::HeavyCGI::ExePlan->new(
+$Exeplan = PAUSE::HeavyCGI::ExePlan->new(
 					  CLASSES => [qw(
 pause_1999::authen_user
 pause_1999::edit
@@ -19,11 +19,11 @@ pause_1999::usermenu
 )]);
 
 sub handler {
-  my($r) = shift;
+  my($req) = shift;
   my $dti = PAUSE::downtimeinfo();
   my $downtime = $dti->{downtime};
   my $willlast = $dti->{willlast};
-  my $user = $r->connection->user;
+  my $user = $req->user;
   if (time >= $downtime && time < $downtime + $willlast) {
     use Time::Duration;
     my $delta = $downtime + $willlast - time;
@@ -36,16 +36,16 @@ $expr.</p><p class="motd">Sorry for the inconvenience and Thanks for
 your patience.</p>};
 
     if ($user && $user eq "ANDK") { # would prefer a check of the admin role here
-      $r->notes("CLOSED", $closed_text);
+      $req->env->{'psgix.notes'}{CLOSED} = $closed_text;
     } else {
-      $r->content_type("text/html");
-      $r->send_http_header;
+      my $res = $req->new_response(HTTP_OK);
+      $res->content_type("text/html");
 
-      $r->print(qq{<html> <head><title>PAUSE
+      $res->body(qq{<html> <head><title>PAUSE
 CLOSED</title></head><body> <h1>Closed for Maintainance</h1>
 $closed_text <p>Andreas Koenig</p></body> </html>});
 
-      return Apache::Constants::OK;
+      return $res;
     }
   }
   my $self = pause_1999::main->
@@ -367,7 +367,8 @@ share_perms
 	    ModDsn       => $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
 	    ModDsnPasswd => $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 	    ModDsnUser   => $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-	    R       => $r,
+	    REQ       => $req,
+	    RES       => $req->new_response(HTTP_OK),
 	    RootURL => "/pause",
             SessionDataDir => "$PAUSE::Config->{RUNDATA}/session/sdata",
             SessionCounterDir => "$PAUSE::Config->{RUNDATA}/session/cnt",
@@ -376,7 +377,7 @@ share_perms
 
 	   );
 
-  if ($r->connection->user) {
+  if ($req->user) {
     $self->{QueryURL} = "authenquery";
 
     ############# Main Switch for experimental CGI Patch #############
@@ -400,18 +401,6 @@ share_perms
 
   }
 
-  if ($self->{UseModuleSet} eq "patchedCGI") {
-    warn "patchedCGI not supported anymore";
-    require CGI;
-    $self->{CGI} = CGI->new;
-  } elsif ($self->{UseModuleSet} eq "ApReq") {
-    my $req = Apache::Request->new($r);
-    my $rc = $req->parse;
-    # warn "rc[$rc]";
-    $self->{CGI} = $req;
-  } else {
-    die "Illegal value for UseModuleSet: $self->{UseModuleSet}";
-  }
   $self->{OurEmailFrom} = "\"Perl Authors Upload Server\" <$PAUSE::Config->{UPLOAD}>";
   # warn "Debug: OurEmailFrom=UPLOAD[$self->{OurEmailFrom}]";
   my(@time) = gmtime; # sec,min,hour,day,month,year

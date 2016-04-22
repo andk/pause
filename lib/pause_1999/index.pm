@@ -1,52 +1,47 @@
 package pause_1999::index;
 use strict;
-use Apache::Constants qw(:common);
+use HTTP::Status qw(:constants);
 our $VERSION = "304";
 
 sub handler {
-  my $r = shift or return DECLINED;
-  if ($r->is_initial_req) {
-    my $the_request = $r->the_request;
-    my $redir_to;
-    my $server = $r->server->server_hostname;
-    my $port = $r->server->port || 80;
-    my $scheme = $port == 443 ? "https" : "http";
-    my $is_ssl = $r->header_in("X-pause-is-SSL") || 0;
+  my $req = shift;
+  if (1) { # $r->is_initial_req
+    my $method = $req->method;
+    my $redir_to = $req->base;
+    my $is_ssl = $req->header("X-pause-is-SSL") || 0;
     if ($is_ssl) {
-        $scheme = "https";
+        $redir_to->scheme("https");
     }
-    if ($the_request =~ m|^GET /\?|) {
-      my $args = $r->args;
+    if ($method eq 'GET' && $redir_to->path eq '/' && $req->env->{QUERY_STRING}) {
+      my $args = $req->env->{QUERY_STRING};
       # warn "Returning SERVER_ERROR: the_request[$the_request]uri[$uri]args[$args]";
       # return SERVER_ERROR;
-      my $uri = "/pause/query";
+      $redir_to->path("/pause/query");
       $args =~ s|/$||;
       $args =~ s|\s.*||;
-      $args = "?$args" if $args;
-      $redir_to = "$scheme\://$server$uri$args";
+      $redir_to->query($args) if $args;
       # warn "Statistics: Redirecting the_request[$the_request]redir_to[$redir_to]";
-      $r->header_out("Location",$redir_to);
-      my $stat = Apache::Constants::REDIRECT();
-      # $r->status($stat);
-      # $r->send_http_header;
-      return $stat;
+      my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
+      $res->header("Location",$redir_to);
+      return $res->finalize;
     }
-    my $uri = $r->uri;
+    my $uri = $req->path;
     #my $host = $r->server->server_hostname;
     #my $args = $r->args;
     #warn "index-uri[$uri]host[$host]args[$args]";
-    return DECLINED unless $uri eq "/" || $uri eq "/index.html";
-    my(%redir) = (
-                  "/" => "query",
-                  "/index.html" => "query?ACTION=pause_news",
-                 );
+    return HTTP_NOT_FOUND unless $uri eq "/" || $uri eq "/index.html";
+    #my(%redir) = (
+    #              "/" => "query",
+    #              "/index.html" => "query?ACTION=pause_05news",
+    #             );
     # $r->internal_redirect_handler("/query");
-    $redir_to = sprintf "%s://%s/pause/%s", $scheme, $server, $redir{$uri};
-    $r->header_out("Location",$redir_to);
-    my $stat = Apache::Constants::REDIRECT();
-    return $stat;
-  } else {
-    return OK;
+    $redir_to->path("/pause/query");
+    $redir_to->query("ACTION=pause_05news") if $uri eq "/index.html";
+    my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
+    $res->header("Location",$redir_to);
+    return $res->finalize;
+#  } else {
+#    return OK;
   }
 }
 

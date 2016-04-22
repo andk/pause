@@ -27,7 +27,7 @@ sub as_string {
   my $pnggif = $mgr->can_png ? "png" : "gif";
   my $validator_href = "http://validator.w3.org/check/referer";
   my $validator_comment = "";
-  if ($mgr->{R}->uri =~ /authen/ or $mgr->myurl->scheme eq "https") {
+  if ($mgr->{REQ}->path =~ /authen/ or $mgr->myurl->scheme eq "https") {
     $validator_href = "http://validator.w3.org/file-upload.html";
     $validator_comment = q{<div class="xexplain" align="right">To validate, download page first.</div><br />};
   }

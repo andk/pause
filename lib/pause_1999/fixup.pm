@@ -1,7 +1,7 @@
 #!/usr/bin/perl -- -*- Mode: cperl; -*-
 package pause_1999::fixup;
 use strict;
-use Apache::Constants qw(:common);
+use HTTP::Status qw(:constants);
 our $VERSION = "85";
 
 =comment
@@ -20,49 +20,39 @@ different approach, but as it works, I do not investigate further now.
 =cut
 
 sub handler {
-  my $r = shift or return DECLINED;
-  return OK unless $r->is_initial_req;
-  my $uri = $r->uri;
-  my $location = $r->location;
+  my $req = shift;
+  # return HTTP_OK unless $r->is_initial_req;
+  my $uri = $req->request_uri;
+  my $location = '/pause'; # $r->location;
 
   # CASE 3
 
-  return DECLINED if $location =~ /query/;
+#  return DECLINED if $location =~ /query/;
 
   # warn "uri[$uri]location[$location] (Question was, does location ever match /query/?)";
   if ($uri eq $location) {
 
     # CASE 1
 
-    my $port = $r->server->port;
-    my $colonport = ":" . $port;
-    if ($port==80 || $port==443) {
-      $colonport = "";
-    }
-    my $proto = $port == 443 ? "https" : "http";
-    my $is_ssl = $r->header_in("X-pause-is-SSL") || 0;
+    my $redir = $req->base;
+    my $is_ssl = $req->header("X-pause-is-SSL") || 0;
     if ($is_ssl) {
-      $proto = "https";
+      $redir->scheme("https");
     }
-    my $server = $r->server->server_hostname;
-    my $redir = "$proto://$server$colonport$location/query";
-    $r->header_out("Location",$redir);
+    $redir->path("$location/query");
+    my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
+    $res->header("Location",$redir);
     # warn "redir[$redir]";
-    $r->status(Apache::Constants::MOVED());
-    $r->send_http_header;
-    return Apache::Constants::MOVED();
+    return $res->finalize;
   }
-  return DECLINED unless $uri eq "$location/";
+  return unless $uri eq "$location/";
 
   # CASE 2
 
   # warn sprintf "uri[%s]location[%s]path_info[%s]", $uri, $location, $r->path_info;
-  $r->uri("$location/query");
-  $r->path_info("") if $r->path_info;
-  $r->handler("perl-script");
-  require pause_1999::config;
-  $r->set_handlers("PerlHandler",[qw(pause_1999::config)]);
-  OK;
+  $req->path("$location/query");
+  $req->path_info("") if $req->path_info;
+  return;
 }
 
 1;

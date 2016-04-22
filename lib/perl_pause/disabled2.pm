@@ -16,18 +16,18 @@ the message.
 use strict;
 
 sub handler {
-  my($r) = @_;
-  $r->content_type("text/html");
-  $r->send_http_header;
+  my($req) = @_;
+  my $res = $req->new_response(200);
+  $res->content_type("text/html");
   open my $fh, "/etc/PAUSE.CLOSED";
   local $/;
   my $mess = <$fh>;
   $mess ||= qq{please retry in a few seconds};
-  print qq{<html><head><title>Closed for Maintanance</title></head><body>
+  $res->body([qq{<html><head><title>Closed for Maintanance</title></head><body>
 <h2>Dear visitor,</h2>},
     $mess,
-        qq{</html>};
-  200;
+        qq{</html>}]);
+  $res->finalize;
 }
 
 1;

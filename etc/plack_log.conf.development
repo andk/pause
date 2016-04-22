@@ -1,0 +1,5 @@
+dispatchers = screen
+
+screen.class = Log::Dispatch::Screen
+screen.min_level = debug
+screen.format = [%d] [%p] %m at %F line %L%n

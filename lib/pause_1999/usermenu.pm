@@ -9,8 +9,8 @@ our $VERSION = "854";
 sub as_string {
   my $self = shift;
   my $mgr = shift;
-  my $r = $mgr->{R};
-  my $user = $r->connection->user;
+  my $req = $mgr->{REQ};
+  my $user = $req->user;
   my $myurl = $mgr->myurl;
   my $server = $myurl->can("host") ? $myurl->host : $myurl->hostname;
   if (my $port = $myurl->port) {
@@ -21,19 +21,19 @@ sub as_string {
   }
 
   if (0) {
-    $r->log_error(sprintf(
+    $req->logger->({level => 'error', message => sprintf(
                           "Watch: server[%s]at[%s]line[%d]",
                           $server,
                           __FILE__,
                           __LINE__,
-                         ));
+                         )});
   }
   my @m;
   push @m, qq{<table width="155" cellspacing="1" cellpadding="0">};
   my $activecolor = $mgr->{ActiveColor};
   unless ($user) {
     push @m, qq{<tr><td class="menuitem">};
-    if ($mgr->{R}->server->port == 8000) {
+    if ($mgr->{REQ}->port == 8000) {
       $server =~ s/:8000/:8443/ or $server .= ":8443";
     }
     my $schema = "https";

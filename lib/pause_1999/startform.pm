@@ -11,8 +11,9 @@ sub as_string {
   my @m;
   my $myurl = $mgr->myurl;
   my $can_unparse = $myurl->can("unparse");
-  my $me = $can_unparse ? $myurl->unparse : $myurl->as_string;
-  $me =~ s/\?.*//; # unparse keeps the querystring which breaks XHTML
+#  my $me = $can_unparse ? $myurl->unparse : $myurl->as_string;
+#  $me =~ s/\?.*//; # unparse keeps the querystring which breaks XHTML
+  my $me = $myurl->path;
 
   # since we have a perlbal that does the https for us, we can easily
   # have a wrong scheme in this $me and a wrong hostname, e.g.

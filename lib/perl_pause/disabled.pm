@@ -3,10 +3,10 @@ package perl_pause::disabled;
 use strict;
 
 sub handler {
-  my($r) = @_;
-  $r->content_type("text/html");
-  $r->send_http_header;
-  print qq{
+  my($req) = @_;
+  my $res = $req->new_response(200);
+  $res->content_type("text/html");
+  $res->body([qq{
 <HTML><HEAD><TITLE>disabled</TITLE></HEAD><BODY>
 <H2>Moved...</H2>
 
@@ -26,8 +26,8 @@ the inconvenience, I hope, you at least enjoy the 2 MBit line.<P>
 andreas<BR>
 Dec 20, 1998
 </HTML>
-};
-  200;
+}]);
+  $res->finalize;
 }
 
 1;

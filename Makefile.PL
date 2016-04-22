@@ -9,9 +9,6 @@ WriteMakefile(
               AUTHOR        => 'Andreas Koenig <andreas.koenig.7os6VVqR@franz.ak.mind.de>',
               LICENSE       => 'perl',
               PREREQ_PM     => { map +($_ => 0), qw(
-    Apache::DB
-    Apache::HeavyCGI
-    Apache::Request
     Apache::Session::Counted
     BSD::Resource
     CPAN::Checksums
@@ -22,6 +19,7 @@ WriteMakefile(
     Crypt::Eksblowfish::Bcrypt
     Cwd
     DB_File
+    DBD::mysql
     DBD::SQLite
     DBI
     DBIx::RunSQL
@@ -33,14 +31,18 @@ WriteMakefile(
     File::Copy::Recursive
     File::pushd
     File::Rsync::Mirror::Recentfile
+    File::Temp
     File::Which
     Git::Wrapper
     HTML::Entities
     HTTP::Date
+    HTTP::Request::Common
     IO::Socket::SSL
     IPC::Cmd
     IPC::Run3
     JSON::XS
+    Log::Dispatch
+    Log::Dispatch::Config
     LWP::UserAgent
     LWP::Protocol::https
     LWP::UserAgent
@@ -54,19 +56,28 @@ WriteMakefile(
     Parse::CPAN::Packages
     Path::Class
     Path::Tiny
+    Plack
+    Plack::Middleware::Auth::Basic
+    Plack::Middleware::ReverseProxy
+    Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
     String::Random
     Test::Deep
     Test::FITesque::Fixture
     Test::MockObject
+    Test::mysqld
     Text::Format
     Text::Metaphone
+    Text::Soundex
     Text::Unidecode
+    Time::Duration
     Time::HiRes
     URI::Escape
     URI::URL
     Unicode::Collate
     Unicode::String
+    XML::LibXML
+    XML::Parser
     XML::SAX::Base
     XML::SAX::Writer
     YAML::XS
