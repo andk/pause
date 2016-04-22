@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin;
+use Daemon::Control;
+
+my $name = 'bbbike';
+my $psgi = "$FindBin::RealBin/../cgi/bbbike.psgi";
+(my $starman = $^X) =~ s{/perl[^/]*$}{/starman};
+
+exit My::Daemon::Control->new({
+    name        => $name,
+    lsb_start   => '$syslog $remote_fs',
+    lsb_stop    => '$syslog',
+    lsb_sdesc   => 'BBBike',
+    lsb_desc    => 'BBBike web program',
+
+    program     => $starman,
+    program_args => [
+        $psgi,
+        '--workers',    4,
+        '--listen',     ":5000",
+        '--user',       'www-data',
+        '--group',      'www-data',
+        '--env',        'production',
+        '--access-log', "/var/log/${name}_access.log",
+    ],
+
+    pid_file    => "/var/run/$name.pid",
+    stderr_file => "/var/log/${name}_error.log",
+    stdout_file => "/var/log/${name}_error.log",
+
+    fork        => 2,
+
+})->run;
+
+{
+    package My::Daemon::Control;
+    use base 'Daemon::Control';
+    # See https://github.com/miyagawa/Starman/issues/94
+    # and https://github.com/miyagawa/Starman/issues/106
+    # why checking for a working psgi is a good idea.
+    sub do_reload {
+        my $self = shift;
+        my $psgi_file = $self->program_args->[0];
+        my $child_pid = fork;
+        die if !defined $child_pid;
+        if ($child_pid == 0) {
+            require Plack::Util;
+            Plack::Util::load_psgi($psgi_file);
+            exit 0;
+        }
+        waitpid $child_pid, 0;
+        if ($? != 0) {
+            die "load_psgi of $psgi_file failed";
+        }
+        $self->SUPER::do_reload();
+    }
+}
+
+__END__
+
+=head1 INSTALLATION
+
+As root:
+
+    ./bbbike.psgi-init get_init_file > /etc/init.d/bbbike
+    chmod 755 /etc/init.d/bbbike
+    update-rc.d bbbike defaults
+
+=cut
