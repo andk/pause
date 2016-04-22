@@ -1,6 +1,6 @@
 =head1 NAME
 
-main - 
+main -
 
 =head1 SYNOPSIS
 
@@ -973,7 +973,7 @@ sub version {
   my($self) = @_;
   return $self->{VERSION} if defined $self->{VERSION};
   my $version = $VERSION;
-  for my $m (grep /pause_1999/, keys %INC) {
+  for my $m (grep {! m!/Test/!} grep /pause_1999/, keys %INC) {
     $m =~ s|/|::|g;
     $m =~ s|\.pm$||;
     my $v = $m->VERSION || 0;
