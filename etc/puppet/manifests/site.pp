@@ -483,6 +483,14 @@ class pause-mon {
 		hasstatus => true,		
 	}
 }
+class pause-cron {
+	file { "/etc/cron.d/pause2016":
+                owner => "root",
+                group => "root",
+                mode  => 644,
+                source => "puppet:///files/etc/cron.d/pause2016",
+	}
+}
 class pause {
 	# file { "/etc/puppet/files":
 	# 	path => "/etc/puppet/files",
@@ -501,6 +509,7 @@ class pause {
 	include pause-limits
 	include pause-iptables
 	include pause-mon
+        include pause-cron
 }
 
 node pause2 {

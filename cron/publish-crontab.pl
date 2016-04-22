@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 
+die "
+# since we are switching to use /etc/cron.d/pause2016 for the core
+# pause stuff and puppet for OS and NOC level things, we believe, this
+# file is obsolete";
+
 use File::Basename ();
 use File::Compare ();
 use File::Copy ();
