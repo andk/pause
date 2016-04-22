@@ -9,6 +9,8 @@ use File::Temp ();
 use Getopt::Long::Descriptive;
 use Path::Class;
 use PAUSE::TestPAUSE;
+use Parse::CPAN::Packages;
+use Parse::CPAN::Perms;
 
 my ($opt, $usage) = describe_options(
   '%c %o [USER:]DISTFILE...',
@@ -18,6 +20,8 @@ my ($opt, $usage) = describe_options(
                     { default => 1 } ],
   [ 'dists-from=s', 'program to run to get dist names'            ],
   [ 'each',         'index after each' ],
+  [ 'packages|p=s', '02packages file to prefill packages table'   ],
+  [ 'perms|P=s',    '06perms file to prefill mods/primeur/perms'  ],
 );
 
 my @uploads;
@@ -49,6 +53,86 @@ $pause->pause_config_overrides->{LOG_CALLBACK} = sub {
   print STDERR @what if $opt->verbose;
 };
 
+if ($opt->packages) {
+  $pause->with_our_config(sub {
+    my $dbh = PAUSE::dbh;
+
+    my $p = Parse::CPAN::Packages->new($opt->packages);
+
+    my $query = "INSERT INTO packages (package, version, dist, status) VALUES (?, ?, ?, ?);";
+
+    my $count = 0;
+
+    print "Inserting packages from " . $opt->packages . "...\n";
+
+    $dbh->begin_work;
+
+    for my $pkg ($p->packages) {
+      dbh_do($dbh, $query, {},
+        $pkg->package,
+        $pkg->version,
+        $pkg->distribution->prefix,
+        "indexed",
+      );
+
+      $count++;
+    }
+
+    $dbh->commit;
+
+    print "\t...done! Inserted $count packages\n";
+  });
+}
+
+if ($opt->perms) {
+  $pause->with_our_config(sub {
+    my $dbh = PAUSE::dbh;
+
+    my $p = Parse::CPAN::Perms->new($opt->perms);
+
+    my $perms_data = $p->perms;
+
+    my %queries = (
+      m => "INSERT INTO mods    (modid,   userid) VALUES (?, ?)",
+      f => "INSERT INTO primeur (package, userid) VALUES (?, ?)",
+      c => "INSERT INTO perms   (package, userid) VALUES (?, ?)",
+    );
+
+#    my %inserted;
+
+    my $count = 0;
+
+    print "Inserting perms from " . $opt->perms . "...\n";
+
+    $dbh->begin_work;
+
+    for my $pkg (keys %$perms_data) {
+      for my $user (keys %{ $perms_data->{$pkg} }) {
+        my $perm = $perms_data->{$pkg}->{$user};
+
+#        # Add a users entry for the user ?
+#        unless ($inserted{$user}++) {
+#          dbh_do($dbh, "INSERT INTO users (userid, ustatus) VALUES (?, ?)", {},
+#            $user, 'active',
+#          );
+#        }
+
+        my $query = $queries{$perm} || die "Unknown perm flag $perm\n";
+
+        dbh_do($dbh, $query, {},
+          $pkg, $user,
+        );
+
+        $count++;
+      }
+    }
+
+    $dbh->commit;
+
+    print "\t...done! Inserted $count permissions\n";
+  });
+}
+
 my $just_reindexed;
 
 UPLOAD: for my $upload (@uploads) {
@@ -76,6 +160,24 @@ close $log_fh or warn "error closing $dir/pause.log: $!";
 if ($opt->shell) {
   my $chdir_guard = pushd($dir);
   system($ENV{SHELL});
+}
+
+sub dbh_do {
+  my ($dbh, @args) = @_;
+
+  my $ret;
+
+  # Capture errors so we can hopefully provide some
+  # useful debug.
+  eval {
+    $ret = $dbh->do(@args);
+  };
+
+  my $err = "";
+  $err = $dbh->errstr unless defined $ret;
+  $err ||= $@;
+
+  die "Failed insertion (@args): $err\n" if $err;
 }
 
 1;

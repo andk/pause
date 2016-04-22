@@ -52,6 +52,7 @@ WriteMakefile(
     MooseX::StrictConstructor
     Net::FTP
     Parse::CPAN::Packages
+    Parse::CPAN::Perms
     Path::Class
     Path::Tiny
     Set::Crontab
