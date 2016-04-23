@@ -99,8 +99,9 @@ sub new_with_author {
 sub site_model {
     my ( $self, $author ) = @_;
     my $mech = Test::WWW::Mechanize::PSGI->new( app => $self->plack_app );
-    $mech->credentials( $author->username, $author->password );
-    return pause_1999::Test::SiteModel->new( mech => $mech );
+    my $model = pause_1999::Test::SiteModel->new( mech => $mech );
+    $model->set_user( $author );
+    return $model;
 }
 
 1;
