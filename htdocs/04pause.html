@@ -396,7 +396,8 @@ through CPAN but is not in a stable state. Something <i>between</i>
 two versions.</p>
 
 <p>If you want to do that simply choose a filename that matches
-<b><code>/\d\.\d+_\d/</code></b> or contains <b><code>TRIAL</code></b>.
+<b><code>/\d\.\d+_\d/</code></b> or matches <b><code>-TRIAL[0-9]*</code></b>
+before the file extension (example: <code>My-Dist-0.01-TRIAL.tar.gz</code>).
 Please choose a sequence that is easy to comprehend. People have adopted
 different conventions:</p>
 
