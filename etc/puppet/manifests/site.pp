@@ -140,16 +140,40 @@ class pause-apache {
 		mode   => 755,
 		source => "puppet:///files/etc/init.d/PAUSE-httpd-pause-us",
 	}
+	file { "/etc/init.d/PAUSE-plack":
+		path   => "/etc/init.d/PAUSE-plack",
+		owner  => root,
+		group  => root,
+		mode   => 755,
+		source => "puppet:///files/etc/init.d/PAUSE-plack",
+	}
 	file { "/opt/apache/current/conf/httpd.conf":
 		path => "/opt/apache/current/conf/httpd.conf",
 		ensure => "/home/puppet/pause/apache-conf/httpd.conf.pause-us-80",
 	}
+        # 2016-04-23 10:48  mkdir /var/log/PAUSE-plack
+        # 2016-04-23 10:55  chown apache:apache /var/log/PAUSE-plack
+	file { "/var/log/PAUSE-plack":
+		owner => apache,
+		group => apache,
+		mode => 755,
+		ensure => directory,
+	}
+        # apache was replaced by starman 2016-04
 	service { "PAUSE-httpd":
-		ensure => running,
-                enable  => true,
+		ensure => stopped,
+                enable  => false,
                 require => [
                             File["/etc/init.d/PAUSE-httpd"],
 			    File["/opt/apache/current/conf/httpd.conf"],
+			    ],
+		hasstatus => true,
+	}
+	service { "PAUSE-plack":
+		ensure => running,
+                enable  => true,
+                require => [
+                            File["/etc/init.d/PAUSE-plack"],
 			    ],
 		hasstatus => true,
 	}
@@ -168,6 +192,24 @@ class pause-apache {
     dateext
     postrotate
         /etc/init.d/PAUSE-httpd reload;
+    endscript
+}\n",
+	}
+	file { "/etc/logrotate.d/PAUSE-plack":
+		owner   => root,
+		group   => root,
+		mode    => 644,
+		content => "/var/log/PAUSE-plack/*log {
+    daily
+    rotate 150
+    compress
+    delaycompress
+    notifempty
+    missingok
+    sharedscripts
+    dateext
+    postrotate
+        /etc/init.d/PAUSE-plack reload;
     endscript
 }\n",
 	}

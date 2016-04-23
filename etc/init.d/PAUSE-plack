@@ -1,11 +1,26 @@
 #!/usr/bin/perl
 
+# INIT Info Generated at Sat Apr 23 13:17:44 2016 with Daemon::Control DEV
+
+### BEGIN INIT INFO
+# Provides:          PAUSE-plack
+# Required-Start:    $syslog $remote_fs
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: PAUSE-Plack
+# Description:       PAUSE-Plack web program
+### END INIT INFO`
+
 use strict;
 use FindBin;
 use Daemon::Control;
 
+# for the record, on 20160421 we started plackperl/charsbar for live from /home/puppet/pause manually with
+# 2016-04-22 16:31  /opt/perl/v5.16.2/165a/bin/plackup -I ../pause-private/lib -E production -s Starman -r -p 81 &
+
 my $name = 'PAUSE-plack';
-my $psgi = "$FindBin::RealBin/../cgi/PAUSE-plack.psgi";
+my $psgi = "$FindBin::RealBin/../../app.psgi";
 (my $starman = $^X) =~ s{/perl[^/]*$}{/starman};
 
 exit My::Daemon::Control->new({
@@ -18,17 +33,17 @@ exit My::Daemon::Control->new({
     program     => $starman,
     program_args => [
         $psgi,
-        '--workers',    4,
-        '--listen',     ":5000",
-        '--user',       'www-data',
-        '--group',      'www-data',
+        '--workers',    5,
+        '--listen',     ":81",
+        '--user',       'apache',
+        '--group',      'apache',
         '--env',        'production',
-        '--access-log', "/var/log/${name}_access.log",
+        '--access-log', "/var/log/$name/access_log",
     ],
 
     pid_file    => "/var/run/$name.pid",
-    stderr_file => "/var/log/${name}_error.log",
-    stdout_file => "/var/log/${name}_error.log",
+    stderr_file => "/var/log/$name/error_log",
+    stdout_file => "/var/log/$name/error_log",
 
     fork        => 2,
 
@@ -64,7 +79,7 @@ __END__
 
 As root:
 
-    ./PAUSE-plack.psgi-init get_init_file > /etc/init.d/PAUSE-plack
+    ./PAUSE-plack.psgi-init get_init_file > /etc/init.d/PAUSE-plack   # optional
     chmod 755 /etc/init.d/PAUSE-plack
     update-rc.d PAUSE-plack defaults
 
