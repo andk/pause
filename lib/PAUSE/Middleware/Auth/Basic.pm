@@ -5,7 +5,7 @@ use Plack::Request;
 use HTTP::Status qw(:constants);
 use pause_1999::authen_user;
 
-sub prepare_app {}
+sub prepare_app { shift->realm('PAUSE') }
 
 sub call {
     my($self, $env) = @_;
