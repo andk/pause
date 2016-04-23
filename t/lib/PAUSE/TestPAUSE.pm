@@ -52,6 +52,18 @@ has tmpdir => (
   default => sub { dir($_[0]->_tmpdir_obj) },
 );
 
+has email_sender_transport => (
+  is      => 'rw',
+  isa     => 'Str',
+  default => 'Test',
+);
+
+has email_sender_transport_args => (
+  is      => 'ro',
+  isa     => 'HashRef[Str]',
+  default => sub { {} },
+);
+
 sub deploy_schemas_at {
   my ($self, $dir) = @_;
 
@@ -188,7 +200,26 @@ sub test_reindex {
     my $chdir_guard = pushd;
 
     Email::Sender::Simple->reset_default_transport;
-    local $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
+
+    # If we aren't using the Test transport, we need to wrap the chosen
+    # transport with Email::Sender::Transport::KeepDeliveries as test_reindex
+    # expects to be able to access ->deliveries() for all sent email.
+    my $transport = $self->email_sender_transport;
+    my $wrap_transport = $transport ne 'Test';
+
+    local $ENV{EMAIL_SENDER_TRANSPORT} =
+      $wrap_transport ? 'KeepDeliveries' : $transport;
+
+    local $ENV{EMAIL_SENDER_TRANSPORT_transport_class} = $transport
+      if $wrap_transport;
+
+    my %args = %{ $self->email_sender_transport_args };
+
+    %args = map {;
+      "EMAIL_SENDER_TRANSPORT_transport_arg_$_" => $args{$_}
+    } keys %args;
+
+    local @ENV{keys %args} = values %args;
 
     my @stray_mail = Email::Sender::Simple->default_transport->deliveries;
 
