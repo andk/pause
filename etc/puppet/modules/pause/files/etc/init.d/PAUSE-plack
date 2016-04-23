@@ -37,6 +37,7 @@ exit My::Daemon::Control->new({
         '--listen',     ":81",
         '--user',       'apache',
         '--group',      'apache',
+        '--preload-app',
         '--env',        'production',
         '--access-log', "/var/log/$name/access_log",
     ],
