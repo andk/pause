@@ -420,9 +420,13 @@ sub mail_summary {
   # problem and let the rest of the report run as usual
   if ($self->{NO_DISTNAME_PERMISSION}) {
     my $pkg = $self->_package_governing_permission;
-    push @m, $tf->format(qq[This distribution name can only be used
-      by users with permission for the package $pkg, which you
-      do not have. No modules will be indexed.]);
+    push @m, $tf->format(qq[This distribution name will only be indexed
+      when uploaded by users with permission for the package $pkg.
+      Either someone else has ownership over that package name, or
+      this is a brand new distribution and that package name was neither
+      listed in the 'provides' field in the META file nor found
+      inside the distribution's modules.  Therefore, no modules
+      will be indexed.]);
     push @m, qq{\n\nFurther details on the indexing attempt follow.\n\n};
     $status_over_all = "Failed";
 
