@@ -48,7 +48,7 @@ sub parameter {
 
   if ($mgr->{User} && $mgr->{User}{userid} && $mgr->{User}{userid} ne "-") {
 
-    # warn "userid[$mgr->{User}{userid}]";
+    # $mgr->warn("userid[$mgr->{User}{userid}]");
 
     # All authenticated Users
     for my $command (
@@ -112,7 +112,7 @@ sub parameter {
 
     # Only Admins
     if (exists $mgr->{UserGroups}{admin}) {
-      # warn "We have an admin here";
+      # $mgr->warn("We have an admin here");
       for my $command (
 		       "add_user",
 		       "edit_ml",
@@ -175,30 +175,30 @@ parameter ABRA=$param, but the database doesn't know about this token.");
 
   } else {
 
-    # warn "unauthorized access (but OK)";
+    # $mgr->warn("unauthorized access (but OK)");
     $allow_action{"mailpw"} = undef;
     push @allow_submit, "mailpw";
 
   }
   $mgr->{AllowAction} = [ sort { $a cmp $b } keys %allow_action ];
-  # warn "allowaction[@{$mgr->{AllowAction}}]";
-  # warn "allowsubmit[@allow_submit]";
+  # $mgr->warn("allowaction[@{$mgr->{AllowAction}}]");
+  # $mgr->warn("allowsubmit[@allow_submit]");
 
   $param = $req->param("ACTION");
-  # warn "ACTION-param[$param]req[$req]";
+  # $mgr->warn("ACTION-param[$param]req[$req]");
   if ($param && exists $allow_action{$param}) {
     $mgr->{Action} = $param;
   } else {
     # ...they might ask for it in a submit button
   ACTION: for my $action (@allow_submit) {
 
-      # warn "DEBUG: action[$action]";
+      # $mgr->warn("DEBUG: action[$action]");
 
       # we inherited from a different project: One submitbutton on a page
       if (
 	  $param = $req->param("pause99_$action\_sub")
 	 ) {
-	# warn "action[$action]";
+	# $mgr->warn("action[$action]");
 	$mgr->{Action} = $action;
 	last ACTION;
       }
@@ -237,7 +237,7 @@ parameter ABRA=$param, but the database doesn't know about this token.");
     # New and more generic than the inherited ones above: several submit buttons
     my @params = grep s/^(weak)?SUBMIT_pause99_//i, $req->param;
     for my $p (@params) {
-      # warn "p[$p]";
+      # $mgr->warn("p[$p]");
       for my $a (@allow_submit) {
 	if ( substr($p,0,length($a)) eq $a ) {
 	  $mgr->{Action} = $a;
@@ -248,8 +248,8 @@ parameter ABRA=$param, but the database doesn't know about this token.");
     }
   }
   $action = $mgr->{Action};
-  # warn "action[$action]";
-  # warn sprintf "param[%s]", join ":", $mgr->{REQ}->param;
+  # $mgr->warn("action[$action]");
+  # $mgr->warn(sprintf "param[%s]", join ":", $mgr->{REQ}->param);
   if ($action) { # delegate to a subroutine
     die PAUSE::HeavyCGI::Exception->new(ERROR => "Unanticipated Error on Server.
 Please report to the administrator what you were trying to do")
@@ -258,7 +258,7 @@ Please report to the administrator what you were trying to do")
     # sanity check:
     for (0..$#action_result) {
       next if defined $action_result[$_];
-      warn "undefined element in \@action_result: _[$_]#[$#action_result]action[$action]";
+      $mgr->warn("undefined element in \@action_result: _[$_]#[$#action_result]action[$action]");
     }
     $mgr->{EditOutput} = join "", @action_result;
   } else {
@@ -296,7 +296,7 @@ sub manage_id_requests { # was reject_id_request
           local $/;
           my $content = <$fh>;
           my $session = Storable::thaw $content;
-          # warn "DEBUG: mtime[$mtime]stat[@stat]session[$session]";
+          # $mgr->warn("DEBUG: mtime[$mtime]stat[@stat]session[$session]");
           my $userid = $session->{APPLY}{userid} or return;
           if ($delete && $session->{_session_id} eq $delete) {
             unlink $path or die "Could not unlink '$path': $!";
@@ -373,7 +373,7 @@ sub as_string {
   my $self = shift;
   my $mgr = shift;
   my @m;
-  warn "mgr->Action undef" unless defined $mgr->{Action};
+  $mgr->warn("mgr->Action undef") unless defined $mgr->{Action};
   my $action;
   $action = $mgr->{ActionTuning}{$mgr->{Action}}{verb}
       if exists $mgr->{ActionTuning}{$mgr->{Action}};
@@ -382,9 +382,9 @@ sub as_string {
   my $sentit;
   my @err = @{$mgr->{ERROR}||[]};
   push @m, @err and $sentit++ if @err;
-  # warn "sentit[$sentit]";
+  # $mgr->warn("sentit[$sentit]");
   push @m, $mgr->{EditOutput} and $sentit++ if !$sentit && $mgr->{EditOutput};
-  # warn "sentit[$sentit]";
+  # $mgr->warn("sentit[$sentit]");
   unless ($sentit) {
     push @m, sprintf(
                      qq{\n<h2 class="firstheader">%slease choose an action from the menu.</h2>\n},
@@ -393,7 +393,7 @@ sub as_string {
                      "P"
                     );
 
-    # warn sprintf "DEBUG: host believes he is[%s]", $mgr->myurl->host;
+    # $mgr->warn(sprintf "DEBUG: host believes he is[%s]", $mgr->myurl->host);
 
     push @m, qq{<p>The usermenu to the left shows all menus available to
     you, the table below shows descriptions for all menues available
@@ -458,7 +458,7 @@ sub active_user_record {
   } else {
     my $hiddenname_para = $req->param('HIDDENNAME') || "";
     $hidden_user ||= $hiddenname_para;
-    warn "DEBUG: hidden_user[$hidden_user] after hiddenname parameter[$hiddenname_para]";
+    $mgr->warn("DEBUG: hidden_user[$hidden_user] after hiddenname parameter[$hiddenname_para]");
   }
   {
     my $uc_hidden_user = uc $hidden_user;
@@ -532,7 +532,7 @@ sub active_user_record {
 	if (
 	    grep { $_ eq $mgr->{Action} } @{$mgr->{AllowMlreprTakeover}}
 	   ) {
-          warn "Watch: privilege escalation";
+          $mgr->warn("Watch: privilege escalation");
 	  $u = $hiddenuser_h1; # no secrets for a mailinglist
 	} else {
 	  die PAUSE::HeavyCGI::Exception
@@ -838,10 +838,10 @@ sub edit_cred {
       my(@set,@mailblurb);
       my $dbh = $mgr->$connect(); #### the () for older perls
       for my $field (@$atmeta) { ####
-	# warn "field[$field]";
+	# $mgr->warn("field[$field]");
 	# Ignore fields we do not intend to change
 	unless ($meta{$field}){
-	  warn "Someone tried strange field[$field], ignored";
+	  $mgr->warn("Someone tried strange field[$field], ignored");
 	  next;
 	}
 	# find out the form field name
@@ -919,7 +919,7 @@ Please check if they are correct.
 Thanks,
 The Pause
 };
-	# warn "sql[$sql]mailblurb[$mailblurb]";
+	# $mgr->warn("sql[$sql]mailblurb[$mailblurb]");
 	# die;
 	if ($dbh->do($sql, undef, @query_params)) {
 	  push @m, qq{The new data are registered in table $table.<hr />};
@@ -963,7 +963,7 @@ The Pause
   my $alter = 1;
   for my $field (@allmeta) {
     unless ($meta{$field}){
-      warn "Someone tried strange field[$field], ignored";
+      $mgr->warn("Someone tried strange field[$field], ignored");
       next;
     }
     if ( $field eq "ustatus" ) {
@@ -980,8 +980,8 @@ The Pause
     my %args = %{$meta{$field}{args}};
     my $type = $meta{$field}{type};
     my $form = $mgr->$type(%args, default=>$u->{$field});
-    # warn "field[$field]u->field[$u->{$field}]";
-    # warn "form[$form]";
+    # $mgr->warn("field[$field]u->field[$u->{$field}]");
+    # $mgr->warn("form[$form]");
     push @m, qq{$form</td></tr>};
   }
   push @m, qq{</table>\n};
@@ -1266,10 +1266,10 @@ sub change_passwd {
                            changed = ?,
                            changedby = ?
                        WHERE $PAUSE::Config->{AUTHEN_USER_FLD} = ?};
-	  # warn "sql[$sql]";
+	  # $mgr->warn("sql[$sql]");
 	  my $rc = $dbh->do($sql,undef,
 			    $pwenc,0,time,$mgr->{User}{userid},$u->{userid});
-	  warn "rc[$rc]";
+	  $mgr->warn("rc[$rc]");
 	  die PAUSE::HeavyCGI::Exception
 	      ->new(ERROR =>
 		    sprintf qq[Could not set password: '%s'], $dbh->errstr
@@ -1386,7 +1386,7 @@ sub add_uri {
   my $mgr = shift;
   my $req = $mgr->{REQ};
   my $debug_table = $req->parameters; # XXX: $r->parms
-  warn sprintf "DEBUG: req[%s]", join(":",%$debug_table);
+  $mgr->warn(sprintf "DEBUG: req[%s]", join(":",%$debug_table));
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
   my @m;
   my $u = $self->active_user_record($mgr);
@@ -1407,7 +1407,7 @@ sub add_uri {
       || $req->param("SUBMIT_pause99_add_uri_httpupload")) {
     my $upl = $req->upload('pause99_add_uri_httpupload');
     unless ($upl->size) {
-      warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
+      $mgr->warn("Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD");
       $req->parameters->set("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
       $req->parameters->set("SUBMIT_pause99_add_uri_httpupload","");
     }
@@ -1455,7 +1455,7 @@ sub add_uri {
 	    $uri = $filename;
 	    # Got an empty $to in the HTML page, so for debugging..
 	    my $h1 = qq{<h3>File successfully copied to '$to'</h3>};
-	    warn "h1[$h1]filename[$filename]";
+	    $mgr->warn("h1[$h1]filename[$filename]");
 	    push @m, $h1;
 	  } else {
 	    die PAUSE::HeavyCGI::Exception
@@ -1489,7 +1489,7 @@ filename[%s]. </p>
 		  "Could not create an upload object. DEBUG: upl[$upl]");
       }
     } elsif ($mgr->{UseModuleSet} eq "patchedCGI") {
-      warn "patchedCGI not supported anymore";
+      $mgr->warn("patchedCGI not supported anymore");
 
       my $handle;
       if (
@@ -1652,7 +1652,7 @@ filename[%s]. </p>
 
   # via FTP GET
 
-  warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+  $mgr->warn("DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]");
   push @m, qq{<tr><td bgcolor="#ffe0ff">If you want me <b>to fetch a
       file</b> from an URL, enter the full URL here.<br />};
 
@@ -1819,7 +1819,7 @@ href="mailto:},
       my $cp = $mgr->escapeHTML("$query/(@query_params)");
       push @m, qq{<h3>Submitting query</h3>};
       if ($mgr->{UseModuleSet} eq "patchedCGI") {
-        warn "patchedCGI not supported anymore";
+        $mgr->warn("patchedCGI not supported anymore");
 	my @debug = "DEBUGGING patched CGI:\n";
 	push @debug, scalar localtime;
 	my %headers = %{ $req->headers }; # XXX: or maybe use header_field_names
@@ -1850,7 +1850,7 @@ href="mailto:},
 	    push @debug, " </blockquote><br />\n";
 	  }
 	}
-	warn join "", @debug;
+	$mgr->warn(join "", @debug);
 	push @m, "Resulting SQL: ", $cp;
       }
       local($dbh->{RaiseError}) = 0;
@@ -1945,20 +1945,20 @@ twice</b>.</p>
 	}
       }
     }
-    
+
     push @m, "\n<!-- end of the response to the user's action -->\n</blockquote>\n";
-    
+
     push @m, (qq{<hr noshade="noshade" />\n});
   return @m;
 }
 
 sub manifind {
-  my($self) = @_;
+  my($self, $mgr) = @_;
   my $cwd = Cwd::cwd();
-  warn "cwd[$cwd]";
+  $mgr->warn("cwd[$cwd]");
   my %files = %{ExtUtils::Manifest::manifind()};
   if (keys %files == 1 && exists $files{""} && $files{""} eq "") {
-    warn "ALERT: BUG in MANIFIND, falling back to zsh !!!";
+    $mgr->warn("ALERT: BUG in MANIFIND, falling back to zsh !!!");
 
     # This bug was caused by libc upgrade: perl and apache were
     # compiled with 2.1.3; upgrading to 2.2.5 and/or later
@@ -1980,11 +1980,11 @@ sub scroll_subdirs {
   my $userhome = PAUSE::user2dir($u->{userid});
   require ExtUtils::Manifest;
   if (chdir "$PAUSE::Config->{MLROOT}/$userhome"){
-    warn "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] E:M:V[$ExtUtils::Manifest::VERSION]";
+    $mgr->warn("DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] E:M:V[$ExtUtils::Manifest::VERSION]");
   } else {
     return "";
   }
-  my %files = $self->manifind;
+  my %files = $self->manifind( $mgr );
   my %seen;
   my @dirs = sort grep !$seen{$_}++, grep s|(.+)/[^/]+|$1|, keys %files;
   return "" unless @dirs;
@@ -2034,7 +2034,7 @@ sub delete_files {
   my $cwd = Cwd::cwd();
 
   if (chdir "$PAUSE::Config->{MLROOT}/$userhome"){
-    warn "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] ExtUtils:Manifest:VERSION[$ExtUtils::Manifest::VERSION]";
+    $mgr->warn( "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] ExtUtils:Manifest:VERSION[$ExtUtils::Manifest::VERSION]" );
   } else {
     # QUICK DEPARTURE
     push @m, qq{No files found in authors/id/$userhome};
@@ -2090,7 +2090,7 @@ sub delete_files {
       $dbh->do(
 	$sql, undef,
 	"$userhome/$f"
-      ) or warn sprintf "FAILED Query: %s/: %s", $sql, "$userhome/$f", $DBI::errstr;
+      ) or $mgr->warn(sprintf "FAILED Query: %s/: %s", $sql, "$userhome/$f", $DBI::errstr);
     }
   }
   if ($blurb) {
@@ -2142,7 +2142,7 @@ glory is collected on http://history.perl.org/backpan/});
   push @m, $submit_butts;
   push @m, "<pre>";
 
-  my %files = $self->manifind;
+  my %files = $self->manifind( $mgr );
   my(%deletes,%whendele,$sth);
   if (
       $sth = $dbh->prepare(qq{SELECT deleteid, changed
@@ -2166,7 +2166,7 @@ glory is collected on http://history.perl.org/backpan/});
   require HTTP::Date;
   foreach my $f (keys %files) {
     unless (stat $f) {
-      warn "ALERT: Could not stat f[$f]: $!";
+      $mgr->warn("ALERT: Could not stat f[$f]: $!");
       next;
     }
     my $blurb = $deletes{$f} ?
@@ -2209,7 +2209,7 @@ sub show_files {
   my $cwd = Cwd::cwd();
 
   if (chdir "$PAUSE::Config->{MLROOT}/$userhome"){
-    warn "DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] E:M:V[$ExtUtils::Manifest::VERSION]";
+    $mgr->warn("DEBUG: MLROOT[$PAUSE::Config->{MLROOT}] userhome[$userhome] E:M:V[$ExtUtils::Manifest::VERSION]");
   } else {
     # QUICK DEPARTURE
     push @m, qq{No files found in authors/id/$userhome};
@@ -2220,7 +2220,7 @@ sub show_files {
 
   push @m, "<pre>";
 
-  my %files = $self->manifind;
+  my %files = $self->manifind( $mgr );
 
   my(%deletes,%whendele,$sth);
   if (
@@ -2245,7 +2245,7 @@ sub show_files {
   require HTTP::Date;
   foreach my $f (sort keys %files) {
     unless (stat $f) {
-      warn "ALERT: Could not stat f[$f]: $!";
+      $mgr->warn("ALERT: Could not stat f[$f]: $!");
       next;
     }
     my $blurb = $deletes{$f} ?
@@ -2410,7 +2410,7 @@ $PAUSE::Config->{ADMIN}
         my $header = {
                       Subject => $subject,
                      };
-        warn "header[$header]otpwblurb[$otpwblurb]";
+        $mgr->warn("header[$header]otpwblurb[$otpwblurb]");
         $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
                               $header,
                               $otpwblurb);
@@ -2463,7 +2463,7 @@ The Pause Team
 
     # both users and mailing lists run this code
 
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    $mgr->warn("DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]");
     my(@to) = @{$PAUSE::Config->{ADMINS}};
     push @m, qq{ Sending separate mails to:
 }, join(" AND ", @to, $email), qq{
@@ -2484,7 +2484,7 @@ Subject: $subject\n};
     $mgr->send_mail_multi([$email],$header,$blurb);
 
     unless ($dont_clear) {
-      warn "Info: clearing all fields";
+      $mgr->warn("Info: clearing all fields");
       for my $field (qw(userid fullname email homepage subscribe memo)) {
         my $param = "pause99_add_user_$field";
         $req->parameters->set($param,"");
@@ -2527,7 +2527,7 @@ sub add_user {
     my $s = $session->{APPLY};
     for my $a (keys %$s) {
       $req->parameters->set("pause99_add_user_$a" => $s->{$a});
-      warn "retrieving from session a[$a]s(a)[$s->{$a}]";
+      $mgr->warn("retrieving from session a[$a]s(a)[$s->{$a}]");
     }
   }
 
@@ -2551,14 +2551,14 @@ sub add_user {
     my $fullname_raw = $req->param('pause99_add_user_fullname');
     my($fullname);
     $fullname = $mgr->any2utf8($fullname_raw);
-    warn "fullname[$fullname]fullname_raw[$fullname_raw]";
+    $mgr->warn("fullname[$fullname]fullname_raw[$fullname_raw]");
     if ($fullname ne $fullname_raw) {
       $req->parameters->set("pause99_add_user_fullname",$fullname);
       my $debug = $req->param("pause99_add_user_fullname");
-      warn "debug[$debug]fullname[$fullname]";
+      $mgr->warn("debug[$debug]fullname[$fullname]");
     }
     unless ($fullname) {
-      warn "no fullname";
+      $mgr->warn("no fullname");
       push @error, qq{No fullname, nothing done.};
     }
     unless (@error) {
@@ -2593,7 +2593,7 @@ sub add_user {
 	  $s_func = \&Text::Metaphone::Metaphone;
 	}
 	my $s_code = $s_func->($surname);
-	warn "s_code[$s_code]";
+	$mgr->warn("s_code[$s_code]");
         my $requserid   = $req->param("pause99_add_user_userid")||"";
         my $reqfullname = $req->param("pause99_add_user_fullname")||"";
         my $reqemail    = $req->param("pause99_add_user_email")||"";
@@ -2721,10 +2721,10 @@ sub add_user {
       }
       push @m, qq{<p>Please retry.</p>};
     } else {
-      warn "T[$T]doit[$doit]userid[$userid]";
+      $mgr->warn("T[$T]doit[$doit]userid[$userid]");
     }
   } else {
-    warn "No userid, nothing done";
+    $mgr->warn("No userid, nothing done");
   }
 
   my $submit_butts = join("",
@@ -2863,12 +2863,12 @@ sub request_id {
     $req->parameters->set("pause99_request_id_rationale", $urat);
     $rationale = $urat;
   }
-  warn sprintf(
+  $mgr->warn(sprintf(
                "userid[%s]Valid_Userid[%s]args[%s]",
                $userid,
                $Valid_Userid,
                scalar($req->uri->query)||"",
-              );
+              ));
 
   if ( $req->param("SUBMIT_pause99_request_id_sub") ) {
     # check for errors
@@ -2911,11 +2911,11 @@ sub request_id {
       my $db = $mgr->connect;
       my $sth = $db->prepare("SELECT userid FROM users WHERE userid=?");
       $sth->execute($userid);
-      warn sprintf("userid[%s]Valid_Userid[%s]matches[%s]",
+      $mgr->warn(sprintf("userid[%s]Valid_Userid[%s]matches[%s]",
                    $userid,
                    $Valid_Userid,
                    $userid =~ $Valid_Userid || "",
-                  );
+                  ));
       if ($sth->rows > 0) {
         my $euserid = $mgr->escapeHTML($userid);
         push @errors, "The userid $euserid is already taken.";
@@ -3092,7 +3092,7 @@ $blurbcopy
     $header = {
                Subject => $subject
               };
-    warn "To[@to]Subject[$header->{Subject}]";
+    $mgr->warn("To[@to]Subject[$header->{Subject}]");
     $mgr->send_mail_multi(\@to,$header,$blurb);
   }
 
@@ -3190,7 +3190,7 @@ sub mailpw {
 
       my $passwd = sprintf "%08x" x 4, rand(0xffffffff), rand(0xffffffff),
 	  rand(0xffffffff), rand(0xffffffff);
-      # warn "pw[$passwd]";
+      # $mgr->warn("pw[$passwd]");
       my $then = time + $PAUSE::Config->{ABRA_EXPIRATION};
       $sql = sprintf qq{INSERT INTO abrakadabra
                         ( user, chpasswd, expires )
@@ -3254,7 +3254,7 @@ the way, your old password is still valid.
 
 $Yours};
       my $header = { Subject => "Your visit at $me" };
-      warn "mailto[$email]mailblurb[$mailblurb]";
+      $mgr->warn("mailto[$email]mailblurb[$mailblurb]");
       $mgr->send_mail_multi([$email], $header, $mailblurb);
 
       push @m, qq{
@@ -3342,13 +3342,13 @@ Excerpt from a mail:<pre>
     $selectedid = $param;
     $req->parameters->set("pause99_edit_ml_3",$param);
   }
-  warn sprintf(
+  $mgr->warn(sprintf(
 	       "selectedid[%s]IsMR[%s]",
 	       $selectedid,
 	       join(":",
 		    keys(%{$mgr->{IsMailinglistRepresentative}})
 		   )
-	      );
+	      ));
   my($sql,@bind);
   if (exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
     $sql = qq{SELECT users.userid
@@ -3503,8 +3503,8 @@ Please check if they are correct.
 
 $Yours};
       my @to = ($u->{secretemail}||$u->{email}, $mgr->{MailtoAdmins});
-      warn "sending to[@to]";
-      warn "mailblurb[$mailblurb]";
+      $mgr->warn("sending to[@to]");
+      $mgr->warn("mailblurb[$mailblurb]");
       my $header = {
                     Subject => "Mailinglist update for $selectedrec->{maillistid}"
                    };
@@ -3536,14 +3536,14 @@ sub edit_mod {
       time - ($u->{introduced}||0) > 86400
      ) {
     $to[0] .= sprintf ",%s\@cpan.org", lc $u->{userid};
-    # warn qq{Prepared to send mail to: @to};
+    # $mgr->warn(qq{Prepared to send mail to: @to});
   } else {
     # we have nothing else, so we must send separate mail
     my $user_email = $u->{secretemail};
     $user_email ||= $u->{email};
     push @to, $user_email if $user_email;
-    warn qq{Prepared to send separate mails to: }, join(" AND ",
-                                                    map { "[$_]" } @to);
+    $mgr->warn(qq{Prepared to send separate mails to: }, join(" AND ",
+                                                    map { "[$_]" } @to));
   }
 
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
@@ -3572,13 +3572,13 @@ sub edit_mod {
 
   my $dbh = $mgr->connect;
   if (0) {
-    warn sprintf(
+    $mgr->warn(sprintf(
                  "selectedid[%s]IsMailinglistRepr[%s]",
                  $selectedid,
                  join(":",
                       keys(%{$mgr->{IsMailinglistRepresentative}})
                      )
-                );
+                ));
   }
   my($sth);
   if ($selectedid and exists $mgr->{IsMailinglistRepresentative}{$selectedid}) {
@@ -3750,12 +3750,12 @@ mlstatus
       if ($field =~ /^stat/) { # there are many blanks instead of
                                # question marks, I believe
         if (0) {
-          warn sprintf(
+          $mgr->warn(sprintf(
                        "field[%s]value[%s]mfals[%s]",
                        $field,
                        $selectedrec->{$field},
                        $meta{$field}{args}{labels}{$selectedrec->{$field}},
-                      );
+                      ));
         }
         $selectedrec->{$field} = "?" unless exists
             $meta{$field}{args}{labels}{$selectedrec->{$field}};
@@ -3809,7 +3809,7 @@ mlstatus
             my $query = "UPDATE primeur SET userid=? WHERE package=? AND userid=?";
             my $ret = $dbh->do($query,{},$nu->{userid},$selectedrec->{modid},$u->{userid});
             $ret ||= 0;
-            warn "INFO: Updated primeur with $nu->{userid},$selectedrec->{modid},$u->{userid} and ret[$ret]";
+            $mgr->warn("INFO: Updated primeur with $nu->{userid},$selectedrec->{modid},$u->{userid} and ret[$ret]");
           } elsif ($field eq "description") {
             # Truncate if necessary, the database won't do it anymore
             substr($param,44) = "" if length($param)>44;
@@ -3875,8 +3875,8 @@ Please check if they are correct.
 $Yours};
       push @to, $mgr->{User}{secretemail}||$mgr->{User}{email}
 	  unless $mgr->{User}{userid} eq $u->{userid};
-      warn sprintf "sending to[%s]", join(" AND ",@to);
-      warn "mailblurb[$mailblurb]";
+      $mgr->warn(sprintf "sending to[%s]", join(" AND ",@to));
+      $mgr->warn("mailblurb[$mailblurb]");
       my $header = {
                     Subject => "Module update for $selectedrec->{modid}"
                    };
@@ -4075,7 +4075,7 @@ changedby
 	}
       }
       if ($fieldtype) {
-	warn "fieldtype[$fieldtype]fieldname[$fieldname]field[$field]rec->{field}[$selectedrec->{$field}]";
+	$mgr->warn("fieldtype[$fieldtype]fieldname[$fieldname]field[$field]rec->{field}[$selectedrec->{$field}]");
 	push @m_rec, $mgr->$fieldtype(
 				      'name' => $fieldname,
 				      'value' => $selectedrec->{$field},
@@ -4099,8 +4099,8 @@ Please check if they are correct.
 $Yours};
       my @to = ($u->{secretemail}||$u->{email}, $mgr->{MailtoAdmins});
       push @to, $mgr->{User}{secretemail}||$mgr->{User}{email};
-      warn "sending to[@to]";
-      warn "mailblurb[$mailblurb]";
+      $mgr->warn("sending to[@to]");
+      $mgr->warn("mailblurb[$mailblurb]");
       my $header = {
                     Subject => "Uri update for $selectedrec->{uriid}"
                    };
@@ -4180,7 +4180,7 @@ sub add_mod {
     my $s = $session->{APPLY};
     for my $a (keys %$s) {
       $req->parameters->set("pause99_add_mod_$a", $s->{$a});
-      warn "retrieving from session a[$a]s(a)[$s->{$a}]";
+      $mgr->warn("retrieving from session a[$a]s(a)[$s->{$a}]");
     }
   }
 
@@ -4207,14 +4207,14 @@ sub add_mod {
     # $req->parameters->set("pause99_add_mod_modid", $modid) if $modid;
 
     my($chapterid) = $req->param('pause99_add_mod_chapterid');
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
     die "chapterid not integer" if $strict_chapterid && $chapterid !~ /^\d*$/;
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
     unless ($meta{chapterid}{args}{labels}{$chapterid}) {
       push @errors, qq{The chapterid [$chapterid] is not known.};
     }
     die "chapterid not integer" if $strict_chapterid && $chapterid !~ /^\d*$/;
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
 
     my($statd) = $req->param('pause99_add_mod_statd');
     $req->parameters->set('pause99_add_mod_statd',$statd='?') unless $statd;
@@ -4347,14 +4347,14 @@ sub add_mod {
     $sth = $dbh->prepare("SELECT shorttitle
                           FROM chapters
                           WHERE chapterid=?");
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
     $sth->execute($chapterid);
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
     if ($sth->rows == 1) {
       $chap_shorttitle = $mgr->fetchrow($sth, "fetchrow_array");
       $chap_shorttitle = substr($chap_shorttitle,3) if $chap_shorttitle =~ /^\d/;
     } else {
-      warn "ALERT: could not find chaptertitle";
+      $mgr->warn("ALERT: could not find chaptertitle");
     }
 
     my $gmtime = gmtime($time) . " UTC";
@@ -4404,14 +4404,14 @@ Parts of the data listed above can be edited interactively on the
 PAUSE. See https://$server/pause/authenquery?ACTION=edit_mod
 
 Thanks for registering,
--- 
+--
 The PAUSE
 };
 
     my($blurb) = join "", @blurb;
     require HTML::Entities;
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    $mgr->warn("DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]");
     push @m, qq{<pre>
 From: $PAUSE::Config->{UPLOAD}
 Subject: $subject
@@ -4419,12 +4419,12 @@ Subject: $subject
 $blurbcopy
 </pre>
 };
-    warn "blurb[$blurb]";
+    $mgr->warn("blurb[$blurb]");
 
     my $header = {
                   Subject => $subject
                  };
-    warn "To[@to]Subject[$header->{Subject}]";
+    $mgr->warn("To[@to]Subject[$header->{Subject}]");
     $mgr->send_mail_multi(\@to, $header, $blurb);
   } else {
     $modid = $req->param('pause99_add_mod_modid')||"";
@@ -4445,9 +4445,9 @@ $blurbcopy
                     );
     my $uri = "http://www.xray.mpe.mpg.de/cgi-bin/w3glimpse/modules?" . $query;
     push @m, sprintf qq{<a href="%s">Search for %s at xray</a><br />}, $uri, $modid;
-    warn "uri[$uri]modid[$modid]";
+    $mgr->warn("uri[$uri]modid[$modid]");
   } else {
-    warn "DEBUG: No modid";
+    $mgr->warn("DEBUG: No modid");
   }
 
  FORMULAR:
@@ -4469,7 +4469,7 @@ $blurbcopy
   } else {
     # As we have had so much success, there is no point in leaving the
     # form filled
-    # warn "clearing all fields";
+    # $mgr->warn("clearing all fields");
     for my $field (@formfields) {
       my $param = "pause99_add_mod_$field";
       # there must be a more elegant way to specify empty list for
@@ -4515,7 +4515,7 @@ $blurbcopy
     push @m, qq{<p><small>$note</small></p>} if $note;
     my $fieldtype = $meta{$field}{type} or die "empty fieldtype";
     my $fieldname = "pause99_add_mod_$field";
-    # warn sprintf "field[%s]value[%s]", $field, $req->param($fieldname);
+    # $mgr->warn(sprintf "field[%s]value[%s]", $field, $req->param($fieldname));
     if ($field eq "chapterid") {
       my $val = $req->param($fieldname);
       die "chapterid not integer" if $strict_chapterid && $val !~ /^\d*$/;
@@ -4565,13 +4565,13 @@ sub _add_mod_hint {
     $sth->execute($wanted->{modid});
 
     if ($userid) {
-      warn "userid[$userid]";
+      $mgr->warn("userid[$userid]");
       # XXX check if user exists, and if not, suggest alternatives
     } else {
       # XXX check if somebody has already uploaded the module and if
       # so, tell the user. Link to readme.
       my $rows = $sth->rows;
-      warn "rows[$rows]";
+      $mgr->warn("rows[$rows]");
       if ($rows > 0) {
         my $rec = $mgr->fetchrow($sth, "fetchrow_hashref");
         my $dist = $rec->{dist};
@@ -4606,7 +4606,7 @@ sub _add_mod_hint {
       $chapterid = $mgr->fetchrow($sth, "fetchrow_array");
     }
 
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
     $req->parameters->set("pause99_add_mod_modid",$wanted->{modid});
     my(@dsli) = $dsli =~ /(.?)(.?)(.?)(.?)(.?)/;
     $req->parameters->set("pause99_add_mod_statd",$dsli[0]||"?");
@@ -4618,7 +4618,7 @@ sub _add_mod_hint {
     $description ||= "";
     $req->parameters->set("pause99_add_mod_description",$description);
     $chapterid ||= "";
-    warn "chapterid[$chapterid]";
+    $mgr->warn("chapterid[$chapterid]");
     $req->parameters->set("pause99_add_mod_chapterid",$chapterid);
     $req->parameters->set("pause99_add_mod_userid",$userid);
 }
@@ -4763,7 +4763,7 @@ sub apply_mod {
 
       # guess the chapter, code also found in mldistwatch
       ($root) = $modid =~ /^([^:]+)/;
-      warn "root[$root]";
+      $mgr->warn("root[$root]");
       $sth = $dbh->prepare("SELECT chapterid
                             FROM   mods
                             WHERE  modid = ? OR modid LIKE ?");
@@ -4783,7 +4783,7 @@ sub apply_mod {
 
     my($chapterid) = $req->param('pause99_apply_mod_chapterid');
     die "chapterid not numeric" if $strict_chapterid && $chapterid !~ /^\d*$/;
-    warn "appropriate_chapterid[@appropriate_chapterid]";
+    $mgr->warn("appropriate_chapterid[@appropriate_chapterid]");
     my($chap_confirmed) = $req->param('pause99_apply_mod_chapfirm');
     if (!$chapterid) {
       push @errors, qq{No chapter given.};
@@ -4891,7 +4891,7 @@ sub apply_mod {
       $chap_shorttitle = $mgr->fetchrow($sth, "fetchrow_array");
       $chap_shorttitle = substr($chap_shorttitle,3) if $chap_shorttitle =~ /^\d/;
     } else {
-      warn "ALERT: could not find chaptertitle";
+      $mgr->warn("ALERT: could not find chaptertitle");
     }
 
     my $gmtime = gmtime($time) . " UTC";
@@ -4966,7 +4966,7 @@ The resulting entry would be:
 $ml_entry
 
 Thanks for registering,
--- 
+--
 The PAUSE
 
 PS: The following links are only valid for module list maintainers:
@@ -4984,7 +4984,7 @@ Peek at the current permissions:
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
     $blurbcopy =~ s|(https?://[^\s\"]+)|<a href="$1">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
-    # warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    # $mgr->warn("DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]");
     push @m, qq{<pre>
 From: $PAUSE::Config->{UPLOAD}
 Subject: $subject
@@ -4993,12 +4993,12 @@ $blurbcopy
 </pre>
 <hr noshade="noshade" />
 };
-    warn "blurb[$blurb]";
+    $mgr->warn("blurb[$blurb]");
 
     my $header = {
                   Subject => $subject
                  };
-    warn "To[@to]Subject[$header->{Subject}]";
+    $mgr->warn("To[@to]Subject[$header->{Subject}]");
     $mgr->send_mail_multi(\@to, $header, $blurb);
   } else {
     $modid = $req->param('pause99_apply_mod_modid')||"";
@@ -5039,7 +5039,7 @@ $blurbcopy
   } else {
     # As we have had so much success, there is no point in leaving the
     # form filled
-    # warn "clearing all fields";
+    # $mgr->warn("clearing all fields");
     for my $field (@formfields) {
       my $param = "pause99_apply_mod_$field";
       # there must be a more elegant way to specify empty list for
@@ -5342,10 +5342,10 @@ sub user_meta {
         $tlc{$row[1]} = Time::HiRes::time() - $tlcstart;
       }
     }
-    # warn sprintf "TIME: fetchrow and lc on users: %7.4f", Time::HiRes::time()-$start;
+    # $mgr->warn(sprintf "TIME: fetchrow and lc on users: %7.4f", Time::HiRes::time()-$start);
     my $top = 10;
     for my $t (sort { $tlc{$b} <=> $tlc{$a} } keys %tlc) {
-      warn sprintf "%-43s: %9.7f\n", $t, $tlc{$t};
+      $mgr->warn(sprintf "%-43s: %9.7f\n", $t, $tlc{$t});
       last unless --$top;
     }
   } else { # splitted!
@@ -5366,7 +5366,7 @@ sub user_meta {
       $u{$row[0]} = lc $sort;
       $labels{$row[0]} = $disp;
     }
-    warn sprintf "TIME: fetchrow and split on users: %7.4f", Time::HiRes::time()-$start;
+    $mgr->warn(sprintf "TIME: fetchrow and split on users: %7.4f", Time::HiRes::time()-$start);
   }
   my $start = Time::HiRes::time();
   our @tlcmark = ();
@@ -5413,18 +5413,18 @@ sub user_meta {
       $u{$a} cmp $u{$b};
     }
   } keys %u;
-  warn sprintf "TIME: sort on users: %7.4f", Time::HiRes::time()-$start;
+  $mgr->warn(sprintf "TIME: sort on users: %7.4f", Time::HiRes::time()-$start);
   if (@tlcmark) {
-    warn "COMPARISONS: $#tlcmark";
+    $mgr->warn("COMPARISONS: $#tlcmark");
     my($Ltlcmark) = $tlcmark[0] =~ /:\s([\d\.]+)/;
-    # warn "$Ltlcmark;$tlcmark[0]";
+    # $mgr->warn("$Ltlcmark;$tlcmark[0]");
     my $Mdura = 0;
     for my $t (1..$#tlcmark) {
       my($tlcmark) = $tlcmark[$t] =~ /:\s([\d\.]+)/;
       my $dura = $tlcmark - $Ltlcmark;
       if ($dura > $Mdura) {
         my($lterm) = $tlcmark[$t-1] =~ /(.*):/;
-        warn sprintf "%s: %9.7f\n", $lterm, $dura;
+        $mgr->warn(sprintf "%s: %9.7f\n", $lterm, $dura);
         $Mdura = $dura;
       }
       $Ltlcmark = $tlcmark;
@@ -5502,7 +5502,7 @@ sub index_users {
   my $jobid = sprintf "%04s-%02s-%02s_%02s:%02s_%d", @localtime[5,4,3,2,1], $$;
   my $name = "$mgr->{WaitUserDb}-$jobid";
   my $directory = $mgr->{WaitDir};
-  warn "name[$name] directory[$directory]";
+  $mgr->warn("name[$name] directory[$directory]");
   my $wdb = WAIT::Database->create(name      => $name,
                                   directory => $directory,
                                  )
@@ -5806,10 +5806,10 @@ sub peek_perms {
       my $sth = $db->prepare($query);
       $sth->execute($qterm);
       if ($sth->rows > 0) {
-        # warn sprintf "query[%s]qterm[%s]rows[%d]", $query, $qterm, $sth->rows;
+        # $mgr->warn(sprintf "query[%s]qterm[%s]rows[%d]", $query, $qterm, $sth->rows);
         while (my @row = $mgr->fetchrow($sth, "fetchrow_array")) {
           if ($seen{join "|", @row[0,1]}++){
-            # warn "Ignoring row[$row[0]][$row[1]]";
+            # $mgr->warn("Ignoring row[$row[0]][$row[1]]");
             next;
           }
           push @res, \@row;
@@ -5988,7 +5988,7 @@ decision.</li>
         my $sc;
         eval { $sc = Set::Crontab->new($minute,[0..59]); };
         if ($@) {
-          warn "Could not create a Crontab object: $@ (minute[$minute])";
+          $mgr->warn("Could not create a Crontab object: $@ (minute[$minute])");
           $eta = "N/A";
         } else {
           my $now = time;
@@ -6002,7 +6002,7 @@ decision.</li>
           }
         }
       } else {
-        warn "Not found: $ctf";
+        $mgr->warn("Not found: $ctf");
         $eta = "N/A";
       }
     }
@@ -6024,7 +6024,7 @@ Estimated time of job completion: %s
     if (0) { # debugging
       require Data::Dumper;
       my $dd = Data::Dumper::Dumper({ u => $u, mgrUser => $mgr->{User} });
-      warn "email debugging: dd[$dd]";
+      $mgr->warn("email debugging: dd[$dd]");
 
       # By debugging this, I found out, that $u always had a
       # secretemail but $mgr->{User} didn't (upto rev 230).
@@ -6059,7 +6059,7 @@ Estimated time of job completion: %s
   push @m, $submitbutton;
   push @m, "<pre>";
 
-  my %files = $self->manifind;
+  my %files = $self->manifind( $mgr );
 
   foreach my $f (keys %files) {
     if (
@@ -6113,7 +6113,7 @@ sub share_perms {
     }
   }
   my $u = $self->active_user_record($mgr);
-  # warn sprintf "subaction[%s] u->userid[%s]", $subaction||"", $u->{userid}||"";
+  # $mgr->warn(sprintf "subaction[%s] u->userid[%s]", $subaction||"", $u->{userid}||"");
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
   push @m, qq{<input type="hidden" name="lsw" value="1" />}; # let submit win
 
@@ -6262,7 +6262,7 @@ sub share_perms {
   }
 
   my $method = "share_perms_$subaction";
-  # warn "method[$method]";
+  # $mgr->warn("method[$method]");
   push @m, $self->$method($mgr);
   @m;
 }
@@ -6388,7 +6388,7 @@ sub share_perms_remocos {
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";
-          warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
+          $mgr->warn("DEBUG: selmod[$selmod]ret[$ret]err[$err]");
           if ($ret) {
             push @m, "<p>Removed $otheruser from co-maintainers of $selmod.</p>\n";
           } else {
@@ -6454,7 +6454,7 @@ sub all_comaints {
   $sth2->execute;
   while (my($p,$i) = $mgr->fetchrow($sth2,"fetchrow_array")) {
     $result->{"$p -- $i"} = undef;
-    warn "p[$p]i[$i]";
+    $mgr->warn("p[$p]i[$i]");
   }
   return $result;
 }
@@ -6502,7 +6502,7 @@ sub share_perms_remome {
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";
-          warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
+          $mgr->warn("DEBUG: selmod[$selmod]ret[$ret]err[$err]");
           if ($ret) {
             push @m, "<p>Removed $u->{userid} from co-maintainers of $selmod.</p>\n";
             delete $all_mods->{$selmod};
@@ -6559,14 +6559,14 @@ sub share_perms_makeco {
   my $req = $mgr->{REQ};
 
   my $u = $self->active_user_record($mgr);
-  # warn "u->userid[%s]", $u->{userid};
+  # $mgr->warn("u->userid[%s]", $u->{userid});
 
   my $db = $mgr->connect;
 
   my $all_mmods = $self->all_mmods($mgr,$u);
-  # warn sprintf "all_mmods[%s]", join("|", keys %$all_mmods);
+  # $mgr->warn(sprintf "all_mmods[%s]", join("|", keys %$all_mmods));
   my $all_pmods = $self->all_pmods($mgr,$u);
-  # warn sprintf "all_pmods[%s]", join("|", keys %$all_pmods);
+  # $mgr->warn(sprintf "all_pmods[%s]", join("|", keys %$all_pmods));
   my $all_mods = {%$all_mmods, %$all_pmods};
 
   if (
@@ -6601,7 +6601,7 @@ sub share_perms_makeco {
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";
-          warn "DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]";
+          $mgr->warn("DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]");
           if ($ret) {
             push @m, "<p>Added $other_user to co-maintainers of $selmod.</p>\n";
           } elsif ($err =~ /Duplicate entry/) {
@@ -6697,7 +6697,7 @@ sub share_perms_remopr {
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";
-          warn "DEBUG: selmod[$selmod]ret[$ret]err[$err]";
+          $mgr->warn("DEBUG: selmod[$selmod]ret[$ret]err[$err]");
           if ($ret) {
             push @m, "<p>Removed primary maintainership of $u->{userid} from $selmod.</p>\n";
           } else {
@@ -6793,7 +6793,7 @@ sub share_perms_movepr {
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";
-          warn "DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]";
+          $mgr->warn("DEBUG: selmod[$selmod]other_user[$other_user]ret[$ret]err[$err]");
           if ($ret) {
             push @m, "<p>Made $other_user primary maintainer of $selmod.</p>\n";
           } else {
@@ -6984,9 +6984,9 @@ sub coredump {
   require "syscall.ph";
   require "linux/sys.ph";
   require "linux/prctl.ph";
-  warn syscall(&SYS_prctl,&PR_SET_DUMPABLE,1);
+  $mgr->warn(syscall(&SYS_prctl,&PR_SET_DUMPABLE,1));
   chdir "/usr/local/apache/cores" or die "Couldn't chdir: $!";
-  warn "**************>>>>>>>>>>     strace -p $$\n";
+  $mgr->warn("**************>>>>>>>>>>     strace -p $$\n");
   sleep 10;
   require Cwd;
   my $cwd = Cwd::cwd();
@@ -7081,7 +7081,7 @@ sub post_message {
   my $mto = $req->param('pause99_post_message_mto');
   $mto = uc $mto;
   my $mess = $req->param('pause99_post_message_mess');
-  warn "mto[$mto]mess[$mess]";
+  $mgr->warn("mto[$mto]mess[$mess]");
 
   my $showform = 0;
   my $regOK = 0;
@@ -7271,7 +7271,7 @@ packages have their recorded version set to 'undef'.
   while (my($k,$v) = each %p) {
     $p{$k} = sprintf $sprintf, @$v;
   }
-  
+
   my $submitbutton = qq{<input type="submit"
  name="SUBMIT_pause99_reset_version_forget" value="Forget" />};
   push @m, $submitbutton;

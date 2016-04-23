@@ -114,10 +114,15 @@ sub handler {
   my $cookie;
   my $uri = $req->path || "";
   my $args = $req->uri->query;
-  warn "WATCH: uri[$uri]args[$args]";
+  my $warn = sub {
+    my ($message) = @_;
+    local $Log::Dispatch::Config::CallerDepth += 2;
+    $req->logger->({level => 'error', message => $message });
+  };
+  $warn->("WATCH: uri[$uri]args[$args]");
   if ($cookie = $req->header('Cookie')) {
     if ( $cookie =~ /logout/ ) {
-      warn "WATCH: cookie[$cookie]";
+      $warn->("WATCH: cookie[$cookie]");
       my $res = $req->new_response(HTTP_UNAUTHORIZED);
       $res->cookies->{logout} = {
         value => '',
@@ -130,7 +135,7 @@ sub handler {
   if ($args) {
     my $logout;
     if ( my $logout = $req->query_parameters->get('logout') ) {
-      warn "WATCH: logout[$logout]";
+      $warn->("WATCH: logout[$logout]");
       if ($logout =~ /^1/) {
         my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
         $res->cookies->{logout} = {
@@ -144,7 +149,7 @@ sub handler {
         my $redir = $req->base;
         $redir->path($req->uri->path);
         $redir->userinfo('baduser:badpass');
-        warn "redir[$redir]";
+        $warn->("redir[$redir]");
         my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
         $res->header("Location",$redir);
         return $res;
@@ -169,7 +174,7 @@ sub handler {
 	     };
 
   my $dbh;
-  warn "DEBUG: attr.data_source[$attr->{data_source}]";
+  $warn->("DEBUG: attr.data_source[$attr->{data_source}]");
   unless ($dbh = DBI->connect($attr->{data_source},
 			      $attr->{username},
 			      $attr->{password})) {
@@ -227,8 +232,8 @@ sub handler {
       $dbh->disconnect;
       return HTTP_OK;
     } else {
-      warn sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
-	  $crypt_pw, $user_record->{user}, $req->path, HTTP_UNAUTHORIZED;
+      $warn->(sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
+	  $crypt_pw, $user_record->{user}, $req->path, HTTP_UNAUTHORIZED);
     }
   }
 

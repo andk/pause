@@ -18,7 +18,7 @@ sub as_string {
   # since we have a perlbal that does the https for us, we can easily
   # have a wrong scheme in this $me and a wrong hostname, e.g.
   # action="http://pause.perl.org:443/pause/authenquery"
-  warn "DEBUG: can_unparse[$can_unparse]me[$me]";
+  $mgr->warn("DEBUG: can_unparse[$can_unparse]me[$me]");
 
   my $enctype;
   my $method;
@@ -37,7 +37,7 @@ sub as_string {
     $method = "get";
   }
   if ($PAUSE::Config->{TESTHOST}) {
-    warn "DEBUG: me[$me]enctype[$enctype]method[$method]";
+    $mgr->warn("DEBUG: me[$me]enctype[$enctype]method[$method]");
     push @m, qq{<h2>[ATTN: Form going to post to $me]</h2>};
   }
   push @m, qq{<form

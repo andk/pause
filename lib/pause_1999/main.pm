@@ -95,10 +95,10 @@ use Time::HiRes ();
   while (my($k,$v) = each %entity2char) {
     if ($v =~ /[^\000-\177]/) {
       $entity2char{$k} = Unicode::String::latin1($v)->utf8;
-      # warn "CONV k[$k] v[$v]";
+      # $self->warn("CONV k[$k] v[$v]");
     } else {
       delete $entity2char{$k};
-      # warn "DEL v[$v]";
+      # $self->warn("DEL v[$v]");
     }
   }
 }
@@ -154,9 +154,9 @@ sub dispatch {
   my $self = shift;
   $self->init;
   my $req = $self->{REQ};
-  warn sprintf "DEBUG: uri[%s]location[%s]", $req->path, ''; # $r->location;
+  $self->warn(sprintf "DEBUG: uri[%s]location[%s]", $req->path, ''); # $r->location;
   if ($req->path =~ m|^/pause/query/|) { # path info?
-      warn "Warning: killing this request, it has a path_info, only bots have them";
+      $self->warn("Warning: killing this request, it has a path_info, only bots have them");
       return HTTP_NOT_FOUND;
   }
   eval { $self->prepare; };
@@ -167,7 +167,7 @@ sub dispatch {
 	$@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR};
 	push @{$self->{ERROR}}, @{$@->{ERROR}};
         require Data::Dumper;
-        print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$self->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump; # XXX
+        $self->warn("Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$self->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump); # XXX
       } elsif ($@->{HTTP_STATUS}) {
 	return $@->{HTTP_STATUS};
       }
@@ -223,7 +223,7 @@ sub can_utf8 {
     } else {
       $self->{CAN_UTF8} = 0;
     }
-    warn "CAN_UTF8[$self->{CAN_UTF8}]acce[$acce]";
+    $self->warn("CAN_UTF8[$self->{CAN_UTF8}]acce[$acce]");
     return $self->{CAN_UTF8};
   }
   # Mozilla/5.0 (X11; U; Linux 2.2.16-RAID i686; en-US; m18)
@@ -233,7 +233,7 @@ sub can_utf8 {
       $1 >= 5
      ) {
       $self->{CAN_UTF8} = "mozilla 5X";
-      warn "CAN_UTF8[$self->{CAN_UTF8}]uagent[$uagent]";
+      $self->warn("CAN_UTF8[$self->{CAN_UTF8}]uagent[$uagent]");
       return $self->{CAN_UTF8};
   }
   if (0) {
@@ -245,7 +245,7 @@ sub can_utf8 {
       my $protocol = $self->{REQ}->protocol || "";
       my($major,$minor) = $protocol =~ m|HTTP/(\d+)\.(\d+)|;
       $self->{CAN_UTF8} = $major >= 1 && $minor >= 1;
-      warn "CAN_UTF8[$self->{CAN_UTF8}]protocol[$protocol]uagent[$uagent]";
+      $self->warn("CAN_UTF8[$self->{CAN_UTF8}]protocol[$protocol]uagent[$uagent]");
   }
   $self->{CAN_UTF8} = 1;
 }
@@ -280,7 +280,7 @@ sub database_alert {
                   Subject => "PAUSE Database Alert $server",
                  };
     $self->send_mail($header,$mess);
-    open my $fh, ">", $tsf or warn "Could not open $tsf: $!";
+    open my $fh, ">", $tsf or $self->warn("Could not open $tsf: $!");
   }
   die PAUSE::HeavyCGI::Exception->new(ERROR => qq{
 Sorry, the PAUSE Database currently seems unavailable.<br />
@@ -330,11 +330,11 @@ sub myurl {
   my $uri = $req->uri;
 
   # use Data::Dumper;
-  # warn "subprocess_env[".Data::Dumper::Dumper(scalar $r->subprocess_env)."]";
+  # $self->warn("subprocess_env[".Data::Dumper::Dumper(scalar $r->subprocess_env)."]");
   # ONLY WORKS WITH PerlSetupEnv On:
   # my $envscheme = $r->subprocess_env('HTTPS') ? "https" : "http";
   # my $scheme = $uri->scheme;
-  # warn "scheme[$scheme]envscheme[$envscheme]";
+  # $self->warn("scheme[$scheme]envscheme[$envscheme]");
   # $uri->scheme($scheme);
 
   #### Summary scheme: don't use subprocess_env unless PerlSetupEnv is
@@ -343,12 +343,12 @@ sub myurl {
 
   my $Hhostname = $req->header('Host');
   my $hostname = $uri->host();
-  warn "hostname[$hostname]Hhostname[$Hhostname]";
+  $self->warn("hostname[$hostname]Hhostname[$Hhostname]");
   # $uri->hostname($Hhostname); # contains :8443!!!!!
 
   # my $rpath = $uri->rpath;
   # $uri->path($rpath);
-  warn sprintf "DEBUG: uri[%s]location[%s]", $uri, ""; # $r->location;
+  $self->warn( sprintf "DEBUG: uri[%s]location[%s]", $uri, "" );
 
   # XXX should have additional test if we are on pause
   if (( $uri->port == 81 || $uri->port == 12081 )
@@ -425,10 +425,10 @@ sub send_mail {
 
   my @args = @{$self->{MailMailerConstructorArgs}};
 
-  warn "constructing mailer with args[@args]";
+  $self->warn("constructing mailer with args[@args]");
   my $mailer = Mail::Mailer->new(@args);
 
-  my @hdebug = %$header; $self->{REQ}->logger({level => 'error', message => sprintf("hdebug[%s]", join "|", @hdebug) });
+  my @hdebug = %$header; $self->warn({level => 'error', message => sprintf("hdebug[%s]", join "|", @hdebug) });
   $header->{From}                        ||= $self->{OurEmailFrom};
   $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
 
@@ -456,23 +456,23 @@ sub send_mail {
   }
 
   if ($PAUSE::Config->{TESTHOST}){
-    warn "TESTHOST is NOT sending mail";
+    $self->warn("TESTHOST is NOT sending mail");
     require Data::Dumper;
-    warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" .
+    $self->warn("Line " . __LINE__ . ", File: " . __FILE__ . "\n" .
         Data::Dumper->new([$header,$blurb],[qw(header blurb)])
-              ->Indent(1)->Useqq(1)->Dump;
+              ->Indent(1)->Useqq(1)->Dump);
   } else {
-    warn "opening mailer";
+    $self->warn("opening mailer");
     $mailer->open($header);
-    warn "opened mailer";
+    $self->warn("opened mailer");
     if ($binmode && $] > 5.007) {
       my $ret = binmode $mailer, ":$binmode";
-      warn "set binmode of mailer[$mailer] to :utf8? ret[$ret]";
+      $self->warn("set binmode of mailer[$mailer] to :utf8? ret[$ret]");
     }
     $mailer->print($blurb);
-    warn "printed blurb[$blurb]";
+    $self->warn("printed blurb[$blurb]");
     $mailer->close;
-    warn "closed mailer";
+    $self->warn("closed mailer");
   }
   1;
 }
@@ -482,7 +482,7 @@ sub finish {
 
   if ($self->can_utf8) {
   } else {
-    warn sprintf "DEBUG: using Unicode::String uri[%s]gmtime[%s]", $self->{REQ}->uri, scalar gmtime();
+    $self->warn(sprintf "DEBUG: using Unicode::String uri[%s]gmtime[%s]", $self->{REQ}->uri, scalar gmtime());
     my $ustr = Unicode::String::utf8($self->{CONTENT});
     $self->{CONTENT} = $ustr->latin1;
     $self->{CHARSET} = "ISO-8859-1";
@@ -493,7 +493,7 @@ sub finish {
   eval { $p1->parse($self->{CONTENT}); };
   if ($@) {
     my $rand = String::Random::random_string("cn");
-    warn "XML::Parser error. rand[$rand]\$\@[$@]";
+    $self->warn("XML::Parser error. rand[$rand]\$\@[$@]");
     my $deadmeat = "/var/run/httpd/deadmeat/$rand.xhtml";
     require IO::Handle;
     my $fh = IO::Handle->new;
@@ -504,7 +504,7 @@ sub finish {
       $fh->print($self->{CONTENT});
       $fh->close;
     } else {
-      warn "Couldn't open >$deadmeat: $!";
+      $self->warn("Couldn't open >$deadmeat: $!");
     }
   }
 
@@ -538,7 +538,7 @@ sub text_pw_field {
     }
   } else {
     $val = $req->param($name);
-    # warn sprintf "name[%s]val[%s]", $name, $val||"UNDEF";
+    # $self->warn(sprintf "name[%s]val[%s]", $name, $val||"UNDEF");
     if ($] > 5.007) {
       require Encode;
       # Warning: adding second parameter changes behavior (eats characters or so?)
@@ -546,7 +546,7 @@ sub text_pw_field {
                                  # , Encode::FB_WARN()
                                 );
     }
-    # warn sprintf "name[%s]val[%s]", $name, $val||"UNDEF";
+    # $self->warn(sprintf "name[%s]val[%s]", $name, $val||"UNDEF");
   }
   defined $val or
       defined($val = $arg{value}) or
@@ -615,20 +615,20 @@ sub radio_group {
       or defined($checked = $sel)
 	  or defined($checked = $arg{default})
 	      or $checked = "";
-  # warn "checked[$checked]";
+  # $self->warn("checked[$checked]";
 #	  or ($checked = $values->[0]);
   my $escname=$self->escapeHTML($name);
   my $linebreak = $arg{linebreak} ? "<br />" : "";
   my @m;
   for my $v (@$values) {
     my $escv = $self->escapeHTML($v);
-    warn "escname undef" unless defined $escname;
-    warn "escv undef" unless defined $escv;
-    warn "v undef" unless defined $v;
-    warn "\$arg{labels}{\$v} undef" unless defined $arg{labels}{$v};
-    warn "checked undef" unless defined $checked;
-    warn "haslabels undef" unless defined $haslabels;
-    warn "linebreak undef" unless defined $linebreak;
+    $self->warn("escname undef") unless defined $escname;
+    $self->warn("escv undef") unless defined $escv;
+    $self->warn("v undef") unless defined $v;
+    $self->warn("\$arg{labels}{\$v} undef") unless defined $arg{labels}{$v};
+    $self->warn("checked undef") unless defined $checked;
+    $self->warn("haslabels undef") unless defined $haslabels;
+    $self->warn("linebreak undef") unless defined $linebreak;
     push(@m,
 	 sprintf(
 		 qq{<input type="radio" name="%s" value="%s"%s />%s%s},
@@ -690,7 +690,7 @@ sub scrolling_list {
   my $multiple = $arg{multiple} ? qq{ multiple="multiple"} : "";
   my $haslabels = exists $arg{labels};
   my $name = $arg{name};
-  # warn "name[$name]CGI[$self->{CGI}]";
+  # $self->warn("name[$name]CGI[$self->{CGI}]");
   my @sel = $self->{REQ}->param($name);
   if (!@sel && exists $arg{default} && defined $arg{default}) {
     my $d = $arg{default};
@@ -698,7 +698,7 @@ sub scrolling_list {
   } else {
     # require Data::Dumper;
     # my $sel = Data::Dumper::Dumper(\@sel);
-    # warn "HERE2 sel[$sel]default[$arg{default}]";
+    # $self->warn("HERE2 sel[$sel]default[$arg{default}]");
   }
   my %sel;
   @sel{@sel} = ();
@@ -706,7 +706,7 @@ sub scrolling_list {
   push @m, sprintf qq{<select name="%s"%s%s>}, $name, $size, $multiple;
   $arg{values} = [$arg{value}] unless exists $arg{values};
   for my $v (@{$arg{values} || []}) {
-    #### warn "v[$v]label[$arg{labels}{$v}]" if $v =~ /AND/;
+    #### $self->warn("v[$v]label[$arg{labels}{$v}]") if $v =~ /AND/;
     my $escv = $self->escapeHTML($v);
     push @m, sprintf qq{<option%s value="%s">%s</option>\n},
 	exists $sel{$v} ? qq{ selected="selected"} : "",
@@ -757,17 +757,17 @@ sub any2utf8 {
   my $s = shift;
 
   if ($s =~ /[\200-\377]/) {
-    # warn "s[$s]";
+    # $self->warn("s[$s]");
     my $warn;
     local $^W=1;
-    local($SIG{__WARN__}) = sub { $warn = $_[0]; warn "warn[$warn]" };
+    local($SIG{__WARN__}) = sub { $warn = $_[0]; $self->warn("warn[$warn]") };
     my($us) = Unicode::String::utf8($s);
     if ($warn and $warn =~ /utf8|can't/i) {
-      warn "DEBUG: was not UTF8, we suppose latin1 (apologies to shift-jis et al): s[$s]";
+      $self->warn("DEBUG: was not UTF8, we suppose latin1 (apologies to shift-jis et al): s[$s]");
       $s = Unicode::String::latin1($s)->utf8;
-      warn "DEBUG: Now converted to: s[$s]";
+      $self->warn("DEBUG: Now converted to: s[$s]");
     } else {
-      warn "seemed to be utf-8";
+      $self->warn("seemed to be utf-8");
     }
   }
   $s = $self->decode_highbit_entities($s); # modifies in-place
@@ -781,7 +781,7 @@ sub any2utf8 {
 sub decode_highbit_entities {
   my $self = shift;
   my $s = shift;
-  # warn "s[$s]";
+  # $self->warn("s[$s]");
   my $c;
   use utf8;
   for ($s) {
@@ -794,11 +794,11 @@ sub decode_highbit_entities {
       }xeg;
 
     s{ ( & (\w+) ;? )
-    }{my $r = $entity2char{$2} || $1; warn "r[$r]2[$2]"; $r;
+    }{my $r = $entity2char{$2} || $1; $self->warn("r[$r]2[$2]"); $r;
     }xeg;
 
   }
-  # warn "s[$s]";
+  # $self->warn("s[$s]");
   $s;
 }
 
@@ -888,7 +888,7 @@ sub wait_user_record_hook {
   my $method = shift;
   my $id = shift;
 
-  warn "method[$method]id[$id]\$\$[$$]";
+  $self->warn("method[$method]id[$id]\$\$[$$]");
 
   require WAIT::Database;
   require WAIT::Query::Base;
@@ -897,7 +897,7 @@ sub wait_user_record_hook {
                                  mode      => O_RDWR,
                                  directory => $self->{WaitDir});
   my $table = $wdb->table(name => "uidx");
-  warn "HERE";
+  $self->warn("HERE");
   my $sel_sth;
   my $sel_sql = qq{SELECT  userid, fullname
                    FROM    users
@@ -906,9 +906,9 @@ sub wait_user_record_hook {
   $sel_sth = $db->prepare($sel_sql);
   $sel_sth->execute($id);
   unless ($sel_sth->rows) {
-    warn sprintf "WARNING: wait_hook called for method[%s] on id[%s] which
+    $self->warn(sprintf "WARNING: wait_hook called for method[%s] on id[%s] which
  isn't in database. Skipping.", #'
-	$method, $id;
+	$method, $id);
     $sel_sth->finish;
     $table->close;
     $wdb->close;
@@ -916,29 +916,29 @@ sub wait_user_record_hook {
   }
   my $rec = $self->fetchrow($sel_sth, "fetchrow_hashref");
   my $uf = "$rec->{userid} $rec->{fullname}";
-  warn "HERE";
+  $self->warn("HERE");
 
   if ($method eq "delete" && !$table->have(docid => $id)) {
-    warn "delete on not existing record id[$id], nothing done";
+    $self->warn("delete on not existing record id[$id], nothing done");
   } else {
     my $ret = $table->$method(
                               'docid' => $id,
                               userid_and_fullname => $uf,
                              );
-    warn "HERE";
+    $self->warn("HERE");
     # So it failed? Where's the error, what's the reason???'
-    warn sprintf("WARNING: FAILED to run method[%s]on id[%s]record[%s]",#'
+    $self->warn(sprintf("WARNING: FAILED to run method[%s]on id[%s]record[%s]",#'
                  $method,
                  $id,
                  join(":",%$rec),
-                ) unless $ret;
+                )) unless $ret;
   }
 
-  warn "HERE";
+  $self->warn("HERE");
   $table->close;
-  warn "HERE";
+  $self->warn("HERE");
   $wdb->close;
-  warn "HERE";
+  $self->warn("HERE");
   $sel_sth->finish;
 }
 
@@ -978,10 +978,17 @@ sub version {
     $m =~ s|/|::|g;
     $m =~ s|\.pm$||;
     my $v = $m->VERSION || 0;
-    warn "Warning: Strange versioning style in m[$m]v[$v]" if $v < 10;
+    $self->warn("Warning: Strange versioning style in m[$m]v[$v]") if $v < 10;
     $version = $v if $v > $version;
   }
   $version;
+}
+
+# Use Log::Dispatch instead of warnings
+sub warn {
+    my ($self, $message) = @_;
+    local $Log::Dispatch::Config::CallerDepth += 2;
+    $self->{REQ}->logger->({level => 'error', message => $message });
 }
 
 1;
