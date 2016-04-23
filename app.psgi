@@ -47,7 +47,7 @@ my $index_app = sub {
 
 builder {
     enable 'LogDispatch', logger => Log::Dispatch::Config->instance;
-    enable 'AccessLog::Timed', format => 'combined';
+#    enable 'AccessLog::Timed', format => 'combined';
     enable 'ReverseProxy';
 #    enable_if {$_[0]->{REMOTE_ADDR} eq '127.0.0.1'} 'ReverseProxy';
 #    enable 'ErrorDocument',
