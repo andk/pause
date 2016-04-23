@@ -378,6 +378,7 @@ sub myurl {
   #				 $r->server->server_hostname .
   #				 $explicit_port .
   #				 $script_name);
+  $uri->host($PAUSE::Config->{SERVER_NAME}) if $PAUSE::Config->{SERVER_NAME};
   $self->{MYURL} = $uri;
 }
 
