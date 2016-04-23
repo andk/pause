@@ -61,7 +61,7 @@ CREATE SERVICE vhosts
   SET enable_ssl                  = off
   SET plugins                     = vhosts
   VHOST analysis.cpantesters.org  = analysis
-  VHOST *                         = plackperl
+  VHOST *                         = pause
   HEADER vhosts remove X-pause-is-SSL
   HEADER vhosts insert X-pause-is-SSL: 0
 ENABLE vhosts
@@ -86,7 +86,7 @@ CREATE SERVICE vhosts_ssl
   SET ssl_key_file                = /etc/perlbal/servercerts/pause.perl.org-20080519.key
   SET ssl_cert_file               = /etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain
   VHOST pause2.develooper.com     = plackperl
-  VHOST *                         = plackperl
+  VHOST *                         = pause
   HEADER vhosts_ssl remove X-pause-is-SSL
   HEADER vhosts_ssl insert X-pause-is-SSL: 1
 ENABLE vhosts_ssl
