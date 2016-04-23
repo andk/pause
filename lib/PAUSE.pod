@@ -10,7 +10,36 @@ and enables their owners to upload their work into that directory themselves.
 
 =head1 DESCRIPTION
 
-Here is an overview of PAUSE's structure:
+=head2 Class overview
+
+The methods C<alert()> and C<verbose()> exist in all classes. Only the two
+in PAUSE::mldistwatch do something for real, the others just pass
+their arguments up the "stack" of objects. Similarly index_status
+passes arguments up till they reach the PAUSE::dist object. From there
+they are harvested in the C<mail_summary()> method that sends a report to
+the owner of the package
+
+=head3 L<PAUSE::mldistwatch>
+
+Mediates between the database and disk-based distributions.
+
+=head3 L<PAUSE::mldistwatch::Constants>
+
+Constants used for C<PAUSE::dist::index_status()>.
+
+=head3 L<PAUSE::dist>
+
+One distro.
+
+=head3 L<PAUSE::pmfile>
+
+One *.pm file in a distro.
+
+=head3 L<PAUSE::package>
+
+One package statement within a L<PAUSE::pmfile>.
+
+=head2 Overview of contents of the PAUSE distribution
 
     apache-conf/       Apache Configuration
     apache-perl/       Legacy from the very first pause
