@@ -6,6 +6,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Plack::Builder;
 use Plack::Request;
+use Plack::App::Directory;
 use Log::Dispatch::Config;
 
 Log::Dispatch::Config->configure("etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
@@ -60,6 +61,16 @@ builder {
     # Static files should not be served by application server actually.
     # This is only for testing/developing.
     enable 'Static', path => qr{(?<!index)\.(js|css|gif|jpg|png|pod|html)$}, root => "$FindBin::Bin/htdocs";
+
+    mount '/pub/PAUSE' => builder {
+        enable '+PAUSE::Middleware::Auth::Basic';
+        Plack::App::Directory->new(root => $PAUSE::Config->{FTPPUB});
+    };
+
+    mount '/incoming' => builder {
+        enable '+PAUSE::Middleware::Auth::Basic';
+        Plack::App::Directory->new(root => $PAUSE::Config->{INCOMING_LOC});
+    };
 
     mount '/pause' => builder {
         enable_if {$_[0]->{PATH_INFO} =~ /authenquery/ ? 1 : 0} '+PAUSE::Middleware::Auth::Basic';
