@@ -45,7 +45,6 @@ WriteMakefile(
     Log::Dispatch::Config
     LWP::UserAgent
     LWP::Protocol::https
-    LWP::UserAgent
     Digest::MD5
     Digest::SHA1
     Mail::Mailer
@@ -73,6 +72,7 @@ WriteMakefile(
     Test::WWW::Mechanize::PSGI
     Text::Format
     Text::Metaphone
+    Test::Perl::Critic
     Text::Soundex
     Text::Unidecode
     Time::Duration

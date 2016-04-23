@@ -1,6 +1,7 @@
 my $tests;
 BEGIN { $tests = 0 }
 use Test::More;
+use lib 't/lib/privatelib'; # Stub PrivatePAUSE
 use PAUSE::mldistwatch;
 
 {

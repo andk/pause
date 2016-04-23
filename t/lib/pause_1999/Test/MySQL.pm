@@ -67,7 +67,7 @@ has '_db_name' => (
 
 sub _build__db_name {
     my $self = shift;
-    return 'db_' . ( $self + 0 );
+    return 'db_' . ( $self + 0 ) . int(rand 999_999);
 }
 
 # Location of the config file for the mysql client

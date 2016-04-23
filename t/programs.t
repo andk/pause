@@ -29,7 +29,7 @@ for my $s (1..@s) {
   open my $fh, "-|", qq{"$^X" "-Ilib" "-cw" "$script" 2>&1} or die "could not fork: $!";
   while (<$fh>) {
       next if /syntax OK/;
-      print;
+      diag $_;
   }
   my $ret = close $fh;
   ok 1==$ret, "$script:-c:$ret";
