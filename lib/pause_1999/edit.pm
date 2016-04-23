@@ -1882,19 +1882,15 @@ href="http://backpan.cpan.org/authors/id/$userhome/">backpan</a>
 
 });
 
-	my $tmpdir = "ftp://$server/tmp/$userhome";
 	my $usrdir = "https://$server/pub/PAUSE/authors/id/$userhome";
 	my $tailurl = "https://$server/pause/authenquery?ACTION=tail_logfile" .
             "&pause99_tail_logfile_1=5000";
 	my $etailurl = $mgr->escapeHTML($tailurl);
 	push @m, (qq{
 
-<p><b>Debugging:</b> you may want to watch the temporary directory
-where your submission should show up soon: <a
-href="$tmpdir">$tmpdir</a> (be patient, this directory may not exist
-yet). If it passes some simple tests, it will be uploaded to its <a
-href="$usrdir">final destination</a>. If something's wrong, please
-check the logfile of the daemon. See the tail of it with <a
+<p><b>Debugging:</b> your submission should show up soon at <a
+href="$usrdir">$usrdir</a>. If something's wrong, please
+check the logfile of the daemon: see the tail of it with <a
 href="$etailurl">$etailurl</a>. If you already know what's going wrong, you
 may wish to visit the <a href="authenquery?ACTION=edit_uris">repair
 tool</a> for pending uploads.</p>
