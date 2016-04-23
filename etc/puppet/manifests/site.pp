@@ -68,7 +68,7 @@ class pause-munin {
                 owner => "root",
                 group => "root",
                 mode  => 644,
-                source => "puppet:///files/etc/munin/httpd_8000.conf/pause2",
+                source => "puppet:///modules/pause/etc/munin/httpd_8000.conf/pause2",
                 notify => Service["munin_httpd_8000"],
         }
         service { "munin_httpd_8000":
@@ -86,7 +86,7 @@ class pause-munin {
 		owner => root,
 		group => root,
 		mode => 755,
-		source => "puppet:///files/etc/init.d/munin_httpd_8000",
+		source => "puppet:///modules/pause/etc/init.d/munin_httpd_8000",
 		# require => File["/etc/puppet/files"],
 		require => [
 			    Package["httpd"],
@@ -138,14 +138,14 @@ class pause-apache {
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/etc/init.d/PAUSE-httpd-pause-us",
+		source => "puppet:///modules/pause/etc/init.d/PAUSE-httpd-pause-us",
 	}
 	file { "/etc/init.d/PAUSE-plack":
 		path   => "/etc/init.d/PAUSE-plack",
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/etc/init.d/PAUSE-plack",
+		source => "puppet:///modules/pause/etc/init.d/PAUSE-plack",
 	}
 	file { "/opt/apache/current/conf/httpd.conf":
 		path => "/opt/apache/current/conf/httpd.conf",
@@ -253,7 +253,7 @@ class pause-perlbal {
 		owner => root,
 		group => root,
 		mode => 755,
-		source => "puppet:///files/etc/init.d/PAUSE-perlbal-pause-us",
+		source => "puppet:///modules/pause/etc/init.d/PAUSE-perlbal-pause-us",
 	}
 	service { "PAUSE-perlbal":
 		ensure => running,
@@ -276,14 +276,14 @@ class pause-rsyncd-873 {
 		owner => root,
 		group => root,
 		mode => 644,
-		source => "puppet:///files/etc/rsyncd.conf-pause-us",
+		source => "puppet:///modules/pause/etc/rsyncd.conf-pause-us",
 	}
 	file { "/etc/init.d/PAUSE-rsyncd":
 		path => "/etc/init.d/PAUSE-rsyncd",
 		owner => root,
 		group => root,
 		mode => 755,
-		source => "puppet:///files/etc/init.d/PAUSE-rsyncd-pause-us",
+		source => "puppet:///modules/pause/etc/init.d/PAUSE-rsyncd-pause-us",
 	}
 	service { "PAUSE-rsyncd":
 		ensure => running,
@@ -302,14 +302,14 @@ class pause-rsyncd-8732 {
 		owner => root,
 		group => root,
 		mode => 644,
-		source => "puppet:///files/etc/rsyncd2.conf-pause-us",
+		source => "puppet:///modules/pause/etc/rsyncd2.conf-pause-us",
 	}
 	file { "/etc/init.d/PAUSE-rsyncd2":
 		path => "/etc/init.d/PAUSE-rsyncd2",
 		owner => root,
 		group => root,
 		mode => 755,
-		source => "puppet:///files/etc/init.d/PAUSE-rsyncd2-pause-us",
+		source => "puppet:///modules/pause/etc/init.d/PAUSE-rsyncd2-pause-us",
 	}
 	service { "PAUSE-rsyncd2":
 		ensure => running,
@@ -380,13 +380,13 @@ class pause-proftpd {
 		owner => root,
 		group => root,
 		mode => 640,
-		source => "puppet:///files/etc/proftpd.conf-pause-us",
+		source => "puppet:///modules/pause/etc/proftpd.conf-pause-us",
 	}
 	file { "/etc/sysconfig/proftpd":
 		owner => root,
 		group => root,
 		mode => 644,
-		source => "puppet:///files/etc/sysconfig/proftpd-pause-us",
+		source => "puppet:///modules/pause/etc/sysconfig/proftpd-pause-us",
 	}
 	service { "proftpd":
 		ensure => running,
@@ -403,13 +403,13 @@ class pause-postfix {
 		owner => "root",
 		group => "root",
 		mode => 644,
-		source => "puppet:///files/etc/aliases-pause-us",
+		source => "puppet:///modules/pause/etc/aliases-pause-us",
 	}
 	file { "/etc/postfix/main.cf":
 		owner => "root",
 		group => "root",
 		mode => 644,
-		source => "puppet:///files/etc/postfix/main.cf-pause-us",
+		source => "puppet:///modules/pause/etc/postfix/main.cf-pause-us",
 	}
         exec { subscribe-aliases:
                 command => "/usr/bin/newaliases",
@@ -434,7 +434,7 @@ class pause-paused {
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/etc/init.d/PAUSE-paused-pause-us",
+		source => "puppet:///modules/pause/etc/init.d/PAUSE-paused-pause-us",
 	}
 	file { "/etc/logrotate.d/mldistwatch":
 		owner   => root,
@@ -462,7 +462,7 @@ class pause-limits {
 		owner  => root,
 		group  => root,
 		mode   => 644,
-		source => "puppet:///files/etc/security/limits.conf-pause-us",
+		source => "puppet:///modules/pause/etc/security/limits.conf-pause-us",
 	}
 }
 class pause-iptables {
@@ -470,13 +470,13 @@ class pause-iptables {
 		owner  => root,
 		group  => root,
 		mode   => 644,
-		source => "puppet:///files/etc/sysconfig/iptables-config-pause-us",
+		source => "puppet:///modules/pause/etc/sysconfig/iptables-config-pause-us",
 	}
 	file { "/etc/sysconfig/iptables":
 		owner  => root,
 		group  => root,
 		mode   => 644,
-		source => "puppet:///files/etc/sysconfig/iptables-pause-us",
+		source => "puppet:///modules/pause/etc/sysconfig/iptables-pause-us",
 	}
 }
 class pause-mon {
@@ -484,37 +484,37 @@ class pause-mon {
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/usr/lib64/mon/mon.d/freespace.monitor",
+		source => "puppet:///modules/pause/usr/lib64/mon/mon.d/freespace.monitor",
 	}
 	file { "/usr/lib64/mon/mon.d/paused.monitor":
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/usr/lib64/mon/mon.d/paused.monitor",
+		source => "puppet:///modules/pause/usr/lib64/mon/mon.d/paused.monitor",
 	}
 	file { "/usr/lib64/mon/mon.d/rsyncd.monitor":
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/usr/lib64/mon/mon.d/rsyncd.monitor",
+		source => "puppet:///modules/pause/usr/lib64/mon/mon.d/rsyncd.monitor",
 	}
 	file { "/usr/lib64/mon/mon.d/rsyncd2.monitor":
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/usr/lib64/mon/mon.d/rsyncd2.monitor",
+		source => "puppet:///modules/pause/usr/lib64/mon/mon.d/rsyncd2.monitor",
 	}
 	file { "/usr/lib64/mon/mon.d/rersyncrecent.monitor":
 		owner  => root,
 		group  => root,
 		mode   => 755,
-		source => "puppet:///files/usr/lib64/mon/mon.d/rersyncrecent.monitor",
+		source => "puppet:///modules/pause/usr/lib64/mon/mon.d/rersyncrecent.monitor",
 	}
 	file { "/etc/mon/mon.cf":
 		owner  => root,
 		group  => root,
 		mode   => 644,
-		source => "puppet:///files/etc/mon/mon.cf",
+		source => "puppet:///modules/pause/etc/mon/mon.cf",
 	}
 	service { "mon":
 		ensure => running,
@@ -530,7 +530,7 @@ class pause-cron {
                 owner => "root",
                 group => "root",
                 mode  => 644,
-                source => "puppet:///files/etc/cron.d/pause2016",
+                source => "puppet:///modules/pause/etc/cron.d/pause2016",
 	}
 }
 class pause {
