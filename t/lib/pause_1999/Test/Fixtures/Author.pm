@@ -37,6 +37,23 @@ sub _build_password_crypted {
     return crypt( $self->password, 'zz' );
 }
 
+has 'email' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_email {
+    my $self = shift;
+    return $self->username . '@example.com';
+}
+
+has 'cpan_mail_alias' => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'publ',
+);
+
 has 'fullname' => (
     is         => 'ro',
     isa        => 'Str',
@@ -67,10 +84,10 @@ sub BUILD {
     my $self = shift;
 
     my $usertable = $self->environment->authen_dbh->prepare( "
-        INSERT INTO usertable (user, password)
-        VALUES (?, ?)
+        INSERT INTO usertable (user, password, secretemail)
+        VALUES (?, ?, ?)
     " );
-    $usertable->execute( $self->username, $self->password_crypted );
+    $usertable->execute( $self->username, $self->password_crypted, $self->email );
 
     my $grouptable = $self->environment->authen_dbh->prepare( "
         INSERT INTO grouptable (user, ugroup)
@@ -81,12 +98,12 @@ sub BUILD {
     }
 
     my $mod_users = $self->environment->mod_dbh->prepare( "
-        INSERT INTO users (userid, ustatus, fullname, asciiname)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO users (userid, email, ustatus, fullname, asciiname, cpan_mail_alias)
+        VALUES (?, ?, ?, ?, ?, ?)
     " );
     $mod_users->execute(
-        $self->username, $self->ustatus,
-        $self->fullname, $self->asciiname
+        $self->username, $self->email, $self->ustatus,
+        $self->fullname, $self->asciiname, $self->cpan_mail_alias,
     );
 }
 

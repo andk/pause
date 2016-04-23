@@ -8,6 +8,7 @@ use Path::Class;
 use File::Temp qw/tempdir tempfile/;
 
 use pause_1999::Test::Environment;
+use pause_1999::Test::Fixtures::Author;
 
 my ( $env, $author ) = pause_1999::Test::Environment->new_with_author(
     username  => 'ANDK',
@@ -33,13 +34,12 @@ my $m = $env->site_model($author);
     for my $query (qw/show_files delete_files/) {
         my $data = $m->$query->parse();
         my %files = map { @$_{qw/filename size/} } @{ $data->{'file_list'} };
-        is_deeply(
-            \%files,
-            $expected_files,
-            "$query: File list finds two author files"
-        );
+        is_deeply( \%files, $expected_files,
+            "$query: File list finds two author files" );
         is( $data->{'author_directory'},
-            'authors/id/A/AN/ANDK', "$query: Author directory looks sensible"
-        );
+            'authors/id/A/AN/ANDK',
+            "$query: Author directory looks sensible" );
     }
 }
+
+done_testing();

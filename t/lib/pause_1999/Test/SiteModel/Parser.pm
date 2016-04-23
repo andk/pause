@@ -2,6 +2,7 @@ package pause_1999::Test::SiteModel::Parser;
 
 use Moose::Role;
 use HTML::TreeBuilder;
+use YAML::XS qw/Load/;
 requires 'mech';
 
 # See the SiteModel for the basic justification
@@ -13,16 +14,17 @@ requires 'mech';
 # HTML::TreeBuilder object.
 
 our %pages = (
-    homepage   => ['basic'],
-    show_files => [qw/basic author_directory file_list/],
-    delete_files => [qw/basic author_directory file_list/],
+    homepage              => ['basic'],
+    delete_files          => [qw/basic author_directory file_list/],
+    email_for_admin       => [qw/basic email_for_admin/],
+    email_for_admin__yaml => [qw/yaml/],
+    show_files            => [qw/basic author_directory file_list/],
 );
 
 our %parsers = (
     author_directory => sub {
         my $tree = shift;
-        my ($directory)
-            = ( $tree->as_text =~ m!Files in directory (.+?) ! );
+        my ($directory) = ( $tree->as_text =~ m!Files in directory (.+?) ! );
         return $directory;
     },
     basic => sub {
@@ -37,9 +39,19 @@ our %parsers = (
             email    => $email,
         };
     },
+    email_for_admin => sub {
+        my $tree           = shift;
+        my @all_tables     = $tree->look_down( _tag => 'table' );
+        my @content_tables = $all_tables[2]->look_down( _tag => 'table' );
+        my $author_table   = $content_tables[2];
+        my %authors
+            = map { length $_->as_text == 0 ? undef : $_->as_text }
+            $author_table->look_down( _tag => 'td' );
+        return \%authors;
+    },
     file_list => sub {
-        my $tree  = shift;
-        my $pre   = $tree->look_down( _tag => 'pre' );
+        my $tree = shift;
+        my $pre = $tree->look_down( _tag => 'pre' );
         return [] unless $pre;
         my @files = map {
             my $line = $_;
@@ -52,6 +64,10 @@ our %parsers = (
         } split( m!<br />|\n!, $pre->as_HTML );
         return \@files;
     },
+    yaml => sub {
+        my ( $tree, $content ) = @_;
+        return Load $content;
+    },
 );
 
 sub parse {
@@ -62,7 +78,10 @@ sub parse {
 
     # Check we know how to parse this page
     my $page_spec;
-    if ( $url =~ m!/pause/authenquery\?ACTION=(.+)! ) {
+    if ( $url =~ m!/pause/authenquery\?ACTION=email_for_admin[;&]OF=YAML! ) {
+        $page_spec = $pages{'email_for_admin__yaml'};
+    }
+    elsif ( $url =~ m!/pause/authenquery\?ACTION=(.+)! ) {
         $page_spec = $pages{$1}
             || die "Don't know how to autoparse [$url] ($1)";
     }
@@ -81,7 +100,7 @@ sub parse {
 
     my %result = map {
         my $parser = $parsers{$_} || die "Unknown parser [$_]";
-        $_ => $parser->($tree);
+        $_ => $parser->( $tree, $self->mech->content );
     } @$page_spec;
 
     return \%result;
