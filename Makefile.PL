@@ -57,6 +57,7 @@ WriteMakefile(
     Path::Class
     Path::Tiny
     Plack
+    Plack::App::Directory::Apaxy
     Plack::Middleware::Auth::Basic
     Plack::Middleware::ReverseProxy
     Plack::Middleware::ServerStatus::Tiny
