@@ -13,14 +13,14 @@
 ### END INIT INFO`
 
 use strict;
-use FindBin;
+# use FindBin;
 use Daemon::Control;
 
 # for the record, on 20160421 we started plackperl/charsbar for live from /home/puppet/pause manually with
 # 2016-04-22 16:31  /opt/perl/v5.16.2/165a/bin/plackup -I ../pause-private/lib -E production -s Starman -r -p 81 &
 
 my $name = 'PAUSE-plack';
-my $psgi = "$FindBin::RealBin/../../app.psgi";
+my $psgi = "/home/puppet/pause/app.psgi";
 (my $starman = $^X) =~ s{/perl[^/]*$}{/starman};
 
 exit My::Daemon::Control->new({
