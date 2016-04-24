@@ -183,6 +183,7 @@ sub examine_fio {
                   FIO => $self,
                   USERID => $self->{USERID},
                   META_CONTENT => $self->{META_CONTENT},
+                  MAIN_PACKAGE => $self->{MAIN_PACKAGE},
                   );
 
         $pio->examine_pkg;

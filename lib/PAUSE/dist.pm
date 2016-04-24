@@ -835,6 +835,7 @@ sub _index_by_files {
   my $binary_dist;
   # ftp://ftp.funet.fi/pub/CPAN/modules/05bindist.convention.html
   $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
+  my $main_package = $self->_package_governing_permission;
 
   for my $pmfile (@$pmfiles) {
     if ($binary_dist) {
@@ -856,6 +857,7 @@ sub _index_by_files {
       TIME => $self->{TIME},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
+      MAIN_PACKAGE => $main_package,
     );
     $fio->examine_fio;
   }
@@ -865,6 +867,7 @@ sub _index_by_meta {
   my ($self, $pmfiles, $provides) = @_;
   my $dist = $self->{DIST};
 
+  my $main_package = $self->_package_governing_permission;
   while (my($k,$v) = each %$provides) {
     $v->{infile} = "$v->{file}";
     my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
@@ -899,6 +902,7 @@ sub _index_by_meta {
       PMFILE => $v->{infile},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
+      MAIN_PACKAGE => $main_package,
     );
     $pio->examine_pkg;
   }
