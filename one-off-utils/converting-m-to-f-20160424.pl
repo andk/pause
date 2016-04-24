@@ -92,6 +92,7 @@ while (<DATA>) {
     chomp;
     my $csv = $_;
     next if /^\s*$/;
+    next if /^#/;
     my($m,$a,$type,$action) = split /,/, $csv;
     die "illegal type" unless $type =~ /[mfc]/;
     my $t = scalar localtime;
@@ -175,16 +176,16 @@ while (<DATA>) {
 # End:
 
 __END__
-AI::nnflex,CCOLBOURN,f,delete
-AI::NNFlex,CCOLBOURN,m,f
-
-App::GnuGet,KHAREC,f,delete
-App::Gnuget,KHAREC,m,f
-
-Authen::NTLM,BUZZ,f,c
-Authen::NTLM,NBEBOUT,m,f
-
-AutoReloader,SHMEM,m,c
+# AI::nnflex,CCOLBOURN,f,delete
+# AI::NNFlex,CCOLBOURN,m,f
+# 
+# App::GnuGet,KHAREC,f,delete
+# App::Gnuget,KHAREC,m,f
+# 
+# Authen::NTLM,BUZZ,f,c
+# Authen::NTLM,NBEBOUT,m,f
+# 
+# AutoReloader,SHMEM,m,c
 
 B::C,MICB,f,c
 B::C,RURBAN,m,f
