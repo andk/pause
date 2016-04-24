@@ -762,6 +762,7 @@ sub checkin_into_primeur {
   if (exists $dio->{META_CONTENT}{x_authority}) {
       $userid = $dio->{META_CONTENT}{x_authority};
       $userid =~ s/^cpan://i;
+      # FIXME: if this ends up being blank we should probably die?
       # validate userid existing
   } else {
       $userid = $self->{USERID} or die;
