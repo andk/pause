@@ -362,7 +362,7 @@ share_perms
 	    AuthenDsnUser   => $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
 	    CHARSET         => $pause_1999::main::DO_UTF8 ? "utf-8" : "iso-8859-1",
 	    EXECUTION_PLAN => $Exeplan,
-	    MailMailerConstructorArgs => ["sendmail"],
+	    MailMailerConstructorArgs => $PAUSE::Config->{MAIL_MAILER},
 	    MailtoAdmins => join(",",@{$PAUSE::Config->{ADMINS}}),
 	    ModDsn       => $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
 	    ModDsnPasswd => $PAUSE::Config->{MOD_DATA_SOURCE_PW},

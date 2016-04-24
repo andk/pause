@@ -45,7 +45,6 @@ WriteMakefile(
     Log::Dispatch::Config
     LWP::UserAgent
     LWP::Protocol::https
-    LWP::UserAgent
     Digest::MD5
     Digest::SHA1
     Mail::Mailer

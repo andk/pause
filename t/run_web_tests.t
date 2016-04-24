@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use lib 'lib';
 use lib 't/lib';
 
 use Test::Aggregate;

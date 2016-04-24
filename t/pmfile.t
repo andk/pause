@@ -1,3 +1,3 @@
-use lib 't/lib', 'privatelib';
+use lib 't/lib';
 use PAUSE::Tester;
 PAUSE::Tester->run;

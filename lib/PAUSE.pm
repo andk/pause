@@ -129,6 +129,7 @@ $PAUSE::Config ||=
        }
        print $logfh @what;
      },
+     MAIL_MAILER => ["sendmail"],
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
      MIRRORED_BY_URL => "ftp://ftp.funet.fi/pub/languages/perl/CPAN/MIRRORED.BY",

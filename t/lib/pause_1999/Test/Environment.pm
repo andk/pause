@@ -84,6 +84,17 @@ sub _build_plack_test {
     return Plack::Test->create($self->plack_app);
 }
 
+has 'mail_mailer' => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    default => sub {['testfile']},
+);
+
+sub BUILD {
+    my $self = shift;
+    pause_1999::Test::Config->set_mail_mailer( $self->mail_mailer );
+}
+
 sub new_with_author {
     my ( $class, %options ) = @_;
     my $self = $class->new();
