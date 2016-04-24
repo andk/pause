@@ -160,7 +160,7 @@ while (<DATA>) {
             if ($Opt{"dry-run"}){
                 warn "Would insert first-come\n";
             } else {
-                warn "Inserting into perms modid=$m,userid=$a";
+                warn "Inserting into primeur modid=$m,userid=$a";
                 $sth5->execute($m,$a);
             }
         } else {
@@ -186,132 +186,132 @@ __END__
 # Authen::NTLM,NBEBOUT,m,f
 # 
 # AutoReloader,SHMEM,m,c
-
-B::C,MICB,f,c
-B::C,RURBAN,m,f
-
-B::C,MICB,f,c
-B::C,RURBAN,m,f
-
-Business::ISBN::Data,ESUMMERS,f,c
-Business::ISBN::Data,BDFOY,m,f
-
-Business::OnlinePayment::CyberSource,HGDEV,f,c
-Business::OnlinePayment::Cybersource,XENO,m,f
-
-CGI::Session::Serialize::yaml,MARKSTOS,f,c
-CGI::Session::Serialize::yaml,RSAVAGE,m,f
-
-Catalyst::Engine::Apache,MSTROUT,f,c
-Catalyst::Engine::Apache,AGRUNDMA,m,f
-
-Catalyst::Engine::HTTP::POE,MSTROUT,f,c
-Catalyst::Engine::HTTP::POE,AGRUNDMA,m,f
-
-Catalyst::Plugin::I18N,MSTROUT,f,c
-Catalyst::Plugin::I18N,CHANSEN,m,f
-
-Class::TOM,JDUNCAN,m,delete
-
-Config::Hash,MINIMAL,m,delete
-
-Config::Ini,AVATAR,m,delete
-
-Config::Model::TkUi,DDUMONT,f,delete
-Config::Model::TkUI,DDUMONT,m,f
-
-Config::Properties,RANDY,f,c
-Config::Properties,SALVA,m,f
-
-ConfigReader::Simple,GOSSAMER,f,c
-ConfigReader::Simple,BDFOY,m,f
-
-DBA::Backup::MySQL,SEANQ,f,delete
-DBA::Backup::mysql,SEANQ,m,f
-
-DBD::google,DARREN,c,delete
-DBD::google,STENNIE,f,delete
-DBD::Google,DARREN,m,f
-
-DBD::SQLrelay,DMOW,m,delete
-
-DBD::Cego,COMPLX,f,delete
-DBD::cego,COMPLX,m,f
-
-DBIx::XMLMEssage,ANDREIN,m,delete
-
-Des,MICB,m,delete
-DES,EAYNG,m,f
-
-Data::Report,AORR,f,c
-Data::Report,JV,m,f
-
-Devel::Strace,DARNOLD,m,delete
-
-DirHandle,CHIPS,m,c
-
-Facebook::OpenGraph,BARTENDER,f,c
-Facebook::OpenGraph,OKLAHOMER,m,f
-
-Fcntl,JHI,m,c
-
-File::Remove,SHLOMIF,f,c
-File::Remove,RSOD,m,f
-
-File::stat,TOMC,m,c
-
-Filesys::statfs,TOMC,m,delete
-
-Fortran::NameList,SGEL,m,delete
-
-GX,JAU,m,delete
-
-Games::Go::SGF,SAMTREGAR,f,delete
-Games::Go::SGF,DEG,m,f
-
-Games::PerlWar,YANICK,f,delete
-Games::Perlwar,YANICK,m,f
-
-HG,RTWARD,m,delete
-
-HTTP::Body,MRAMBERG,f,c
-HTTP::Body,CHANSEN,m,f
-
-HTTP::Request::AsCGI,MRAMBERG,f,c
-HTTP::Request::AsCGI,CHANSEN,m,f
-
-Hailo,HINRIK,f,c
-Hailo,AVAR,m,f
-
-I18N::Collate,JHI,m,c
-
-Image::EPEG,MCURTIS,f,delete
-Image::EPEG,TOKUHIROM,c,delete
-Image::Epeg,MCURTIS,m,f
-
-Javascript,FGLOCK,f,c
-JavaScript,CLAESJAC,m,f
-
-Labkey::Query,BBIMBER,m,delete
-Labkey::Query,LABKEY,c,delete
-Labkey::query,BBIMBER,m,delete
-
-ngua::PT::pln,AMBS,f,delete
-Lingua::PT::PLN,AMBS,m,delete
-
-Marc,FREDERICD,f,delete
-MARC,PERL4LIB,m,f
-
-Marc::Record,FREDERICD,f,delete
-MARC::Record,MIKERY,m,f
-
-Math::BigFloat,TELS,m,c
-
-Math::BigInt,TELS,m,c
-
-Math::Complex,RAM,m,c
-Math::Complex,ZEFRAM,f,c
-Math::Complex,P5P,f,add
+# 
+# B::C,MICB,f,c
+# B::C,RURBAN,m,f
+# 
+# B::C,MICB,f,c
+# B::C,RURBAN,m,f
+# 
+# Business::ISBN::Data,ESUMMERS,f,c
+# Business::ISBN::Data,BDFOY,m,f
+# 
+# Business::OnlinePayment::CyberSource,HGDEV,f,c
+# Business::OnlinePayment::Cybersource,XENO,m,f
+# 
+# CGI::Session::Serialize::yaml,MARKSTOS,f,c
+# CGI::Session::Serialize::yaml,RSAVAGE,m,f
+# 
+# Catalyst::Engine::Apache,MSTROUT,f,c
+# Catalyst::Engine::Apache,AGRUNDMA,m,f
+# 
+# Catalyst::Engine::HTTP::POE,MSTROUT,f,c
+# Catalyst::Engine::HTTP::POE,AGRUNDMA,m,f
+# 
+# Catalyst::Plugin::I18N,MSTROUT,f,c
+# Catalyst::Plugin::I18N,CHANSEN,m,f
+# 
+# Class::TOM,JDUNCAN,m,delete
+# 
+# Config::Hash,MINIMAL,m,delete
+# 
+# Config::Ini,AVATAR,m,delete
+# 
+# Config::Model::TkUi,DDUMONT,f,delete
+# Config::Model::TkUI,DDUMONT,m,f
+# 
+# Config::Properties,RANDY,f,c
+# Config::Properties,SALVA,m,f
+# 
+# ConfigReader::Simple,GOSSAMER,f,c
+# ConfigReader::Simple,BDFOY,m,f
+# 
+# DBA::Backup::MySQL,SEANQ,f,delete
+# DBA::Backup::mysql,SEANQ,m,f
+# 
+# DBD::google,DARREN,c,delete
+# DBD::google,STENNIE,f,delete
+# DBD::Google,DARREN,m,f
+# 
+# DBD::SQLrelay,DMOW,m,delete
+# 
+# DBD::Cego,COMPLX,f,delete
+# DBD::cego,COMPLX,m,f
+# 
+# DBIx::XMLMEssage,ANDREIN,m,delete
+# 
+# Des,MICB,m,delete
+# DES,EAYNG,m,f
+# 
+# Data::Report,AORR,f,c
+# Data::Report,JV,m,f
+# 
+# Devel::Strace,DARNOLD,m,delete
+# 
+# DirHandle,CHIPS,m,c
+# 
+# Facebook::OpenGraph,BARTENDER,f,c
+# Facebook::OpenGraph,OKLAHOMER,m,f
+# 
+# Fcntl,JHI,m,c
+# 
+# File::Remove,SHLOMIF,f,c
+# File::Remove,RSOD,m,f
+# 
+# File::stat,TOMC,m,c
+# 
+# Filesys::statfs,TOMC,m,delete
+# 
+# Fortran::NameList,SGEL,m,delete
+# 
+# GX,JAU,m,delete
+# 
+# Games::Go::SGF,SAMTREGAR,f,delete
+# Games::Go::SGF,DEG,m,f
+# 
+# Games::PerlWar,YANICK,f,delete
+# Games::Perlwar,YANICK,m,f
+# 
+# HG,RTWARD,m,delete
+# 
+# HTTP::Body,MRAMBERG,f,c
+# HTTP::Body,CHANSEN,m,f
+# 
+# HTTP::Request::AsCGI,MRAMBERG,f,c
+# HTTP::Request::AsCGI,CHANSEN,m,f
+# 
+# Hailo,HINRIK,f,c
+# Hailo,AVAR,m,f
+# 
+# I18N::Collate,JHI,m,c
+# 
+# Image::EPEG,MCURTIS,f,delete
+# Image::EPEG,TOKUHIROM,c,delete
+# Image::Epeg,MCURTIS,m,f
+# 
+# Javascript,FGLOCK,f,c
+# JavaScript,CLAESJAC,m,f
+# 
+# Labkey::Query,BBIMBER,m,delete
+# Labkey::Query,LABKEY,c,delete
+# Labkey::query,BBIMBER,m,delete
+# 
+# ngua::PT::pln,AMBS,f,delete
+# Lingua::PT::PLN,AMBS,m,delete
+# 
+# Marc,FREDERICD,f,delete
+# MARC,PERL4LIB,m,f
+# 
+# Marc::Record,FREDERICD,f,delete
+# MARC::Record,MIKERY,m,f
+# 
+# Math::BigFloat,TELS,m,c
+# 
+# Math::BigInt,TELS,m,c
+# 
+# Math::Complex,RAM,m,c
+# Math::Complex,ZEFRAM,f,c
+# Math::Complex,P5P,f,add
 
 Math::Geometry::Planar::Offset,DVDPOL,f,c
 Math::Geometry::Planar::Offset,EWILHELM,m,f
