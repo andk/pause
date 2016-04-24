@@ -18,7 +18,7 @@ CREATE SERVICE pause
   SET persist_client              = on
   SET persist_client_idle_timeout = 30
   SET idle_timeout                = 180
-  SET persist_backend             = on
+  SET persist_backend             = off
   SET max_backend_uses            = 0
   SET backend_persist_cache       = 2
   SET verify_backend              = on
