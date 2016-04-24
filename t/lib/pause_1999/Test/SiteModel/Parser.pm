@@ -66,7 +66,7 @@ our %parsers = (
     },
     yaml => sub {
         my ( $tree, $content ) = @_;
-        return Load $content;
+        return scalar Load $content;
     },
 );
 
