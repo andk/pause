@@ -400,8 +400,6 @@ subtest "comaint upload" => sub {
 
   $pause->import_author_root('corpus/mld/008/authors');
   my $result = $pause->test_reindex;
-  TODO: {
-    local $TODO = "Default permissions for new modules to be implemented";
     $result->perm_list_ok(
       {
         'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
@@ -410,20 +408,18 @@ subtest "comaint upload" => sub {
         'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
         'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
         'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/MERCKX/] },
+        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
         'XForm::Rollout'  => { f => 'OPRIME' },
         'Y',              => { f => 'XYZZY' },
       }
     );
-  };
 };
 
 subtest "other comaint upload" => sub {
 
   $pause->import_author_root('corpus/mld/009/authors');
   my $result = $pause->test_reindex;
-  TODO: {
-    local $TODO = "Default permissions for new modules to be implemented";
     $result->perm_list_ok(
       {
         'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
@@ -432,13 +428,12 @@ subtest "other comaint upload" => sub {
         'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
         'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
         'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/MERCKX/] },
-        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN/] },
+        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
         'XForm::Rollout'  => { f => 'OPRIME' },
         'Y',              => { f => 'XYZZY' },
       }
     );
-  };
 };
 done_testing;
 
