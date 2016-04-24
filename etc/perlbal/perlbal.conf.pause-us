@@ -24,7 +24,7 @@ CREATE SERVICE pause
   SET persist_backend             = off
   SET max_backend_uses            = 0
   SET backend_persist_cache       = 2
-  SET verify_backend              = on
+  SET verify_backend              = off
   SET enable_reproxy              = off
   # SET trusted_upstream_proxies    = 0.0.0.0/0
   SET connect_ahead               = 2
