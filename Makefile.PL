@@ -72,7 +72,6 @@ WriteMakefile(
     Test::WWW::Mechanize::PSGI
     Text::Format
     Text::Metaphone
-    Test::Perl::Critic
     Text::Soundex
     Text::Unidecode
     Time::Duration
