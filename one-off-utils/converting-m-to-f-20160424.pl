@@ -312,50 +312,51 @@ __END__
 # Math::Complex,RAM,m,c
 # Math::Complex,ZEFRAM,f,c
 # Math::Complex,P5P,f,add
-
-Math::Geometry::Planar::Offset,DVDPOL,f,c
-Math::Geometry::Planar::Offset,EWILHELM,m,f
-
-Mobile::Wurfl,AWRIGLEY,f,c
-Mobile::WURFL,VALDEZ,m,f
-
-Mojolicious::Plugin::deCSRF,SYSADM,m,delete
-
-Nagios::Nrpe,AVERNA,f,c
-Nagios::NRPE,AMARSCHKE,m,f
-
-Net::CouchDB,MNF,m,f
-
-Net::MitM,BAVELING,m,delete
-
-Net::Oscar,SLAFF,m,delete
-Net::OSCAR,MATTHEWG,m,f
-
-Net::hostent,TOMC,m,c
-
-Net::netent,TOMC,m,c
-
-Net::protoent,TOMC,m,c
-
-Net::servent,TOMC,m,c
-
-o,DAMS,f,delete
-O,MICB,m,c
-O,P5P,f,add
-
-Ox,KJM,m,delete
-
-Pdf,KAARE,f,delete
-PDF,ANTRO,m,f
-
-PDL::IO::HDF5,CHM,f,c
-PDL::IO::HDF5,CERNEY,m,f
-
-Panda,SYBER,m,delete
-
-Parse::YAPP::KeyValue,DIZ,m,delete
-
-PerlMenu,SKUNZ,m,drop
+# 
+# Math::Geometry::Planar::Offset,DVDPOL,f,c
+# Math::Geometry::Planar::Offset,EWILHELM,m,f
+# 
+# Mobile::Wurfl,AWRIGLEY,f,c
+# Mobile::WURFL,VALDEZ,m,f
+# 
+# Mojolicious::Plugin::deCSRF,SYSADM,m,delete
+# 
+# Nagios::Nrpe,AVERNA,f,c
+# Nagios::NRPE,AMARSCHKE,m,f
+# 
+# Net::CouchDB,MNF,m,f
+# 
+# Net::MitM,BAVELING,m,delete
+# 
+# Net::Oscar,SLAFF,m,delete
+# Net::OSCAR,MATTHEWG,m,f
+# 
+# Net::hostent,TOMC,m,c
+# 
+# Net::netent,TOMC,m,c
+# 
+# Net::protoent,TOMC,m,c
+# 
+# Net::servent,TOMC,m,c
+# 
+# o,DAMS,f,delete
+# O,MICB,m,c
+# O,P5P,f,add
+# 
+# Ox,KJM,m,delete
+# 
+# Pdf,KAARE,f,delete
+# PDF,ANTRO,m,f
+# 
+# PDL::IO::HDF5,CHM,f,c
+# PDL::IO::HDF5,CERNEY,m,f
+# 
+# Panda,SYBER,m,delete
+# 
+# Parse::YAPP::KeyValue,DIZ,m,delete
+# 
+# next line changed by andk from drop to delete, presuming this was meant
+PerlMenu,SKUNZ,m,delete
 
 Pod::HTML,KJALB,m,c
 
