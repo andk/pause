@@ -356,156 +356,157 @@ __END__
 # Parse::YAPP::KeyValue,DIZ,m,delete
 # 
 # next line changed by andk from drop to delete, presuming this was meant
-PerlMenu,SKUNZ,m,delete
-
-Pod::HTML,KJALB,m,c
-
-Pod::Latex,KJALB,m,delete
-
-Pod::Rtf,PVHP,f,c
-Pod::RTF,KJALB,m,f
-
-Pod::SpeakIT::MacSpeech,BDFOY,m,delete
-
-Pod::Text,TOMC,m,c
-
-protect,JDUNCAN,f,delete
-Protect,JDUNCAN,m,f
-
-QT,CDAWSON,f,c
-Qt,AWIN,m,f
-
-RT::Extension::MenubarUserTickets,DUMB,m,delete
-
-RWDE,DAMJANP,f,c
-RWDE,VKHERA,m,f
-
-readonly,BDFOY,f,delete
-Readonly,ROODE,m,f
-
-Remedy::AR,RIK,m,delete
-
-SMS::Send::TW::Emome,SNOWFLY,m,delete
-
-super,DROLSKY,f,delete
-SUPER,P5P,m,delete
-
-SVN::Look,DMUEY,m,c
-
-Sane,RATCLIFFE,m,c
-
-Search::Glimpse,MIKEH,f,c
-Search::Glimpse,AMBS,m,f
-
-SelectSaver,CHIPS,m,c
-
-Sendmail::M4::mail8,CML,m,delete
-
-Socket,GNAT,m,c
-
-Symbol,CHIPS,m,c
-
-SYS::lastlog,TOMC,f,delete
-Sys::Lastlog,JSTOWE,m,f
-
-template,ABALAMA,f,delete
-Template,ABW,m,f
-
-Term::Cap,TSANDERS,m,c
-
-Term::ReadLine,ILYAZ,m,c
-
-Test::Cucumber,JOHND,f,c
-Test::Cucumber,SARGIE,m,f
-
-Text::Banner,LORY,m,c
-Text::Capitalize,SYP,m,c
-
-Text::ParseWords,CHORNY,m,c
-
-Text::Soundex,MARKM,m,c
-
-Thesaurus::DBI,DROLSKY,f,c
-Thesaurus::DBI,JOSEIBERT,m,f
-
-Tie::SentientHash,ADOPTME,f,delete
-Tie::SentientHash,ANDREWF,m,delete
-
-Tie::SubstrHash,LWALL,m,c
-
-Time::Format,PGOLLUCCI,f,delete
-Time::Format,ROODE,m,c
-
-Time::gmtime,TOMC,m,c
-Time::localtime,TOMC,m,c
-
-Tk::CheckBox,DKWILSON,m,c
-
-Tk::Pod,TKML,m,c
-
-Tk::Statusbar,ZABEL,m,delete
-
-TUXEDO,AFRYER,f,delete
-Tuxedo,AFRYER,m,f
-
-UUID,BRAAM,f,c
-UUID,JRM,m,f
-
-User::grent,TOMC,m,c
-
-User::pwent,TOMC,m,c
-
-VCS::CVS,RSAVAGE,m,delete
-VCS::CVS,ETJ,c,delete
-
-VMS::Filespec,CBAIL,m,c
-
-VMS::Fileutils::Root,CLANE,m,delete
-
-VMS::Fileutils::SafeName,CLANE,m,delete
-
-Wait,JACKS,f,delete
-WAIT,ULPFR,m,f
-
-WING,MICB,m,delete
-
-WWW::AllTop,ARNIE,f,delete
-WWW::Alltop,ARNIE,m,f
-
-WWW::Search::Google,MTHURN,f,c
-WWW::Search::Google,LBROCARD,m,f
-
-WWW::Tamperdata,MARCUSSEN,m,delete
-
-WebService::NMA,CHISEL,f,delete
-WebService::NMA,SHUFF,m,f
-
-WebService::Rakuten,DRAWNBOY,f,c
-WebService::Rakuten,DYLAN,m,f
-
-Webservice::Instagram,DAYANUNE,m,delete
-
-Webservice::Tesco::API,WBASSON,m,delete
-
-Webservice::Vtiger,MONSENHOR,m,delete
-
-Xbase,PRATP,f,delete
-XBase,JANPAZ,m,f
-
-Xml,SAKOHT,f,c
-XML,XMLML,m,f
-
-XML::LibXML,PHISH,m,c
-
-XML::Smart,GMPASSOS,f,c
-XML::Smart,TMHARISH,m,f
-
-diagnostics,TOMC,m,c
-
-overload,ILYAZ,m,c
-
-VERSION,LEIF,f,delete
-Version,ASKSH,f,delete
-version,JPEACOCK,m,f
-
-
+# PerlMenu,SKUNZ,m,delete
+# 
+# Pod::HTML,KJALB,m,c
+# 
+# Pod::Latex,KJALB,m,delete
+# 
+# Pod::Rtf,PVHP,f,c
+# Pod::RTF,KJALB,m,f
+# 
+# Pod::SpeakIT::MacSpeech,BDFOY,m,delete
+# 
+# Pod::Text,TOMC,m,c
+# 
+# protect,JDUNCAN,f,delete
+# Protect,JDUNCAN,m,f
+# 
+# QT,CDAWSON,f,c
+# Qt,AWIN,m,f
+# 
+# RT::Extension::MenubarUserTickets,DUMB,m,delete
+# 
+# RWDE,DAMJANP,f,c
+# RWDE,VKHERA,m,f
+# 
+# readonly,BDFOY,f,delete
+# Readonly,ROODE,m,f
+# 
+# Remedy::AR,RIK,m,delete
+# 
+# SMS::Send::TW::Emome,SNOWFLY,m,delete
+# 
+# super,DROLSKY,f,delete
+# SUPER,P5P,m,delete
+# 
+# SVN::Look,DMUEY,m,c
+# 
+# Sane,RATCLIFFE,m,c
+# 
+# Search::Glimpse,MIKEH,f,c
+# Search::Glimpse,AMBS,m,f
+# 
+# SelectSaver,CHIPS,m,c
+# 
+# Sendmail::M4::mail8,CML,m,delete
+# 
+# Socket,GNAT,m,c
+# 
+# Symbol,CHIPS,m,c
+# 
+# SYS::lastlog,TOMC,f,delete
+# Sys::Lastlog,JSTOWE,m,f
+# 
+# template,ABALAMA,f,delete
+# Template,ABW,m,f
+# 
+# Term::Cap,TSANDERS,m,c
+# 
+# Term::ReadLine,ILYAZ,m,c
+# 
+# Test::Cucumber,JOHND,f,c
+# Test::Cucumber,SARGIE,m,f
+# 
+# Text::Banner,LORY,m,c
+# Text::Capitalize,SYP,m,c
+# 
+# Text::ParseWords,CHORNY,m,c
+# 
+# Text::Soundex,MARKM,m,c
+# 
+# Thesaurus::DBI,DROLSKY,f,c
+# Thesaurus::DBI,JOSEIBERT,m,f
+# 
+# Tie::SentientHash,ADOPTME,f,delete
+# Tie::SentientHash,ANDREWF,m,delete
+# 
+# Tie::SubstrHash,LWALL,m,c
+# 
+# Time::Format,PGOLLUCCI,f,delete
+# Time::Format,ROODE,m,c
+# 
+# Time::gmtime,TOMC,m,c
+# Time::localtime,TOMC,m,c
+# 
+# Tk::CheckBox,DKWILSON,m,c
+# 
+# Tk::Pod,TKML,m,c
+# 
+# Tk::Statusbar,ZABEL,m,delete
+# 
+# TUXEDO,AFRYER,f,delete
+# Tuxedo,AFRYER,m,f
+# 
+# UUID,BRAAM,f,c
+# UUID,JRM,m,f
+# 
+# User::grent,TOMC,m,c
+# 
+# User::pwent,TOMC,m,c
+# 
+# VCS::CVS,RSAVAGE,m,delete
+# VCS::CVS,ETJ,c,delete
+# 
+# VMS::Filespec,CBAIL,m,c
+# 
+# VMS::Fileutils::Root,CLANE,m,delete
+# 
+# VMS::Fileutils::SafeName,CLANE,m,delete
+# 
+# Wait,JACKS,f,delete
+# WAIT,ULPFR,m,f
+# 
+# WING,MICB,m,delete
+# 
+# WWW::AllTop,ARNIE,f,delete
+# WWW::Alltop,ARNIE,m,f
+# 
+# WWW::Search::Google,MTHURN,f,c
+# WWW::Search::Google,LBROCARD,m,f
+# 
+# WWW::Tamperdata,MARCUSSEN,m,delete
+# 
+# WebService::NMA,CHISEL,f,delete
+# WebService::NMA,SHUFF,m,f
+# 
+# WebService::Rakuten,DRAWNBOY,f,c
+# WebService::Rakuten,DYLAN,m,f
+# 
+# Webservice::Instagram,DAYANUNE,m,delete
+# 
+# Webservice::Tesco::API,WBASSON,m,delete
+# 
+# Webservice::Vtiger,MONSENHOR,m,delete
+# 
+# Xbase,PRATP,f,delete
+# XBase,JANPAZ,m,f
+# 
+# Xml,SAKOHT,f,c
+# XML,XMLML,m,f
+# 
+# XML::LibXML,PHISH,m,c
+# 
+# XML::Smart,GMPASSOS,f,c
+# XML::Smart,TMHARISH,m,f
+# 
+# diagnostics,TOMC,m,c
+# 
+# overload,ILYAZ,m,c
+# 
+# VERSION,LEIF,f,delete
+# Version,ASKSH,f,delete
+# version,JPEACOCK,m,f
+B::C,MICB,f,c
+B::C,RURBAN,m,f
+Apache::test,APML,m,delete
