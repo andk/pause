@@ -43,6 +43,12 @@ The difference this time is, the format has one field more:
 	f       downgrade an ‘m’ to an ‘f’
 	add     add this permission
 
+When we reached circa line 335 of the list after the DATA filehandle,
+we discovered the need to have the upgrade c=>f option too and
+implemented it:
+
+        f       downgrade m=>f or upgrade c=>f
+
 =cut
 
 use FindBin;
@@ -151,6 +157,15 @@ while (<DATA>) {
                 warn "Would call mods-to-primeur\n";
             } else {
                 0 == system "/opt/perl/current/bin/perl", "-Iprivatelib", "-Ilib", "bin/from-mods-to-primeur.pl", @dry_run, $m or die "Alert: $t: Problem while running from-mods-to-primeur for '$m'";
+            }
+        } elsif ($type eq "c") {
+            if ($Opt{"dry-run"}){
+                warn "Would delete comaint AND Would insert first-come\n";
+            } else {
+                warn "Deleting from perms package=$m,userid=$a";
+                $sth3->execute($m,$a);
+                warn "Inserting into primeur modid=$m,userid=$a";
+                $sth5->execute($m,$a);
             }
         } else {
             die "illegal";
@@ -507,6 +522,12 @@ __END__
 # VERSION,LEIF,f,delete
 # Version,ASKSH,f,delete
 # version,JPEACOCK,m,f
-B::C,MICB,f,c
-B::C,RURBAN,m,f
-Apache::test,APML,m,delete
+# B::C,MICB,f,c
+# B::C,RURBAN,m,f
+# Apache::test,APML,m,delete
+DBD::Cego,COMPLX,c,f
+Sane,RATCLIFFE,f,c
+Time::Format,ROODE,c,f
+Tk::CheckBox,DKWILSON,f,c
+B::CC,MICB,f,c
+B::CC,RURBAN,m,f
