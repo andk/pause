@@ -525,9 +525,10 @@ __END__
 # B::C,MICB,f,c
 # B::C,RURBAN,m,f
 # Apache::test,APML,m,delete
-DBD::Cego,COMPLX,c,f
-Sane,RATCLIFFE,f,c
-Time::Format,ROODE,c,f
-Tk::CheckBox,DKWILSON,f,c
-B::CC,MICB,f,c
-B::CC,RURBAN,m,f
+# DBD::Cego,COMPLX,c,f
+# Sane,RATCLIFFE,f,c
+# Time::Format,ROODE,c,f
+# Tk::CheckBox,DKWILSON,f,c
+# B::CC,MICB,f,c
+# B::CC,RURBAN,m,f
+cpan::outdated,TOKUHIROM,c,f
