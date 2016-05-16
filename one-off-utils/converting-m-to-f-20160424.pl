@@ -531,4 +531,5 @@ __END__
 # Tk::CheckBox,DKWILSON,f,c
 # B::CC,MICB,f,c
 # B::CC,RURBAN,m,f
-cpan::outdated,TOKUHIROM,c,f
+# cpan::outdated,TOKUHIROM,c,f
+Des,MICB,c,delete
