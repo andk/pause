@@ -532,4 +532,6 @@ __END__
 # B::CC,MICB,f,c
 # B::CC,RURBAN,m,f
 # cpan::outdated,TOKUHIROM,c,f
-Des,MICB,c,delete
+# Des,MICB,c,delete
+Gearman,DORMANDO,c,f
+
