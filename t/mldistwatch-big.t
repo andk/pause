@@ -36,17 +36,27 @@ subtest "first indexing" => sub {
     [
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.11'  },
+      { package => 'Mooooooose',     version => '0.01'  },
       { package => 'XForm::Rollout', version => '1.00'  },
       { package => 'Y',              version => 2       },
     ],
   );
-
   $result->perm_list_ok(
-    [ undef, undef, undef, undef ],
+    {
+      'Bug::Gold'       => { f => 'OPRIME' },
+      'Hall::MtKing'    => { f => 'XYZZY'  },
+      'Jenkins::Hack'   => { f => 'OOOPPP' },
+      'Mooooooose'      => { f => 'AAARGH' },
+      'XForm::Rollout'  => { f => 'OPRIME' },
+      'Y',              => { f => 'XYZZY'  },
+    }
   );
 
   $result->email_ok(
     [
+      { subject => 'PAUSE indexer report AAARGH/Mooooooose-0.01.tar.gz' },
+      { subject => 'PAUSE indexer report OOOPPP/Jenkins-Hack-0.11.tar.gz' },
       { subject => 'PAUSE indexer report OPRIME/Bug-Gold-9.001.tar.gz' },
       { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.00.tar.gz' },
       { subject => 'PAUSE indexer report XYZZY/Hall-MtKing-0.01.tar.gz' },
@@ -61,6 +71,37 @@ subtest "first indexing" => sub {
     );
   };
 
+};
+
+subtest "add comaintainer" => sub {
+
+  my $result = $pause->test_reindex;
+  my $dbh = $result->connect_mod_db;
+  my @comaintainers = (
+    [qw/Bug::Gold ATRION/],
+    [qw/Jenkins::Hack ONE/],
+    [qw/Jenkins::Hack TWO/],
+    [qw/Mooooooose MERCKX/],
+    [qw/Mooooooose BOONEN/],
+  );
+  for my $comaint (@comaintainers)
+  {
+    $dbh->do("INSERT INTO perms   (package, userid) VALUES (?,?)", {}, @$comaint)
+        or die "couldn't insert!";
+  }
+
+  $result = $pause->test_reindex;
+
+  $result->perm_list_ok(
+    {
+      'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
+      'Hall::MtKing'    => { f => 'XYZZY' },
+      'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+      'XForm::Rollout'  => { f => 'OPRIME' },
+      'Y',              => { f => 'XYZZY' },
+    }
+  );
 };
 
 subtest "add historic content" => sub {
@@ -79,6 +120,8 @@ subtest "add historic content" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.11'  },
+      { package => 'Mooooooose',     version => '0.01'  },
       { package => 'XForm::Rollout', version => '1.00'  },
       { package => 'Y',              version => 2       },
     ]
@@ -101,6 +144,10 @@ subtest "reindexing" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -108,6 +155,8 @@ subtest "reindexing" => sub {
 
   $result->email_ok(
     [
+      { subject => 'PAUSE indexer report MERCKX/Mooooooose-0.02.tar.gz' },
+      { subject => 'PAUSE indexer report OOOPPP/Jenkins-Hack-0.12.tar.gz' },
       { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
     ],
   );
@@ -128,6 +177,10 @@ subtest "distname/pkgname permission mismatch" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -174,6 +227,10 @@ subtest "case mismatch, authorized for original" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -202,6 +259,10 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -240,6 +301,10 @@ subtest "perl-\\d should not get indexed" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -263,6 +328,10 @@ subtest "don't allow upload on permissions case conflict" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -290,6 +359,10 @@ subtest "distname/pkgname permission check" => sub {
       { package => 'Bug::Gold',      version => '9.001' },
       { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
+      { package => 'Jenkins::Hack',  version => '0.12'  },
+      { package => 'Jenkins::Hack2', version => '0.12'  },
+      { package => 'Mooooooose',     version => '0.02'  },
+      { package => 'Mooooooose::Role', version => '0.02'  },
       { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
     ],
@@ -303,6 +376,65 @@ subtest "distname/pkgname permission check" => sub {
   );
 };
 
+subtest "check comaintainers" => sub {
+
+  my $result = $pause->test_reindex;
+  TODO: {
+    local $TODO = "Default permissions for new modules to be implemented";
+    $result->perm_list_ok(
+      {
+        'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
+        'Hall::MtKing'    => { f => 'XYZZY' },
+        'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Mooooooose'      => { f => 'AAARGH' },
+        'Mooooooose::Role' => { f => 'AAARGH', c => [qw/MERCKX/] },
+        'XForm::Rollout'  => { f => 'OPRIME' },
+        'Y',              => { f => 'XYZZY' },
+      }
+    );
+  };
+};
+
+subtest "comaint upload" => sub {
+
+  $pause->import_author_root('corpus/mld/008/authors');
+  my $result = $pause->test_reindex;
+    $result->perm_list_ok(
+      {
+        'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
+        'Hall::MtKing'    => { f => 'XYZZY' },
+        'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'XForm::Rollout'  => { f => 'OPRIME' },
+        'Y',              => { f => 'XYZZY' },
+      }
+    );
+};
+
+subtest "other comaint upload" => sub {
+
+  $pause->import_author_root('corpus/mld/009/authors');
+  my $result = $pause->test_reindex;
+    $result->perm_list_ok(
+      {
+        'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
+        'Hall::MtKing'    => { f => 'XYZZY' },
+        'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+        'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'XForm::Rollout'  => { f => 'OPRIME' },
+        'Y',              => { f => 'XYZZY' },
+      }
+    );
+};
 done_testing;
 
 # Local Variables:

@@ -102,6 +102,8 @@ sub p6dists_ok {
 sub perm_list_ok {
   my ($self, $want) = @_;
 
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
   my $index_06 = $self->tmpdir->subdir(qw(cpan modules))
                  ->file(qw(06perms.txt.gz));
 
@@ -110,13 +112,21 @@ sub perm_list_ok {
     or die "can't open $index_06 for reading with gip: $!";
 
   my (@header, @data);
+  my $module;
+  my %permissions;
   while (<$fh>) {
     push(@header, $_), next if 1../^\s*$/;
-    push @data, $_;
+    chomp;
+    my ($m, $u, $p) = split(/,/, $_);
+    if($p eq 'c') {
+      push @{$permissions{$m}->{$p}}, $u;
+    } else {
+      $permissions{$m}->{$p} = $u;
+    }
   }
 
-  # simple is() for now to check for line count
-  is(@data, @$want, "there are right number of lines in 06perms");
+  cmp_deeply(\%permissions, $want, "permissions look correct in 06perms")
+  or diag explain(\%permissions);
 }
 
 has deliveries => (
