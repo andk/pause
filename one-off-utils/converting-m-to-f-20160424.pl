@@ -136,7 +136,7 @@ while (<DATA>) {
             } else {
                 warn "Setting mlstatus for modid=$m,userid=$a in mods to 'delete'";
                 $sth1->execute($m,$a);
-                warn "Inserting into perms modid=$m,userid=$a";
+                warn "Inserting into perms modid=$m,userid=$a (may fail with 'Duplicate entry')";
                 $sth4->execute($m,$a);
             }
         } elsif ($type eq "f") {
@@ -145,7 +145,7 @@ while (<DATA>) {
             } else {
                 warn "Deleting from primeur package=$m,userid=$a";
                 $sth2->execute($m,$a);
-                warn "Inserting into perms modid=$m,userid=$a";
+                warn "Inserting into perms modid=$m,userid=$a (may fail with 'Duplicate entry')";
                 $sth4->execute($m,$a);
             }
         } else {
@@ -182,7 +182,7 @@ while (<DATA>) {
             if ($Opt{"dry-run"}){
                 warn "Would insert comaint 3\n";
             } else {
-                warn "Inserting into perms modid=$m,userid=$a";
+                warn "Inserting into perms modid=$m,userid=$a (may fail with 'Duplicate entry')";
                 $sth4->execute($m,$a);
             }
         } else {
