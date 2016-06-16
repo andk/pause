@@ -178,6 +178,13 @@ while (<DATA>) {
                 warn "Inserting into primeur modid=$m,userid=$a";
                 $sth5->execute($m,$a);
             }
+        } elsif ($type eq "c") {
+            if ($Opt{"dry-run"}){
+                warn "Would insert comaint 3\n";
+            } else {
+                warn "Inserting into perms modid=$m,userid=$a";
+                $sth4->execute($m,$a);
+            }
         } else {
             die "illegal";
         }
