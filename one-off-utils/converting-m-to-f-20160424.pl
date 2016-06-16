@@ -533,5 +533,10 @@ __END__
 # B::CC,RURBAN,m,f
 # cpan::outdated,TOKUHIROM,c,f
 # Des,MICB,c,delete
-Gearman,DORMANDO,c,f
-
+# Gearman,DORMANDO,c,f
+Tie::Handle,STBEY,f,c
+Tie::Handle,P5P,f,add
+ExtUtils::Installed,P5P,c,add
+ExtUtils::MM_Win32,P5P,c,add
+ExtUtils::Packlist,P5P,c,add
+Tie::RefHash,P5P,c,add
