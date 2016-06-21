@@ -547,5 +547,6 @@ __END__
 # ExtUtils::MM_Win32,P5P,c,add
 # ExtUtils::Packlist,P5P,c,add
 # Tie::RefHash,P5P,c,add
-EWINDISCH,Annelidous,f,delete
-Annelidous,EWINDISCH,f,add
+# EWINDISCH,Annelidous,f,delete
+# Annelidous,EWINDISCH,f,add
+Math::TrulyRandom,DANAJ,f,add
