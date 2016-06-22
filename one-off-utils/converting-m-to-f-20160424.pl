@@ -100,6 +100,9 @@ while (<DATA>) {
     next if /^\s*$/;
     next if /^#/;
     my($m,$a,$type,$action) = split /,/, $csv;
+    for ($m,$a,$type,$action) {
+        s/\s//g;
+    }
     die "illegal type" unless $type =~ /[mfc]/;
     my $t = scalar localtime;
     $i++;
@@ -549,4 +552,5 @@ __END__
 # Tie::RefHash,P5P,c,add
 # EWINDISCH,Annelidous,f,delete
 # Annelidous,EWINDISCH,f,add
-Math::TrulyRandom,DANAJ,f,add
+# Math::TrulyRandom,DANAJ,f,add
+Apache::RegistryLexInfo, DOUGM,f,add
