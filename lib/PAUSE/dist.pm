@@ -772,7 +772,8 @@ sub filter_pms {
     # skip "local" - somebody shipped his carton setup!
     # skip 'perl5" - somebody shipped her local::lib!
     # skip 'fatlib' - somebody shipped their fatpack lib!
-    next if $inmf =~ m!^(?:x?t|inc|local|perl5|fatlib)/!;
+    # skip 'examples', 'example', 'ex', 'eg', 'demo' - example usage
+    next if $inmf =~ m!^(?:x?t|inc|local|perl5|fatlib|examples?|ex|eg|demo)/!;
 
     if ($self->{META_CONTENT}){
       my $no_index = $self->{META_CONTENT}{no_index}
