@@ -554,5 +554,6 @@ __END__
 # Annelidous,EWINDISCH,f,add
 # Math::TrulyRandom,DANAJ,f,add
 # Apache::RegistryLexInfo, DOUGM,f,add
-blib,perl,f,delete
-blib,P5P,f,add
+# blib,perl,f,delete
+# blib,P5P,f,add
+asterisk::perl,JAMESGOL,f,add
