@@ -557,16 +557,17 @@ __END__
 # blib,perl,f,delete
 # blib,P5P,f,add
 # asterisk::perl,JAMESGOL,f,add
-Pod::ProjectDocs,LYOKATO,f,add
-Pod::ProjectDocs::ArrowImage,LYOKATO,f,add
-Pod::ProjectDocs::CSS,LYOKATO,f,add
-Pod::ProjectDocs::Config,LYOKATO,f,add
-Pod::ProjectDocs::Doc,LYOKATO,f,add
-Pod::ProjectDocs::DocManager,LYOKATO,f,add
-Pod::ProjectDocs::DocManager::Iterator,LYOKATO,f,add
-Pod::ProjectDocs::File,LYOKATO,f,add
-Pod::ProjectDocs::IndexPage,LYOKATO,f,add
-Pod::ProjectDocs::Parser,LYOKATO,f,add
-Pod::ProjectDocs::Parser::JavaScriptPod,LYOKATO,f,add
-Pod::ProjectDocs::Parser::PerlPod,LYOKATO,f,add
-Pod::ProjectDocs::Template,LYOKATO,f,add
+# Pod::ProjectDocs,LYOKATO,f,add
+# Pod::ProjectDocs::ArrowImage,LYOKATO,f,add
+# Pod::ProjectDocs::CSS,LYOKATO,f,add
+# Pod::ProjectDocs::Config,LYOKATO,f,add
+# Pod::ProjectDocs::Doc,LYOKATO,f,add
+# Pod::ProjectDocs::DocManager,LYOKATO,f,add
+# Pod::ProjectDocs::DocManager::Iterator,LYOKATO,f,add
+# Pod::ProjectDocs::File,LYOKATO,f,add
+# Pod::ProjectDocs::IndexPage,LYOKATO,f,add
+# Pod::ProjectDocs::Parser,LYOKATO,f,add
+# Pod::ProjectDocs::Parser::JavaScriptPod,LYOKATO,f,add
+# Pod::ProjectDocs::Parser::PerlPod,LYOKATO,f,add
+# Pod::ProjectDocs::Template,LYOKATO,f,add
+Audio::ScratchLive,CAPOEIRAB,c,f
