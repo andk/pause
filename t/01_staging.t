@@ -86,6 +86,13 @@ use Test::More;
 }
 
 {
+    # admin
+    BEGIN { $tests+=1 }
+    my $resp = _ua->get("$root/pause/query?ACTION=who_admin;OF=YAML");
+    like $resp->decoded_content, qr/\bDAGOLDEN\b/, "found David Golden as admin";
+}
+
+{
     # emails for ABH
     BEGIN { $tests+=1 }
     my $resp = _ua->get("$root/pause/authenquery?ACTION=email_for_admin;OF=YAML");

@@ -40,6 +40,7 @@ sub parameter {
      "pause_namingmodules",
      "request_id",
      "who_pumpkin",
+     "who_admin",
     )} = ();
 
   @allow_submit = (
@@ -5595,6 +5596,54 @@ sub who_pumpkin {
     push @m, join ", ", @hres;
     push @m, "</p>";
     my $href = sprintf("query?ACTION=who_pumpkin;OF=YAML");
+    push @m, qq{<p><a href="$href" style="text-decoration: none;">
+<span class="orange_button">YAML</span>
+</a></p>};
+    return join "", @m;
+  }
+}
+
+sub who_admin {
+  my $self = shift;
+  my $mgr = shift;
+  my $req = $mgr->{REQ};
+
+  my @m;
+
+  push @m, qq{<p>Query the <code>grouptable</code> table for who is a
+          admin bit holder</p>
+
+          <p>Registered admins:
+};
+
+  my @hres;
+  {
+    my $db = $mgr->authen_connect;
+    my $sth = $db->prepare("SELECT user FROM grouptable WHERE ugroup='admin' order by user");
+    $sth->execute;
+    while (my @row = $sth->fetchrow_array) {
+      push @hres, $row[0];
+    }
+    $sth->finish;
+  };
+  my $output_format = $req->param("OF");
+  if ($output_format){
+    if ($output_format eq "YAML") {
+      require YAML::Syck;
+      local $YAML::Syck::ImplicitUnicode = 1;
+      my $dump = YAML::Syck::Dump(\@hres);
+      my $edump = Encode::encode_utf8($dump);
+      my $res = $mgr->{RES};
+      $res->content_type("text/plain; charset=utf8");
+      $res->body($edump);
+      return $mgr->{DONE} = HTTP_OK;
+    } else {
+      die "not supported OF=$output_format"
+    }
+  } else {
+    push @m, join ", ", @hres;
+    push @m, "</p>";
+    my $href = sprintf("query?ACTION=who_admin;OF=YAML");
     push @m, qq{<p><a href="$href" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
 </a></p>};

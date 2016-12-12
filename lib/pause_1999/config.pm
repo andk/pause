@@ -116,6 +116,15 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 
                      },
 
+           who_admin => {
+                      verb => "List of admins",
+                      priv => "public",
+                      cat => "02serv/06",
+
+                      desc => "A list, also available as YAML",
+
+                     },
+
            # USER
 
            # USER/FILES
