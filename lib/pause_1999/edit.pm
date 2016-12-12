@@ -5610,7 +5610,7 @@ sub who_admin {
 
   my @m;
 
-  push @m, qq{<p>Query the <code>grouptable</code> table for who is a
+  push @m, qq{<p>Query the <code>grouptable</code> table for who is an
           admin bit holder</p>
 
           <p>Registered admins:
