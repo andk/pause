@@ -571,25 +571,26 @@ __END__
 # Pod::ProjectDocs::Parser::PerlPod,LYOKATO,f,add
 # Pod::ProjectDocs::Template,LYOKATO,f,add
 # Audio::ScratchLive,CAPOEIRAB,c,f
-Apache::test,APML,c,delete
-Chart::GnuPlot,NPESKETT,c,delete
-Config::Hash,MINIMAL,c,delete
-Config::Ini,AVATAR,c,delete
-HG,RTWARD,c,delete
-Labkey::Query,BBIMBER,c,delete
-Labkey::query,BBIMBER,c,delete
-Lingua::PT::pln,AMBS,c,delete
-Math::Continuedfraction,JGAMBLE,c,delete
-Mobile::WURFL,VALDEZ,c,delete
-PerlIO::Via::Base64,ELIZABETH,c,delete
-PerlIO::Via::MD5,ELIZABETH,c,delete
-PerlIO::Via::QuotedPrint,ELIZABETH,c,delete
-PerlIO::Via::StripHTML,RGARCIA,c,delete
-Plack::Middleware::OAuth::Github,CORNELIUS,c,delete
-Pod::HTML,KJALB,c,delete
-Pod::Rtf,PVHP,c,delete
-Pod::Wikidoc::Cookbook,DAGOLDEN,c,delete
-Tk::CheckBox,DKWILSON,c,delete
-VCS::CVS,RSAVAGE,c,delete
-Webservice::Instagram,DAYANUNE,c,delete
-Xbase,PRATP,c,delete
+# Apache::test,APML,c,delete
+# Chart::GnuPlot,NPESKETT,c,delete
+# Config::Hash,MINIMAL,c,delete
+# Config::Ini,AVATAR,c,delete
+# HG,RTWARD,c,delete
+# Labkey::Query,BBIMBER,c,delete
+# Labkey::query,BBIMBER,c,delete
+# Lingua::PT::pln,AMBS,c,delete
+# Math::Continuedfraction,JGAMBLE,c,delete
+# Mobile::WURFL,VALDEZ,c,delete
+# PerlIO::Via::Base64,ELIZABETH,c,delete
+# PerlIO::Via::MD5,ELIZABETH,c,delete
+# PerlIO::Via::QuotedPrint,ELIZABETH,c,delete
+# PerlIO::Via::StripHTML,RGARCIA,c,delete
+# Plack::Middleware::OAuth::Github,CORNELIUS,c,delete
+# Pod::HTML,KJALB,c,delete
+# Pod::Rtf,PVHP,c,delete
+# Pod::Wikidoc::Cookbook,DAGOLDEN,c,delete
+# Tk::CheckBox,DKWILSON,c,delete
+# VCS::CVS,RSAVAGE,c,delete
+# Webservice::Instagram,DAYANUNE,c,delete
+# Xbase,PRATP,c,delete
+Business::OnlinePayment::CyberSource,XENO,f,add
