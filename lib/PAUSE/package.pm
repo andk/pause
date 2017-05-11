@@ -90,6 +90,11 @@ sub give_regdowner_perms {
                                 FROM   mods
                                 WHERE  modid = ?
                                 ";
+  my ($perms_before) = $dbh->selectrow_arrayref(
+      "SELECT userid FROM perms WHERE LOWER(package) = LOWER(?)",
+      undef,
+      $package,
+  );
   my @args = ($package);
   unless(lc($main_package) eq lc($package)) {
     $sql .= q{
@@ -102,6 +107,21 @@ sub give_regdowner_perms {
   }
 
   my $uids = $dbh->selectall_arrayref($sql, {Slice=>{}}, @args);
+  if ($perms_before && @$perms_before) {
+      for my $p_before (@$perms_before) {
+          my $t_allow_extending_perms = 0;
+          for my $p_future (@$uids) {
+              if ($p_future->{userid} eq $p_before) {
+                  $t_allow_extending_perms = 1;
+                  last;
+              }
+          }
+          unless ($t_allow_extending_perms) {
+              $self->verbose(1,"Ownership preserved. Package[$package]perms[$perms_before]\n");
+              return;
+          }
+      }
+  }
   for my $sth_mods (@$uids)
   {
       my($mods_userid) = $sth_mods->{userid};
@@ -161,15 +181,6 @@ sub perm_check {
     WHERE  LOWER(modid) = LOWER(?)
   };
   my @args = ($package) x 3;
-  unless(lc($main_package) eq lc($package)) {
-    $sql .= q{
-    UNION
-    SELECT ?, userid
-    FROM   perms
-    WHERE  LOWER(package) = LOWER(?)
-    };
-    push @args, $package, $main_package;
-  }
   my($auth_ids) = $dbh->selectall_arrayref($sql,
     undef,
     @args

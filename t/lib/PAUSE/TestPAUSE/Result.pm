@@ -125,7 +125,7 @@ sub perm_list_ok {
     }
   }
 
-  cmp_deeply(\%permissions, $want, "permissions look correct in 06perms")
+  is_deeply(\%permissions, $want, "permissions look correct in 06perms")
   or diag explain(\%permissions);
 }
 
