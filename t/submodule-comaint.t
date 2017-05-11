@@ -38,10 +38,6 @@ my $expected_package_list = [
 # Instantiate a new TestPAUSE
 my $pause = PAUSE::TestPAUSE->init_new;
 
-# Save the locations of the perms file
-my $perms_file_location
-    = $pause->tmpdir->subdir(qw(cpan modules))->file('06perms.txt');
-
 # Create the modules database, and add the existing permissions
 {
     my $db_file = File::Spec->catfile( $pause->db_root, 'mod.sqlite' );
@@ -65,14 +61,12 @@ my $result = $pause->test_reindex;
 # Check the results using Rik's convenience method
 $result->package_list_ok( $expected_package_list );
 
-# Brittle but effective positive and negative double-check tests
-my $data = $perms_file_location->slurp;
-if ( $data =~ m/Jenkins::Hack2,ATRION,f/ ) {
-    pass("ATRION has maintained f on Jenkins::Hack2");
-}
-if ( $data =~ m/Jenkins::Hack2,OOOPPP,c/ ) {
-    fail("Co-maint erroneously awarded on Jenkins::Hack2");
-}
+$result->email_ok(
+  [
+      { subject => 'Failed: PAUSE indexer report OOOPPP/Jenkins-Hack-0.14.tar.gz' },
+      { subject => 'Upload Permission or Version mismatch' },
+  ],
+);
 
 done_testing;
 
