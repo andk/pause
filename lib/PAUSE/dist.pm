@@ -869,7 +869,10 @@ sub _index_by_meta {
   my $dist = $self->{DIST};
 
   my $main_package = $self->_package_governing_permission;
-  while (my($k,$v) = each %$provides) {
+
+  my @packages =  map {[ $_ => $provides->{$_ }]} sort keys %$provides;
+  for (@packages) {
+    my ( $k, $v ) = @$_;
     $v->{infile} = "$v->{file}";
     my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
     if (@stat) {
