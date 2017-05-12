@@ -39,9 +39,10 @@ my $expected_package_list = [
 my $pause = PAUSE::TestPAUSE->init_new;
 
 # Create the modules database, and add the existing permissions
+my $dbh;
 {
     my $db_file = File::Spec->catfile( $pause->db_root, 'mod.sqlite' );
-    my $dbh = DBI->connect(
+    $dbh = DBI->connect(
         'dbi:SQLite:dbname='
             . $db_file,
         undef,
@@ -66,6 +67,27 @@ $result->email_ok(
       { subject => 'Failed: PAUSE indexer report OOOPPP/Jenkins-Hack-0.14.tar.gz' },
       { subject => 'Upload Permission or Version mismatch' },
   ],
+);
+
+# now lets add OOP as comaint on that and check we can upload it okay.
+$dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", {},
+        'Jenkins::Hack2','OOOPPP')
+    or die "couldn't insert!";
+$corpus = 'corpus/mld/submodule-comaint2/authors';
+note("Indexing the corpus at [$corpus] now OOOPPP has comaint");
+$pause->import_author_root( $corpus );
+$result = $pause->test_reindex;
+$result->email_ok(
+  [
+      { subject => 'PAUSE indexer report OOOPPP/Jenkins-Hack-0.15.tar.gz' },
+  ],
+);
+$result->perm_list_ok(
+  {
+    'Jenkins::Hack'        => { f => 'OOOPPP' },
+    'Jenkins::Hack2'       => { f => 'ATRION', c => [qw/OOOPPP/] },
+    'Jenkins::Hack::Utils' => { f => 'OOOPPP' },
+  }
 );
 
 done_testing;
