@@ -7,6 +7,9 @@ use Test::More;
 
 use Time::Local qw/timelocal/;
 use HTTP::Request::Common;
+
+use lib 't/lib';
+use TestSetup;
 use pause_1999::Test::Environment;
 use PAUSE::Crypt;
 

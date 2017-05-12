@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use Test::More;
+
+use lib 't/lib';
+use TestSetup;
 use pause_1999::Test::Environment;
 
 my ( $env, $author ) = pause_1999::Test::Environment->new_with_author(

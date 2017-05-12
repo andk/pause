@@ -7,6 +7,8 @@ use Test::More;
 use Path::Class;
 use File::Temp qw/tempdir tempfile/;
 
+use lib 't/lib';
+use TestSetup;
 use pause_1999::Test::Environment;
 use pause_1999::Test::Fixtures::Author;
 

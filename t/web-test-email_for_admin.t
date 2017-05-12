@@ -7,6 +7,8 @@ use Test::More;
 use Path::Class;
 use File::Temp qw/tempdir tempfile/;
 
+use lib 't/lib';
+use TestSetup;
 use pause_1999::Test::Environment;
 use pause_1999::Test::Fixtures::Author;
 
@@ -33,7 +35,7 @@ for (
     #username public secretemail cpan_mail_alias shouldshow
     [ user1 => 'public@user1', 'secret@user1', 'publ', 'public@user1' ],
     [ user2 => 'public@user2', 'secret@user2', 'secr', 'secret@user2' ],
-    [ user3 => 'public@user3', 'secret@user3', 'blah', undef ],
+    [ user3 => 'public@user3', 'secret@user3', 'none', undef ],
     [ user4 => 'public@user4', undef, 'secr', [] ],
     )
 {
@@ -50,7 +52,7 @@ for (
     " )->execute( $secret_email, $username ) if defined $secret_email;
 
     $env->mod_dbh->prepare( "
-        INSERT INTO users ( userid, email, cpan_mail_alias ) VALUES ( ?, ?, ? )
+        INSERT INTO users ( userid, email, cpan_mail_alias, ustatus_ch ) VALUES ( ?, ?, ?, NOW() )
     " )->execute( $username, $public_email, $cpan_mail_alias );
 
     if ( defined $should_show ) {
