@@ -98,8 +98,8 @@ sub BUILD {
     }
 
     my $mod_users = $self->environment->mod_dbh->prepare( "
-        INSERT INTO users (userid, email, ustatus, fullname, asciiname, cpan_mail_alias)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO users (userid, email, ustatus, fullname, asciiname, cpan_mail_alias, ustatus_ch)
+        VALUES (?, ?, ?, ?, ?, ?, NOW())
     " );
     $mod_users->execute(
         $self->username, $self->email, $self->ustatus,

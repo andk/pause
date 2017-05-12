@@ -52,7 +52,7 @@ for (
     " )->execute( $secret_email, $username ) if defined $secret_email;
 
     $env->mod_dbh->prepare( "
-        INSERT INTO users ( userid, email, cpan_mail_alias ) VALUES ( ?, ?, ? )
+        INSERT INTO users ( userid, email, cpan_mail_alias, ustatus_ch ) VALUES ( ?, ?, ?, NOW() )
     " )->execute( $username, $public_email, $cpan_mail_alias );
 
     if ( defined $should_show ) {
