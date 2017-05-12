@@ -81,6 +81,7 @@ subtest "add comaintainer" => sub {
     [qw/Bug::Gold ATRION/],
     [qw/Jenkins::Hack ONE/],
     [qw/Jenkins::Hack TWO/],
+    [qw/Jenkins::Hack2 OOOPPP/],
     [qw/Mooooooose MERCKX/],
     [qw/Mooooooose BOONEN/],
   );
@@ -97,6 +98,7 @@ subtest "add comaintainer" => sub {
       'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
       'Hall::MtKing'    => { f => 'XYZZY' },
       'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Jenkins::Hack2'  => { c => [qw/OOOPPP/] },
       'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
       'XForm::Rollout'  => { f => 'OPRIME' },
       'Y',              => { f => 'XYZZY' },
