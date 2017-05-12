@@ -1,26 +1,19 @@
-#!perl
+package Test::Pause99::Web::ReadOnlyPages;
 
 use strict;
 use warnings;
+use File::Temp qw/tempdir/;
+use Path::Class qw/dir file/;
 
 use Test::More;
-use Path::Class;
-use File::Temp qw/tempdir tempfile/;
+use base 'Test::Pause99::Web::Base';
 
-use lib 't/lib';
-use TestSetup;
-use pause_1999::Test::Environment;
-use pause_1999::Test::Fixtures::Author;
-
-my ( $env, $author ) = pause_1999::Test::Environment->new_with_author(
-    username  => 'ANDK',
-    asciiname => 'Andreas K',
-);
-
-my $m = $env->site_model($author);
+sub test_basic : Tests(4) {
+    my $t = shift;
+    my ( $env, $author, $m ) = $t->new_andreas();
 
 # File list
-{
+
     # Create some files in a directory
     my $root_dir = tempdir( CLEANUP => 0 );
     my $dir = dir("$root_dir/A/AN/ANDK");
@@ -44,4 +37,4 @@ my $m = $env->site_model($author);
     }
 }
 
-done_testing();
+1;

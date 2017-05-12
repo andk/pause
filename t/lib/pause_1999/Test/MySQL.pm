@@ -5,6 +5,7 @@ use Test::mysqld;
 use Test::More;
 use DBI;
 use File::Temp qw/tempfile/;
+use Capture::Tiny qw/capture_merged/;
 
 $SIG{INT} = sub { die "caught SIGINT, shutting down mysql\n" };
 
@@ -148,8 +149,15 @@ sub mysqld {
     return $mysqld if $mysqld;
 
     note("Starting a test mysqld");
-    $mysqld = Test::mysqld->new( my_cnf => { 'skip-networking' => '' } )
-        or die $Test::mysqld::errstr;
+    note(
+        capture_merged(
+            sub {   $mysqld = Test::mysqld->new(
+                    my_cnf => { 'skip-networking' => '' }
+                );
+            }
+        )
+    );
+    die $Test::mysqld::errstr unless $mysqld;
     note("mysqld started");
 
     return $mysqld;

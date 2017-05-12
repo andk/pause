@@ -5,6 +5,10 @@ use Plack::Util;
 use Plack::Test;
 use Test::WWW::Mechanize::PSGI;
 
+use Class::MOP::Class;
+use Plack::Test::MockHTTP;
+use Capture::Tiny qw/capture_stderr/;
+
 =head1 SYNOPSIS
 
 Set up a whole web environment ready to go. Currently supports:
@@ -80,8 +84,28 @@ has 'plack_test' => (
 );
 
 sub _build_plack_test {
-    my $self = shift;
-    return Plack::Test->create($self->plack_app);
+    my $self      = shift;
+    my $metaclass = Class::MOP::Class->create_anon_class(
+        superclasses => ['Plack::Test::MockHTTP'] );
+
+    my $plack_test = Plack::Test->create( $self->plack_app );
+    $metaclass->rebless_instance($plack_test);
+
+    my $method = $metaclass->add_method(
+        'request',
+        sub {
+            my ( $obj, $req ) = @_;
+            my $result;
+            my ($stderr) = capture_stderr {
+                $result = Plack::Test::MockHTTP::request( $obj, $req );
+            };
+            $self->_filter_stderr($stderr);
+            return $result;
+
+        }
+    );
+
+    return $plack_test;
 }
 
 has 'mail_mailer' => (
@@ -109,10 +133,35 @@ sub new_with_author {
 
 sub site_model {
     my ( $self, $author ) = @_;
+    my $metaclass = Class::MOP::Class->create_anon_class(
+        superclasses => ['Test::WWW::Mechanize::PSGI'] );
+
     my $mech = Test::WWW::Mechanize::PSGI->new( app => $self->plack_app );
+    $metaclass->rebless_instance($mech);
+
+    my $method = $metaclass->add_method(
+        'simple_request',
+        sub {
+            my ( $obj, $req ) = @_;
+            my $result;
+            my ($stderr) = capture_stderr {
+                $result = Test::WWW::Mechanize::PSGI::simple_request( $obj,
+                    $req );
+            };
+            $self->_filter_stderr($stderr);
+            return $result;
+
+        }
+    );
+
     my $model = pause_1999::Test::SiteModel->new( mech => $mech );
-    $model->set_user( $author );
+    $model->set_user($author);
     return $model;
+}
+
+sub _filter_stderr {
+    my ( $self, $stderr ) = @_;
+    Test::More::note($stderr) unless $ENV{'HUSH_PAUSE_STDERR'};
 }
 
 1;

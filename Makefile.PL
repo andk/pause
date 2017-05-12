@@ -11,9 +11,11 @@ WriteMakefile(
               PREREQ_PM     => { map +($_ => 0), qw(
     Apache::Session::Counted
     BSD::Resource
+    Capture::Tiny
     CPAN::Checksums
     CPAN::DistnameInfo
     CPAN::Indexer::Mirror
+    Class::MOP::Class
     Class::Singleton
     Compress::Zlib
     Crypt::Eksblowfish::Bcrypt
@@ -64,6 +66,8 @@ WriteMakefile(
     Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
     String::Random
+    Test::Aggregate
+    Test::Class
     Test::Deep
     Test::FITesque::Fixture
     Test::MockObject
