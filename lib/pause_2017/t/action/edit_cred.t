@@ -9,7 +9,7 @@ my $default = {
     pause99_edit_cred_asciiname => "new ascii name",
     pause99_edit_cred_email => "new_email\@localhost.localdomain",
     pause99_edit_cred_homepage => "none",
-    pause99_edit_cred_cpan_mail_alias => "none"
+    pause99_edit_cred_cpan_mail_alias => "none",
     pause99_edit_cred_sub => 1,
 };
 
