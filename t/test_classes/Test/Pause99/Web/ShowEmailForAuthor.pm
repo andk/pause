@@ -35,7 +35,7 @@ sub test_basic : Tests(3) {
         #username public secretemail cpan_mail_alias shouldshow
         [ user1 => 'public@user1', 'secret@user1', 'publ', 'public@user1' ],
         [ user2 => 'public@user2', 'secret@user2', 'secr', 'secret@user2' ],
-        [ user3 => 'public@user3', 'secret@user3', 'blah', undef ],
+        [ user3 => 'public@user3', 'secret@user3', 'none', undef ],
         [ user4 => 'public@user4', undef, 'secr', [] ],
         )
     {
