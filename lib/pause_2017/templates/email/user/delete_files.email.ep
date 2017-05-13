@@ -2,7 +2,7 @@
 %
 %#------------------------------------------------------------------
 %
-%= wrap begin
+%= text_format begin
 According to a request entered by <%== $pause->{User}{fullname} %> the
 following files and the symlinks pointing to them have been scheduled
 for deletion. They will expire after 72 hours and then be deleted by a
@@ -13,7 +13,7 @@ cronjob. Until then you can undelete them via
 
 <%== $pause->{blurb} %>
 
-%= wrap begin
+%= text_format begin
 Note: to encourage deletions, all of past CPAN
 glory is collected on http://history.perl.org/backpan/
 % end
