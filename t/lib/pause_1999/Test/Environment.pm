@@ -134,7 +134,10 @@ sub new_with_author {
 sub site_model {
     my ( $self, $author ) = @_;
     my $metaclass = Class::MOP::Class->create_anon_class(
-        superclasses => ['Test::WWW::Mechanize::PSGI'] );
+        superclasses => [
+            'Test::WWW::Mechanize::PSGI', @Test::WWW::Mechanize::PSGI::ISA
+        ]
+    );
 
     my $mech = Test::WWW::Mechanize::PSGI->new( app => $self->plack_app );
     $metaclass->rebless_instance($mech);
@@ -155,7 +158,7 @@ sub site_model {
     );
 
     my $model = pause_1999::Test::SiteModel->new( mech => $mech );
-    $model->set_user($author);
+    $model->set_user($author) if $author;
     return $model;
 }
 
