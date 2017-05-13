@@ -10,12 +10,6 @@ services:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libdb-dev
-  ## Stop PrivatePAUSE complaints
-  # Where bin/ will be able to find it
-  - cp -r t/lib/privatelib ./
-  # Where the tests will be able to find it
-  - mkdir blib
-  - cp -r t/lib/privatelib ./blib/
   ## Set a git identity
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis PAUSE"
