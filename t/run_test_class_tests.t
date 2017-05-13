@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use lib 'lib';
-use lib 't/lib/';
+use lib 't/lib';
+use TestSetup;
 
 use Test::Class::Load 't/test_classes/';
 
