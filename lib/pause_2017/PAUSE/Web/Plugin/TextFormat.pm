@@ -9,7 +9,7 @@ sub register {
   $app->helper(text_format => \&_text_format);
 }
 
-sub _wrap {
+sub _text_format {
   my ($c, $block) = @_;
   my $result = $block->();
   Mojo::ByteStream->new(Text::Format->new(firstIndent => 0)->format($result));
