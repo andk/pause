@@ -22,6 +22,7 @@ use Unicode::String;
 
 sub any2utf8 {
   my $s = shift;
+  return $s unless defined $s;
 
   if ($s =~ /[\200-\377]/) {
     # warn "s[$s]";
