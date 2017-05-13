@@ -179,8 +179,6 @@ sub send_mail {
     body_str => $blurb,
   );
 
-warn "EMAIL: ".$email->as_string;
-
   if ($PAUSE::Config->{TESTHOST}){
     warn "TESTHOST is NOT sending mail";
     warn "Line " . __LINE__ . ", File: " . __FILE__ . "\n" .
