@@ -15,6 +15,7 @@ our $VERSION = "1072";
 has root => sub { Carp::confess "requires root" };
 has config => sub { PAUSE::Web::Config->new };
 has logger => sub { Log::Dispatch::Config->instance };
+has mailer => sub { Email::Sender::Simple->new };
 
 sub init {
   my $self = shift;
@@ -185,7 +186,7 @@ sub send_mail {
         Data::Dumper->new([$header,$blurb],[qw(header blurb)])
               ->Indent(1)->Useqq(1)->Dump;
   }
-  Email::Sender::Simple->send($email);
+  $self->mailer->send($email);
   1;
 }
 
