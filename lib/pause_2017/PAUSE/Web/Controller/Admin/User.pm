@@ -244,8 +244,8 @@ sub add_user_doit {
   if ($dbh->do($query,undef,@qbind)) {
     $pause->{succeeded} = 1;
 
-    my(@blurb);
-    my($subject);
+    my $blurb;
+    my $subject;
     my $need_onetime = 0;
     if ( $req->param('pause99_add_user_subscribe') gt '' ) {
 
@@ -259,6 +259,7 @@ sub add_user_doit {
       my($changed) = $T;
       $pause->{maillistname} = $maillistname;
       $pause->{subscribe} = $subscribe;
+      $blurb = $c->render_to_string("email/admin/user/welcome_ml", format => "email");
 
       $query = qq{INSERT INTO maillists (
                         maillistid, maillistname,
@@ -318,6 +319,8 @@ sub add_user_doit {
                               $otpwblurb);
 
       }
+      $pause->{memo} = $req->param('pause99_add_user_memo');
+      $blurb = $c->render_to_string("email/admin/user/welcome_user", format => "email");
     }
 
     # both users and mailing lists run this code
@@ -327,8 +330,6 @@ sub add_user_doit {
 
     $pause->{send_to} = join(" AND ", @to, $email);
     $pause->{subject} = $subject;
-
-    my($blurb) = join "", @blurb;
     $pause->{blurb} = $blurb;
 
     my $header = {
