@@ -21,13 +21,13 @@ subtest 'basic' => sub {
     $t->mod_dbh->do("TRUNCATE uris");
 
     # prepare distribution
-    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", {Content => $default_for_add_uri});
+    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
 
     $t->copy_to_authors_dir("TESTUSER", scalar Test::PAUSE::Web->file_to_upload);
 
     my %form = %$default;
     $form{SUBMIT_pause99_delete_files_delete} = 1;
-    $t->user_post_ok("/pause/authenquery?ACTION=delete_files", {Content => \%form});
+    $t->user_post_ok("/pause/authenquery?ACTION=delete_files", \%form);
     note $t->content;
 };
 

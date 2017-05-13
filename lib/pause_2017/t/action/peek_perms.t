@@ -21,7 +21,7 @@ subtest 'basic' => sub {
     $sth->execute("Bar", "TESTUSER");
 
     my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=peek_perms", {Content => \%form});
+    $t->user_post_ok("/pause/authenquery?ACTION=peek_perms", \%form);
     note $t->content;
 };
 

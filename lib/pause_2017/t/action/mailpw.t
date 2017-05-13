@@ -15,7 +15,7 @@ subtest 'basic' => sub {
     my $t = Test::PAUSE::Web->new;
     my %form = %$default;
     $t->authen_dbh->do("TRUNCATE abrakadabra");
-    $t->post_ok("/pause/query?ACTION=mailpw", {Content => \%form});
+    $t->post_ok("/pause/query?ACTION=mailpw", \%form);
     note $t->content;
 };
 
