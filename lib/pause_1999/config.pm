@@ -18,6 +18,284 @@ pause_1999::edit
 pause_1999::usermenu
 )]);
 
+our $DEFAULT_USER_ACTIONS =
+{
+    # PUBLIC
+    request_id => {
+        verb => "Request PAUSE account",
+        priv => "public",
+        cat  => "00reg/01",
+        desc => "Apply for a PAUSE account.",
+    },
+
+    mailpw => {
+        verb => "Forgot Password?",
+        priv => "public",
+        cat  => "00urg/01",
+        desc => <<'DESC',
+A passwordmailer that sends you a password that enables you to set a new password.
+DESC
+    },
+
+    pause_04about => {
+        verb => "About PAUSE",
+        priv => "public",
+        cat  => "01self/04a",
+        desc => "Same as modules/04pause.html on any CPAN server",
+    },
+
+    pause_04imprint => {
+        verb => "Imprint/Impressum",
+        priv => "public",
+        cat  => "01self/06b",
+    },
+
+    pause_05news => {
+        verb => "PAUSE News",
+        priv => "public",
+        cat  => "01self/05",
+        desc => "What's going on on PAUSE",
+    },
+
+    pause_06history => {
+        verb => "PAUSE History",
+        priv => "public",
+        cat  => "01self/06",
+        desc => "Old News",
+    },
+
+    pause_namingmodules => {
+        verb => "On The Naming of Modules",
+        priv => "public",
+        cat  => "01self/04b",
+        desc => "A couple of suggestions that hopefully get you on track",
+    },
+
+    who_pumpkin => {
+        verb => "List of pumpkins",
+        priv => "public",
+        cat  => "02serv/05",
+        desc => "A list, also available as YAML",
+    },
+
+    who_admin => {
+        verb => "List of admins",
+        priv => "public",
+        cat  => "02serv/06",
+        desc => "A list, also available as YAML",
+    },
+
+    # USER
+
+    # USER/FILES
+
+    add_uri => {
+        verb => "Upload a file to CPAN",
+        priv => "user",
+        cat  => "User/01Files/01up",
+        desc => <<'DESC',
+This is the heart of the <b>Upload Server</b>, the page most heavily used on
+PAUSE.
+DESC
+    },
+
+    show_files => {
+        verb => "Show my files",
+        priv => "user",
+        cat  => "User/01Files/02show",
+        desc => "find . -ls resemblance",
+    },
+
+    edit_uris => {
+        verb => "Repair a Pending Upload",
+        priv => "user",
+        cat  => "User/01Files/03rep",
+        desc => <<'DESC',
+When an upload you requested hangs for some reason, you can go here and edit the
+file to be uploaded.
+DESC
+    },
+
+    delete_files => {
+        verb => "Delete Files",
+        priv => "user",
+        cat  => "User/01Files/04del",
+        desc => <<'DESC',
+Schedule files for deletion. There is a delay until the deletion really happens.
+Until then you can also undelete files here.
+DESC
+    },
+
+    # User/Permissions
+
+    peek_perms => {
+        verb => "View Permissions",
+        priv => "user",
+        cat  => "User/04Permissions/01",
+        desc => "Whose uploads of what are being indexed on PAUSE",
+    },
+
+    share_perms => {
+        verb => "Change Permissions",
+        priv => "user",
+        cat  => "User/04Permissions/02",
+        desc => <<'DESC',
+Enable other users to upload a module for any of your namespaces, manage your
+own permissions.
+DESC
+    },
+
+    # User/Util
+
+    tail_logfile => {
+        verb => "Tail Daemon Logfile",
+        priv => "user",
+        cat  => "User/05Utils/06",
+    },
+
+    reindex => {
+        verb => "Force Reindexing",
+        priv => "user",
+        cat  => "User/05Utils/02",
+        desc => <<'DESC',
+Tell the indexer to index a file again (e.g. after a change in the perms table)
+DESC
+    },
+
+    reset_version => {
+        verb => "Reset Version",
+        priv => "user",
+        cat  => "User/05Utils/02",
+        desc => <<'DESC',
+Overrule the record of the current version number of a module that the indexer
+uses and set it to 'undef'
+DESC
+    },
+
+    # User/Account
+
+    change_passwd => {
+        verb => "Change Password",
+        priv => "user",
+        cat  => "User/06Account/02",
+        desc => "Change your password any time you want.",
+    },
+
+    edit_cred => {
+        verb => "Edit Account Info",
+        priv => "user",
+        cat  => "User/06Account/01",
+        desc => <<'DESC',
+Edit your user name, your email addresses (both public and secret one),
+change the URL of your homepage.",
+DESC
+    },
+
+    pause_logout => {
+        verb => "About Logging Out",
+        priv => "user",
+        cat  => "User/06Account/04",
+    },
+
+    # ADMIN+mlrep+modlistmaint
+
+    add_user => {
+        verb => "Add a User or Mailinglist",
+        priv => "admin",
+        cat  => "01usr/01add",
+        desc => "Admins can add users or mailinglists.",
+
+    },
+
+    manage_id_requests => {
+        verb => "Manage a registration request (alpha)",
+        priv => "admin",
+        cat  => "01usr/01rej",
+        desc => "show/reject open registration requests",
+    },
+
+    edit_ml => {
+        verb => "Edit a Mailinglist",
+        priv => "admin",
+        cat  => "01usr/02",
+        desc => <<'DESC',
+Admins and mailing list representatives can change the name, address and
+description of a mailing list.
+DESC
+    },
+
+    email_for_admin => {
+        verb => "Look up the forward email address",
+        priv => "admin",
+        cat  => "01usr/01look",
+        desc => "Admins can look where email should go",
+    },
+
+    select_user => {
+        verb => "Select User/Action",
+        priv => "admin",
+        cat  => "01usr/03",
+        desc => <<'DESC',
+Admins can access PAUSE as-if they were somebody else. Here they select a
+user/action pair.
+DESC
+    },
+
+    post_message => {
+        verb => "Post a message",
+        priv => "admin",
+        cat  => "01usr/04",
+        desc => "Post a message to a specific user.",
+    },
+
+    dele_message => {
+        verb => "Show/Delete Msgs",
+        priv => "admin",
+        cat  => "01usr/05",
+        desc => "Delete your messages from the message board.",
+    },
+
+    show_ml_repr => {
+        verb => "Show Mailinglist Reps",
+        priv => "mlrepr",
+        cat  => "09root/04",
+        desc => <<'DESC',
+Admins and the representatives themselves can lookup who is elected to be
+representative of a mailing list.
+DESC
+    },
+
+    index_users => {
+        verb => "Index users with digrams (BROKEN)",
+        priv => "admin",
+        desc => "Batch-index all users.",
+        cat  => "09root/05",
+    },
+
+    select_ml_action => {
+
+        verb => "Select Mailinglist/Action",
+        priv => "mlrepr",
+        cat  => "09root/02",
+        desc => <<'DESC',
+Representatives of mailing lists have their special menu here.
+DESC
+    },
+
+    "check_xhtml" => {
+        verb => "Show bad xhtml output",
+        priv => "admin",
+        cat  => "09root/06",
+        desc => "Monitor bad xhtml output stored from previous sessions",
+    },
+
+    "coredump" => {
+        priv => "admin",
+        cat  => "09root/07",
+        }
+
+};
+
 sub handler {
   my($req) = shift;
   my $dti = PAUSE::downtimeinfo();
@@ -53,301 +331,7 @@ $closed_text <p>Andreas Koenig</p></body> </html>});
 
           DownTime => $downtime,
           WillLast => $willlast,
-          ActionTuning =>
-          {
-
-           # PUBLIC
-
-           request_id => {
-                      verb => "Request PAUSE account",
-                      priv => "public",
-                      cat => "00reg/01",
-
-                      desc => "Apply for a PAUSE account.",
-
-                     },
-
-           mailpw => {
-                      verb => "Forgot Password?",
-                      priv => "public",
-                      cat => "00urg/01",
-
-                      desc => "A passwordmailer that sends you a
-			password that enables you to set a new
-			password.",
-
-                     },
-           pause_04about => {
-                             verb => "About PAUSE",
-                             priv => "public",
-                             desc => "Same as modules/04pause.html on any CPAN server",
-                             cat => "01self/04a",
-                            },
-           pause_04imprint => {
-                               verb => "Imprint/Impressum",
-                               priv => "public",
-                               cat => "01self/06b",
-                            },
-           pause_05news => {
-                            verb => "PAUSE News",
-                            priv => "public",
-                            desc => "What's going on on PAUSE",
-                            cat => "01self/05",
-                           },
-           pause_06history => {
-                               verb => "PAUSE History",
-                               priv => "public",
-                               desc => "Old News",
-                               cat => "01self/06",
-                              },
-           pause_namingmodules => {
-                               verb => "On The Naming of Modules",
-                               priv => "public",
-                               desc => "A couple of suggestions that hopefully get you on track",
-                               cat => "01self/04b",
-                              },
-
-           who_pumpkin => {
-                      verb => "List of pumpkins",
-                      priv => "public",
-                      cat => "02serv/05",
-
-                      desc => "A list, also available as YAML",
-
-                     },
-
-           who_admin => {
-                      verb => "List of admins",
-                      priv => "public",
-                      cat => "02serv/06",
-
-                      desc => "A list, also available as YAML",
-
-                     },
-
-           # USER
-
-           # USER/FILES
-
-           add_uri => {
-                       verb => "Upload a file to CPAN",
-                       priv => "user",
-                       cat => "User/01Files/01up",
-
-                       desc => "This is the heart of the <b>Upload
-			 Server</b>, the page most heavily used on
-			 PAUSE.",
-
-                      },
-           show_files => {
-                       verb => "Show my files",
-                       priv => "user",
-                       cat => "User/01Files/02show",
-
-                       desc => "find . -ls resemblance",
-
-                      },
-           edit_uris => {
-                         verb => "Repair a Pending Upload",
-                         priv => "user",
-                         cat => "User/01Files/03rep",
-
-                         desc => "When an upload you requested hangs
-			   for some reason, you can go here and edit
-			   the file to be uploaded.",
-
-			  },
-           delete_files => {
-                            verb => "Delete Files",
-                            priv => "user",
-                            cat => "User/01Files/04del",
-
-                            desc => "Schedule files for deletion.
-			      There is a delay until the deletion
-			      really happens. Until then you can also
-			      undelete files here.",
-
-                           },
-
-           # User/Permissions
-
-           peek_perms => {
-                          verb => "View Permissions",
-                          priv => "user",
-                          desc => "Whose uploads of what are being indexed on PAUSE",
-                          cat => "User/04Permissions/01",
-                         },
-           share_perms => {
-                           verb => "Change Permissions",
-                           priv => "user",
-                           cat => "User/04Permissions/02",
-
-                           desc => "Enable other users to upload a
-                             module for any of your namespaces, manage
-                             your own permissions.",
-
-                          },
-
-           # User/Util
-
-           tail_logfile => {
-                            verb => "Tail Daemon Logfile",
-                            priv => "user",
-                            cat => "User/05Utils/06",
-                           },
-
-           reindex => {
-                       verb => "Force Reindexing",
-                       priv => "user",
-                       cat => "User/05Utils/02",
-
-                       desc => "Tell the indexer to index a file again
-                         (e.g. after a change in the perms table)",
-
-                        },
-
-           reset_version => {
-                       verb => "Reset Version",
-                       priv => "user",
-                       cat => "User/05Utils/02",
-
-                       desc => "Overrule the record of the current
-                           version number of a module that the indexer
-                           uses and set it to 'undef'",
-
-                            },
-
-           # User/Account
-
-           change_passwd => {
-                             verb => "Change Password",
-                             priv => "user",
-                             cat => "User/06Account/02",
-
-                             desc => "Change your password any time
-				you want.",
-
-                            },
-           edit_cred => {
-                         verb => "Edit Account Info",
-                         priv => "user",
-                         cat => "User/06Account/01",
-
-                         desc => "Edit your user name, your email
-			   addresses (both public and secret one),
-			   change the URL of your homepage.",
-
-                        },
-           pause_logout => {
-                            verb => "About Logging Out",
-                            priv => "user",
-                            cat => "User/06Account/04",
-                            },
-
-
-           # ADMIN+mlrep+modlistmaint
-
-
-           add_user => {
-                        verb => "Add a User or Mailinglist",
-                        priv => "admin",
-                        cat => "01usr/01add",
-
-                        desc => "Admins can add users or
-				  mailinglists.",
-
-                       },
-           manage_id_requests => {
-                        verb => "Manage a registration request (alpha)",
-                        priv => "admin",
-                        cat => "01usr/01rej",
-                        desc => "show/reject open registration requests",
-
-                       },
-           edit_ml => {
-                       verb => "Edit a Mailinglist",
-                       priv => "admin",
-                       cat => "01usr/02",
-
-                       desc => "Admins and mailing list
-				 representatives can change the name,
-				 address and description of a mailing
-				 list.",
-
-                      },
-           email_for_admin => {
-                               verb => "Look up the forward email address",
-                               priv => "admin",
-                               cat => "01usr/01look",
-
-                               desc => "Admins can look where email should go",
-                              },
-           select_user => {
-			     verb => "Select User/Action",
-			     priv => "admin",
-                              cat => "01usr/03",
-
-			     desc => "Admins can access PAUSE as-if
-				     they were somebody else. Here
-				     they select a user/action pair.",
-
-			    },
-           post_message => {
-			     verb => "Post a message",
-			     priv => "admin",
-                              cat => "01usr/04",
-
-			     desc => "Post a message to a specific user.",
-
-			    },
-           dele_message => {
-			     verb => "Show/Delete Msgs",
-			     priv => "admin",
-                              cat => "01usr/05",
-
-			     desc => "Delete your messages from the message board.",
-
-			    },
-           show_ml_repr => {
-                            verb => "Show Mailinglist Reps",
-                            priv => "mlrepr",
-                            cat => "09root/04",
-
-			      desc => "Admins and the representatives themselves
-                                      can lookup who is
-				      elected to be representative of
-				      a mailing list.",
-
-			     },
-             index_users => {
-                             verb => "Index users with digrams (BROKEN)",
-                             priv => "admin",
-                             desc => "Batch-index all users.",
-                              cat => "09root/05",
-                            },
-	     select_ml_action => {
-
-				  verb => "Select Mailinglist/Action",
-				  priv => "mlrepr",
-                              cat => "09root/02",
-
-				  desc => "Representatives of mailing
-					  lists have their special
-					  menu here.",
-
-				 },
-
-           "check_xhtml" =>    {
-                                verb => "Show bad xhtml output",
-                                priv => "admin",
-                                cat => "09root/06",
-                                desc => "Monitor bad xhtml output stored from previous sessions",
-                               },
-           "coredump" => {
-                          priv => "admin",
-                          cat => "09root/07",
-                         }
-          },
+          ActionTuning => $DEFAULT_USER_ACTIONS,
           ActiveColor        => "#bbffbb",
           AllowAdminTakeover => [qw(
  add_uri
