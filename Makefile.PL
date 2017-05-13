@@ -66,7 +66,6 @@ WriteMakefile(
     Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
     String::Random
-    Test::Aggregate
     Test::Class
     Test::Deep
     Test::FITesque::Fixture
