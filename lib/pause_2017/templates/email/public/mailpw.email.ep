@@ -1,0 +1,28 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+
+(this an automatic mail sent by a program because somebody asked for
+it. If you did not intend to get it, please let us know and we will
+take more precautions to prevent abuse.)
+
+Somebody, probably you, has visited the URL
+
+    <%== my_full_url->query(ACTION => "mailpw") %>
+
+and asked that you, "<%= $pause->{mailpw_userid} %>", should get a token that enables the
+setting of a new password. Here it is (please watch out for line
+wrapping errors of your mail reader and other cut and paste errors,
+this URL must not contain any spaces):
+
+    <%== my_full_url->path("/pause/authenquery")->query(ACTION => "change_passwd", ABRA => "$pause->{mailpw_userid}.$pause->{passwd}")->scheme("https") %>
+
+Please visit this URL, it should open you the door to a password
+changer that lets you set a new password for yourself. This token
+will expire within a few hours. If you don't need it, do nothing. By
+the way, your old password is still valid.
+
+Thanks,
+--
+The PAUSE

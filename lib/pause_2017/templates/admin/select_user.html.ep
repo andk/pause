@@ -1,0 +1,16 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<%= select_field "HIDDENNAME" => $pause->{hidden_name_list},
+    size => 10,
+=%>
+
+<br />
+
+<%= select_field "ACTIONREQ" => $pause->{action_req_list},
+    size => 13,
+=%>
+
+<br />
+
+<input type="submit" name="pause99_select_user_sub" value="Submit" />

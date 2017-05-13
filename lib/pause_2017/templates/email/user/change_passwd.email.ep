@@ -1,0 +1,15 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+Password update on PAUSE:
+
+<%== $pause->{User}{userid} %> (<%== $pause->{User}{fullname} || "fullname N/A" %>) visited the
+password changer on PAUSE at <%== scalar gmtime %> UTC
+and changed the password for <%== $pause->{HiddenUser}{userid} %> (<%== $pause->{HiddenUser}{fullname} || "fullname N/A" %>).
+
+No action is required, but it would be a good idea if somebody
+would check the correctness of the new password.
+
+Thanks,
+The Pause

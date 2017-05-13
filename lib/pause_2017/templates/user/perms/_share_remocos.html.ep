@@ -1,0 +1,41 @@
+% my $pause = stash(".pause") || {};
+
+% if (param("SUBMIT_pause99_share_perms_remocos")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+%     for (@{$pause->{results}}) {
+%       if ($_->{not_exists}) {
+<p>Cannot handle tuple <i><%= $_->{mod} %></i>. If you believe, this is a bug, please complain.</p>
+%       } elsif ($_->{error}) {
+<p>Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
+%       } else {
+<p>Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
+%       }
+%     }
+%   } else {
+<p>You need to select one or more packages. Nothing done.</p>
+%   }
+<hr />
+% }
+
+% if (@{$pause->{mods} || []}) {
+<h3>Remove co-maintainer status</h3>
+<p>The scrolling
+list shows you, which packages are associated with other
+maintainers besides yourself. Every line denotes a tuple
+of a namespace and a userid. Select those that you want to
+remove and press <i>Remove</i></p><p>
+
+<%= select_field "pause99_share_perms_remocos_tuples" => $pause->{mods},
+  multiple => "multiple",
+  size => (@{$pause->{mods}} > 8 ? 5 : scalar (@{pause->{mods}}),
+=%>
+</p>
+<p>
+<input type="submit" name="SUBMIT_pause99_share_perms_remocos"
+ value="Remove" /></p>
+
+% } else {
+<p>There are no co-maintainers registered to any of <%= $pause->{User}{userid} %>'s modules.</p>
+% }

@@ -1,0 +1,5 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<hr noshade="noshade" />
+%== $pause->{doc}

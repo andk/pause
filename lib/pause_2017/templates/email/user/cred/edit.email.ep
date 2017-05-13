@@ -1,0 +1,18 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+Record update in the PAUSE users database:
+
+<%== sprintf "%11s: [%s]", "userid", $pause->{Hidden}{userid} %>
+
+% for (@{$pause->{mailblurb}}) {
+<%== sprintf "%11s: [%s]", $_->{field}, $_->{value} %><%== ($_->{was}) ? " was [$_->{was}]" : "" %>
+
+% }
+
+Data were entered by <%== $pause->{User}{userid} %> (<%== $pause->{User}{fullname} %>).
+Please check if they are correct.
+
+Thanks,
+The Pause

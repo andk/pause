@@ -1,0 +1,91 @@
+% my $pause = stash(".pause") || {};
+% my $title = $PAUSE::Config->{TESTHOST} ? "pause\@home: " : "PAUSE: ";
+% my $action = $pause->{action} || "The CPAN back stage entrance";
+%
+% #-----------------------------------------------------------------
+%
+% if ($pause->{can_utf8}) {
+<?xml version="1.0" encoding="UTF-8"?>
+% } else {
+<?xml version="1.0" encoding="ISO-8859-1"?>
+% }
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewpoint" content="width=device-width, initial-scale=1" />
+<title><%= $title %><%= $action %></title>
+<link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg" />
+<link rel="stylesheet" type="text/css" href="/pause/pause.css" title="pause" />
+
+% if ($PAUSE::Config->{TESTHOST}) { #-------------------------------
+
+<style type="text/css">
+h2,h4,b,th,td { color: #486f8d; }
+</style>
+
+% } #---------------------------------------------------------------
+
+</head>
+<body bgcolor="white" link="#0000CC" vlink="#0000BB" alink="#FF0000" text="#000000">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td valign="middle">
+      %= include "_pausegif";
+    </td>
+    <td nowrap="nowrap">
+      <h4 style="margin: 0 0 0 0; padding: 0 1em;">The [Perl programming] Authors Upload Server</h4>
+    </td>
+    <td align="right" style="width: 100%;">
+      %= include "_user_status";
+    </td>
+  </tr>
+</table>
+
+<br />
+
+% if (my $downtime = $pause->{scheduled_downtime}) {
+
+<div align="center">
+  <p class="motd">
+    <b>Scheduled downtime</b><br />
+    On <%= $downtime->{http_time} %> (that is in <%= $downtime->{delta} %>) PAUSE will be closed for maintainance work. The estimated downtime is <%= $downtime->{will_last} %>.
+</p>
+</div>
+% } elsif ($pause->{closed}) {
+  % my $user = $c->req->env->{REMOTE_USER};
+<div align="center">
+<p class="motd">Hi <%= $user %>, you see the site now <b>but it is closed for maintainance</b>.
+Please be careful not to disturb the database operation. Expect failures everywhere. Do not edit anything, it may get lost. Other users get the following text:</p>
+%= include "_closed";
+</div>
+% }
+
+% if ($pause->{ERROR}) {
+<h1>Error</h1>
+<p>
+%   for (@{$pause->{ERROR}}) {
+<%= $_ %>
+%   }
+</p>
+<p>Please try again, probably by using the Back button of your browser and repeating the last action you took.</p>
+% } else {
+%= include "_startform";
+<table border="0" cellpadding="1"><tr><td valign="top">
+%= include "_user_menu";
+</td><td valign="top" bgcolor="red">&#160;</td><td valign="top">
+
+% if (my $verb = app->pause->config->action($pause->{Action})->{verb}) {
+<h2 class="firstheader"><%= $verb %></h2>
+% }
+<%== content %>
+</td></tr></table>
+</form>
+% }
+<hr noshade="noshade" />
+%= include "_speedlinkgif";
+%= include "_debug";
+</body>
+</html>

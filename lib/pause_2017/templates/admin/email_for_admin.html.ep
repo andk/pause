@@ -1,0 +1,13 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<p>Query a combination of <code>usertable</code> table and user for public or private emails according to the preferences</p>
+
+<table><tr><th>id</th><th><i>id</i>@cpan.org gets forwarded to</th></tr>
+% for (@{$pause->{list} || []}) {
+<tr><td><%= $_->{id} %></td><td><%= $_->{mail} %></td></tr>
+% }
+</table>
+
+<p><a href="<%= my_url->query([ACTION => "email_for_admin", OF => "YAML"]) %>" style="text-decoration: none;"><span class="orange_button">YAML</span>
+</a></p>

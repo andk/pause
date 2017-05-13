@@ -1,0 +1,6 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<%= select_field pause99_tail_logfile_1 => [qw/2000 5000 10000 20000 40000/]; =%>
+<input type="submit" name="pause99_tail_logfile_sub" value="Tail characters" />
+<pre><%= $pause->{tail} %></pre>

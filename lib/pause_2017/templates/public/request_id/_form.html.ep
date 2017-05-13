@@ -1,0 +1,45 @@
+% my $pause = stash(".pause") || {};
+% my $alt = 0;
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Your full name (civil name)</b></p>
+<p><small>Unicode Characters OK.</small></p>
+<p>
+<%= text_field "pause99_request_id_fullname", size => 32 %>
+</p>
+<div style='font-size:0.75em'>
+Note: PAUSE has been developed in a time when it was more common than today that people have names consisting of at least a first name and a second name, like <i>Ben Cartwright</i> or <i>Tony Nelson</i>, you get the idea. This field is considered to be filled with both names, separated by a space. This trivial expectation was then coded into the server side sanity check of this form and it turned out to be a super efficient spam protection because bots often did not try to enter a space in the middle of the field. It was about the year 2003 when people started to complain that they had tried <i>Peter</i> and it did not work. Poor Peter, please remember you <b>do</b> have a second name.
+</div>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Email</b></p>
+<p><small>required, otherwise we cannot send you the password</small></p>
+<p>
+<%= text_field "pause99_request_id_email", size => 32 %>
+</p>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Web site</b></p>
+<p><small>optional</small></p>
+<p>
+<%= text_field "pause99_request_id_homepage", size => 32 %>
+</p>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Desired ID</b></p>
+<p><small>3-9 characters matching [A-Z], please</small></p>
+<%= text_field "pause99_request_id_userid", size => 32 %>
+</div>
+
+<p><b>A short description of why you would like a
+PAUSE ID:</b></p><p><small>required; include what you are planning to contribute; do not use HTML</small></p><p>
+
+<%= text_area "pause99_request_id_rationale", rows=>8, cols=>60 =%>
+<!-- zdjela meda -->
+
+<div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"/></div>
+</p>
+<input type="submit" name="SUBMIT_pause99_request_id_sub" value="Request Account" />

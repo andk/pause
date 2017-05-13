@@ -1,0 +1,30 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+%= text_format begin
+<%== $pause->{User}{userid} %> (<%== $pause->{User}{fullname} %>) visited the PAUSE and requested an upload
+into <%== $pause->{whose} %> directory. The request used the following parameters:}
+
+% end
+% for (@{$pause->{mb} || []}) {
+<%== sprintf qq{ %-*s [%s]}, $pause->{longest}, $_->[0], $_->[1] %>
+% }
+
+% if ($pause->{query_succeeded}) {
+%= text_format begin
+The request is now entered into the database where the PAUSE daemon
+will pick it up as soon as possible (usually 1-2 minutes).
+
+
+During upload you can watch the logfile in <%== $pause->{tailurl} %>.
+
+You'll be notified as soon as the upload has succeeded, and if the
+uploaded package contains modules, you'll get another notification
+from the indexer a little later (usually within 1 hour).
+% end
+% }
+
+Thanks for your contribution,
+--
+The PAUSE

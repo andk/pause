@@ -1,0 +1,43 @@
+% my $pause = stash(".pause") || {};
+% my $user = $pause->{User} || {};
+% my $user_groups = $pause->{UserGroups} || {};
+% my @offer_groups = app->pause->config->public_groups;
+% $pause->{Action} ||= "menu";
+% if (%$user) {
+%   push @offer_groups, "user";
+%   for my $group (app->pause->config->extra_groups) {
+%     push @offer_groups, $group if exists $user_groups->{$group} || exists $user_groups->{admin};
+%   }
+% }
+<table width="155" cellspacing="1" cellpadding="0">
+% unless (%$user) {
+%   my $scheme = $PAUSE::Config->{TESTHOST_SCHEMA} ? $PAUSE::Config->{TESTHOST_SCHEMA} : "https";
+<tr><td class="menuitem"><a class="menuitem" href="<%= url_for('/authenquery')->scheme($scheme) %>">Login</a>
+</td><td class="menupointer"></td></tr>
+% }
+% for my $group (@offer_groups) {
+%   last if $group eq "user" and !$user->{userid};
+%   last if $group eq "admin" and !exists $user_groups->{admin};
+<tr><td class="menuheading" colspan="2"><b><%= app->pause->config->group_label($group) %> menu</b></td></tr>
+%   my $Lscat = "";
+%   for my $action (app->pause->config->sort_allowed_group_actions($group, $pause->{allow_action})) {
+%     unless ($action->{priv}) {
+%       warn "action[$action->{name}] has no priv!";
+%       $action->{priv} = "admin";
+%     }
+%
+%     my $verbose = $action->{verb} if exists $action->{verb};
+%     $verbose ||= $action->{name};
+%     my $cat = $action->{cat};
+%     if (substr($cat, 0, 1) =~ tr/A-Z//) {
+%       my($scat) = $cat =~ m|.+?/\d\d(.+?)/|;
+%       if ($scat ne $Lscat) {
+<tr><td class="menuheading"><%= $scat %></td></tr>
+%         $Lscat = $scat;
+%       }
+%     }
+%     my $menu_class = ($action->{name} eq $pause->{Action}) ? "activemenu" : "menuitem";
+<tr><td class="<%= $menu_class %>"><a class="<%= $menu_class %>" href="<%= my_url->query([ACTION => $action->{name}]) %>"><% if ($action->{name} eq $pause->{Action}) { %>&gt; <% } %><%= $verbose %></a></td><td class="menupointer"></td></tr>
+%   }
+% }
+</table>

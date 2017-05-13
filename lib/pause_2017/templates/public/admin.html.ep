@@ -1,0 +1,8 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<p>Query the <code>grouptable</code> table for who is an admin bit holder</p>
+<p>Registered admins: <%= join ", ", @{$pause->{admins} || []} %></p>
+<p><a href="<%= my_url->query([ACTION => "who_admin", OF => "YAML"]) %>" style="text-decoration: none;">
+<span class="orange_button">YAML</span>
+</a></p>
