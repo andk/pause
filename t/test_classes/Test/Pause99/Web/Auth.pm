@@ -11,6 +11,24 @@ use PAUSE::Crypt;
 use Test::More;
 use base 'Test::Pause99::Web::Base';
 
+sub test_disabled_account : Tests(2) {
+    my $t = shift;
+    my ( $env, $author, $m ) = $t->new_andreas();
+
+    $env->mod_dbh->prepare( "
+        UPDATE users SET ustatus = 'nologin' WHERE userid = ?
+    " )->execute( $author->username );
+
+    $m->set_user( $author );
+
+    $m->homepage;
+
+    is $m->mech->status, 200, "Code matches";
+    $m->mech->content_like( qr/Many users with an insecure password/,
+        "Content matches" );
+
+}
+
 sub test_basic : Tests(12) {
     my $t = shift;
     my ( $env, $author, $m ) = $t->new_andreas();
@@ -30,8 +48,8 @@ sub test_basic : Tests(12) {
     my @no_auth = ( 401 => qr/Authorization required/ );
     for (
         [ undef, @no_auth, 'No username or password' ],
-        [ [ foo  => 'foo' ], @no_auth, 'Unknown user' ],
-        [ [ andk => 'foo' ], @no_auth, 'Wrong password' ],
+        [ [ foo => 'foo' ], @no_auth, 'Unknown user' ],
+        [ [ $author->username, 'foo' ], @no_auth, 'Wrong password' ],
         [   [ $author->username, $author->password ],
             200 => qr($author_fullname),
             'Correct credentials'
@@ -39,14 +57,22 @@ sub test_basic : Tests(12) {
         )
     {
         my ( $credentials, $code, $content, $name ) = @$_;
-        my $req = GET "/pause/authenquery";
+
         if ($credentials) {
-            $req->headers->authorization_basic(@$credentials);
+            $m->set_user(
+                {   username => $credentials->[0],
+                    password => $credentials->[1]
+                }
+            );
+        }
+        else {
+            $m->clear_user;
         }
 
-        my $res = $m->mech->simple_request($req);
-        is $res->code,              $code,    "$name: Code matches";
-        like $res->decoded_content, $content, "$name: Content matches";
+        $m->homepage;
+
+        is $m->mech->status, $code, "$name: Code matches";
+        $m->mech->content_like( $content, "$name: Content matches" );
     }
 
     # Get the user's data from auth database
