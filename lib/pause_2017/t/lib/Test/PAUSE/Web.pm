@@ -31,6 +31,7 @@ push @INC, "$AppRoot/lib", "$AppRoot/lib/pause_2017", "$AppRoot/privatelib";
 $TmpDir->child($_)->mkpath for qw/rundata incoming etc public/;
 
 $INC{"PrivatePAUSE.pm"} = 1;
+$ENV{EMAIL_SENDER_TRANSPORT} = "Test";
 
 require PAUSE;
 
