@@ -6,7 +6,6 @@ use FindBin;
 use JSON::PP; # just to avoid redefine warnings
 use Path::Tiny;
 use DBI;
-use PAUSE::Crypt;
 use Test::WWW::Mechanize::PSGI;
 use Test::More;
 use Exporter qw/import/;
@@ -64,6 +63,8 @@ sub mod_dbh    { $ModDBH ||= DBI->connect(@$PAUSE::Config{qw/MOD_DATA_SOURCE_NAM
 
 sub setup { # better to use Test::mysqld
   my $class = shift;
+
+  require PAUSE::Crypt;
 
   # test fixture
   { # authen_pause.usertable
