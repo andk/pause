@@ -6,9 +6,13 @@ use FindBin;
 use JSON::PP; # just to avoid redefine warnings
 use Path::Tiny;
 use DBI;
-use Test::WWW::Mechanize::PSGI;
+use LWP::ConsoleLogger::Easy qw/debug_ua/;
+use Plack::Test;
+use HTTP::Message::PSGI;
+use WWW::Mechanize;
 use Test::More;
 use Exporter qw/import/;
+use Try::Tiny;
 
 #our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
 our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
@@ -97,59 +101,87 @@ sub setup { # better to use Test::mysqld
   return 1;
 }
 
+*WWW::Mechanize::simple_request = sub {
+  my ($self, $request) = @_;
+  $self->run_handlers( "request_send", $request );
+
+  my $uri = $request->uri;
+  $uri->scheme('http')    unless defined $uri->scheme;
+  $uri->host('localhost') unless defined $uri->host;
+
+  my $env = $self->prepare_request($request)->to_psgi;
+  my $response;
+  try {
+    $response = HTTP::Response->from_psgi( $self->{app}->($env) );
+  }
+  catch {
+    warn ("PSGI error: $_");
+    $response = HTTP::Response->new(500);
+    $response->content($_);
+    $response->content_type('');
+  };
+  $response->request($request);
+  $self->run_handlers( "response_done", $response );
+  return $response;
+};
+
 sub new {
   my $class = shift;
 
   my $app = do "$AppRoot/app_2017.psgi";
 
-  bless {mech => Test::WWW::Mechanize::PSGI->new(app => $app)}, $class;
+  my $mech = WWW::Mechanize->new;
+  $mech->{app} = $app;
+  debug_ua($mech);
+  bless {mech => $mech}, $class;
 }
 
 sub get_ok {
-  my ($self, $url, $args) = @_;
+  my ($self, $url, @args) = @_;
 
   $_->remove for $DeadMeatDir->children;
-  $self->{mech}->get_ok($url, $args, "GET $url");
+  my $res = $self->{mech}->get($url, @args);
+  ok $res->is_success, "GET $url";
   ok !$DeadMeatDir->children, "no deadmeat for $url";
   $self;
 }
 
 sub user_get_ok {
-  my ($self, $url, $args) = @_;
+  my ($self, $url, @args) = @_;
 
   $self->{mech}->credentials("TESTUSER", "test");
-  $self->get_ok($url, $args);
+  $self->get_ok($url, @args);
 }
 
 sub admin_get_ok {
-  my ($self, $url, $args) = @_;
+  my ($self, $url, @args) = @_;
 
   $self->{mech}->credentials("TESTADMIN", "test");
-  $self->get_ok($url, $args);
+  $self->get_ok($url, @args);
 }
 
 sub post_ok {
-  my ($self, $url, $args) = @_;
-  $args->{Content} //= {};
+  my ($self, $url, @args) = @_;
 
   $_->remove for $DeadMeatDir->children;
-  $self->{mech}->post_ok($url, $args, "POST $url");
+  my $res = $self->{mech}->post($url, @args);
+  ok $res->is_success, "POST $url";
   ok !$DeadMeatDir->children, "no deadmeat for $url";
   $self;
 }
 
 sub user_post_ok {
-  my ($self, $url, $args) = @_;
+  my ($self, $url, @args) = @_;
 
   $self->{mech}->credentials("TESTUSER", "test");
-  $self->post_ok($url, $args);
+  $self->post_ok($url, @args);
 }
 
 sub admin_post_ok {
-  my ($self, $url, $args) = @_;
+  my ($self, $url, @args) = @_;
 
   $self->{mech}->credentials("TESTADMIN", "test");
-  $self->post_ok($url, $args);
+  $self->post_ok($url, @args);
 }
 
 sub content {
