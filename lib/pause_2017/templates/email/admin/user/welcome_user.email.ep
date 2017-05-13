@@ -38,9 +38,9 @@ experienced Perl developers.
 
 Thank you for your prospective contributions,
 The Pause Team
-% if (my($memo) = param('pause99_add_user_memo')) {
+% if ($pause->{memo}) {
 
 Note from <%== $pause->{User}{fullname} %>:
-<%== $memo %>
+<%== $pause->{memo} %>
 
 % }
