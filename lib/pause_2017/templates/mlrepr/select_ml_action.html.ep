@@ -1,0 +1,44 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<p>
+Mailinglist support is intended to be available on a
+delegates/representatives basis, that means, one or more users
+are "elected" (no formal election though) to be allowed to act
+on behalf of a mailing list. There is no password for a mailing
+list, there are no user credentials for a mailing list. There
+are no uploads for mailing lists, thus no deletes or repairs of
+uploads.
+</p>
+<p>
+There are only the infos about the mailing list
+editable via the method <i>edit_ml</i> and ther are a number of
+modules associated with a mailing list and these are accessible
+in the <i>edit_mod</i> method.
+</p>
+<p>
+The menu item <i>Select
+Mailinglist/Action</i> lets you access the available methods and
+the mailing lists you are associated with. Only people elected
+as a representative of a mailing list should be able to ever see
+the menu entry.</p> <p>This feature is available since Oct 25th,
+1999 and hardly tested, so please take care and let us know how
+it goes.
+</p>
+
+<h3>Choose your mailing list and the action and click the submit
+button.</h3>
+
+<%= select_field HIDDENNAME => [
+  map {
+    $_ eq $pause->{User}{userid}
+      ? [$_ => $_, selected => "selected"]
+      : $_
+  } @{$pause->{users}}
+], size => (@{$pause->{users}} > 8 ? 5 : scalar @{$pause->{users}}),
+%>
+<%= select_field ACTIONREQ => $pause->{action_reqs},
+  size => (@{$pause->{action_reqs}} > 8 ? 5 : scalar @{$pause->{action_reqs}}),
+%>
+
+<input type="submit" name="pause99_select_ml_action_sub" value="Submit" />

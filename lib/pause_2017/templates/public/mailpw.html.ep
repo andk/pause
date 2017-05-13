@@ -1,0 +1,20 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="ABRA" value="<%= param("ABRA") %>" />
+
+% if ($pause->{mailpw_userid}) {
+%   if ($pause->{valid_email}) {
+<p>A token to change the password for <i><%= $pause->{mailpw_userid} %></i> is on its way to its owner. Should the mail not arrive, please tell us.</p>
+%   } else {
+<p>We have not found the email of <i><%= $pause->{mailpw_user_id} %></i>. Please try with a different name or mail to the administrator directly.</p>
+%   }
+% }
+
+<p>This form lets you request a token that enables you to set a new
+password. It only operates correctly if the database knows you and
+your email adress. Please fill in your userid on the CPAN. The token
+will be mailed to that userid.</p>
+
+<%= text_field "pause99_mailpw_1", size => 32 %>
+<input type="submit" name="pause99_mailpw_sub" value="OK" />

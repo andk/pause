@@ -1,0 +1,18 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $files = $pause->{files} || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>
+% if (%$files) {
+<input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete" /><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete" />
+<pre>
+% my $ct = 0;
+% for my $file (sort keys %$files) {
+<span class="line<%= 1 + ($ct++ % 3) %>"><%= check_box "pause99_delete_files_FILE" => $file %><%= sprintf " %-50s %7d  %s", $file, $files->{$file}{stat}, $files->{$file}{blurb} %></span>
+% }
+</pre>
+<input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete" /><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete" />
+% } else {
+No files found in authors/id/<%= $pause->{userhome} %>
+% }

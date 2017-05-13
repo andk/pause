@@ -1,0 +1,74 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+Excerpt from a mail:<pre>
+
+   From: andreas.koenig@anima.de (Andreas J. Koenig)
+   To: kstar@chapin.edu
+   Subject: Re: [elagache@ipn.caida.org: No email found for CAIDA? (Re: Missing CAIDA password?)]
+   Date: 02 Nov 2000 17:59:28 +0100
+
+   A mailing list occupies the same namespace as users because we do
+   not want that users and mailing lists get confused. But a mailing
+   list does not have a password and does not have a directory of its
+   own. Only people can upload and occupy a directory and have a
+   password. (It's clear that the user namespace is not related to the
+   modules namespace, right?)
+
+   The Module List may list a mailinglist as "the contact", so the
+   field userid in the table mods identifies either a mailing list or
+   a user. This has been useful in the past when several clueful
+   people represent several related modules and use a common mailing
+   list as the contact.
+
+   The table list2user maps mailing lists to their owners so that the
+   owners can edit the data associated with the mailing list like
+   address and comment. The table list2user does not have a web
+   interface because we are not really established as the primary
+   source for mailing list information and so it has not been used
+   much. But I'm open to offer one if you believe it's useful.
+   [...]
+</pre>
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+
+<%= select_field "pause99_edit_ml_3" => $pause->{mls},
+    size => (@{$pause->{mls}} > 8 ? 5 : scalar @{$pause->{mls}}),
+=%>
+<br />
+<input type="submit" name="pause99_edit_ml_2" value="Select" /><br />
+% if (%{$pause->{selected} || {}}) {
+<h3>Record for <%= $pause->{selected}{maillistid} %></h3>
+
+<p><b>The name of the mailing list</b></p>
+<p><small>The name appears in the CPAN authors list, so it is good if the name contains the term <i>mailing list</i> or something equivalent</small></p>
+<%= text_field pause99_edit_ml_maillistname => $pause->{selected}{maillistname},
+    size => 50,
+    maxsize => 64,
+=%>
+<br />
+
+<p><b>The address of the mailing list</b></p>
+<p><small>This is the address where people post to (where all members of the group can be contacted)</small></p>
+<%= text_field pause99_edit_ml_address => $pause->{selected}{address},
+    size => 50,
+=%>
+<br />
+
+<p><b>How to subscribe</b></p>
+<p><small>This is a text that describes how to join the mailing list. E.g. the mailing list subscribe address or a URL with more details.</small></p>
+<%= text_area pause99_edit_ml_subscribe => $pause->{selected}{subscribe},
+    rows => 5,
+    cols => 60,
+=%>
+<br />
+
+<input type="submit" name="pause99_edit_ml_4" value="Update" /><br />
+%   if ($pause->{changed}) {
+<p>The record has been updated in the database</p>
+%   } elsif ($pause->{updated_sel}) {
+<p>It seems to me the record was NOT updated. Maybe
+nothing changed? Please take a closer look and inform an admin if
+things didn't proceed as expected.</p>
+%   }
+% }

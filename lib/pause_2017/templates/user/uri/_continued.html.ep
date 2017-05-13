@@ -1,0 +1,64 @@
+% my $pause = stash(".pause") || {};
+
+<blockquote class="actionresponse">
+<!-- start of response to user's action -->
+
+% if ($pause->{invalid_uri}) {
+% } else {
+
+<h3>Submitting query</h3>
+
+%   if ($pause->{query_succeeded}) {
+
+<p>Query succeeded. <b>Thank you for your contribution</b></p>
+
+<p>As it is done by a separate process, it may take a few minutes to
+complete the upload. The processing of your file is going on while you
+read this. There's no need for you to retry. The form below is only
+here in case you want to upload further files.</p>
+
+<p><b>Please tidy up your homedir:</b> CPAN is getting larger every day which
+is nice but usually there is no need to keep old an outdated version
+of a module on several hundred mirrors. Please consider <a
+href="<%= my_url->query([ACTION => "delete_files"]) %>">removing</a> old versions of
+your module from PAUSE and CPAN. If you are worried that someone might
+need an old version, it can always be found on the <a
+href="http://backpan.cpan.org/authors/id/<%= $pause->{userhome} %>/">backpan</a>
+</p>
+
+<p><b>Debugging:</b> your submission should show up soon at <a
+href="<%= $pause->{usrdir} %>"><%= $pause->{usrdir} %></a>. If something's wrong, please
+check the logfile of the daemon: see the tail of it with <a
+href="<%= $pause->{tailurl} %>"><%= $pause->{tailurl} %></a>. If you already know what's going wrong, you
+may wish to visit the <a href="<%= my_url->query([ACTION => "edit_uris" ]) %>">repair
+tool</a> for pending uploads.</p>
+
+%   } else {
+
+<p><b>Could not enter the URL into the database.
+Reason:</b></p><p><%= $pause->{errmsg} %></p>
+
+%     if ($pause->{duplicate}) {
+<p>This indicates that you probably tried to upload a file that is
+already in the database. You will most probably have to rename your
+file and try again, because <b>PAUSE doesn't let you upload a file
+twice</b>.</p>
+
+<p>This seems to be the record causing the conflict:<br/>
+<table border="1">
+%       if (my $rec = $pause->{rec}) {
+%         for my $k (sort keys %$rec) {
+<tr><td><%= $k %></td><td><%= $rec->{$k} || b("&#160;") %></td></tr>
+%         }
+%       }
+</table>
+</p>
+
+%     }
+%   }
+% }
+
+<!-- end of the response to the user's action -->
+</blockquote>
+
+<hr noshade="noshade" />

@@ -1,0 +1,159 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $subaction = $pause->{subaction} || "";
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<input type="hidden" name="lsw" value="1" />
+
+% unless ($subaction) {
+<p>Permissions on PAUSE come in three flavors:</p>
+  <ul>
+    <li>
+      only one user per module can be either
+      <br/>
+      <ul>
+        <li>
+          registered in <i>modulelist</i> or
+        </li>
+        <li>
+          primary maintainer on a <i>first-come-first-serve</i>
+          basis;
+        </li>
+      </ul>
+    </li>
+    <li>
+      many users can get granted permissions as <i>co-maintainers</i>,
+      which means their uploads for the given module are honoured by
+      the indexer.
+    </li>
+  </ul>
+
+  <p>You can <i>view</i> your current set of permissions on the <a
+  href="authenquery?ACTION=peek_perms">View Permissions</a> page. To
+  <i>change</i> permissions, select one of the following submit
+  buttons, each of which leads you to a different page:</p>
+
+  <table class="texttable" cellspacing="2" cellpadding="3">
+
+    <tbody>
+
+      <tr>
+        <td colspan="3">
+          1. You are registered in modulelist
+        </td>
+      </tr>
+
+      <tr>
+        <td valign="top">
+% if (my @mods = @{$pause->{mods} || []}) {
+<%= select_field "pause99_edit_mod_3" => \@mods, size => (@mods > 8 ? 5 : scalar @mods) %>
+% } else {
+--NONE--
+% }
+        </td>
+        <td align="right" valign="top">
+        </td>
+        <td valign="top">
+          <i>Module Metadata</i> has been removed from PAUSE and
+          is no longer editable.  Please contact a PAUSE administrator to
+          choose a new owner.
+        </td>
+      </tr>
+
+      <tr><td colspan="3">2. You are primary maintainer:</td></tr>
+
+      <tr>
+        <td rowspan="2">
+% if (my @mods = @{$pause->{remove_primary} || []}) {
+<%= select_field "pause99_share_perms_pr_m" => \@mods, size => (@mods > 8 ? 5 : scalar @mods), multiple => "multiple" %>
+% } else {
+--NONE--
+% }
+        </td>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_movepr"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">
+          2.1 Transfer primary maintainership status to somebody else
+          (you become co-maintainer)
+        </td>
+      </tr>
+
+      <tr>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_remopr"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">
+          2.2 Give up primary maintainership status (abandoning it without
+          transfering it to someone else)
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="3">
+          3. Making and unmaking co-maintainers (for both modulelist
+          owners and primary maintainers):
+        </td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">
+% if (my @mods = @{$pause->{make_comaintainer} || []}) {
+<%= select_field "pause99_share_perms_makeco_m" => \@mods, size => (@mods > 8 ? 5 : scalar @mods), multiple => "multiple" %>
+% } else {
+--NONE--
+% }
+        </td>
+        <td align="right"
+            valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_makeco"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">
+          3.1 Make somebody else co-maintainer
+        </td>
+      </tr>
+
+      <tr>
+        <td align="right" valign="top">
+          <input type="submit"
+                 name="weaksubmit_pause99_share_perms_remocos"
+                 value="Select"
+                 />
+        </td>
+        <td valign="top">3.2 Remove a co-maintainer</td>
+      </tr>
+
+      <tr> <td colspan="3">4. You are co-maintainer</td> </tr>
+
+      <tr>
+        <td valign="top">
+% if (my @mods = @{$pause->{remove_comaintainer} || []}) {
+<%= select_field "pause99_share_perms_remome_m" => \@mods, size => (@mods > 8 ? 5 : scalar @mods), multiple => "multiple" %>
+% } else {
+--NONE--
+% }
+        </td>
+        <td align="right"
+            valign="top"><input type="submit"
+            name="weaksubmit_pause99_share_perms_remome" value="Select"
+            />
+        </td>
+        <td valign="top">
+          4.1 Give up co-maintainership status
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+% } else {
+%= include "user/perms/_$subaction";
+% }

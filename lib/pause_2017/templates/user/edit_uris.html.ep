@@ -1,0 +1,83 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<h3>for user <%= $pause->{HiddenUser}{userid} %></h3>
+
+% if ($pause->{no_pending_uploads}) {
+<p>No pending uploads for <%= $pause->{HiddenUser}{userid} %> found</p>
+% } else {
+
+<%= select_field "pause99_edit_uris_3" => $pause->{all_recs},
+    size => 1,
+%>
+
+<input type="submit" name="pause99_edit_uris_2" value="Select" /><br />
+
+%   if (%{$pause->{selected}}) {
+<h3>Record for <%= $pause->{selected}{uriid} %></h3>
+
+%     if ($pause->{changed}) {
+<p>The record has been updated in the database</p>
+%     } elsif ($pause->{update_sel}) {
+It seems to me the record was NOT updated. Maybe nothing has changed?
+Please take a closer look and inform an admin if things didn't proceed as expected.<br />
+%     }
+
+<p><b>URI to download</b></p>
+<small>
+If you change this field to a different URI,
+PAUSE will try to fetch this URI instead. Note that the
+filename on PAUSE will remain unaltered. So you can fix a
+typo, but you cannot alter the name of the uploaded file, it
+will be the original filename. So this is only an opportunity
+to fix <i>broken</i> uploads that cannot be completed, not an
+opportunity to turn the time back.
+
+<p> To re-iterate: If you change the content of this field to
+<b>http://www.slashdot.org/</b>, PAUSE will fetch the current
+Slashdot page and will put it into
+<b><%= $pause->{selected}{uriid} %></b>. If you change it to
+<b>FooBar-3.14.tar.gz</b>, PAUSE will try to get
+<b><%= $PAUSE::Config->{INCOMING} %>/FooBar-3.14.tar.gz</b> and if it
+finds it, it puts it into <b><%= $pause->{selected}{uriid} %></b>.</p>
+
+<p>An example: if you made a typo and requested to upload
+<b>http://badsite.org/foo</b> instead of
+<b>http://goodsite.org/foo</b>, just correct the thing in the
+textfield below.</p>
+
+<p>Another example: If your upload was unsuccessful and you now have
+a bad file in the incoming directory, then you have the
+problem that PAUSE tries to fetch your file (say <b>foo</b>)
+but doesn't succeed and then it retries and retries. Your
+solution: transfer the file into the incoming directory with
+<b>a different name</b> (say <b>bar</b>) using ftp. Fill in
+the different name below. PAUSE will fetch <b>bar</b> and
+upload it as <b>foo</b>. So you're done.</p>
+</small><br />
+
+<%= text_field "pause99_edit_uris_uri" => $pause->{selected}{uri},
+    size => 60,
+    maxlength => 255,
+%>
+<br />
+
+<p><b>UNIX time of last unsuccessful attempt to retrieve this item</b></p>
+<%= $pause->{selected}{nosuccesstime} || 0 %><br />
+<br />
+
+<p><b>Number of unsuccessful attempts so far</b></p>
+<%= $pause->{selected}{nosuccesscount} || 0 %><br />
+<br />
+
+<p><b>Record was last changed on</b></p>
+<%= $pause->{selected}{changed} || 0 %><br />
+<br />
+
+<p><b>Record was last changed by</b></p>
+<%= $pause->{selected}{changedby} || 0 %><br />
+<br />
+<input type="submit" name="pause99_edit_uris_4" value="Update" /><br />
+%   }
+% }
