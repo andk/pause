@@ -171,6 +171,7 @@ sub get_ok {
   my $res = $self->{mech}->get($url, @args);
   ok $res->is_success, "GET $url";
   ok !$DeadMeatDir->children, "no deadmeat for $url";
+  $self->note_deliveries;
   $self;
 }
 
@@ -195,6 +196,7 @@ sub post_ok {
   my $res = $self->{mech}->post($url, @args);
   ok $res->is_success, "POST $url";
   ok !$DeadMeatDir->children, "no deadmeat for $url";
+  $self->note_deliveries;
   $self;
 }
 
@@ -229,6 +231,9 @@ sub copy_to_authors_dir {
   note "copy $file to $destination";
   path($file)->copy($destination);
 }
+
+sub deliveries { Email::Sender::Simple->default_transport->deliveries }
+sub note_deliveries { note "-- email begin --\n".$_->{email}->as_string."\n-- email end --\n\n" for shift->deliveries }
 
 END { $TmpDir->remove_tree if $TmpDir }
 
