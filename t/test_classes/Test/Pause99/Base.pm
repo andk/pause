@@ -13,11 +13,9 @@ sub warble : Test(startup) {
 
 sub new_environment {
     my ( $self, %options ) = @_;
-
     # ($env, $author)
     return pause_1999::Test::Environment->new_with_author(
-        username  => 'ANDK',
-        asciiname => 'Andreas K',
+        %options
     );
 }
 
