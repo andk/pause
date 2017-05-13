@@ -22,10 +22,10 @@ subtest 'basic' => sub {
     $t->mod_dbh->do("TRUNCATE uris");
 
     # prepare distribution
-    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", {Content => $default_for_add_uri});
+    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
 
     my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=edit_uris", {Content => \%form});
+    $t->user_post_ok("/pause/authenquery?ACTION=edit_uris", \%form);
     note $t->content;
 };
 

@@ -18,7 +18,7 @@ Test::PAUSE::Web->setup;
 subtest 'basic' => sub {
     my $t = Test::PAUSE::Web->new;
     my %form = %$default;
-    $t->post_ok("/pause/query?ACTION=request_id", {Content => \%form});
+    $t->post_ok("/pause/query?ACTION=request_id", \%form);
     note $t->content;
 };
 

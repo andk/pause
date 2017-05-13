@@ -15,7 +15,7 @@ subtest 'basic' => sub {
     my $t = Test::PAUSE::Web->new;
 
     my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=tail_logfile", {Content => \%form});
+    $t->user_post_ok("/pause/authenquery?ACTION=tail_logfile", \%form);
     note $t->content;
 };
 
