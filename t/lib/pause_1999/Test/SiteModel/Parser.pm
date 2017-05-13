@@ -15,6 +15,7 @@ requires 'mech';
 
 our %pages = (
     homepage              => ['basic'],
+    title_only            => ['title','header'],
     delete_files          => [qw/basic author_directory file_list/],
     email_for_admin       => [qw/basic email_for_admin/],
     email_for_admin__yaml => [qw/yaml/],
@@ -64,6 +65,16 @@ our %parsers = (
         } split( m!<br />|\n!, $pre->as_HTML );
         return \@files;
     },
+    header => sub {
+        my $tree = shift;
+        my $status_box = $tree->find_by_attribute( _tag => 'h2', class => 'firstheader' );
+        return $status_box->as_text;
+    },
+    title => sub {
+        my $tree = shift;
+        my $status_box = $tree->find_by_attribute( _tag => 'title' );
+        return $status_box->as_text;
+    },
     yaml => sub {
         my ( $tree, $content ) = @_;
         return scalar Load $content;
@@ -77,19 +88,27 @@ sub parse {
     $url =~ s!http://[^/]+!!;
 
     # Check we know how to parse this page
+    my $page_spec_force = shift;
     my $page_spec;
-    if ( $url =~ m!/pause/authenquery\?ACTION=email_for_admin[;&]OF=YAML! ) {
-        $page_spec = $pages{'email_for_admin__yaml'};
-    }
-    elsif ( $url =~ m!/pause/authenquery\?ACTION=(.+)! ) {
-        $page_spec = $pages{$1}
-            || die "Don't know how to autoparse [$url] ($1)";
-    }
-    elsif ( $url eq '/pause/authenquery' ) {
-        $page_spec = $pages{'homepage'};
+
+    if ( $page_spec_force ) {
+        $page_spec = $pages{ $page_spec_force } || die "Unknown page spec [$page_spec_force]";
     }
     else {
-        die "Don't know how to autoparse [$url]";
+        if ($url =~ m!/pause/authenquery\?ACTION=email_for_admin[;&]OF=YAML! )
+        {
+            $page_spec = $pages{'email_for_admin__yaml'};
+        }
+        elsif ( $url =~ m!/pause/authenquery\?ACTION=(.+)! ) {
+            $page_spec = $pages{$1}
+                || die "Don't know how to autoparse [$url] ($1)";
+        }
+        elsif ( $url eq '/pause/authenquery' ) {
+            $page_spec = $pages{'homepage'};
+        }
+        else {
+            die "Don't know how to autoparse [$url]";
+        }
     }
 
     # Get the TreeBuilder for ir
