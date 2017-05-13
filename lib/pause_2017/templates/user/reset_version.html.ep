@@ -1,7 +1,7 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<input type="hidden" name="HIDDENNAME" value="$pause->{HiddenUser}{userid}" />
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
 <p>Note: resetting versions is a major inconvenience for
 module users. This page will probably be withdrawn from PAUSE if
 the perl community does not want to allow falling version numbers
