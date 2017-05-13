@@ -170,7 +170,9 @@ sub get_ok {
   $_->remove for $DeadMeatDir->children;
   my $res = $self->{mech}->get($url, @args);
   ok $res->is_success, "GET $url";
+  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !$DeadMeatDir->children, "no deadmeat for $url";
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
 }
@@ -195,7 +197,9 @@ sub post_ok {
   $_->remove for $DeadMeatDir->children;
   my $res = $self->{mech}->post($url, @args);
   ok $res->is_success, "POST $url";
+  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !$DeadMeatDir->children, "no deadmeat for $url";
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
 }
