@@ -71,7 +71,7 @@ sub mod_dbh    { $ModDBH ||= mod_db()->dbh }
 our $AuthDB;
 sub authen_db {
     my $db = $AuthDB ||= Test::PAUSE::MySQL->new(
-      schemas => ['doc/authen_pause.schema.txt']
+      schemas => ["$AppRoot/doc/authen_pause.schema.txt"]
     );
     $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = $db->dsn;
     $db;
@@ -80,7 +80,7 @@ sub authen_db {
 our $ModDB;
 sub mod_db {
     my $db = $ModDB ||= Test::PAUSE::MySQL->new(
-      schemas => ['doc/mod.schema.txt']
+      schemas => ["$AppRoot/doc/mod.schema.txt"]
     );
     $PAUSE::Config->{MOD_DATA_SOURCE_NAME} = $db->dsn;
     $db;
