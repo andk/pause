@@ -13,6 +13,7 @@ use WWW::Mechanize;
 use Test::More;
 use Exporter qw/import/;
 use Try::Tiny;
+use Test::PAUSE::MySQL;
 
 #our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
 our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
@@ -53,22 +54,48 @@ $PAUSE::Config->{HAVE_PERLBAL} = 0;
 $PAUSE::Config->{SLEEP} = 1;
 $PAUSE::Config->{INCOMING} = "file://$TestRoot/incoming/";
 
-$PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = "dbi:mysql:test_authen_pause";
-$PAUSE::Config->{MOD_DATA_SOURCE_NAME}    = "dbi:mysql:test_mod";
+# These will get changed every time you run setup()
+$PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = "";
+$PAUSE::Config->{MOD_DATA_SOURCE_NAME}    = "";
 
 $ENV{TEST_PAUSE_WEB} = 1;
 
 our $AuthDBH;
 our $ModDBH;
+
 my $dbh_attr = {ShowErrorStatement => 1};
 
-sub authen_dbh { $AuthDBH ||= DBI->connect(@$PAUSE::Config{qw/AUTHEN_DATA_SOURCE_NAME AUTHEN_DATA_SOURCE_USER AUTHEN_DATA_SOURCE_PW/}, $dbh_attr); }
-sub mod_dbh    { $ModDBH ||= DBI->connect(@$PAUSE::Config{qw/MOD_DATA_SOURCE_NAME MOD_DATA_SOURCE_USER MOD_DATA_SOURCE_PW/}, $dbh_attr); }
+sub authen_dbh { $AuthDBH ||= authen_db()->dbh }
+sub mod_dbh    { $ModDBH ||= mod_db()->dbh }
+
+our $AuthDB;
+sub authen_db {
+    my $db = $AuthDB ||= Test::PAUSE::MySQL->new(
+      schemas => ['doc/authen_pause.schema.txt']
+    );
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = $db->dsn;
+    $db;
+}
+
+our $ModDB;
+sub mod_db {
+    my $db = $ModDB ||= Test::PAUSE::MySQL->new(
+      schemas => ['doc/mod.schema.txt']
+    );
+    $PAUSE::Config->{MOD_DATA_SOURCE_NAME} = $db->dsn;
+    $db;
+}
 
 sub setup { # better to use Test::mysqld
   my $class = shift;
 
   require PAUSE::Crypt;
+
+  # Remove old DB handles and objects
+  undef $AuthDBH;
+  undef $AuthDB;
+  undef $ModDBH;
+  undef $ModDB;
 
   # test fixture
   { # authen_pause.usertable
