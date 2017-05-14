@@ -13,6 +13,7 @@ use Test::More;
 use Exporter qw/import/;
 use Try::Tiny;
 use Test::PAUSE::MySQL;
+use Email::Sender::Simple;
 
 #our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
 our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
