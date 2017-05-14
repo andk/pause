@@ -20,7 +20,7 @@ subtest 'basic' => sub {
     $t->get_ok('/pause/query?ACTION=who_pumpkin');
     like(
         $t->content,
-        qr/Registered pumpkins: BAR, FOO/,
+        qr/Registered pumpkins:\s+BAR, FOO/i,
         'Found expected pumpkins'
     );
 
