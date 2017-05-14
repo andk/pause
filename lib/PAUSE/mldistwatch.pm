@@ -1278,6 +1278,7 @@ sub rewrite07 {
     for my $exte (qw(json yml)) {
         my $f = "$fromdir/mirror.$exte";
         my $t = "$todir/07mirror.$exte";
+        next unless -e $f;
         rename $f, $t or $self->verbose(1,"Could not rename $f -> $t: $!");
         PAUSE::newfile_hook($t);
     }
