@@ -9,6 +9,7 @@ use List::MoreUtils ();
 use PAUSE ();
 use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
+use JSON::XS ();
 
 # ISA_REGULAR_PERL means a perl release for public consumption
 # (and must exclude developer releases like 5.9.4). I need to
@@ -1045,7 +1046,11 @@ sub extract_readme_and_meta {
   for my $metafile ($json || $yaml) {
     if (-s $metafile) {
       $self->{METAFILE} = $metafile;
-      File::Copy::copy $metafile, "$MLROOT/$sans.meta";
+      if ($self->perl_major_version == 6) {
+        $self->write_updated_meta6_json($metafile, $MLROOT, $dist, $sans);
+      } else {
+        File::Copy::copy $metafile, "$MLROOT/$sans.meta";
+      }
       utime((stat $metafile)[8,9], "$MLROOT/$sans.meta");
       PAUSE::newfile_hook("$MLROOT/$sans.meta");
       my $ok = eval {
@@ -1061,6 +1066,32 @@ sub extract_readme_and_meta {
       $self->{METAFILE} = "Empty $metafile found, ignoring\n";
     }
   }
+}
+
+sub write_updated_meta6_json {
+  my($self, $metafile, $MLROOT, $dist, $sans) = @_;
+
+  my $json = JSON::XS->new->utf8->canonical->pretty;
+
+  open my $meta_fh, '<', $metafile
+    or $self->verbose(1,"Failed to open META6.json file for reading $!");
+  my $meta = eval {
+    $json->decode(join '', <$meta_fh>);
+  };
+  if ($@) {
+    $self->verbose(1,"Failed to parse META6.json file: $@");
+    File::Copy::copy $metafile, "$MLROOT/$sans.meta";
+    return;
+  }
+  close $meta_fh;
+
+  $meta->{'source-url'} = $PAUSE::Config->{PUB_MODULE_URL} . "$MLROOT/$dist";
+
+  open $meta_fh, '>', "$MLROOT/$sans.meta"
+    or $self->verbose(1,"Failed to open Perl 6 meta file for writing: $!");
+  print { $meta_fh } $json->encode($meta)
+    or $self->verbose(1,"Failed to write Perl 6 meta file: $!");
+  close $meta_fh;
 }
 
 # package PAUSE::dist
