@@ -788,7 +788,7 @@ sub verify_gzip_tar {
             return;
         }
     }
-    my $lpath_is_for_perl6 = $lpath =~ m{./../[-\w]/Perl6/};
+    my $lpath_is_for_perl6 = $lpath =~ m{\Q$PAUSE::Config->{MLROOT}\E[A-Z]/[A-Z][A-Z]/[A-Z][-A-Z]*[A-Z0-9]+/Perl6/};
     if (open my $fh, "-|", tar => $taropt, $tpath) {
         my $must_rewrite = 0;
         my $p6_must_change_lpath = $lpath_is_for_perl6 ? 0 : undef;
@@ -798,11 +798,12 @@ sub verify_gzip_tar {
                 $must_rewrite = 1 if $ow eq "w";
             }
             if (/META6\.json/ && ! defined $p6_must_change_lpath) {
+                # maybe a perl6 package, make sure it really is
                 my @F = split " ", $_;
                 my @path = split m:/:, $F[-1];
                 if ($path[1] eq 'META6.json') {
                     $p6_must_change_lpath = 1;
-                    $self->logge("will have to move to change lpath to a Perl6 directory");
+                    $self->logge("will have to change lpath $lpath to a Perl6 directory");
                 }
             }
         }
@@ -816,9 +817,10 @@ sub verify_gzip_tar {
             }
         }
         if ($p6_must_change_lpath) {
-            $lpath =~ s!($PAUSE::Config->{MLROOT}./../[^/]+)(/.+)!$1/Perl6$2!;
+            $lpath =~ s!(\Q$PAUSE::Config->{MLROOT}\E./../[^/]+)(/.+)!$1/Perl6$2!;
             File::Path::mkpath(File::Basename::dirname($lpath));
             $$lpath_ref = $lpath; # propagate back to caller
+            $self->logge("Perl6-change: have changed lpath to $lpath");
         }
     }
     if ( $tpath =~ m/\.Z$/ ) {
