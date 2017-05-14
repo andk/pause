@@ -933,7 +933,7 @@ sub writeback {
   my($self,$hash,$hash_orig,$dbh) = @_;
   my(@v,@queryparams);
   for (qw[dgot dverified ddeleted uriid
-	  nosuccesstime nosuccesscount]) {
+	  nosuccesstime nosuccesscount is_perl6]) {
     next if $hash->{$_} eq $hash_orig->{$_};
     push @v, "$_=?";
     push @queryparams, $hash->{$_};
