@@ -30,6 +30,7 @@ sub startup {
   unshift @{$app->static->paths}, $app->home->rel_file("htdocs");
 
   # Load plugins to modify path/set stash values/provide helper methods
+  $app->plugin("WithCSRFProtection");
   $app->plugin("PAUSE::Web::Plugin::ConfigPerRequest");
   $app->plugin("PAUSE::Web::Plugin::IsPauseClosed");
   $app->plugin("PAUSE::Web::Plugin::GetActiveUserRecord");
