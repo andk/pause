@@ -3,7 +3,6 @@
 %# From 2003-11-27, Fiz-Chemie is the Sponsor.
 %
 % my $pause = stash(".pause") || {};
-% my $png_or_gif = $pause->{can_png} ? "png" : "gif";
 % my $validator_href = "http://validator.w3.org/check/referer";
 % my $validator_comment = "";
 % if ($c->req->url->path =~ /authen/ or $pause->{is_ssl}) {
@@ -20,11 +19,11 @@
   <tr>
     <td width="100%"></td>
     <td>
-      <a href="http://jigsaw.w3.org/css-validator/"><img src="/pause/vcss.<%= $png_or_gif %>" alt="Valid CSS!" height="31" width="88" /></a>
+      <a href="http://jigsaw.w3.org/css-validator/"><img src="/pause/vcss.png" alt="Valid CSS!" height="31" width="88" /></a>
     </td>
     <td>
       <a href="<%= $validator_href %>">
-        <img src="/pause/valid-xhtml10.<%= $png_or_gif %>" alt="Valid XHTML 1.0!" height="31" width="88" />
+        <img src="/pause/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88" />
       </a>
     </td>
   </tr>

@@ -1,3 +1,2 @@
 % my $pause = stash(".pause") || {};
-% my $ext = $pause->{can_png} ? "png" : "jpg";
-<a href="authenquery"><img src="/pause/pause2.<%= $ext %>" border="0" alt="PAUSE Logo" width="177" height="43" align="left" /></a>
+<a href="authenquery"><img src="/pause/pause2.png" border="0" alt="PAUSE Logo" width="177" height="43" align="left" /></a>
