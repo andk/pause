@@ -1,2 +1,0 @@
-% my $pause = stash(".pause") || {};
-<a href="authenquery"><img src="/pause/pause2.png" border="0" alt="PAUSE Logo" width="177" height="43" align="left" /></a>
