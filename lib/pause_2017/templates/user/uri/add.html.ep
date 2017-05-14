@@ -2,7 +2,7 @@
 % my $pause = stash(".pause") || {};
 
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
-<input type="hidden" name="CAN_MULTIPART" value="<%= $pause->{can_multipart} %>" />
+<input type="hidden" name="CAN_MULTIPART" value="1" /><%# just for compatibility; will be removed eventually =%>
 
 <h3>Add a file for <%= $pause->{HiddenUser}{userid} %></h3>
 
