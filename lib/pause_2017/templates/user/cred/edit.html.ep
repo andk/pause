@@ -50,12 +50,6 @@ No change seen, nothing done.<hr />
 <tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">Full Name</h4>
 <p class="explain">
 PAUSE supports names containing UTF-8 characters. 
-% if ($pause->{can_utf8}) {
-As your browser seems to support UTF-8 too,
-feel free to enter your name as it is written natively.
-% } else {
-As your browser <b>does not seem to support UTF-8</b>, you can only use characters encoded in ISO-8859-1.
-% }
 See also the field <i>ASCII transliteration</i> below.
 </p>
 <%= text_field "pause99_edit_cred_fullname",
