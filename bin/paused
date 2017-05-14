@@ -630,6 +630,7 @@ sub is_valid {
 sub getit {
   my($self) = @_;
 
+  my $is_perl6       = $self->{URIRECORD}{is_perl6};
   my $nosuccesscount = $self->{URIRECORD}{nosuccesscount};
   my $uri            = $self->{URIRECORD}{uri};
   my $uriid          = $self->{URIRECORD}{uriid}; # e.g. A/AA/AADLER/Games-LogicPuzzle-0.10.tar.gz,
@@ -693,6 +694,9 @@ sub getit {
           unless ($lpath eq $lpath_orig) {
               # OMG, they changed the lpath
               $self->{URIRECORD}{uriid} = $uriid = substr($lpath, length($PAUSE::Config->{MLROOT}));
+              if ($lpath =~ m{^Perl6/}) {
+                  $self->{URIRECORD}{is_perl6} = $is_perl6 = 1;
+              }
           }
           return $size;
       } else {
