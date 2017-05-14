@@ -637,7 +637,8 @@ sub getit {
 
   return unless $self->is_valid($uriid);
 
-  my $lpath_orig = my $lpath  = $PAUSE::Config->{MLROOT} . $uriid;
+  my $lpath  = $PAUSE::Config->{MLROOT} . $uriid;
+  my $lpath_orig = $lpath; # e.g. verify_gzip_tar could change it for the Perl6/ directory
   my $tpath  = $PAUSE::Config->{TMP} . $uriid;
   die "Panic" if $tpath =~ s/[\\\'\"\;\s]//g;
   if ($uri =~ /\.Z$/) {
@@ -710,6 +711,7 @@ sub getit {
 
 sub verify_gzip_tar {
     my($self,$tpath,$uri,$nosuccesscount,$lpath_ref) = @_;
+    my $lpath = $$lpath_ref;
     my $zcat;
     my $gzip;
     my $taropt;
@@ -726,11 +728,11 @@ sub verify_gzip_tar {
         $testinggzip = $gzip;
     } else {
         # nothing I could verify
-        if (rename($tpath,$$lpath_ref)) {
-            $self->logge("Info: renamed '$tpath' to '$$lpath_ref'");
-            return $$lpath_ref;
+        if (rename($tpath,$lpath)) {
+            $self->logge("Info: renamed '$tpath' to '$lpath'");
+            return $lpath;
         } else {
-            $self->logge("Alert: could not rename '$tpath' to '$$lpath_ref'");
+            $self->logge("Alert: could not rename '$tpath' to '$lpath'");
             return;
         }
     }
@@ -786,7 +788,7 @@ sub verify_gzip_tar {
             return;
         }
     }
-    my $lpath_is_for_perl6 = $$lpath_ref =~ m{./../[-\w]/Perl6/};
+    my $lpath_is_for_perl6 = $lpath =~ m{./../[-\w]/Perl6/};
     if (open my $fh, "-|", tar => $taropt, $tpath) {
         my $must_rewrite = 0;
         my $p6_must_change_lpath = $lpath_is_for_perl6 ? 0 : undef;
@@ -814,29 +816,28 @@ sub verify_gzip_tar {
             }
         }
         if ($p6_must_change_lpath) {
-            my $lpath = $$lpath_ref;
             $lpath =~ s!($PAUSE::Config->{MLROOT}./../[^/]+)(/.+)!$1/Perl6$2!;
             File::Path::mkpath(File::Basename::dirname($lpath));
-            $$lpath_ref = $lpath;
+            $$lpath_ref = $lpath; # propagate back to caller
         }
     }
     if ( $tpath =~ m/\.Z$/ ) {
-        if (-e $$lpath_ref) {
+        if (-e $lpath) {
             $self->logge("Alert: Seem to have both a .Z and a .gz");
         } else {
-            my $system = "$gzip -dc $tpath | $gzip -9c > $$lpath_ref";
+            my $system = "$gzip -dc $tpath | $gzip -9c > $lpath";
             my $ret = system($system);
             $self->logge("Info: Ran $system with return [$ret]");
         }
     } else {
-        if (rename($tpath,$$lpath_ref)) {
-            $self->logge("Info: renamed '$tpath' to '$$lpath_ref'");
+        if (rename($tpath,$lpath)) {
+            $self->logge("Info: renamed '$tpath' to '$lpath'");
         } else {
-            $self->logge("Alert: could not rename '$tpath' to '$$lpath_ref': $!");
+            $self->logge("Alert: could not rename '$tpath' to '$lpath': $!");
             return;
         }
     }
-    return -s $$lpath_ref;
+    return -s $lpath;
 }
 
 sub _rewrite_tarball {
