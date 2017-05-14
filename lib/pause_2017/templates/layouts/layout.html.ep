@@ -86,6 +86,8 @@ Please be careful not to disturb the database operation. Expect failures everywh
 % }
 <hr noshade="noshade" />
 %= include "_speedlinkgif";
+% if ($PAUSE::Config->{PAUSE_WEB_DEBUG}) {
 %= include "_debug";
+% }
 </body>
 </html>
