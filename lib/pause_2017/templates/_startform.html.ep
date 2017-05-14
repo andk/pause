@@ -3,10 +3,8 @@
 % my ($method, $enctype);
 % if ($pause->{need_multipart}) {
 %   ($enctype, $method) = ("multipart/form-data", "post");
-% } elsif ($pause->{prefer_post}) {
-%   ($enctype, $method) = ("multipart/x-www-form-urlencoded", "post");
 % } else {
-%   ($enctype, $method) = ("multipart/x-www-form-urlencoded", "get");
+%   ($enctype, $method) = ("multipart/x-www-form-urlencoded", "post");
 % }
 % if ($PAUSE::Config->{TESTHOST}) {
 %   warn "DEBUG: me[$me]enctype[$enctype]method[$method]";

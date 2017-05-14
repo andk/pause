@@ -123,8 +123,6 @@ sub share {
   my $mgr = $c->app->pause;
   my $req = $c->req;
 
-  $c->prefer_post(1); # because the querystring can get too long
-
   my $subaction = $req->param("SUBACTION");
   unless ($subaction) {
     ####################### 2.1    2.2    3.1    3.2     4.1

@@ -324,8 +324,6 @@ sub change_passwd {
   my $mgr = $c->app->pause;
   my $req = $c->req;
 
-  $c->prefer_post(1);
-
   my $u = $c->active_user_record;
 
   if ($req->param("pause99_change_passwd_sub")) {

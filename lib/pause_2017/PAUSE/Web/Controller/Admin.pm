@@ -173,8 +173,6 @@ sub select_user {
   my $mgr = $c->app->pause;
   my $req = $c->req;
 
-  $c->prefer_post(0);
-
   if (my $action = $req->param("ACTIONREQ")) {
     if (
         $mgr->config->has_action($action)

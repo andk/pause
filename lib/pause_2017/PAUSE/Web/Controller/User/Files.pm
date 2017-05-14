@@ -10,7 +10,6 @@ sub show {
   my $pause = $c->stash(".pause");
   my $mgr = $c->app->pause;
   my $u = $c->active_user_record;
-  $c->prefer_post(1);
 
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
@@ -61,7 +60,6 @@ sub delete {
   my $mgr = $c->app->pause;
   my $req = $c->req;
   my $u = $c->active_user_record;
-  $c->prefer_post(1);
 
   my $dbh = $mgr->connect;
   local($dbh->{RaiseError}) = 0;
