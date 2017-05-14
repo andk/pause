@@ -788,7 +788,8 @@ sub verify_gzip_tar {
             return;
         }
     }
-    my $lpath_is_for_perl6 = $lpath =~ m{\Q$PAUSE::Config->{MLROOT}\E[A-Z]/[A-Z][A-Z]/[A-Z][-A-Z]*[A-Z0-9]+/Perl6/};
+    my $lpath_is_for_perl6 = $lpath =~
+        m{\Q$PAUSE::Config->{MLROOT}\E[A-Z]/[A-Z][A-Z]/[A-Z][-A-Z]*[A-Z0-9]+/Perl6/};
     if (open my $fh, "-|", tar => $taropt, $tpath) {
         my $must_rewrite = 0;
         my $p6_must_change_lpath = $lpath_is_for_perl6 ? 0 : undef;
