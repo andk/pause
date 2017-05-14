@@ -6398,9 +6398,8 @@ sub share_perms_remocos {
   my $u = $self->active_user_record($mgr);
 
   my $db = $mgr->connect;
-  my $all_mmods = $self->all_mmods($mgr,$u);
   my $all_pmods = $self->all_pmods($mgr,$u);
-  my $all_mods = { %$all_mmods, %$all_pmods, $u };
+  my $all_mods = { %$all_pmods, $u };
   my $all_comaints = $self->all_comaints($mgr,$all_mods,$u);
   if (
       $req->param("SUBMIT_pause99_share_perms_remocos")
@@ -6496,13 +6495,9 @@ sub all_comaints {
 
 sub all_only_cmods {
   my($self,$mgr,$u) = @_;
-  my $all_mmods = $self->all_mmods($mgr,$u);
   my $all_pmods = $self->all_pmods($mgr,$u);
   my $all_mods = $self->all_cmods($mgr,$u);
 
-  for my $k (keys %$all_mmods) {
-    delete $all_mods->{$k};
-  }
   for my $k (keys %$all_pmods) {
     delete $all_mods->{$k};
   }
@@ -6598,11 +6593,9 @@ sub share_perms_makeco {
 
   my $db = $mgr->connect;
 
-  my $all_mmods = $self->all_mmods($mgr,$u);
-  # warn sprintf "all_mmods[%s]", join("|", keys %$all_mmods);
   my $all_pmods = $self->all_pmods($mgr,$u);
   # warn sprintf "all_pmods[%s]", join("|", keys %$all_pmods);
-  my $all_mods = {%$all_mmods, %$all_pmods};
+  my $all_mods = {%$all_pmods};
 
   if (
       $req->param("SUBMIT_pause99_share_perms_makeco")
@@ -6892,23 +6885,6 @@ sub share_perms_movepr {
   @m;
 }
 
-sub all_mmods {
-  my $self = shift;
-  my $mgr = shift;
-  my $u = shift;
-  my $db = $mgr->connect;
-  my(%all_mods);
-  my $sth2 = $db->prepare(qq{SELECT modid
-                             FROM mods
-                             WHERE userid=?});
-  $sth2->execute($u->{userid});
-  while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
-    $all_mods{$id} = undef;
-  }
-  $sth2->finish;
-  \%all_mods;
-}
-
 sub all_pmods {
   my $self = shift;
   my $mgr = shift;
@@ -6938,16 +6914,6 @@ sub all_pmods_not_mmods {
   $sth2->execute($u->{userid});
   while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
     $all_mods{$id} = undef;
-  }
-  $sth2->finish;
-  $sth2 = $db->prepare(qq{SELECT modid
-                             FROM mods
-                             WHERE userid=?
-                             AND mlstatus='list'
-});
-  $sth2->execute($u->{userid});
-  while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
-    delete $all_mods{$id};
   }
   $sth2->finish;
   \%all_mods;
