@@ -8,12 +8,12 @@ Things I hope to have done at PTS and afterwards:
 - Port spurious warn and print STDERR to ->log(level => "debug", ...)
 - Replace YAML::Syck with something else
 - Kill PAUSE::Web::Exception where appropriate, most of which can be replaced with return + $pause->{some_flags} + template blocks
-- Add csrf_token where necessary (using Mojolicious::Plugin::WithCSRFProtection, maybe. add_uri shouldn't have it yet, and some other pages too, or at least without prior discussion because some people use scripts to modify their PAUSE data)
+- Add csrf_token where necessary (add_uri shouldn't have it yet, and some other pages too, or at least without prior discussion because some people use scripts to modify their PAUSE data)
 - Consider removing/replacing some plugins
 - Replace XHTML with HTML5 if time permits, to remove a dirty hack on TagHelpers
 - Incorporate fixes that have been merged to Andreas' master
 
-- Drop HTTP support, can_multipart, can_png, latin-1 encoding declaration
+- Drop HTTP support
 - Remove modulelist related stuff
 
 Things that'll take more time to address (to avoid double encoding etc):
