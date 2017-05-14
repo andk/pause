@@ -158,7 +158,8 @@ sub setup { # better to use Test::mysqld
 sub new {
   my $class = shift;
 
-  my $app = do "$AppRoot/app_2017.psgi";
+  my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2017.psgi";
+  my $app = do "$AppRoot/$psgi";
 
   my $mech = WWW::Mechanize->new;
   $mech->{app} = $app;
