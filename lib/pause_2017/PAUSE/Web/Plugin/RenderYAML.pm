@@ -12,6 +12,7 @@ sub register {
     local $YAML::Syck::ImplicitUnicode = 1;
     my $dump = YAML::Syck::Dump($data);
     my $edump = Encode::encode_utf8($dump);
+    $c->stash(format => "text");
     $c->render(text => $edump);
     return;
   });
