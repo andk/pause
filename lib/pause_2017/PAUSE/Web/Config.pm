@@ -3,8 +3,6 @@ package PAUSE::Web::Config;
 use Mojo::Base -base;
 use PAUSE;
 
-our $DO_UTF8 = 1;
-
 our %Actions = (
   # PUBLIC
   request_id => {
