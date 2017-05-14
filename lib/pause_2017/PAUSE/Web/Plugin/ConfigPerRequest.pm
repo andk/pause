@@ -21,7 +21,6 @@ sub _before_dispatch {
 
   _is_ssl($c);
   _prefer_post($c);
-  _can_utf8($c);
   _retrieve_user($c);
   _set_allowed_actions($c);
 }
