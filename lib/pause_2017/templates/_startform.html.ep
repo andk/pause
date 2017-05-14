@@ -1,13 +1,13 @@
 % my $pause = stash(".pause") || {};
 % my $me = my_url();
-% my ($method, $enctype);
+% my $enctype;
 % if ($pause->{need_multipart}) {
-%   ($enctype, $method) = ("multipart/form-data", "post");
+%   $enctype = "multipart/form-data";
 % } else {
-%   ($enctype, $method) = ("multipart/x-www-form-urlencoded", "post");
+%   $enctype = "multipart/x-www-form-urlencoded";
 % }
 % if ($PAUSE::Config->{TESTHOST}) {
-%   warn "DEBUG: me[$me]enctype[$enctype]method[$method]";
+%   warn "DEBUG: me[$me]enctype[$enctype]";
 <h2>[ATTN: Form going to post to <%= $me %>]</h2>
 % }
 <form action="<%= $me %>" enctype="<%= $enctype %>" method="<%= $method %>">
