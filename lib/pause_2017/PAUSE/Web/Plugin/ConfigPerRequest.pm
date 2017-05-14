@@ -21,7 +21,6 @@ sub _before_dispatch {
 
   _is_ssl($c);
   _prefer_post($c);
-  _can_png($c);
   _can_utf8($c);
   _can_multipart($c);
   _retrieve_user($c);
@@ -70,16 +69,6 @@ sub _can_multipart {
   my $can = $c->req->param("CAN_MULTIPART"); # no guessing, no special casing
   $can = 1 unless defined $can; # default
   $c->stash(".pause")->{can_multipart} = $can;
-}
-
-sub _can_png {
-  my $c = shift;
-  my $pause = $c->stash(".pause");
-
-  my $accept = $c->req->headers->accept;
-  return $pause->{can_png} = 0 unless $accept;
-
-  $pause->{can_png} = $accept =~ m|image/png|i;
 }
 
 sub _can_utf8 {
