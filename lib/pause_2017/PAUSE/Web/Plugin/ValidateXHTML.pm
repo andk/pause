@@ -12,6 +12,7 @@ sub register {
   {
     no warnings 'redefine';
     *Mojolicious::Plugin::TagHelpers::_tag = \&_fix_tag;
+    *Mojo::Parameters::pairs = \&_fix_pairs;
   }
 }
 
@@ -50,6 +51,40 @@ sub _fix_tag {
     @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
   }
   return Mojo::ByteStream->new(Mojo::DOM::HTML::_render($tree, 'xml')); # TWEAKED
+}
+
+sub _fix_pairs {
+  my $self = shift;
+
+  # Replace parameters
+  if (@_) {
+    $self->{pairs} = shift;
+    delete $self->{string};
+    return $self;
+  }
+
+  # Parse string
+  if (defined(my $str = delete $self->{string})) {
+    my $pairs = $self->{pairs} = [];
+    return $pairs unless length $str;
+
+    my $charset = $self->charset;
+    for my $pair (split /[;&]/, $str) { # TWEAKED
+      next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
+      my ($name, $value) = ($1, $2 // '');
+
+      # Replace "+" with whitespace, unescape and decode
+      s/\+/ /g for $name, $value;
+      $name  = Mojo::Util::url_unescape $name;
+      $name  = Mojo::Util::decode($charset, $name) // $name if $charset;
+      $value = Mojo::Util::url_unescape $value;
+      $value = Mojo::Util::decode($charset, $value) // $value if $charset;
+
+      push @$pairs, $name, $value;
+    }
+  }
+
+  return $self->{pairs} ||= [];
 }
 
 1;
