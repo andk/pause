@@ -10,8 +10,6 @@ sub request {
   my $req = $c->req;
   my $valid_userid = $mgr->config->valid_userid;
 
-  $c->prefer_post(1);
-
   # first time: form
   # second time with error: error message + form
   # second time without error: OK message

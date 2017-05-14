@@ -10,7 +10,6 @@ sub register {
   my ($self, $app, $conf) = @_;
   $app->hook(before_dispatch => \&_before_dispatch);
   $app->hook(before_render => \&_before_render);
-  $app->helper(prefer_post => \&_prefer_post);
   $app->helper(need_multipart => \&_need_multipart);
 }
 
@@ -20,7 +19,6 @@ sub _before_dispatch {
   $c->stash(".pause" => {}) unless $c->stash(".pause");
 
   _is_ssl($c);
-  _prefer_post($c);
   _retrieve_user($c);
   _set_allowed_actions($c);
 }
@@ -49,17 +47,6 @@ sub _need_multipart {
     $pause->{need_multipart} = shift;
   }
   $pause->{need_multipart};
-}
-
-sub _prefer_post {
-  my $c = shift;
-  my $pause = $c->stash(".pause");
-  return $pause->{prefer_post} = 1; # Because we should always prefer post now
-
-  if (@_) {
-    $pause->{prefer_post} = shift;
-  }
-  $pause->{prefer_post};
 }
 
 # pause_1999::authen_user::header
