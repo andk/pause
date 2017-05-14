@@ -175,13 +175,13 @@ sub share {
       # it should be sufficiently helpful to prepare only makeco_m on
       # these two submit buttons. For 3.2 people may be a little confused
       # but it is so rarely needed that we do not worry.
-      my $all_mods = $c->all_pmods($mgr,$u);
+      my $all_mods = $c->all_pmods($u);
       my @all_mods = sort keys %$all_mods;
       $pause->{make_comaintainer} = \@all_mods;
     }
 
     {
-      my $all_mods = $c->all_only_cmods($mgr,$u);
+      my $all_mods = $c->all_only_cmods($u);
       my @all_mods = sort keys %$all_mods;
       my %labels;
       my @all_mods_with_label;
