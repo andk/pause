@@ -6,7 +6,6 @@ use FindBin;
 use JSON::PP; # just to avoid redefine warnings
 use Path::Tiny;
 use DBI;
-use LWP::ConsoleLogger::Easy qw/debug_ua/;
 use Plack::Test;
 use HTTP::Message::PSGI;
 use WWW::Mechanize;
@@ -163,7 +162,9 @@ sub new {
 
   my $mech = WWW::Mechanize->new;
   $mech->{app} = $app;
-  debug_ua($mech);
+  if (eval {require LWP::ConsoleLogger::Easy; 1}) {
+    LWP::ConsoleLogger::Easy::debug_ua($mech);
+  }
   bless {mech => $mech}, $class;
 }
 
