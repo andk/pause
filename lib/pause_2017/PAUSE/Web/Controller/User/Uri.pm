@@ -130,7 +130,7 @@ sub add {
   # HTTP UPLOAD
 
   if ($tryupload) {
-    $c->need_multipart(1);
+    $c->need_form_data(1);
     $c->res->headers->accept("*");
   }
 

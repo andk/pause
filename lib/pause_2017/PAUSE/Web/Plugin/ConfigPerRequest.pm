@@ -10,7 +10,7 @@ sub register {
   my ($self, $app, $conf) = @_;
   $app->hook(before_dispatch => \&_before_dispatch);
   $app->hook(before_render => \&_before_render);
-  $app->helper(need_multipart => \&_need_multipart);
+  $app->helper(need_form_data => \&_need_form_data);
 }
 
 sub _before_dispatch {
@@ -40,13 +40,13 @@ sub _is_ssl {
   }
 }
 
-sub _need_multipart {
+sub _need_form_data {
   my $c = shift;
   my $pause = $c->stash(".pause");
   if (@_) {
-    $pause->{need_multipart} = shift;
+    $pause->{need_form_data} = shift;
   }
-  $pause->{need_multipart};
+  $pause->{need_form_data};
 }
 
 # pause_1999::authen_user::header
