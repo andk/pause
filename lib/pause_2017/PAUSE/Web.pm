@@ -46,12 +46,6 @@ sub startup {
   $app->plugin("PAUSE::Web::Plugin::TextFormat");
   $app->plugin("PAUSE::Web::Plugin::ValidateXHTML");
 
-  # tweak default TagHelpers to spit xml for now
-  {
-    no warnings 'redefine';
-    *Mojolicious::Plugin::TagHelpers::_tag = \&_fix_tag;
-  }
-
   # Check HTTP headers and set stash
   my $r = $app->routes->under("/")->to("root#check");
 
@@ -82,21 +76,6 @@ sub startup {
       }
     }
   }
-}
-
-sub _fix_tag {
-  my $tree = ['tag', shift, undef, undef];
-
-  # Content
-  if (ref $_[-1] eq 'CODE') { push @$tree, ['raw', pop->()] }
-  elsif (@_ % 2) { push @$tree, ['text', pop] }
-
-  # Attributes
-  my $attrs = $tree->[2] = {@_};
-  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
-    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
-  }
-  return Mojo::ByteStream->new(Mojo::DOM::HTML::_render($tree, 'xml')); # TWEAKED
 }
 
 1;
