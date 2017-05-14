@@ -30,6 +30,7 @@ WriteMakefile(
     Email::Address
     Email::MIME
     Email::Sender::Simple
+    EV
     File::Copy::Recursive
     File::pushd
     File::Rsync::Mirror::Recentfile
@@ -54,6 +55,9 @@ WriteMakefile(
     Module::Faker::Dist
     Module::Signature
     Moo
+    Mojolicious
+    Mojolicious::Plugin::WithCSRFProtection
+    MojoX::Log::Dispatch::Simple
     MooseX::StrictConstructor
     Net::FTP
     Parse::CPAN::Packages
