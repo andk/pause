@@ -191,7 +191,7 @@ sub share {
         push @all_mods_with_label, ["$m => $owner", $m];
       }
 
-      $pause->{remove_maintainer} = \@all_mods_with_label;
+      $pause->{remove_comaintainer} = \@all_mods_with_label;
     }
 
     return;
