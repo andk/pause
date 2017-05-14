@@ -1,4 +1,4 @@
-use Modern::Perl;
+use Mojo::Base -strict;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test::PAUSE::Web;
