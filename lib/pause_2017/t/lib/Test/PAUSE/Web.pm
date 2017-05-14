@@ -29,6 +29,7 @@ our $FileToUpload = "$AppRoot/t/staging/$FilenameToUpload";
 push @INC, "$AppRoot/lib", "$AppRoot/lib/pause_2017", "$AppRoot/privatelib";
 
 $TmpDir->child($_)->mkpath for qw/rundata incoming etc public log/;
+$TmpDir->child('log')->child('paused.log')->touch();
 
 $INC{"PrivatePAUSE.pm"} = 1;
 $ENV{EMAIL_SENDER_TRANSPORT} = "Test";
