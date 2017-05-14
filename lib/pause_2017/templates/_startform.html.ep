@@ -1,7 +1,7 @@
 % my $pause = stash(".pause") || {};
 % my $me = my_url();
 % my ($method, $enctype);
-% if ($pause->{can_multipart} and $pause->{need_multipart}) {
+% if ($pause->{need_multipart}) {
 %   ($enctype, $method) = ("multipart/form-data", "post");
 % } elsif ($pause->{prefer_post}) {
 %   ($enctype, $method) = ("multipart/x-www-form-urlencoded", "post");

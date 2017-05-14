@@ -20,7 +20,7 @@ sub add {
  at $PAUSE::Config->{ADMIN} and help them identifying what's going on. Thanks!")
           unless $u->{userid};
 
-  my($tryupload) = $pause->{can_multipart};
+  my($tryupload) = 1; # everyone supports multipart now
   my($uri);
   my $userhome = PAUSE::user2dir($u->{userid});
 

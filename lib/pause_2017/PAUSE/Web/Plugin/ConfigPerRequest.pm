@@ -22,7 +22,6 @@ sub _before_dispatch {
   _is_ssl($c);
   _prefer_post($c);
   _can_utf8($c);
-  _can_multipart($c);
   _retrieve_user($c);
   _set_allowed_actions($c);
 }
@@ -62,13 +61,6 @@ sub _prefer_post {
     $pause->{prefer_post} = shift;
   }
   $pause->{prefer_post};
-}
-
-sub _can_multipart {
-  my $c = shift;
-  my $can = $c->req->param("CAN_MULTIPART"); # no guessing, no special casing
-  $can = 1 unless defined $can; # default
-  $c->stash(".pause")->{can_multipart} = $can;
 }
 
 sub _can_utf8 {
