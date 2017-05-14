@@ -18,12 +18,6 @@ sub peek {
   if (my $qterm = $req->param("pause99_peek_perms_query")) {
     my $by = $req->param("pause99_peek_perms_by");
     my @query = (
-                qq{SELECT mods.modid,
-                          mods.userid,
-                          "modulelist",
-                          mods.userid
-                   FROM mods LEFT JOIN users ON mods.userid=users.userid
-                },
                 qq{SELECT primeur.package,
                           primeur.userid,
                           "first-come",
@@ -44,10 +38,6 @@ sub peek {
     my %seen;
     for my $query (@query) {
       my %fields = (
-                    modulelist => {
-                                   package => "mods.modid",
-                                   userid  => "mods.userid",
-                                  },
                     "first-come" => {
                                      package => "primeur.package",
                                      userid  => "primeur.userid",
