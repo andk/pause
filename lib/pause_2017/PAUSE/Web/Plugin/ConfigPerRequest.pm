@@ -63,45 +63,6 @@ sub _prefer_post {
   $pause->{prefer_post};
 }
 
-sub _can_utf8 {
-  my $c = shift;
-  my $pause = $c->stash(".pause");
-
-  my $charset = $c->req->headers->accept_charset;
-  if (defined $charset) {
-    if ($charset =~ m|\butf-8\b|i) {
-      $pause->{can_utf8} = 1;
-    } else {
-      $pause->{can_utf8} = 0;
-    }
-    warn "CAN_UTF8[$pause->{can_utf8}]acce[$charset]";
-    return;
-  }
-
-  # Mozilla/5.0 (X11; U; Linux 2.2.16-RAID i686; en-US; m18)
-  my $user_agent = $c->req->headers->user_agent || "";
-  if ($user_agent =~ /^Mozilla\/(\d+)\.\d+\s+\(X11;/
-    &&
-    $1 >= 5
-  ) {
-    $pause->{can_utf8} = "mozilla 5X";
-    warn "CAN_UTF8[$pause->{can_utf8}]uagent[$user_agent]";
-    return;
-  }
-
-  if (0) {
-    # since we have a perlbal this protocol check is turns UTF-8 off
-    # more often than in previous times and reveals that our
-    # solutions for non-utf-8 browsers do not work anymore.
-    # Disabling completely for now. May need reconsidering, but
-    # maybe UTF-8 works everywhere now...
-    my $protocol_version = $c->req->version;
-    my ($major, $minor) = $protocol_version =~ /(\d+)\.(\d+)/;
-    $pause->{can_utf8} = $major >= 1 && $minor >= 1;
-    return;
-  }
-}
-
 # pause_1999::authen_user::header
 sub _retrieve_user {
   my $c = shift;
