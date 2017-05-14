@@ -103,7 +103,7 @@ sub BUILD {
 
     for my $schema ( @{$self->schemas} ) {
         note("Loading schema: $schema");
-        $self->run_mysql( $schema );
+        $self->run_mysql( "< '$schema'" );
     }
 }
 
@@ -134,7 +134,6 @@ sub _build_dbh {
 sub run_mysql {
     my $self = shift;
     my $cmd = shift || '';
-    $cmd = "< $cmd" if $cmd;
     my $exe = $self->mysql_client;
     system(sprintf("%s --defaults-extra-file=%s %s", $exe, $self->_auth_file, $cmd));
 }
