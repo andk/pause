@@ -60,7 +60,12 @@ sub startup {
   $public->any("/")->to("root#index");
   for my $group ($app->pause->config->public_groups) {
     for my $name ($app->pause->config->action_names_for($group)) {
-      $public->any("/$name")->to($app->pause->config->action($name)->{x_mojo_to});
+      my $action = $app->pause->config->action($name);
+      for my $method (qw/get post/) {
+        my $route = $public->$method("/$name");
+        $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
+        $route->to($action->{x_mojo_to});
+      }
     }
   }
 
@@ -69,7 +74,12 @@ sub startup {
   $private->any("/")->to("root#index");
   for my $group ($app->pause->config->all_groups) {
     for my $name ($app->pause->config->action_names_for($group)) {
-      $private->any("/$name")->to($app->pause->config->action($name)->{x_mojo_to});
+      my $action = $app->pause->config->action($name);
+      for my $method (qw/get post/) {
+        my $route = $private->$method("/$name");
+        $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
+        $route->to($action->{x_mojo_to});
+      }
     }
   }
 }
