@@ -22,7 +22,6 @@ sub manage {
   }
   my $dbh = $mgr->connect;
   my $sthu = $dbh->prepare("SELECT userid from users where userid=?");
-  my $sthm = $dbh->prepare("SELECT modid from mods where modid=?");
 
   find
       (
@@ -46,10 +45,6 @@ sub manage {
             $sthu->execute($userid);
             return if $sthu->rows > 0;
             $type = "user";
-          } elsif (exists $session->{APPLY}{modid}) {
-            $sthm->execute($session->{APPLY}{modid});
-            return if $sthm->rows > 0;
-            $type = "mod";
           }
           if ($session->{APPLY}{rationale} =~ /\b(?:BLONDE\s+NAKED|NAKED\s+SEXY|FREE\s+CUMSHOT|CUMSHOT\s+VIDEOS|FREE\s+SEX|FREE\s+TUBE|GROUP\s+SEX|FREE\s+PORN|SEX\s+VIDEO|SEX\s+MOVIES?|SEX\s+TUBE|SEX\s+MATURE|STREET\s+BLOWJOBS|SEX\s+PUBLIC|TUBE\s+PORN|PORN\s+TUBE|TUBE\s+VIDEOS|VIDEO\s+TUBE|XNXX\s+VIDEOS|XXX\s+FREE|ANIMAL\s+SEX|GIRLS\s+SEX|PORN\s+VIDEOS?|PORN\s+MOVIES|TITS\s+PORN|RAW\s+SEX|DEEPTHROAT\s+TUBE|celeb\s+porn|PREGNANT\s+TUBE|picture\s+sex|NAKED\s+WOMEN|WOMEN\s+MOVIES|MATURE\s+NAKED|SEX\s+ANIME|hot\s+nude|nude\s+celebs|ANIME\s+TUBES|SEX\s+DOG|MATURE\s+SEX|MATURE\s+PUSSY|Rape\s+Porn|brutal\s+fuck|rape\s+video|ANIMAL\s+TUBE|SHEMALE\s+CUMSHOT|ANIMAL\s+PORN|ANIMAP\s+CLIP|CLIP\s+SEX|PUBLIC\s+BLOWJOB|free\s+lesbian|lesbian\s+sex|SEX\s+ZOO|tv-adult|numismata.org|www.soulcommune.com|www.petsusa.org|www.csucssa.org|www.thisis50.com|www.comunidad-latina.net|www.singlefathernetwork.com|www.freetoadvertise.biz|gayforum.dk|www.purevolume.com|playgroup.themouthpiece.com|www.bananacorp.cl|party.thebamboozle.com|blog.tellurideskiresort.com|www.pethealthforums.com|www.burropride.com|lpokemon.19.forumer.com|Zootube365|Eskimotube|xtube-1|phentermine without a prescription)\b/i) {
             unlink $path or die "Could not unlink '$path': $!";

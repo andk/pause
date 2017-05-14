@@ -149,21 +149,6 @@ sub share {
     # more options.
 
     my $dbh = $mgr->connect;
-    {
-      my $sql = qq{SELECT modid
-                   FROM mods
-                   WHERE userid=?
-                   AND mlstatus='list'
-                   ORDER BY modid};
-      my $sth = $dbh->prepare($sql);
-      $sth->execute($u->{userid});
-      my @all_mods;
-      while (my($id) = $mgr->fetchrow($sth, "fetchrow_array")) {
-        # register this mailinglist for the selectbox
-        push @all_mods, $id;
-      }
-      $pause->{mods} = \@all_mods;
-    }
 
     {
       my $all_mods = $c->all_pmods_not_mmods($u);
@@ -366,8 +351,7 @@ sub _share_makeco {
         $sth1->execute($other_user);
         die PAUSE::Web::Exception
             ->new(ERROR => sprintf(
-                                   "%s is not a valid userid.",
-                                   $mgr->escapeHTML($other_user),
+                                   "$other_user is not a valid userid.",
                                   )
                  )
                 unless $sth1->rows;
@@ -557,16 +541,6 @@ sub all_pmods_not_mmods {
     $all_mods{$id} = undef;
   }
   $sth2->finish;
-  $sth2 = $db->prepare(qq{SELECT modid
-                             FROM mods
-                             WHERE userid=?
-                             AND mlstatus='list'
-  });
-  $sth2->execute($u->{userid});
-  while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
-    delete $all_mods{$id};
-  }
-  $sth2->finish;
   \%all_mods;
 }
 
@@ -603,31 +577,11 @@ sub all_pmods {
   \%all_mods;
 }
 
-sub all_mmods {
-  my ($c, $u) = @_;
-  my $mgr = $c->app->pause;
-  my $db = $mgr->connect;
-  my(%all_mods);
-  my $sth2 = $db->prepare(qq{SELECT modid
-                             FROM mods
-                             WHERE userid=?});
-  $sth2->execute($u->{userid});
-  while (my($id) = $mgr->fetchrow($sth2, "fetchrow_array")) {
-    $all_mods{$id} = undef;
-  }
-  $sth2->finish;
-  \%all_mods;
-}
-
 sub all_only_cmods {
   my($c,$u) = @_;
-  my $all_mmods = $c->all_mmods($u);
   my $all_pmods = $c->all_pmods($u);
   my $all_mods = $c->all_cmods($u);
 
-  for my $k (keys %$all_mmods) {
-    delete $all_mods->{$k};
-  }
   for my $k (keys %$all_pmods) {
     delete $all_mods->{$k};
   }
