@@ -28,7 +28,7 @@ our $FileToUpload = "$AppRoot/t/staging/$FilenameToUpload";
 
 push @INC, "$AppRoot/lib", "$AppRoot/lib/pause_2017", "$AppRoot/privatelib";
 
-$TmpDir->child($_)->mkpath for qw/rundata incoming etc public/;
+$TmpDir->child($_)->mkpath for qw/rundata incoming etc public log/;
 
 $INC{"PrivatePAUSE.pm"} = 1;
 $ENV{EMAIL_SENDER_TRANSPORT} = "Test";
@@ -54,6 +54,8 @@ $PAUSE::Config->{UPLOAD} = $TestEmail;
 $PAUSE::Config->{HAVE_PERLBAL} = 0;
 $PAUSE::Config->{SLEEP} = 1;
 $PAUSE::Config->{INCOMING} = "file://$TestRoot/incoming/";
+$PAUSE::Config->{PAUSE_LOG} = "$TestRoot/log/paused.log";
+$PAUSE::Config->{PAUSE_LOG_DIR} = "$TestRoot/log";
 
 # These will get changed every time you run setup()
 $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = "";
