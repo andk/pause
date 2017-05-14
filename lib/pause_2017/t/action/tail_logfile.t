@@ -14,6 +14,13 @@ Test::PAUSE::Web->setup;
 subtest 'basic' => sub {
     my $t = Test::PAUSE::Web->new;
 
+    open my $fh, '>', $PAUSE::Config->{PAUSE_LOG};
+    say $fh <<LOG;
+pause log
+pause log
+pause log
+LOG
+
     my %form = %$default;
     $t->user_post_ok("/pause/authenquery?ACTION=tail_logfile", \%form);
     note $t->content;
