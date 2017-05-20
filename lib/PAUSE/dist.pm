@@ -1085,7 +1085,7 @@ sub write_updated_meta6_json {
   }
   close $meta_fh;
 
-  $meta->{'source-url'} = $PAUSE::Config->{PUB_MODULE_URL} . "$MLROOT/$dist";
+  $meta->{'source-url'} = $PAUSE::Config->{PUB_MODULE_URL} . $dist;
 
   open $meta_fh, '>', "$MLROOT/$sans.meta"
     or $self->verbose(1,"Failed to open Perl 6 meta file for writing: $!");
