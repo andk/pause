@@ -593,4 +593,5 @@ __END__
 # VCS::CVS,RSAVAGE,c,delete
 # Webservice::Instagram,DAYANUNE,c,delete
 # Xbase,PRATP,c,delete
-Business::OnlinePayment::CyberSource,XENO,f,add
+# Business::OnlinePayment::CyberSource,XENO,f,add
+libxml::perl,KMACLEOD,f,add
