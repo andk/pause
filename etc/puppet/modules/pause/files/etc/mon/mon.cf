@@ -39,7 +39,7 @@ watch pausepartitions
 	monitor freespace.monitor /:1000000 /home:2000000 /tmp:250000 /var:1000000
 	period wd {Sun-Sat}
 	    alert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
-	    alertevery 3h
+	    alertevery 3h strict
             upalert mail.alert andreas.koenig.7os6VVqR@franz.ak.mind.de
 
 watch paused
