@@ -465,20 +465,20 @@ class pause-limits {
 		source => "puppet:///modules/pause/etc/security/limits.conf-pause-us",
 	}
 }
-class pause-iptables {
-	file { "/etc/sysconfig/iptables-config":
-		owner  => root,
-		group  => root,
-		mode   => 644,
-		source => "puppet:///modules/pause/etc/sysconfig/iptables-config-pause-us",
-	}
-	file { "/etc/sysconfig/iptables":
-		owner  => root,
-		group  => root,
-		mode   => 644,
-		source => "puppet:///modules/pause/etc/sysconfig/iptables-pause-us",
-	}
-}
+# class pause-iptables {
+# 	file { "/etc/sysconfig/iptables-config":
+# 		owner  => root,
+# 		group  => root,
+# 		mode   => 644,
+# 		source => "puppet:///modules/pause/etc/sysconfig/iptables-config-pause-us",
+# 	}
+# 	file { "/etc/sysconfig/iptables":
+# 		owner  => root,
+# 		group  => root,
+# 		mode   => 644,
+# 		source => "puppet:///modules/pause/etc/sysconfig/iptables-pause-us",
+# 	}
+# }
 class pause-mon {
 	file { "/usr/lib64/mon/mon.d/freespace.monitor":
 		owner  => root,
@@ -549,7 +549,6 @@ class pause {
 	include pause-postfix
 	include pause-paused
 	include pause-limits
-	include pause-iptables
 	include pause-mon
         include pause-cron
 }
