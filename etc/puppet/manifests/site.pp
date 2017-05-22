@@ -353,7 +353,7 @@ class pause-proftpd {
 	}
 	file { "/home/ftp/pub":
 		owner => "root",
-		group => "ftp",
+		group => "root",
 		mode => 755,
 		ensure => directory,
 	}
