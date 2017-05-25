@@ -205,6 +205,13 @@ subtest "distname/pkgname permission mismatch" => sub {
               qr/You\s+appear.*\.pm\s+file.*dist\s+name\s+\(XFR\)/s,
               "email looks right",
             );
+          },
+          sub {
+            like(
+              $_[0]->{email}->as_string,
+              qr/You\s+appear.*\.pm\s+file.*dist\s+name\s+\(XFR\)/s,
+              "email looks right",
+            );
           }
         ],
       },
