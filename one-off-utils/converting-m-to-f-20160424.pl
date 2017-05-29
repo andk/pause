@@ -594,4 +594,6 @@ __END__
 # Webservice::Instagram,DAYANUNE,c,delete
 # Xbase,PRATP,c,delete
 # Business::OnlinePayment::CyberSource,XENO,f,add
-libxml::perl,KMACLEOD,f,add
+# libxml::perl,KMACLEOD,f,add
+JSON::Assert,SGREEN,f,add
+Test::JSON::Assert,SGREEN,f,add
