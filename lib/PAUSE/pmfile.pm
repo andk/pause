@@ -456,10 +456,10 @@ sub parse_version {
         } else {
             $self->connect->{InactiveDestroy} = 1;
             my($gnam,$gpw,$gid,$gmem) = getgrnam($PAUSE::Config->{ML_CHOWN_GROUP});
-            die "Could not determine GID of $PAUSE::Config->{ML_CHOWN_GROUP}" unless $gid;
+            die "Could not determine GID of $PAUSE::Config->{ML_CHOWN_GROUP}" unless defined $gid;
             my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) =
                 getpwnam($PAUSE::Config->{ML_CHOWN_USER});
-            die "Could not determine UID of $PAUSE::Config->{ML_CHOWN_USER}" unless $uid;
+            die "Could not determine UID of $PAUSE::Config->{ML_CHOWN_USER}" unless defined $uid;
             $( = $gid; $) = "$gid $gid";
             $< = $> = $uid;
 
