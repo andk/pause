@@ -240,13 +240,14 @@ class pause-perlbal {
 		mode => 700,
 		ensure => directory,
 	}
-	file { "/etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain":
-		path => "/etc/perlbal/servercerts/rapidssl.pause.perl.org.crt+chain",
-		ensure => "/home/puppet/pause/apache-conf/ssl.crt/rapidssl.pause.perl.org.crt+chain",
-	}
 	file { "/etc/perlbal/perlbal.conf":
 		path => "/etc/perlbal/perlbal.conf",
 		ensure => "/home/puppet/pause/etc/perlbal/perlbal.conf.pause-us",
+	}
+	file { "/etc/perlbal/restarter.sh":
+		path => "/etc/perlbal/restarter.sh",
+		ensure => "/home/puppet/pause/etc/perlbal/restarter.sh",
+		mode => 755,
 	}
 	file { "/etc/init.d/PAUSE-perlbal":
 		path => "/etc/init.d/PAUSE-perlbal",
