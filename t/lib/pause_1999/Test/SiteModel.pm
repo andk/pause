@@ -40,14 +40,22 @@ sub clear_user {
     return $self;
 }
 
-__PACKAGE__->create_fetch_method(
-    method_name      => 'homepage',
-    page_description => 'homepage',
-    page_url         => '/pause/authenquery',
+my %fetch_pages = (
+    homepage        => '/pause/authenquery',
+    pausecss        => '/pause/pause.css',
+    unknownpath     => '/.not-well-known/acme-challenge/jhoQM',
+    challengereadme => '/.well-known/acme-challenge/README',
 );
+while ( my ( $atom, $desc ) = each %fetch_pages ) {
+    __PACKAGE__->create_fetch_method(
+        method_name      => $atom,
+        page_description => $atom,
+        page_url         => $fetch_pages{$atom},
+    );
+}
 
 # Create many simple fetch methods
-my %fetch_pages = (
+%fetch_pages = (
     change_passwd   => 'Change Password',
     delete_files    => 'Delete files',
     email_for_admin => 'Look up the forward email address',
