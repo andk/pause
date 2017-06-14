@@ -36,6 +36,10 @@ stop running after that many signatures
 
 Sleep that amount of time in every directory we enter
 
+=item B<--startdir=s>
+
+start at this directory
+
 =back
 
 =head1 DESCRIPTION
@@ -48,7 +52,6 @@ Sleep that amount of time in every directory we enter
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Dumpvalue;
 use File::Basename qw(dirname);
 use File::Path qw(mkpath);
 use File::Spec;
@@ -79,7 +82,7 @@ if ($Opt{help}) {
     pod2usage(1);
 }
 
-use CPAN::Checksums 1.018;
+use CPAN::Checksums 2.12;
 use File::Copy qw(cp);
 use File::Find;
 use File::Spec;
@@ -94,6 +97,7 @@ if ($Opt{debug}) {
   warn "Debugging on. CPAN::Checksums::VERSION[$CPAN::Checksums::VERSION]";
 }
 my $root = $PAUSE::Config->{MLROOT};
+$Opt{startdir} //= $root;
 our $TESTDIR;
 
 # max: 15 was really slow, 100 is fine, 1000 was temporarily used
@@ -185,5 +189,5 @@ find(sub {
        my $abs = File::Spec->rel2abs($ffname);
        PAUSE::newfile_hook("$abs/CHECKSUMS");
        $cnt++;
-     }, $root);
+     }, $Opt{startdir});
 
