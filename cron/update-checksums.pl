@@ -156,10 +156,11 @@ find(sub {
                                                 );
          my @stat = stat $old_checksums;
          $yaml->{stat_1} = \@stat;
-         cp($old_checksums,
-            File::Spec->catfile($debugdir,
-                                "CHECKSUMS.old")
-           ) or die $!;
+         my $old_checksums_old =
+             File::Spec->catfile($debugdir, "CHECKSUMS.old");
+         cp($old_checksums, $old_checksums_old)
+             or die "Could not copy '$old_checksums' to ".
+             "'$old_checksums_old': $!";
          $yaml->{start} = time;
        }
        my $ret = eval { CPAN::Checksums::updatedir($ffname); };
