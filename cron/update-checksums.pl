@@ -120,7 +120,7 @@ $CPAN::Checksums::MIN_MTIME_CHECKSUMS =
 
 find(sub {
        exit if $cnt>=$Opt{max};
-       return unless $File::Find::name =~ m|id/.|;
+       return unless $File::Find::name =~ m{id(/|$)};
        return if -l;
        return unless -d;
        if ($Opt{"sleep-per-dir"}) {
@@ -146,9 +146,9 @@ find(sub {
                                           DIR => "/tmp",
                                           CLEANUP => 0,
                                          ) or die "Could not make a tmp directory";
-         $debugdir = File::Spec->catdir($TESTDIR,
-                                        substr($ffname,
-                                               length($root)));
+         my $test_sub_dir = length($ffname) <= length($root)
+             ? "Root" : substr($ffname, length($root));
+         $debugdir = File::Spec->catdir($TESTDIR,$test_sub_dir);
          File::Path::mkpath($debugdir);
          my $old_checksums = File::Spec->catfile(
                                                  $ffname,

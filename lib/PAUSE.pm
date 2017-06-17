@@ -160,7 +160,7 @@ $PAUSE::Config ||=
      CHECKSUMS_SIGNING_ARGS => '--homedir /home/puppet/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ',
      CHECKSUMS_SIGNING_KEY => '450F89EC',
      BATCH_SIG_HOME => "/home/puppet/pause-private/gnupg-pause-batch-signing-home",
-     MIN_MTIME_CHECKSUMS => (time - 60*60*24*36.525), # max one tenth year old
+     MIN_MTIME_CHECKSUMS => 1300000000, # invent a threshold for oldest mtime
      HAVE_PERLBAL => 1,
      ZCAT_PATH  => (List::Util::first { -x $_ } ("/bin/zcat", "/usr/bin/zcat" )),
     };
