@@ -461,17 +461,16 @@ prepared to get mail from them before you have closed the buffer in
 your editor.</p>
 
 <p>
-  Module::Build is an effort to overcome many deficiencies in
-  MakeMaker and CPAN. One idea in that context is the storage of
-  module-metadata in a file <a
-  href="http://module-build.sourceforge.net/META-spec-v1.2.html">META.yml</a>,
-  that is being integrated into the module-tarball. PAUSE is supposed
-  to follow this emerging standard. The current code base of the PAUSE
-  indexer supports META.yml by extracting it and storing it in a
-  separate file that is called
-  <code><i>package-name</i><b>.meta</b></code> in the same directory.
-  The PAUSE indexer honours the contents of the <i>no_index</i> and
-  the <i>provides</i> fields. All other fields are currently ignored.
+  Module metadata is stored in a file called <a
+  href="https://metacpan.org/pod/CPAN::Meta::Spec">META.json</a> in the
+  module tarball. Previous versions of the meta-spec used a file called
+  <a href="https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4">META.yml</a>.
+  The PAUSE indexer supports this metadata by extracting META.json if
+  present, or META.yml otherwise, and storing it in a separate file that
+  is called <code><i>package-name</i><b>.meta</b></code> in the same
+  directory. The PAUSE indexer honours the contents of fields in this
+  metadata relevant to its operation, such as <i>no_index</i>,
+  <i>provides</i>, and <i>release_status</i>.
 </p>
 
 <h3><a id="services" name="services"></a>Related services on PAUSE</h3>
