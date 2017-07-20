@@ -198,10 +198,13 @@ sub perm_check {
       return 1;           # P2.1, P3.0
   }
 
-  # is uploader authorized for this package? --> case sensitive
+  # is uploader authorized for this package?
+  # This used to be done case-sensitively, but now PAUSE needs to consider
+  # these case sensitively, thanks to CASE insensitive filesystems like on Windows
+  # and MacOS.
   my($is_primeur) = $dbh->selectrow_hashref(qq{SELECT package, userid
                                     FROM   primeur
-                                    WHERE  package = ? AND userid = ?},
+                                    WHERE  LOWER(package) = LOWER(?) AND userid = ?},
                                     undef,
                                     $package, $userid
                                   );
