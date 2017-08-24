@@ -597,4 +597,5 @@ __END__
 # libxml::perl,KMACLEOD,f,add
 # JSON::Assert,SGREEN,f,add
 # Test::JSON::Assert,SGREEN,f,add
-Array::Iterator,PERLANCAR,f,add
+# Array::Iterator,PERLANCAR,f,add
+W3C::LogValidator::CSSValidator,OLIVIERT,f,add
