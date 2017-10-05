@@ -598,4 +598,6 @@ __END__
 # JSON::Assert,SGREEN,f,add
 # Test::JSON::Assert,SGREEN,f,add
 # Array::Iterator,PERLANCAR,f,add
-W3C::LogValidator::CSSValidator,OLIVIERT,f,add
+# W3C::LogValidator::CSSValidator,OLIVIERT,f,add
+XML::SRS,NZRS,f,add
+XML::EPP,NZRS,f,add
