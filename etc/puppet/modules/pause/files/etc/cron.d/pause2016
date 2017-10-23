@@ -1,5 +1,5 @@
 MAILTO=andreas.koenig.5c1c1wmb@franz.ak.mind.de
-PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron
+PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron:/usr/sbin
 
 * * * * *             root  recentfile-aggregate.sh
 * * * * *             root  date -u +"\%s \%a \%b \%e \%T \%Z \%Y" > /home/ftp/tmp/02STAMP && mv /home/ftp/tmp/02STAMP /home/ftp/pub/PAUSE/authors/02STAMP && /opt/perl/current/bin/perl -I /home/puppet/pause/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' /home/ftp/pub/PAUSE/authors/02STAMP
@@ -23,3 +23,4 @@ PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron
 46 0,6,12,18 * * *    root  perl -I/home/puppet/pause/lib /home/puppet/pause/bin/indexscripts.pl    >/home/puppet/pause/bin/indexscripts.pl.out 2>&1
 7 2   * * 0           root  perl -I/home/puppet/pause/lib /home/puppet/pause/bin/indexscripts.pl -f
 4,11,19,26,34,42,49,56 * * * * root  zsh /home/puppet/pause/cron/assert-paused-running.zsh
+29 4 22 2,4,6,8,10,12 *        root  cd /home/andreas/src/certbot/ && ./certbot-auto renew --renew-hook /etc/perlbal/restarter.sh
