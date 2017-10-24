@@ -223,7 +223,7 @@ in your upload will be considered for inclusion in the CPAN Index.
   whether a package will be added to the index.
   The other factors are listed in §3.5. below.
 
-Indexing permissions do not give you any control any other author's directory:
+Indexing permissions do not give you any control over any other author's directory:
 
 * If you have first-come,
   grant co-maint to someone and subsequently don't like a release they do,
