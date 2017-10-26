@@ -1,7 +1,7 @@
 ﻿
 # The PAUSE Operating Model
 
-## Version 1
+## Version 2
 
 
 This document defines the operating model under which
@@ -703,17 +703,17 @@ you do not want indexing permissions transferred / granted
 to another person without your explicit permission,
 you can record this:
 
-* Give co-maint to the **NOTRANSFER** user.
+* Give co-maint to the **NOXFER** user.
   If your distribution contains multiple modules,
-  you only need to give co-maint to NOTRANSFER on the main module.
+  you only need to give co-maint to NOXFER on the main module.
   If it's not clear what the main module is,
   then err on the side of giving it to all modules in the distribution.
 * Consider adding a section to the documentation,
   with your policy on indexing permissions.
-  Many users are more likely to see this rather than the NOTRANSFER permission.
+  Many users are more likely to see this rather than the NOXFER permission.
 
-The PAUSE admins will honour the NOTRANSFER permission:
-if someone asks for co-maint on a package that has NOTRANSFER on it,
+The PAUSE admins will honour the NOXFER permission:
+if someone asks for co-maint on a package that has NOXFER on it,
 then the PAUSE admins will only do this with the express permission
 of the first-come.
 There is one exception to the above:
@@ -808,15 +808,15 @@ the author is currently looking for help with this URL:
 > https://rt.cpan.org/Public/Dist/ByMaintainer.html?Name=NEEDHELP
 
 
-#### 4.5.4. NOTRANSFER
+#### 4.5.4. NOXFER
 
 If you do not want the PAUSE admins to grant or transfer indexing permissions
 for a package,
-then grant **co-maint to NOTRANSFER**.
+then grant **co-maint to NOXFER**.
 
 You can find modules marked for no permissions transfer with this URL:
 
-> https://rt.cpan.org/Public/Dist/ByMaintainer.html?Name=NOTRANSFER
+> https://rt.cpan.org/Public/Dist/ByMaintainer.html?Name=NOXFER
 
 
 #### 4.5.5. P5P
