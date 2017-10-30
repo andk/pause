@@ -454,7 +454,7 @@ one or all of the packages in a release will be included in the index:
   (this was a hack put in place before the **`no_index`** directive
   was available,
   but given it is used by many distributions on CPAN,
-  it will be respected for the forseeable future).
+  it will be respected for the foreseeable future).
 * If an error (in PAUSE) happens during indexing,
   then one or more packages in a distribution may end up not being indexed.
   You will generally be informed about this in an email you receive from PAUSE.
