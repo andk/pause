@@ -113,6 +113,8 @@ sub give_regdowner_perms {
           for my $p_future (@$uids) {
               if ($p_future->{userid} eq $p_before) {
                   $t_allow_extending_perms = 1;
+                  my $uids = join ",", sort map { $_->{userid} } @$uids;
+                  $self->verbose(1,"Allow extending perms. main_package[$main_package]package[$package]p_before[$p_before]uids[$uids]\n");
                   last;
               }
           }

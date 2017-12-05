@@ -401,6 +401,15 @@ subtest "check comaintainers" => sub {
 subtest "comaint upload" => sub {
 
   $pause->import_author_root('corpus/mld/008/authors');
+  # BOONEN:
+  # -rw-rw-r--   colin/colin        52 Mooooooose-0.03/lib/Mooooooose/Trait.pm
+  # -rw-rw-r--   colin/colin        51 Mooooooose-0.03/lib/Mooooooose/Role.pm
+  # -rw-rw-r--   colin/colin        45 Mooooooose-0.03/lib/Mooooooose.pm
+  # ONE:
+  # -rw-rw-r--   colin/colin        49 Jenkins-Hack-0.13/lib/Jenkins/Hack2.pm
+  # -rw-rw-r--   colin/colin        55 Jenkins-Hack-0.13/lib/Jenkins/Hack/Utils.pm
+  # -rw-rw-r--   colin/colin        48 Jenkins-Hack-0.13/lib/Jenkins/Hack.pm
+
   my $result = $pause->test_reindex;
     $result->perm_list_ok(
       {
@@ -408,10 +417,10 @@ subtest "comaint upload" => sub {
         'Hall::MtKing'    => { f => 'XYZZY' },
         'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
         'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+        'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },         # new
+        'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },         # changed from { f => 'AAARGH' }
+        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },   # changed from { f => 'AAARGH', c => [qw/MERCKX/] }
+        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },  # new
         'XForm::Rollout'  => { f => 'OPRIME' },
         'Y',              => { f => 'XYZZY' },
       }
