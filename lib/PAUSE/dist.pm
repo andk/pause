@@ -428,17 +428,22 @@ sub mail_summary {
       listed in the 'provides' field in the META file nor found
       inside the distribution's modules.  Therefore, no modules
       will be indexed.]);
-    push @m, qq{\n\nFurther details on the indexing attempt follow.\n\n};
+    push @m, qq{\nFurther details on the indexing attempt follow.\n\n};
     $status_over_all = "Failed";
 
     my $inxst = $self->{INDEX_STATUS};
     if ($inxst && ref $inxst && %$inxst) {
       unless ($inxst->{$pkg}) {
         # Perhaps they forgot a pm file matching the dist name
+        my($inxpkg_eg) = sort keys %$inxst;
+        $inxpkg_eg =~ s/::/-/g;
+        $inxpkg_eg =~ s/$/-.../;
         push @m, $tf->format(qq{\n\nYou appear to be missing a .pm file
-           containing a package matching the dist name ($pkg). Adding this
-           may solve your issue.}) . "\n";
-      }
+          containing a package matching the dist name ($pkg). Adding this
+          may solve your issue. Or maybe it is the other way round and a
+          different distribution name could be chosen to reflect an
+          actually included package name (eg. $inxpkg_eg).\n});
+    }
 
       for my $p ( keys %$inxst ) {
           next unless
@@ -533,7 +538,7 @@ sub mail_summary {
           push @m, "="x(length($status_over_all)+23), "\n\n";
         }
         unless ($intro_written++) {
-          push @m, qq{The following packages (grouped by }.
+          push @m, qq{\nThe following packages (grouped by }.
           qq{status) have been found in the distro:\n\n};
         }
         if ($status != $Lstatus) {

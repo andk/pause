@@ -205,7 +205,18 @@ subtest "distname/pkgname permission mismatch" => sub {
               qr/You\s+appear.*\.pm\s+file.*dist\s+name\s+\(XFR\)/s,
               "email looks right",
             );
-          }
+          },
+          sub {
+            like(
+              $_[0]->{email}->as_string,
+                qr/
+                  \s+the\s+other\s+way\s+round
+                  .+
+                  xform-rollout-\.\.\.
+                  /xs,
+              "email looks right",
+            );
+          },
         ],
       },
       { subject => 'Upload Permission or Version mismatch' },
