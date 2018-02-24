@@ -1578,9 +1578,10 @@ filename[%s]. </p>
       any http or ftp URL that can be handled by LWP: use the text
       field (please specify the <i>complete URL</i>). How to use this
       for direct publishing from your github repository has been
-      described by Mike Schilli <a
-      href="http://blog.usarundbrief.com/?p=36">in his
-      blog</a></td></tr>\n};
+      described by Mike Schilli in the historical posting
+      http://blog.usarundbrief.com/?p=36 but it is not available on
+      the net anymore. If you find a copy, please let us
+      know.</td></tr>\n};
 
   push @m, qq{</table>\n <blockquote><b>Please,</b> make sure your filename
       contains a version number. For security reasons you will never
