@@ -599,5 +599,14 @@ __END__
 # Test::JSON::Assert,SGREEN,f,add
 # Array::Iterator,PERLANCAR,f,add
 # W3C::LogValidator::CSSValidator,OLIVIERT,f,add
-XML::SRS,NZRS,f,add
-XML::EPP,NZRS,f,add
+# XML::SRS,NZRS,f,add
+# XML::EPP,NZRS,f,add
+Memoize,ARISTOTLE,f,add
+Memoize::AnyDBM_File,ARISTOTLE,f,add
+Memoize::Expire,ARISTOTLE,f,add
+Memoize::ExpireFile,ARISTOTLE,f,add
+Memoize::ExpireTest,ARISTOTLE,f,add
+Memoize::NDBM_File,ARISTOTLE,f,add
+Memoize::SDBM_File,ARISTOTLE,f,add
+Memoize::Saves,ARISTOTLE,f,add
+Memoize::Storable,ARISTOTLE,f,add
