@@ -601,12 +601,49 @@ __END__
 # W3C::LogValidator::CSSValidator,OLIVIERT,f,add
 # XML::SRS,NZRS,f,add
 # XML::EPP,NZRS,f,add
-Memoize,ARISTOTLE,f,add
-Memoize::AnyDBM_File,ARISTOTLE,f,add
-Memoize::Expire,ARISTOTLE,f,add
-Memoize::ExpireFile,ARISTOTLE,f,add
-Memoize::ExpireTest,ARISTOTLE,f,add
-Memoize::NDBM_File,ARISTOTLE,f,add
-Memoize::SDBM_File,ARISTOTLE,f,add
-Memoize::Saves,ARISTOTLE,f,add
-Memoize::Storable,ARISTOTLE,f,add
+# Memoize,ARISTOTLE,f,add
+# Memoize::AnyDBM_File,ARISTOTLE,f,add
+# Memoize::Expire,ARISTOTLE,f,add
+# Memoize::ExpireFile,ARISTOTLE,f,add
+# Memoize::ExpireTest,ARISTOTLE,f,add
+# Memoize::NDBM_File,ARISTOTLE,f,add
+# Memoize::SDBM_File,ARISTOTLE,f,add
+# Memoize::Saves,ARISTOTLE,f,add
+# Memoize::Storable,ARISTOTLE,f,add
+Algorithm::LCS,ADOPTME,f,add
+ArrayHashMonster,ADOPTME,f,add
+ArrayHashMonster::Siphuncle,ADOPTME,f,add
+Async,ADOPTME,f,add
+AsyncData,ADOPTME,f,add
+AsyncTimeout,ADOPTME,f,add
+Dpchrist::FileType,ADOPTME,f,add
+EZDBI,ADOPTME,f,add
+FakeHash,ADOPTME,f,add
+FakeHash::DrawHash,ADOPTME,f,add
+FakeHash::Node,ADOPTME,f,add
+FlatFile,ADOPTME,f,add
+FlatFile::Position,ADOPTME,f,add
+FlatFile::Rec,ADOPTME,f,add
+Interpolation,ADOPTME,f,add
+ModuleBundle,ADOPTME,f,add
+Net::DHCP::Control,ADOPTME,f,add
+Net::DHCP::Control::Failover,ADOPTME,f,add
+Net::DHCP::Control::Failover::Link,ADOPTME,f,add
+Net::DHCP::Control::Failover::Listener,ADOPTME,f,add
+Net::DHCP::Control::Failover::State,ADOPTME,f,add
+Net::DHCP::Control::Generic,ADOPTME,f,add
+Net::DHCP::Control::Lease,ADOPTME,f,add
+Net::DHCP::Control::ServerHandle,ADOPTME,f,add
+PeekPoke,ADOPTME,f,add
+Rx,ADOPTME,f,add
+Stat::lsMode,ADOPTME,f,add
+SuperPython,ADOPTME,f,add
+Text::Hyphenate,ADOPTME,f,add
+Text::Template,ADOPTME,f,add
+Text::Template::Lexer,ADOPTME,f,add
+Text::Template::Preprocess,ADOPTME,f,add
+Text::Wrap::Hyphenate,ADOPTME,f,add
+Tie::HashHistory,ADOPTME,f,add
+UDCode,ADOPTME,f,add
+punctuation,ADOPTME,f,add
+y2k,ADOPTME,f,add
