@@ -19,7 +19,9 @@ sub request {
   my $regOK = 0;
 
   if ($req->param('url')) { # debunked
-    return $c->render(text => "Thank you!");
+    $c->stash(format => 'text');
+    $c->render(text => "Thank you!");
+    return;
   }
 
   my $fullname  = $req->param('pause99_request_id_fullname') || "";
@@ -137,16 +139,16 @@ sub request {
                         };
     require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$session->{APPLY}],[qw(APPLY)])->Indent(1)->Useqq(1)->Dump; # XXX
     if (lc($fullname) eq lc($userid)) {
-      die "fullname looks like spam";
+      die PAUSE::Web::Exception->new(ERROR => "fullname looks like spam");
     }
     if (my @x = $rationale =~ /(\.info)/g) {
-      die "rationale looks like spam" if @x >= 5;
+      die PAUSE::Web::Exception->new(ERROR => "rationale looks like spam") if @x >= 5;
     }
     if (my @x = $rationale =~ m|(http://)|g) {
-      die "rationale looks like spam" if @x >= 5;
+      die PAUSE::Web::Exception->new(ERROR => "rationale looks like spam") if @x >= 5;
     }
     if ($rationale =~ /interesting/i && $homepage =~ m|http://[^/]+\.cn/.+\.htm$|) {
-      die "rationale looks like spam";
+      die PAUSE::Web::Exception->new(ERROR => "rationale looks like spam");
     }
 
     $pause->{fullname} = $fullname;
@@ -172,6 +174,7 @@ sub request {
                    }{<a href=\"$1\">$1</a>}xg;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
 
+    $pause->{subject} = $subject;
     $pause->{blurbcopy} = $blurbcopy;
 
     $header = {
