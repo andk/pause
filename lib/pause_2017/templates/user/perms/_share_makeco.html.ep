@@ -33,7 +33,7 @@ into the text field and press <i>Make Co-Maintainer</i></p>
 
 <%= select_field "pause99_share_perms_makeco_m" => $pause->{mods},
   multiple => "multiple",
-  size => (@{$pause->{mods}} > 8 ? 5 : scalar @{$pause->{mods}}),
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
 =%>
 
 </p>

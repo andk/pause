@@ -29,7 +29,7 @@ remove and press <i>Remove</i></p><p>
 
 <%= select_field "pause99_share_perms_remocos_tuples" => $pause->{mods},
   multiple => "multiple",
-  size => (@{$pause->{mods}} > 8 ? 5 : scalar (@{pause->{mods}}),
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar (@{pause->{mods}}),
 =%>
 </p>
 <p>

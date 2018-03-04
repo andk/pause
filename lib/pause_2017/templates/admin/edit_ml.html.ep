@@ -33,7 +33,7 @@ Excerpt from a mail:<pre>
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
 
 <%= select_field "pause99_edit_ml_3" => $pause->{mls},
-    size => (@{$pause->{mls}} > 8 ? 5 : scalar @{$pause->{mls}}),
+    size => (@{$pause->{mls}} > 18 ? 15 : scalar @{$pause->{mls}}),
 =%>
 <br />
 <input type="submit" name="pause99_edit_ml_2" value="Select" /><br />

@@ -31,7 +31,7 @@ co-maintainership status</a> next.</p>
 <p>Select one or more namespaces:</p><p>
 <%= select_field "pause99_share_perms_pr_m" => $pause->{mods},
   multiple => "multiple",
-  size => (@{$pause->{mods}} > 8 ? 5 : scalar @{$pause->{mods}}),
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
 =%>
 
 </p>
