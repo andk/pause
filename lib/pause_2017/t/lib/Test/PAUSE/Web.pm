@@ -12,6 +12,7 @@ use Test::More;
 use Exporter qw/import/;
 use Test::PAUSE::MySQL;
 use Email::Sender::Simple;
+use Mojo::DOM;
 
 #our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
 our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
@@ -233,6 +234,35 @@ sub tests_for_post {
 sub content {
   my $self = shift;
   $self->{mech}->content;
+}
+
+sub dom {
+  my $self = shift;
+  Mojo::DOM->new($self->content);
+}
+
+sub text_is {
+  my ($self, $selector, $expects) = @_;
+  my $at = $self->dom->at($selector);
+  if ($at) {
+    my $text = $at->all_text // '';
+    is $text => $expects;
+  } else {
+    fail "'$selector' is not found";
+  }
+  $self;
+}
+
+sub text_like {
+  my ($self, $selector, $expects) = @_;
+  my $at = $self->dom->at($selector);
+  if ($at) {
+    my $text = $at->all_text // '';
+    like $text => $expects;
+  } else {
+    fail "'$selector' is not found";
+  }
+  $self;
 }
 
 sub file_to_upload {
