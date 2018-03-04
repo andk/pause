@@ -102,29 +102,23 @@ sub setup { # better to use Test::mysqld
   # test fixture
   { # authen_pause.usertable
     $class->authen_dbh->do(qq{TRUNCATE usertable});
-    my $sth = $class->authen_dbh->prepare(qq{
-      INSERT INTO usertable (user, password, secretemail)
-      VALUES (?, ?, ?)
-    });
-    $sth->execute("TESTUSER", PAUSE::Crypt::hash_password("test"), $TestEmail);
-    $sth->execute("TESTADMIN", PAUSE::Crypt::hash_password("test"), $TestEmail);
+    for my $user ("TESTUSER", "TESTADMIN") {
+      $class->authen_db->insert('usertable', {
+        user => $user,
+        password => PAUSE::Crypt::hash_password("test"),
+        secretemail => $TestEmail,
+      });
+    }
   }
   { # authen_pause.grouptable
     $class->authen_dbh->do(qq{TRUNCATE grouptable});
-    my $sth = $class->authen_dbh->prepare(qq{
-      INSERT INTO grouptable (user, ugroup)
-      VALUES (?, ?)
-    });
-    $sth->execute("TESTADMIN", "admin");
+    $class->authen_db->insert('grouptable', {user => "TESTADMIN", ugroup => "admin"});
   }
   { # mod.users
     $class->mod_dbh->do(qq{TRUNCATE users});
-    my $sth = $class->mod_dbh->prepare(qq{
-      INSERT INTO users (userid, fullname, email, homepage, isa_list, introduced, changed, changedby)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    });
-    $sth->execute("TESTUSER", "test", $TestEmail, "", "", time, time, "TESTADMIN");
-    $sth->execute("TESTADMIN", "test", $TestEmail, "", "", time, time, "TESTADMIN");
+    for my $user ("TESTUSER", "TESTADMIN") {
+      $class->mod_db->insert('users', {userid => $user, email => $TestEmail});
+    }
   }
 
   return 1;
