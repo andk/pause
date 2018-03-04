@@ -12,6 +12,9 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   Mojo::File->new($SessionDataDir)->make_path;
+  Mojo::File->new($SessionCounterDir)->make_path;
+
+  Apache::Session::CountedStore->tree_init($SessionDataDir, 1);
 
   $app->helper(session_data_dir => sub { $SessionDataDir });
   $app->helper(session_counted => \&_session);
