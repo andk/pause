@@ -16,19 +16,34 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=reindex");
+        # note $t->content;
+    }
+};
 
-    $t->mod_dbh->do("TRUNCATE uris");
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path, $user) = @$test;
+        note "$method for $path";
 
-    # prepare distribution
-    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
+        my $t = Test::PAUSE::Web->new;
 
-    $t->copy_to_authors_dir("TESTUSER", scalar Test::PAUSE::Web->file_to_upload);
+        $t->mod_dbh->do("TRUNCATE uris");
 
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=reindex", \%form);
-    note $t->content;
+        # prepare distribution
+        $t->$method("$path?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
+
+        $t->copy_to_authors_dir($user, scalar Test::PAUSE::Web->file_to_upload);
+
+        my %form = %$default;
+        $t->$method("$path?ACTION=reindex", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

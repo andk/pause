@@ -11,12 +11,26 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
-    my %form = %$default;
-    $t->authen_dbh->do("TRUNCATE abrakadabra");
-    $t->post_ok("/pause/query?ACTION=mailpw", \%form);
-    note $t->content;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('public')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=mailpw");
+        #note $t->content;
+    }
+};
+
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        my %form = %$default;
+        $t->authen_dbh->do("TRUNCATE abrakadabra");
+        $t->$method("$path?ACTION=mailpw", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

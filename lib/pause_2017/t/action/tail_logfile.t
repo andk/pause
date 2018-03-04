@@ -11,19 +11,35 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
-
+{
     open my $fh, '>', $PAUSE::Config->{PAUSE_LOG};
     say $fh <<LOG;
 pause log
 pause log
 pause log
 LOG
+}
 
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=tail_logfile", \%form);
-    note $t->content;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->user_get_ok("/pause/authenquery?ACTION=tail_logfile");
+        # note $t->content;
+    }
+};
+
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+
+        my %form = %$default;
+        $t->$method("$path?ACTION=tail_logfile", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;
