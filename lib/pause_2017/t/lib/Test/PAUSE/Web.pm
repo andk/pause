@@ -134,6 +134,9 @@ sub new {
   if (!$INC{'Devel/Cover.pm'} and eval {require LWP::ConsoleLogger::Easy; 1}) {
     LWP::ConsoleLogger::Easy::debug_ua($mech);
   }
+
+  $class->clear_deliveries;
+
   bless {mech => $mech}, $class;
 }
 
@@ -246,6 +249,7 @@ sub copy_to_authors_dir {
 }
 
 sub deliveries { Email::Sender::Simple->default_transport->deliveries }
+sub clear_deliveries { Email::Sender::Simple->default_transport->clear_deliveries }
 sub note_deliveries { note "-- email begin --\n".$_->{email}->as_string."\n-- email end --\n\n" for shift->deliveries }
 
 END { $TmpDir->remove_tree if $TmpDir }
