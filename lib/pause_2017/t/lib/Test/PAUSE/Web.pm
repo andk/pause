@@ -193,6 +193,40 @@ sub admin_post_ok {
   $self->post_ok($url, @args);
 }
 
+sub tests_for_get {
+  my ($self, $permission) = @_;
+  my @tests;
+  if ($permission eq "public") {
+    push @tests, (
+      [get_ok       => "/pause/query"],
+      [user_get_ok  => "/pause/query"],
+      [admin_get_ok => "/pause/query"],
+    );
+  }
+  if ($permission ne "admin") {
+    push @tests, [user_get_ok => "/pause/authenquery", "TESTUSER"];
+  }
+  push @tests, [admin_get_ok => "/pause/authenquery", "TESTADMIN"];
+  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
+}
+
+sub tests_for_post {
+  my ($self, $permission) = @_;
+  my @tests;
+  if ($permission eq "public") {
+    push @tests, (
+      [post_ok       => "/pause/query"],
+      [user_post_ok  => "/pause/query"],
+      [admin_post_ok => "/pause/query"],
+    );
+  }
+  if ($permission ne "admin") {
+    push @tests, [user_post_ok => "/pause/authenquery", "TESTUSER"];
+  }
+  push @tests, [admin_post_ok => "/pause/authenquery", "TESTADMIN"];
+  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
+}
+
 sub content {
   my $self = shift;
   $self->{mech}->content;
