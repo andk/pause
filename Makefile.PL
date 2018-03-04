@@ -69,6 +69,7 @@ WriteMakefile(
     Plack::Middleware::ReverseProxy
     Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
+    SQL::Maker
     String::Random
     Test::Class
     Test::Deep
