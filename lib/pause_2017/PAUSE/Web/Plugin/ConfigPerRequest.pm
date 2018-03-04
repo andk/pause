@@ -9,7 +9,6 @@ use Sys::Hostname;
 sub register {
   my ($self, $app, $conf) = @_;
   $app->hook(before_dispatch => \&_before_dispatch);
-  $app->hook(before_render => \&_before_render);
   $app->helper(need_form_data => \&_need_form_data);
 }
 
@@ -21,12 +20,6 @@ sub _before_dispatch {
   _is_ssl($c);
   _retrieve_user($c);
   _set_allowed_actions($c);
-}
-
-sub _before_render {
-  my $c = shift;
-
-  _get_pause_messages($c);
 }
 
 sub _is_ssl {
@@ -362,26 +355,6 @@ parameter ABRA=$param, but the database doesn't know about this token.");
   }
   $action = $pause->{Action};
   # warn "action[$action]";
-}
-
-sub _get_pause_messages {
-  my $c = shift;
-  my $pause = $c->stash(".pause");
-  my $mgr = $c->app->pause;
-
-  my $user = $pause->{HiddenUser}{userid} || $pause->{User}{userid} or return;
-
-  my $dbh = $mgr->connect;
-  my $sth = $dbh->prepare("select * from messages where mto=? AND mstatus='active'");
-  $sth->execute($user);
-  my @messages;
-  if ($sth->rows > 0) {
-    while(my $rec = $sth->fetchrow_hashref) {
-      push @messages, $rec;
-    }
-    $pause->{messages} = \@messages;
-  }
-  $sth->finish;
 }
 
 1;
