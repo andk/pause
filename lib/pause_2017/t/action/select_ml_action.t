@@ -19,16 +19,33 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('admin')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=select_ml_action");
+        # note $t->content;
+    }
+};
 
-    $t->admin_post_ok("/pause/authenquery?ACTION=add_user", $mailing_list);
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('admin')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
 
-    $t->mod_dbh->do("INSERT INTO list2user VALUE (?, ?)", undef, "MAILLIST", "TESTUSER");
+        $t->$method("$path?ACTION=add_user", $mailing_list);
 
-    my %form = %$default;
-    $t->admin_post_ok("/pause/authenquery?ACTION=select_ml_action", \%form);
-    # note $t->content;
+        $t->mod_db->insert("list2user", {
+            maillistid => "MAILLIST",
+            userid => "TESTUSER",
+        }, {ignore => 1});
+
+        my %form = %$default;
+        $t->$method("$path?ACTION=select_ml_action", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

@@ -15,12 +15,26 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=edit_cred");
+        # note $t->content;
+    }
+};
 
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=edit_cred", \%form);
-    # note $t->content;
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+
+        my %form = %$default;
+        $t->$method("$path?ACTION=edit_cred", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

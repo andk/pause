@@ -11,28 +11,40 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=reset_version");
+        # note $t->content;
+    }
+};
 
-    $t->mod_dbh->do("TRUNCATE packages");
-    my $sth = $t->mod_dbh->prepare("INSERT INTO packages (
-      package,
-      version,
-      dist,
-      file,
-      filemtime,
-      pause_reg,
-      comment,
-      status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $sth->execute("Foo", "0.01", "T/TE/TESTUSER/Foo-0.01.tar.gz", "Foo-0.01.tar.gz", 0, "TESTUSER", "", "index");
-    $sth->execute("Bar", "0.02", "T/TE/TESTUSER/Bar-0.02.tar.gz", "Bar-0.02.tar.gz", 0, "TESTUSER", "", "index");
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path, $user) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
 
+        $t->mod_dbh->do("TRUNCATE packages");
+        $t->mod_db->insert('packages', {
+            package => "Foo",
+            version => "0.01",
+            dist => "T/TE/$user/Foo-0.01.tar.gz",
+            file => "Foo-0.01.tar.gz",
+        });
+        $t->mod_db->insert('packages', {
+            package => "Bar",
+            version => "0.02",
+            dist => "T/TE/$user/Bar-0.02.tar.gz",
+            file => "Bar-0.02.tar.gz",
+        });
 
-
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=reset_version", \%form);
-    # note $t->content;
+        my %form = %$default;
+        $t->$method("$path?ACTION=reset_version", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

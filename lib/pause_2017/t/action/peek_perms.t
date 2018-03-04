@@ -12,17 +12,41 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=peek_perms");
+        # note $t->content;
+    }
+};
 
-    $t->mod_dbh->do("TRUNCATE primeur");
-    my $sth = $t->mod_dbh->prepare("INSERT INTO primeur (package, userid) VALUES (?, ?)");
-    $sth->execute("Foo", "TESTUSER");
-    $sth->execute("Bar", "TESTUSER");
+#subtest 'post: basic' => sub {
+{
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path, $user) = @$test;
+        note "$method for $path";
 
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=peek_perms", \%form);
-    note $t->content;
+        my $t = Test::PAUSE::Web->new;
+
+        $t->mod_dbh->do("TRUNCATE primeur");
+        $t->mod_db->insert("primeur", {
+            package => "Foo",
+            userid => $user,
+        });
+        $t->mod_db->insert("primeur", {
+            package => "Bar",
+            userid => $user,
+        });
+
+        my %form = (
+            %$default,
+            pause99_peek_perms_by => $user,
+        );
+        $t->$method("$path?ACTION=peek_perms", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

@@ -11,11 +11,25 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", \%form, "Content-Type" => "form-data");
-    note $t->content;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=add_uri");
+        # note $t->content;
+    }
+};
+
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        my %form = %$default;
+        $t->$method("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        # note $t->content;
+    }
 };
 
 done_testing;

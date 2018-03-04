@@ -27,18 +27,34 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'ordinary user' => sub {
-    my $t = Test::PAUSE::Web->new;
-
-    $t->admin_post_ok("/pause/authenquery?ACTION=add_user", $user);
-    # note $t->content;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('admin')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=add_user");
+        # note $t->content;
+    }
 };
 
-subtest 'mailing list' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'post: ordinary user' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('admin')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=add_user", $user);
+        # note $t->content;
+    }
+};
 
-    $t->admin_post_ok("/pause/authenquery?ACTION=add_user", $mailing_list);
-    # note $t->content;
+subtest 'post: mailing list' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('admin')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=add_user", $mailing_list);
+        # note $t->content;
+    }
 };
 
 done_testing;

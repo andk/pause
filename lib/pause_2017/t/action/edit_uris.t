@@ -16,17 +16,32 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=edit_uris");
+        # note $t->content;
+    }
+};
 
-    $t->mod_dbh->do("TRUNCATE uris");
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path, $user) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
 
-    # prepare distribution
-    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
+        $t->mod_dbh->do("TRUNCATE uris");
 
-    my %form = %$default;
-    $t->user_post_ok("/pause/authenquery?ACTION=edit_uris", \%form);
-    note $t->content;
+        # prepare distribution
+        $t->$method("$path?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
+
+        my %form = %$default;
+        $form{pause99_edit_uris_3} =~ s/TESTUSER/$user/;
+        $t->$method("$path?ACTION=edit_uris", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;

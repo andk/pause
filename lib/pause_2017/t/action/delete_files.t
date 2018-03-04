@@ -15,20 +15,34 @@ my $default = {
 
 Test::PAUSE::Web->setup;
 
-subtest 'basic' => sub {
-    my $t = Test::PAUSE::Web->new;
+subtest 'get' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=delete_files");
+        # note $t->content;
+    }
+};
 
-    $t->mod_dbh->do("TRUNCATE uris");
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path, $user) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
 
-    # prepare distribution
-    $t->user_post_ok("/pause/authenquery?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
+        $t->mod_dbh->do("TRUNCATE uris");
 
-    $t->copy_to_authors_dir("TESTUSER", scalar Test::PAUSE::Web->file_to_upload);
+        # prepare distribution
+        $t->$method("$path?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
 
-    my %form = %$default;
-    $form{SUBMIT_pause99_delete_files_delete} = 1;
-    $t->user_post_ok("/pause/authenquery?ACTION=delete_files", \%form);
-    note $t->content;
+        $t->copy_to_authors_dir($user, scalar Test::PAUSE::Web->file_to_upload);
+
+        my %form = %$default;
+        $form{SUBMIT_pause99_delete_files_delete} = 1;
+        $t->$method("$path?ACTION=delete_files", \%form);
+        # note $t->content;
+    }
 };
 
 done_testing;
