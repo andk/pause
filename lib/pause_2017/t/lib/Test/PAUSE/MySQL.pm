@@ -6,6 +6,7 @@ use Test::More;
 use DBI;
 use File::Temp qw/tempfile/;
 use Capture::Tiny qw/capture_merged/;
+use SQL::Maker;
 
 $SIG{INT} = sub { die "caught SIGINT, shutting down mysql\n" };
 
@@ -43,6 +44,12 @@ has 'mysql_client' => (
 has 'dbh' => (
     is => 'ro',
     isa => 'DBI::db',
+    lazy_build => 1,
+);
+
+has 'sql_maker' => (
+    is => 'ro',
+    isa => 'SQL::Maker',
     lazy_build => 1,
 );
 
@@ -131,6 +138,11 @@ sub _build_dbh {
     return $dbh;
 }
 
+sub _build_sql_maker {
+    my $self = shift;
+    SQL::Maker->new(driver => 'mysql');
+}
+
 sub run_mysql {
     my $self = shift;
     my $cmd = shift || '';
@@ -160,6 +172,57 @@ sub mysqld {
     note("mysqld started");
 
     return $mysqld;
+}
+
+my %DefaultValues = (
+    # authen_pause
+    # mod
+    packages => {
+        filemtime => time,
+        pause_reg => 'TESTUSER',
+        comment => '',
+        status => 'index',
+    },
+    users => {
+        fullname => 'test',
+        homepage => '',
+        isa_list => '',
+        introduced => time,
+        changed => time,
+        changedby => 'TESTADMIN',
+    },
+);
+
+sub insert {
+    my ($self, $table, $values, $opt) = @_;
+    if (my $default = $DefaultValues{$table}) {
+        for my $key (keys %$default) {
+            $values->{$key} //= $default->{$key};
+        }
+    }
+    if ($opt and delete $opt->{replace}) {
+        $opt->{prefix} = 'REPLACE';
+    }
+    my ($sql, @bind) = $self->sql_maker->insert($table, $values, $opt);
+    $self->dbh->do($sql, undef, @bind);
+}
+
+sub update {
+    my ($self, $table, $set, $where) = @_;
+    my ($sql, @bind) = $self->sql_maker->update($table, $set, $where);
+    $self->dbh->do($sql, undef, @bind);
+}
+
+sub delete {
+    my ($self, $table, $where) = @_;
+    my ($sql, @bind) = $self->sql_maker->delete($table, $where);
+    $self->dbh->do($sql, undef, @bind);
+}
+
+sub select {
+    my ($self, $table, $fields, $where, $opt) = @_;
+    my ($sql, @bind) = $self->sql_maker->select($table, $fields, $where, $opt);
+    $self->dbh->selectall_arrayref($sql, {Slice => +{}}, @bind);
 }
 
 1;
