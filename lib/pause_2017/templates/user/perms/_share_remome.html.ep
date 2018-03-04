@@ -26,7 +26,7 @@ the co-maintainer table and press <i>Give Up</i></p>
 
 <%= select_field "pause99_share_perms_remome_m" => $pause->{mods},
   multiple => "multiple",
-  size => (@{$pause->{mods}} > 8 ? 5 : scalar @{$pause->{mods}}),
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
 =%>
 
 </p>

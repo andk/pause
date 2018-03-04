@@ -35,10 +35,10 @@ button.</h3>
       ? [$_ => $_, selected => "selected"]
       : $_
   } @{$pause->{users}}
-], size => (@{$pause->{users}} > 8 ? 5 : scalar @{$pause->{users}}),
+], size => (@{$pause->{users}} > 18 ? 15 : scalar @{$pause->{users}}),
 %>
 <%= select_field ACTIONREQ => $pause->{action_reqs},
-  size => (@{$pause->{action_reqs}} > 8 ? 5 : scalar @{$pause->{action_reqs}}),
+  size => (@{$pause->{action_reqs}} > 18 ? 15 : scalar @{$pause->{action_reqs}}),
 %>
 
 <input type="submit" name="pause99_select_ml_action_sub" value="Submit" />

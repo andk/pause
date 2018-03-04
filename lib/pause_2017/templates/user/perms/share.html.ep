@@ -46,7 +46,7 @@
       <tr>
         <td valign="top">
 % if (my @mods = @{$pause->{mods} || []}) {
-<%= select_field "pause99_edit_mod_3" => \@mods, size => (@mods > 8 ? 5 : scalar @mods) %>
+<%= select_field "pause99_edit_mod_3" => \@mods, size => (@mods > 18 ? 15 : scalar @mods) %>
 % } else {
 --NONE--
 % }
@@ -65,7 +65,7 @@
       <tr>
         <td rowspan="2">
 % if (my @mods = @{$pause->{remove_primary} || []}) {
-<%= select_field "pause99_share_perms_pr_m" => \@mods, size => (@mods > 8 ? 5 : scalar @mods), multiple => "multiple" %>
+<%= select_field "pause99_share_perms_pr_m" => \@mods, size => (@mods > 18 ? 15 : scalar @mods), multiple => "multiple" %>
 % } else {
 --NONE--
 % }
@@ -105,7 +105,7 @@
       <tr>
         <td rowspan="2">
 % if (my @mods = @{$pause->{make_comaintainer} || []}) {
-<%= select_field "pause99_share_perms_makeco_m" => \@mods, size => (@mods > 8 ? 5 : scalar @mods), multiple => "multiple" %>
+<%= select_field "pause99_share_perms_makeco_m" => \@mods, size => (@mods > 18 ? 15 : scalar @mods), multiple => "multiple" %>
 % } else {
 --NONE--
 % }
@@ -137,7 +137,7 @@
       <tr>
         <td valign="top">
 % if (my @mods = @{$pause->{remove_comaintainer} || []}) {
-<%= select_field "pause99_share_perms_remome_m" => \@mods, size => (@mods > 8 ? 5 : scalar @mods), multiple => "multiple" %>
+<%= select_field "pause99_share_perms_remome_m" => \@mods, size => (@mods > 18 ? 15 : scalar @mods), multiple => "multiple" %>
 % } else {
 --NONE--
 % }
