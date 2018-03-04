@@ -7,11 +7,9 @@ use JSON::PP; # just to avoid redefine warnings
 use Path::Tiny;
 use DBI;
 use Plack::Test;
-use HTTP::Message::PSGI;
-use WWW::Mechanize;
+use Test::WWW::Mechanize::PSGI;
 use Test::More;
 use Exporter qw/import/;
-use Try::Tiny;
 use Test::PAUSE::MySQL;
 use Email::Sender::Simple;
 
@@ -132,38 +130,13 @@ sub setup { # better to use Test::mysqld
   return 1;
 }
 
-*WWW::Mechanize::simple_request = sub {
-  my ($self, $request) = @_;
-  $self->run_handlers( "request_send", $request );
-
-  my $uri = $request->uri;
-  $uri->scheme('http')    unless defined $uri->scheme;
-  $uri->host('localhost') unless defined $uri->host;
-
-  my $env = $self->prepare_request($request)->to_psgi;
-  my $response;
-  try {
-    $response = HTTP::Response->from_psgi( $self->{app}->($env) );
-  }
-  catch {
-    warn ("PSGI error: $_");
-    $response = HTTP::Response->new(500);
-    $response->content($_);
-    $response->content_type('');
-  };
-  $response->request($request);
-  $self->run_handlers( "response_done", $response );
-  return $response;
-};
-
 sub new {
   my $class = shift;
 
   my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2017.psgi";
   my $app = do "$AppRoot/$psgi";
 
-  my $mech = WWW::Mechanize->new;
-  $mech->{app} = $app;
+  my $mech = Test::WWW::Mechanize::PSGI->new(app => $app);
   if (eval {require LWP::ConsoleLogger::Easy; 1}) {
     LWP::ConsoleLogger::Easy::debug_ua($mech);
   }
