@@ -10,7 +10,7 @@ in many Perl community sites — please register a
 % if (@{$pause->{errors} || []}) {
 <h3>Error processing form</h3>
 %   for (@{$pause->{errors}}) {
-<ul><li><%= $_ %></li></ul>
+<ul class="errors"><li><%= $_ %></li></ul>
 %   }
 <p>Please retry.</p>
 % }
@@ -22,9 +22,9 @@ in many Perl community sites — please register a
 % }
 % if ($pause->{reg_ok}) {
 Sending mail to: <%= $pause->{send_to} %>
-<pre>
+<pre class="email_sent">
 From: <%= $PAUSE::Config->{UPLOAD} %>
-Subject: $subject
+Subject: <%= $pause->{subject} %>
 
 <%== $pause->{blurbcopy} %>
 </pre>
