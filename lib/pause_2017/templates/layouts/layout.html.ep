@@ -61,7 +61,7 @@ Please be careful not to disturb the database operation. Expect failures everywh
 
 % if ($pause->{ERROR}) {
 <h1>Error</h1>
-<p>
+<p class="error_message">
 %   for (@{$pause->{ERROR}}) {
 <%= $_ %>
 %   }
