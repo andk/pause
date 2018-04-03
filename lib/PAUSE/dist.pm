@@ -1132,7 +1132,8 @@ sub version_from_meta_ok {
 # package PAUSE::dist
 sub verbose {
   my($self,$level,@what) = @_;
-  PAUSE->log($self, $level, @what);
+  my $main = $self->{MAIN};
+  $main->verbose($level,@what);
 }
 
 # package PAUSE::dist
