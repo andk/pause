@@ -195,7 +195,7 @@ sub perm_check {
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      # print "(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n";
+      $self->verbose(1,"(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
 
       return 1;           # P2.1, P3.0
   }
@@ -215,7 +215,7 @@ sub perm_check {
       my $err = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      # print "(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n";
+      $self->verbose(1,"(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
 
       return 1;           # P2.1, P3.0
   }
