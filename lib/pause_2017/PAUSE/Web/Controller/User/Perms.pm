@@ -307,6 +307,7 @@ sub _share_remopr {
             };
           }
         }
+        $pause->{results} = \@results;
       }
     };
   }
