@@ -330,11 +330,9 @@ sub _share_makeco {
 
   my $db = $mgr->connect;
 
-  my $all_mmods = $c->all_mmods($u);
-  # warn sprintf "all_mmods[%s]", join("|", keys %$all_mmods);
   my $all_pmods = $c->all_pmods($u);
   # warn sprintf "all_pmods[%s]", join("|", keys %$all_pmods);
-  my $all_mods = {%$all_mmods, %$all_pmods};
+  my $all_mods = {%$all_pmods};
 
   if (
       $req->param("SUBMIT_pause99_share_perms_makeco")
@@ -414,9 +412,8 @@ sub _share_remocos {
 
   my $db = $mgr->connect;
 
-  my $all_mmods = $c->all_mmods($u);
   my $all_pmods = $c->all_pmods($u);
-  my $all_mods = { %$all_mmods, %$all_pmods, $u };
+  my $all_mods = { %$all_pmods, $u };
   my $all_comaints = $c->all_comaints($all_mods,$u);
 
   if (
