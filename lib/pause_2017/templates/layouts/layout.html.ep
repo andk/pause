@@ -4,17 +4,15 @@
 %
 % #-----------------------------------------------------------------
 %
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html
-PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewpoint" content="width=device-width, initial-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewpoint" content="width=device-width, initial-scale=1">
 <title><%= $title %><%= $action %></title>
-<link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg" />
-<link rel="stylesheet" type="text/css" href="/pause/pause.css" title="pause" />
+<link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg">
+<link rel="stylesheet" type="text/css" href="/pause/min.css">
+<link rel="stylesheet" type="text/css" href="/pause/pause.css">
 
 % if ($PAUSE::Config->{TESTHOST}) { #-------------------------------
 
@@ -25,65 +23,75 @@ h2,h4,b,th,td { color: #486f8d; }
 % } #---------------------------------------------------------------
 
 </head>
-<body bgcolor="white" link="#0000CC" vlink="#0000BB" alink="#FF0000" text="#000000">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr>
-    <td valign="middle">
-      <a href="authenquery"><img src="/pause/pause2.png" border="0" alt="PAUSE Logo" width="177" height="43" align="left" /></a>
-    </td>
-    <td nowrap="nowrap">
-      <h4 style="margin: 0 0 0 0; padding: 0 1em;">The [Perl programming] Authors Upload Server</h4>
-    </td>
-    <td align="right" style="width: 100%;">
-      %= include "_user_status";
-    </td>
-  </tr>
-</table>
+<body>
 
-<br />
+<header>
+<div class="row">
+  <div class="col c8">
+    <h1 class="logo"><a href="authenquery"><img src="/pause/pause2.png" border="0" alt="PAUSE Logo" width="177" height="43" align="left"></a>
+    The [Perl programming] Authors Upload Server</h1>
+  </div>
+  <div class="col c3">
+    %= include "_user_status";
+  </div>
+</div>
+</header>
 
 % if (my $downtime = $pause->{scheduled_downtime}) {
 
-<div align="center">
-  <p class="motd">
-    <b>Scheduled downtime</b><br />
+<div class="row">
+  <div class="col c11">
+    <p class="motd">
+    <b>Scheduled downtime</b><br>
     On <%= $downtime->{http_time} %> (that is in <%= $downtime->{delta} %>) PAUSE will be closed for maintainance work. The estimated downtime is <%= $downtime->{will_last} %>.
-</p>
+    </p>
+  </div>
 </div>
 % } elsif ($pause->{closed}) {
   % my $user = $c->req->env->{REMOTE_USER};
-<div align="center">
+<div class="row">
+  <div class="col c11">
 <p class="motd">Hi <%= $user %>, you see the site now <b>but it is closed for maintainance</b>.
 Please be careful not to disturb the database operation. Expect failures everywhere. Do not edit anything, it may get lost. Other users get the following text:</p>
 %= include "_closed";
+  </div>
 </div>
 % }
 
 % if ($pause->{ERROR}) {
-<h1>Error</h1>
-<p class="error_message">
+<div class="row">
+  <div class="col c11">
+    <h2>Error</h2>
+    <p class="error_message">
 %   for (@{$pause->{ERROR}}) {
 <%= $_ %>
 %   }
-</p>
-<p>Please try again, probably by using the Back button of your browser and repeating the last action you took.</p>
+    </p>
+    <p>Please try again, probably by using the Back button of your browser and repeating the last action you took.</p>
+  </div>
+</div>
 % } else {
-%= include "_startform";
-<table border="0" cellpadding="1"><tr><td valign="top">
-%= include "_user_menu";
-</td><td valign="top" bgcolor="red">&#160;</td><td valign="top">
-
-% if (my $verb = app->pause->config->action($pause->{Action})->{verb}) {
-<h2 class="firstheader"><%= $verb %></h2>
+<div class="row">
+  <div class="col c2">
+    %= include "_user_menu";
+  </div>
+  <div class="col c9">
+    %= include "_startform";
+    <main>
+    % my $action_conf = app->pause->config->action($pause->{Action});
+    % if (my $verb = $action_conf->{verb} and !$action_conf->{has_title}) {
+      <h2 class="firstheader"><%= $verb %></h2>
+    % }
+    <%== content %>
+    </main>
+    </form>
+  </div>
+</div>
 % }
-<%== content %>
-</td></tr></table>
-</form>
-% }
-<hr noshade="noshade" />
+<hr noshade="noshade">
 %= include "_speedlinkgif";
 % if ($PAUSE::Config->{PAUSE_WEB_DEBUG}) {
-%= include "_debug";
+  %= include "_debug";
 % }
 </body>
 </html>
