@@ -147,17 +147,7 @@ sub _set_allowed_actions {
   my ($param, @allow_submit, %allow_action);
 
   # What is allowed here is allowed to anybody
-  @allow_action{
-    (
-     "pause_04about",
-     "pause_04imprint",
-     "pause_05news",
-     "pause_06history",
-     "pause_namingmodules",
-     "request_id",
-     "who_pumpkin",
-     "who_admin",
-    )} = ();
+  @allow_action{ $mgr->config->action_names_for('public') } = ();
 
   @allow_submit = (
                    "request_id",
@@ -168,35 +158,14 @@ sub _set_allowed_actions {
     # warn "userid[$pause->{User}{userid}]";
 
     # All authenticated Users
-    for my $command (
-                     "add_uri",
-                     "change_passwd",
-                     "delete_files",
-                     "edit_cred",
-                     # "edit_mod",
-                     "edit_uris",
-                     # "apply_mod",
-                     "pause_logout",
-                     "peek_perms",
-                     "reindex",
-                     "reset_version",
-                     "share_perms",
-                     "show_files",
-                     "tail_logfile",
-                    ) {
+    for my $command ( $mgr->config->action_names_for('user') ) {
       $allow_action{$command} = undef;
       push @allow_submit, $command;
     }
 
     # Only Mailinglist Representatives
-    if (exists $pause->{UserGroups}{mlrepr}) {
-      for my $command (
-                       "select_ml_action",
-                       "edit_ml",
-                       # "edit_mod",
-                       "reset_version",
-                       "show_ml_repr",
-                      ) {
+    if (exists $pause->{UserGroups}{mlrepr} or exists $pause->{UserGroups}{admin}) {
+      for my $command ( $mgr->config->action_names_for('mlrepr') ) {
         $allow_action{$command} = undef;
         push @allow_submit, $command;
       }
@@ -219,21 +188,7 @@ sub _set_allowed_actions {
     # Only Admins
     if (exists $pause->{UserGroups}{admin}) {
       # warn "We have an admin here";
-      for my $command (
-                       "add_user",
-                       "edit_ml",
-                       "select_user",
-                       "show_ml_repr",
-                       # "add_mod", # all admins may maintain the module list for now
-                       # "apply_mod",
-                       # "check_xhtml",
-                       # "coredump",
-                       # "dele_message",
-                       # "index_users",
-                       # "post_message",
-                       "manage_id_requests",
-                       # "test_session",
-                      ) {
+      for my $command ( $mgr->config->action_names_for('admin') ) {
         $allow_action{$command} = undef;
         push @allow_submit, $command;
       }
