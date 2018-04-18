@@ -15,7 +15,7 @@
 <p>You need to select one or more packages and enter a userid.
 Nothing done.</p>
 %   }
-<hr />
+<hr>
 % }
 
 % if (@{$pause->{mods}}) {
@@ -35,10 +35,10 @@ co-maintainership status</a> next.</p>
 =%>
 
 </p>
-<p>Select a userid:<br />
+<p>Select a userid:<br>
 <%= text_field "pause99_share_perms_movepr_a", size => 15, maxlength => 9 =%>
 </p><p>
-<input type="submit" name="SUBMIT_pause99_share_perms_movepr" value="Pass Maintainership Status" /></p>
+<input type="submit" name="SUBMIT_pause99_share_perms_movepr" value="Pass Maintainership Status"></p>
 
 % } else {
 <p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>

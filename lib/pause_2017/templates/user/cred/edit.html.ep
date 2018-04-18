@@ -1,7 +1,7 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 
 <h3>Editing <%= $pause->{HiddenUser}{userid} %>
 % if (exists $pause->{UserGroups}{admin}) {
@@ -11,19 +11,19 @@
 
 % if (param("pause99_edit_cred_sub")) {
 %   if ($pause->{no_email}) {
-<b>ERROR</b>: Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.<hr />
+<b>ERROR</b>: Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.<hr>
 %   } elsif ($pause->{no_public_email}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your public email address but your public email address is left blank. Please either pick a different choice for the alias or fill in a public email address.<hr />
+<b>ERROR</b>: You chose your email alias on CPAN to point to your public email address but your public email address is left blank. Please either pick a different choice for the alias or fill in a public email address.<hr>
 %   } elsif ($pause->{public_is_cpan_alias}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your public email address but your public email address field contains $cpan_alias. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable public email address.<hr />
+<b>ERROR</b>: You chose your email alias on CPAN to point to your public email address but your public email address field contains $cpan_alias. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable public email address.<hr>
 %   } elsif ($pause->{no_secret_email}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.<hr />
+<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.<hr>
 %   } elsif ($pause->{secret_is_cpan_alias}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address field contains $cpan_alias. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.<hr />
+<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address field contains $cpan_alias. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.<hr>
 %   } elsif ($pause->{invalid_secret}) {
-<b>ERROR</b>: Your secret email address doesn't look like valid email address.<hr />
+<b>ERROR</b>: Your secret email address doesn't look like valid email address.<hr>
 %   } elsif ($pause->{invalid_public}) {
-<b>ERROR</b>: Your public email address doesn't look like valid email address.<hr />
+<b>ERROR</b>: Your public email address doesn't look like valid email address.<hr>
 %   } else {
 
 %     if ($pause->{not_ascii}) {
@@ -35,16 +35,16 @@
 % if ($pause->{consistentsubmit}) {
 %   for my $table ("users", $PAUSE::Config->{AUTHEN_USER_TABLE}) {
 %     if ($pause->{registered}{$table}) {
-The new data are registered in table <%= $table %>.<hr />
+The new data are registered in table <%= $table %>.<hr>
 
 %     }
 %   }
     if (!$pause->{saw_a_change}) {
-No change seen, nothing done.<hr />
+No change seen, nothing done.<hr>
     }
 % }
 
-<br />
+<br>
 <table cellspacing="2" cellpadding="8">
 % my $alter = 0;
 <tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">Full Name</h4>
@@ -105,18 +105,18 @@ address for you and it's your choice if you want it to point to your
 public email address or to your secret one. Please allow a few hours
 for any change you make to this setting for propagation. BTW, let us
 reassure you that cpan.org gets the data through a secure
-channel.<br/><br/><b>Note:</b> you can disable redirect by clicking
+channel.<br><br><b>Note:</b> you can disable redirect by clicking
 <i>neither nor</i> or by using an invalid email address in the
 according field above, but this will prevent you from recieving
 emails from services like rt.cpan.org.
 </p>
 <%= radio_button "pause99_edit_cred_cpan_mail_alias" => "publ" %>
-my public email address<br />
+my public email address<br>
 <%= radio_button "pause99_edit_cred_cpan_mail_alias" => "secr" %>
-my secret email address<br />
+my secret email address<br>
 <%= radio_button "pause99_edit_cred_cpan_mail_alias" => "none",
     checked => "checked",
-%>neither nor<br />
+%>neither nor<br>
 </td></tr>
 
 % if ($pause->{HiddenUser}{ustatus} ne "active") {
@@ -137,4 +137,4 @@ Account can be removed
 % }
 
 </table>
-<input type="submit" name="pause99_edit_cred_sub" value="Submit" />
+<input type="submit" name="pause99_edit_cred_sub" value="Submit">

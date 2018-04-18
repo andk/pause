@@ -16,7 +16,7 @@
 %   } else {
 <p>You need to select one or more packages. Nothing done.</p>
 %   }
-<hr />
+<hr>
 % }
 
 % if (@{$pause->{mods} || []}) {
@@ -34,7 +34,7 @@ remove and press <i>Remove</i></p><p>
 </p>
 <p>
 <input type="submit" name="SUBMIT_pause99_share_perms_remocos"
- value="Remove" /></p>
+ value="Remove"></p>
 
 % } else {
 <p>There are no co-maintainers registered to any of <%= $pause->{User}{userid} %>'s modules.</p>

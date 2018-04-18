@@ -1,7 +1,7 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 <h3>for user <%= $pause->{HiddenUser}{userid} %></h3>
 
 % if ($pause->{no_pending_uploads}) {
@@ -12,7 +12,7 @@
     size => 1,
 %>
 
-<input type="submit" name="pause99_edit_uris_2" value="Select" /><br />
+<input type="submit" name="pause99_edit_uris_2" value="Select"><br>
 
 %   if (%{$pause->{selected}}) {
 <h3>Record for <%= $pause->{selected}{uriid} %></h3>
@@ -21,7 +21,7 @@
 <p>The record has been updated in the database</p>
 %     } elsif ($pause->{update_sel}) {
 It seems to me the record was NOT updated. Maybe nothing has changed?
-Please take a closer look and inform an admin if things didn't proceed as expected.<br />
+Please take a closer look and inform an admin if things didn't proceed as expected.<br>
 %     }
 
 <p><b>URI to download</b></p>
@@ -55,29 +55,29 @@ solution: transfer the file into the incoming directory with
 <b>a different name</b> (say <b>bar</b>) using ftp. Fill in
 the different name below. PAUSE will fetch <b>bar</b> and
 upload it as <b>foo</b>. So you're done.</p>
-</small><br />
+</small><br>
 
 <%= text_field "pause99_edit_uris_uri" => $pause->{selected}{uri},
     size => 60,
     maxlength => 255,
 %>
-<br />
+<br>
 
 <p><b>UNIX time of last unsuccessful attempt to retrieve this item</b></p>
-<%= $pause->{selected}{nosuccesstime} || 0 %><br />
-<br />
+<%= $pause->{selected}{nosuccesstime} || 0 %><br>
+<br>
 
 <p><b>Number of unsuccessful attempts so far</b></p>
-<%= $pause->{selected}{nosuccesscount} || 0 %><br />
-<br />
+<%= $pause->{selected}{nosuccesscount} || 0 %><br>
+<br>
 
 <p><b>Record was last changed on</b></p>
-<%= $pause->{selected}{changed} || 0 %><br />
-<br />
+<%= $pause->{selected}{changed} || 0 %><br>
+<br>
 
 <p><b>Record was last changed by</b></p>
-<%= $pause->{selected}{changedby} || 0 %><br />
-<br />
-<input type="submit" name="pause99_edit_uris_4" value="Update" /><br />
+<%= $pause->{selected}{changedby} || 0 %><br>
+<br>
+<input type="submit" name="pause99_edit_uris_4" value="Update"><br>
 %   }
 % }

@@ -40,6 +40,6 @@ PAUSE ID:</b></p><p><small>required; include what you are planning to contribute
 <%= text_area "pause99_request_id_rationale", rows=>8, cols=>60 =%>
 <!-- zdjela meda -->
 
-<div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"/></div>
+<div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"></div>
 </p>
-<input type="submit" name="SUBMIT_pause99_request_id_sub" value="Request Account" />
+<input type="submit" name="SUBMIT_pause99_request_id_sub" value="Request Account">

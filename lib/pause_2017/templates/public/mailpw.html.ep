@@ -1,7 +1,7 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<input type="hidden" name="ABRA" value="<%= param("ABRA") %>" />
+<input type="hidden" name="ABRA" value="<%= param("ABRA") %>">
 
 % if ($pause->{mailpw_userid}) {
 %   if ($pause->{valid_email}) {
@@ -17,4 +17,4 @@ your email adress. Please fill in your userid on the CPAN. The token
 will be mailed to that userid.</p>
 
 <%= text_field "pause99_mailpw_1", size => 32 %>
-<input type="submit" name="pause99_mailpw_sub" value="OK" />
+<input type="submit" name="pause99_mailpw_sub" value="OK">

@@ -41,4 +41,4 @@ button.</h3>
   size => (@{$pause->{action_reqs}} > 18 ? 15 : scalar @{$pause->{action_reqs}}),
 %>
 
-<input type="submit" name="pause99_select_ml_action_sub" value="Submit" />
+<input type="submit" name="pause99_select_ml_action_sub" value="Submit">
