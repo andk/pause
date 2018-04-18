@@ -38,7 +38,7 @@ can be corrected.--Thank you!</p><p>
 
 <%= text_field 'pause99_peek_perms_query', size => 44, maxlength => 112, =%>
 
-<input type="submit" name="pause99_peek_perms_sub" value="Submit" />
+<input type="submit" name="pause99_peek_perms_sub" value="Submit">
 
 </p>
 % if (@{$pause->{rows} || []}) {

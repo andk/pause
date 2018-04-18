@@ -13,7 +13,7 @@
 %   } else {
 <p>You need to select one or more packages. Nothing done.</p>
 %   }
-<hr />
+<hr>
 % }
 
 % if (@{$pause->{mods} || []}) {
@@ -32,7 +32,7 @@ the co-maintainer table and press <i>Give Up</i></p>
 </p>
 <p>
 <input type="submit" name="SUBMIT_pause99_share_perms_remome"
- value="Give Up" /></p>
+ value="Give Up"></p>
 
 % } else {
 <p>Sorry, <%= $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>

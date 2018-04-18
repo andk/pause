@@ -30,13 +30,13 @@ Excerpt from a mail:<pre>
    [...]
 </pre>
 
-<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 
 <%= select_field "pause99_edit_ml_3" => $pause->{mls},
     size => (@{$pause->{mls}} > 18 ? 15 : scalar @{$pause->{mls}}),
 =%>
-<br />
-<input type="submit" name="pause99_edit_ml_2" value="Select" /><br />
+<br>
+<input type="submit" name="pause99_edit_ml_2" value="Select"><br>
 % if (%{$pause->{selected} || {}}) {
 <h3>Record for <%= $pause->{selected}{maillistid} %></h3>
 
@@ -46,14 +46,14 @@ Excerpt from a mail:<pre>
     size => 50,
     maxsize => 64,
 =%>
-<br />
+<br>
 
 <p><b>The address of the mailing list</b></p>
 <p><small>This is the address where people post to (where all members of the group can be contacted)</small></p>
 <%= text_field pause99_edit_ml_address => $pause->{selected}{address},
     size => 50,
 =%>
-<br />
+<br>
 
 <p><b>How to subscribe</b></p>
 <p><small>This is a text that describes how to join the mailing list. E.g. the mailing list subscribe address or a URL with more details.</small></p>
@@ -61,9 +61,9 @@ Excerpt from a mail:<pre>
     rows => 5,
     cols => 60,
 =%>
-<br />
+<br>
 
-<input type="submit" name="pause99_edit_ml_4" value="Update" /><br />
+<input type="submit" name="pause99_edit_ml_4" value="Update"><br>
 %   if ($pause->{changed}) {
 <p>The record has been updated in the database</p>
 %   } elsif ($pause->{updated_sel}) {

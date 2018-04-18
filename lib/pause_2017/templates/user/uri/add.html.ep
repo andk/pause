@@ -1,8 +1,8 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
-<input type="hidden" name="CAN_MULTIPART" value="1" /><%# just for compatibility; will be removed eventually =%>
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+<input type="hidden" name="CAN_MULTIPART" value="1"><%# just for compatibility; will be removed eventually =%>
 
 <h3>Add a file for <%= $pause->{HiddenUser}{userid} %></h3>
 
@@ -114,12 +114,11 @@ Perl6 dist if these two conditions are satisfied.
 
 <tr><td bgcolor="#e0ffff">If <b>your browser can handle
 file upload</b>, enter the filename here and I'll transfer it
-to your homedirectory:<br />
+to your homedirectory:<br>
 
 <%= file_field "pause99_add_uri_httpupload",
     size => 50,
-%>
-<br />
+%><br>
 <input type="submit" name="SUBMIT_pause99_add_uri_httpupload"
  value=" Upload this file from my disk " /></td></tr>
 

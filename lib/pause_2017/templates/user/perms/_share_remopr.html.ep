@@ -14,7 +14,7 @@
 %       }
 %     }
 %   }
-<hr />
+<hr>
 % }
 
 % if (@{$pause->{mods} || []}) {
@@ -35,7 +35,7 @@ co-maintainership status</a> next.</p>
 
 </p><p>
 <input type="submit" name="SUBMIT_pause99_share_perms_remopr"
- value="Give Up Maintainership Status" /></p>
+ value="Give Up Maintainership Status"></p>
 
 % } else {
 <p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>

@@ -2,7 +2,7 @@
 % my $pause = stash(".pause") || {};
 % my $files = $pause->{files} || {};
 
-<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 Indexing normally happens only once, shortly after the upload takes place. Sometimes it is necessary to reindex a file. The reason is typically one of the following:<ul>
 
 <li>A file that contained a current version of a module got deleted, now an older file should be considered current.</li>
@@ -17,7 +17,7 @@ With this form you can tell the indexer to index selected files again. As it is 
 
 % if (%$files) {
 %   if ($pause->{mailbody}) {
-<hr /><pre><%= $pause->{mailbody} %></pre><hr />
+<hr><pre><%= $pause->{mailbody} %></pre><hr>
 %   }
 
 <h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>

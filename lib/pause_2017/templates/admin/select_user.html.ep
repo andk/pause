@@ -5,12 +5,12 @@
     size => 10,
 =%>
 
-<br />
+<br>
 
 <%= select_field "ACTIONREQ" => $pause->{action_req_list},
     size => 13,
 =%>
 
-<br />
+<br>
 
-<input type="submit" name="pause99_select_user_sub" value="Submit" />
+<input type="submit" name="pause99_select_user_sub" value="Submit">

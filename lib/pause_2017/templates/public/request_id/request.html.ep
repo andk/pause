@@ -28,6 +28,6 @@ Subject: <%= $pause->{subject} %>
 
 <%== $pause->{blurbcopy} %>
 </pre>
-<hr noshade="noshade" />
+<hr noshade="noshade">
 
 % }

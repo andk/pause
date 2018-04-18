@@ -18,7 +18,7 @@
 <p>You need to select one or more packages and enter a userid.
  Nothing done.</p>
 %   }
-<hr />
+<hr>
 % }
 
 % if (@{$pause->{mods} || []}) {
@@ -37,12 +37,12 @@ into the text field and press <i>Make Co-Maintainer</i></p>
 =%>
 
 </p>
-<p>Select a userid:<br />
+<p>Select a userid:<br>
 <%= text_field "pause99_share_perms_makeco_a", size => 15, maxlength => 9 %>
 
 </p><p>
 <input type="submit" name="SUBMIT_pause99_share_perms_makeco"
- value="Make Co-Maintainer" /></p>
+ value="Make Co-Maintainer"></p>
 
 % } else {
 <p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>

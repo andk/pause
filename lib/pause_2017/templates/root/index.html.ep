@@ -2,7 +2,7 @@
 % my $pause = stash(".pause") || {};
 % my $mgr = $c->app->pause;
 % if ($pause->{User}{fullname}) {
-<h2 class="firstheader">Hi <%= $pause->{User}{fullname} %>,<br />please choose an action from the menu.</h2>
+<h2 class="firstheader">Hi <%= $pause->{User}{fullname} %>,<br>please choose an action from the menu.</h2>
 % } else {
 <h2 class="firstheader">Please choose an action from the menu.</h2>
 % }

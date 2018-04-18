@@ -2,15 +2,15 @@
 % my $pause = stash(".pause") || {};
 % my $subaction = $pause->{subaction} || "";
 
-<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>" />
-<input type="hidden" name="lsw" value="1" />
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+<input type="hidden" name="lsw" value="1">
 
 % unless ($subaction) {
 <p>Permissions on PAUSE come in three flavors:</p>
   <ul>
     <li>
       only one user per module can be either
-      <br/>
+      <br>
       <ul>
         <li>
           registered in <i>modulelist</i> or
@@ -74,7 +74,7 @@
           <input type="submit"
                  name="weaksubmit_pause99_share_perms_movepr"
                  value="Select"
-                 />
+                 >
         </td>
         <td valign="top">
           2.1 Transfer primary maintainership status to somebody else
@@ -87,7 +87,7 @@
           <input type="submit"
                  name="weaksubmit_pause99_share_perms_remopr"
                  value="Select"
-                 />
+                 >
         </td>
         <td valign="top">
           2.2 Give up primary maintainership status (abandoning it without
@@ -115,7 +115,7 @@
           <input type="submit"
                  name="weaksubmit_pause99_share_perms_makeco"
                  value="Select"
-                 />
+                 >
         </td>
         <td valign="top">
           3.1 Make somebody else co-maintainer
@@ -127,7 +127,7 @@
           <input type="submit"
                  name="weaksubmit_pause99_share_perms_remocos"
                  value="Select"
-                 />
+                 >
         </td>
         <td valign="top">3.2 Remove a co-maintainer</td>
       </tr>
@@ -145,7 +145,7 @@
         <td align="right"
             valign="top"><input type="submit"
             name="weaksubmit_pause99_share_perms_remome" value="Select"
-            />
+            >
         </td>
         <td valign="top">
           4.1 Give up co-maintainership status

@@ -34,36 +34,36 @@
 %         }
 
 %         if ($row->{same_email}) {
-<td><b><%= $row->{email_parts}[0] %><br />@<%= $row->{email_parts}[1] %></b></td>
+<td><b><%= $row->{email_parts}[0] %><br>@<%= $row->{email_parts}[1] %></b></td>
 %         } else {
-<td><%= $row->{email_parts}[0] %><br />@<%= $row->{email_parts}[1] %></td>
+<td><%= $row->{email_parts}[0] %><br>@<%= $row->{email_parts}[1] %></td>
 %         }
 
 <td>
 %         if ($row->{same_secretemail}) {
-secret&#160;email:&#160;<span style="color: <%= $pause->{se_color} %>"><b><%= $row->{secretemail} %></b></span><br/>
+secret&#160;email:&#160;<span style="color: <%= $pause->{se_color} %>"><b><%= $row->{secretemail} %></b></span><br>
 %         } elsif ($row->{secretemail}) {
-secret&#160;email:&#160;<span style="color: <%= $pause->{se_color} %>"><%= $row->{secret_email} %></span><br/>
+secret&#160;email:&#160;<span style="color: <%= $pause->{se_color} %>"><%= $row->{secret_email} %></span><br>
 %         }
 
 %         if ($row->{same_homepage}) {
-homepage:&#160;<b><%= $row->{homepage} %></b><br/>
+homepage:&#160;<b><%= $row->{homepage} %></b><br>
 %         } elsif ($row->{homepage}) {
-homepage:&#160;<%= $row->{homepage} %><br/>
+homepage:&#160;<%= $row->{homepage} %><br>
 %         }
 
 %         if ($row->{introduced}) {
 %           my $time = $row->{introduced};
 %           $time =~ s/\s/\&#160;/g;
-introduced&#160;on:&#160;<%= $time %><br/>
+introduced&#160;on:&#160;<%= $time %><br>
 %         }
 
 %         if ($row->{changed}) {
 %           my $time = $row->{changed};
 %           $time =~ s/\s/\&#160;/g;
-changed&#160;on:&#160;<%= $time %>&#160;by&#160;<%= $row->{changedby} %><br/>
+changed&#160;on:&#160;<%= $time %>&#160;by&#160;<%= $row->{changedby} %><br>
 %         } else {
-changed&#160;by&#160;<%= $row->{changedby} %><br/>
+changed&#160;by&#160;<%= $row->{changedby} %><br>
 %         }
 </td>
 </tr>
@@ -94,7 +94,7 @@ Subject: <%= $pause->{subject} %>
 
 %     }
 
-Content of user record in table <i>users</i>:<br />
+Content of user record in table <i>users</i>:<br>
 %     if ($pause->{usertable}) {
 <table border="1">
 %       for (sort keys %{$pause->{usertable}}) {
@@ -131,64 +131,64 @@ No fullname, nothing done.
     name => "SUBMIT_pause99_add_user_Definitely",
 =%>
 
-<br />
+<br>
 
-userid (entering lowercase is OK, but it will be uppercased by the server):<br />
+userid (entering lowercase is OK, but it will be uppercased by the server):<br>
 
 <%= text_field "pause99_add_user_userid",
     size => 12,
     maxlength => 9,
 =%>
 
-<br />
+<br>
 
-full name (mailinglist name):<br />
+full name (mailinglist name):<br>
 
 <%= text_field "pause99_add_user_fullname",
     size => 50,
     maxlength => 50
 =%>
 
-<br />
+<br>
 
-email address (for mailing lists this is the real address):<br />
+email address (for mailing lists this is the real address):<br>
 
 <%= text_field "pause99_add_user_email",
     size => 50,
     maxlength => 50,
 =%>
 
-<br />
+<br>
 
-homepage url (ignored for mailing lists):<br />
+homepage url (ignored for mailing lists):<br>
 
 <%= text_field "pause99_add_user_homepage",
     size => 50,
     maxlength => 256
 =%>
 
-<br />
+<br>
 
 subscribe information if this user is a mailing list
-(leave blank for ordinary users):<br />
+(leave blank for ordinary users):<br>
 
 <%= text_field "pause99_add_user_subscribe",
     size => 50,
     maxlength => 256,
 =%>
 
-<br />
+<br>
 
-<br />
+<br>
 If you want to send a message to new author, please
-enter it here:<br />
+enter it here:<br>
 
 <%= text_area "pause99_add_user_memo",
     rows => 6,
     cols => 60,
 =%>
 
-<br />
+<br>
 
 <%= submit_button "  Insert with soundex care  ",
     name => "SUBMIT_pause99_add_user_Soundex",
@@ -200,7 +200,7 @@ enter it here:<br />
     name => "SUBMIT_pause99_add_user_Definitely",
 =%>
 
-<br />
+<br>
 
 <p>If this is a bad request: <a href="<%= my_url->query([
   ACTION => "manage_id_requests",

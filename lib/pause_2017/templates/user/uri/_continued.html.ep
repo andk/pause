@@ -44,7 +44,7 @@ already in the database. You will most probably have to rename your
 file and try again, because <b>PAUSE doesn't let you upload a file
 twice</b>.</p>
 
-<p>This seems to be the record causing the conflict:<br/>
+<p>This seems to be the record causing the conflict:<br>
 <table border="1">
 %       if (my $rec = $pause->{rec}) {
 %         for my $k (sort keys %$rec) {
@@ -61,4 +61,4 @@ twice</b>.</p>
 <!-- end of the response to the user's action -->
 </blockquote>
 
-<hr noshade="noshade" />
+<hr noshade="noshade">
