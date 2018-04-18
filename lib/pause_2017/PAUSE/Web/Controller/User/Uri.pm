@@ -108,7 +108,7 @@ sub add {
                                                   # XHTML
   } elsif ( $req->param("SUBMIT_pause99_add_uri_upload") ) {
     $uri = $req->param("pause99_add_uri_upload");
-    $req->parameters->set("pause99_add_uri_httpupload",""); # I saw spurious
+    $req->param("pause99_add_uri_httpupload",""); # I saw spurious
                                                   # nonsense in the
                                                   # field that broke
                                                   # XHTML
@@ -146,7 +146,7 @@ sub add {
 
     my @mb;
     my $longest = 0;
-    for my $param ($req->param) {
+    for my $param (@{$req->param->names}) {
       next if $param eq "HIDDENNAME";
       next if $param eq "CAN_MULTIPART";
       next if $param eq "pause99_add_uri_sub"; # we're not interested

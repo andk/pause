@@ -203,7 +203,7 @@ sub _share_movepr {
      ) {
     eval {
       my(@selmods, $other_user);
-      if (@selmods = $req->param("pause99_share_perms_pr_m")
+      if (@selmods = @{$req->every_param("pause99_share_perms_pr_m")}
           and
           $other_user = $req->param("pause99_share_perms_movepr_a")
          ) {
@@ -269,7 +269,7 @@ sub _share_remopr {
 
   if (0) {
     # here I discovered that Apache::Request has case-insensitive keys
-    my %p = map { $_, [ $req->param($_)] } $req->param;
+    my %p = map { $_, [ $req->every_param($_)] } @{$req->param->names};
     require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%p],[qw()])->Indent(1)->Useqq(1)->Dump; # XXX
 
   }
@@ -279,7 +279,7 @@ sub _share_remopr {
      ) {
     eval {
       my(@selmods);
-      if (@selmods = $req->param("pause99_share_perms_pr_m")
+      if (@selmods = @{$req->every_param("pause99_share_perms_pr_m")}
          ) {
         local($db->{RaiseError}) = 0;
         my $sth = $db->prepare("DELETE FROM primeur WHERE userid=? AND package=?");
@@ -340,7 +340,7 @@ sub _share_makeco {
      ) {
     eval {
       my(@selmods,$other_user);
-      if (@selmods = $req->param("pause99_share_perms_makeco_m")
+      if (@selmods = @{$req->every_param("pause99_share_perms_makeco_m")}
           and
           $other_user = $req->param("pause99_share_perms_makeco_a")
          ) {
@@ -422,7 +422,7 @@ sub _share_remocos {
       $req->param("SUBMIT_pause99_share_perms_remocos")
      ) {
     eval {
-      my @sel = $req->param("pause99_share_perms_remocos_tuples");
+      my @sel = @{$req->every_param("pause99_share_perms_remocos_tuples")};
       my $sth1 = $db->prepare("DELETE FROM perms WHERE package=? AND userid=?");
       if (@sel) {
         my @results;
@@ -483,7 +483,7 @@ sub _share_remome {
      ) {
     eval {
       my(@selmods);
-      if (@selmods = $req->param("pause99_share_perms_remome_m")
+      if (@selmods = @{$req->every_param("pause99_share_perms_remome_m")}
          ) {
         local($db->{RaiseError}) = 0;
         my $sth = $db->prepare("DELETE FROM perms WHERE package=? AND userid=?");
