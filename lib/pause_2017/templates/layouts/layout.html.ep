@@ -90,7 +90,7 @@ Please be careful not to disturb the database operation. Expect failures everywh
   </div>
 </div>
 % }
-% if ($PAUSE::Config->{PAUSE_WEB_DEBUG}) {
+% if ($ENV{PAUSE_WEB_DEBUG} // $PAUSE::Config->{PAUSE_WEB_DEBUG}) {
   %= include "_debug";
 % }
 %== content 'javascript'
