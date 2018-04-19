@@ -4,4 +4,4 @@ file.class = Log::Dispatch::File
 file.min_level = debug
 file.filename = /var/log/PAUSE-httpd/access_log_plack
 file.mode = append
-file.format = [%d] [%p] %m at %F line %L%n
+file.format = [%d{%Y-%m-%d %H:%M:%S}] [%p] %m%n

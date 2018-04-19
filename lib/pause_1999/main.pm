@@ -152,6 +152,21 @@ WillLast
 
 sub dispatch {
   my $self = shift;
+  local $SIG{__WARN__} = sub {
+    my $message = shift;
+    Log::Dispatch::Config->instance->log(
+      level   => 'warn',
+      message => $message,
+    );
+  };
+  local $SIG{__DIE__} = sub {
+    my $message = shift;
+    Log::Dispatch::Config->instance->log(
+      level   => 'error',
+      message => ref $message eq 'PAUSE::HeavyCGI::Exception' ? $message->{ERROR} : $message,
+    );
+    Carp::croak $message;
+  };
   $self->init;
   my $req = $self->{REQ};
   warn sprintf "DEBUG: uri[%s]location[%s]", $req->path, ''; # $r->location;
