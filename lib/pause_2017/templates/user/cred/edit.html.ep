@@ -39,9 +39,9 @@ The new data are registered in table <%= $table %>.<hr>
 
 %     }
 %   }
-    if (!$pause->{saw_a_change}) {
+%   if (!$pause->{saw_a_change}) {
 No change seen, nothing done.<hr>
-    }
+%   }
 % }
 
 <br>
