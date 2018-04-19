@@ -80,53 +80,39 @@ sub alert {
 # return value nonsensical
 # XXX needs case check
 sub give_regdowner_perms {
+  # This subroutine originally existed for interactions with the module list,
+  # which was effectively made a non-feature years ago.  Its job now is to
+  # ensure that new packages are given the same permission as those given to
+  # the main package of the distribution being uploaded. -- rjbs, 2018-04-19
   my $self = shift;
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   my $main_package = $self->{MAIN_PACKAGE};
   local($dbh->{RaiseError}) = 0;
-  # warn "Going to execute [SELECT userid FROM mods WHERE modid = '$package']";
-  my $sql = "SELECT userid
-                                FROM   mods
-                                WHERE  modid = ?
-                                ";
-  my ($perms_before) = $dbh->selectrow_arrayref(
-      "SELECT userid FROM perms WHERE LOWER(package) = LOWER(?)",
-      undef,
-      $package,
-  );
-  my @args = ($package);
-  unless(lc($main_package) eq lc($package)) {
-    $sql .= q{
-    UNION
-    SELECT userid
-    FROM   perms
-    WHERE  LOWER(package) = LOWER(?)
-    };
-    push @args, $main_package;
-  }
 
-  my $uids = $dbh->selectall_arrayref($sql, {Slice=>{}}, @args);
-  if ($perms_before && @$perms_before) {
-      for my $p_before (@$perms_before) {
-          my $t_allow_extending_perms = 0;
-          for my $p_future (@$uids) {
-              if ($p_future->{userid} eq $p_before) {
-                  $t_allow_extending_perms = 1;
-                  my $uids = join ",", sort map { $_->{userid} } @$uids;
-                  $self->verbose(1,"Allow extending perms. main_package[$main_package]package[$package]p_before[$p_before]uids[$uids]\n");
-                  last;
-              }
-          }
-          unless ($t_allow_extending_perms) {
-              $self->verbose(1,"Ownership preserved. Package[$package]perms[$perms_before]\n");
-              return;
-          }
-      }
-  }
-  for my $sth_mods (@$uids)
+  return if lc $main_package eq lc $package;
+
+  # Get the permissions for the main package of this distribution so that we
+  # can ensure that *this* package has the same permissions as the main
+  # package. -- rjbs, 2018-04-19
+  my $existing_permissions = $dbh->selectall_arrayref(
+    q{
+      SELECT userid
+      FROM   perms
+      WHERE  LOWER(package) = LOWER(?)
+    },
+    { Slice => {} },
+    $main_package,
+  );
+
+  # TODO: correctly set first-come as well
+
+  # TODO: return if they're already equal permissions -- rjbs, 2018-04-19
+  $self->verbose(1, "Making permissions for package[$package] match main_mackage[$main_package]");
+
+  for my $row (@$existing_permissions)
   {
-      my($mods_userid) = $sth_mods->{userid};
+      my($mods_userid) = $row->{userid};
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
       my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
@@ -137,6 +123,8 @@ sub give_regdowner_perms {
       $self->verbose(1,"Insert into perms package[$package]mods_userid".
                       "[$mods_userid]ret[$ret]err[$err]\n");
   }
+
+  return;
 }
 
 # perm_check: we're both guessing and setting.
