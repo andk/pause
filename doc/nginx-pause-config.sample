@@ -1,0 +1,51 @@
+upstream pause {
+    server 127.0.0.1:5000;
+}
+
+server {
+
+    location / {
+        proxy_pass http://pause;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_pass_request_headers on;
+        proxy_no_cache $cookie_nocache  $arg_nocache$arg_comment;
+        proxy_no_cache $http_pragma     $http_authorization;
+        proxy_cache_bypass $cookie_nocache $arg_nocache $arg_comment;
+        proxy_cache_bypass $http_pragma $http_authorization;
+        proxy_pass_header Authorization;
+    }
+
+}
+
+server {
+    listen 443 default ssl;
+
+    ssl on;
+    ssl_certificate /usr/local/nginx/conf/server.crt;
+    ssl_certificate_key /usr/local/nginx/conf/server.key;
+
+    ssl_session_timeout 5m;
+
+    ssl_ciphers  'RSA ECDH !LOW !EXPORT !3DES !MD5 !aNULL !eNULL !SSLv2';
+    ssl_prefer_server_ciphers on;
+
+    location / {
+        proxy_pass http://pause;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_pass_request_headers on;
+        proxy_no_cache $cookie_nocache  $arg_nocache$arg_comment;
+        proxy_no_cache $http_pragma     $http_authorization;
+        proxy_cache_bypass $cookie_nocache $arg_nocache $arg_comment;
+        proxy_cache_bypass $http_pragma $http_authorization;
+        proxy_pass_header Authorization;
+    }
+}
