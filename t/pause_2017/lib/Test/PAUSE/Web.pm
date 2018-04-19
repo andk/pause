@@ -14,8 +14,8 @@ use Test::PAUSE::MySQL;
 use Email::Sender::Simple;
 use Mojo::DOM;
 
-#our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
-our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
+our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
+#our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
 our $TmpDir = Path::Tiny->tempdir(TEMPLATE => "pause_web_XXXXXXXX");
 our $TestRoot = path($TmpDir)->realpath;
 our $TestEmail = 'pause_admin@localhost.localdomain';
