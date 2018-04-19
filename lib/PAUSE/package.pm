@@ -333,16 +333,15 @@ sub examine_pkg {
       return;
   }
 
-  # set perms for registered owner in any case
-
-  $self->give_regdowner_perms; # (P1.0)
-
   # Query all users with perms for this package
 
   unless ($self->perm_check){ # (P2.0&P3.0)
       delete $self->{FIO};    # circular reference
       return;
   }
+
+  # Copy permissions from main module to subsidiary modules.
+  $self->give_regdowner_perms;
 
   # Check that package name matches case of file name
   {
