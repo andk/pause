@@ -103,12 +103,6 @@ subtest "cannot steal a library when only perms exist" => refused_index_test(sub
     or die "couldn't insert!";
 });
 
-subtest "cannot steal a library when only mods exist" => refused_index_test(sub {
-  my ($dbh) = @_;
-  $dbh->do("INSERT INTO mods (modid, userid) VALUES ('Bug::Gold','ATRION')")
-    or die "couldn't insert!";
-});
-
 subtest "do not index if meta has release_status <> stable" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/002/authors');
