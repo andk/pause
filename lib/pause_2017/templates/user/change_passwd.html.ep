@@ -9,10 +9,10 @@
 % }
 
 % if ($pause->{password_stored}) {
-New password stored and enabled. Be prepared that
+<p class="password_stored">New password stored and enabled. Be prepared that
 you will be asked for a new authentication on the next request. If
 this doesn't work out, it may be that you have to restart the
-browser.
+browser.</p>
 % } else {
 %   if ( $pause->{UserSecrets}{forcechange} ) {
 
