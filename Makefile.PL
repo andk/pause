@@ -79,6 +79,7 @@ WriteMakefile(
     Test::mysqld
     Test::WWW::Mechanize::PSGI
     Text::Format
+    Text::Markdown::Hoedown
     Text::Metaphone
     Text::Soundex
     Text::Unidecode
