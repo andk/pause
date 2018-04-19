@@ -42,37 +42,60 @@ can be corrected.--Thank you!</p><p>
 
 </p>
 % if (@{$pause->{rows} || []}) {
-<table border="1" cellspacing="1" cellpadding="4">
-<tr>
+<div id="perms">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
 %   for (@{$pause->{column_names}}) {
-<td><b><%= $_ %></b></td>
+      <th class="sort" data-sort="<%= $_ %>"><%= $_ %></th>
 %   }
-</tr>
+    </tr>
+  </thead>
+  <tbody class="list">
 %   for my $row (@{$pause->{rows}}) {
-<tr>
-<td><a href="<%= my_url->query([
-  pause99_peek_perms_by => "me",
-  pause99_peek_perms_query => $row->[0],
-  pause99_peek_perms_sub => 1,
-]) %>"><%= $row->[0] %></a></td>
-<td><a href="<%= my_url->query([
-  pause99_peek_perms_by => "a",
-  pause99_peek_perms_query => $row->[1],
-  pause99_peek_perms_sub => 1,
-]) %>"><%= $row->[1] %></a></td>
-<td><%= $row->[2] %></td>
-<td><%= $row->[3] %></td>
-</tr>
+    <tr>
+      <td class="module"><a href="<%= my_url->query([
+        pause99_peek_perms_by => "me",
+        pause99_peek_perms_query => $row->[0],
+        pause99_peek_perms_sub => 1,
+      ]) %>"><%= $row->[0] %></a></td>
+      <td class="userid"><a href="<%= my_url->query([
+        pause99_peek_perms_by => "a",
+        pause99_peek_perms_query => $row->[1],
+        pause99_peek_perms_sub => 1,
+      ]) %>"><%= $row->[1] %></a></td>
+      <td class="type"><%= $row->[2] %></td>
+      <td class="owner"><%= $row->[3] %></td>
+    </tr>
 % }
+  </tbody>
 </table>
-<a href="<%= my_url->query([
+<ul class="pagination paginationBottom"></ul>
+<p><a href="<%= my_url->query([
   OF => "YAML",
   pause99_peek_perms_sub => 1,
   pause99_peek_perms_by => param("pause99_peek_perms_by"),
   pause_peek_perms_query => param("pause99_peek_perms_query")],
 ) %>" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
-</a>
+</a></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('perms', {
+  valueNames: ['module', 'userid', 'type', 'owner'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
+
 % } else {
 No records found.
 % }

@@ -4,15 +4,49 @@
 
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 <h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>
+
 % if (%$files) {
-<input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete" /><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete" />
-<pre>
-% my $ct = 0;
+<div id="files">
+<input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete"><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete"><input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="file">File</th>
+      <th class="sort" data-sort="size">Size</th>
+      <th class="sort" data-sort="modified">Modified</th>
+    </tr>
+  </thead>
+  <tbody class="list">
 % for my $file (sort keys %$files) {
-<span class="line<%= 1 + ($ct++ % 3) %>"><%= check_box "pause99_delete_files_FILE" => $file %><%= sprintf " %-50s %7d  %s", $file, $files->{$file}{stat}, $files->{$file}{blurb} %></span>
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_delete_files_FILE" => $file %></td>
+      <td class="file"><%= $file %></td>
+      <td class="size"><%= $files->{$file}{stat} %></td>
+      <td class="modified"><%= $files->{$file}{blurb} %></td>
+    </tr>
 % }
-</pre>
-<input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete" /><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete" />
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+
+<p><input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete"><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('files', {
+  valueNames: ['file', 'size', 'modified'],
+  page: 500,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 7, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 7, outerWindow: 1}
+  ]
+});
+% end
+% end
+
 % } else {
 No files found in authors/id/<%= $pause->{userhome} %>
 % }

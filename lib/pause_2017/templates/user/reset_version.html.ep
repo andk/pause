@@ -32,14 +32,47 @@ there was a problem.</p>
 % if (%{$pause->{packages} || {}}) {
 <h3><%= scalar keys %{$pause->{packages}} %> <%= keys %{$pause->{packages}} == 1 ? "package" : "packages" %> associated with <%= $pause->{User}{userid} %></h3>
 
-<input type="submit" name="SUBMIT_pause99_reset_version_forget" value="Forget" />
-<pre>
-%   my $ct = 0;
+<div id="packages">
+<input type="submit" name="SUBMIT_pause99_reset_version_forget" value="Forget">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="package">Package</th>
+      <th class="sort" data-sort="version">Version</th>
+      <th class="sort" data-sort="dist">Dist</th>
+    </tr>
+  </thead>
+  <tbody class="list">
 %   for my $package (sort keys %{$pause->{packages}}) {
-<span class="line<%= 1 + ($ct++ % 3) %>"><%= check_box pause99_reset_version_PKG => $package %><%= $pause->{packages}{$package} %></span>
+    <tr>
+      <td class="checkbox"><%= check_box pause99_reset_version_PKG => $package %></td>
+      <td class="package"><%= $package %></td>
+      <td class="version"><%= $pause->{packages}{$package}{version} %></td>
+      <td class="dist"><%= $pause->{packages}{$package}{dist} %></td>
+    </tr>
 %   }
-</pre>
-<input type="submit" name="SUBMIT_pause99_reset_version_forget" value="Forget" />
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+<p><input type="submit" name="SUBMIT_pause99_reset_version_forget" value="Forget"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('packages', {
+  valueNames: ['package', 'version', 'dist'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
+
 % } else {
 <h3>No packages associated with <%= $pause->{User}{userid} %></h3>
 % }
