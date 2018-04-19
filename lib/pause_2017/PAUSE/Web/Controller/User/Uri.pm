@@ -139,49 +139,6 @@ sub add {
   warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
 
   # END OF UPLOAD OPTIONS
-
-  my $want_to_send_email_on_upload_submission = 0;
-  if ($want_to_send_email_on_upload_submission && $didit) {
-    $pause->{whose} = $pause->{User}{userid} eq $u->{userid} ? "his/her" : "$u->{userid}'s";
-
-    my @mb;
-    my $longest = 0;
-    for my $param (@{$req->param->names}) {
-      next if $param eq "HIDDENNAME";
-      next if $param eq "CAN_MULTIPART";
-      next if $param eq "pause99_add_uri_sub"; # we're not interested
-      my $v = $req->param($param);
-      next unless defined $v;
-      next unless length $v;
-      $longest = length($param) if length($param) > $longest;
-      push @mb, [$param,$v];
-    }
-    $pause->{longest} = $longest;
-    $pause->{mb} = \@mb;
-
-    my %umailset;
-    my $name = $u->{asciiname} || $u->{fullname} || "";
-    if ($u->{secretemail}) {
-      $umailset{qq{"$name" <$u->{secretemail}>}} = 1;
-    } elsif ($u->{email}) {
-      $umailset{qq{"$name" <$u->{email}>}} = 1;
-    }
-    if ($u->{userid} ne $pause->{User}{userid}) {
-      my $Uname = $pause->{User}{asciiname} || $pause->{User}{fullname} || "";
-      if ($pause->{User}{secretemail}) {
-        $umailset{qq{"$Uname" <$pause->{User}{secretemail}>}} = 1;
-      }elsif ($pause->{User}{email}) {
-        $umailset{qq{"$Uname" <$pause->{User}{email}>}} = 1;
-      }
-    }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
-    my @to = keys %umailset;
-    my $header = {
-                  Subject => "Notification from PAUSE",
-                 };
-    my $mailbody = $c->render_to_string("email/user/uri/submission", format => "email");
-    $mgr->send_mail_multi(\@to, $header, $mailbody);
-  }
 }
 
 sub _find_subdirs {
