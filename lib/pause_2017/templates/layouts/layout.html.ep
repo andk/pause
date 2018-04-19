@@ -76,7 +76,18 @@ Please be careful not to disturb the database operation. Expect failures everywh
     %= include "_user_menu";
   </div>
   <div class="col c9">
-    %= include "_startform";
+    % my $me = my_url();
+    % my $enctype;
+    % if ($pause->{need_form_data}) {
+    %   $enctype = "multipart/form-data";
+    % } else {
+    %   $enctype = "multipart/x-www-form-urlencoded";
+    % }
+    % if ($PAUSE::Config->{TESTHOST}) {
+    %   warn "DEBUG: me[$me]enctype[$enctype]";
+    <h2>[ATTN: Form going to post to <%= $me %>]</h2>
+    % }
+    <form action="<%= $me %>" enctype="<%= $enctype %>" method="post">
     <main>
     % my $action_conf = app->pause->config->action($pause->{Action});
     % if (my $verb = $action_conf->{verb} and !$action_conf->{has_title}) {
@@ -88,8 +99,6 @@ Please be careful not to disturb the database operation. Expect failures everywh
   </div>
 </div>
 % }
-<hr noshade="noshade">
-%= include "_speedlinkgif";
 % if ($PAUSE::Config->{PAUSE_WEB_DEBUG}) {
   %= include "_debug";
 % }
