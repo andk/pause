@@ -295,7 +295,6 @@ sub manifind {
                               DIR => "/tmp",
                               TEMPLATE => "mldistwatch_manifind_XXXX",
                              );
-    tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
 
     my $wanted = sub {
         return if m|CHECKSUMS$|;
