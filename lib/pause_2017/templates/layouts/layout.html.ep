@@ -102,5 +102,6 @@ Please be careful not to disturb the database operation. Expect failures everywh
 % if ($PAUSE::Config->{PAUSE_WEB_DEBUG}) {
   %= include "_debug";
 % }
+%== content 'javascript'
 </body>
 </html>

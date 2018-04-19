@@ -282,20 +282,11 @@ sub reset_version {
     return;
   }
 
-  my(@maxl, %p);
-  while (my(@row) = $sths->fetchrow_array) {
-    for my $i (0..$#row) {
-      if (!$maxl[$i] or $maxl[$i]<length($row[$i])) {
-        $maxl[$i] = length($row[$i]);
-      }
-    }
-    $p{$row[0]} = \@row;
+  my %packages;
+  while (my($package, $version, $dist) = $sths->fetchrow_array) {
+    $packages{$package} = {version => $version, dist => $dist};
   }
-  my $sprintf = join " | ", map { "%-$_"."s" } @maxl;
-  while (my($k,$v) = each %p) {
-    $p{$k} = sprintf $sprintf, @$v;
-  }
-  $pause->{packages} = \%p;
+  $pause->{packages} = \%packages;
 }
 
 sub tail_logfile {

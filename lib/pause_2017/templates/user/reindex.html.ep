@@ -3,7 +3,8 @@
 % my $files = $pause->{files} || {};
 
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
-Indexing normally happens only once, shortly after the upload takes place. Sometimes it is necessary to reindex a file. The reason is typically one of the following:<ul>
+<p>Indexing normally happens only once, shortly after the upload takes place. Sometimes it is necessary to reindex a file. The reason is typically one of the following:</p>
+<ul>
 
 <li>A file that contained a current version of a module got deleted, now an older file should be considered current.</li>
 
@@ -13,7 +14,7 @@ Indexing normally happens only once, shortly after the upload takes place. Somet
 
 </ul>
 
-With this form you can tell the indexer to index selected files again. As it is done by a cron job, it may take up to an hour until the indexer actually executes the command. If this doesn't repair the index, please <a href="mailto:<%= $PAUSE::Config->{UPLOAD} %>">email me</a>.
+<p>With this form you can tell the indexer to index selected files again. As it is done by a cron job, it may take up to an hour until the indexer actually executes the command. If this doesn't repair the index, please <a href="mailto:<%= $PAUSE::Config->{UPLOAD} %>">email me</a>.</p>
 
 % if (%$files) {
 %   if ($pause->{mailbody}) {
@@ -22,14 +23,42 @@ With this form you can tell the indexer to index selected files again. As it is 
 
 <h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>
 
-<input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex" />
-<pre>
-% my $ct = 0;
+<div id="files">
+<input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="checkbox"></th>
+      <th class="sort" data-sort="file">File</th>
+    </tr>
+  </thead>
+  <tbody class="list">
 % for my $file (sort keys %$files) {
-<span class="line<%= 1 + ($ct++ % 3) %>"><%= check_box "pause99_reindex_FILE" => $file %><%= $file %></span>
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_reindex_FILE" => $file %></td>
+      <td class="file"><%= $file %></td>
+    </tr>
 % }
-</pre>
-<input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex" />
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+<p><input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('files', {
+  valueNames: ['file'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
 
 % } else {
 No files found in authors/id/<%= $pause->{userhome} %>

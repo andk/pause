@@ -6,10 +6,27 @@ There's currently no way to edit the table except
 direct SQL. The table says who is representative of a
 mailing list.</p>
 
-<table border="1"><tr><th>Mailing list</th>
-<th>User-ID</th>
-</tr>
-% for my $rec (@{$pause->{lists} || []}) {
-<tr><td><%= $rec->{maillistid} %></td><td><%= $rec->{userid} %></td></tr>
-% }
+<div id="users">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="sort asc" data-sort="ml">Mailing list</th>
+      <th class="sort" data-sort="userid">User-ID</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for my $rec (@{$pause->{lists} || []}) {
+    <tr>
+      <td class="ml"><%= $rec->{maillistid} %></td>
+      <td class="userid"><%= $rec->{userid} %></td>
+    </tr>
+  % }
+  </tbody>
 </table>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var userList = new List('users', {valueNames: ['ml', 'userid']});
+% end
+% end
