@@ -4,13 +4,9 @@ perl:
 
 sudo: required
 
-services:
-  - mysql
-
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libdb-dev
   ## Set a git identity
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis PAUSE"
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
