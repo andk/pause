@@ -33,9 +33,12 @@ subtest 'get' => sub {
         my $list_amp = YAML::Syck::Load( $t->content );
         is_deeply( $list_amp, [qw/BAR FOO TESTADMIN/], "YAML output works" );
 
+    SKIP: {
+        skip "; is not supported anymore", 1;
         $t->$method("$path?ACTION=who_admin;OF=YAML");
         my $list_sem = YAML::Syck::Load( $t->content );
         is_deeply( $list_sem, [qw/BAR FOO TESTADMIN/], "YAML output works" );
+        }
     }
 };
 
