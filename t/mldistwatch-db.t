@@ -54,6 +54,21 @@ subtest "retry indexing on db failure, only three times" => sub {
     $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
     "did not reindex",
   );
+
+  $result->email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report OOOPPP/Jenkins-Hack-0.14.tar.gz',
+        callbacks => [
+          sub {
+            my $index = index $_[0]->{email}->object->body_str,
+                           m{ERROR: Database error occurred during index};
+            ok($index >= 0, "our indexer report mentions db error");
+          },
+        ]
+      },
+      { subject => 'PAUSE upload indexing error' },
+    ],
+  );
 };
 
 done_testing;

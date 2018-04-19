@@ -219,7 +219,7 @@ subtest "distname/pkgname permission mismatch" => sub {
           },
         ],
       },
-      { subject => 'Upload Permission or Version mismatch' },
+      { subject => 'PAUSE upload indexing error' },
     ],
   );
 };
@@ -252,7 +252,7 @@ subtest "case mismatch, authorized for original" => sub {
   $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
-      { subject => 'Upload Permission or Version mismatch' },
+      { subject => 'PAUSE upload indexing error' },
     ],
   );
 };
@@ -294,7 +294,7 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
           }
         ],
       },
-      { subject => 'Upload Permission or Version mismatch' },
+      { subject => 'PAUSE upload indexing error' },
     ],
   );
 };
@@ -384,7 +384,7 @@ subtest "distname/pkgname permission check" => sub {
   $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz' },
-      { subject => 'Upload Permission or Version mismatch' },
+      { subject => 'PAUSE upload indexing error' },
     ],
   );
 };

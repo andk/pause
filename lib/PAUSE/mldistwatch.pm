@@ -501,7 +501,8 @@ sub check_for_new {
           last if $db_ok;
           if ($attempt == 3) {
             $self->verbose(2, "tried $attempt times to do db work, but all failed");
-            next BIGLOOP;
+            $dio->alert("database errors while indexing $dio->{DIST}");
+            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
           }
         }
 
@@ -521,7 +522,7 @@ sub check_for_new {
             my $email = Email::MIME->create(
                 header_str => [
                     To      => $PAUSE::Config->{ADMIN},
-                    Subject => "Upload Permission or Version mismatch",
+                    Subject => "PAUSE upload indexing error",
                     From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
                 ],
                 attributes => {

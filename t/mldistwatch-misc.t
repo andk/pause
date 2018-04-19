@@ -306,7 +306,7 @@ subtest "check overlong versions" => sub {
         callbacks => [ $etoolong ],
       },
       {
-        subject   => 'Upload Permission or Version mismatch',
+        subject   => 'PAUSE upload indexing error',
         callbacks => [ $etoolong ],
       },
     ],
