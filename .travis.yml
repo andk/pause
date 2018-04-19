@@ -2,6 +2,14 @@ language: perl
 perl:
   - "5.14"
 
+addons:
+  apt:
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client
+
 sudo: required
 
 before_install:
@@ -10,3 +18,6 @@ before_install:
   ## Set a git identity
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis PAUSE"
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade
+  - sudo service mysql restart
