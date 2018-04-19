@@ -295,7 +295,6 @@ sub manifind {
                               DIR => "/tmp",
                               TEMPLATE => "mldistwatch_manifind_XXXX",
                              );
-    tie %found, 'DB_File', $fh->filename, O_RDWR|O_CREAT, 0644, $DB_HASH;
 
     my $wanted = sub {
         return if m|CHECKSUMS$|;
@@ -315,6 +314,64 @@ sub _newcountokay {
   my ($self, $count) = @_;
   my $MIN = $PAUSE::Config->{ML_MIN_FILES};
   return $count >= $MIN;
+}
+
+sub _do_the_database_work {
+  my ($self, $dio) = @_;
+
+  my $ok = eval {
+    # This is here for test purposes.  It lets us force the db work to die,
+    # which should trigger a retry. -- rjbs, 2018-04-19
+    if ($PAUSE::Config->{PRE_DB_WORK_CALLBACK}) {
+      $PAUSE::Config->{PRE_DB_WORK_CALLBACK}->($dio);
+    }
+
+    my $dbh = $self->connect;
+    unless ($dbh->begin_work) {
+      $self->verbose("Couldn't begin transaction!");
+      return 1;
+    }
+
+    # Either we're doing Perl 6...
+    if ($dio->perl_major_version == 6) {
+      if ($dio->p6_dist_meta_ok) {
+        if (my $err = $dio->p6_index_dist) {
+          $dio->alert($err);
+          $dbh->rollback;
+        } else {
+          $dbh->commit;
+        }
+      }
+      else {
+        $dio->alert("Meta information of Perl 6 dist $dio->{DIST} is invalid");
+        $dbh->rollback;
+      }
+
+      return 1;
+    }
+
+    # ...or else Perl 5...
+    $dio->examine_pms;      # will switch user
+
+    my $main_pkg = $dio->_package_governing_permission;
+
+    if ($self->_userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
+      $dbh->commit;
+    } else {
+      $dio->alert(
+        "Uploading user has no permissions on package $main_pkg"
+      );
+      $dio->{NO_DISTNAME_PERMISSION} = 1;
+      $dbh->rollback;
+    }
+
+    return 1;
+  };
+
+  # Remember, $ok here only means "did the db work die," not "did we
+  # successfully index stuff." -- rjbs, 2018-04-19
+  $self->verbose(2, "Error with database work: $@") unless $ok;
+  return $ok;
 }
 
 sub check_for_new {
@@ -348,7 +405,7 @@ sub check_for_new {
         # Examine all files, even CHECKSUMS and READMEs
         #
         $i++;
-        $self->verbose(2,". $dist ..") unless $i%256;
+        $self->verbose(2,". $dist ..") if $i%256 == 0;
 
         my $dio = PAUSE::dist->new(
                                    MAIN   => $self,
@@ -363,6 +420,7 @@ sub check_for_new {
                                   );
 
         if ($dio->ignoredist){
+            $self->verbose(2, "skipping $dist: ignoredist");
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
             next BIGLOOP;
@@ -372,12 +430,14 @@ sub check_for_new {
             unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
                 delete $self->{ALLlasttime}{$dist};
                 delete $self->{ALLfound}{$dist};
+                $self->verbose(2, "skipping $dist: mtime not ok");
                 next BIGLOOP;
             }
         } else {
             $dio->delete_goner;
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
+            $self->verbose(2, "skipping $dist: it's a goner");
             next BIGLOOP;
         }
         unless ($dio->lock) {
@@ -436,41 +496,13 @@ sub check_for_new {
         $dio->check_multiple_root;
         $dio->check_world_writable;
 
-        # START XACT
-        {
-          my $dbh = $self->connect;
-          unless ($dbh->begin_work) {
-            $self->verbose("Couldn't begin transaction!");
-            next BIGLOOP;
-          }
-
-          if ($dio->perl_major_version == 6) {
-            if ($dio->p6_dist_meta_ok) {
-              if (my $err = $dio->p6_index_dist) {
-                $dio->alert($err);
-                $dbh->rollback;
-              } else {
-                $dbh->commit;
-              }
-            }
-            else {
-              $dio->alert("Meta information of Perl 6 dist $dist is invalid");
-              $dbh->rollback;
-            }
-          } else {
-            $dio->examine_pms;      # will switch user
-
-            my $main_pkg = $dio->_package_governing_permission;
-
-            if ($self->_userid_has_permissions_on_package($userid, $main_pkg)) {
-              $dbh->commit;
-            } else {
-              $dio->alert(
-                "Uploading user has no permissions on package $main_pkg"
-              );
-              $dio->{NO_DISTNAME_PERMISSION} = 1;
-              $dbh->rollback;
-            }
+        for my $attempt (1 .. 3) {
+          my $db_ok = $self->_do_the_database_work($dio);
+          last if $db_ok;
+          if ($attempt == 3) {
+            $self->verbose(2, "tried $attempt times to do db work, but all failed");
+            $dio->alert("database errors while indexing $dio->{DIST}");
+            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
           }
         }
 
@@ -490,7 +522,7 @@ sub check_for_new {
             my $email = Email::MIME->create(
                 header_str => [
                     To      => $PAUSE::Config->{ADMIN},
-                    Subject => "Upload Permission or Version mismatch",
+                    Subject => "PAUSE upload indexing error",
                     From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
                 ],
                 attributes => {

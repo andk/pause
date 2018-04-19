@@ -66,7 +66,7 @@ $result->package_list_ok( $expected_package_list );
 $result->email_ok(
   [
       { subject => 'Failed: PAUSE indexer report NEILB/Acme-Playpen-2.00.tar.gz' },
-      { subject => 'Upload Permission or Version mismatch' },
+      { subject => 'PAUSE upload indexing error' },
   ],
 );
 

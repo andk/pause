@@ -53,7 +53,21 @@ subtest "should index single-life dev vers. modules in perl dist" => sub {
 };
 
 sub refused_index_test {
-  my ($code) = @_;
+  my ($arg) = @_;
+
+  if (ref $arg eq 'CODE') {
+    $arg = {
+      before => $arg,
+      author_root => 'corpus/mld/001/authors',
+      want_package_list => [
+        { package => 'Hall::MtKing',   version => '0.01'  },
+        { package => 'Jenkins::Hack',  version => '0.11'  },
+        { package => 'Mooooooose',     version => '0.01'  },
+        { package => 'XForm::Rollout', version => '1.00'  },
+        { package => 'Y',              version => 2       },
+      ],
+    };
+  }
 
   sub {
     my $pause = PAUSE::TestPAUSE->init_new;
@@ -65,19 +79,11 @@ sub refused_index_test {
       undef,
     ) or die "can't connect to db at $db_file: $DBI::errstr";
 
-    $code->($dbh);
-    $pause->import_author_root('corpus/mld/001/authors');
+    $arg->{before}->($dbh);
+    $pause->import_author_root($arg->{author_root});
     my $result = $pause->test_reindex;
 
-    $result->package_list_ok(
-      [
-        { package => 'Hall::MtKing',   version => '0.01'  },
-        { package => 'Jenkins::Hack',  version => '0.11'  },
-        { package => 'Mooooooose',     version => '0.01'  },
-        { package => 'XForm::Rollout', version => '1.00'  },
-        { package => 'Y',              version => 2       },
-      ],
-    );
+    $result->package_list_ok($arg->{want_package_list});
 
     my $file = $pause->tmpdir->subdir(qw(cpan modules))->file('06perms.txt');
   };
@@ -103,10 +109,17 @@ subtest "cannot steal a library when only perms exist" => refused_index_test(sub
     or die "couldn't insert!";
 });
 
-subtest "cannot steal a library when only mods exist" => refused_index_test(sub {
-  my ($dbh) = @_;
-  $dbh->do("INSERT INTO mods (modid, userid) VALUES ('Bug::Gold','ATRION')")
-    or die "couldn't insert!";
+subtest "cannot steal a library via copy-main-perms mechanism" => refused_index_test({
+  author_root => 'corpus/mld/009/authors',
+  want_package_list => [
+    { package => 'Jenkins::Hack',         version => '0.14' },
+    { package => 'Jenkins::Hack::Utils',  version => '0.14' },
+  ],
+  before      => sub {
+    my ($dbh) = @_;
+    $dbh->do("INSERT INTO perms (package, userid) VALUES ('Jenkins::Hack2','ATRION')")
+      or die "couldn't insert!";
+  },
 });
 
 subtest "do not index if meta has release_status <> stable" => sub {
@@ -293,7 +306,7 @@ subtest "check overlong versions" => sub {
         callbacks => [ $etoolong ],
       },
       {
-        subject   => 'Upload Permission or Version mismatch',
+        subject   => 'PAUSE upload indexing error',
         callbacks => [ $etoolong ],
       },
     ],

@@ -574,19 +574,26 @@ sub mail_summary {
         sprintf "st[%s]\n", (Data::Dumper::Dumper($inxst) =~ s/\v+\z//r)
       );
       if ($pmfiles > 0 || $self->{SKIP_REPORT}) {
-        if ($self->version_from_meta_ok) {
+        if ($self->{SKIP_REPORT} == PAUSE::mldistwatch::Constants::E_DB_XACTFAIL) {
+          push @m,  qq{This distribution was not indexed due to database\n}
+                 .  qq{errors.  You can request another indexing attempt be\n}
+                 .  qq{made by logging into https://pause.perl.org/\n\n};
 
-          push @m, qq{Nothing in this distro has been
-          indexed, because according to META.yml this
-          package does not provide any modules.\n\n};
+          $status_over_all = "Failed";
+        } elsif ($self->version_from_meta_ok) {
+
+          push @m,  qq{Nothing in this distro has been \n}
+                 .  qq{indexed, because according to META.yml this\n}
+                 .  qq{package does not provide any modules.\n\n};
+
           $status_over_all = "Empty_provides";
 
         } else {
 
-          push @m, qq{No or no indexable package
-          statements could be found in the distro (maybe a
-          script or documentation distribution or a
-          developer release?)\n\n};
+          push @m,  qq{No or no indexable package statements could be found\n}
+                 .  qq{in the distro (maybe a script or documentation\n}
+                 .  qq{distribution or a developer release?)\n\n};
+
           $status_over_all = "Empty_no_pm";
 
         }

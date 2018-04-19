@@ -65,7 +65,7 @@ $result->package_list_ok( $expected_package_list );
 $result->email_ok(
   [
       { subject => 'Failed: PAUSE indexer report OOOPPP/Jenkins-Hack-0.14.tar.gz' },
-      { subject => 'Upload Permission or Version mismatch' },
+      { subject => 'PAUSE upload indexing error' },
   ],
 );
 
