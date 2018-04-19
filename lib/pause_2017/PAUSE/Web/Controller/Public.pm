@@ -157,6 +157,11 @@ sub imprint {
   $c->serve_pause_doc("imprint.html")
 }
 
+sub operating_model {
+  my $c = shift;
+  $c->serve_pause_doc("doc/operating-model.md")
+}
+
 sub pumpkin {
   my $c = shift;
   my $pause = $c->stash(".pause");

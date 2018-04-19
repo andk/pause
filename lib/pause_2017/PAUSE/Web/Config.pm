@@ -64,8 +64,16 @@ our %Actions = (
     x_mojo_to => "public#naming",
     verb => "On The Naming of Modules",
     priv => "public",
-    cat => "01self/04b",
+    cat => "01self/04c",
     desc => "A couple of suggestions that hopefully get you on track",
+  },
+  pause_operating_model => {
+    x_mojo_to => "public#operating_model",
+    verb => "PAUSE Operating Model",
+    priv => "public",
+    cat => "01self/04b",
+    desc => "How the PAUSE admins run PAUSE",
+    has_title => 1,
   },
   who_pumpkin => {
     x_mojo_to => "public#pumpkin",
