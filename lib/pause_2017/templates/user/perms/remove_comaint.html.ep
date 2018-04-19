@@ -40,7 +40,8 @@ remove and press <i>Remove</i></p>
     <tr>
       <th></th>
       <th class="sort asc" data-sort="package">Package</th>
-      <th class="sort" data-sort="userid">userid</th>
+      <th class="sort" data-sort="dist">Indexed Distribution</th>
+      <th class="sort" data-sort="userid">UserID</th>
     </tr>
   </thead>
   <tbody class="list">
@@ -49,6 +50,7 @@ remove and press <i>Remove</i></p>
     <tr>
       <td class="checkbox"><%= check_box "pause99_share_perms_remocos_tuples" => $_ %></td>
       <td class="package"><%= $package %></td>
+      <td class="dist"><%= $pause->{dist_for_package}{$package} // '' %></td>
       <td class="userid"><%= $userid %></td>
     </tr>
   % }
@@ -63,7 +65,7 @@ remove and press <i>Remove</i></p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('packages', {
-  valueNames: ['pacakge', 'userid'],
+  valueNames: ['pacakge', 'dist', 'userid'],
   page: 300,
   pagination: [
     {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},

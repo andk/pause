@@ -186,7 +186,11 @@ sub share {
   $c->$method;
 }
 
-sub move_primary { shift->_share_movepr(@_) }
+sub move_primary {
+  my $c = shift;
+  $c->_share_movepr(@_);
+  $c->_prepare_dist_package_mapping;
+}
 
 sub _share_movepr {
   my $c = shift;
@@ -258,7 +262,11 @@ sub _share_movepr {
   }
 }
 
-sub remove_primary { shift->_share_remopr(@_) }
+sub remove_primary {
+  my $c = shift;
+  $c->_share_remopr(@_);
+  $c->_prepare_dist_package_mapping;
+}
 
 sub _share_remopr {
   my $c = shift;
@@ -324,7 +332,11 @@ sub _share_remopr {
   }
 }
 
-sub make_comaint { shift->_share_makeco(@_) }
+sub make_comaint {
+  my $c = shift;
+  $c->_share_makeco(@_);
+  $c->_prepare_dist_package_mapping;
+}
 
 sub _share_makeco {
   my $c = shift;
@@ -409,7 +421,12 @@ sub _share_makeco {
   }
 }
 
-sub remove_comaint { shift->_share_remocos(@_) }
+sub remove_comaint {
+  my $c = shift;
+  my $pause = $c->stash(".pause");
+  $c->_share_remocos(@_);
+  $c->_prepare_dist_package_mapping([map {/^(\S+)/; $1} @{$pause->{mods}}]);
+}
 
 sub _share_remocos {
   my $c = shift;
@@ -474,7 +491,11 @@ sub _share_remocos {
   $pause->{mods} = \@all;
 }
 
-sub giveup_comaint { shift->_share_remome(@_) }
+sub giveup_comaint {
+  my $c = shift;
+  $c->_share_remome(@_);
+  $c->_prepare_dist_package_mapping;
+}
 
 sub _share_remome {
   my $c = shift;
@@ -611,6 +632,25 @@ sub all_comaints {
     warn "p[$p]i[$i]";
   }
   return $result;
+}
+
+sub _prepare_dist_package_mapping {
+  my ($c, $packages) = @_;
+  my $pause = $c->stash(".pause");
+  my $mgr = $c->app->pause;
+  my $db = $mgr->connect;
+  $packages //= [@{$pause->{mods} // []}];
+
+  my %map;
+  while(my @part = splice @$packages, 0, 500) {
+    my $placeholders = substr "?," x @part, 0, -1;
+    my $sth = $db->prepare("SELECT dist, package FROM packages WHERE package IN ($placeholders)");
+    $sth->execute(@part);
+    while(my ($dist, $package) = $sth->fetchrow_array) {
+      $map{$package} = $dist;
+    }
+  }
+  $pause->{dist_for_package} = \%map;
 }
 
 1;
