@@ -34,11 +34,13 @@ Note: PAUSE has been developed in a time when it was more common than today that
 <%= text_field "pause99_request_id_userid", size => 32 %>
 </div>
 
+<div class="alternate<%= $alt++ % 2 + 1 %>">
 <p><b>A short description of why you would like a
 PAUSE ID:</b></p><p><small>required; include what you are planning to contribute; do not use HTML</small></p><p>
 
 <%= text_area "pause99_request_id_rationale", rows=>8, cols=>60 =%>
 <!-- zdjela meda -->
+</div>
 
 <div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"></div>
 </p>
