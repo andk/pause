@@ -315,7 +315,7 @@ sub examine_dist {
     $self->verbose(1,"Dist '$dist' is a single-.pm-file upload\n");
     $suffix = "N/A";
     $skip   = 1;
-    $self->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
+    $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
     my $unzipbin = $self->{UNZIPBIN};
@@ -410,7 +410,7 @@ sub mail_summary {
 
   my $status_over_all;
 
-  if (my $err = $self->{SKIP_REPORT}) {
+  if (my $err = $self->{REASON_TO_SKIP}) {
     push @m, $tf->format( PAUSE::mldistwatch::Constants::heading($err) ),
              qq{\n\n};
     $status_over_all = "Failed";
@@ -573,8 +573,8 @@ sub mail_summary {
       $self->verbose(1,
         sprintf "st[%s]\n", (Data::Dumper::Dumper($inxst) =~ s/\v+\z//r)
       );
-      if ($pmfiles > 0 || $self->{SKIP_REPORT}) {
-        if ($self->{SKIP_REPORT} == PAUSE::mldistwatch::Constants::E_DB_XACTFAIL) {
+      if ($pmfiles > 0 || $self->{REASON_TO_SKIP}) {
+        if ($self->{REASON_TO_SKIP} == PAUSE::mldistwatch::Constants::E_DB_XACTFAIL) {
           push @m,  qq{This distribution was not indexed due to database\n}
                  .  qq{errors.  You can request another indexing attempt be\n}
                  .  qq{made by logging into https://pause.perl.org/\n\n};

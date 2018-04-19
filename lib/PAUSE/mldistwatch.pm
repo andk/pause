@@ -453,7 +453,6 @@ sub check_for_new {
         $self->verbose(1,"Examining $dist ...\n");
         $0 = "mldistwatch: $dist";
 
-
         # >99% of all distros are already registered by the
         # newfilehook but the few coming though mirror(1) are not.
         # Registering *everything* that comes here should catch them
@@ -476,7 +475,7 @@ sub check_for_new {
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
 
-            if ($dio->{SKIP_REPORT}) {
+            if ($dio->{REASON_TO_SKIP}) {
               $dio->mail_summary;
             }
             next BIGLOOP;
@@ -492,7 +491,7 @@ sub check_for_new {
 
         if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
             # META.json / META.yml declares it's not stable; do not index!
-            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
+            $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
             $dio->mail_summary;
             next BIGLOOP;
         }
@@ -507,7 +506,7 @@ sub check_for_new {
           if ($attempt == 3) {
             $self->verbose(2, "tried $attempt times to do db work, but all failed");
             $dio->alert("database errors while indexing $dio->{DIST}");
-            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
+            $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
           }
         }
 
@@ -840,7 +839,6 @@ sub rewrite01 {
             $pkg{chapter} = "99_Not_In_Modulelist";
             $self->verbose(1,"Found no chapter for $pkg{rootpack}\n");
         }
-
 
         # XXX need to split progress tracking from logging -- dagolden, 2011-08-13
         $self->verbose(2,".") if !($i % 16);
@@ -1399,7 +1397,6 @@ sub mlroot {
     $mlroot =~ s|/+$||; # I found the trailing slash annoying
     $self->{MLROOT} = $mlroot;
 }
-
 
 1;
 __END__
