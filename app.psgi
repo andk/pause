@@ -9,7 +9,7 @@ use Plack::Request;
 use Plack::App::Directory::Apaxy;
 use Log::Dispatch::Config;
 
-Log::Dispatch::Config->configure("etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
+Log::Dispatch::Config->configure("$FindBin::Bin/etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
 
 # preload stuff
 use pause_1999::config;
@@ -60,9 +60,7 @@ builder {
 
     # Static files should not be served by application server actually.
     # This is only for testing/developing.
-    enable 'Static',
-        path => qr{(?:(?<!index)\.(js|css|gif|jpg|png|pod|html)$|^/\.well-known/)},
-        root => "$FindBin::Bin/htdocs";
+    enable 'Static', path => qr{(?<!index)\.(js|css|gif|jpg|png|pod|html)$}, root => "$FindBin::Bin/htdocs";
 
     mount '/pub/PAUSE' => builder {
         enable '+PAUSE::Middleware::Auth::Basic';

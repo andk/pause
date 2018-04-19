@@ -2,4 +2,4 @@ dispatchers = screen
 
 screen.class = Log::Dispatch::Screen
 screen.min_level = debug
-screen.format = [%d] [%p] %m at %F line %L%n
+screen.format = [%d{%Y-%m-%d %H:%M:%S}] [%p] %m%n
