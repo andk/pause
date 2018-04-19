@@ -316,6 +316,64 @@ sub _newcountokay {
   return $count >= $MIN;
 }
 
+sub _do_the_database_work {
+  my ($self, $dio) = @_;
+
+  my $ok = eval {
+    # This is here for test purposes.  It lets us force the db work to die,
+    # which should trigger a retry. -- rjbs, 2018-04-19
+    if ($PAUSE::Config->{PRE_DB_WORK_CALLBACK}) {
+      $PAUSE::Config->{PRE_DB_WORK_CALLBACK}->($dio);
+    }
+
+    my $dbh = $self->connect;
+    unless ($dbh->begin_work) {
+      $self->verbose("Couldn't begin transaction!");
+      return 1;
+    }
+
+    # Either we're doing Perl 6...
+    if ($dio->perl_major_version == 6) {
+      if ($dio->p6_dist_meta_ok) {
+        if (my $err = $dio->p6_index_dist) {
+          $dio->alert($err);
+          $dbh->rollback;
+        } else {
+          $dbh->commit;
+        }
+      }
+      else {
+        $dio->alert("Meta information of Perl 6 dist $dio->{DIST} is invalid");
+        $dbh->rollback;
+      }
+
+      return 1;
+    }
+
+    # ...or else Perl 5...
+    $dio->examine_pms;      # will switch user
+
+    my $main_pkg = $dio->_package_governing_permission;
+
+    if ($self->_userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
+      $dbh->commit;
+    } else {
+      $dio->alert(
+        "Uploading user has no permissions on package $main_pkg"
+      );
+      $dio->{NO_DISTNAME_PERMISSION} = 1;
+      $dbh->rollback;
+    }
+
+    return 1;
+  };
+
+  # Remember, $ok here only means "did the db work die," not "did we
+  # successfully index stuff." -- rjbs, 2018-04-19
+  $self->verbose(2, "Error with database work: $@") unless $ok;
+  return $ok;
+}
+
 sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
@@ -438,41 +496,12 @@ sub check_for_new {
         $dio->check_multiple_root;
         $dio->check_world_writable;
 
-        # START XACT
-        {
-          my $dbh = $self->connect;
-          unless ($dbh->begin_work) {
-            $self->verbose("Couldn't begin transaction!");
+        for my $attempt (1 .. 3) {
+          my $db_ok = $self->_do_the_database_work($dio);
+          last if $db_ok;
+          if ($attempt == 3) {
+            $self->verbose(2, "tried $attempt times to do db work, but all failed");
             next BIGLOOP;
-          }
-
-          if ($dio->perl_major_version == 6) {
-            if ($dio->p6_dist_meta_ok) {
-              if (my $err = $dio->p6_index_dist) {
-                $dio->alert($err);
-                $dbh->rollback;
-              } else {
-                $dbh->commit;
-              }
-            }
-            else {
-              $dio->alert("Meta information of Perl 6 dist $dist is invalid");
-              $dbh->rollback;
-            }
-          } else {
-            $dio->examine_pms;      # will switch user
-
-            my $main_pkg = $dio->_package_governing_permission;
-
-            if ($self->_userid_has_permissions_on_package($userid, $main_pkg)) {
-              $dbh->commit;
-            } else {
-              $dio->alert(
-                "Uploading user has no permissions on package $main_pkg"
-              );
-              $dio->{NO_DISTNAME_PERMISSION} = 1;
-              $dbh->rollback;
-            }
           }
         }
 
