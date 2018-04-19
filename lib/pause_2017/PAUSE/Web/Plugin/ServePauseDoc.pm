@@ -20,6 +20,10 @@ sub _serve_pause_doc {
     my $file = $home->rel_file("$subdir/$name");
     next unless -f $file;
     $html = decode_utf8($file->slurp);
+    if ($name =~ /\.md$/) {
+      require Text::Markdown::Hoedown;
+      $html = Text::Markdown::Hoedown::markdown($html);
+    }
     last;
   }
 
