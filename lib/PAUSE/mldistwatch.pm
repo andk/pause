@@ -362,6 +362,7 @@ sub check_for_new {
                                   );
 
         if ($dio->ignoredist){
+            $self->verbose(2, "skipping $dist: ignoredist");
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
             next BIGLOOP;
@@ -371,12 +372,14 @@ sub check_for_new {
             unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
                 delete $self->{ALLlasttime}{$dist};
                 delete $self->{ALLfound}{$dist};
+                $self->verbose(2, "skipping $dist: mtime not ok");
                 next BIGLOOP;
             }
         } else {
             $dio->delete_goner;
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
+            $self->verbose(2, "skipping $dist: it's a goner");
             next BIGLOOP;
         }
         unless ($dio->lock) {
