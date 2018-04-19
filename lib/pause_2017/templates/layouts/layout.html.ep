@@ -12,16 +12,7 @@
 <title><%= $title %><%= $action %></title>
 <link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg">
 <link rel="stylesheet" type="text/css" href="/pause/min.css">
-<link rel="stylesheet" type="text/css" href="/pause/pause.css">
-
-% if ($PAUSE::Config->{TESTHOST}) { #-------------------------------
-
-<style type="text/css">
-h2,h4,b,th,td { color: #486f8d; }
-</style>
-
-% } #---------------------------------------------------------------
-
+<link rel="stylesheet" type="text/css" href="/pause/pause_2017.css">
 </head>
 <body>
 
