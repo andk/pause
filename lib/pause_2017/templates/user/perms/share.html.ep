@@ -155,5 +155,5 @@
     </tbody>
   </table>
 % } else {
-%= include "user/perms/_$subaction";
+%= include "user/perms/_share_$subaction";
 % }
