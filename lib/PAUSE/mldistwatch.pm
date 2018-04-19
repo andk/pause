@@ -347,7 +347,7 @@ sub check_for_new {
         # Examine all files, even CHECKSUMS and READMEs
         #
         $i++;
-        $self->verbose(2,". $dist ..") unless $i%256;
+        $self->verbose(2,". $dist ..") if $i%256 == 0;
 
         my $dio = PAUSE::dist->new(
                                    MAIN   => $self,
