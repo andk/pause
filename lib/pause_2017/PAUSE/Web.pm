@@ -20,6 +20,8 @@ sub startup {
     level => "debug",
   ));
 
+  $app->hook(around_dispatch => \&_log);
+
   # Set random secrets to keep mojo session secure
   $app->secrets([sha1_hex($$.time)]);
 
@@ -75,6 +77,26 @@ sub startup {
       }
     }
   }
+}
+
+sub _log {
+  my ($next, $c) = @_;
+  local $SIG{__WARN__} = sub {
+    my $message = shift;
+    Log::Dispatch::Config->instance->log(
+      level => 'warn',
+      message => $message,
+    );
+  };
+  local $SIG{__DIE__} = sub {
+    my $message = shift;
+    Log::Dispatch::Config->instance->log(
+      level => 'error',
+      message => "$message",
+    );
+    Carp::croak $message;
+  };
+  $c->helpers->reply->exception($@) unless eval { $next->(); 1 };
 }
 
 1;
