@@ -12,6 +12,10 @@ use POSIX ();
 use URI::Escape;
 use Text::Format;
 use HTTP::Status qw(:constants);
+use HTTP::Tiny 0.059;
+use IO::Socket::SSL 1.56;
+use Net::SSLeay 1.49;
+use JSON::XS;
 eval {require Time::Duration};
 our $HAVE_TIME_DURATION = !$@;
 
@@ -2856,6 +2860,7 @@ sub request_id {
   my $homepage  = $req->param( 'pause99_request_id_homepage') || "";
   my $userid    = $req->param( 'pause99_request_id_userid') || "";
   my $rationale = $req->param("pause99_request_id_rationale") || "";
+  my $token     = $req->param("g-recaptcha-response") || "";
   my $urat = $mgr->any2utf8($rationale);
   if ($urat ne $rationale) {
     $req->parameters->set("pause99_request_id_rationale", $urat);
@@ -2924,6 +2929,9 @@ sub request_id {
       $sth->finish;
     } else {
       push @errors, "You must supply a desired user-ID\n";
+    }
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} && ! $token ) {
+      push @errors, "You must complete the recaptcha to proceed\n";
     }
 
     if( @errors ) {
@@ -3003,11 +3011,33 @@ sub request_id {
     push @m, qq{</p>};
     # push @m, "</table>\n";
 
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
+        if ( $PAUSE::Config->{RECAPTCHA_SITE_KEY} ) {
+            push @m, qq{<script src="https://www.google.com/recaptcha/api.js" async defer></script>};
+            push @m, qq{<div class="g-recaptcha" data-sitekey="$PAUSE::Config->{RECAPTCHA_SITE_KEY}"></div><br/>};
+        }
+        else {
+            warn "request_id: RECAPTCHA_SITE_KEY not available\n";
+        }
+    }
+
     push @m, qq{<input type="submit" name="SUBMIT_pause99_request_id_sub"
   	  value="Request Account" />};
 
   }
   if ($regOK) {
+
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
+        my ($valid, $err) = _verify_recaptcha($token);
+        if ( $valid ) {
+            # XXX go insert directly and return HTML to display
+        }
+        elsif ( defined $valid && ! $valid ) {
+            die "recaptcha failed validation: $err\n";
+        }
+        # else recapture couldn't complete so continue with normal
+        # ID request moderation
+    }
 
     my @to = $mgr->{MailtoAdmins};
     push @to, $email;
@@ -7324,6 +7354,36 @@ packages have their recorded version set to 'undef'.
   push @m, "</pre>";
   push @m, $submitbutton;
   @m;
+}
+
+# return values are $ok, $err; $ok undef means unknown validation;
+# $ok defined true/false indicates whether verification succeeded.  If
+# completed but failed, $err will have error message(s).
+sub _verify_recaptcha {
+    my ($token) = @_;
+    if ( ! $PAUSE::Config->{RECAPTCHA_SECRET_KEY} ) {
+        warn "_verify_recaptcha: RECAPTCHA_SECRET_KEY not available\n";
+        return;
+    }
+
+    my $ht = HTTP::Tiny->new;
+    my $ok = undef;
+    my $err = "";
+    eval {
+        my $res = $ht->post_form(
+            "https://www.google.com/recaptcha/api/siteverify",
+            { secret => $PAUSE::Config->{RECAPTCHA_SECRET_KEY}, response => $token }
+        );
+        if ( $res->{success} ) {
+            my $data = decode_json( $res->{content} );
+            $ok = $data->{success};
+            if ( ref $err eq 'ARRAY' ) {
+                $err = join(", ", @$err)
+            }
+        }
+    };
+
+    return $ok, $err;
 }
 
 1;
