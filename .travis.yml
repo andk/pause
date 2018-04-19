@@ -13,3 +13,4 @@ before_install:
   ## Set a git identity
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis PAUSE"
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
