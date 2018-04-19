@@ -374,6 +374,29 @@ sub _do_the_database_work {
   return $ok;
 }
 
+sub reason_to_skip_dist {
+    my ($self, $dio) = @_;
+
+    my $dist = $dio->{DIST};
+
+    return "ignoredist" if $dio->ignoredist;
+
+    unless (exists $self->{ALLfound}{$dist}) {
+        $dio->delete_goner;
+        return "it's a goner";
+    }
+
+    unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
+        return "mtime not okay";
+    }
+
+    unless ($dio->lock) {
+        return "could not obtain a lock";
+    }
+
+    return;
+}
+
 sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
@@ -399,12 +422,12 @@ sub check_for_new {
     die "Panic: unusual small number of files involved ($all)"
         if !$self->{PICK} && ! $self->_newcountokay($all);
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
-  BIGLOOP: for (my $i=0;scalar @all;$self->empty_dir($testdir)) {
-        my $dist = shift @all;
+  BIGLOOP: for my $i (0 .. $#all) {
+        my $dist = $all[$i];
+
         #
         # Examine all files, even CHECKSUMS and READMEs
         #
-        $i++;
         $self->verbose(2,". $dist ..") if $i%256 == 0;
 
         my $dio = PAUSE::dist->new(
@@ -416,39 +439,20 @@ sub check_for_new {
                                    TARBIN => $self->{TARBIN},
                                    UNZIPBIN  => $self->{UNZIPBIN},
                                    PICK   => $self->{PICK},
+                                   USERID => PAUSE::dir2user($dist),
                                    'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
                                   );
 
-        if ($dio->ignoredist){
-            $self->verbose(2, "skipping $dist: ignoredist");
+        if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
+            $self->verbose(2, "skipping $dist: $skip_reason");
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
             next BIGLOOP;
         }
 
-        if (exists $self->{ALLfound}{$dist}) {
-            unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
-                delete $self->{ALLlasttime}{$dist};
-                delete $self->{ALLfound}{$dist};
-                $self->verbose(2, "skipping $dist: mtime not ok");
-                next BIGLOOP;
-            }
-        } else {
-            $dio->delete_goner;
-            delete $self->{ALLlasttime}{$dist};
-            delete $self->{ALLfound}{$dist};
-            $self->verbose(2, "skipping $dist: it's a goner");
-            next BIGLOOP;
-        }
-        unless ($dio->lock) {
-            $self->verbose(1,"Could not obtain a lock on $dist\n");
-            next BIGLOOP;
-        }
         $self->verbose(1,"Examining $dist ...\n");
         $0 = "mldistwatch: $dist";
 
-        my $userid = PAUSE::dir2user($dist);
-        $dio->{USERID} = $userid;
 
         # >99% of all distros are already registered by the
         # newfilehook but the few coming though mirror(1) are not.
@@ -467,7 +471,8 @@ sub check_for_new {
         }
 
         $dio->examine_dist; # checks for perl, developer, version, etc. and untars
-        if ($dio->skip){
+
+        if ($dio->skip) {
             delete $self->{ALLlasttime}{$dist};
             delete $self->{ALLfound}{$dist};
 
@@ -511,7 +516,10 @@ sub check_for_new {
         $dio->set_indexed;
 
         $alert .= $dio->alert;  # now $dio can go out of scope
+    } continue {
+        $self->empty_dir($testdir);
     }
+
     untie @all;
     undef $fh;
     if ($alert) {
