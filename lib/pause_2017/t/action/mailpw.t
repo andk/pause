@@ -47,7 +47,7 @@ subtest 'got an email instead of a userid' => sub {
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
         $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is('h1', 'Error')
+          ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/Please supply a userid/s);
     }
 };
@@ -63,7 +63,7 @@ subtest 'invalid userid' => sub {
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
         $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is('h1', 'Error')
+          ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/A userid of INV#LID is not allowed/s);
     }
 };
@@ -79,7 +79,7 @@ subtest 'cannot find a userid' => sub {
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
         $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is('h1', 'Error')
+          ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/Cannot find a userid.+NOTFOUND/s);
         # note $t->content;
     }
@@ -114,7 +114,7 @@ subtest 'requested recently' => sub {
         $t->$method("$path?ACTION=mailpw", \%form)
           ->text_like("p.form_response", qr/A token to change the password/);
         $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is('h1', 'Error')
+          ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/A token for TESTUSER that allows/s);
         # note $t->content;
     }
@@ -163,7 +163,7 @@ subtest 'user without an entry in usertable: without email' => sub {
         $t->authen_db->delete('usertable', {user => 'OTHERUSER'});
         ok !@{ $t->authen_db->select('usertable', ['user'], {user => 'OTHERUSER'}) // [] };
         $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is('h1', 'Error')
+          ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/A userid of OTHERUSER\s+is not known/s);
 
         # new usertable entry is not created

@@ -17,18 +17,78 @@ subtest 'get' => sub {
         my ($method, $path) = @$test;
         note "$method for $path";
         my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=change_passwd");
+        $t->$method("$path?ACTION=change_passwd")
+          ->text_is("h2.firstheader", "Change Password");
         # note $t->content;
     }
 };
 
 subtest 'post: basic' => sub {
+    Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for_post('user')) {
         my ($method, $path) = @$test;
         note "$method for $path";
         my $t = Test::PAUSE::Web->new;
         my %form = %$default;
-        $t->$method("$path?ACTION=change_passwd", \%form);
+        $t->$method("$path?ACTION=change_passwd", \%form)
+          ->text_is("h2.firstheader", "Change Password")
+          ->text_like("p.password_stored", qr/New password stored/);
+        is $t->deliveries => 1, "one delivery for admin";
+        # note $t->content;
+    }
+};
+
+subtest 'post: passwords mismatch' => sub {
+    Test::PAUSE::Web->setup;
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        my %form = (
+            %$default,
+            pause99_change_passwd_pw2 => "wrong_pass",
+        );
+        $t->$method("$path?ACTION=change_passwd", \%form)
+          ->text_is("h2", "Error")
+          ->text_like("p.error_message", qr/The two passwords didn't match./);
+        ok !$t->deliveries, "no delivery for admin";
+        # note $t->content;
+    }
+};
+
+subtest 'post: only one password' => sub {
+    Test::PAUSE::Web->setup;
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        my %form = (
+            %$default,
+            pause99_change_passwd_pw2 => undef,
+        );
+        $t->$method("$path?ACTION=change_passwd", \%form)
+          ->text_is("h2", "Error")
+          ->text_like("p.error_message", qr/You need to fill in the same password in both fields./);
+        ok !$t->deliveries, "no delivery for admin";
+        # note $t->content;
+    }
+};
+
+subtest 'post: no password' => sub {
+    Test::PAUSE::Web->setup;
+    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+        my %form = (
+            %$default,
+            pause99_change_passwd_pw1 => undef,
+            pause99_change_passwd_pw2 => undef,
+        );
+        $t->$method("$path?ACTION=change_passwd", \%form)
+          ->text_is("h2", "Error")
+          ->text_like("p.error_message", qr/Please fill in the form with passwords./);
+        ok !$t->deliveries, "no delivery for admin";
         # note $t->content;
     }
 };

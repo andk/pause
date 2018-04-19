@@ -256,7 +256,7 @@ ttp://spam.info
 SPAM
         );
         $t->$method("$path?ACTION=request_id", \%form)
-          ->text_is("h1", "Error")
+          ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/rationale looks like spam/);
         ok !$t->deliveries, "no deliveries";
         # note $t->content;
@@ -274,7 +274,7 @@ subtest 'post: interesting .cn homepage' => sub {
             pause99_request_id_rationale => 'interesting site',
         );
         $t->$method("$path?ACTION=request_id", \%form)
-          ->text_is("h1", "Error")
+          ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/rationale looks like spam/);
         ok !$t->deliveries, "no deliveries";
         # note $t->content;
