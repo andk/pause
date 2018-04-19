@@ -9,16 +9,16 @@
 %     push @offer_groups, $group if exists $user_groups->{$group} || exists $user_groups->{admin};
 %   }
 % }
-<table width="155" cellspacing="1" cellpadding="0">
+<nav>
+<div class="menu">
 % unless (%$user) {
 %   my $scheme = $PAUSE::Config->{TESTHOST_SCHEMA} ? $PAUSE::Config->{TESTHOST_SCHEMA} : "https";
-<tr><td class="menuitem"><a class="menuitem" href="<%= url_for('/authenquery')->scheme($scheme) %>">Login</a>
-</td><td class="menupointer"></td></tr>
+<p class="menuitem"><a class="menuitem" href="<%= url_for('/authenquery')->scheme($scheme) %>">Login</a></p>
 % }
 % for my $group (@offer_groups) {
 %   last if $group eq "user" and !$user->{userid};
 %   last if $group eq "admin" and !exists $user_groups->{admin};
-<tr><td class="menuheading" colspan="2"><b><%= app->pause->config->group_label($group) %> menu</b></td></tr>
+<p class="menuheading"><b><%= app->pause->config->group_label($group) %> menu</b></p>
 %   my $Lscat = "";
 %   for my $action (app->pause->config->sort_allowed_group_actions($group, $pause->{allow_action})) {
 %     unless ($action->{priv}) {
@@ -32,12 +32,13 @@
 %     if (substr($cat, 0, 1) =~ tr/A-Z//) {
 %       my($scat) = $cat =~ m|.+?/\d\d(.+?)/|;
 %       if ($scat ne $Lscat) {
-<tr><td class="menuheading"><%= $scat %></td></tr>
+<p class="menuheading"><%= $scat %></p>
 %         $Lscat = $scat;
 %       }
 %     }
 %     my $menu_class = ($action->{name} eq $pause->{Action}) ? "activemenu" : "menuitem";
-<tr><td class="<%= $menu_class %>"><a class="<%= $menu_class %>" href="<%= my_url->query([ACTION => $action->{name}]) %>"><% if ($action->{name} eq $pause->{Action}) { %>&gt; <% } %><%= $verbose %></a></td><td class="menupointer"></td></tr>
+<p class="<%= $menu_class %>"><a class="<%= $menu_class %>" href="<%= my_url->query([ACTION => $action->{name}]) %>"><% if ($action->{name} eq $pause->{Action}) { %>&gt; <% } %><%= $verbose %></a></p>
 %   }
 % }
-</table>
+</div>
+</nav>
