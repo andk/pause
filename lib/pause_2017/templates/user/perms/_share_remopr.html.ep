@@ -3,14 +3,14 @@
 % if (param("SUBMIT_pause99_share_perms_remopr")) {
 %   if ($pause->{error}) {
 <p><%= $pause->{error} %></p>
-%   } elsif (@{$pause->{results} || []}) {
+%   } elsif (!@{$pause->{results} || []}) {
 <p>You need to select one or more packages. Nothing done.</p>
 %   } else {
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
 <p>Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } else {
-<p>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod %>.</p>
+<p>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</p>
 %       }
 %     }
 %   }

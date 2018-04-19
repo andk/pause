@@ -9,6 +9,7 @@
 <p>Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } else {
 <p>Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
+%       }
 %     }
 %   } else {
 <p>You need to select one or more packages. Nothing done.</p>
