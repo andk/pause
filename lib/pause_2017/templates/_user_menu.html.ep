@@ -4,7 +4,7 @@
 % my @offer_groups = app->pause->config->public_groups;
 % $pause->{Action} ||= "menu";
 % if (%$user) {
-%   push @offer_groups, "user";
+%   unshift @offer_groups, "user";
 %   for my $group (app->pause->config->extra_groups) {
 %     push @offer_groups, $group if exists $user_groups->{$group} || exists $user_groups->{admin};
 %   }
