@@ -172,7 +172,8 @@ sub handler {
   warn "DEBUG: attr.data_source[$attr->{data_source}]";
   unless ($dbh = DBI->connect($attr->{data_source},
 			      $attr->{username},
-			      $attr->{password})) {
+			      $attr->{password},
+			      {mysql_auto_reconnect => 1})) {
     $req->logger->({level => 'error', message => " db connect error with $attr->{data_source} ".$req->path });
     my $redir = $req->path;
     $redir =~ s/authen//;

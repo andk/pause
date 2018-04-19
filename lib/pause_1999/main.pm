@@ -262,7 +262,7 @@ sub connect {
   eval {$self->{DbHandle} ||= DBI->connect($self->{ModDsn},
 				     $self->{ModDsnUser},
 				     $self->{ModDsnPasswd},
-				    { RaiseError => 1 })};
+				    { RaiseError => 1, mysql_auto_reconnect => 1 })};
   return $self->{DbHandle} if $self->{DbHandle};
   $self->database_alert;
 }
@@ -295,7 +295,7 @@ sub authen_connect {
   eval {$self->{DbHandle4Authen} ||= DBI->connect($self->{AuthenDsn},
 				     $self->{AuthenDsnUser},
 				     $self->{AuthenDsnPasswd},
-				    { RaiseError => 1 })};
+				    { RaiseError => 1, mysql_auto_reconnect => 1 })};
   return $self->{DbHandle4Authen} if $self->{DbHandle4Authen};
   $self->database_alert;
 }
