@@ -441,12 +441,22 @@ our @AllowAdminTakeover = qw(
   reindex
   reset_version
   share_perms
+  move_primary
+  remove_primary
+  make_comaint
+  remove_comaint
+  giveup_comaint
 );
 
 our @AllowMlreprTakeover = qw(
   edit_ml
   reset_version
   share_perms
+  move_primary
+  remove_primary
+  make_comaint
+  remove_comaint
+  giveup_comaint
 );
 
 sub allow_admin_takeover { @AllowAdminTakeover }
