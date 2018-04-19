@@ -40,7 +40,7 @@ sub as_string {
     if ($PAUSE::Config->{TESTHOST_SCHEMA} && $PAUSE::Config->{TESTHOST_SCHEMA}) {
         $schema = $PAUSE::Config->{TESTHOST_SCHEMA};
     }
-    push @m, qq{<a class="menuitem" href="$schema://$server/pause/authenquery">Login</a>};
+    push @m, qq{<a class="menuitem" href="$schema://$server/pause/authenquery">Log in</a>};
     push @m, qq{</td></tr>\n};
 
   }
