@@ -44,7 +44,6 @@ sub startup {
   $app->plugin("PAUSE::Web::Plugin::MyURL");
   $app->plugin("PAUSE::Web::Plugin::RenderYAML");
   $app->plugin("PAUSE::Web::Plugin::TextFormat");
-  $app->plugin("PAUSE::Web::Plugin::ValidateXHTML");
 
   # Check HTTP headers and set stash
   my $r = $app->routes->under("/")->to("root#check");
