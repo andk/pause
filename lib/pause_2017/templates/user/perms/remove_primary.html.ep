@@ -1,0 +1,77 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_share_perms_remopr")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li>Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></li>
+%       } else {
+<li>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p>You need to select one or more packages. Nothing done.</p>
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+
+<h3>Give up maintainership status</h3>
+<p>Please select one or more namespaces for which you
+want to give up primary maintainership status and press
+<i>Give Up Maintainership Status</i>. Note: you keep co-maintainer
+status after this move. If you want to get rid of that too,
+please visit <a href="<%= my_url->query(ACTION => "remove_comaint") %>">Give up
+co-maintainership status</a> next.</p>
+
+<p>Select one or more namespaces:</p>
+<div id="packages">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort" data-sort="package">Package</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{mods}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_share_perms_pr_m" => $_ %></td>
+      <td class="package"><%= $_ %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+
+<p><input type="submit" name="SUBMIT_pause99_share_perms_remopr"
+ value="Give Up Maintainership Status"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('packages', {
+  valueNames: ['package'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
+
+% } else {
+<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+% }
+

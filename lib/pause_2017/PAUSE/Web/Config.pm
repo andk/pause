@@ -201,6 +201,73 @@ our %Actions = (
       SUBMIT_pause99_share_perms_remome => {form_type => "submit_button"},
     },
   },
+  move_primary => {
+    x_mojo_to => "user-perms#move_primary",
+    verb => "Transfer Primary Permissions",
+    priv => "user",
+    cat => "User/04Permissions/03",
+    desc => "Transfer primary maintainership status to somebody else (you become co-maintainer).",
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_share_perms_pr_m => {form_type => "select_field"},
+      pause99_share_perms_movepr_a => {form_type => "text_field"},
+      SUBMIT_pause99_share_perms_movepr => {form_type => "submit_button"},
+    },
+  },
+  remove_primary => {
+    x_mojo_to => "user-perms#remove_primary",
+    verb => "Give up Primary Permissions",
+    priv => "user",
+    cat => "User/04Permissions/04",
+    desc => "Give up primary maintainership status (abandoning it without transfering it to someone else).",
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_share_perms_pr_m => {form_type => "select_field"},
+      SUBMIT_pause99_share_perms_remopr => {form_type => "select_field"},
+    },
+  },
+  make_comaint => {
+    x_mojo_to => "user-perms#make_comaint",
+    verb => "Add Comaintainers",
+    priv => "user",
+    cat => "User/04Permissions/05",
+    desc => "Make somebody else co-maintainer.",
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_share_perms_makeco_m => {form_type => "select_field"},
+      pause99_share_perms_makeco_a => {form_type => "text_field"},
+      SUBMIT_pause99_share_perms_makeco => {form_type => "submit_button"},
+    },
+  },
+  remove_comaint => {
+    x_mojo_to => "user-perms#remove_comaint",
+    verb => "Remove Comaintainers",
+    priv => "user",
+    cat => "User/04Permissions/06",
+    desc => "Remove a co-maintainer.",
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_share_perms_remocos_tuples => {form_type => "select_field"},
+      SUBMIT_pause99_share_perms_remocos => {form_type => "submit_button"},
+    },
+  },
+  giveup_comaint => {
+    x_mojo_to => "user-perms#giveup_comaint",
+    verb => "Give up co-maintainership status",
+    priv => "user",
+    cat => "User/04Permissions/07",
+    desc => "Give up co-maintainership status.",
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_share_perms_remome_m => {form_type => "select_field"},
+      SUBMIT_pause99_share_perms_remome => {form_type => "submit_button"},
+    },
+  },
 
   # User/Util
 

@@ -186,6 +186,8 @@ sub share {
   $c->$method;
 }
 
+sub move_primary { shift->_share_movepr(@_) }
+
 sub _share_movepr {
   my $c = shift;
   my $pause = $c->stash(".pause");
@@ -256,6 +258,8 @@ sub _share_movepr {
   }
 }
 
+sub remove_primary { shift->_share_remopr(@_) }
+
 sub _share_remopr {
   my $c = shift;
   my $pause = $c->stash(".pause");
@@ -319,6 +323,8 @@ sub _share_remopr {
     $req->param("pause99_share_perms_pr_m" => $all_mods[0]);
   }
 }
+
+sub make_comaint { shift->_share_makeco(@_) }
 
 sub _share_makeco {
   my $c = shift;
@@ -403,6 +409,8 @@ sub _share_makeco {
   }
 }
 
+sub remove_comaint { shift->_share_remocos(@_) }
+
 sub _share_remocos {
   my $c = shift;
   my $pause = $c->stash(".pause");
@@ -465,6 +473,8 @@ sub _share_remocos {
   my @all = sort keys %$all_comaints;
   $pause->{mods} = \@all;
 }
+
+sub giveup_comaint { shift->_share_remome(@_) }
 
 sub _share_remome {
   my $c = shift;
