@@ -42,6 +42,7 @@ into the text field and press <i>Make Co-Maintainer</i></p>
     <tr>
       <th></th>
       <th class="sort asc" data-sort="package">Package</th>
+      <th class="sort" data-sort="dist">Indexed Distribution</th>
     </tr>
   </thead>
   <tbody class="list">
@@ -49,6 +50,7 @@ into the text field and press <i>Make Co-Maintainer</i></p>
     <tr>
       <td class="checkbox"><%= check_box "pause99_share_perms_makeco_m" => $_ %></td>
       <td class="package"><%= $_ %></td>
+      <td class="dist"><%= $pause->{dist_for_package}{$_} %></td>
     </tr>
   % }
   </tbody>
@@ -65,7 +67,7 @@ into the text field and press <i>Make Co-Maintainer</i></p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('packages', {
-  valueNames: ['package'],
+  valueNames: ['package', 'dist'],
   page: 300,
   pagination: [
     {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
