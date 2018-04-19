@@ -1,0 +1,73 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_share_perms_remome")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li>Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></li>
+%       } else {
+<li>Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p>You need to select one or more packages. Nothing done.</p>
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+<h3>Give up co-maintainer status</h3>
+<p>Please select one or
+more namespaces for which you want to be removed from
+the co-maintainer table and press <i>Give Up</i></p>
+
+<p>Select one or more namespaces:</p>
+
+<div id="packages">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="package">Package</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{mods}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_share_perms_remome_m" => $_ %></td>
+      <td class="package"><%= $_ %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+<p>
+<input type="submit" name="SUBMIT_pause99_share_perms_remome"
+ value="Give Up"></p>
+<div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('packages', {
+  valueNames: ['package'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
+
+% } else {
+<p>Sorry, <%= $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
+% }
