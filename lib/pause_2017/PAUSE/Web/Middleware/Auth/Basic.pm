@@ -15,18 +15,11 @@ sub call {
 
   local $SIG{__WARN__} = sub {
     my $message = shift;
+    chomp $message;
     Log::Dispatch::Config->instance->log(
       level => 'warn',
       message => $message,
     );
-  };
-  local $SIG{__DIE__} = sub {
-    my $message = shift;
-    Log::Dispatch::Config->instance->log(
-      level => 'error',
-      message => "$message",
-    );
-    Carp::croak $message;
   };
 
   my $res = $self->authenticate($env);
