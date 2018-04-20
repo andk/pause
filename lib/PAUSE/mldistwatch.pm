@@ -508,10 +508,7 @@ sub check_for_new {
         my $dio = PAUSE::dist->new(
                                    MAIN   => $self,
                                    DIST   => $dist,
-                                   DBH    => $dbh,
                                    TIME   => $time,
-                                   TARBIN => $self->{TARBIN},
-                                   UNZIPBIN  => $self->{UNZIPBIN},
                                    PICK   => $self->{PICK},
                                    USERID => PAUSE::dir2user($dist),
                                    'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},

@@ -141,7 +141,7 @@ sub untar {
   my $self = shift;
   my $dist = $self->{DIST};
   local *TARTEST;
-  my $tarbin = $self->{TARBIN};
+  my $tarbin = $self->{MAIN}{TARBIN};
   my $MLROOT = $self->mlroot;
   my $tar_opt = "tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
@@ -271,7 +271,7 @@ sub examine_dist {
     $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
-    my $unzipbin = $self->{UNZIPBIN};
+    my $unzipbin = $self->{MAIN}{UNZIPBIN};
     my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
     unless (system($system)==0) {
       $self->verbose(1,
@@ -1180,7 +1180,7 @@ sub p6_index_dist {
   ###
   # Index binaries. We need to scan the archives content for this.
   local *TARTEST;
-  my $tarbin = $self->{TARBIN};
+  my $tarbin = $self->{MAIN}{TARBIN};
   my $tar_opt = "tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
     $tar_opt = "tjf";
@@ -1218,10 +1218,7 @@ PAUSE::dist - Class representing one distribution
   my $dio = PAUSE::dist->new(
     MAIN   => $self,
     DIST   => $dist,
-    DBH    => $dbh,
     TIME   => $time,
-    TARBIN => $self->{TARBIN},
-    UNZIPBIN  => $self->{UNZIPBIN},
     PICK   => $self->{PICK},
     'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
   );
