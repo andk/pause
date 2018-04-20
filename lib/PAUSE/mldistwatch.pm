@@ -401,7 +401,7 @@ sub maybe_index_dist {
     my ($self, $dist) = @_;
 
     my $dio = PAUSE::dist->new(
-                               MAIN   => $self,
+                               HUB    => $self,
                                DIST   => $dist,
                               );
 

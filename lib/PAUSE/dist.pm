@@ -22,7 +22,7 @@ sub new {
   return $self;
 }
 
-sub hub { $_[0]{MAIN} }
+sub hub { $_[0]{HUB} }
 
 sub ignoredist {
   my $self = shift;
@@ -1213,7 +1213,7 @@ PAUSE::dist - Class representing one distribution
 =head1 SYNOPSIS
 
   my $dio = PAUSE::dist->new(
-    MAIN   => $self,
+    HUB    => $mldistwatch,
     DIST   => $dist,
   );
 

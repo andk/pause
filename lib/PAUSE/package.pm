@@ -62,7 +62,7 @@ sub parent {
 
 sub pmfile { $_[0]{FIO}      }
 sub dist   { $_[0]{FIO}{DIO} }
-sub hub    { $_[0]{FIO}{DIO}{MAIN} }
+sub hub    { $_[0]{FIO}{DIO}{HUB} }
 
 sub DESTROY {}
 
