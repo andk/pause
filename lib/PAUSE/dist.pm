@@ -395,7 +395,10 @@ sub mail_summary {
 
   # This can occur when, for example, the "distribution" is Foo.pm.gz — of
   # course then there is no README or META.*! -- rjbs, 2014-03-15
-  my $readme   = $self->{README} // "(none)";
+  # ...but we banned bare .pm files in 2013, so what's this really about?
+  # I think it's plain old "no README file included".
+  # -- rjbs, 2018-04-19
+  my $readme   = $self->{README}   // "(none)";
   my $metafile = $self->{METAFILE} // "(none)";
 
   push @m, qq[
