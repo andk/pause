@@ -62,7 +62,6 @@ builder {
     enable 'Static',
         path => qr{(?:(?<!index)\.(js|css|gif|jpg|png|pod|html)$|^/\.well-known/)},
         root => "$FindBin::Bin/htdocs";
-    enable 'Static', path => qr{(?<!index)\.(js|css|gif|jpg|png|pod|html)$}, root => "$FindBin::Bin/htdocs";
 
     mount '/pub/PAUSE' => builder {
         enable '+PAUSE::Middleware::Auth::Basic';
