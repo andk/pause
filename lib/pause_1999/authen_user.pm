@@ -113,18 +113,11 @@ sub handler {
 
   local $SIG{__WARN__} = sub {
     my $message = shift;
+    chomp $message;
     Log::Dispatch::Config->instance->log(
       level => 'warn',
       message => $message,
     );
-  };
-  local $SIG{__DIE__} = sub {
-    my $message = shift;
-    Log::Dispatch::Config->instance->log(
-      level => 'warn',
-      message => ref $message eq 'PAUSE::HeavyCGI::Exception' ? $message->{ERROR} : $message
-    );
-    Carp::croak $message;
   };
 
   my $cookie;
