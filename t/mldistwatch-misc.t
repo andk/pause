@@ -293,7 +293,7 @@ subtest "check overlong versions" => sub {
 
   my $etoolong = sub {
     like(
-      $_[0]{email}->get_body,
+      $_[0]{email}->object->body_str,
       qr/Version string exceeds maximum allowed length/,
       "email contains ELONGVERSION string",
     );

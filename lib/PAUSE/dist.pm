@@ -165,14 +165,17 @@ sub mtime_ok {
 
 # package PAUSE::dist;
 sub alert {
-  my $self = shift;
-  my $what = shift;
-  if (defined $what) {
-    $self->{ALERT} ||= "";
-    $self->{ALERT} .= " $what";
-  } else {
-    return $self->{ALERT};
-  }
+  my ($self, $what) = @_;
+
+  $self->{ALERT} //= [];
+  1 while chomp $what;
+  push @{ $self->{ALERT} }, $what;
+  return;
+}
+
+sub all_alerts {
+  my ($self) = @_;
+  return @{ $self->{ALERT} // [] };
 }
 
 # package PAUSE::dist;
@@ -190,7 +193,7 @@ sub untar {
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
       $self->verbose(1,"*** ALERT: Updir detected in $dist!\n\n");
-      $self->alert("ALERT: Updir detected in $dist!");
+      $self->alert("Updir detected!");
       $self->{COULD_NOT_UNTAR}++;
       return;
     }
@@ -201,7 +204,7 @@ sub untar {
   $self->{PERL_MAJOR_VERSION} = 5 unless defined $self->{PERL_MAJOR_VERSION};
   unless (close TARTEST) {
     $self->verbose(1,"Could not untar $dist!\n");
-    $self->alert("\nCould not untar $dist!\n");
+    $self->alert("Could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return;
   }
@@ -315,7 +318,7 @@ sub examine_dist {
     $self->verbose(1,"Dist '$dist' is a single-.pm-file upload\n");
     $suffix = "N/A";
     $skip   = 1;
-    $self->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
+    $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
     my $unzipbin = $self->{UNZIPBIN};
@@ -360,7 +363,7 @@ sub mlroot {
 sub mail_summary {
   my($self) = @_;
   my $distro = $self->{DIST};
-  my $author = PAUSE::dir2user($distro);
+  my $author = $self->{USERID};
   my @m;
 
   push @m,
@@ -392,7 +395,10 @@ sub mail_summary {
 
   # This can occur when, for example, the "distribution" is Foo.pm.gz — of
   # course then there is no README or META.*! -- rjbs, 2014-03-15
-  my $readme   = $self->{README} // "(none)";
+  # ...but we banned bare .pm files in 2013, so what's this really about?
+  # I think it's plain old "no README file included".
+  # -- rjbs, 2018-04-19
+  my $readme   = $self->{README}   // "(none)";
   my $metafile = $self->{METAFILE} // "(none)";
 
   push @m, qq[
@@ -410,7 +416,7 @@ sub mail_summary {
 
   my $status_over_all;
 
-  if (my $err = $self->{SKIP_REPORT}) {
+  if (my $err = $self->{REASON_TO_SKIP}) {
     push @m, $tf->format( PAUSE::mldistwatch::Constants::heading($err) ),
              qq{\n\n};
     $status_over_all = "Failed";
@@ -573,8 +579,8 @@ sub mail_summary {
       $self->verbose(1,
         sprintf "st[%s]\n", (Data::Dumper::Dumper($inxst) =~ s/\v+\z//r)
       );
-      if ($pmfiles > 0 || $self->{SKIP_REPORT}) {
-        if ($self->{SKIP_REPORT} == PAUSE::mldistwatch::Constants::E_DB_XACTFAIL) {
+      if ($pmfiles > 0 || $self->{REASON_TO_SKIP}) {
+        if ($self->{REASON_TO_SKIP} == PAUSE::mldistwatch::Constants::E_DB_XACTFAIL) {
           push @m,  qq{This distribution was not indexed due to database\n}
                  .  qq{errors.  You can request another indexing attempt be\n}
                  .  qq{made by logging into https://pause.perl.org/\n\n};
@@ -691,7 +697,7 @@ sub check_blib {
       }
       last DIRDOWN unless $success; # no directory to step down anymore
       if (++$endless > 10) {
-        $self->alert("ENDLESS LOOP detected in $self->{DIST}!");
+        $self->alert("ENDLESS LOOP detected!");
         last DIRDOWN;
       }
       next DIRDOWN;
@@ -857,9 +863,7 @@ sub _index_by_files {
       # package would be
       # better
     } elsif ($pmfile =~ m|/blib/|) {
-      $self->alert("Still a blib directory detected:
-        dist[$dist]pmfile[$pmfile]
-        ");
+      $self->alert("blib directory detected ($pmfile)");
       next;
     }
 
@@ -956,7 +960,7 @@ sub examine_pms {
   if ($indexing_method) {
     $self->$indexing_method($pmfiles, $provides);
   } else {
-    $self->alert("Does this work out elsewhere? Neither yaml nor pmfiles indexing in dist[$dist]???");
+    $self->alert("Couldn't determine an indexing method!");
   }
 }
 
@@ -1262,7 +1266,7 @@ sub p6_index_dist {
   }
   unless (close TARTEST) {
     $self->verbose(1,"Could not untar $dist!\n");
-    $self->alert("\nCould not untar $dist!\n");
+    $self->alert("Could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return "ERROR: Could not untar $dist!";
   }
@@ -1284,7 +1288,6 @@ PAUSE::dist - Class representing one distribution
     MAIN   => $self,
     DIST   => $dist,
     DBH    => $dbh,
-    ALERT  => "",
     TIME   => $time,
     TARBIN => $self->{TARBIN},
     UNZIPBIN  => $self->{UNZIPBIN},

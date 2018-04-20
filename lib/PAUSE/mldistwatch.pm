@@ -343,7 +343,7 @@ sub _do_the_database_work {
         }
       }
       else {
-        $dio->alert("Meta information of Perl 6 dist $dio->{DIST} is invalid");
+        $dio->alert("Meta information of Perl 6 dist is invalid");
         $dbh->rollback;
       }
 
@@ -358,9 +358,7 @@ sub _do_the_database_work {
     if ($self->_userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
       $dbh->commit;
     } else {
-      $dio->alert(
-        "Uploading user has no permissions on package $main_pkg"
-      );
+      $dio->alert("Uploading user has no permissions on package $main_pkg");
       $dio->{NO_DISTNAME_PERMISSION} = 1;
       $dbh->rollback;
     }
@@ -374,12 +372,115 @@ sub _do_the_database_work {
   return $ok;
 }
 
+sub reason_to_skip_dist {
+    my ($self, $dio) = @_;
+
+    my $dist = $dio->{DIST};
+
+    return "ignoredist" if $dio->ignoredist;
+
+    unless (exists $self->{ALLfound}{$dist}) {
+        $dio->delete_goner;
+        return "it's a goner";
+    }
+
+    unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
+        return "mtime not okay";
+    }
+
+    unless ($dio->lock) {
+        return "could not obtain a lock";
+    }
+
+    return;
+}
+
+sub maybe_index_dist {
+    my ($self, $dio) = @_;
+    my $dist = $dio->{DIST};
+
+    if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
+        $self->verbose(2, "skipping $dist: $skip_reason");
+        delete $self->{ALLlasttime}{$dist};
+        delete $self->{ALLfound}{$dist};
+        return;
+    }
+
+    $self->verbose(1,"Examining $dist ...\n");
+    $0 = "mldistwatch: $dist";
+
+    # >99% of all distros are already registered by the
+    # newfilehook but the few coming though mirror(1) are not.
+    # Registering *everything* that comes here should catch them
+    # and if we re-register this or that it should not hurt. But
+    # everything older than a day does not belong here, like when
+    # people re-index an old distro.
+    {
+        my $MLROOT = $self->mlroot;
+        for my $f ("$MLROOT/$dist") {
+            local $^T = time;
+            if (-M $f < 1) {
+                PAUSE::newfile_hook($f);
+            }
+        }
+    }
+
+    $dio->examine_dist; # checks for perl, developer, version, etc. and untars
+
+    if ($dio->skip) {
+        delete $self->{ALLlasttime}{$dist};
+        delete $self->{ALLfound}{$dist};
+
+        if ($dio->{REASON_TO_SKIP}) {
+          $dio->mail_summary;
+        }
+        return;
+    }
+
+    $dio->read_dist;
+    $dio->extract_readme_and_meta;
+
+    if ($dio->{META_CONTENT}{distribution_type}
+        && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
+        return;
+    }
+
+    if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
+        # META.json / META.yml declares it's not stable; do not index!
+        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
+        $dio->mail_summary;
+        return;
+    }
+
+    $dio->check_blib;
+    $dio->check_multiple_root;
+    $dio->check_world_writable;
+
+    for my $attempt (1 .. 3) {
+      my $db_ok = $self->_do_the_database_work($dio);
+      last if $db_ok;
+      if ($attempt == 3) {
+        $self->verbose(2, "tried $attempt times to do db work, but all failed");
+        $dio->alert("database errors while indexing");
+        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
+      }
+    }
+
+    $dio->mail_summary unless $dio->perl_major_version == 6;
+    $self->sleep;
+    $dio->set_indexed;
+
+    my @alerts = $dio->all_alerts;
+    return unless @alerts;
+    return @alerts;
+}
+
 sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
     my $dbh = $self->connect;
     my $time = time;
-    my $alert;
+    my %alerts;
     my @all;
     my($fh) = File::Temp->new(
                               DIR => "/tmp",
@@ -399,143 +500,75 @@ sub check_for_new {
     die "Panic: unusual small number of files involved ($all)"
         if !$self->{PICK} && ! $self->_newcountokay($all);
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
-  BIGLOOP: for (my $i=0;scalar @all;$self->empty_dir($testdir)) {
+  BIGLOOP: for (my $i=0;scalar @all;$i++, $self->empty_dir($testdir)) {
         my $dist = shift @all;
-        #
-        # Examine all files, even CHECKSUMS and READMEs
-        #
-        $i++;
+
         $self->verbose(2,". $dist ..") if $i%256 == 0;
 
         my $dio = PAUSE::dist->new(
                                    MAIN   => $self,
                                    DIST   => $dist,
                                    DBH    => $dbh,
-                                   ALERT  => "",
                                    TIME   => $time,
                                    TARBIN => $self->{TARBIN},
                                    UNZIPBIN  => $self->{UNZIPBIN},
                                    PICK   => $self->{PICK},
+                                   USERID => PAUSE::dir2user($dist),
                                    'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
                                   );
 
-        if ($dio->ignoredist){
-            $self->verbose(2, "skipping $dist: ignoredist");
-            delete $self->{ALLlasttime}{$dist};
-            delete $self->{ALLfound}{$dist};
-            next BIGLOOP;
-        }
-
-        if (exists $self->{ALLfound}{$dist}) {
-            unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
-                delete $self->{ALLlasttime}{$dist};
-                delete $self->{ALLfound}{$dist};
-                $self->verbose(2, "skipping $dist: mtime not ok");
-                next BIGLOOP;
-            }
-        } else {
-            $dio->delete_goner;
-            delete $self->{ALLlasttime}{$dist};
-            delete $self->{ALLfound}{$dist};
-            $self->verbose(2, "skipping $dist: it's a goner");
-            next BIGLOOP;
-        }
-        unless ($dio->lock) {
-            $self->verbose(1,"Could not obtain a lock on $dist\n");
-            next BIGLOOP;
-        }
-        $self->verbose(1,"Examining $dist ...\n");
-        $0 = "mldistwatch: $dist";
-
-        my $userid = PAUSE::dir2user($dist);
-        $dio->{USERID} = $userid;
-
-        # >99% of all distros are already registered by the
-        # newfilehook but the few coming though mirror(1) are not.
-        # Registering *everything* that comes here should catch them
-        # and if we re-register this or that it should not hurt. But
-        # everything older than a day does not belong here, like when
-        # people re-index an old distro.
-        {
-            my $MLROOT = $self->mlroot;
-            for my $f ("$MLROOT/$dist") {
-                local $^T = time;
-                if (-M $f < 1) {
-                    PAUSE::newfile_hook($f);
-                }
-            }
-        }
-
-        $dio->examine_dist; # checks for perl, developer, version, etc. and untars
-        if ($dio->skip){
-            delete $self->{ALLlasttime}{$dist};
-            delete $self->{ALLfound}{$dist};
-
-            if ($dio->{SKIP_REPORT}) {
-              $dio->mail_summary;
-            }
-            next BIGLOOP;
-        }
-
-        $dio->read_dist;
-        $dio->extract_readme_and_meta;
-
-        if ($dio->{META_CONTENT}{distribution_type}
-            && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
-            next BIGLOOP;
-        }
-
-        if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
-            # META.json / META.yml declares it's not stable; do not index!
-            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
-            $dio->mail_summary;
-            next BIGLOOP;
-        }
-
-        $dio->check_blib;
-        $dio->check_multiple_root;
-        $dio->check_world_writable;
-
-        for my $attempt (1 .. 3) {
-          my $db_ok = $self->_do_the_database_work($dio);
-          last if $db_ok;
-          if ($attempt == 3) {
-            $self->verbose(2, "tried $attempt times to do db work, but all failed");
-            $dio->alert("database errors while indexing $dio->{DIST}");
-            $dio->{SKIP_REPORT} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
-          }
-        }
-
-        $dio->mail_summary unless $dio->perl_major_version == 6;
-        $self->sleep;
-        $dio->set_indexed;
-
-        $alert .= $dio->alert;  # now $dio can go out of scope
+        my @alerts = $self->maybe_index_dist($dio);
+        $alerts{ $dist } = \@alerts if @alerts;
     }
+
     untie @all;
     undef $fh;
-    if ($alert) {
-        # XXX This should get cleaned up for logging -- dagolden, 2011-08-13
-        $self->verbose(1,$alert); # summary
-        if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
-        } else {
-            my $email = Email::MIME->create(
-                header_str => [
-                    To      => $PAUSE::Config->{ADMIN},
-                    Subject => "PAUSE upload indexing error",
-                    From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
-                ],
-                attributes => {
-                  charset      => 'utf-8',
-                  content_type => 'text/plain',
-                  encoding     => 'quoted-printable',
-                },
-                body_str => join(qq{\n\n}, "Not indexed.\n\n\t$PAUSE::Id", $alert),
-            );
 
-            sendmail($email);
-        }
+    $self->handle_alerts(\%alerts);
+}
+
+sub handle_alerts {
+    my ($self, $alerts) = @_;
+
+    return unless keys %$alerts;
+
+    if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
+      my $dists = join q{, }, sort keys %$alerts;
+      $self->verbose(1, "Sending alerts for $dists");
+      return;
     }
+
+    my $body_str = "# Errors when processing new files\n\n";
+
+    for my $dist (sort keys %$alerts) {
+      next unless @{ $alerts->{$dist} }; # Should never happen. -- rjbs
+
+      $body_str .= "$dist\n";
+      for my $alert (@{ $alerts->{$dist} }) {
+        $alert =~ s/^/  /mg;
+        $alert =~ s/\A /-/;
+        $body_str .= "$alert\n";
+      }
+      $body_str .= "\n";
+    }
+
+    my $email = Email::MIME->create(
+        header_str => [
+            To      => $PAUSE::Config->{ADMIN},
+            Subject => "PAUSE upload indexing error",
+            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+        ],
+        attributes => {
+            charset      => 'utf-8',
+            content_type => 'text/plain',
+            encoding     => 'quoted-printable',
+        },
+        body_str => $body_str,
+    );
+
+    sendmail($email);
+
+    return;
 }
 
 sub _userid_has_permissions_on_package {
@@ -832,7 +865,6 @@ sub rewrite01 {
             $pkg{chapter} = "99_Not_In_Modulelist";
             $self->verbose(1,"Found no chapter for $pkg{rootpack}\n");
         }
-
 
         # XXX need to split progress tracking from logging -- dagolden, 2011-08-13
         $self->verbose(2,".") if !($i % 16);
@@ -1391,7 +1423,6 @@ sub mlroot {
     $mlroot =~ s|/+$||; # I found the trailing slash annoying
     $self->{MLROOT} = $mlroot;
 }
-
 
 1;
 __END__
