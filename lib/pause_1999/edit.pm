@@ -2288,8 +2288,9 @@ sub add_user_doit {
   my($email) = $req->param('pause99_add_user_email');
   my($homepage) = $req->param('pause99_add_user_homepage');
   my $entered_by = $mgr->{User}{fullname};
+  my $is_mailing_list = $req->param('pause99_add_user_subscribe') gt '';
 
-  if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+  if ( $is_mailing_list ) {
     $query = qq{INSERT INTO users (
                       userid,          isa_list,             introduced,
                       changed,         changedby)
@@ -2315,7 +2316,7 @@ sub add_user_doit {
     my(@blurb);
     my($subject);
     my $need_onetime = 0;
-    if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+    if ( $is_mailing_list ) {
 
       # Add a mailinglist: INSERT INTO maillists
 
