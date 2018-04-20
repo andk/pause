@@ -19,7 +19,6 @@ our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->r
 our $TmpDir = Path::Tiny->tempdir(TEMPLATE => "pause_web_XXXXXXXX");
 our $TestRoot = path($TmpDir)->realpath;
 our $TestEmail = 'pause_admin@localhost.localdomain';
-our $DeadMeatDir = path($AppRoot)->child("tmp/deadmeat");
 our @EXPORT = @Test::More::EXPORT;
 
 our $FilenameToUpload = "Hash-RenameKey-0.02.tar.gz";
@@ -144,13 +143,9 @@ sub new {
 sub get_ok {
   my ($self, $url, @args) = @_;
 
-  $_->remove for $DeadMeatDir->children;
   my $res = $self->{mech}->get($url, @args);
   ok $res->is_success, "GET $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  unless (ok !$DeadMeatDir->children, "no deadmeat for $url") {
-      diag("Deadmeat: " . $_) for $DeadMeatDir->children
-  };
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
@@ -173,11 +168,9 @@ sub admin_get_ok {
 sub post_ok {
   my ($self, $url, @args) = @_;
 
-  $_->remove for $DeadMeatDir->children;
   my $res = $self->{mech}->post($url, @args);
   ok $res->is_success, "POST $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !$DeadMeatDir->children, "no deadmeat for $url";
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
