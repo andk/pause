@@ -2287,7 +2287,7 @@ sub add_user_doit {
   my($query,$sth,@qbind);
   my($email) = $req->param('pause99_add_user_email');
   my($homepage) = $req->param('pause99_add_user_homepage');
-  my $entered_by = $mgr->{User}{fullname};
+  my $entered_by = $mgr->{User}{fullname} || $mgr->{User}{userid};
   my $is_mailing_list = $req->param('pause99_add_user_subscribe') gt '';
 
   if ( $is_mailing_list ) {
@@ -2313,56 +2313,38 @@ sub add_user_doit {
   push @m, qq{<h3>Submitting query</h3>};
   if ($dbh->do($query,undef,@qbind)) {
     push @m, qq{<p>New user creation succeeded.</p>};
-    my(@blurb);
-    my($subject);
-    my $need_onetime = 0;
+
     if ( $is_mailing_list ) {
-
       # Add a mailinglist: INSERT INTO maillists
-
-      $need_onetime = 0;
-      $subject = "Mailing list added to PAUSE database";
       my($maillistid) = $userid;
       my($maillistname) = $fullname;
       my($subscribe) = $req->param('pause99_add_user_subscribe');
       my($changed) = $T;
-      push @blurb, qq{
-Mailing list entered by };
-      push @blurb, $mgr->{User}{fullname};
-      push @blurb, qq{:
+
+      push @m, qq{\n Mailing list entered by };
+      push @m, $mgr->{User}{fullname};
+      push @m, qq{:
 
 Userid:      $userid
 Name:        $maillistname
 Description: };
-      push @blurb, $self->wrap($subscribe);
-      $query = qq{INSERT INTO maillists (
-                        maillistid, maillistname,
-                        subscribe,  changed,  changedby,            address)
-                      VALUES (
-                        ?,          ?,
-                        ?,          ?,        ?,                    ?)};
-      my @qbind2 = ($maillistid,    $maillistname,
-                    $subscribe,     $changed, $mgr->{User}{userid}, $email);
-      unless ($dbh->do($query,undef,@qbind2)) {
-        die PAUSE::HeavyCGI::Exception
-            ->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
- Reason:</b></p><p>$DBI::errstr</p>}]);
-      }
+      push @m, $self->wrap($subscribe);
+
+      $self->_setup_mailing_list($mgr, $dbh, $maillistid, $maillistname, $subscribe, $changed, $email);
 
     } else {
         # Not a mailinglist: set and send one time password
         my $onetime = $self->_set_onetime_password( $mgr, $userid, $email);
         $self->_send_otp_email( $mgr, $userid, $email, $onetime );
-        $subject = qq{Welcome new user $userid}
+
+        # send emails to user and modules@perl.org; latter must censor the
+        # user's email address
+        my ($subject, $email_text) = $self->_send_welcome_email( $mgr, [$email], $userid, $email, $fullname, $homepage, $entered_by );
+        $self->_send_welcome_email( $mgr, $PAUSE::Config->{ADMINS}, $userid, "CENSORED", $fullname, $homepage, $entered_by );
+
+        push @m, qq{ Sending separate mails to:\n}, join(" AND ", @{$PAUSE::Config->{ADMINS}}, $email);
+        push @m, $self->_format_email_as_pre($subject, $email_text);
     }
-
-    # send emails to user and modules@perl.org; latter must censor the
-    # user's email address
-    my $email_text = $self->_send_welcome_email( $mgr, [$email], $subject, $userid, $email, $fullname, $entered_by );
-    $self->_send_welcome_email( $mgr, $PAUSE::Config->{ADMINS}, $subject, $userid, "CENSORED", $fullname, $entered_by );
-
-    push @m, qq{ Sending separate mails to:\n}, join(" AND ", @{$PAUSE::Config->{ADMINS}}, $email);
-    push @m, $self->_format_email_as_pre($subject, $email_text);
 
     warn "Info: clearing all fields";
     for my $field (qw(userid fullname email homepage subscribe memo)) {
@@ -7313,15 +7295,14 @@ $PAUSE::Config->{ADMIN}
 HERE
 
     my $header = {
-        Subject => qq{Welcome new user $userid}
+        Subject => qq{Temporary PAUSE password for $userid}
     };
     warn "header[$header]otpwblurb[$otpwblurb]";
     $mgr->send_mail_multi( [ $email, $PAUSE::Config->{ADMIN} ], $header, $otpwblurb );
 }
 
 sub _send_welcome_email {
-    my ( $self, $mgr, $to, $subject, $userid, $email, $fullname, $homepage, $memo, $entered_by ) = @_;
-    $email //= "CENSORED";
+    my ( $self, $mgr, $to, $userid, $email, $fullname, $homepage, $entered_by ) = @_;
 
     my $blurb = qq{
 Welcome $fullname,
@@ -7362,10 +7343,10 @@ Thank you for your prospective contributions,
 The Pause Team
 };
 
-    my $header = { Subject => $subject };
+    my $header = { Subject => "Welcome new user $userid" };
     $mgr->send_mail_multi($to,$header,$blurb);
 
-    return $blurb;
+    return $header->{Subject}, $blurb;
 }
 
 sub _format_email_as_pre {
@@ -7381,6 +7362,22 @@ HERE
     return $html;
 }
 
+sub _setup_mailing_list {
+    my ($self, $mgr, $dbh, $maillistid, $maillistname, $subscribe, $changed, $email) = @_;
+    my $query = qq{INSERT INTO maillists (
+                        maillistid, maillistname,
+                        subscribe,  changed,  changedby,            address)
+                      VALUES (
+                        ?,          ?,
+                        ?,          ?,        ?,                    ?)};
+      my @qbind2 = ($maillistid,    $maillistname,
+                    $subscribe,     $changed, $mgr->{User}{userid}, $email);
+      unless ($dbh->do($query,undef,@qbind2)) {
+        die PAUSE::HeavyCGI::Exception
+            ->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
+ Reason:</b></p><p>$DBI::errstr</p>}]);
+      }
+}
 1;
 #Local Variables:
 #mode: cperl
