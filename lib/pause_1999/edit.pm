@@ -2352,38 +2352,8 @@ Description: };
       }
 
     } else {
-
-      # Not a mailinglist: Compose Welcome
-
-      $subject = qq{Welcome new user $userid};
-      $need_onetime = 1;
-      # not for mailing lists
-      if ($need_onetime) {
-
-        my $onetime = sprintf "%08x", rand(0xffffffff);
-
-        my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
-                       $PAUSE::Config->{AUTHEN_USER_FLD},
-                        $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
-                         secretemail,
-                          forcechange,
-                           changed,
-                            changedby
-                       ) VALUES (
-                       ?,?,?,?,?,?
-                       )};
-        my $pwenc = PAUSE::Crypt::hash_password($onetime);
-        my $dbh = $mgr->authen_connect;
-        local($dbh->{RaiseError}) = 0;
-        my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
-        die PAUSE::HeavyCGI::Exception
-            ->new(ERROR =>
-                  [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
-                   qq{<p>This is very unfortunate as we have no option to rollback.}.
-                   qq{The user is now registered in mod.users and could not be regi}.
-                   qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
-                 ) unless $rc;
-        $dbh->disconnect;
+        # Not a mailinglist: set and send one time password
+        my $onetime = $self->_set_onetime_password( $mgr, $userid, $email);
         $self->_send_otp_email( $mgr, $userid, $email, $onetime );
       }
 
@@ -7352,6 +7322,36 @@ sub _verify_recaptcha {
     };
 
     return $ok, $err;
+}
+
+sub _set_onetime_password {
+    my ( $self, $mgr, $userid, $email) = @_;
+    my $onetime = sprintf "%08x", rand(0xffffffff);
+
+    my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
+                    $PAUSE::Config->{AUTHEN_USER_FLD},
+                    $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
+                        secretemail,
+                        forcechange,
+                        changed,
+                        changedby
+                    ) VALUES (
+                    ?,?,?,?,?,?
+                    )};
+    my $pwenc = PAUSE::Crypt::hash_password($onetime);
+    my $dbh = $mgr->authen_connect;
+    local($dbh->{RaiseError}) = 0;
+    my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
+    die PAUSE::HeavyCGI::Exception
+        ->new(ERROR =>
+                [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
+                qq{<p>This is very unfortunate as we have no option to rollback.}.
+                qq{The user is now registered in mod.users and could not be regi}.
+                qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
+                ) unless $rc;
+    $dbh->disconnect;
+
+    return $onetime;
 }
 
 sub _send_otp_email {
