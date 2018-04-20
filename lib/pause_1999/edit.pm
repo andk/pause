@@ -2311,13 +2311,7 @@ sub add_user_doit {
 
   push @m, qq{<h3>Submitting query</h3>};
   if ($dbh->do($query,undef,@qbind)) {
-    push @m, sprintf(qq{<p>Query succeeded.</p><p>Do you want to }.
-                     qq{<a href="/pause/authenquery?pause99_add_m}.
-                     qq{od_userid=%s;SUBMIT_pause99_add_mod_previ}.
-                     qq{ew=preview">register a module for %s?</a></p>},
-                     $userid,
-                     $userid,
-                    );
+    push @m, qq{<p>New user creation succeeded.</p>};
     my(@blurb);
     my($subject);
     my $need_onetime = 0;
