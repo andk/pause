@@ -5,11 +5,15 @@ LOAD vhosts
 CREATE POOL pause81
   POOL pause81 ADD 127.0.0.1:81
 
-CREATE POOL catalyst
-  POOL catalyst ADD 217.199.168.174:3000
+# dated: analysis
+# CREATE POOL catalyst
+#   POOL catalyst ADD 217.199.168.174:3000
 
-CREATE POOL qah2015_pool
-  POOL qah2015_pool ADD 127.0.0.1:5000
+# CREATE POOL qah2015_pool
+#   POOL qah2015_pool ADD 127.0.0.1:5000
+
+CREATE POOL pts2018_pool
+  POOL pts2018_pool ADD 127.0.0.1:5000
 
 CREATE POOL munin_pool
   POOL munin_pool ADD 127.0.0.1:8000
@@ -31,10 +35,10 @@ CREATE SERVICE pause
   SET buffer_size                 = 2048k
 ENABLE pause
 
-CREATE SERVICE plackperl
+CREATE SERVICE alternatepause
   SET role                        = reverse_proxy
   SET plugins                     = trustheader
-  SET pool                        = qah2015_pool
+  SET pool                        = pts2018_pool
   SET trusted_upstream_proxies    = 0.0.0.0/0
   SET persist_client              = on
   SET persist_client_idle_timeout = 30
@@ -47,7 +51,7 @@ CREATE SERVICE plackperl
   # SET trusted_upstream_proxies    = 0.0.0.0/0
   SET connect_ahead               = 2
   SET buffer_size                 = 2048k
-ENABLE plackperl
+ENABLE alternatepause
 
 # CREATE SERVICE munin
 #   SET role                        = reverse_proxy
@@ -68,13 +72,13 @@ ENABLE plackperl
 # ENABLE munin
 
 # dated:
-CREATE SERVICE analysis
-  SET role                        = reverse_proxy
-  SET pool                        = catalyst
-  SET trusted_upstream_proxies    = 0.0.0.0/0
-  SET persist_client_timeout      = 300
-  SET enable_reproxy              = off
-ENABLE analysis
+# CREATE SERVICE analysis
+#   SET role                        = reverse_proxy
+#   SET pool                        = catalyst
+#   SET trusted_upstream_proxies    = 0.0.0.0/0
+#   SET persist_client_timeout      = 300
+#   SET enable_reproxy              = off
+# ENABLE analysis
 
 CREATE SERVICE vhosts
   SET listen                      = 0.0.0.0:80
