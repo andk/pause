@@ -53,6 +53,7 @@ $PAUSE::Config->{UPLOAD} = $TestEmail;
 $PAUSE::Config->{HAVE_PERLBAL} = 0;
 $PAUSE::Config->{SLEEP} = 1;
 $PAUSE::Config->{INCOMING} = "file://$TestRoot/incoming/";
+$PAUSE::Config->{INCOMING_LOC} = "$TestRoot/incoming/";
 $PAUSE::Config->{PAUSE_LOG} = "$TestRoot/log/paused.log";
 $PAUSE::Config->{PAUSE_LOG_DIR} = "$TestRoot/log";
 
