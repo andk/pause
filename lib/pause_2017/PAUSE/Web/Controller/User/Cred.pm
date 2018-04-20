@@ -3,6 +3,7 @@ package PAUSE::Web::Controller::User::Cred;
 use Mojo::Base "Mojolicious::Controller";
 use Email::Address;
 use PAUSE::Web::Util::Encode;
+use Text::Unidecode;
 
 sub edit {
   my $c = shift;
