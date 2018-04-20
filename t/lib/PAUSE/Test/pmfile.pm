@@ -38,12 +38,12 @@ sub new {
   my ($self) = shift->SUPER::new(@_);
   my $mock = delete $self->{mock} || {};
   $self->{dist} ||= Mock::Dist->new;
+  $self->{dist}{TIME} = time;
   $self->{dist}{DIST} ||= 'My-Dist';
   $self->{pmfile} ||= PAUSE::pmfile->new(
     PMFILE => "fake-pmfile",
     DIO    => $self->{dist},
     USERID => 'FAKE',
-    TIME   => time,
     META_CONTENT => {},
     VERSION => $self->fake_dist->version,
   );
@@ -143,14 +143,14 @@ sub examine_fio :Test :Plan(3) {
       [1, "Will check keys_ppp[My::Dist]\n"],
   );
   cmp_deeply(
-    [ @{$PACKAGE}{ qw(PACKAGE DIST FIO TIME PMFILE USERID META_CONTENT) } ],
+    [ @{$PACKAGE}{ qw(PACKAGE DIST FIO PMFILE USERID META_CONTENT) } ],
     [
       'My::Dist', 'My-Dist', $pmfile,
-      @{$pmfile}{qw(TIME PMFILE USERID META_CONTENT)},
+      @{$pmfile}{qw(PMFILE USERID META_CONTENT)},
     ],
     "correct package info",
   );
-  delete $PACKAGE->{PP}{pause_reg}; # cannot guess
+
   cmp_deeply(
     $PACKAGE->{PP},
     {
@@ -158,6 +158,7 @@ sub examine_fio :Test :Plan(3) {
       filemtime => (stat $pmfile->{PMFILE})[9],
       infile    => $pmfile->{PMFILE},
       simile    => $pmfile->{PMFILE},
+      pause_reg => $self->{dist}{TIME},
     },
     "correct package PP",
   );
