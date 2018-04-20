@@ -27,16 +27,11 @@ sub hub { $_[0]{MAIN} }
 sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};
-
-  my $pick = $self->hub->{PICK};
-  if ($pick && %$pick && ! $pick->{$dist}) {
-    return "using --pick, but not for this dist";
+  if ($dist =~ m|/\.|) {
+    $self->verbose(1,"Warning: dist[$dist] has illegal filename\n");
+    return 1;
   }
-
-  return "illegal filename" if $dist =~ m|/\.|;
-
-  return "ruled out by extension" if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
-
+  return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
   # Stupid to have code that needs to be maintained in two places,
   # here and in edit.pm:
   return "weird CNANDOR case"
