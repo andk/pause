@@ -377,7 +377,9 @@ sub reason_to_skip_dist {
 
     my $dist = $dio->{DIST};
 
-    return "ignoredist" if $dio->ignoredist;
+    if (my $reason = $dio->ignoredist) {
+      return $reason;
+    }
 
     unless (exists $self->{ALLfound}{$dist}) {
         $dio->delete_goner;
