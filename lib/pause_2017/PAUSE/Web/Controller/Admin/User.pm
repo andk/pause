@@ -39,7 +39,7 @@ sub add {
 
     my $doit = 0;
     my $dont_clear;
-    my $fullname_raw = $req->param('pause99_add_user_fullname');
+    my $fullname_raw = $req->param('pause99_add_user_fullname') // '';
     my($fullname);
     $fullname = PAUSE::Web::Util::Encode::any2utf8($fullname_raw);
     warn "fullname[$fullname]fullname_raw[$fullname_raw]";
@@ -221,7 +221,8 @@ sub add_user_doit {
   my($query,$sth,@qbind);
   my($email) = $req->param('pause99_add_user_email');
   my($homepage) = $req->param('pause99_add_user_homepage');
-  if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+  my $subscribe = $req->param('pause99_add_user_subscribe') // '';
+  if ( $subscribe gt '' ) {
     $query = qq{INSERT INTO users (
                       userid,          isa_list,             introduced,
                       changed,         changedby)
@@ -247,7 +248,7 @@ sub add_user_doit {
     my $blurb;
     my $subject;
     my $need_onetime = 0;
-    if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+    if ( $subscribe gt '' ) {
 
       # Add a mailinglist: INSERT INTO maillists
 

@@ -4,7 +4,7 @@
 %
 Record update in the PAUSE users database:
 
-<%== sprintf "%11s: [%s]", "userid", $pause->{Hidden}{userid} %>
+<%== sprintf "%11s: [%s]", "userid", $pause->{HiddenUser}{userid} %>
 
 % for (@{$pause->{mailblurb}}) {
 <%== sprintf "%11s: [%s]", $_->{field}, $_->{value} %><%== ($_->{was}) ? " was [$_->{was}]" : "" %>

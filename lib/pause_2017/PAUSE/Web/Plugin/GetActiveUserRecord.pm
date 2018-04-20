@@ -14,10 +14,10 @@ sub _get {
   my $pause = $c->stash(".pause");
   my $mgr = $c->app->pause;
 
-  my $hidden_user_ok = $opt->{hidden_user_ok}; # caller is absolutely
-                                               # sure that hidden_user
-                                               # is authenticated or
-                                               # harmless (mailpw)
+  my $hidden_user_ok = $opt->{hidden_user_ok} // ''; # caller is absolutely
+                                                     # sure that hidden_user
+                                                     # is authenticated or
+                                                     # harmless (mailpw)
 
   my $req = $c->req;
   if ($hidden_user) {
@@ -37,8 +37,9 @@ sub _get {
   }
 
   my $user = {};
+  my $userid = $pause->{User}{userid} // '';
   $mgr->log({level => 'error', message => sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]where[%s]",
-    $pause->{User}{userid},
+    $userid,
     $hidden_user,
     join(":", keys %{$pause->{UserGroups} || {}}),
     join(":", caller),
@@ -48,7 +49,7 @@ sub _get {
   if (
     $hidden_user
     &&
-    $hidden_user ne $pause->{User}{userid}
+    $hidden_user ne $userid
   ){
     # Imagine, MSERGEANT wants to pass Win32::ASP to WNODOM
 

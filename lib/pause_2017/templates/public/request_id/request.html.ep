@@ -19,7 +19,7 @@ in many Perl community sites.</p>
 %= include "public/request_id/_form";
 
 % }
-% if ($pause->{reg_ok}) {
+% if ($pause->{reg_ok} && $pause->{blurbcopy}) {
 Sending mail to: <%= $pause->{send_to} %>
 <pre class="email_sent">
 From: <%= $PAUSE::Config->{UPLOAD} %>
