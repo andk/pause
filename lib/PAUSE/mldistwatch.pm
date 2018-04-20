@@ -343,7 +343,7 @@ sub _do_the_database_work {
         }
       }
       else {
-        $dio->alert("Meta information of Perl 6 dist $dio->{DIST} is invalid");
+        $dio->alert("Meta information of Perl 6 dist is invalid");
         $dbh->rollback;
       }
 
@@ -358,9 +358,7 @@ sub _do_the_database_work {
     if ($self->_userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
       $dbh->commit;
     } else {
-      $dio->alert(
-        "Uploading user has no permissions on package $main_pkg"
-      );
+      $dio->alert("Uploading user has no permissions on package $main_pkg");
       $dio->{NO_DISTNAME_PERMISSION} = 1;
       $dbh->rollback;
     }

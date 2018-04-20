@@ -421,7 +421,7 @@ sub _version_ok {
                         $errno,
                         $error,
                         );
-          $self->alert(qq{$error:
+    $self->alert(qq{$error:
 package[$package]
 version[$pp->{version}]
 file[$pp->{infile}]
