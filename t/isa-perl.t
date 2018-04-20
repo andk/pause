@@ -1,7 +1,7 @@
 use strict;
 
 use lib 't/lib';
-use lib 't/lib/privatelib'; # Stub PrivatePAUSE
+use lib 't/privatelib'; # Stub PrivatePAUSE
 use TestSetup;
 use Test::More;
 use PAUSE;
