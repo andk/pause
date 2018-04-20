@@ -2658,13 +2658,6 @@ sub add_user {
                        maxlength=>256),
        qq{<br />},
 
-       qq{<br />If you want to send a message to new author, please
-       enter it here:<br />},
-
-       $mgr->textarea(name=>"pause99_add_user_memo",
-                      rows=>6,
-                      cols=>60),
-       qq{<br />},
        $submit_butts,
        qq{<br />},
        $delete_link,
