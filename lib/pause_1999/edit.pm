@@ -2880,7 +2880,9 @@ sub request_id {
     if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
         my ($valid, $err) = _verify_recaptcha($token);
         if ( $valid ) {
-            # XXX go insert directly and return HTML to display
+            # If recaptcha is valid, we shortcut and add the user directly,
+            # returning HTML for them to see.
+            return $self->_directly_add_user($mgr, $req, $userid, $fullname);
         }
         elsif ( defined $valid && ! $valid ) {
             die "recaptcha failed validation: $err\n";
@@ -7378,6 +7380,66 @@ sub _setup_mailing_list {
  Reason:</b></p><p>$DBI::errstr</p>}]);
       }
 }
+
+sub _directly_add_user {
+    my ( $self, $mgr, $req, $userid, $fullname ) = @_;
+    my $T   = time;
+    my $dbh = $mgr->connect;
+    local ( $dbh->{RaiseError} ) = 0;
+    my @m;
+    my ( $query, $sth, @qbind );
+    my ($email)    = $req->param('pause99_request_id_email');
+    my ($homepage) = $req->param('pause99_request_id_homepage');
+    $query = qq{INSERT INTO users (
+                    userid,     email,    homepage,  fullname,
+                     isa_list, introduced, changed,  changedby)
+                    VALUES (
+                     ?,          ?,        ?,         ?,
+                     ?,        ?,          ?,        ?)};
+    @qbind =
+      ( $userid, "CENSORED", $homepage, $fullname, "", $T, $T, $userid );
+
+    # We have a query for INSERT INTO users
+
+    if ( $dbh->do( $query, undef, @qbind ) ) {
+        push @m, <<"HERE";
+<p>New user creation succeeded.</p>
+
+<p><b>LOOK FOR AN EMAIL WITH YOUR TEMPORARY PASSWORD.</b></p>
+
+<p>You'll also receive a welcome email like the one below.</p>
+HERE
+
+        # Not a mailinglist: set and send one time password
+        my $onetime = $self->_set_onetime_password( $mgr, $userid, $email );
+        $self->_send_otp_email( $mgr, $userid, $email, $onetime );
+
+        # send emails to user and modules@perl.org; latter must censor the
+        # user's email address
+        my ( $subject, $email_text ) =
+          $self->_send_welcome_email( $mgr, [$email], $userid, $email, $fullname, $homepage,
+            $fullname );
+        $self->_send_welcome_email( $mgr, $PAUSE::Config->{ADMINS},
+            $userid, "CENSORED", $fullname, $homepage, $fullname );
+
+        push @m, $self->_format_email_as_pre( $subject, $email_text );
+
+        warn "Info: clearing all fields";
+        for my $field (qw(userid fullname email homepage subscribe memo)) {
+            my $param = "pause99_request_id_$field";
+            $req->parameters->set( $param, "" );
+        }
+
+    }
+    else {
+        push @m,
+          sprintf( qq{<p><b>New user creation failed: [$query] failed. Reason:</b></p><p>%s</p>\n},
+            $dbh->errstr );
+        # TODO should notify administrators if this occurs
+    }
+    return @m;
+}
+
 1;
 #Local Variables:
 #mode: cperl
