@@ -132,7 +132,7 @@ sub new {
   my $app = do "$AppRoot/$psgi";
 
   my $mech = Test::WWW::Mechanize::PSGI->new(app => $app);
-  if (!$INC{'Devel/Cover.pm'} and eval {require LWP::ConsoleLogger::Easy; 1}) {
+  if (!$INC{'Devel/Cover.pm'} and !$ENV{TRAVIS} and eval {require LWP::ConsoleLogger::Easy; 1}) {
     LWP::ConsoleLogger::Easy::debug_ua($mech);
   }
 
