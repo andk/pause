@@ -15,10 +15,10 @@ in the PAUSE database.
 
 This is what we have stored in the database now:
 
-  Name:      <%== $pause->{fullname} %>
+  Name:      <%== $pause->{fullname} // '' %>
   email:     CENSORED
-  homepage:  <%== $pause->{homepage} %>
-  enteredby: <%== $pause->{User}{fullname} %>
+  homepage:  <%== $pause->{homepage} // '' %>
+  enteredby: <%== $pause->{User}{fullname} // '' %>
 
 Please note that your email address is exposed in various listings and
 database dumps. You can register with both a public and a secret email

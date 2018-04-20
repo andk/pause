@@ -38,9 +38,9 @@ sub edit {
       $pause->{no_secret_email} = 1;
     } elsif ($wantalias eq "secr" && $wantsecretemail=~/\Q$cpan_alias\E/i) {
       $pause->{secret_is_cpan_alias} = 1;
-    } elsif ($wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
+    } elsif (defined $wantsecretemail && $wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
       $pause->{invalid_secret} = 1;
-    } elsif ($wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/) {
+    } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/) {
       $pause->{invalid_public} = 1;
     } else {
       $consistentsubmit = 1;
