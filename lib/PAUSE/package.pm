@@ -176,7 +176,7 @@ sub perm_check {
     @args
   );
 
-  if ($self->{FIO}{DIO} && $self->{FIO}{DIO}->isa_regular_perl($dist)) {
+  if ($self->{FIO}{DIO} && PAUSE::isa_regular_perl($dist)) {
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
       my $ret = $dbh->do($ins_perms, undef, @ins_params);
@@ -223,7 +223,7 @@ sub perm_check {
       my @owned       = grep { $_->[1] eq $userid  } @$auth_ids;
       my @owned_exact = grep { $_->[0] eq $package } @owned;
 
-      if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
+      if (PAUSE::isa_regular_perl($dist)) {
           # seems ok: perl is always right
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
@@ -462,7 +462,7 @@ sub update_package {
   my $distorperlok = File::Basename::basename($dist) !~ m|/perl|;
   # this dist is not named perl-something (lex ILYAZ)
 
-  my $isa_regular_perl = $self->{FIO}{DIO}->isa_regular_perl($dist);
+  my $isa_regular_perl = PAUSE::isa_regular_perl($dist);
 
   $distorperlok ||= $isa_regular_perl;
   # or it is THE perl dist
@@ -471,7 +471,7 @@ sub update_package {
   # or it is called perl-something (e.g. perl-ldap) AND...
   my($something2) = File::Basename::basename($odist) =~ m|/perl(.....)|;
   # and we compare against another perl-something AND...
-  my($older_isa_regular_perl) = $self->{FIO}{DIO}->isa_regular_perl($odist);
+  my($older_isa_regular_perl) = PAUSE::isa_regular_perl($odist);
   # the file we're comparing with is not the perl dist
 
   $distorperlok ||= $something1 && $something2 &&

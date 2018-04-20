@@ -11,39 +11,6 @@ use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
 use JSON::XS ();
 
-# ISA_REGULAR_PERL means a perl release for public consumption
-# (and must exclude developer releases like 5.9.4). I need to
-# rename it from ISAPERL to ISA_REGULAR_PERL to avoid
-# confusion with CPAN.pm. CPAN.pm has a different regex for
-# ISAPERL because there we want to protect the user from
-# developer releases too, but here we want to index a distro
-# with very special treatment that is only reserved for "real"
-# perl distros. (The exclusion of developer releases was
-# accidentally lost in rev 815)
-our $ISA_REGULAR_PERL = qr{
-    /
-    ( perl-5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
-    | perl5[._](00\d(_[0-4][0-9])?)
-    | ponie-[\d.\-]
-    )
-    (?: \.tar[._-]gz
-    |   \.tar\.bz2
-    )
-    \z
-}x;
-# But we need to refuse indexing of bleadperls too: for duallife
-# modules.
-# 2013-04-14: no longer used, but left commented out in case we change
-# our minds -- xdg, 2013-04-14
-##our $ISA_BLEAD_PERL = qr{
-##    /
-##    perl-5\.\d*[13579]\.\d+
-##    (?: \.tar\.gz
-##    |   \.tar\.bz2
-##    )
-##    \z
-##}x;
-
 sub DESTROY {}
 
 sub new {
@@ -218,11 +185,6 @@ sub perl_major_version { shift->{PERL_MAJOR_VERSION} }
 
 sub skip { shift->{SKIP} }
 
-sub isa_regular_perl {
-  my($self,$dist) = @_;
-  scalar $dist =~ /$PAUSE::dist::ISA_REGULAR_PERL/;
-}
-
 # Commented out this function just like $ISA_BLEAD_PERL
 ##sub isa_blead_perl {
 ##  my($self,$dist) = @_;
@@ -278,7 +240,7 @@ sub examine_dist {
   my($suffix,$skip);
   $suffix = $skip = "";
 
-  if ($self->isa_regular_perl($dist)) {
+  if (PAUSE::isa_regular_perl($dist)) {
     ($suffix, $skip) = $self->_examine_regular_perl;
     $self->{SUFFIX} = $suffix;
     $self->{SKIP}   = $skip;
@@ -1279,7 +1241,7 @@ Constructor.
 
 Does these checks:
 
-  $dio->isa_regular_perl
+  PAUSE::isa_regular_perl($dio->dist)
   $dio->isa_dev_version
   $dist =~ m|/perl-\d+|
 
@@ -1341,8 +1303,6 @@ Is this a distro for Perl 5 or 6?
 =head3 skip
 
 Accessor method. True if perl distro from non-pumpking or a dev release.
-
-=head3 isa_regular_perl
 
 =head3 _examine_regular_perl
 

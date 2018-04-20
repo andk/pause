@@ -140,7 +140,7 @@ sub examine_fio {
 
         $self->{VERSION} = $version;
 
-        my $dist_is_perl = $self->{DIO}->isa_regular_perl($self->{DIO}{DIST});
+        my $dist_is_perl = PAUSE::isa_regular_perl($self->{DIO}{DIST});
 
         if ($self->{VERSION} =~ /^\{.*\}$/) {
             # JSON error message
