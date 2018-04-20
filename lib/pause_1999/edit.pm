@@ -7,6 +7,7 @@ use strict;
 use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use File::Find qw(find);
+use HTML::Entities;
 use PAUSE::Crypt;
 use POSIX ();
 use URI::Escape;
@@ -2286,6 +2287,8 @@ sub add_user_doit {
   my($query,$sth,@qbind);
   my($email) = $req->param('pause99_add_user_email');
   my($homepage) = $req->param('pause99_add_user_homepage');
+  my $entered_by = $mgr->{User}{fullname};
+
   if ( $req->param('pause99_add_user_subscribe') gt '' ) {
     $query = qq{INSERT INTO users (
                       userid,          isa_list,             introduced,
@@ -2355,73 +2358,16 @@ Description: };
         # Not a mailinglist: set and send one time password
         my $onetime = $self->_set_onetime_password( $mgr, $userid, $email);
         $self->_send_otp_email( $mgr, $userid, $email, $onetime );
-      }
-
-      @blurb = qq{
-Welcome $fullname,
-
-PAUSE, the Perl Authors Upload Server, has a userid for you:
-
-    $userid
-
-Once you\'ve gone through the procedure of password approval (see the
-separate mail you should receive about right now), this userid will be
-the one that you can use to upload your work or edit your credentials
-in the PAUSE database.
-
-This is what we have stored in the database now:
-
-  Name:      $fullname
-  email:     CENSORED
-  homepage:  $homepage
-  enteredby: $mgr->{User}{fullname}
-
-Please note that your email address is exposed in various listings and
-database dumps. You can register with both a public and a secret email
-if you want to protect yourself from SPAM. If you want to do this,
-please visit
-  https://pause.perl.org/pause/authenquery?ACTION=edit_cred
-or
-  http://pause.perl.org/pause/authenquery?ACTION=edit_cred
-
-If you need any further information, please visit
-  \$CPAN/modules/04pause.html.
-If this doesn't answer your questions, contact modules\@perl.org.
-
-Before uploading your first module, we strongly encourage you to discuss
-your module idea on PrePAN at http://prepan.org/ to get feedback from
-experienced Perl developers.
-
-Thank you for your prospective contributions,
-The Pause Team
-};
-
-      my($memo) = $req->param('pause99_add_user_memo');
-      push @blurb, "\nNote from $mgr->{User}{fullname}:\n$memo\n\n"
-          if length $memo;
+        $subject = qq{Welcome new user $userid}
     }
 
-    # both users and mailing lists run this code
+    # send emails to user and modules@perl.org; latter must censor the
+    # user's email address
+    my $email_text = $self->_send_welcome_email( $mgr, [$email], $subject, $userid, $email, $fullname, $entered_by );
+    $self->_send_welcome_email( $mgr, $PAUSE::Config->{ADMINS}, $subject, $userid, "CENSORED", $fullname, $entered_by );
 
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
-    my(@to) = @{$PAUSE::Config->{ADMINS}};
-    push @m, qq{ Sending separate mails to:
-}, join(" AND ", @to, $email), qq{
-<pre>
-From: $PAUSE::Config->{UPLOAD}
-Subject: $subject\n};
-
-    my($blurb) = join "", @blurb;
-    require HTML::Entities;
-    my($blurbcopy) = HTML::Entities::encode($blurb,"<>");
-    push @m, $blurbcopy, "</pre>\n";
-
-    my $header = {
-                  Subject => $subject
-                 };
-    $mgr->send_mail_multi(\@to,$header,$blurb);
-    $blurb =~ s/\bCENSORED\b/$email/;
-    $mgr->send_mail_multi([$email],$header,$blurb);
+    push @m, qq{ Sending separate mails to:\n}, join(" AND ", @{$PAUSE::Config->{ADMINS}}, $email);
+    push @m, $self->_format_email_as_pre($subject, $email_text);
 
     warn "Info: clearing all fields";
     for my $field (qw(userid fullname email homepage subscribe memo)) {
@@ -7383,6 +7329,68 @@ HERE
     };
     warn "header[$header]otpwblurb[$otpwblurb]";
     $mgr->send_mail_multi( [ $email, $PAUSE::Config->{ADMIN} ], $header, $otpwblurb );
+}
+
+sub _send_welcome_email {
+    my ( $self, $mgr, $to, $subject, $userid, $email, $fullname, $homepage, $memo, $entered_by ) = @_;
+    $email //= "CENSORED";
+
+    my $blurb = qq{
+Welcome $fullname,
+
+PAUSE, the Perl Authors Upload Server, has a userid for you:
+
+    $userid
+
+Once you\'ve gone through the procedure of password approval (see the
+separate mail you should receive about right now), this userid will be
+the one that you can use to upload your work or edit your credentials
+in the PAUSE database.
+
+This is what we have stored in the database now:
+
+  Name:      $fullname
+  email:     $email
+  homepage:  $homepage
+  enteredby: $entered_by
+
+Please note that your email address is exposed in various listings and
+database dumps. You can register with both a public and a secret email
+if you want to protect yourself from SPAM. If you want to do this,
+please visit
+  https://pause.perl.org/pause/authenquery?ACTION=edit_cred
+or
+  http://pause.perl.org/pause/authenquery?ACTION=edit_cred
+
+If you need any further information, please visit
+  \$CPAN/modules/04pause.html.
+If this doesn't answer your questions, contact modules\@perl.org.
+
+Before uploading your first module, we strongly encourage you to discuss
+your module idea on PrePAN at http://prepan.org/ to get feedback from
+experienced Perl developers.
+
+Thank you for your prospective contributions,
+The Pause Team
+};
+
+    my $header = { Subject => $subject };
+    $mgr->send_mail_multi($to,$header,$blurb);
+
+    return $blurb;
+}
+
+sub _format_email_as_pre {
+    my ($self, $subject, $text) = @_;
+    my $html = <<"HERE";
+<pre>
+From: $PAUSE::Config->{UPLOAD}
+Subject: $subject\n
+HERE
+    $html .= HTML::Entities::encode($text,"<>");
+    $html .= "</pre>\n";
+
+    return $html;
 }
 
 1;
