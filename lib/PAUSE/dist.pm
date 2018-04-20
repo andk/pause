@@ -18,6 +18,8 @@ sub new {
   bless { @_ }, ref($me) || $me;
 }
 
+sub hub { $_[0]{MAIN} }
+
 sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};

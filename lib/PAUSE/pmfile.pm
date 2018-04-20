@@ -13,6 +13,9 @@ sub parent {
     $self->{DIO};
 }
 
+sub dist { $_[0]{DIO} }
+sub hub  { $_[0]{DIO}{MAIN} }
+
 sub DESTROY {}
 
 sub verbose {
