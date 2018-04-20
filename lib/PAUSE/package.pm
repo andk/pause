@@ -676,7 +676,7 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
       my $query = qq{UPDATE packages SET package = ?, version = ?, dist = ?, file = ?,
 filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
-      $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
+      $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . ",$package\n");
       my $rows_affected = eval { $dbh->do
                                      ($query,
                                       undef,
@@ -685,7 +685,7 @@ filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
                                       $dist,
                                       $pp->{infile},
                                       $pp->{filemtime},
-                                      $self->{TIME},
+                                      $self->dist->{TIME},
                                       $package,
                                      );
                              };
@@ -746,7 +746,7 @@ sub insert_into_package {
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
   my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg) VALUES (?,?,?,?,?,?) };
-  $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
+  $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . "\n");
 
   return unless $self->_version_ok($pp, $package, $dist);
   $dbh->do($query,
@@ -756,7 +756,7 @@ sub insert_into_package {
             $dist,
             $pp->{infile},
             $pp->{filemtime},
-            $self->{TIME},
+            $self->dist->{TIME},
           );
   $self->index_status($package,
                       $pp->{version},

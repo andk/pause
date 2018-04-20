@@ -175,18 +175,16 @@ sub examine_fio {
   DBPACK: foreach $package (@keys_ppp) {
 
         # What do we need? dio, fio, pmfile, time, dist, dbh, alert?
-        my $pio = PAUSE::package
-            ->new(
-                  PACKAGE => $package,
-                  DIST => $dist,
-                  PP => $ppp->{$package}, # hash containing
-                                          # version
-                  TIME => $self->{TIME},
-                  PMFILE => $pmfile,
-                  FIO => $self,
-                  USERID => $self->{USERID},
-                  META_CONTENT => $self->{META_CONTENT},
-                  MAIN_PACKAGE => $self->{MAIN_PACKAGE},
+        my $pio = PAUSE::package->new(
+                      PACKAGE => $package,
+                      DIST => $dist,
+                      PP => $ppp->{$package}, # hash containing
+                                              # version
+                      PMFILE => $pmfile,
+                      FIO => $self,
+                      USERID => $self->{USERID},
+                      META_CONTENT => $self->{META_CONTENT},
+                      MAIN_PACKAGE => $self->{MAIN_PACKAGE},
                   );
 
         $pio->examine_pkg;
