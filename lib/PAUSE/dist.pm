@@ -1284,7 +1284,6 @@ PAUSE::dist - Class representing one distribution
     MAIN   => $self,
     DIST   => $dist,
     DBH    => $dbh,
-    ALERT  => "",
     TIME   => $time,
     TARBIN => $self->{TARBIN},
     UNZIPBIN  => $self->{UNZIPBIN},

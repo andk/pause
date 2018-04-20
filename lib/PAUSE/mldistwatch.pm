@@ -425,16 +425,12 @@ sub check_for_new {
   BIGLOOP: for my $i (0 .. $#all) {
         my $dist = $all[$i];
 
-        #
-        # Examine all files, even CHECKSUMS and READMEs
-        #
         $self->verbose(2,". $dist ..") if $i%256 == 0;
 
         my $dio = PAUSE::dist->new(
                                    MAIN   => $self,
                                    DIST   => $dist,
                                    DBH    => $dbh,
-                                   ALERT  => "",
                                    TIME   => $time,
                                    TARBIN => $self->{TARBIN},
                                    UNZIPBIN  => $self->{UNZIPBIN},
