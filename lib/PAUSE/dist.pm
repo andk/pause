@@ -15,7 +15,11 @@ sub DESTROY {}
 
 sub new {
   my($me) = shift;
-  bless { @_ }, ref($me) || $me;
+  my $self = bless { @_ }, ref($me) || $me;
+  $self->{USERID} = PAUSE::dir2user($self->{DIST});
+  $self->{TIME}   = time;
+
+  return $self;
 }
 
 sub hub { $_[0]{MAIN} }
@@ -23,24 +27,28 @@ sub hub { $_[0]{MAIN} }
 sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};
-  if ($dist =~ m|/\.|) {
-    $self->verbose(1,"Warning: dist[$dist] has illegal filename\n");
-    return 1;
+
+  my $pick = $self->hub->{PICK};
+  if ($pick && %$pick && ! $pick->{$dist}) {
+    return "using --pick, but not for this dist";
   }
-  return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
+
+  return "illegal filename" if $dist =~ m|/\.|;
+
+  return "ruled out by extension" if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
+
   # Stupid to have code that needs to be maintained in two places,
   # here and in edit.pm:
-  return 1 if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
-  if ($self->{PICK}) {
-    return 1 unless $self->{PICK}{$dist};
-  }
+  return "weird CNANDOR case"
+    if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
+
   return;
 }
 
 sub delete_goner {
   my $self = shift;
   my $dist = $self->{DIST};
-  if ($self->{PICK} && $self->{PICK}{$dist}) {
+  if ($self->hub->{PICK} && $self->hub->{PICK}{$dist}) {
     $self->verbose(1,"Warning: parameter pick '$dist' refers to a goner, ignoring");
     return;
   }
@@ -119,7 +127,7 @@ sub mtime_ok {
       return 1;
     }
   }
-  if ($self->{PICK}{$dist}) {
+  if ($self->hub->{PICK}{$dist}) {
     return 1;
   }
   return;
@@ -143,7 +151,7 @@ sub untar {
   my $self = shift;
   my $dist = $self->{DIST};
   local *TARTEST;
-  my $tarbin = $self->{MAIN}{TARBIN};
+  my $tarbin = $self->hub->{TARBIN};
   my $MLROOT = $self->mlroot;
   my $tar_opt = "tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
@@ -273,7 +281,7 @@ sub examine_dist {
     $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
-    my $unzipbin = $self->{MAIN}{UNZIPBIN};
+    my $unzipbin = $self->hub->{UNZIPBIN};
     my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
     unless (system($system)==0) {
       $self->verbose(1,
@@ -292,20 +300,17 @@ sub examine_dist {
 
 sub connect {
   my($self) = @_;
-  my $main = $self->{MAIN};
-  $main->connect;
+  return $self->hub->connect;
 }
 
 sub disconnect {
   my($self) = @_;
-  my $main = $self->{MAIN};
-  $main->disconnect;
+  return $self->hub->disconnect;
 }
 
 sub mlroot {
   my($self) = @_;
-  my $main = $self->{MAIN};
-  $main->mlroot;
+  $self->hub->mlroot;
 }
 
 sub mail_summary {
@@ -560,8 +565,8 @@ sub mail_summary {
   }
   push @m, qq{__END__\n};
   my $pma = PAUSE::MailAddress->new_from_userid($author);
-  if ($PAUSE::Config->{TESTHOST} || $self->{MAIN}{OPT}{testhost}) {
-    if ($self->{PICK}) {
+  if ($PAUSE::Config->{TESTHOST} || $self->hub->{OPT}{testhost}) {
+    if ($self->hub->{PICK}) {
       local $"="";
       warn "Unsent Report [@m]";
     }
@@ -696,7 +701,7 @@ sub check_world_writable {
     }
     my $fixedfile = "$self->{DISTROOT}-withoutworldwriteables.tar.gz";
     my $todir = File::Basename::dirname($self->{DIST}); # M/MA/MAKAROW
-    my $to_abs = "$self->{MAIN}{MLROOT}/$todir/$fixedfile";
+    my $to_abs = $self->hub->{MLROOT} . "/$todir/$fixedfile";
     if (! length $self->{DISTROOT}) {
       push @wwfixingerrors, "Alert: \$self->{DISTROOT} is empty, cannot fix";
     } elsif ($self->{DIST} =~ /-withoutworldwriteables/) {
@@ -815,7 +820,6 @@ sub _index_by_files {
     my $fio = PAUSE::pmfile->new(
       DIO => $self,
       PMFILE => $pmfile,
-      TIME => $self->{TIME},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
       MAIN_PACKAGE => $main_package,
@@ -852,17 +856,14 @@ sub _index_by_meta {
     (
       DIO => $self,
       PMFILE => $v->{infile},
-      TIME => $self->{TIME},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
     );
-    my $pio = PAUSE::package
-    ->new(
+    my $pio = PAUSE::package->new(
       PACKAGE => $k,
       DIST => $dist,
       FIO => $fio,
       PP => $v,
-      TIME => $self->{TIME},
       PMFILE => $v->{infile},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
@@ -1080,13 +1081,12 @@ sub version_from_meta_ok {
 
 sub verbose {
   my($self,$level,@what) = @_;
-  my $main = $self->{MAIN};
-  $main->verbose($level,@what);
+  $self->hub->verbose($level,@what);
 }
 
 sub lock {
   my($self) = @_;
-  if ($self->{'SKIP-LOCKING'}) {
+  if ($self->hub->{'SKIP-LOCKING'}) {
     $self->verbose(1,"Forcing indexing without a lock");
     return 1;
   }
@@ -1182,7 +1182,7 @@ sub p6_index_dist {
   ###
   # Index binaries. We need to scan the archives content for this.
   local *TARTEST;
-  my $tarbin = $self->{MAIN}{TARBIN};
+  my $tarbin = $self->hub->{TARBIN};
   my $tar_opt = "tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
     $tar_opt = "tjf";
@@ -1220,9 +1220,6 @@ PAUSE::dist - Class representing one distribution
   my $dio = PAUSE::dist->new(
     MAIN   => $self,
     DIST   => $dist,
-    TIME   => $time,
-    PICK   => $self->{PICK},
-    'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
   );
 
 =head1 DESCRIPTION

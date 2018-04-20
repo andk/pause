@@ -396,8 +396,12 @@ sub reason_to_skip_dist {
 }
 
 sub maybe_index_dist {
-    my ($self, $dio) = @_;
-    my $dist = $dio->{DIST};
+    my ($self, $dist) = @_;
+
+    my $dio = PAUSE::dist->new(
+                               MAIN   => $self,
+                               DIST   => $dist,
+                              );
 
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
         $self->verbose(2, "skipping $dist: $skip_reason");
@@ -479,7 +483,6 @@ sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
     my $dbh = $self->connect;
-    my $time = time;
     my %alerts;
     my @all;
     my($fh) = File::Temp->new(
@@ -505,16 +508,7 @@ sub check_for_new {
 
         $self->verbose(2,". $dist ..") if $i%256 == 0;
 
-        my $dio = PAUSE::dist->new(
-                                   MAIN   => $self,
-                                   DIST   => $dist,
-                                   TIME   => $time,
-                                   PICK   => $self->{PICK},
-                                   USERID => PAUSE::dir2user($dist),
-                                   'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
-                                  );
-
-        my @alerts = $self->maybe_index_dist($dio);
+        my @alerts = $self->maybe_index_dist($dist);
         $alerts{ $dist } = \@alerts if @alerts;
     }
 
