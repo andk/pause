@@ -44,17 +44,13 @@ our $ISA_REGULAR_PERL = qr{
 ##    \z
 ##}x;
 
-
-# package PAUSE::dist
 sub DESTROY {}
 
-# package PAUSE::dist;
 sub new {
   my($me) = shift;
   bless { @_ }, ref($me) || $me;
 }
 
-# package PAUSE::dist;
 sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};
@@ -72,7 +68,6 @@ sub ignoredist {
   return;
 }
 
-# package PAUSE::dist;
 sub delete_goner {
   my $self = shift;
   my $dist = $self->{DIST};
@@ -85,7 +80,6 @@ sub delete_goner {
   $dbh->do("DELETE FROM distmtimes WHERE dist=?", undef, $dist);
 }
 
-# package PAUSE::dist;
 sub writechecksum {
   no warnings 'once';
   my($self, $dir) = @_;
@@ -106,7 +100,6 @@ sub writechecksum {
   PAUSE::newfile_hook("$dir/CHECKSUMS");
 }
 
-# package PAUSE::dist;
 sub mtime_ok {
   my $self = shift;
   my $otherts = shift || 0;
@@ -163,7 +156,6 @@ sub mtime_ok {
   return;
 }
 
-# package PAUSE::dist;
 sub alert {
   my ($self, $what) = @_;
 
@@ -178,7 +170,6 @@ sub all_alerts {
   return @{ $self->{ALERT} // [] };
 }
 
-# package PAUSE::dist;
 sub untar {
   my $self = shift;
   my $dist = $self->{DIST};
@@ -223,10 +214,8 @@ sub untar {
   return 1;
 }
 
-# package PAUSE::dist;
 sub perl_major_version { shift->{PERL_MAJOR_VERSION} }
 
-# package PAUSE::dist;
 sub skip { shift->{SKIP} }
 
 sub isa_regular_perl {
@@ -282,7 +271,6 @@ sub isa_dev_version {
   return $dist =~ /\d\.\d+_\d/ || $dist =~ /-TRIAL[0-9]*$SUFFQR/;
 }
 
-# package PAUSE::dist;
 sub examine_dist {
   my($self) = @_;
   my $dist = $self->{DIST};
@@ -338,28 +326,24 @@ sub examine_dist {
   $self->{SKIP}   = $skip;
 }
 
-# package PAUSE::dist
 sub connect {
   my($self) = @_;
   my $main = $self->{MAIN};
   $main->connect;
 }
 
-# package PAUSE::dist
 sub disconnect {
   my($self) = @_;
   my $main = $self->{MAIN};
   $main->disconnect;
 }
 
-# package PAUSE::dist
 sub mlroot {
   my($self) = @_;
   my $main = $self->{MAIN};
   $main->mlroot;
 }
 
-# package PAUSE::dist;
 sub mail_summary {
   my($self) = @_;
   my $distro = $self->{DIST};
@@ -644,7 +628,6 @@ sub mail_summary {
   }
 }
 
-# package PAUSE::dist;
 sub index_status {
   my($self,$pack,$version,$infile,$status,$verb_status) = @_;
   $self->{INDEX_STATUS}{$pack} = {
@@ -675,7 +658,6 @@ sub has_indexing_warnings {
   @$_ && return 1 for values %$warnings;
 }
 
-# package PAUSE::dist;
 sub check_blib {
   my($self) = @_;
   if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}) {
@@ -710,7 +692,6 @@ sub check_blib {
   }
 }
 
-# package PAUSE::dist;
 sub check_multiple_root {
   my($self) = @_;
   my %seen;
@@ -723,7 +704,6 @@ sub check_multiple_root {
   }
 }
 
-# package PAUSE::dist;
 sub check_world_writable {
   my($self) = @_;
   my @files = @{$self->{MANIFOUND}};
@@ -775,7 +755,6 @@ sub check_world_writable {
   }
 }
 
-# package PAUSE::dist;
 sub filter_pms {
   my($self) = @_;
   my @pmfile;
@@ -929,7 +908,6 @@ sub _index_by_meta {
   }
 }
 
-# package PAUSE::dist;
 sub examine_pms {
   my $self = shift;
   return if $self->{HAS_BLIB};
@@ -964,7 +942,6 @@ sub examine_pms {
   }
 }
 
-# package PAUSE::dist
 sub chown_unsafe {
   my($self) = @_;
   return if $self->{CHOWN_UNSAFE_DONE};
@@ -979,7 +956,6 @@ sub chown_unsafe {
   $self->{CHOWN_UNSAFE_DONE}++;
 }
 
-# package PAUSE::dist;
 sub read_dist {
   my $self = shift;
 
@@ -1000,7 +976,6 @@ sub read_dist {
   $self->verbose(1,"Found $manifound files in dist $dist, first $manifind[0]\n");
 }
 
-# package PAUSE::dist;
 sub extract_readme_and_meta {
   my $self = shift;
   my($suffix) = $self->{SUFFIX};
@@ -1110,7 +1085,6 @@ sub write_updated_meta6_json {
   close $meta_fh;
 }
 
-# package PAUSE::dist
 sub version_from_meta_ok {
   my($self) = @_;
   return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
@@ -1140,14 +1114,12 @@ sub version_from_meta_ok {
   return($self->{VERSION_FROM_META_OK} = 1);
 }
 
-# package PAUSE::dist
 sub verbose {
   my($self,$level,@what) = @_;
   my $main = $self->{MAIN};
   $main->verbose($level,@what);
 }
 
-# package PAUSE::dist
 sub lock {
   my($self) = @_;
   if ($self->{'SKIP-LOCKING'}) {
@@ -1183,7 +1155,6 @@ sub lock {
   return;
 }
 
-# package PAUSE::dist
 sub set_indexed {
   my($self) = @_;
   my $dist = $self->{DIST};
@@ -1197,7 +1168,6 @@ sub set_indexed {
   $rows_affected > 0;
 }
 
-# package PAUSE::dist
 sub p6_dist_meta_ok {
   my $self = shift;
   my $c    = $self->{META_CONTENT};
@@ -1207,7 +1177,6 @@ sub p6_dist_meta_ok {
   $c->{description}
 }
 
-# package PAUSE::dist
 sub p6_index_dist {
   my $self   = shift;
   my $dbh    = $self->connect;
