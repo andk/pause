@@ -108,6 +108,8 @@ sub setup { # better to use Test::mysqld
         password => PAUSE::Crypt::hash_password("test"),
         secretemail => $TestEmail,
       });
+      my $user_dir = join "/", $PAUSE::Config->{MLROOT}, PAUSE::user2dir($user);
+      path($user_dir)->mkpath;
     }
   }
   { # authen_pause.grouptable
