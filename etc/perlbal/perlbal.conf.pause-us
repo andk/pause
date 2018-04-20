@@ -110,7 +110,7 @@ CREATE SERVICE vhosts_ssl
 
   SET ssl_key_file                = /etc/letsencrypt/live/pause.perl.org/privkey.pem
   SET ssl_cert_file               = /etc/letsencrypt/live/pause.perl.org/fullchain.pem
-  VHOST pause2.develooper.com     = munin
+  VHOST pause2.develooper.com     = alternatepause
   VHOST *                         = pause
   HEADER vhosts_ssl remove X-pause-is-SSL
   HEADER vhosts_ssl insert X-pause-is-SSL: 1
