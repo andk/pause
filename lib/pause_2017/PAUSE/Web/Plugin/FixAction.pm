@@ -53,13 +53,13 @@ sub _fixup {
     # CASE 1
 
     my $redir = $req->base;
-    my $is_ssl = $req->header("X-pause-is-SSL") || 0;
+    my $is_ssl = $req->headers->header("X-pause-is-SSL") || 0;
     if ($is_ssl) {
       $redir->scheme("https");
     }
     $redir->path("$location/query");
     my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
-    $res->header("Location",$redir);
+    $res->headers->header("Location",$redir);
     # warn "redir[$redir]";
     return $res->finalize;
   }
