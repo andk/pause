@@ -500,8 +500,8 @@ sub check_for_new {
     die "Panic: unusual small number of files involved ($all)"
         if !$self->{PICK} && ! $self->_newcountokay($all);
     $self->verbose(2, "Starting BIGLOOP over $all files\n");
-  BIGLOOP: for my $i (0 .. $#all) {
-        my $dist = $all[$i];
+  BIGLOOP: for (my $i=0;scalar @all;$i++, $self->empty_dir($testdir)) {
+        my $dist = shift @all;
 
         $self->verbose(2,". $dist ..") if $i%256 == 0;
 
@@ -519,8 +519,6 @@ sub check_for_new {
 
         my @alerts = $self->maybe_index_dist($dio);
         $alerts{ $dist } = \@alerts if @alerts;
-    } continue {
-        $self->empty_dir($testdir);
     }
 
     untie @all;
