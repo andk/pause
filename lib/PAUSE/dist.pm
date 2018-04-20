@@ -165,14 +165,17 @@ sub mtime_ok {
 
 # package PAUSE::dist;
 sub alert {
-  my $self = shift;
-  my $what = shift;
-  if (defined $what) {
-    $self->{ALERT} ||= "";
-    $self->{ALERT} .= " $what";
-  } else {
-    return $self->{ALERT};
-  }
+  my ($self, $what) = @_;
+
+  $self->{ALERT} //= [];
+  1 while chomp $what;
+  push @{ $self->{ALERT} }, $what;
+  return;
+}
+
+sub all_alerts {
+  my ($self) = @_;
+  return @{ $self->{ALERT} // [] };
 }
 
 # package PAUSE::dist;
