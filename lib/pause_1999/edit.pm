@@ -2384,39 +2384,7 @@ Description: };
                    qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
                  ) unless $rc;
         $dbh->disconnect;
-        my $otpwblurb = qq{
-
-(This mail has been generated automatically by the Perl Authors Upload
-Server on behalf of the admin $PAUSE::Config->{ADMIN})
-
-As already described in a separate message, you\'re a registered Perl
-Author with the userid $userid. For the sake of approval I have
-assigned to you a change-password-only-password that enables
-you to pick your own password. This password is \"$onetime\"
-(without the enclosing quotes). Please visit
-
-  https://pause.perl.org/pause/authenquery?ACTION=change_passwd
-
-and use this password to initialize your account in the authentication
-database. Once you have entered your password there, your one-time
-password is expired automatically. If you cannot connect to the above
-URL, you can replace 'https' with 'http', but then you are not using
-SSL encryption. Be careful to always use an SSL connection if
-possible, otherwise your password can be intercepted by third parties.
-
-Thanks & Regards,
---
-$PAUSE::Config->{ADMIN}
-};
-
-        my $header = {
-                      Subject => $subject,
-                     };
-        warn "header[$header]otpwblurb[$otpwblurb]";
-        $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
-                              $header,
-                              $otpwblurb);
-
+        $self->_send_otp_email( $mgr, $userid, $email, $onetime );
       }
 
       @blurb = qq{
@@ -7384,6 +7352,41 @@ sub _verify_recaptcha {
     };
 
     return $ok, $err;
+}
+
+sub _send_otp_email {
+    my ( $self, $mgr, $userid, $email, $onetime ) = @_;
+
+    my $otpwblurb = <<"HERE";
+
+(This mail has been generated automatically by the Perl Authors Upload
+Server on behalf of the admin $PAUSE::Config->{ADMIN})
+
+As already described in a separate message, you\'re a registered Perl
+Author with the userid $userid. For the sake of approval I have
+assigned to you a change-password-only-password that enables
+you to pick your own password. This password is \"$onetime\"
+(without the enclosing quotes). Please visit
+
+  https://pause.perl.org/pause/authenquery?ACTION=change_passwd
+
+and use this password to initialize your account in the authentication
+database. Once you have entered your password there, your one-time
+password is expired automatically. If you cannot connect to the above
+URL, you can replace 'https' with 'http', but then you are not using
+SSL encryption. Be careful to always use an SSL connection if
+possible, otherwise your password can be intercepted by third parties.
+
+Thanks & Regards,
+--
+$PAUSE::Config->{ADMIN}
+HERE
+
+    my $header = {
+        Subject => qq{Welcome new user $userid}
+    };
+    warn "header[$header]otpwblurb[$otpwblurb]";
+    $mgr->send_mail_multi( [ $email, $PAUSE::Config->{ADMIN} ], $header, $otpwblurb );
 }
 
 1;
