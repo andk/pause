@@ -6,6 +6,7 @@ use Test::More;
 use DBI;
 use File::Temp qw/tempfile/;
 use Capture::Tiny qw/capture_merged/;
+use Path::Tiny;
 
 $SIG{INT} = sub { die "caught SIGINT, shutting down mysql\n" };
 
@@ -103,7 +104,10 @@ sub BUILD {
 
     for my $schema ( @{$self->schemas} ) {
         note("Loading schema: $schema");
-        $self->run_mysql( $schema );
+        my $body = path($schema)->slurp;
+        for (grep $_, split /;\n/s, $body) {
+            $dbh->do($_);
+        }
     }
 }
 
