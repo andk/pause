@@ -28,7 +28,7 @@ sub _is_ssl {
   if ($c->req->url->to_abs->scheme eq "https") {
     $pause->{is_ssl} = 1;
   } elsif (Sys::Hostname::hostname() =~ /pause2/) {
-    my $header = $c->req->header("X-pause-is-SSL") || 0;
+    my $header = $c->req->headers->header("X-pause-is-SSL") || 0;
     $pause->{is_ssl} = !!$header;
   }
 }
