@@ -97,6 +97,7 @@ WriteMakefile(
     YAML::XS
 )},
               SIGN => 1,
+              test => { RECURSIVE_TEST_FILES => 1 },
               ($ExtUtils::MakeMaker::VERSION >= 6.4502 ?
                (META_ADD => {
                              resources => {
