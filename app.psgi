@@ -58,8 +58,10 @@ builder {
 #    ;
     enable 'ServerStatus::Tiny', path => '/status';
 
-    # Static files should not be served by application server actually.
-    # This is only for testing/developing.
+    # Static files are serverd by us; maybe some day we want to change that
+    enable 'Static',
+        path => qr{(?:(?<!index)\.(js|css|gif|jpg|png|pod|html)$|^/\.well-known/)},
+        root => "$FindBin::Bin/htdocs";
     enable 'Static', path => qr{(?<!index)\.(js|css|gif|jpg|png|pod|html)$}, root => "$FindBin::Bin/htdocs";
 
     mount '/pub/PAUSE' => builder {
