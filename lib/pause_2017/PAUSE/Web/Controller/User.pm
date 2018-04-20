@@ -199,7 +199,7 @@ sub reindex {
     $pause->{eta} = $eta;
 
     my @to = $mgr->prepare_sendto($u, $pause->{User}, $PAUSE::Config->{ADMIN});
-    my $mailbody => $c->render_to_string("email/user/reindex", format => "email");
+    my $mailbody = $c->render_to_string("email/user/reindex", format => "email");
     my $header = {
                   Subject => "Scheduled for reindexing $u->{userid}"
                  };
