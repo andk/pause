@@ -14,7 +14,7 @@ sub parent {
 }
 
 sub dist { $_[0]{DIO} }
-sub hub  { $_[0]{DIO}{MAIN} }
+sub hub  { $_[0]{DIO}{HUB} }
 
 sub DESTROY {}
 
