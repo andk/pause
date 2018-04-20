@@ -2277,7 +2277,7 @@ sub scheduled {
 }
 
 sub add_user_doit {
-  my($self,$mgr,$userid,$fullname,$dont_clear) = @_;
+  my($self,$mgr,$userid,$fullname) = @_;
   my $req = $mgr->{REQ};
   my $T = time;
   my $dbh = $mgr->connect;
@@ -2423,12 +2423,10 @@ Subject: $subject\n};
     $blurb =~ s/\bCENSORED\b/$email/;
     $mgr->send_mail_multi([$email],$header,$blurb);
 
-    unless ($dont_clear) {
-      warn "Info: clearing all fields";
-      for my $field (qw(userid fullname email homepage subscribe memo)) {
+    warn "Info: clearing all fields";
+    for my $field (qw(userid fullname email homepage subscribe memo)) {
         my $param = "pause99_add_user_$field";
         $req->parameters->set($param,"");
-      }
     }
 
   } else {
@@ -2487,7 +2485,6 @@ sub add_user {
 
     $req->parameters->set("pause99_add_user_userid", $userid) if $userid;
     my $doit = 0;
-    my $dont_clear;
     my $fullname_raw = $req->param('pause99_add_user_fullname');
     my($fullname);
     $fullname = $mgr->any2utf8($fullname_raw);
@@ -2630,7 +2627,6 @@ sub add_user {
 	if (@urows) {
           my @rows = map { $_->{line} } sort { $b->{score} <=> $a->{score} } @urows;
 	  $doit = 0;
-	  $dont_clear = 1;
 	  unshift @rows, qq{
  <h3>Not submitting <i>$userid</i>, maybe we have a duplicate here</h3>
  <p>$s_package converted the fullname [<b>$fullname</b>] to [$s_code]</p>
@@ -2653,7 +2649,7 @@ sub add_user {
     }
     my $T = time;
     if ($doit) {
-      push @m, $self->add_user_doit($mgr,$userid,$fullname,$dont_clear);
+      push @m, $self->add_user_doit($mgr,$userid,$fullname);
     } elsif (@error) {
       push @m, qq{<h3>Error processing form</h3>};
       for (@error) {
