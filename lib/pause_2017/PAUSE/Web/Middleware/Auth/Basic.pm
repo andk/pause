@@ -51,7 +51,7 @@ sub authenticate {
   my $uri = $req->path || "";
   my $args = $req->uri->query || "";
   warn "WATCH: uri[$uri]args[$args]";
-  if ($cookie = $req->header('Cookie')) {
+  if ($cookie = $req->headers->header('Cookie')) {
     if ( $cookie =~ /logout/ ) {
       warn "WATCH: cookie[$cookie]";
       my $res = $req->new_response(HTTP_UNAUTHORIZED);
@@ -74,7 +74,7 @@ sub authenticate {
             path => $uri,
             expires => "Sat, 01-Oct-2027 00:00:00 UTC",
         };
-        $res->header("Location",$uri);
+        $res->headers->header("Location",$uri);
         return $res;
       } elsif ($logout =~ /^2/) { # badname
         my $redir = $req->base;
@@ -82,7 +82,7 @@ sub authenticate {
         $redir->userinfo('baduser:badpass');
         warn "redir[$redir]";
         my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
-        $res->header("Location",$redir);
+        $res->headers->header("Location",$redir);
         return $res;
       } elsif ($logout =~ /^3/) { # cancelnote
         return  HTTP_UNAUTHORIZED;

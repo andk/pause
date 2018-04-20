@@ -22,7 +22,7 @@ sub dispatch {
 
   my $method = $req->method;
   my $redir_to = $req->base;
-  my $is_ssl = $req->header("X-pause-is-SSL") || 1;
+  my $is_ssl = $req->headers->header("X-pause-is-SSL") || 1;
   if ($is_ssl) {
     $redir_to->scheme("https");
   }
@@ -36,7 +36,7 @@ sub dispatch {
     $redir_to->query($args) if $args;
     # warn "Statistics: Redirecting the_request[$the_request]redir_to[$redir_to]";
     my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
-    $res->header("Location", $redir_to);
+    $res->headers->header("Location", $redir_to);
     return $res->finalize;
   }
 
@@ -54,7 +54,7 @@ sub dispatch {
   $redir_to->path("/pause/query");
   $redir_to->query("ACTION=pause_05news") if $uri eq "/index.html";
   my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
-  $res->header("Location", $redir_to);
+  $res->headers->header("Location", $redir_to);
   return $res->finalize;
 }
 
