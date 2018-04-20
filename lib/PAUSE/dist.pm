@@ -363,7 +363,7 @@ sub mlroot {
 sub mail_summary {
   my($self) = @_;
   my $distro = $self->{DIST};
-  my $author = PAUSE::dir2user($distro);
+  my $author = $self->{USERID};
   my @m;
 
   push @m,
