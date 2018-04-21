@@ -251,6 +251,7 @@ sub disconnect {
     my $self = shift;
     return unless $self->{DBH};
     $self->{DBH}->disconnect;
+    delete $self->{PERM_MGR};
     delete $self->{DBH};
 }
 
