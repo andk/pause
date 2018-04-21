@@ -21,7 +21,7 @@ subtest "retry indexing on db failure" => sub {
   local $PAUSE::Config->{PRE_DB_WORK_CALLBACK} = sub {
     state $x = 1;
     if ($x) {
-      $x--, die "dying for diagnostic purposes (x eq $x)\n";
+      $x--, die PAUSE::DBError->new("dying for diagnostic purposes (x eq $x)\n");
     }
   };
 
@@ -43,7 +43,7 @@ subtest "retry indexing on db failure, only three times" => sub {
   my $x = 0;
   local $PAUSE::Config->{PRE_DB_WORK_CALLBACK} = sub {
     $x++;
-    die "dying for diagnostic purposes (failure $x)\n";
+    die PAUSE::DBError->new("dying for diagnostic purposes (failure $x)\n");
   };
 
   my $result = $pause->test_reindex;

@@ -373,9 +373,17 @@ sub _do_the_database_work {
     return 1;
   };
 
+  my $err = $@;
   # Remember, $ok here only means "did the db work die," not "did we
   # successfully index stuff." -- rjbs, 2018-04-19
-  $self->verbose(2, "Error with database work: $@") unless $ok;
+  if ( !$ok ) {
+    # Rethrow any errors that weren't from the database
+    die $err if $err && ref($err) ne 'PAUSE::DBError';
+
+    # $err should have a value if !$ok, but just in case not
+    $err ||= "unknown error";
+    $self->verbose(2, "Error with database work: $err");
+  }
   return $ok;
 }
 
@@ -472,6 +480,7 @@ sub maybe_index_dist {
     for my $attempt (1 .. 3) {
       my $db_ok = $self->_do_the_database_work($dio);
       last if $db_ok;
+      $self->disconnect;
       if ($attempt == 3) {
         $self->verbose(2, "tried $attempt times to do db work, but all failed");
         $dio->alert("database errors while indexing");
