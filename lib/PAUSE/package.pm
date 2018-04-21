@@ -60,6 +60,10 @@ sub parent {
   $self->{FIO} || $self->{DIO};
 }
 
+sub pmfile { $_[0]{FIO}      }
+sub dist   { $_[0]{FIO}{DIO} }
+sub hub    { $_[0]{FIO}{DIO}{HUB} }
+
 sub DESTROY {}
 
 # package PAUSE::package;
@@ -176,7 +180,7 @@ sub perm_check {
     @args
   );
 
-  if ($self->{FIO}{DIO} && $self->{FIO}{DIO}->isa_regular_perl($dist)) {
+  if ($self->{FIO}{DIO} && PAUSE::isa_regular_perl($dist)) {
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
       my $ret = $dbh->do($ins_perms, undef, @ins_params);
@@ -223,7 +227,7 @@ sub perm_check {
       my @owned       = grep { $_->[1] eq $userid  } @$auth_ids;
       my @owned_exact = grep { $_->[0] eq $package } @owned;
 
-      if ($self->{FIO}{DIO}->isa_regular_perl($dist)) {
+      if (PAUSE::isa_regular_perl($dist)) {
           # seems ok: perl is always right
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
@@ -462,7 +466,7 @@ sub update_package {
   my $distorperlok = File::Basename::basename($dist) !~ m|/perl|;
   # this dist is not named perl-something (lex ILYAZ)
 
-  my $isa_regular_perl = $self->{FIO}{DIO}->isa_regular_perl($dist);
+  my $isa_regular_perl = PAUSE::isa_regular_perl($dist);
 
   $distorperlok ||= $isa_regular_perl;
   # or it is THE perl dist
@@ -471,7 +475,7 @@ sub update_package {
   # or it is called perl-something (e.g. perl-ldap) AND...
   my($something2) = File::Basename::basename($odist) =~ m|/perl(.....)|;
   # and we compare against another perl-something AND...
-  my($older_isa_regular_perl) = $self->{FIO}{DIO}->isa_regular_perl($odist);
+  my($older_isa_regular_perl) = PAUSE::isa_regular_perl($odist);
   # the file we're comparing with is not the perl dist
 
   $distorperlok ||= $something1 && $something2 &&
@@ -672,7 +676,7 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
       my $query = qq{UPDATE packages SET package = ?, version = ?, dist = ?, file = ?,
 filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
-      $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME},$package\n");
+      $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . ",$package\n");
       my $rows_affected = eval { $dbh->do
                                      ($query,
                                       undef,
@@ -681,7 +685,7 @@ filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
                                       $dist,
                                       $pp->{infile},
                                       $pp->{filemtime},
-                                      $self->{TIME},
+                                      $self->dist->{TIME},
                                       $package,
                                      );
                              };
@@ -742,7 +746,7 @@ sub insert_into_package {
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
   my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg) VALUES (?,?,?,?,?,?) };
-  $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime},$self->{TIME}\n");
+  $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . "\n");
 
   return unless $self->_version_ok($pp, $package, $dist);
   $dbh->do($query,
@@ -752,7 +756,7 @@ sub insert_into_package {
             $dist,
             $pp->{infile},
             $pp->{filemtime},
-            $self->{TIME},
+            $self->dist->{TIME},
           );
   $self->index_status($package,
                       $pp->{version},

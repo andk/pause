@@ -37,7 +37,7 @@ if ($USE_RECENTFILE_HOOKS) {
 }
 our $IS_PAUSE_US = Sys::Hostname::hostname =~ /pause2/ ? 1 : 0;
 
-use strict;
+use v5.12.0;
 use vars qw(@ISA @EXPORT_OK $VERSION $Config $Id);
 
 @ISA = qw(Exporter); ## no critic
@@ -529,6 +529,31 @@ sub user_has_pumpking_bit {
   $adbh->disconnect;
 
   return $ok;
+}
+
+sub isa_regular_perl {
+  my ($filename) = @_;
+
+  # ISA_REGULAR_PERL means a perl release for public consumption (and must
+  # exclude developer releases like 5.9.4).  CPAN.pm has a different regex for
+  # perl because there we want to protect the user from developer releases too,
+  # but here we want to index a distro with very special treatment that is only
+  # reserved for "real" perl distros. (The exclusion of developer releases was
+  # accidentally lost in rev 815) -- andk
+
+  state $ISA_REGULAR_PERL = qr{
+      /
+      ( perl-5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
+      | perl5[._](00\d(_[0-4][0-9])?)
+      | ponie-[\d.\-]
+      )
+      (?: \.tar[._-]gz
+      |   \.tar\.bz2
+      )
+      \z
+  }x;
+
+  return scalar $filename =~ $ISA_REGULAR_PERL;
 }
 
 1;

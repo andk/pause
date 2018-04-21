@@ -3,7 +3,7 @@ use warnings;
 
 use 5.10.1;
 use lib 't/lib';
-use lib 't/lib/privatelib'; # Stub PrivatePAUSE
+use lib 't/privatelib'; # Stub PrivatePAUSE
 
 use Email::Sender::Transport::Test;
 $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';

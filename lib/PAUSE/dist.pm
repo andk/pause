@@ -11,50 +11,19 @@ use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
 use JSON::XS ();
 
-# ISA_REGULAR_PERL means a perl release for public consumption
-# (and must exclude developer releases like 5.9.4). I need to
-# rename it from ISAPERL to ISA_REGULAR_PERL to avoid
-# confusion with CPAN.pm. CPAN.pm has a different regex for
-# ISAPERL because there we want to protect the user from
-# developer releases too, but here we want to index a distro
-# with very special treatment that is only reserved for "real"
-# perl distros. (The exclusion of developer releases was
-# accidentally lost in rev 815)
-our $ISA_REGULAR_PERL = qr{
-    /
-    ( perl-5[._-](\d{3}(_[0-4][0-9])?|\d*[02468]\.\d+)
-    | perl5[._](00\d(_[0-4][0-9])?)
-    | ponie-[\d.\-]
-    )
-    (?: \.tar[._-]gz
-    |   \.tar\.bz2
-    )
-    \z
-}x;
-# But we need to refuse indexing of bleadperls too: for duallife
-# modules.
-# 2013-04-14: no longer used, but left commented out in case we change
-# our minds -- xdg, 2013-04-14
-##our $ISA_BLEAD_PERL = qr{
-##    /
-##    perl-5\.\d*[13579]\.\d+
-##    (?: \.tar\.gz
-##    |   \.tar\.bz2
-##    )
-##    \z
-##}x;
-
-
-# package PAUSE::dist
 sub DESTROY {}
 
-# package PAUSE::dist;
 sub new {
   my($me) = shift;
-  bless { @_ }, ref($me) || $me;
+  my $self = bless { @_ }, ref($me) || $me;
+  $self->{USERID} = PAUSE::dir2user($self->{DIST});
+  $self->{TIME}   = time;
+
+  return $self;
 }
 
-# package PAUSE::dist;
+sub hub { $_[0]{HUB} }
+
 sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};
@@ -65,18 +34,16 @@ sub ignoredist {
   return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
   # Stupid to have code that needs to be maintained in two places,
   # here and in edit.pm:
-  return 1 if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
-  if ($self->{PICK}) {
-    return 1 unless $self->{PICK}{$dist};
-  }
+  return "weird CNANDOR case"
+    if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
+
   return;
 }
 
-# package PAUSE::dist;
 sub delete_goner {
   my $self = shift;
   my $dist = $self->{DIST};
-  if ($self->{PICK} && $self->{PICK}{$dist}) {
+  if ($self->hub->{PICK} && $self->hub->{PICK}{$dist}) {
     $self->verbose(1,"Warning: parameter pick '$dist' refers to a goner, ignoring");
     return;
   }
@@ -85,7 +52,6 @@ sub delete_goner {
   $dbh->do("DELETE FROM distmtimes WHERE dist=?", undef, $dist);
 }
 
-# package PAUSE::dist;
 sub writechecksum {
   no warnings 'once';
   my($self, $dir) = @_;
@@ -106,7 +72,6 @@ sub writechecksum {
   PAUSE::newfile_hook("$dir/CHECKSUMS");
 }
 
-# package PAUSE::dist;
 sub mtime_ok {
   my $self = shift;
   my $otherts = shift || 0;
@@ -157,13 +122,12 @@ sub mtime_ok {
       return 1;
     }
   }
-  if ($self->{PICK}{$dist}) {
+  if ($self->hub->{PICK}{$dist}) {
     return 1;
   }
   return;
 }
 
-# package PAUSE::dist;
 sub alert {
   my ($self, $what) = @_;
 
@@ -178,12 +142,11 @@ sub all_alerts {
   return @{ $self->{ALERT} // [] };
 }
 
-# package PAUSE::dist;
 sub untar {
   my $self = shift;
   my $dist = $self->{DIST};
   local *TARTEST;
-  my $tarbin = $self->{TARBIN};
+  my $tarbin = $self->hub->{TARBIN};
   my $MLROOT = $self->mlroot;
   my $tar_opt = "tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
@@ -223,16 +186,9 @@ sub untar {
   return 1;
 }
 
-# package PAUSE::dist;
 sub perl_major_version { shift->{PERL_MAJOR_VERSION} }
 
-# package PAUSE::dist;
 sub skip { shift->{SKIP} }
-
-sub isa_regular_perl {
-  my($self,$dist) = @_;
-  scalar $dist =~ /$PAUSE::dist::ISA_REGULAR_PERL/;
-}
 
 # Commented out this function just like $ISA_BLEAD_PERL
 ##sub isa_blead_perl {
@@ -282,7 +238,6 @@ sub isa_dev_version {
   return $dist =~ /\d\.\d+_\d/ || $dist =~ /-TRIAL[0-9]*$SUFFQR/;
 }
 
-# package PAUSE::dist;
 sub examine_dist {
   my($self) = @_;
   my $dist = $self->{DIST};
@@ -290,7 +245,7 @@ sub examine_dist {
   my($suffix,$skip);
   $suffix = $skip = "";
 
-  if ($self->isa_regular_perl($dist)) {
+  if (PAUSE::isa_regular_perl($dist)) {
     ($suffix, $skip) = $self->_examine_regular_perl;
     $self->{SUFFIX} = $suffix;
     $self->{SKIP}   = $skip;
@@ -321,7 +276,7 @@ sub examine_dist {
     $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
   } elsif ($dist =~ /\.zip$/) {
     $suffix = "zip";
-    my $unzipbin = $self->{UNZIPBIN};
+    my $unzipbin = $self->hub->{UNZIPBIN};
     my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
     unless (system($system)==0) {
       $self->verbose(1,
@@ -338,28 +293,21 @@ sub examine_dist {
   $self->{SKIP}   = $skip;
 }
 
-# package PAUSE::dist
 sub connect {
   my($self) = @_;
-  my $main = $self->{MAIN};
-  $main->connect;
+  return $self->hub->connect;
 }
 
-# package PAUSE::dist
 sub disconnect {
   my($self) = @_;
-  my $main = $self->{MAIN};
-  $main->disconnect;
+  return $self->hub->disconnect;
 }
 
-# package PAUSE::dist
 sub mlroot {
   my($self) = @_;
-  my $main = $self->{MAIN};
-  $main->mlroot;
+  $self->hub->mlroot;
 }
 
-# package PAUSE::dist;
 sub mail_summary {
   my($self) = @_;
   my $distro = $self->{DIST};
@@ -612,8 +560,8 @@ sub mail_summary {
   }
   push @m, qq{__END__\n};
   my $pma = PAUSE::MailAddress->new_from_userid($author);
-  if ($PAUSE::Config->{TESTHOST} || $self->{MAIN}{OPT}{testhost}) {
-    if ($self->{PICK}) {
+  if ($PAUSE::Config->{TESTHOST} || $self->hub->{OPT}{testhost}) {
+    if ($self->hub->{PICK}) {
       local $"="";
       warn "Unsent Report [@m]";
     }
@@ -644,7 +592,6 @@ sub mail_summary {
   }
 }
 
-# package PAUSE::dist;
 sub index_status {
   my($self,$pack,$version,$infile,$status,$verb_status) = @_;
   $self->{INDEX_STATUS}{$pack} = {
@@ -675,7 +622,6 @@ sub has_indexing_warnings {
   @$_ && return 1 for values %$warnings;
 }
 
-# package PAUSE::dist;
 sub check_blib {
   my($self) = @_;
   if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}) {
@@ -710,7 +656,6 @@ sub check_blib {
   }
 }
 
-# package PAUSE::dist;
 sub check_multiple_root {
   my($self) = @_;
   my %seen;
@@ -723,7 +668,6 @@ sub check_multiple_root {
   }
 }
 
-# package PAUSE::dist;
 sub check_world_writable {
   my($self) = @_;
   my @files = @{$self->{MANIFOUND}};
@@ -752,7 +696,7 @@ sub check_world_writable {
     }
     my $fixedfile = "$self->{DISTROOT}-withoutworldwriteables.tar.gz";
     my $todir = File::Basename::dirname($self->{DIST}); # M/MA/MAKAROW
-    my $to_abs = "$self->{MAIN}{MLROOT}/$todir/$fixedfile";
+    my $to_abs = $self->hub->{MLROOT} . "/$todir/$fixedfile";
     if (! length $self->{DISTROOT}) {
       push @wwfixingerrors, "Alert: \$self->{DISTROOT} is empty, cannot fix";
     } elsif ($self->{DIST} =~ /-withoutworldwriteables/) {
@@ -775,7 +719,6 @@ sub check_world_writable {
   }
 }
 
-# package PAUSE::dist;
 sub filter_pms {
   my($self) = @_;
   my @pmfile;
@@ -872,7 +815,6 @@ sub _index_by_files {
     my $fio = PAUSE::pmfile->new(
       DIO => $self,
       PMFILE => $pmfile,
-      TIME => $self->{TIME},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
       MAIN_PACKAGE => $main_package,
@@ -909,17 +851,14 @@ sub _index_by_meta {
     (
       DIO => $self,
       PMFILE => $v->{infile},
-      TIME => $self->{TIME},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
     );
-    my $pio = PAUSE::package
-    ->new(
+    my $pio = PAUSE::package->new(
       PACKAGE => $k,
       DIST => $dist,
       FIO => $fio,
       PP => $v,
-      TIME => $self->{TIME},
       PMFILE => $v->{infile},
       USERID => $self->{USERID},
       META_CONTENT => $self->{META_CONTENT},
@@ -929,7 +868,6 @@ sub _index_by_meta {
   }
 }
 
-# package PAUSE::dist;
 sub examine_pms {
   my $self = shift;
   return if $self->{HAS_BLIB};
@@ -964,7 +902,6 @@ sub examine_pms {
   }
 }
 
-# package PAUSE::dist
 sub chown_unsafe {
   my($self) = @_;
   return if $self->{CHOWN_UNSAFE_DONE};
@@ -979,7 +916,6 @@ sub chown_unsafe {
   $self->{CHOWN_UNSAFE_DONE}++;
 }
 
-# package PAUSE::dist;
 sub read_dist {
   my $self = shift;
 
@@ -1000,7 +936,6 @@ sub read_dist {
   $self->verbose(1,"Found $manifound files in dist $dist, first $manifind[0]\n");
 }
 
-# package PAUSE::dist;
 sub extract_readme_and_meta {
   my $self = shift;
   my($suffix) = $self->{SUFFIX};
@@ -1110,7 +1045,6 @@ sub write_updated_meta6_json {
   close $meta_fh;
 }
 
-# package PAUSE::dist
 sub version_from_meta_ok {
   my($self) = @_;
   return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
@@ -1140,17 +1074,14 @@ sub version_from_meta_ok {
   return($self->{VERSION_FROM_META_OK} = 1);
 }
 
-# package PAUSE::dist
 sub verbose {
   my($self,$level,@what) = @_;
-  my $main = $self->{MAIN};
-  $main->verbose($level,@what);
+  $self->hub->verbose($level,@what);
 }
 
-# package PAUSE::dist
 sub lock {
   my($self) = @_;
-  if ($self->{'SKIP-LOCKING'}) {
+  if ($self->hub->{'SKIP-LOCKING'}) {
     $self->verbose(1,"Forcing indexing without a lock");
     return 1;
   }
@@ -1183,7 +1114,6 @@ sub lock {
   return;
 }
 
-# package PAUSE::dist
 sub set_indexed {
   my($self) = @_;
   my $dist = $self->{DIST};
@@ -1197,7 +1127,6 @@ sub set_indexed {
   $rows_affected > 0;
 }
 
-# package PAUSE::dist
 sub p6_dist_meta_ok {
   my $self = shift;
   my $c    = $self->{META_CONTENT};
@@ -1207,7 +1136,6 @@ sub p6_dist_meta_ok {
   $c->{description}
 }
 
-# package PAUSE::dist
 sub p6_index_dist {
   my $self   = shift;
   my $dbh    = $self->connect;
@@ -1249,7 +1177,7 @@ sub p6_index_dist {
   ###
   # Index binaries. We need to scan the archives content for this.
   local *TARTEST;
-  my $tarbin = $self->{TARBIN};
+  my $tarbin = $self->hub->{TARBIN};
   my $tar_opt = "tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
     $tar_opt = "tjf";
@@ -1285,14 +1213,8 @@ PAUSE::dist - Class representing one distribution
 =head1 SYNOPSIS
 
   my $dio = PAUSE::dist->new(
-    MAIN   => $self,
+    HUB    => $mldistwatch,
     DIST   => $dist,
-    DBH    => $dbh,
-    TIME   => $time,
-    TARBIN => $self->{TARBIN},
-    UNZIPBIN  => $self->{UNZIPBIN},
-    PICK   => $self->{PICK},
-    'SKIP-LOCKING'  => $self->{'SKIP-LOCKING'},
   );
 
 =head1 DESCRIPTION
@@ -1310,7 +1232,7 @@ Constructor.
 
 Does these checks:
 
-  $dio->isa_regular_perl
+  PAUSE::isa_regular_perl($dio->dist)
   $dio->isa_dev_version
   $dist =~ m|/perl-\d+|
 
@@ -1372,8 +1294,6 @@ Is this a distro for Perl 5 or 6?
 =head3 skip
 
 Accessor method. True if perl distro from non-pumpking or a dev release.
-
-=head3 isa_regular_perl
 
 =head3 _examine_regular_perl
 
