@@ -128,6 +128,7 @@ sub _auto_registration_rate_limit_ok {
         qq{ SELECT COUNT(*) FROM users where introduced > ?  },
         undef, time - 24 * 3600,
     );
+    warn "new_user $new_users <= limit $limit?";
 
     return $new_users <= $limit;
 }
