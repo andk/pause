@@ -86,6 +86,7 @@ CREATE SERVICE vhosts
   SET enable_ssl                  = off
   SET plugins                     = vhosts
   VHOST analysis.cpantesters.org  = analysis
+  VHOST pause2.develooper.com     = alternatepause
   VHOST *                         = pause
   HEADER vhosts remove X-pause-is-SSL
   HEADER vhosts insert X-pause-is-SSL: 0
