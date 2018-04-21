@@ -164,13 +164,8 @@ sub perm_check {
   }
 
   # is uploader authorized for this package? --> case sensitive
-  my($is_primeur) = $dbh->selectrow_hashref(qq{SELECT package, userid
-                                    FROM   primeur
-                                    WHERE  package = ? AND userid = ?},
-                                    undef,
-                                    $package, $userid
-                                  );
-  if ($is_primeur) {
+  my $primeur = $self->hub->permissions->get_package_first_come_with_exact_case($package);
+  if ($userid eq $primeur) {
 
       local($dbh->{RaiseError}) = 0;
       local($dbh->{PrintError}) = 0;
