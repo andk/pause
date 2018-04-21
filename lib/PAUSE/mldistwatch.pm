@@ -38,6 +38,7 @@ use PAUSE::pmfile ();
 use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
 use PAUSE::MailAddress ();
+use PAUSE::Permissions ();
 use Safe;
 use Text::Format;
 
@@ -143,6 +144,12 @@ sub reindex {
     $self->rewrite_indexes;
 
     $self->disconnect;
+}
+
+sub permissions {
+    my $self = shift;
+    return $self->{PERM_MGR} if $self->{PERM_MGR};
+    $self->{PERM_MGR} = PAUSE::Permissions->new( dbh => $self->connect );
 }
 
 sub rewrite_indexes {
@@ -355,7 +362,7 @@ sub _do_the_database_work {
 
     my $main_pkg = $dio->_package_governing_permission;
 
-    if ($self->_userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
+    if ($self->permissions->userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
       $dbh->commit;
     } else {
       $dio->alert("Uploading user has no permissions on package $main_pkg");
@@ -562,36 +569,6 @@ sub handle_alerts {
     sendmail($email);
 
     return;
-}
-
-sub _userid_has_permissions_on_package {
-  my ($self, $userid, $package) = @_;
-
-  if ($package eq 'perl') {
-    return PAUSE->user_has_pumpking_bit($userid);
-  }
-
-  my $dbh = $self->connect;
-
-  my ($has_perms) = $dbh->selectrow_array(
-    qq{
-      SELECT COUNT(*) FROM perms
-      WHERE userid = ? AND LOWER(package) = LOWER(?)
-    },
-    undef,
-    $userid, $package,
-  );
-
-  my ($has_primary) = $dbh->selectrow_array(
-    qq{
-      SELECT COUNT(*) FROM primeur
-      WHERE userid = ? AND LOWER(package) = LOWER(?)
-    },
-    undef,
-    $userid, $package,
-  );
-
-  return($has_perms || $has_primary);
 }
 
 sub empty_dir {
