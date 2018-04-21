@@ -34,6 +34,7 @@ sub request {
   my $homepage  = $req->param('pause99_request_id_homepage') || "";
   my $userid    = $req->param('pause99_request_id_userid') || "";
   my $rationale = $req->param("pause99_request_id_rationale") || "";
+  my $token     = $req->param("g-recaptcha-response") || "";
   my $urat = PAUSE::Web::Util::Encode::any2utf8($rationale);
   if ($urat ne $rationale) {
     $req->param("pause99_request_id_rationale" => $urat);
@@ -114,6 +115,22 @@ sub request {
   $pause->{reg_ok} = $regOK;
 
   if ($regOK) {
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED}
+        && $c->auto_registration_rate_limit_ok
+    ) {
+        $pause->{recaptcha_enabled} = 1;
+        my ($valid, $err) = $c->verify_recaptcha($token);
+        if ( $valid ) {
+            # If recaptcha is valid, we shortcut and add the user directly,
+            # returning HTML for them to see.
+            return $c->_directly_add_user($userid, $fullname);
+        }
+        elsif ( defined $valid && ! $valid ) {
+            die PAUSE::Web::Exception->new(ERROR => "recaptcha failed validation: $err\n");
+        }
+        # else recapture couldn't complete so continue with normal
+        # ID request moderation
+    }
 
     my @to = $mgr->config->mailto_admins;
     push @to, $email;
@@ -183,6 +200,59 @@ sub request {
     warn "To[@to]Subject[$header->{Subject}]";
     $mgr->send_mail_multi(\@to,$header,$blurb);
   }
+}
+
+sub _directly_add_user {
+    my ($c, $userid, $fullname) = @_;
+    my $pause = $c->stash(".pause");
+    my $mgr = $c->app->pause;
+    my $req = $c->req;
+
+    my $T   = time;
+    my $dbh = $mgr->connect;
+    local ( $dbh->{RaiseError} ) = 0;
+
+    my ( $query, $sth, @qbind );
+    my ($email)    = $req->param('pause99_request_id_email');
+    my ($homepage) = $req->param('pause99_request_id_homepage');
+    $query = qq{INSERT INTO users (
+                    userid,     email,    homepage,  fullname,
+                     isa_list, introduced, changed,  changedby)
+                    VALUES (
+                     ?,          ?,        ?,         ?,
+                     ?,        ?,          ?,        ?)};
+    @qbind =
+      ( $userid, "CENSORED", $homepage, $fullname, "", $T, $T, $userid );
+
+    # We have a query for INSERT INTO users
+
+    if ( $dbh->do( $query, undef, @qbind ) ) {
+        $pause->{added_user} = 1;
+        # Not a mailinglist: set and send one time password
+        my $onetime = $c->set_onetime_password( $userid, $email );
+        $c->send_otp_email( $userid, $email, $onetime );
+
+        # send emails to user and modules@perl.org; latter must censor the
+        # user's email address
+        my ( $subject, $blurb ) =
+          $c->send_welcome_email( [$email], $userid, $email, $fullname, $homepage,
+            $fullname );
+        $c->send_welcome_email( $PAUSE::Config->{ADMINS},
+            $userid, "CENSORED", $fullname, $homepage, $fullname );
+
+        $pause->{subject_for_user_addition} = $subject;
+        $pause->{blurb_for_user_addition} = $blurb;
+
+        warn "Info: clearing all fields";
+        for my $field (qw(userid fullname email homepage subscribe)) {
+            my $param = "pause99_request_id_$field";
+            $req->param( $param, "" );
+        }
+    }
+    else {
+        warn qq{New user creation failed: [$query] failed. Reason: } . $dbh->errstr;
+        # TODO should notify administrators if this occurs
+    }
 }
 
 1;

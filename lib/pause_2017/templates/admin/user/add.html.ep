@@ -76,11 +76,14 @@ changed&#160;by&#160;<%= $row->{changedby} %><br>
 %     if ($pause->{succeeded}) {
 
 <h3>Submitting query</h3>
-<p>Query succeeded.</p><p>Do you want to 
-<a href="<%= my_url->query([
-  pause99_add_mod_userid => $pause->{userid},
-  SUBMIT_pause99_add_mod_preview => "preview",
-]) %>">register a module for <%= $pause->{userid} %>?</a></p>
+<p>New user creation succeeded.</p>
+
+%       if ($pause->{subscribe}) { # mailing list
+<p>Mailing list entered by <%= $pause->{User}{fullname} %>:</p>
+<p>Userid: <%= $pause->{userid} %></p>
+<p>Name: <%= $pause->{maillistname} %></p>
+<p>Description: <%= $pause->{subscribe} %></p>
+%       } else { # new user
 
 Sending separate mails to: <%= $pause->{send_to} %>
 <pre>
@@ -89,6 +92,7 @@ Subject: <%= $pause->{subject} %>
 
 <%= $pause->{blurb} %>
 </pre>
+%       }
 %     } else {
 <p><b>Query [<%= $pause->{query} %>] failed. Reason:</b></p><p><%= $pause->{query_error} %></p>
 
@@ -175,17 +179,6 @@ subscribe information if this user is a mailing list
 <%= text_field "pause99_add_user_subscribe",
     size => 50,
     maxlength => 256,
-=%>
-
-<br>
-
-<br>
-If you want to send a message to new author, please
-enter it here:<br>
-
-<%= text_area "pause99_add_user_memo",
-    rows => 6,
-    cols => 60,
 =%>
 
 <br>

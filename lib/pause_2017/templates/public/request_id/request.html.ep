@@ -19,7 +19,27 @@ in many Perl community sites.</p>
 %= include "public/request_id/_form";
 
 % }
-% if ($pause->{reg_ok} && $pause->{blurbcopy}) {
+% if ($pause->{reg_ok}) {
+%   if ($pause->{recaptcha_enabled}) {
+%     if ($pause->{added_user}) {
+<p>New user creation succeeded.</p>
+
+<p><b>LOOK FOR AN EMAIL WITH YOUR TEMPORARY PASSWORD.</b></p>
+
+<p>You'll also receive a welcome email like the one below.</p>
+
+<pre class="email_sent">
+From: <%= $PAUSE::Config->{UPLOAD} %>
+Subject: <%= $pause->{subject_for_user_addition} %>
+
+<%== $pause->{blurb_for_user_addition} %>
+</pre>
+<hr noshade="noshade">
+%     } else {
+<p><b>New user creation failed.</b></p>
+%     }
+%   }
+%   elsif ($pause->{blurbcopy}) {
 Sending mail to: <%= $pause->{send_to} %>
 <pre class="email_sent">
 From: <%= $PAUSE::Config->{UPLOAD} %>
@@ -29,4 +49,5 @@ Subject: <%= $pause->{subject} %>
 </pre>
 <hr noshade="noshade">
 
+%   }
 % }
