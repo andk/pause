@@ -14,12 +14,12 @@ homepage: <%== $pause->{homepage} %>
 The following links are only valid for PAUSE maintainers:
 
 Registration form with editing capabilities:
-  <%== my_full_url->path("/pause/authenquery")->query(
+  <%== my_full_url->path("/pause/authenquery")->scheme('https')->query(
        ACTION => "add_user",
        USERID => $pause->{session_id},
        SUBMIT_pause99_add_user_sub => 1) %>
 Immediate (one click) registration:
-  <%== my_full_url->path("/pause/authenquery")->query(
+  <%== my_full_url->path("/pause/authenquery")->scheme('https')->query(
        ACTION => "add_user",
        USERID => $pause->{session_id},
        SUBMIT_pause99_add_user_Definitely => 1 ) %>
