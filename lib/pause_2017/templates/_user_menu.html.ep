@@ -13,7 +13,7 @@
 <div class="menu">
 % unless (%$user) {
 %   my $scheme = $PAUSE::Config->{TESTHOST_SCHEMA} ? $PAUSE::Config->{TESTHOST_SCHEMA} : "https";
-<p class="menuitem"><a class="menuitem" href="<%= url_for('/authenquery')->scheme($scheme) %>">Login</a></p>
+<p class="menuitem"><a class="menuitem" href="<%= url_for('/authenquery')->scheme($scheme) %>">Log in</a></p>
 % }
 % for my $group (@offer_groups) {
 %   last if $group eq "user" and !$user->{userid};
