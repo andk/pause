@@ -4,17 +4,55 @@ use warnings;
 
 package PAUSE::Permissions;
 
-use DBI;
 use Moo;
 use PAUSE ();
 
 has dbh => (
-  is => 'lazy',
+  is => 'ro',
+  required => 1,
 );
 
-sub _build_dbh {
-  my ($self) = @_;
-  return PAUSE::dbh("mod");
+# returns callback to copy permissions from one package to another;
+# currently doesn't address primeur or *remove* excess permissions from
+# the destination. I.e. after running this, perms on the destination will
+# be a superset of the source.
+sub plan_package_permission_copy {
+  my ( $self, $src, $dst ) = @_;
+  my $dbh = $self->dbh;
+
+  return sub {
+    local($dbh->{RaiseError}) = 0;
+    my $src_permissions = $dbh->selectall_arrayref(
+        q{
+        SELECT userid
+        FROM   perms
+        WHERE  LOWER(package) = LOWER(?)
+        },
+        { Slice => {} },
+        $src,
+        );
+
+    # TODO: correctly set first-come as well
+
+    # TODO: drop perms on the destination before copying so they are
+    # actually equal
+
+    # TODO: return if they're already equal permissions -- rjbs, 2018-04-19
+
+    for my $row (@$src_permissions) {
+      my ($mods_userid) = $row->{userid};
+      local ( $dbh->{RaiseError} ) = 0;
+      local ( $dbh->{PrintError} ) = 0;
+      my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
+      my $ret   = $dbh->do( $query, {}, $dst, $mods_userid );
+      my $err   = "";
+      $err = $dbh->errstr unless defined $ret;
+      $ret ||= "";
+      $self->verbose( 1,
+          "Insert into perms package[$dst]mods_userid"
+          . "[$mods_userid]ret[$ret]err[$err]\n" );
+    }
+  }
 }
 
 sub userid_has_permissions_on_package {
@@ -45,6 +83,11 @@ sub userid_has_permissions_on_package {
   );
 
   return($has_perms || $has_primary);
+}
+
+sub verbose {
+    my ($self, $level, @what) = @_;
+    PAUSE->log($self, $level, @what);
 }
 
 1;

@@ -90,44 +90,14 @@ sub give_regdowner_perms {
   # those given to the main package of the distribution being uploaded.
   # -- rjbs, 2018-04-19
   my $self = shift;
-  my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   my $main_package = $self->{MAIN_PACKAGE};
-  local($dbh->{RaiseError}) = 0;
 
   return if lc $main_package eq lc $package;
 
-  # Get the permissions for the main package of this distribution so that we
-  # can ensure that *this* package has the same permissions as the main
-  # package. -- rjbs, 2018-04-19
-  my $existing_permissions = $dbh->selectall_arrayref(
-    q{
-      SELECT userid
-      FROM   perms
-      WHERE  LOWER(package) = LOWER(?)
-    },
-    { Slice => {} },
-    $main_package,
-  );
-
-  # TODO: correctly set first-come as well
-
-  # TODO: return if they're already equal permissions -- rjbs, 2018-04-19
   $self->verbose(1, "Granting permissions of main_mackage[$main_package] to package[$package]");
-
-  for my $row (@$existing_permissions)
-  {
-      my($mods_userid) = $row->{userid};
-      local($dbh->{RaiseError}) = 0;
-      local($dbh->{PrintError}) = 0;
-      my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
-      my $ret = $dbh->do($query, {}, $package, $mods_userid);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"Insert into perms package[$package]mods_userid".
-                      "[$mods_userid]ret[$ret]err[$err]\n");
-  }
+  my $changer = $self->hub->permissions->plan_package_permission_copy($main_package, $package);
+  $changer->();
 
   return;
 }
