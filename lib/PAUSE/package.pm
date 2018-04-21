@@ -86,8 +86,9 @@ sub alert {
 sub give_regdowner_perms {
   # This subroutine originally existed for interactions with the module list,
   # which was effectively made a non-feature years ago.  Its job now is to
-  # ensure that new packages are given the same permission as those given to
-  # the main package of the distribution being uploaded. -- rjbs, 2018-04-19
+  # ensure that new packages are given, at a minimum, the same permission as
+  # those given to the main package of the distribution being uploaded.
+  # -- rjbs, 2018-04-19
   my $self = shift;
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
@@ -112,7 +113,7 @@ sub give_regdowner_perms {
   # TODO: correctly set first-come as well
 
   # TODO: return if they're already equal permissions -- rjbs, 2018-04-19
-  $self->verbose(1, "Making permissions for package[$package] match main_mackage[$main_package]");
+  $self->verbose(1, "Granting permissions of main_mackage[$main_package] to package[$package]");
 
   for my $row (@$existing_permissions)
   {
