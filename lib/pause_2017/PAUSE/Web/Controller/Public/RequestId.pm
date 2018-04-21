@@ -118,9 +118,8 @@ sub request {
   $pause->{reg_ok} = $regOK;
 
   if ($regOK) {
-    if ( $PAUSE::Config->{RECAPTCHA_ENABLED}
-        && $c->auto_registration_rate_limit_ok
-    ) {
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
+      if ( $c->auto_registration_rate_limit_ok ) {
         $pause->{recaptcha_enabled} = 1;
         my ($valid, $err) = $c->verify_recaptcha($token);
         if ( $valid ) {
@@ -133,6 +132,9 @@ sub request {
         }
         # else recapture couldn't complete so continue with normal
         # ID request moderation
+      } else {
+        warn "reCAPTCHA rate limit is exceeded";
+      }
     }
 
     my @to = $mgr->config->mailto_admins;
