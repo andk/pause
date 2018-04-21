@@ -437,8 +437,7 @@ sub _share_remocos {
 
   my $db = $mgr->connect;
 
-  my $all_pmods = $c->all_pmods($u);
-  my $all_mods = { %$all_pmods, $u };
+  my $all_mods = $c->all_pmods($u);
   my $all_comaints = $c->all_comaints($all_mods,$u);
 
   if (
