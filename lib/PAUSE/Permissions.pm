@@ -15,7 +15,16 @@ has dbh => (
 # returns first_come user for a package or the empty string
 sub get_package_first_come {
   my ($self, $pkg) = @_;
-  my $query = "qq{SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)}";
+  my $query = "SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)";
+  my $owner = $self->dbh->selectrow_arrayref($query, undef, $pkg);
+  return $owner->[1] if $owner;
+  return "";
+}
+
+# returns first_come user for a package or the empty string
+sub get_package_first_come_with_exact_case {
+  my ($self, $pkg) = @_;
+  my $query = "SELECT package, userid FROM primeur where package = ?";
   my $owner = $self->dbh->selectrow_arrayref($query, undef, $pkg);
   return $owner->[1] if $owner;
   return "";
