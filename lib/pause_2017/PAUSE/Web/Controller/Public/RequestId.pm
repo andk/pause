@@ -102,6 +102,9 @@ sub request {
     } else {
       push @errors, "You must supply a desired user-ID\n";
     }
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} && ! $token ) {
+      push @errors, "You must complete the recaptcha to proceed\n";
+    }
     if( @errors ) {
       $pause->{errors} = \@errors;
       $showform = 1;
