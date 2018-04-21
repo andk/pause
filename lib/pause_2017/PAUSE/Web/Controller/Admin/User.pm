@@ -15,7 +15,7 @@ sub add {
   local($dbh->{RaiseError}) = 0;
 
   if ($req->param("USERID")) {
-    my $session = $mgr->session_counted;
+    my $session = $c->session_counted;
     my $s = $session->{APPLY};
     for my $a (keys %$s) {
       $req->param("pause99_add_user_$a" => $s->{$a});
