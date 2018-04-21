@@ -12,6 +12,15 @@ has dbh => (
   required => 1,
 );
 
+# returns first_come user for a package or the empty string
+sub get_package_first_come {
+  my ($self, $pkg) = @_;
+  my $query = "qq{SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)}";
+  my $owner = $self->dbh->selectrow_arrayref($query, undef, $pkg);
+  return $owner->[1] if $owner;
+  return "";
+}
+
 # returns callback to copy permissions from one package to another;
 # currently doesn't address primeur or *remove* excess permissions from
 # the destination. I.e. after running this, perms on the destination will

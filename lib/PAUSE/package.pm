@@ -202,7 +202,7 @@ sub perm_check {
           # seems ok: perl is always right
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
-          my $owner = eval { PAUSE::owner_of_module($package, $dbh) }
+          my $owner = eval { $self->hub->permissions->get_package_first_come($package) }
                     // "unknown";
 
           my $not_owner = qq{Not indexed because permission missing.
