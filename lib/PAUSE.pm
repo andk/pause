@@ -273,7 +273,12 @@ sub dbh {
                $dsn,
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_USER"},
                $PAUSE::Config->{uc($db)."_DATA_SOURCE_PW"},
-               { RaiseError => 1 }
+               {
+                # wraps error in an object; return 0 so DBI continues as
+                # normal to clean up and invoke RaiseError
+                HandleError => sub { $_[0] = PAUSE::DBError->new($_[0]); 0 },
+                RaiseError => 1
+               },
               )
       or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
 
@@ -555,6 +560,17 @@ sub isa_regular_perl {
 
   return scalar $filename =~ $ISA_REGULAR_PERL;
 }
+
+package PAUSE::DBError;
+
+sub new {
+    my ($class, $msg) = @_;
+    return bless \$msg, $class;
+}
+
+use overload (
+    '""' => sub { ${$_[0]} }
+);
 
 1;
 
