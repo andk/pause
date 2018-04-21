@@ -27,6 +27,7 @@ subtest 'get' => sub {
 };
 
 subtest 'post: basic' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -41,6 +42,7 @@ subtest 'post: basic' => sub {
 };
 
 subtest 'post: thank you, bot' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -57,6 +59,7 @@ subtest 'post: thank you, bot' => sub {
 };
 
 subtest 'post: no space in full name' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -75,6 +78,7 @@ subtest 'post: no space in full name' => sub {
 };
 
 subtest 'post: no full name' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -93,6 +97,7 @@ subtest 'post: no full name' => sub {
 };
 
 subtest 'post: no email' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -111,6 +116,7 @@ subtest 'post: no email' => sub {
 };
 
 subtest 'post: rational is too short' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -130,6 +136,7 @@ subtest 'post: rational is too short' => sub {
 
 # XXX: might be better to ignore other attributes (or YAGNI)
 subtest 'post: rational has html links' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -148,6 +155,7 @@ subtest 'post: rational has html links' => sub {
 };
 
 subtest 'post: multiple links' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -169,6 +177,7 @@ SPAM
 };
 
 subtest 'post: no rationale' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -187,6 +196,7 @@ subtest 'post: no rationale' => sub {
 };
 
 subtest 'post: userid is taken' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -205,6 +215,7 @@ subtest 'post: userid is taken' => sub {
 };
 
 subtest 'post: invalid userid' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -223,6 +234,7 @@ subtest 'post: invalid userid' => sub {
 };
 
 subtest 'post: no userid' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -241,6 +253,7 @@ subtest 'post: no userid' => sub {
 };
 
 subtest 'post: lots of .info' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
@@ -264,6 +277,7 @@ SPAM
 };
 
 subtest 'post: interesting .cn homepage' => sub {
+    local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
     for my $test (Test::PAUSE::Web->tests_for_post('public')) {
         my ($method, $path) = @$test;
         note "$method for $path";
