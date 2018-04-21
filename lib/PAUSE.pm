@@ -166,6 +166,7 @@ $PAUSE::Config ||=
      RECAPTCHA_ENABLED => 0,
      RECAPTCHA_SITE_KEY => "",
      RECAPTCHA_SECRET_KEY => "",
+     RECAPTCHA_DAILY_LIMIT => 100, # above this, revert to manual approval
     };
 
 unless ($INC{"PrivatePAUSE.pm"}) { # reload within apache

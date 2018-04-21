@@ -2877,7 +2877,9 @@ sub request_id {
   }
   if ($regOK) {
 
-    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED}
+        && $self->_auto_registration_rate_limit_ok($mgr)
+    ) {
         my ($valid, $err) = _verify_recaptcha($token);
         if ( $valid ) {
             # If recaptcha is valid, we shortcut and add the user directly,
@@ -7438,6 +7440,22 @@ HERE
         # TODO should notify administrators if this occurs
     }
     return @m;
+}
+
+sub _auto_registration_rate_limit_ok {
+    my ( $self, $mgr ) = @_;
+    my $limit = $PAUSE::Config->{RECAPTCHA_DAILY_LIMIT};
+
+    # $limit 0 or undef means "no limit"
+    return 1 if !$limit;
+
+    my $dbh = $mgr->connect;
+    my ($new_users) = $dbh->selectrow_array(
+        qq{ SELECT COUNT(*) FROM users where introduced > ?  },
+        undef, time - 24 * 3600,
+    );
+
+    return $new_users <= $limit;
 }
 
 1;
