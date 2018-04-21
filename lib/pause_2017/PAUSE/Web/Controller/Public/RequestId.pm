@@ -222,7 +222,7 @@ sub _directly_add_user {
                      ?,          ?,        ?,         ?,
                      ?,        ?,          ?,        ?)};
     @qbind =
-      ( $userid, "CENSORED", $homepage, $fullname, "", $T, $T, $userid );
+      ( $userid, "CENSORED", $homepage, $fullname, "", $T, $T, 'RECAPTCHA' );
 
     # We have a query for INSERT INTO users
 
