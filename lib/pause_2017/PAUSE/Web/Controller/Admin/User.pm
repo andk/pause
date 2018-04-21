@@ -38,7 +38,6 @@ sub add {
     $req->param("pause99_add_user_userid" => $userid) if $userid;
 
     my $doit = 0;
-    my $dont_clear;
     my $fullname_raw = $req->param('pause99_add_user_fullname') // '';
     my($fullname);
     $fullname = PAUSE::Web::Util::Encode::any2utf8($fullname_raw);
@@ -172,7 +171,6 @@ sub add {
         }
         if (@urows) {
           $doit = 0;
-          $dont_clear = 1;
           $pause->{urows} = \@urows;
         } else {
           $doit = 1;
@@ -184,7 +182,7 @@ sub add {
     $pause->{doit} = $doit;
 
     if ($doit) {
-      $c->add_user_doit($userid,$fullname,$dont_clear);
+      $c->add_user_doit($userid,$fullname);
     } elsif (@error) {
       $pause->{error} = \@error;
     } else {
@@ -210,7 +208,7 @@ sub get_secretemail {
 }
 
 sub add_user_doit {
-  my($c, $userid, $fullname, $dont_clear) = @_;
+  my($c, $userid, $fullname) = @_;
   my $pause = $c->stash(".pause");
   my $mgr = $c->app->pause;
   my $req = $c->req;
@@ -222,7 +220,9 @@ sub add_user_doit {
   my($email) = $req->param('pause99_add_user_email');
   my($homepage) = $req->param('pause99_add_user_homepage');
   my $subscribe = $req->param('pause99_add_user_subscribe') // '';
-  if ( $subscribe gt '' ) {
+  my $entered_by = $pause->{User}{fullname} || $pause->{User}{userid};
+  my $is_mailing_list = $subscribe gt '';
+  if ( $is_mailing_list ) {
     $query = qq{INSERT INTO users (
                       userid,          isa_list,             introduced,
                       changed,         changedby)
@@ -245,22 +245,14 @@ sub add_user_doit {
   if ($dbh->do($query,undef,@qbind)) {
     $pause->{succeeded} = 1;
 
-    my $blurb;
-    my $subject;
-    my $need_onetime = 0;
-    if ( $subscribe gt '' ) {
-
+    if ( $is_mailing_list ) {
       # Add a mailinglist: INSERT INTO maillists
 
-      $need_onetime = 0;
-      $subject = "Mailing list added to PAUSE database";
       my($maillistid) = $userid;
       my($maillistname) = $fullname;
-      my($subscribe) = $req->param('pause99_add_user_subscribe');
       my($changed) = $T;
       $pause->{maillistname} = $maillistname;
       $pause->{subscribe} = $subscribe;
-      $blurb = $c->render_to_string("email/admin/user/welcome_ml", format => "email");
 
       $query = qq{INSERT INTO maillists (
                         maillistid, maillistname,
@@ -272,80 +264,27 @@ sub add_user_doit {
                     $subscribe,     $changed, $pause->{User}{userid}, $email);
       unless ($dbh->do($query,undef,@qbind2)) {
         die PAUSE::Web::Exception
-            ->new(ERROR => [qq{Query[$query]with qbind2[@qbind2] failed.
- Reason:}, $DBI::errstr]);
+            ->new(ERROR => [qq{Query[$query]with qbind2[@qbind2] failed. Reason:}, $DBI::errstr]);
       }
 
     } else {
+      # Not a mailinglist: set and send one time password
+      my $onetime = $c->set_onetime_password($userid, $email);
+      $c->send_otp_email($userid, $email, $onetime);
+      # send emails to user and modules@perl.org; latter must censor the
+      # user's email address
+      my ($subject, $blurb) = $c->send_welcome_email( [$email], $userid, $email, $fullname, $homepage, $entered_by );
+      $c->send_welcome_email( $PAUSE::Config->{ADMINS}, $userid, "CENSORED", $fullname, $homepage, $entered_by );
 
-      # Not a mailinglist: Compose Welcome
-
-      $subject = qq{Welcome new user $userid};
-      $need_onetime = 1;
-      # not for mailing lists
-      if ($need_onetime) {
-
-        my $onetime = sprintf "%08x", rand(0xffffffff);
-        $pause->{onetime} = $onetime;
-
-        my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
-                       $PAUSE::Config->{AUTHEN_USER_FLD},
-                        $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
-                         secretemail,
-                          forcechange,
-                           changed,
-                            changedby
-                       ) VALUES (
-                       ?,?,?,?,?,?
-                       )};
-        my $pwenc = PAUSE::Crypt::hash_password($onetime);
-        my $dbh = $mgr->authen_connect;
-        local($dbh->{RaiseError}) = 0;
-        my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
-        die PAUSE::Web::Exception
-            ->new(ERROR =>
-                  [qq{Query [$sql] failed. Reason:},
-                   $DBI::errstr,
-                   qq{This is very unfortunate as we have no option to rollback. The user is now registered in mod.users and could not be registered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}}]
-                 ) unless $rc;
-        $dbh->disconnect;
-        my $otpwblurb = $c->render_to_string("email/admin/user/onetime_password", format => "email");
-
-        my $header = {
-                      Subject => $subject,
-                     };
-        warn "header[$header]otpwblurb[$otpwblurb]";
-        $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
-                              $header,
-                              $otpwblurb);
-
-      }
-      $pause->{memo} = $req->param('pause99_add_user_memo');
-      $blurb = $c->render_to_string("email/admin/user/welcome_user", format => "email");
+      $pause->{subject} = $subject;
+      $pause->{blurb}   = $blurb;
+      $pause->{send_to} = join(" AND ", @{$PAUSE::Config->{ADMINS}}, $email);
     }
 
-    # both users and mailing lists run this code
-
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
-    my(@to) = @{$PAUSE::Config->{ADMINS}};
-
-    $pause->{send_to} = join(" AND ", @to, $email);
-    $pause->{subject} = $subject;
-    $pause->{blurb} = $blurb;
-
-    my $header = {
-                  Subject => $subject
-                 };
-    $mgr->send_mail_multi(\@to,$header,$blurb);
-    $blurb =~ s/\bCENSORED\b/$email/;
-    $mgr->send_mail_multi([$email],$header,$blurb);
-
-    unless ($dont_clear) {
-      warn "Info: clearing all fields";
-      for my $field (qw(userid fullname email homepage subscribe memo)) {
-        my $param = "pause99_add_user_$field";
-        $req->param($param => "");
-      }
+    warn "Info: clearing all fields";
+    for my $field (qw(userid fullname email homepage subscribe)) {
+      my $param = "pause99_add_user_$field";
+      $req->param($param => "");
     }
 
   } else {

@@ -16,9 +16,9 @@ in the PAUSE database.
 This is what we have stored in the database now:
 
   Name:      <%== $pause->{fullname} // '' %>
-  email:     CENSORED
+  email:     <%== $pause->{email} // '' %>
   homepage:  <%== $pause->{homepage} // '' %>
-  enteredby: <%== $pause->{User}{fullname} // '' %>
+  enteredby: <%== $pause->{entered_by} // '' %>
 
 Please note that your email address is exposed in various listings and
 database dumps. You can register with both a public and a secret email
@@ -38,9 +38,3 @@ experienced Perl developers.
 
 Thank you for your prospective contributions,
 The Pause Team
-% if ($pause->{memo}) {
-
-Note from <%== $pause->{User}{fullname} %>:
-<%== $pause->{memo} %>
-
-% }
