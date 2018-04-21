@@ -12,7 +12,8 @@ has dbh => (
   required => 1,
 );
 
-# returns first_come user for a package or the empty string
+# returns first_come user for a package or the empty string. If there are
+# more than one matches, only the first is returned
 sub get_package_first_come {
   my ($self, $pkg) = @_;
   my $query = "SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)";
