@@ -6399,8 +6399,7 @@ sub share_perms_remocos {
   my $u = $self->active_user_record($mgr);
 
   my $db = $mgr->connect;
-  my $all_pmods = $self->all_pmods($mgr,$u);
-  my $all_mods = { %$all_pmods, $u };
+  my $all_mods = $self->all_pmods($mgr,$u);
   my $all_comaints = $self->all_comaints($mgr,$all_mods,$u);
   if (
       $req->param("SUBMIT_pause99_share_perms_remocos")
