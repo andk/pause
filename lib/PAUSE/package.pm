@@ -151,18 +151,14 @@ sub perm_check {
   );
 
   if ($self->{FIO}{DIO} && PAUSE::isa_regular_perl($dist)) {
-      # XXX Why do we ignore errors?  This predated refactoring to use
-      # $set_comaint_plan. -- xdg, 2018-04-22
-      eval { $plan_set_comaint ->("(perl)") };
+      $plan_set_comaint ->("(perl)");
       return 1;           # P2.1, P3.0
   }
 
   # is uploader authorized for this package? --> case sensitive
   my $primeur = $self->hub->permissions->get_package_first_come_with_exact_case($package);
   if ($userid eq $primeur) {
-      # XXX Why do we ignore errors?  This predated refactoring to use
-      # $set_comaint_plan. -- xdg, 2018-04-22
-      eval { $plan_set_comaint ->("(primeur)") };
+      $plan_set_comaint ->("(primeur)");
       return 1;           # P2.1, P3.0
   }
 
@@ -221,9 +217,7 @@ owner[$owner]
 
       # package has no existence in perms yet, so this guy is OK
 
-      # XXX Why do we ignore errors?  This predated refactoring to use
-      # $set_comaint_plan. -- xdg, 2018-04-22
-      eval { $plan_set_comaint ->("(uploader)") };
+      $plan_set_comaint ->("(uploader)");
 
   }
   $self->verbose(1,sprintf( # just for debugging
@@ -737,9 +731,6 @@ sub checkin_into_primeur {
 
   # print ">>>>>>>>checkin_into_primeur not yet implemented<<<<<<<<\n";
 
-  local($dbh->{RaiseError}) = 0;
-  local($dbh->{PrintError}) = 0;
-
   my $userid;
   my $dio = $self->parent->parent;
   if (exists $dio->{META_CONTENT}{x_authority}) {
@@ -757,12 +748,9 @@ sub checkin_into_primeur {
           die unless $userid;
       }
   }
- 
+
   my $plan = $self->hub->permissions->plan_set_first_come($userid, $package);
-  
-  # XXX Why do we discard errors here?  It was like that before the
-  # refactoring so this just continues that. -- xdg, 2018-04-22
-  eval { $plan->() };
+  $plan->();
 
   return 1;
 }
