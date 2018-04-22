@@ -73,7 +73,7 @@ sub add {
             $uri = $filename;
             # Got an empty $to in the HTML page, so for debugging..
             $pause->{successfully_copied_to} = $to;
-            # warn "h1[$h1]filename[$filename]";
+            warn "h1[$h1]filename[$filename]";
           } else {
             die PAUSE::Web::Exception
                 ->new(ERROR =>
