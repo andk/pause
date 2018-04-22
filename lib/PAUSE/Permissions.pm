@@ -60,6 +60,7 @@ sub plan_package_permission_copy {
 
     for my $row (@$src_permissions) {
       my ($mods_userid) = $row->{userid};
+      # we disable errors so that the insert emulates an upsert
       local ( $dbh->{RaiseError} ) = 0;
       local ( $dbh->{PrintError} ) = 0;
       my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
@@ -71,6 +72,8 @@ sub plan_package_permission_copy {
           "Insert into perms package[$dst]mods_userid"
           . "[$mods_userid]ret[$ret]err[$err]\n" );
     }
+
+    return 1;
   }
 }
 
@@ -80,13 +83,15 @@ sub plan_set_first_come {
   my $dbh = $self->dbh;
 
   return sub {
-    my $ret = eval { $dbh->do("INSERT INTO primeur (package, userid) VALUES (?,?)", undef, $package, $userid) };
+    # we disable errors so that the insert emulates an upsert
+    local ( $dbh->{RaiseError} ) = 0;
+    local ( $dbh->{PrintError} ) = 0;
+    my $ret = $dbh->do("INSERT INTO primeur (package, userid) VALUES (?,?)", undef, $package, $userid);
     my $err = $@;
     $ret //= "";
     $self->verbose(1,
                   "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
                   "err[$err]\n");
-    die $err if $err;
     return 1;
   };
 }
@@ -99,13 +104,15 @@ sub plan_set_comaint {
   return sub {
     my $log_prefix = shift || "";
     $log_prefix .= " " if length $log_prefix;
-    my $ret = eval { $dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", undef, $package, $userid) };
+    # we disable errors so that the insert emulates an upsert
+    local ( $dbh->{RaiseError} ) = 0;
+    local ( $dbh->{PrintError} ) = 0;
+    my $ret = $dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", undef, $package, $userid);
     my $err = $@;
     $ret //= "";
     $self->verbose(1,
                   "${log_prefix}Inserted into perms package[$package]userid[$userid]ret[$ret]".
                   "err[$err]\n");
-    die $err if $err;
     return 1;
   };
 }
