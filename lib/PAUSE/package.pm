@@ -726,7 +726,7 @@ sub checkin_into_primeur {
       } else {
           $userid = $self->hub->permissions->get_package_first_come_any_case($self->{MAIN_PACKAGE});
           $userid = $self->{USERID} unless $userid;
-          die unless $userid;
+          die "Shouldn't reach here: userid unknown" unless $userid;
       }
   }
 
