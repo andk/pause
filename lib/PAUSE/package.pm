@@ -162,7 +162,7 @@ sub perm_check {
           # seems ok: perl is always right
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
-          my $owner = eval { $self->hub->permissions->get_package_first_come($package) }
+          my $owner = eval { $self->hub->permissions->get_package_first_come_any_case($package) }
                     // "unknown";
 
           my $not_owner = qq{Not indexed because permission missing.
@@ -724,7 +724,7 @@ sub checkin_into_primeur {
       if(lc($self->{MAIN_PACKAGE}) eq lc($package)) {
           $userid = $self->{USERID} or die;
       } else {
-          $userid = $self->hub->permissions->get_package_first_come($self->{MAIN_PACKAGE});
+          $userid = $self->hub->permissions->get_package_first_come_any_case($self->{MAIN_PACKAGE});
           $userid = $self->{USERID} unless $userid;
           die unless $userid;
       }
