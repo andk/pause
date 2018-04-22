@@ -7,11 +7,16 @@ use strict;
 use Encode ();
 use Fcntl qw(O_RDWR O_RDONLY);
 use File::Find qw(find);
+use HTML::Entities;
 use PAUSE::Crypt;
 use POSIX ();
 use URI::Escape;
 use Text::Format;
 use HTTP::Status qw(:constants);
+use HTTP::Tiny 0.059;
+use IO::Socket::SSL 1.56;
+use Net::SSLeay 1.49;
+use JSON::XS;
 eval {require Time::Duration};
 our $HAVE_TIME_DURATION = !$@;
 
@@ -2273,7 +2278,7 @@ sub scheduled {
 }
 
 sub add_user_doit {
-  my($self,$mgr,$userid,$fullname,$dont_clear) = @_;
+  my($self,$mgr,$userid,$fullname) = @_;
   my $req = $mgr->{REQ};
   my $T = time;
   my $dbh = $mgr->connect;
@@ -2282,7 +2287,10 @@ sub add_user_doit {
   my($query,$sth,@qbind);
   my($email) = $req->param('pause99_add_user_email');
   my($homepage) = $req->param('pause99_add_user_homepage');
-  if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+  my $entered_by = $mgr->{User}{fullname} || $mgr->{User}{userid};
+  my $is_mailing_list = $req->param('pause99_add_user_subscribe') gt '';
+
+  if ( $is_mailing_list ) {
     $query = qq{INSERT INTO users (
                       userid,          isa_list,             introduced,
                       changed,         changedby)
@@ -2304,189 +2312,44 @@ sub add_user_doit {
 
   push @m, qq{<h3>Submitting query</h3>};
   if ($dbh->do($query,undef,@qbind)) {
-    push @m, sprintf(qq{<p>Query succeeded.</p><p>Do you want to }.
-                     qq{<a href="/pause/authenquery?pause99_add_m}.
-                     qq{od_userid=%s;SUBMIT_pause99_add_mod_previ}.
-                     qq{ew=preview">register a module for %s?</a></p>},
-                     $userid,
-                     $userid,
-                    );
-    my(@blurb);
-    my($subject);
-    my $need_onetime = 0;
-    if ( $req->param('pause99_add_user_subscribe') gt '' ) {
+    push @m, qq{<p>New user creation succeeded.</p>};
 
+    if ( $is_mailing_list ) {
       # Add a mailinglist: INSERT INTO maillists
-
-      $need_onetime = 0;
-      $subject = "Mailing list added to PAUSE database";
       my($maillistid) = $userid;
       my($maillistname) = $fullname;
       my($subscribe) = $req->param('pause99_add_user_subscribe');
       my($changed) = $T;
-      push @blurb, qq{
-Mailing list entered by };
-      push @blurb, $mgr->{User}{fullname};
-      push @blurb, qq{:
+
+      push @m, qq{\n Mailing list entered by };
+      push @m, $mgr->{User}{fullname};
+      push @m, qq{:
 
 Userid:      $userid
 Name:        $maillistname
 Description: };
-      push @blurb, $self->wrap($subscribe);
-      $query = qq{INSERT INTO maillists (
-                        maillistid, maillistname,
-                        subscribe,  changed,  changedby,            address)
-                      VALUES (
-                        ?,          ?,
-                        ?,          ?,        ?,                    ?)};
-      my @qbind2 = ($maillistid,    $maillistname,
-                    $subscribe,     $changed, $mgr->{User}{userid}, $email);
-      unless ($dbh->do($query,undef,@qbind2)) {
-        die PAUSE::HeavyCGI::Exception
-            ->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
- Reason:</b></p><p>$DBI::errstr</p>}]);
-      }
+      push @m, $self->wrap($subscribe);
+
+      $self->_setup_mailing_list($mgr, $dbh, $maillistid, $maillistname, $subscribe, $changed, $email);
 
     } else {
+        # Not a mailinglist: set and send one time password
+        my $onetime = $self->_set_onetime_password( $mgr, $userid, $email);
+        $self->_send_otp_email( $mgr, $userid, $email, $onetime );
 
-      # Not a mailinglist: Compose Welcome
+        # send emails to user and modules@perl.org; latter must censor the
+        # user's email address
+        my ($subject, $email_text) = $self->_send_welcome_email( $mgr, [$email], $userid, $email, $fullname, $homepage, $entered_by );
+        $self->_send_welcome_email( $mgr, $PAUSE::Config->{ADMINS}, $userid, "CENSORED", $fullname, $homepage, $entered_by );
 
-      $subject = qq{Welcome new user $userid};
-      $need_onetime = 1;
-      # not for mailing lists
-      if ($need_onetime) {
-
-        my $onetime = sprintf "%08x", rand(0xffffffff);
-
-        my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
-                       $PAUSE::Config->{AUTHEN_USER_FLD},
-                        $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
-                         secretemail,
-                          forcechange,
-                           changed,
-                            changedby
-                       ) VALUES (
-                       ?,?,?,?,?,?
-                       )};
-        my $pwenc = PAUSE::Crypt::hash_password($onetime);
-        my $dbh = $mgr->authen_connect;
-        local($dbh->{RaiseError}) = 0;
-        my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
-        die PAUSE::HeavyCGI::Exception
-            ->new(ERROR =>
-                  [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
-                   qq{<p>This is very unfortunate as we have no option to rollback.}.
-                   qq{The user is now registered in mod.users and could not be regi}.
-                   qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
-                 ) unless $rc;
-        $dbh->disconnect;
-        my $otpwblurb = qq{
-
-(This mail has been generated automatically by the Perl Authors Upload
-Server on behalf of the admin $PAUSE::Config->{ADMIN})
-
-As already described in a separate message, you\'re a registered Perl
-Author with the userid $userid. For the sake of approval I have
-assigned to you a change-password-only-password that enables
-you to pick your own password. This password is \"$onetime\"
-(without the enclosing quotes). Please visit
-
-  https://pause.perl.org/pause/authenquery?ACTION=change_passwd
-
-and use this password to initialize your account in the authentication
-database. Once you have entered your password there, your one-time
-password is expired automatically. If you cannot connect to the above
-URL, you can replace 'https' with 'http', but then you are not using
-SSL encryption. Be careful to always use an SSL connection if
-possible, otherwise your password can be intercepted by third parties.
-
-Thanks & Regards,
---
-$PAUSE::Config->{ADMIN}
-};
-
-        my $header = {
-                      Subject => $subject,
-                     };
-        warn "header[$header]otpwblurb[$otpwblurb]";
-        $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
-                              $header,
-                              $otpwblurb);
-
-      }
-
-      @blurb = qq{
-Welcome $fullname,
-
-PAUSE, the Perl Authors Upload Server, has a userid for you:
-
-    $userid
-
-Once you\'ve gone through the procedure of password approval (see the
-separate mail you should receive about right now), this userid will be
-the one that you can use to upload your work or edit your credentials
-in the PAUSE database.
-
-This is what we have stored in the database now:
-
-  Name:      $fullname
-  email:     CENSORED
-  homepage:  $homepage
-  enteredby: $mgr->{User}{fullname}
-
-Please note that your email address is exposed in various listings and
-database dumps. You can register with both a public and a secret email
-if you want to protect yourself from SPAM. If you want to do this,
-please visit
-  https://pause.perl.org/pause/authenquery?ACTION=edit_cred
-or
-  http://pause.perl.org/pause/authenquery?ACTION=edit_cred
-
-If you need any further information, please visit
-  \$CPAN/modules/04pause.html.
-If this doesn't answer your questions, contact modules\@perl.org.
-
-Before uploading your first module, we strongly encourage you to discuss
-your module idea on PrePAN at http://prepan.org/ to get feedback from
-experienced Perl developers.
-
-Thank you for your prospective contributions,
-The Pause Team
-};
-
-      my($memo) = $req->param('pause99_add_user_memo');
-      push @blurb, "\nNote from $mgr->{User}{fullname}:\n$memo\n\n"
-          if length $memo;
+        push @m, qq{ Sending separate mails to:\n}, join(" AND ", @{$PAUSE::Config->{ADMINS}}, $email);
+        push @m, $self->_format_email_as_pre($subject, $email_text);
     }
 
-    # both users and mailing lists run this code
-
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
-    my(@to) = @{$PAUSE::Config->{ADMINS}};
-    push @m, qq{ Sending separate mails to:
-}, join(" AND ", @to, $email), qq{
-<pre>
-From: $PAUSE::Config->{UPLOAD}
-Subject: $subject\n};
-
-    my($blurb) = join "", @blurb;
-    require HTML::Entities;
-    my($blurbcopy) = HTML::Entities::encode($blurb,"<>");
-    push @m, $blurbcopy, "</pre>\n";
-
-    my $header = {
-                  Subject => $subject
-                 };
-    $mgr->send_mail_multi(\@to,$header,$blurb);
-    $blurb =~ s/\bCENSORED\b/$email/;
-    $mgr->send_mail_multi([$email],$header,$blurb);
-
-    unless ($dont_clear) {
-      warn "Info: clearing all fields";
-      for my $field (qw(userid fullname email homepage subscribe memo)) {
+    warn "Info: clearing all fields";
+    for my $field (qw(userid fullname email homepage subscribe memo)) {
         my $param = "pause99_add_user_$field";
         $req->parameters->set($param,"");
-      }
     }
 
   } else {
@@ -2545,7 +2408,6 @@ sub add_user {
 
     $req->parameters->set("pause99_add_user_userid", $userid) if $userid;
     my $doit = 0;
-    my $dont_clear;
     my $fullname_raw = $req->param('pause99_add_user_fullname');
     my($fullname);
     $fullname = $mgr->any2utf8($fullname_raw);
@@ -2688,7 +2550,6 @@ sub add_user {
 	if (@urows) {
           my @rows = map { $_->{line} } sort { $b->{score} <=> $a->{score} } @urows;
 	  $doit = 0;
-	  $dont_clear = 1;
 	  unshift @rows, qq{
  <h3>Not submitting <i>$userid</i>, maybe we have a duplicate here</h3>
  <p>$s_package converted the fullname [<b>$fullname</b>] to [$s_code]</p>
@@ -2711,7 +2572,7 @@ sub add_user {
     }
     my $T = time;
     if ($doit) {
-      push @m, $self->add_user_doit($mgr,$userid,$fullname,$dont_clear);
+      push @m, $self->add_user_doit($mgr,$userid,$fullname);
     } elsif (@error) {
       push @m, qq{<h3>Error processing form</h3>};
       for (@error) {
@@ -2774,13 +2635,6 @@ sub add_user {
                        maxlength=>256),
        qq{<br />},
 
-       qq{<br />If you want to send a message to new author, please
-       enter it here:<br />},
-
-       $mgr->textarea(name=>"pause99_add_user_memo",
-                      rows=>6,
-                      cols=>60),
-       qq{<br />},
        $submit_butts,
        qq{<br />},
        $delete_link,
@@ -2856,6 +2710,7 @@ sub request_id {
   my $homepage  = $req->param( 'pause99_request_id_homepage') || "";
   my $userid    = $req->param( 'pause99_request_id_userid') || "";
   my $rationale = $req->param("pause99_request_id_rationale") || "";
+  my $token     = $req->param("g-recaptcha-response") || "";
   my $urat = $mgr->any2utf8($rationale);
   if ($urat ne $rationale) {
     $req->parameters->set("pause99_request_id_rationale", $urat);
@@ -2924,6 +2779,9 @@ sub request_id {
       $sth->finish;
     } else {
       push @errors, "You must supply a desired user-ID\n";
+    }
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} && ! $token ) {
+      push @errors, "You must complete the recaptcha to proceed\n";
     }
 
     if( @errors ) {
@@ -3003,11 +2861,37 @@ sub request_id {
     push @m, qq{</p>};
     # push @m, "</table>\n";
 
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
+        if ( $PAUSE::Config->{RECAPTCHA_SITE_KEY} ) {
+            push @m, qq{<script src="https://www.google.com/recaptcha/api.js" async defer></script>};
+            push @m, qq{<div class="g-recaptcha" data-sitekey="$PAUSE::Config->{RECAPTCHA_SITE_KEY}"></div><br/>};
+        }
+        else {
+            warn "request_id: RECAPTCHA_SITE_KEY not available\n";
+        }
+    }
+
     push @m, qq{<input type="submit" name="SUBMIT_pause99_request_id_sub"
   	  value="Request Account" />};
 
   }
   if ($regOK) {
+
+    if ( $PAUSE::Config->{RECAPTCHA_ENABLED}
+        && $self->_auto_registration_rate_limit_ok($mgr)
+    ) {
+        my ($valid, $err) = _verify_recaptcha($token);
+        if ( $valid ) {
+            # If recaptcha is valid, we shortcut and add the user directly,
+            # returning HTML for them to see.
+            return $self->_directly_add_user($mgr, $req, $userid, $fullname);
+        }
+        elsif ( defined $valid && ! $valid ) {
+            die "recaptcha failed validation: $err\n";
+        }
+        # else recapture couldn't complete so continue with normal
+        # ID request moderation
+    }
 
     my @to = $mgr->{MailtoAdmins};
     push @to, $email;
@@ -7289,6 +7173,254 @@ packages have their recorded version set to 'undef'.
   push @m, "</pre>";
   push @m, $submitbutton;
   @m;
+}
+
+# return values are $ok, $err; $ok undef means unknown validation;
+# $ok defined true/false indicates whether verification succeeded.  If
+# completed but failed, $err will have error message(s).
+sub _verify_recaptcha {
+    my ($token) = @_;
+    if ( ! $PAUSE::Config->{RECAPTCHA_SECRET_KEY} ) {
+        warn "_verify_recaptcha: RECAPTCHA_SECRET_KEY not available\n";
+        return;
+    }
+
+    my $ht = HTTP::Tiny->new;
+    my $ok = undef;
+    my $err = "";
+    eval {
+        my $res = $ht->post_form(
+            "https://www.google.com/recaptcha/api/siteverify",
+            { secret => $PAUSE::Config->{RECAPTCHA_SECRET_KEY}, response => $token }
+        );
+        if ( $res->{success} ) {
+            my $data = decode_json( $res->{content} );
+            $ok = $data->{success};
+            if ( ref $err eq 'ARRAY' ) {
+                $err = join(", ", @$err)
+            }
+        }
+    };
+
+    return $ok, $err;
+}
+
+sub _set_onetime_password {
+    my ( $self, $mgr, $userid, $email) = @_;
+    my $onetime = sprintf "%08x", rand(0xffffffff);
+
+    my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
+                    $PAUSE::Config->{AUTHEN_USER_FLD},
+                    $PAUSE::Config->{AUTHEN_PASSWORD_FLD},
+                        secretemail,
+                        forcechange,
+                        changed,
+                        changedby
+                    ) VALUES (
+                    ?,?,?,?,?,?
+                    )};
+    my $pwenc = PAUSE::Crypt::hash_password($onetime);
+    my $dbh = $mgr->authen_connect;
+    local($dbh->{RaiseError}) = 0;
+    my $rc = $dbh->do($sql,undef,$userid,$pwenc,$email,1,time,$mgr->{User}{userid});
+    die PAUSE::HeavyCGI::Exception
+        ->new(ERROR =>
+                [qq{<p><b>Query [$sql] failed. Reason:</b></p><p>$DBI::errstr</p>}.
+                qq{<p>This is very unfortunate as we have no option to rollback.}.
+                qq{The user is now registered in mod.users and could not be regi}.
+                qq{stered in authen_pause.$PAUSE::Config->{AUTHEN_USER_TABLE}</p>}]
+                ) unless $rc;
+    $dbh->disconnect;
+
+    return $onetime;
+}
+
+sub _send_otp_email {
+    my ( $self, $mgr, $userid, $email, $onetime ) = @_;
+
+    my $otpwblurb = <<"HERE";
+
+(This mail has been generated automatically by the Perl Authors Upload
+Server on behalf of the admin $PAUSE::Config->{ADMIN})
+
+As already described in a separate message, you\'re a registered Perl
+Author with the userid $userid. For the sake of approval I have
+assigned to you a change-password-only-password that enables
+you to pick your own password. This password is \"$onetime\"
+(without the enclosing quotes). Please visit
+
+  https://pause.perl.org/pause/authenquery?ACTION=change_passwd
+
+and use this password to initialize your account in the authentication
+database. Once you have entered your password there, your one-time
+password is expired automatically. If you cannot connect to the above
+URL, you can replace 'https' with 'http', but then you are not using
+SSL encryption. Be careful to always use an SSL connection if
+possible, otherwise your password can be intercepted by third parties.
+
+Thanks & Regards,
+--
+$PAUSE::Config->{ADMIN}
+HERE
+
+    my $header = {
+        Subject => qq{Temporary PAUSE password for $userid}
+    };
+    warn "header[$header]otpwblurb[$otpwblurb]";
+    $mgr->send_mail_multi( [ $email, $PAUSE::Config->{ADMIN} ], $header, $otpwblurb );
+}
+
+sub _send_welcome_email {
+    my ( $self, $mgr, $to, $userid, $email, $fullname, $homepage, $entered_by ) = @_;
+
+    my $blurb = qq{
+Welcome $fullname,
+
+PAUSE, the Perl Authors Upload Server, has a userid for you:
+
+    $userid
+
+Once you\'ve gone through the procedure of password approval (see the
+separate mail you should receive about right now), this userid will be
+the one that you can use to upload your work or edit your credentials
+in the PAUSE database.
+
+This is what we have stored in the database now:
+
+  Name:      $fullname
+  email:     $email
+  homepage:  $homepage
+  enteredby: $entered_by
+
+Please note that your email address is exposed in various listings and
+database dumps. You can register with both a public and a secret email
+if you want to protect yourself from SPAM. If you want to do this,
+please visit
+  https://pause.perl.org/pause/authenquery?ACTION=edit_cred
+or
+  http://pause.perl.org/pause/authenquery?ACTION=edit_cred
+
+If you need any further information, please visit
+  \$CPAN/modules/04pause.html.
+If this doesn't answer your questions, contact modules\@perl.org.
+
+Before uploading your first module, we strongly encourage you to discuss
+your module idea on PrePAN at http://prepan.org/ to get feedback from
+experienced Perl developers.
+
+Thank you for your prospective contributions,
+The Pause Team
+};
+
+    my $header = { Subject => "Welcome new user $userid" };
+    $mgr->send_mail_multi($to,$header,$blurb);
+
+    return $header->{Subject}, $blurb;
+}
+
+sub _format_email_as_pre {
+    my ($self, $subject, $text) = @_;
+    my $html = <<"HERE";
+<pre>
+From: $PAUSE::Config->{UPLOAD}
+Subject: $subject\n
+HERE
+    $html .= HTML::Entities::encode($text,"<>");
+    $html .= "</pre>\n";
+
+    return $html;
+}
+
+sub _setup_mailing_list {
+    my ($self, $mgr, $dbh, $maillistid, $maillistname, $subscribe, $changed, $email) = @_;
+    my $query = qq{INSERT INTO maillists (
+                        maillistid, maillistname,
+                        subscribe,  changed,  changedby,            address)
+                      VALUES (
+                        ?,          ?,
+                        ?,          ?,        ?,                    ?)};
+      my @qbind2 = ($maillistid,    $maillistname,
+                    $subscribe,     $changed, $mgr->{User}{userid}, $email);
+      unless ($dbh->do($query,undef,@qbind2)) {
+        die PAUSE::HeavyCGI::Exception
+            ->new(ERROR => [qq{<p><b>Query[$query]with qbind2[@qbind2] failed.
+ Reason:</b></p><p>$DBI::errstr</p>}]);
+      }
+}
+
+sub _directly_add_user {
+    my ( $self, $mgr, $req, $userid, $fullname ) = @_;
+    my $T   = time;
+    my $dbh = $mgr->connect;
+    local ( $dbh->{RaiseError} ) = 0;
+    my @m;
+    my ( $query, $sth, @qbind );
+    my ($email)    = $req->param('pause99_request_id_email');
+    my ($homepage) = $req->param('pause99_request_id_homepage');
+    $query = qq{INSERT INTO users (
+                    userid,     email,    homepage,  fullname,
+                     isa_list, introduced, changed,  changedby)
+                    VALUES (
+                     ?,          ?,        ?,         ?,
+                     ?,        ?,          ?,        ?)};
+    @qbind =
+      ( $userid, "CENSORED", $homepage, $fullname, "", $T, $T, $userid );
+
+    # We have a query for INSERT INTO users
+
+    if ( $dbh->do( $query, undef, @qbind ) ) {
+        push @m, <<"HERE";
+<p>New user creation succeeded.</p>
+
+<p><b>LOOK FOR AN EMAIL WITH YOUR TEMPORARY PASSWORD.</b></p>
+
+<p>You'll also receive a welcome email like the one below.</p>
+HERE
+
+        # Not a mailinglist: set and send one time password
+        my $onetime = $self->_set_onetime_password( $mgr, $userid, $email );
+        $self->_send_otp_email( $mgr, $userid, $email, $onetime );
+
+        # send emails to user and modules@perl.org; latter must censor the
+        # user's email address
+        my ( $subject, $email_text ) =
+          $self->_send_welcome_email( $mgr, [$email], $userid, $email, $fullname, $homepage,
+            $fullname );
+        $self->_send_welcome_email( $mgr, $PAUSE::Config->{ADMINS},
+            $userid, "CENSORED", $fullname, $homepage, $fullname );
+
+        push @m, $self->_format_email_as_pre( $subject, $email_text );
+
+        warn "Info: clearing all fields";
+        for my $field (qw(userid fullname email homepage subscribe memo)) {
+            my $param = "pause99_request_id_$field";
+            $req->parameters->set( $param, "" );
+        }
+
+    }
+    else {
+        push @m,
+          sprintf( qq{<p><b>New user creation failed: [$query] failed. Reason:</b></p><p>%s</p>\n},
+            $dbh->errstr );
+        # TODO should notify administrators if this occurs
+    }
+    return @m;
+}
+
+sub _auto_registration_rate_limit_ok {
+    my ( $self, $mgr ) = @_;
+    my $limit = $PAUSE::Config->{RECAPTCHA_DAILY_LIMIT};
+
+    # $limit 0 or undef means "no limit"
+    return 1 if !$limit;
+
+    my $dbh = $mgr->connect;
+    my ($new_users) = $dbh->selectrow_array(
+        qq{ SELECT COUNT(*) FROM users where introduced > ?  },
+        undef, time - 24 * 3600,
+    );
+
+    return $new_users <= $limit;
 }
 
 1;
