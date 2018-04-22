@@ -149,6 +149,25 @@ sub import_author_root {
   dircopy($author_root, $ml_root);
 }
 
+sub upload_author_fake {
+  my ($self, $author, $fake) = @_;
+  local $fake->{author} = $author;
+
+  require Module::Faker; # We require 0.020 -- rjbs, 2019-04-25
+
+  my $dist = Module::Faker::Dist->from_struct($fake);
+
+  my $cpan_root   = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $author_root = File::Spec->catdir($cpan_root, qw(authors id));
+
+  $dist->make_archive({
+    dir           => $author_root,
+    author_prefix => 1,
+  });
+
+  return;
+}
+
 sub upload_author_file {
   my ($self, $author, $file) = @_;
 
