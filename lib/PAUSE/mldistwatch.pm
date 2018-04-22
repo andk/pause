@@ -38,7 +38,7 @@ use PAUSE::pmfile ();
 use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
 use PAUSE::MailAddress ();
-use PAUSE::Permissions ();
+use PAUSE::PermsManager ();
 use Safe;
 use Text::Format;
 
@@ -149,7 +149,7 @@ sub reindex {
 sub permissions {
     my $self = shift;
     return $self->{PERM_MGR} if $self->{PERM_MGR};
-    $self->{PERM_MGR} = PAUSE::Permissions->new( dbh_callback => sub { $self->connect } );
+    $self->{PERM_MGR} = PAUSE::PermsManager->new( dbh_callback => sub { $self->connect } );
 }
 
 sub rewrite_indexes {
