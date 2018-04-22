@@ -31,6 +31,21 @@ sub get_package_first_come_with_exact_case {
   return "";
 }
 
+sub get_package_maintainers_list_any_case {
+  my ($self, $package) = @_;
+  my $sql = qq{
+    SELECT package, userid
+      FROM   primeur
+      WHERE  LOWER(package) = LOWER(?)
+      UNION
+    SELECT package, userid
+      FROM   perms
+      WHERE  LOWER(package) = LOWER(?)
+  };
+  my @args = ($package) x 2;
+  return $self->dbh->selectall_arrayref($sql, undef, @args);
+}
+
 # returns callback to copy permissions from one package to another;
 # currently doesn't address primeur or *remove* excess permissions from
 # the destination. I.e. after running this, perms on the destination will
