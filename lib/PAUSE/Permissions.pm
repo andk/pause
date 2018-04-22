@@ -74,6 +74,23 @@ sub plan_package_permission_copy {
   }
 }
 
+# returns a callback to set first_come permissions on a package
+sub plan_set_first_come {
+  my ($self, $userid, $package) = @_;
+  my $dbh = $self->dbh;
+
+  return sub {
+    my $ret = eval { $dbh->do("INSERT INTO primeur (package, userid) VALUES (?,?)", undef, $package, $userid) };
+    my $err = $@;
+    $ret //= "";
+    $self->verbose(1,
+                  "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
+                  "err[$err]\n");
+    die $err if $err;
+    return 1;
+  };
+}
+
 sub userid_has_permissions_on_package {
   my ($self, $userid, $package) = @_;
 
