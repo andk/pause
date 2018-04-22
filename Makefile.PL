@@ -53,6 +53,7 @@ WriteMakefile(
     Mail::Send
     Module::Faker::Dist
     Module::Signature
+    Moo
     MooseX::StrictConstructor
     Net::FTP
     Parse::CPAN::Packages
