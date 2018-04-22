@@ -38,6 +38,7 @@ use PAUSE::pmfile ();
 use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
 use PAUSE::MailAddress ();
+use PAUSE::PermsManager ();
 use Safe;
 use Text::Format;
 
@@ -145,6 +146,12 @@ sub reindex {
     $self->disconnect;
 }
 
+sub permissions {
+    my $self = shift;
+    return $self->{PERM_MGR} if $self->{PERM_MGR};
+    $self->{PERM_MGR} = PAUSE::PermsManager->new( dbh_callback => sub { $self->connect } );
+}
+
 sub rewrite_indexes {
     my $self = shift;
 
@@ -244,6 +251,7 @@ sub disconnect {
     my $self = shift;
     return unless $self->{DBH};
     $self->{DBH}->disconnect;
+    delete $self->{PERM_MGR};
     delete $self->{DBH};
 }
 
@@ -355,7 +363,7 @@ sub _do_the_database_work {
 
     my $main_pkg = $dio->_package_governing_permission;
 
-    if ($self->_userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
+    if ($self->permissions->userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
       $dbh->commit;
     } else {
       $dio->alert("Uploading user has no permissions on package $main_pkg");
@@ -366,9 +374,17 @@ sub _do_the_database_work {
     return 1;
   };
 
+  my $err = $@;
   # Remember, $ok here only means "did the db work die," not "did we
   # successfully index stuff." -- rjbs, 2018-04-19
-  $self->verbose(2, "Error with database work: $@") unless $ok;
+  if ( !$ok ) {
+    # Rethrow any errors that weren't from the database
+    die $err if $err && ref($err) ne 'PAUSE::DBError';
+
+    # $err should have a value if !$ok, but just in case not
+    $err ||= "unknown error";
+    $self->verbose(2, "Error with database work: $err");
+  }
   return $ok;
 }
 
@@ -465,6 +481,7 @@ sub maybe_index_dist {
     for my $attempt (1 .. 3) {
       my $db_ok = $self->_do_the_database_work($dio);
       last if $db_ok;
+      $self->disconnect;
       if ($attempt == 3) {
         $self->verbose(2, "tried $attempt times to do db work, but all failed");
         $dio->alert("database errors while indexing");
@@ -562,36 +579,6 @@ sub handle_alerts {
     sendmail($email);
 
     return;
-}
-
-sub _userid_has_permissions_on_package {
-  my ($self, $userid, $package) = @_;
-
-  if ($package eq 'perl') {
-    return PAUSE->user_has_pumpking_bit($userid);
-  }
-
-  my $dbh = $self->connect;
-
-  my ($has_perms) = $dbh->selectrow_array(
-    qq{
-      SELECT COUNT(*) FROM perms
-      WHERE userid = ? AND LOWER(package) = LOWER(?)
-    },
-    undef,
-    $userid, $package,
-  );
-
-  my ($has_primary) = $dbh->selectrow_array(
-    qq{
-      SELECT COUNT(*) FROM primeur
-      WHERE userid = ? AND LOWER(package) = LOWER(?)
-    },
-    undef,
-    $userid, $package,
-  );
-
-  return($has_perms || $has_primary);
 }
 
 sub empty_dir {

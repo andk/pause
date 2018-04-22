@@ -86,47 +86,18 @@ sub alert {
 sub give_regdowner_perms {
   # This subroutine originally existed for interactions with the module list,
   # which was effectively made a non-feature years ago.  Its job now is to
-  # ensure that new packages are given the same permission as those given to
-  # the main package of the distribution being uploaded. -- rjbs, 2018-04-19
+  # ensure that new packages are given, at a minimum, the same permission as
+  # those given to the main package of the distribution being uploaded.
+  # -- rjbs, 2018-04-19
   my $self = shift;
-  my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   my $main_package = $self->{MAIN_PACKAGE};
-  local($dbh->{RaiseError}) = 0;
 
   return if lc $main_package eq lc $package;
 
-  # Get the permissions for the main package of this distribution so that we
-  # can ensure that *this* package has the same permissions as the main
-  # package. -- rjbs, 2018-04-19
-  my $existing_permissions = $dbh->selectall_arrayref(
-    q{
-      SELECT userid
-      FROM   perms
-      WHERE  LOWER(package) = LOWER(?)
-    },
-    { Slice => {} },
-    $main_package,
-  );
-
-  # TODO: correctly set first-come as well
-
-  # TODO: return if they're already equal permissions -- rjbs, 2018-04-19
-  $self->verbose(1, "Making permissions for package[$package] match main_mackage[$main_package]");
-
-  for my $row (@$existing_permissions)
-  {
-      my($mods_userid) = $row->{userid};
-      local($dbh->{RaiseError}) = 0;
-      local($dbh->{PrintError}) = 0;
-      my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
-      my $ret = $dbh->do($query, {}, $package, $mods_userid);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"Insert into perms package[$package]mods_userid".
-                      "[$mods_userid]ret[$ret]err[$err]\n");
-  }
+  $self->verbose(1, "Granting permissions of main_mackage[$main_package] to package[$package]");
+  my $changer = $self->hub->permissions->plan_package_permission_copy($main_package, $package);
+  $changer->();
 
   return;
 }
@@ -156,61 +127,21 @@ sub perm_check {
 
   my($userid) = $self->{USERID};
 
-  my $ins_perms = "INSERT INTO perms (package, userid) VALUES (?, ?)";
-  my @ins_params = ($package, $userid);
-
-  # package has any authorized maintainers? --> case insensitive
-
-  my $sql = qq{
-    SELECT package, userid
-    FROM   primeur
-    WHERE  LOWER(package) = LOWER(?)
-    UNION
-    SELECT package, userid
-    FROM   perms
-    WHERE  LOWER(package) = LOWER(?)
-    UNION
-    SELECT modid, userid
-    FROM   mods
-    WHERE  LOWER(modid) = LOWER(?)
-  };
-  my @args = ($package) x 3;
-  my($auth_ids) = $dbh->selectall_arrayref($sql,
-    undef,
-    @args
-  );
+  my $plan_set_comaint = $self->hub->permissions->plan_set_comaint($userid, $package);
 
   if ($self->{FIO}{DIO} && PAUSE::isa_regular_perl($dist)) {
-      local($dbh->{RaiseError}) = 0;
-      local($dbh->{PrintError}) = 0;
-      my $ret = $dbh->do($ins_perms, undef, @ins_params);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
-
+      $plan_set_comaint ->("(perl)");
       return 1;           # P2.1, P3.0
   }
 
   # is uploader authorized for this package? --> case sensitive
-  my($is_primeur) = $dbh->selectrow_hashref(qq{SELECT package, userid
-                                    FROM   primeur
-                                    WHERE  package = ? AND userid = ?},
-                                    undef,
-                                    $package, $userid
-                                  );
-  if ($is_primeur) {
-
-      local($dbh->{RaiseError}) = 0;
-      local($dbh->{PrintError}) = 0;
-      my $ret = $dbh->do($ins_perms, undef, @ins_params);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
-
+  my $primeur = $self->hub->permissions->get_package_first_come_with_exact_case($package);
+  if ($userid eq $primeur) {
+      $plan_set_comaint ->("(primeur)");
       return 1;           # P2.1, P3.0
   }
+
+  my $auth_ids = $self->hub->permissions->get_package_maintainers_list_any_case($package);
 
   if (@$auth_ids) {
 
@@ -231,7 +162,7 @@ sub perm_check {
           # seems ok: perl is always right
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
-          my $owner = eval { PAUSE::owner_of_module($package, $dbh) }
+          my $owner = eval { $self->hub->permissions->get_package_first_come_any_case($package) }
                     // "unknown";
 
           my $not_owner = qq{Not indexed because permission missing.
@@ -267,12 +198,7 @@ owner[$owner]
 
       # package has no existence in perms yet, so this guy is OK
 
-      local($dbh->{RaiseError}) = 0;
-      my $ret = $dbh->do($ins_perms, undef, @ins_params);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"Package is new: (uploader)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
+      $plan_set_comaint ->("(uploader)");
 
   }
   $self->verbose(1,sprintf( # just for debugging
@@ -786,9 +712,6 @@ sub checkin_into_primeur {
 
   # print ">>>>>>>>checkin_into_primeur not yet implemented<<<<<<<<\n";
 
-  local($dbh->{RaiseError}) = 0;
-  local($dbh->{PrintError}) = 0;
-
   my $userid;
   my $dio = $self->parent->parent;
   if (exists $dio->{META_CONTENT}{x_authority}) {
@@ -801,24 +724,16 @@ sub checkin_into_primeur {
       if(lc($self->{MAIN_PACKAGE}) eq lc($package)) {
           $userid = $self->{USERID} or die;
       } else {
-          my $lookup = "select userid from primeur where lower(package) = lower(?)";
-          my $user_ids = $dbh->selectall_arrayref($lookup, undef, $self->{MAIN_PACKAGE});
-          my ($row) = pop @$user_ids;
-          if($row) {
-              $userid = pop @$row;
-          }
+          $userid = $self->hub->permissions->get_package_first_come_any_case($self->{MAIN_PACKAGE});
           $userid = $self->{USERID} unless $userid;
-          die unless $userid;
+          die "Shouldn't reach here: userid unknown" unless $userid;
       }
   }
-  my $query = "INSERT INTO primeur (package, userid) VALUES (?,?)";
-  my $ret = $dbh->do($query, {}, $package, $userid);
-  my $err = "";
-  $err = $dbh->errstr unless defined $ret;
-  $ret ||= "";
-  $self->verbose(1,
-                  "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
-                  "err[$err]\n");
+
+  my $plan = $self->hub->permissions->plan_set_first_come($userid, $package);
+  $plan->();
+
+  return 1;
 }
 
 # package PAUSE::package;
