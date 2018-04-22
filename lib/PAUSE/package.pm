@@ -772,14 +772,14 @@ sub checkin_into_primeur {
           die unless $userid;
       }
   }
-  my $query = "INSERT INTO primeur (package, userid) VALUES (?,?)";
-  my $ret = $dbh->do($query, {}, $package, $userid);
-  my $err = "";
-  $err = $dbh->errstr unless defined $ret;
-  $ret ||= "";
-  $self->verbose(1,
-                  "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
-                  "err[$err]\n");
+ 
+  my $plan = $self->hub->permissions->plan_set_first_come($userid, $package);
+  
+  # XXX Why do we discard errors here?  It was like that before the
+  # refactoring so this just continues that. -- xdg, 2018-04-22
+  eval { $plan->() };
+
+  return 1;
 }
 
 # package PAUSE::package;
