@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin/lib/", "$FindBin::Bin/lib/pause_2017", "$FindBin::Bin/privatelib";
+use lib "$FindBin::Bin/lib/", "$FindBin::Bin/lib/pause_2017", "$FindBin::Bin/../pause-private/lib", "$FindBin::Bin/privatelib";
 use Plack::Builder;
 use Plack::App::Directory::Apaxy;
 use Path::Tiny;
