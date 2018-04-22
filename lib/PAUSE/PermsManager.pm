@@ -2,7 +2,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-package PAUSE::Permissions;
+package PAUSE::PermsManager;
 
 use Moo;
 use PAUSE ();
