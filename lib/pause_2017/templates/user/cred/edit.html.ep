@@ -138,4 +138,5 @@ Account can be removed
 % }
 
 </table>
+%= csrf_field
 <input type="submit" name="pause99_edit_cred_sub" value="Submit">

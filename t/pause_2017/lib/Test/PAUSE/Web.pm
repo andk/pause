@@ -133,7 +133,7 @@ sub new {
   my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2017.psgi";
   my $app = do "$AppRoot/$psgi";
 
-  my $mech = Test::WWW::Mechanize::PSGI->new(app => $app);
+  my $mech = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
   if (!$INC{'Devel/Cover.pm'} and !$ENV{TRAVIS} and eval {require LWP::ConsoleLogger::Easy; 1}) {
     LWP::ConsoleLogger::Easy::debug_ua($mech);
   }
@@ -193,6 +193,36 @@ sub admin_post_ok {
   $self->post_ok($url, @args);
 }
 
+sub safe_post_ok {
+  my ($self, $url, @args) = @_;
+
+  my $res = $self->{mech}->get($url);
+  ok $res->is_success, "GET $url";
+  my $token = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]')->attr('value');
+  $args[0]->{csrf_token} = $token if @args and ref $args[0] eq 'HASH';
+
+  $res = $self->{mech}->post($url, @args);
+  ok $res->is_success, "POST $url";
+  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $self->note_deliveries;
+  $self;
+}
+
+sub user_safe_post_ok {
+  my ($self, $url, @args) = @_;
+
+  $self->{mech}->credentials("TESTUSER", "test");
+  $self->safe_post_ok($url, @args);
+}
+
+sub admin_safe_post_ok {
+  my ($self, $url, @args) = @_;
+
+  $self->{mech}->credentials("TESTADMIN", "test");
+  $self->safe_post_ok($url, @args);
+}
+
 sub tests_for_get {
   my ($self, $permission) = @_;
   my @tests;
@@ -224,6 +254,23 @@ sub tests_for_post {
     push @tests, [user_post_ok => "/pause/authenquery", "TESTUSER"];
   }
   push @tests, [admin_post_ok => "/pause/authenquery", "TESTADMIN"];
+  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
+}
+
+sub tests_for_safe_post {
+  my ($self, $permission) = @_;
+  my @tests;
+  if ($permission eq "public") {
+    push @tests, (
+      [safe_post_ok       => "/pause/query"],
+      [user_safe_post_ok  => "/pause/query"],
+      [admin_safe_post_ok => "/pause/query"],
+    );
+  }
+  if ($permission ne "admin") {
+    push @tests, [user_safe_post_ok => "/pause/authenquery", "TESTUSER"];
+  }
+  push @tests, [admin_safe_post_ok => "/pause/authenquery", "TESTADMIN"];
   $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
 }
 

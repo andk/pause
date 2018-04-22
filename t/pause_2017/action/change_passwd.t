@@ -24,12 +24,25 @@ subtest 'get' => sub {
 };
 
 subtest 'post: basic' => sub {
+    plan skip_all => 'SKIP for now';
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for_post('user')) {
         my ($method, $path) = @$test;
         note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
         my %form = %$default;
+        my $t = Test::PAUSE::Web->new;
+        $t->$method("$path?ACTION=change_passwd", \%form);
+        # note $t->content;
+    }
+};
+
+subtest 'safe_post: basic' => sub {
+    Test::PAUSE::Web->setup;
+    for my $test (Test::PAUSE::Web->tests_for_safe_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my %form = %$default;
+        my $t = Test::PAUSE::Web->new;
         $t->$method("$path?ACTION=change_passwd", \%form)
           ->text_is("h2.firstheader", "Change Password")
           ->text_like("p.password_stored", qr/New password stored/);
@@ -38,9 +51,9 @@ subtest 'post: basic' => sub {
     }
 };
 
-subtest 'post: passwords mismatch' => sub {
+subtest 'safe_post: passwords mismatch' => sub {
     Test::PAUSE::Web->setup;
-    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+    for my $test (Test::PAUSE::Web->tests_for_safe_post('user')) {
         my ($method, $path) = @$test;
         note "$method for $path";
         my $t = Test::PAUSE::Web->new;
@@ -56,9 +69,9 @@ subtest 'post: passwords mismatch' => sub {
     }
 };
 
-subtest 'post: only one password' => sub {
+subtest 'safe_post: only one password' => sub {
     Test::PAUSE::Web->setup;
-    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+    for my $test (Test::PAUSE::Web->tests_for_safe_post('user')) {
         my ($method, $path) = @$test;
         note "$method for $path";
         my $t = Test::PAUSE::Web->new;
@@ -74,9 +87,9 @@ subtest 'post: only one password' => sub {
     }
 };
 
-subtest 'post: no password' => sub {
+subtest 'safe_post: no password' => sub {
     Test::PAUSE::Web->setup;
-    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+    for my $test (Test::PAUSE::Web->tests_for_safe_post('user')) {
         my ($method, $path) = @$test;
         note "$method for $path";
         my $t = Test::PAUSE::Web->new;
