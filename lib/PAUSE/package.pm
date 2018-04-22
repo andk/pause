@@ -129,27 +129,6 @@ sub perm_check {
 
   my $plan_set_comaint = $self->hub->permissions->plan_set_comaint($userid, $package);
 
-  # package has any authorized maintainers? --> case insensitive
-
-  my $sql = qq{
-    SELECT package, userid
-    FROM   primeur
-    WHERE  LOWER(package) = LOWER(?)
-    UNION
-    SELECT package, userid
-    FROM   perms
-    WHERE  LOWER(package) = LOWER(?)
-    UNION
-    SELECT modid, userid
-    FROM   mods
-    WHERE  LOWER(modid) = LOWER(?)
-  };
-  my @args = ($package) x 3;
-  my($auth_ids) = $dbh->selectall_arrayref($sql,
-    undef,
-    @args
-  );
-
   if ($self->{FIO}{DIO} && PAUSE::isa_regular_perl($dist)) {
       $plan_set_comaint ->("(perl)");
       return 1;           # P2.1, P3.0
@@ -161,6 +140,8 @@ sub perm_check {
       $plan_set_comaint ->("(primeur)");
       return 1;           # P2.1, P3.0
   }
+
+  my $auth_ids = $self->hub->permissions->get_package_maintainers_list_any_case($package);
 
   if (@$auth_ids) {
 
