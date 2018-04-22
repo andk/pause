@@ -99,6 +99,48 @@ sub _build_db_root {
   return $db_root;
 }
 
+sub add_first_come {
+  my ($self, $package, $userid) = @_;
+
+  my $dir = $self->db_root;
+  my $dbh = DBI->connect(
+    "dbi:SQLite:dbname=$dir/mod.sqlite",
+    undef,
+    undef,
+    { RaiseError => 1 },
+  );
+
+  $dbh->do(
+    q{
+      INSERT INTO primeur (package, userid) VALUES (?, ?);
+      INSERT INTO perms   (package, userid) VALUES (?, ?);
+    },
+    undef,
+    uc $userid, $package,
+    uc $userid, $package,
+  );
+}
+
+sub add_comaint {
+  my ($self, $package, $userid) = @_;
+
+  my $dir = $self->db_root;
+  my $dbh = DBI->connect(
+    "dbi:SQLite:dbname=$dir/mod.sqlite",
+    undef,
+    undef,
+    { RaiseError => 1 },
+  );
+
+  $dbh->do(
+    q{
+      INSERT INTO perms (package, userid) VALUES (?, ?);
+    },
+    undef,
+    uc $userid, $package,
+  );
+}
+
 sub import_author_root {
   my ($self, $author_root) = @_;
 
