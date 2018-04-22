@@ -23,16 +23,27 @@ sub select_ml_action {
     }
   }
 
-  my $sql = qq{SELECT users.userid
-               FROM users, list2user
-               WHERE isa_list > ''
-                 AND users.userid = list2user.maillistid
-                 AND list2user.userid = ?
-               ORDER BY users.userid
-  };
+  my ($sql, @bind);
+  if (exists $pause->{UserGroups}{admin}) {
+    $sql = qq{SELECT users.userid
+              FROM users, list2user
+              WHERE isa_list > ''
+                AND users.userid = list2user.maillistid
+              ORDER BY users.userid
+    };
+  } else {
+    $sql = qq{SELECT users.userid
+              FROM users, list2user
+              WHERE isa_list > ''
+                AND users.userid = list2user.maillistid
+                AND list2user.userid = ?
+              ORDER BY users.userid
+    };
+    @bind = $pause->{User}{userid};
+  }
 
   my $sth = $dbh->prepare($sql);
-  $sth->execute($pause->{User}{userid});
+  $sth->execute(@bind);
   my %u;
   while (my @row = $mgr->fetchrow($sth, "fetchrow_array")) {
     $u{$row[0]} = $row[0];
