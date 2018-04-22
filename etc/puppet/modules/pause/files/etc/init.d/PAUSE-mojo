@@ -80,6 +80,7 @@ __END__
 As root / into puppet:
 
     chmod 755 /etc/init.d/PAUSE-mojo
-    update-rc.d PAUSE-mojo defaults
+    update-rc.d PAUSE-mojo defaults # Debian
+    chkconfig --add PAUSE-mojo      # RedHat
 
 =cut
