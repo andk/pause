@@ -102,6 +102,10 @@ sub plan_set_first_come {
 
   return sub {
     my $dbh = $self->dbh_callback->();
+
+    # ensure first-come also is in perms
+    $self->plan_set_comaint($userid, $package)->();
+
     # we disable errors so that the insert emulates an upsert
     local ( $dbh->{RaiseError} ) = 0;
     local ( $dbh->{PrintError} ) = 0;
