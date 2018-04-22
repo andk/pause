@@ -145,6 +145,7 @@ sub edit {
           if ($field eq "ustatus") {
             push @set, "ustatus_ch = NOW()";
           }
+          $u->{$field} = $s;
         } else {
           $mb = {field => $field, value => $s};
         }
