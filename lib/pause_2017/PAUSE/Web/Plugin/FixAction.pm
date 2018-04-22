@@ -13,7 +13,8 @@ sub register {
 sub _fix {
   my $c = shift;
 
-  #_fixup($c); # does what fixup handler did
+  _fixup($c); # does what fixup handler did
+  return if $c->res->is_finished;
 
   my $action = $c->req->param("ACTION");
 
@@ -44,33 +45,26 @@ sub _fixup {
   my $c = shift;
   my $req = $c->req;
 
-  my $uri = $req->request_uri;
+  my $uri = $req->env->{REQUEST_URI};
   my $location = '/pause'; # $r->location;
 
   # warn "uri[$uri]location[$location] (Question was, does location ever match /query/?)";
-  if ($uri eq $location) {
+  if ($uri eq $location or $uri eq "$location/") {
 
-    # CASE 1
+    # CASE 1/2
 
-    my $redir = $req->base;
+    my $redir = $req->url->base;
     my $is_ssl = $req->headers->header("X-pause-is-SSL") || 0;
     if ($is_ssl) {
       $redir->scheme("https");
     }
     $redir->path("$location/query");
-    my $res = $req->new_response(HTTP_MOVED_PERMANENTLY);
-    $res->headers->header("Location",$redir);
+    $c->res->code(HTTP_MOVED_PERMANENTLY);
+    $c->res->headers->header("Location",$redir);
     # warn "redir[$redir]";
-    return $res->finalize;
+    return $c->res->finish;
   }
   return unless $uri eq "$location/";
-
-  # CASE 2
-
-  # warn sprintf "uri[%s]location[%s]path_info[%s]", $uri, $location, $r->path_info;
-  $req->path("$location/query");
-  $req->path_info("") if $req->path_info;
-  return;
 }
 
 1;
