@@ -59,6 +59,7 @@ WriteMakefile(
     Mojolicious::Plugin::WithCSRFProtection
     Mojo::File
     MojoX::Log::Dispatch::Simple
+    Moo
     MooseX::StrictConstructor
     Net::FTP
     Parse::CPAN::Packages
