@@ -36,6 +36,7 @@ proceed.</p>
     size => 16,
 =%>
 
+%= csrf_field
 <input type="submit" name="pause99_change_passwd_sub" value="Submit">
 
 % }

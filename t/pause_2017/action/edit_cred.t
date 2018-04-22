@@ -26,7 +26,20 @@ subtest 'get' => sub {
 };
 
 subtest 'post: basic' => sub {
+    plan skip_all => 'SKIP for now';
     for my $test (Test::PAUSE::Web->tests_for_post('user')) {
+        my ($method, $path) = @$test;
+        note "$method for $path";
+        my $t = Test::PAUSE::Web->new;
+
+        my %form = %$default;
+        $t->$method("$path?ACTION=edit_cred", \%form);
+        # note $t->content;
+    }
+};
+
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for_safe_post('user')) {
         my ($method, $path) = @$test;
         note "$method for $path";
         my $t = Test::PAUSE::Web->new;

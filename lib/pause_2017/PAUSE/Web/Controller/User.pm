@@ -317,7 +317,7 @@ sub change_passwd {
 
   my $u = $c->active_user_record;
 
-  if ($req->param("pause99_change_passwd_sub")) {
+  if (uc $req->method eq 'POST' and $req->param("pause99_change_passwd_sub")) {
     if (my $pw1 = $req->param("pause99_change_passwd_pw1")) {
       if (my $pw2 = $req->param("pause99_change_passwd_pw2")) {
         if ($pw1 eq $pw2) {

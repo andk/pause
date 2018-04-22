@@ -23,7 +23,7 @@ sub edit {
   my %meta = map {$_ => 1} @allmeta;
 
   my $consistentsubmit = 0;
-  if ($req->param("pause99_edit_cred_sub")) {
+  if (uc $req->method eq 'POST' and $req->param("pause99_edit_cred_sub")) {
     my $wantemail = $req->param("pause99_edit_cred_email");
     my $wantsecretemail = $req->param("pause99_edit_cred_secretemail");
     my $wantalias = $req->param("pause99_edit_cred_cpan_mail_alias");
