@@ -37,7 +37,7 @@
 %       }
 %     }
 %     my $menu_class = ($action->{name} eq $pause->{Action}) ? "activemenu" : "menuitem";
-<p class="<%= $menu_class %>"><a class="<%= $menu_class %>" href="<%= my_url->query([ACTION => $action->{name}]) %>"><% if ($action->{name} eq $pause->{Action}) { %>&gt; <% } %><%= $verbose %></a></p>
+<p class="<%= $menu_class %>"><a class="<%= $menu_class %>" href="<%= my_url->query(ACTION => $action->{name}) %>"><% if ($action->{name} eq $pause->{Action}) { %>&gt; <% } %><%= $verbose %></a></p>
 %   }
 % }
 </div>

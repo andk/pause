@@ -20,7 +20,7 @@ here in case you want to upload further files.</p>
 <p><b>Please tidy up your homedir:</b> CPAN is getting larger every day which
 is nice but usually there is no need to keep old an outdated version
 of a module on several hundred mirrors. Please consider <a
-href="<%= my_url->query([ACTION => "delete_files"]) %>">removing</a> old versions of
+href="<%= my_url->query(ACTION => "delete_files") %>">removing</a> old versions of
 your module from PAUSE and CPAN. If you are worried that someone might
 need an old version, it can always be found on the <a
 href="http://backpan.cpan.org/authors/id/<%= $pause->{userhome} %>/">backpan</a>
@@ -30,7 +30,7 @@ href="http://backpan.cpan.org/authors/id/<%= $pause->{userhome} %>/">backpan</a>
 href="<%= $pause->{usrdir} %>"><%= $pause->{usrdir} %></a>. If something's wrong, please
 check the logfile of the daemon: see the tail of it with <a
 href="<%= $pause->{tailurl} %>"><%= $pause->{tailurl} %></a>. If you already know what's going wrong, you
-may wish to visit the <a href="<%= my_url->query([ACTION => "edit_uris" ]) %>">repair
+may wish to visit the <a href="<%= my_url->query(ACTION => "edit_uris") %>">repair
 tool</a> for pending uploads.</p>
 
 %   } else {

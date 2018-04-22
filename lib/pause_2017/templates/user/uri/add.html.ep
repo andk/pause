@@ -44,14 +44,14 @@ HTTP upload: enter the filename in the lower text field.
 it may be due to the fact that your browser can't handle
 <code>multipart/form-data</code> forms that support file
 upload. In such a case, please retry to access this <a
-href="<%= my_url->query([ACTION => "add_uri", CAN_MULTIPART => 0 ]) %>">file-upload-disabled form</a>.</p>
+href="<%= my_url->query(ACTION => "add_uri", CAN_MULTIPART => 0) %>">file-upload-disabled form</a>.</p>
 
 % } else {
 
 <p class="http_upload"><b>HTTP Upload:</b> <i>As
 you do not seem to want HTTP upload enabled, we do
 <b>not</b> offer it. If this is not what you want, try to
-<a href="<%= my_url->query([ACTION => "add_uri", CAN_MULTIPART => 1 ]) %>">explicitly enable HTTP upload</a>.</i></p>
+<a href="<%= my_url->query(ACTION => "add_uri", CAN_MULTIPART => 1) %>">explicitly enable HTTP upload</a>.</i></p>
 
 % }
 
