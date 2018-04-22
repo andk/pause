@@ -1,0 +1,8 @@
+name: Foo-Bar
+version: 0.001
+provides:
+  Foo::Bar:
+   version: 0.001
+   file: lib/Foo/Bar.pm
+X_Module_Faker:
+  cpan_author: FCOME
