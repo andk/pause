@@ -127,8 +127,7 @@ sub perm_check {
 
   my($userid) = $self->{USERID};
 
-  my $ins_perms = "INSERT INTO perms (package, userid) VALUES (?, ?)";
-  my @ins_params = ($package, $userid);
+  my $plan_set_comaint = $self->hub->permissions->plan_set_comaint($userid, $package);
 
   # package has any authorized maintainers? --> case insensitive
 
@@ -152,29 +151,18 @@ sub perm_check {
   );
 
   if ($self->{FIO}{DIO} && PAUSE::isa_regular_perl($dist)) {
-      local($dbh->{RaiseError}) = 0;
-      local($dbh->{PrintError}) = 0;
-      my $ret = $dbh->do($ins_perms, undef, @ins_params);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
-
+      # XXX Why do we ignore errors?  This predated refactoring to use
+      # $set_comaint_plan. -- xdg, 2018-04-22
+      eval { $plan_set_comaint ->("(perl)") };
       return 1;           # P2.1, P3.0
   }
 
   # is uploader authorized for this package? --> case sensitive
   my $primeur = $self->hub->permissions->get_package_first_come_with_exact_case($package);
   if ($userid eq $primeur) {
-
-      local($dbh->{RaiseError}) = 0;
-      local($dbh->{PrintError}) = 0;
-      my $ret = $dbh->do($ins_perms, undef, @ins_params);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"(primeur)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
-
+      # XXX Why do we ignore errors?  This predated refactoring to use
+      # $set_comaint_plan. -- xdg, 2018-04-22
+      eval { $plan_set_comaint ->("(primeur)") };
       return 1;           # P2.1, P3.0
   }
 
@@ -233,12 +221,9 @@ owner[$owner]
 
       # package has no existence in perms yet, so this guy is OK
 
-      local($dbh->{RaiseError}) = 0;
-      my $ret = $dbh->do($ins_perms, undef, @ins_params);
-      my $err = "";
-      $err = $dbh->errstr unless defined $ret;
-      $ret ||= "";
-      $self->verbose(1,"Package is new: (uploader)ins_perms[$ins_perms/@ins_params]ret[$ret]err[$err]\n");
+      # XXX Why do we ignore errors?  This predated refactoring to use
+      # $set_comaint_plan. -- xdg, 2018-04-22
+      eval { $plan_set_comaint ->("(uploader)") };
 
   }
   $self->verbose(1,sprintf( # just for debugging

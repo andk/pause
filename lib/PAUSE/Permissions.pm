@@ -91,6 +91,25 @@ sub plan_set_first_come {
   };
 }
 
+# returns a callback to set comaint permissions on a package
+sub plan_set_comaint {
+  my ($self, $userid, $package) = @_;
+  my $dbh = $self->dbh;
+
+  return sub {
+    my $log_prefix = shift || "";
+    $log_prefix .= " " if length $log_prefix;
+    my $ret = eval { $dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", undef, $package, $userid) };
+    my $err = $@;
+    $ret //= "";
+    $self->verbose(1,
+                  "${log_prefix}Inserted into perms package[$package]userid[$userid]ret[$ret]".
+                  "err[$err]\n");
+    die $err if $err;
+    return 1;
+  };
+}
+
 sub userid_has_permissions_on_package {
   my ($self, $userid, $package) = @_;
 
