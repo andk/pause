@@ -14,7 +14,7 @@ has dbh => (
 
 # returns first_come user for a package or the empty string. If there are
 # more than one matches, only the first is returned
-sub get_package_first_come {
+sub get_package_first_come_any_case {
   my ($self, $pkg) = @_;
   my $query = "SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)";
   my $owner = $self->dbh->selectrow_arrayref($query, undef, $pkg);
