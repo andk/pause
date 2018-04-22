@@ -32,7 +32,12 @@ sub index {
   my $action = 'add_uri';
   $req->param('ACTION' => $action);
   $pause->{Action} = $action;
-  return $c->delegate($action);
+
+  # kind of delegate but don't add action to stack
+  my $routes = $c->app->routes;
+  my $route = $routes->lookup($action) or die "no route for $action";
+  my $to = $route->to;
+  $routes->_controller($c, $to);
 }
 
 sub auth {
