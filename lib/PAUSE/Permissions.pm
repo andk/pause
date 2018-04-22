@@ -7,8 +7,9 @@ package PAUSE::Permissions;
 use Moo;
 use PAUSE ();
 
-has dbh => (
+has dbh_callback => (
   is => 'ro',
+  isa => sub { die "dbh_callback must be a coderef" unless ref $_[0] eq 'CODE' },
   required => 1,
 );
 
@@ -16,8 +17,9 @@ has dbh => (
 # more than one matches, only the first is returned
 sub get_package_first_come_any_case {
   my ($self, $pkg) = @_;
+  my $dbh = $self->dbh_callback->();
   my $query = "SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)";
-  my $owner = $self->dbh->selectrow_arrayref($query, undef, $pkg);
+  my $owner = $dbh->selectrow_arrayref($query, undef, $pkg);
   return $owner->[1] if $owner;
   return "";
 }
@@ -25,14 +27,16 @@ sub get_package_first_come_any_case {
 # returns first_come user for a package or the empty string
 sub get_package_first_come_with_exact_case {
   my ($self, $pkg) = @_;
+  my $dbh = $self->dbh_callback->();
   my $query = "SELECT package, userid FROM primeur where package = ?";
-  my $owner = $self->dbh->selectrow_arrayref($query, undef, $pkg);
+  my $owner = $dbh->selectrow_arrayref($query, undef, $pkg);
   return $owner->[1] if $owner;
   return "";
 }
 
 sub get_package_maintainers_list_any_case {
   my ($self, $package) = @_;
+  my $dbh = $self->dbh_callback->();
   my $sql = qq{
     SELECT package, userid
       FROM   primeur
@@ -43,7 +47,7 @@ sub get_package_maintainers_list_any_case {
       WHERE  LOWER(package) = LOWER(?)
   };
   my @args = ($package) x 2;
-  return $self->dbh->selectall_arrayref($sql, undef, @args);
+  return $dbh->selectall_arrayref($sql, undef, @args);
 }
 
 # returns callback to copy permissions from one package to another;
@@ -52,9 +56,9 @@ sub get_package_maintainers_list_any_case {
 # be a superset of the source.
 sub plan_package_permission_copy {
   my ( $self, $src, $dst ) = @_;
-  my $dbh = $self->dbh;
 
   return sub {
+    my $dbh = $self->dbh_callback->();
     local($dbh->{RaiseError}) = 0;
     my $src_permissions = $dbh->selectall_arrayref(
         q{
@@ -95,9 +99,9 @@ sub plan_package_permission_copy {
 # returns a callback to set first_come permissions on a package
 sub plan_set_first_come {
   my ($self, $userid, $package) = @_;
-  my $dbh = $self->dbh;
 
   return sub {
+    my $dbh = $self->dbh_callback->();
     # we disable errors so that the insert emulates an upsert
     local ( $dbh->{RaiseError} ) = 0;
     local ( $dbh->{PrintError} ) = 0;
@@ -114,9 +118,9 @@ sub plan_set_first_come {
 # returns a callback to set comaint permissions on a package
 sub plan_set_comaint {
   my ($self, $userid, $package) = @_;
-  my $dbh = $self->dbh;
 
   return sub {
+    my $dbh = $self->dbh_callback->();
     my $log_prefix = shift || "";
     $log_prefix .= " " if length $log_prefix;
     # we disable errors so that the insert emulates an upsert
@@ -139,7 +143,7 @@ sub userid_has_permissions_on_package {
     return PAUSE->user_has_pumpking_bit($userid);
   }
 
-  my $dbh = $self->dbh;
+  my $dbh = $self->dbh_callback->();
 
   my ($has_perms) = $dbh->selectrow_array(
     qq{
