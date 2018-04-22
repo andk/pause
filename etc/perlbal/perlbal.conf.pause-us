@@ -80,6 +80,8 @@ ENABLE alternatepause
 #   SET enable_reproxy              = off
 # ENABLE analysis
 
+# https://groups.google.com/forum/#!msg/perlbal/7VW-7QwQcB8/QEEOyp2VIwgJ;context-place=searchin/perlbal/redirect$20to$20https%7Csort:date
+# would like to provide a forced redirect, but not now
 CREATE SERVICE vhosts
   SET listen                      = 0.0.0.0:80
   SET role                        = selector
