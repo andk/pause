@@ -56,6 +56,7 @@ WriteMakefile(
     Module::Signature
     Mojolicious
     Mojolicious::Plugin::WithCSRFProtection
+    Mojo::File
     MojoX::Log::Dispatch::Simple
     MooseX::StrictConstructor
     Net::FTP
