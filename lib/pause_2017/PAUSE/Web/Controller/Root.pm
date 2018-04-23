@@ -22,6 +22,8 @@ sub index {
   my $pause = $c->stash(".pause");
   my $mgr = $c->app->pause;
   my $req = $c->req;
+
+  return unless exists $pause->{User};
   my $u = $c->active_user_record;
 
   # Special case for cpan-uploaders that post to the /pause/authenquery without any ACTION
