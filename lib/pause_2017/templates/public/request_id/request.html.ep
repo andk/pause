@@ -1,11 +1,6 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<p>A PAUSE account is only required to distribute and manage Perl module
-distributions on CPAN. You do not need a PAUSE account to submit
-bug reports to <a href="http://rt.cpan.org/">RT</a> or participate
-in many Perl community sites.</p>
-
 % if (@{$pause->{errors} || []}) {
 <h3>Error processing form</h3>
 %   for (@{$pause->{errors}}) {
