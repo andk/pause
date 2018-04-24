@@ -98,7 +98,7 @@ sub _retrieve_user {
                          WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
   $sth->execute($user);
   my($secret_email) = $sth->fetchrow_array;
-  $pause->{secret_email} = $secret_email;
+  $pause->{User}{secretemail} = $secret_email;
   $sth->finish;
 
   $sql = qq{SELECT *
