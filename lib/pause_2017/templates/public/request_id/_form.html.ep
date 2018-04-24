@@ -1,6 +1,11 @@
 % my $pause = stash(".pause") || {};
 % my $alt = 0;
 
+<p>A PAUSE account is only required to distribute and manage Perl module
+distributions on CPAN. You do not need a PAUSE account to submit
+bug reports to <a href="http://rt.cpan.org/">RT</a> or participate
+in many Perl community sites.</p>
+
 <div class="alternate<%= $alt++ % 2 + 1 %>">
 <p><b>Your full name (civil name)</b></p>
 <p><small>Unicode Characters OK.</small></p>
