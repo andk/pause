@@ -11,7 +11,10 @@ sub register {
   # to generate a url
   $app->helper(my_url => sub {
     my $c = shift;
-    Mojo::URL->new($c->req->env->{REQUEST_URI});
+    my $url = Mojo::URL->new($c->req->env->{REQUEST_URI});
+    my $action = $c->stash('.pause')->{Action};
+    $url->query->param(ACTION => $action) if $action && $action ne $url->query->param('ACTION');
+    $url;
   });
   $app->helper(my_full_url => sub {
     my $c = shift;
