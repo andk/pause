@@ -22,7 +22,13 @@ sub call {
     );
   };
 
-  my $res = $self->authenticate($env);
+  my $res = eval { $self->authenticate($env) };
+  if ($@) {
+    Log::Dispatch::Config->instance->log(
+      level => 'error',
+      message => "AUTH ERROR: $@",
+    );
+  }
 
   return $res->finalize if ref $res;
   return $self->unauthorized($env) unless $res == HTTP_OK;
@@ -108,7 +114,7 @@ sub authenticate {
   unless ($dbh = DBI->connect($attr->{data_source},
                               $attr->{username},
                               $attr->{password})) {
-    $req->logger->({level => 'error', message => " db connect error with $attr->{data_source} ".$req->path });
+    Log::Dispatch::Config->instance->log(level => 'error', message => " db connect error with $attr->{data_source} ".$req->path);
     my $redir = $req->path;
     $redir =~ s/authen//;
     delete $env->{REMOTE_USER};
@@ -125,13 +131,13 @@ sub authenticate {
   # prepare statement
   my $sth;
   unless ($sth = $dbh->prepare($statement)) {
-    $req->logger->({level => 'error', message => "can not prepare statement: $DBI::errstr". $req->path });
+    Log::Dispatch::Config->instance->log(level => 'error', message => "can not prepare statement: $DBI::errstr". $req->path);
     $dbh->disconnect;
     return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
   }
   for my $user (@try_user){
     unless ($sth->execute($user)) {
-      $req->logger->({level => 'error', message => " can not execute statement: $DBI::errstr" . $req->path });
+      Log::Dispatch::Config->instance->log(level => 'error', message => " can not execute statement: $DBI::errstr" . $req->path);
       $dbh->disconnect;
       return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
     }
