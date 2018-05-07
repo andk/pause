@@ -11,6 +11,7 @@ our %Actions = (
     priv => "public",
     cat => "00reg/01",
     desc => "Apply for a PAUSE account.",
+    method => 'POST',
     x_form => {
       pause99_request_id_fullname => {form_type => "text_field"},
       pause99_request_id_email => {form_type => "text_field"},
@@ -99,6 +100,7 @@ our %Actions = (
     priv => "user",
     cat => "User/01Files/01up",
     desc => "This is the heart of the <b>Upload Server</b>, the page most heavily used on PAUSE.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       CAN_MULTIPART => {form_type => "hidden_field"},
@@ -116,6 +118,7 @@ our %Actions = (
     priv => "user",
     cat => "User/01Files/02show",
     desc => "find . -ls resemblance",
+    method => 'POST',
   },
   edit_uris => {
     x_mojo_to => "user#edit_uris",
@@ -137,6 +140,7 @@ our %Actions = (
     priv => "user",
     cat => "User/01Files/04del",
     desc => "Schedule files for deletion. There is a delay until the deletion really happens. Until then you can also undelete files here.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       SUBMIT_pause99_delete_files_delete => {form_type => "submit_button"},
@@ -165,6 +169,7 @@ our %Actions = (
     priv => "user",
     cat => "User/04Permissions/02",
     desc => "Enable other users to upload a module for any of your namespaces, manage your own permissions.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       lsw => {form_type => "hidden_field"},
@@ -314,6 +319,7 @@ our %Actions = (
     priv => "user",
     cat => "User/06Account/02",
     desc => "Change your password any time you want.",
+    method => 'POST',
     x_csrf_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
