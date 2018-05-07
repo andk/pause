@@ -67,7 +67,9 @@ Please be careful not to disturb the database operation. Expect failures everywh
     %= include "_user_menu";
   </div>
   <div class="col c9">
+    % my $action_conf = app->pause->config->action($pause->{Action});
     % my $me = my_url();
+    % my $method = $action_conf->{method} // 'GET';
     % my $enctype;
     % if ($pause->{need_form_data}) {
     %   $enctype = "multipart/form-data";
@@ -76,9 +78,8 @@ Please be careful not to disturb the database operation. Expect failures everywh
     %   warn "DEBUG: me[$me]enctype[$enctype]";
     <h2>[ATTN: Form going to post to <%= $me %>]</h2>
     % }
-    <form action="<%= $me %>" <% if ($enctype) { %>enctype="<%= $enctype %>" <% } %>method="post">
+    <form action="<%= $me %>" <% if ($enctype) { %>enctype="<%= $enctype %>" <% } %>method="<%= $method %>">
     <main>
-    % my $action_conf = app->pause->config->action($pause->{Action});
     % if (my $verb = $action_conf->{verb} and !$action_conf->{has_title}) {
       <h2 class="firstheader"><%= $verb %></h2>
     % }
