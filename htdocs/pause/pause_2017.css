@@ -141,6 +141,9 @@ td.administration {
   padding-right: 0.5em;
   font-size: 0.8em;
 }
+.pagination li.active {
+  font-weight: bold;
+}
 .pagination:before {
   content: "Page: ";
   font-size: 0.8em;
