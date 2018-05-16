@@ -3510,2739 +3510,2747 @@ __END__
 # XML::Bare,PABLROD,c,delete
 # XML::Twig,PABLROD,c,delete
 # version,PABLROD,c,delete
-am,PABLROD,c,delete
-apc,PABLROD,c,delete
-APR::Request::Hook,PABLROD,c,delete
-APR::Request::Parser,PABLROD,c,delete
-arybase::mg,PABLROD,c,delete
-Authen::Krb5::Address,PABLROD,c,delete
-Authen::Krb5::Admin::Config,PABLROD,c,delete
-Authen::Krb5::Admin::Key,PABLROD,c,delete
-Authen::Krb5::Admin::Policy,PABLROD,c,delete
-Authen::Krb5::Admin::Principal,PABLROD,c,delete
-Authen::Krb5::AuthContext,PABLROD,c,delete
-Authen::Krb5::Ccache,PABLROD,c,delete
-Authen::Krb5::Creds,PABLROD,c,delete
-Authen::Krb5::EncTktPart,PABLROD,c,delete
-Authen::Krb5::Keyblock,PABLROD,c,delete
-Authen::Krb5::Keytab,PABLROD,c,delete
-Authen::Krb5::KeytabEntry,PABLROD,c,delete
-Authen::Krb5::Principal,PABLROD,c,delete
-Authen::Krb5::Ticket,PABLROD,c,delete
-B::AV,PABLROD,c,delete
-B::BINOP,PABLROD,c,delete
-B::BM,PABLROD,c,delete
-B::COP,PABLROD,c,delete
-B::CV,PABLROD,c,delete
-BDB::Cursor,PABLROD,c,delete
-BDB::Db,PABLROD,c,delete
-BDB::Env,PABLROD,c,delete
-BDB::Sequence,PABLROD,c,delete
-BDB::Txn,PABLROD,c,delete
-BerkeleyDB::DbStream,PABLROD,c,delete
-BerkeleyDB::Sequence,PABLROD,c,delete
-B::FM,PABLROD,c,delete
-B::GV,PABLROD,c,delete
-B::GVOP,PABLROD,c,delete
-B::HE,PABLROD,c,delete
-B::Hooks::Toke,PABLROD,c,delete
-B::HV,PABLROD,c,delete
-bi,PABLROD,c,delete
-B::IO,PABLROD,c,delete
-B::IV,PABLROD,c,delete
-B::LISTOP,PABLROD,c,delete
-B::LOGOP,PABLROD,c,delete
-B::LOOP,PABLROD,c,delete
-B::MAGIC,PABLROD,c,delete
-B::METHOP,PABLROD,c,delete
-B::NV,PABLROD,c,delete
-B::PADLIST,PABLROD,c,delete
-B::PADNAME,PABLROD,c,delete
-B::PADNAMELIST,PABLROD,c,delete
-B::PADOP,PABLROD,c,delete
-B::PMOP,PABLROD,c,delete
-B::PV,PABLROD,c,delete
-B::PVLV,PABLROD,c,delete
-B::PVMG,PABLROD,c,delete
-B::PVOP,PABLROD,c,delete
-B::REGEXP,PABLROD,c,delete
-B::RHE,PABLROD,c,delete
-BSSolv,PABLROD,c,delete
-BSSolv::expander,PABLROD,c,delete
-BSSolv::pool,PABLROD,c,delete
-BSSolv::repo,PABLROD,c,delete
-B::SV,PABLROD,c,delete
-B::UNOP,PABLROD,c,delete
-B::UNOP_AUX,PABLROD,c,delete
-Cairo::Context,PABLROD,c,delete
-Cairo::FontFace,PABLROD,c,delete
-Cairo::FontOptions,PABLROD,c,delete
-Cairo::Format,PABLROD,c,delete
-Cairo::FtFontFace,PABLROD,c,delete
-Cairo::Matrix,PABLROD,c,delete
-Cairo::Path,PABLROD,c,delete
-Cairo::Path::Data,PABLROD,c,delete
-Cairo::Path::Point,PABLROD,c,delete
-Cairo::Path::Points,PABLROD,c,delete
-Cairo::Pattern,PABLROD,c,delete
-Cairo::RecordingSurface,PABLROD,c,delete
-Cairo::Region,PABLROD,c,delete
-Cairo::ScaledFont,PABLROD,c,delete
-Cairo::Surface,PABLROD,c,delete
-Cairo::SvgSurface,PABLROD,c,delete
-Cairo::ToyFontFace,PABLROD,c,delete
-ccom,PABLROD,c,delete
-CDB_File::Maker,PABLROD,c,delete
-Cflow,PABLROD,c,delete
-Cflow::LocalTime,PABLROD,c,delete
-Chemistry::OpenBabel::AliasData,PABLROD,c,delete
-Chemistry::OpenBabel::matrix3x3,PABLROD,c,delete
-Chemistry::OpenBabel::_OBAtomAtomIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBAtomBondIter,PABLROD,c,delete
-Chemistry::OpenBabel::OBAtomClassData,PABLROD,c,delete
-Chemistry::OpenBabel::OBAtomHOF,PABLROD,c,delete
-Chemistry::OpenBabel::OBAtomicHeatOfFormationTable,PABLROD,c,delete
-Chemistry::OpenBabel::OBBitVec,PABLROD,c,delete
-Chemistry::OpenBabel::OBBuilder,PABLROD,c,delete
-Chemistry::OpenBabel::OBDescriptor,PABLROD,c,delete
-Chemistry::OpenBabel::OBDOSData,PABLROD,c,delete
-Chemistry::OpenBabel::OBElectronicTransitionData,PABLROD,c,delete
-Chemistry::OpenBabel::OBFFCalculation2,PABLROD,c,delete
-Chemistry::OpenBabel::OBFFCalculation3,PABLROD,c,delete
-Chemistry::OpenBabel::OBFFCalculation4,PABLROD,c,delete
-Chemistry::OpenBabel::OBFFConstraint,PABLROD,c,delete
-Chemistry::OpenBabel::OBFFConstraints,PABLROD,c,delete
-Chemistry::OpenBabel::OBFreeGrid,PABLROD,c,delete
-Chemistry::OpenBabel::OBFreeGridPoint,PABLROD,c,delete
-Chemistry::OpenBabel::OBGridData,PABLROD,c,delete
-Chemistry::OpenBabel::OBMatrixData,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolAngleIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolAtomBFSIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolAtomDFSIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolAtomIter,PABLROD,c,delete
-Chemistry::OpenBabel::OBMolBondBFSIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolBondIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolPairIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolRingIter,PABLROD,c,delete
-Chemistry::OpenBabel::_OBMolTorsionIter,PABLROD,c,delete
-Chemistry::OpenBabel::OBOp,PABLROD,c,delete
-Chemistry::OpenBabel::OBOrbital,PABLROD,c,delete
-Chemistry::OpenBabel::OBOrbitalData,PABLROD,c,delete
-Chemistry::OpenBabel::OBPlugin,PABLROD,c,delete
-Chemistry::OpenBabel::_OBResidueAtomIter,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotamerList,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotationData,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotor,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotorKeys,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotorList,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotorRule,PABLROD,c,delete
-Chemistry::OpenBabel::OBRotorRules,PABLROD,c,delete
-Chemistry::OpenBabel::OBSmartsMatcher,PABLROD,c,delete
-Chemistry::OpenBabel::OBVectorData,PABLROD,c,delete
-Chemistry::OpenBabel::rotor_digit,PABLROD,c,delete
-Chemistry::OpenBabel::VectorOBBond,PABLROD,c,delete
-Chemistry::OpenBabel::VectorOBMol,PABLROD,c,delete
-Chemistry::OpenBabel::VectorOBResidue,PABLROD,c,delete
-Chemistry::OpenBabel::VectorOBRing,PABLROD,c,delete
-Chemistry::OpenBabel::VectorpOBGenericData,PABLROD,c,delete
-Chemistry::OpenBabel::VectorpOBRing,PABLROD,c,delete
-Chemistry::OpenBabel::VectorString,PABLROD,c,delete
-Chemistry::OpenBabel::VectorVector3,PABLROD,c,delete
-Chemistry::OpenBabel::VectorVInt,PABLROD,c,delete
-ci,PABLROD,c,delete
-Class::MOP::Mixin::HasOverloads,PABLROD,c,delete
-ClearSilver::CS,PABLROD,c,delete
-ClearSilver::HDF,PABLROD,c,delete
-cm,PABLROD,c,delete
-ColorStruct_t,PABLROD,c,delete
-Compress::Raw::Lzma::Decoder,PABLROD,c,delete
-Compress::Raw::Lzma::Encoder,PABLROD,c,delete
-Compress::Raw::Lzma::Options,PABLROD,c,delete
-Compress::Raw::Zlib::deflateStream,PABLROD,c,delete
-Compress::Raw::Zlib::inflateScanStream,PABLROD,c,delete
-Compress::Raw::Zlib::inflateStream,PABLROD,c,delete
-Config::AugeasPtr,PABLROD,c,delete
-Convert::UUlib::Item,PABLROD,c,delete
-CORE::GLOBAL,PABLROD,c,delete
-cproton_perl,PABLROD,c,delete
-cproton_perlc,PABLROD,c,delete
-CpuInfo_t,PABLROD,c,delete
-cqpid_perl,PABLROD,c,delete
-cqpid_perl::Address,PABLROD,c,delete
-cqpid_perlc,PABLROD,c,delete
-cqpid_perl::Connection,PABLROD,c,delete
-cqpid_perl::Duration,PABLROD,c,delete
-cqpid_perl::Logger,PABLROD,c,delete
-cqpid_perl::LoggerOutput,PABLROD,c,delete
-cqpid_perl::Message,PABLROD,c,delete
-cqpid_perl::Receiver,PABLROD,c,delete
-cqpid_perl::Sender,PABLROD,c,delete
-cqpid_perl::Session,PABLROD,c,delete
-cr,PABLROD,c,delete
-Crypt::OpenSSL::DSA::Signature,PABLROD,c,delete
-Crypt::OpenSSL::ECDSA::ECDSA_SIG,PABLROD,c,delete
-Crypt::OpenSSL::EC::EC_GROUP,PABLROD,c,delete
-Crypt::OpenSSL::EC::EC_KEY,PABLROD,c,delete
-Crypt::OpenSSL::EC::EC_POINT,PABLROD,c,delete
-Crypt::OpenSSL::X509_CRL,PABLROD,c,delete
-Crypt::OpenSSL::X509::Extension,PABLROD,c,delete
-Crypt::OpenSSL::X509::Name,PABLROD,c,delete
-Crypt::OpenSSL::X509::Name_Entry,PABLROD,c,delete
-Crypt::OpenSSL::X509::ObjectID,PABLROD,c,delete
-Curses::Vars,PABLROD,c,delete
-Data::MessagePack::Unpacker,PABLROD,c,delete
-DBD::FirebirdEmbedded::db,PABLROD,c,delete
-DBD::FirebirdEmbedded::dr,PABLROD,c,delete
-DBD::FirebirdEmbedded::Event,PABLROD,c,delete
-DBD::FirebirdEmbedded::st,PABLROD,c,delete
-DBD::Firebird::Event,PABLROD,c,delete
-DBD::_mem::common,PABLROD,c,delete
-DBD::SQLite2::st,PABLROD,c,delete
-DBD::SQLite::st,PABLROD,c,delete
-Devel::Cover::Inc,PABLROD,c,delete
-Devel::NYTProf::Test,PABLROD,c,delete
-Device::SerialPort::Bits,PABLROD,c,delete
-DisplayPtr,PABLROD,c,delete
-EV::Async,PABLROD,c,delete
-EV::Check,PABLROD,c,delete
-EV::Child,PABLROD,c,delete
-EV::Embed,PABLROD,c,delete
-Event::Event,PABLROD,c,delete
-Event::Lib::base,PABLROD,c,delete
-Event::Lib::Debug,PABLROD,c,delete
-Event::Lib::event,PABLROD,c,delete
-Event::Lib::signal,PABLROD,c,delete
-Event::Lib::timer,PABLROD,c,delete
-Event_t,PABLROD,c,delete
-EV::Fork,PABLROD,c,delete
-EV::Idle,PABLROD,c,delete
-EV::IO,PABLROD,c,delete
-EV::Loop,PABLROD,c,delete
-EV::Periodic,PABLROD,c,delete
-EV::Prepare,PABLROD,c,delete
-EV::Signal,PABLROD,c,delete
-EV::Stat,PABLROD,c,delete
-EV::Timer,PABLROD,c,delete
-EV::Watcher,PABLROD,c,delete
-fdo,PABLROD,c,delete
-fds,PABLROD,c,delete
-fe,PABLROD,c,delete
-FFI::Platypus::ABI,PABLROD,c,delete
-FFI::Platypus::dl,PABLROD,c,delete
-FileStat_t,PABLROD,c,delete
-fitsfilePtr,PABLROD,c,delete
-Foption_t,PABLROD,c,delete
-fr,PABLROD,c,delete
-fs,PABLROD,c,delete
-fw,PABLROD,c,delete
-GC,PABLROD,c,delete
-GCValues_t,PABLROD,c,delete
-GD::Font,PABLROD,c,delete
-Glib::BookmarkFile,PABLROD,c,delete
-Glib::Boxed,PABLROD,c,delete
-Glib::Child,PABLROD,c,delete
-Glib::Idle,PABLROD,c,delete
-Glib::KeyFile,PABLROD,c,delete
-Glib::Log,PABLROD,c,delete
-Glib::MainContext,PABLROD,c,delete
-Glib::MainLoop,PABLROD,c,delete
-Glib::Markup,PABLROD,c,delete
-Glib::Object::Introspection::GValueWrapper,PABLROD,c,delete
-Glib::OptionContext,PABLROD,c,delete
-Glib::OptionGroup,PABLROD,c,delete
-Glib::Param::Char,PABLROD,c,delete
-Glib::Param::Double,PABLROD,c,delete
-Glib::Param::Enum,PABLROD,c,delete
-Glib::Param::Flags,PABLROD,c,delete
-Glib::Param::Float,PABLROD,c,delete
-Glib::Param::GType,PABLROD,c,delete
-Glib::Param::Int,PABLROD,c,delete
-Glib::Param::Int64,PABLROD,c,delete
-Glib::Param::Long,PABLROD,c,delete
-Glib::ParamSpec,PABLROD,c,delete
-Glib::Param::UChar,PABLROD,c,delete
-Glib::Param::UInt,PABLROD,c,delete
-Glib::Param::UInt64,PABLROD,c,delete
-Glib::Param::ULong,PABLROD,c,delete
-Glib::Source,PABLROD,c,delete
-Glib::Timeout,PABLROD,c,delete
-Glib::Type,PABLROD,c,delete
-Glib::VariantType,PABLROD,c,delete
-gm,PABLROD,c,delete
-Gnome2::About,PABLROD,c,delete
-Gnome2::App,PABLROD,c,delete
-Gnome2::AppBar,PABLROD,c,delete
-Gnome2::AuthenticationManager,PABLROD,c,delete
-Gnome2::Bonobo,PABLROD,c,delete
-Gnome2::Bonobo::Dock,PABLROD,c,delete
-Gnome2::Bonobo::DockItem,PABLROD,c,delete
-Gnome2::Canvas::Bpath,PABLROD,c,delete
-Gnome2::Canvas::Item,PABLROD,c,delete
-Gnome2::Canvas::PathDef,PABLROD,c,delete
-Gnome2::Canvas::RichText,PABLROD,c,delete
-Gnome2::Canvas::Shape,PABLROD,c,delete
-Gnome2::Client,PABLROD,c,delete
-Gnome2::ColorPicker,PABLROD,c,delete
-Gnome2::Config,PABLROD,c,delete
-Gnome2::Config::Iterator,PABLROD,c,delete
-Gnome2::Config::Private,PABLROD,c,delete
-Gnome2::DateEdit,PABLROD,c,delete
-Gnome2::Druid,PABLROD,c,delete
-Gnome2::DruidPage,PABLROD,c,delete
-Gnome2::DruidPageEdge,PABLROD,c,delete
-Gnome2::DruidPageStandard,PABLROD,c,delete
-Gnome2::Entry,PABLROD,c,delete
-Gnome2::FileEntry,PABLROD,c,delete
-Gnome2::FontPicker,PABLROD,c,delete
-Gnome2::GConf::Engine,PABLROD,c,delete
-Gnome2::GConf::Schema,PABLROD,c,delete
-Gnome2::Help,PABLROD,c,delete
-Gnome2::HRef,PABLROD,c,delete
-Gnome2::I18N,PABLROD,c,delete
-Gnome2::IconEntry,PABLROD,c,delete
-Gnome2::IconList,PABLROD,c,delete
-Gnome2::IconSelection,PABLROD,c,delete
-Gnome2::IconTextItem,PABLROD,c,delete
-Gnome2::IconTheme,PABLROD,c,delete
-Gnome2::ModuleInfo,PABLROD,c,delete
-Gnome2::Pango::Language,PABLROD,c,delete
-Gnome2::PasswordDialog,PABLROD,c,delete
-Gnome2::PixmapEntry,PABLROD,c,delete
-Gnome2::PopupMenu,PABLROD,c,delete
-Gnome2::Program,PABLROD,c,delete
-Gnome2::Score,PABLROD,c,delete
-Gnome2::Scores,PABLROD,c,delete
-Gnome2::Sound,PABLROD,c,delete
-Gnome2::ThumbnailFactory,PABLROD,c,delete
-Gnome2::UIDefs,PABLROD,c,delete
-Gnome2::URL,PABLROD,c,delete
-Gnome2::Util,PABLROD,c,delete
-Gnome2::VFS::Address,PABLROD,c,delete
-Gnome2::VFS::Application,PABLROD,c,delete
-Gnome2::VFS::ApplicationRegistry,PABLROD,c,delete
-Gnome2::VFS::Async,PABLROD,c,delete
-Gnome2::VFS::Async::Handle,PABLROD,c,delete
-Gnome2::VFS::Directory,PABLROD,c,delete
-Gnome2::VFS::Directory::Handle,PABLROD,c,delete
-Gnome2::VFS::DNSSD,PABLROD,c,delete
-Gnome2::VFS::DNSSD::Browse::Handle,PABLROD,c,delete
-Gnome2::VFS::DNSSD::Resolve::Handle,PABLROD,c,delete
-Gnome2::VFS::Drive,PABLROD,c,delete
-Gnome2::VFS::FileInfo,PABLROD,c,delete
-Gnome2::VFS::Handle,PABLROD,c,delete
-Gnome2::VFS::Mime,PABLROD,c,delete
-Gnome2::VFS::Mime::Application,PABLROD,c,delete
-Gnome2::VFS::Mime::Monitor,PABLROD,c,delete
-Gnome2::VFS::Mime::Type,PABLROD,c,delete
-Gnome2::VFS::Monitor,PABLROD,c,delete
-Gnome2::VFS::Monitor::Handle,PABLROD,c,delete
-Gnome2::VFS::Resolve::Handle,PABLROD,c,delete
-Gnome2::VFS::URI,PABLROD,c,delete
-Gnome2::VFS::Volume,PABLROD,c,delete
-Gnome2::VFS::VolumeMonitor,PABLROD,c,delete
-Gnome2::VFS::Xfer,PABLROD,c,delete
-Gnome2::Vte::Terminal,PABLROD,c,delete
-Gnome2::WindowIcon,PABLROD,c,delete
-Gnome2::Wnck::Application,PABLROD,c,delete
-Gnome2::Wnck::ClassGroup,PABLROD,c,delete
-Gnome2::Wnck::Pager,PABLROD,c,delete
-Gnome2::Wnck::Screen,PABLROD,c,delete
-Gnome2::Wnck::Selector,PABLROD,c,delete
-Gnome2::Wnck::Tasklist,PABLROD,c,delete
-Gnome2::Wnck::Window,PABLROD,c,delete
-Gnome2::Wnck::Workspace,PABLROD,c,delete
-Goo::Cairo::Matrix,PABLROD,c,delete
-Goo::Cairo::Pattern,PABLROD,c,delete
-Goo::Canvas::Bounds,PABLROD,c,delete
-Goo::Canvas::Ellipse,PABLROD,c,delete
-Goo::Canvas::EllipseModel,PABLROD,c,delete
-Goo::Canvas::Group,PABLROD,c,delete
-Goo::Canvas::GroupModel,PABLROD,c,delete
-Goo::Canvas::Image,PABLROD,c,delete
-Goo::Canvas::ImageModel,PABLROD,c,delete
-Goo::Canvas::Item,PABLROD,c,delete
-Goo::Canvas::ItemModel,PABLROD,c,delete
-Goo::Canvas::ItemSimple,PABLROD,c,delete
-Goo::Canvas::LineDash,PABLROD,c,delete
-Goo::Canvas::Path,PABLROD,c,delete
-Goo::Canvas::PathModel,PABLROD,c,delete
-Goo::Canvas::Points,PABLROD,c,delete
-Goo::Canvas::Polyline,PABLROD,c,delete
-Goo::Canvas::PolylineModel,PABLROD,c,delete
-Goo::Canvas::Rect,PABLROD,c,delete
-Goo::Canvas::RectModel,PABLROD,c,delete
-Goo::Canvas::Style,PABLROD,c,delete
-Goo::Canvas::Table,PABLROD,c,delete
-Goo::Canvas::TableModel,PABLROD,c,delete
-Goo::Canvas::Text,PABLROD,c,delete
-Goo::Canvas::TextModel,PABLROD,c,delete
-Goo::Canvas::Widget,PABLROD,c,delete
-GslAccelPtr,PABLROD,c,delete
-GslSplinePtr,PABLROD,c,delete
-GSSAPI::Binding,PABLROD,c,delete
-GSSAPI::Context,PABLROD,c,delete
-GSSAPI::Cred,PABLROD,c,delete
-GSSAPI::Name,PABLROD,c,delete
-GStreamer::Bin,PABLROD,c,delete
-GStreamer::Buffer,PABLROD,c,delete
-GStreamer::Bus,PABLROD,c,delete
-GStreamer::Caps::Any,PABLROD,c,delete
-GStreamer::Caps::Empty,PABLROD,c,delete
-GStreamer::Caps::Full,PABLROD,c,delete
-GStreamer::Caps::Simple,PABLROD,c,delete
-GStreamer::ChildProxy,PABLROD,c,delete
-GStreamer::Clock,PABLROD,c,delete
-GStreamer::ClockID,PABLROD,c,delete
-GStreamer::Element,PABLROD,c,delete
-GStreamer::ElementFactory,PABLROD,c,delete
-GStreamer::Event,PABLROD,c,delete
-GStreamer::Event::BufferSize,PABLROD,c,delete
-GStreamer::Event::Custom,PABLROD,c,delete
-GStreamer::Event::EOS,PABLROD,c,delete
-GStreamer::Event::FlushStart,PABLROD,c,delete
-GStreamer::Event::FlushStop,PABLROD,c,delete
-GStreamer::Event::Navigation,PABLROD,c,delete
-GStreamer::Event::NewSegment,PABLROD,c,delete
-GStreamer::Event::QOS,PABLROD,c,delete
-GStreamer::Event::Seek,PABLROD,c,delete
-GStreamer::Event::Tag,PABLROD,c,delete
-GStreamer::Format,PABLROD,c,delete
-GStreamer::GhostPad,PABLROD,c,delete
-GStreamer::Index,PABLROD,c,delete
-GStreamer::IndexEntry,PABLROD,c,delete
-GStreamer::IndexFactory,PABLROD,c,delete
-GStreamer::Iterator,PABLROD,c,delete
-GStreamer::Iterator::Tie,PABLROD,c,delete
-GStreamer::Message,PABLROD,c,delete
-GStreamer::Message::Application,PABLROD,c,delete
-GStreamer::Message::AsyncDone,PABLROD,c,delete
-GStreamer::Message::AsyncStart,PABLROD,c,delete
-GStreamer::Message::ClockLost,PABLROD,c,delete
-GStreamer::Message::ClockProvide,PABLROD,c,delete
-GStreamer::Message::Custom,PABLROD,c,delete
-GStreamer::Message::Duration,PABLROD,c,delete
-GStreamer::Message::Element,PABLROD,c,delete
-GStreamer::Message::EOS,PABLROD,c,delete
-GStreamer::Message::Error,PABLROD,c,delete
-GStreamer::Message::Latency,PABLROD,c,delete
-GStreamer::Message::NewClock,PABLROD,c,delete
-GStreamer::Message::SegmentDone,PABLROD,c,delete
-GStreamer::Message::SegmentStart,PABLROD,c,delete
-GStreamer::Message::StateChanged,PABLROD,c,delete
-GStreamer::Message::StateDirty,PABLROD,c,delete
-GStreamer::Message::Tag,PABLROD,c,delete
-GStreamer::Message::Warning,PABLROD,c,delete
-GStreamer::MiniObject,PABLROD,c,delete
-GStreamer::Object,PABLROD,c,delete
-GStreamer::Pad,PABLROD,c,delete
-GStreamer::PadTemplate,PABLROD,c,delete
-GStreamer::Pipeline,PABLROD,c,delete
-GStreamer::Plugin,PABLROD,c,delete
-GStreamer::PluginFeature,PABLROD,c,delete
-GStreamer::PropertyProbe,PABLROD,c,delete
-GStreamer::Query,PABLROD,c,delete
-GStreamer::Query::Application,PABLROD,c,delete
-GStreamer::Query::Convert,PABLROD,c,delete
-GStreamer::Query::Duration,PABLROD,c,delete
-GStreamer::Query::Position,PABLROD,c,delete
-GStreamer::Query::Segment,PABLROD,c,delete
-GStreamer::QueryType,PABLROD,c,delete
-GStreamer::Registry,PABLROD,c,delete
-GStreamer::Structure,PABLROD,c,delete
-GStreamer::SystemClock,PABLROD,c,delete
-GStreamer::Tag,PABLROD,c,delete
-GStreamer::TagSetter,PABLROD,c,delete
-GStreamer::TypeFindFactory,PABLROD,c,delete
-GStreamer::XOverlay,PABLROD,c,delete
-gt,PABLROD,c,delete
-Gtk2::AboutDialog,PABLROD,c,delete
-Gtk2::Accelerator,PABLROD,c,delete
-Gtk2::AccelGroups,PABLROD,c,delete
-Gtk2::Action,PABLROD,c,delete
-Gtk2::ActionGroup,PABLROD,c,delete
-Gtk2::Activatable,PABLROD,c,delete
-Gtk2::Assistant,PABLROD,c,delete
-Gtk2::Buildable,PABLROD,c,delete
-Gtk2::Buildable::ParseContext,PABLROD,c,delete
-Gtk2::CellLayout,PABLROD,c,delete
-Gtk2::CellRendererAccel,PABLROD,c,delete
-Gtk2::CellRendererCombo,PABLROD,c,delete
-Gtk2::CellRendererProgress,PABLROD,c,delete
-Gtk2::CellRendererSpin,PABLROD,c,delete
-Gtk2::CellRendererSpinner,PABLROD,c,delete
-Gtk2::CellView,PABLROD,c,delete
-Gtk2::ColorButton,PABLROD,c,delete
-Gtk2::ComboBox,PABLROD,c,delete
-Gtk2::ComboBoxEntry,PABLROD,c,delete
-Gtk2::Drag,PABLROD,c,delete
-Gtk2::EntryBuffer,PABLROD,c,delete
-Gtk2::EntryCompletion,PABLROD,c,delete
-Gtk2::Expander,PABLROD,c,delete
-Gtk2::FileChooser,PABLROD,c,delete
-Gtk2::FileChooserButton,PABLROD,c,delete
-Gtk2::FileChooserDialog,PABLROD,c,delete
-Gtk2::FileChooserWidget,PABLROD,c,delete
-Gtk2::FileFilter,PABLROD,c,delete
-Gtk2::FontButton,PABLROD,c,delete
-Gtk2::Gdk::Cairo::Context,PABLROD,c,delete
-Gtk2::Gdk::Device,PABLROD,c,delete
-Gtk2::Gdk::Display,PABLROD,c,delete
-Gtk2::Gdk::DisplayManager,PABLROD,c,delete
-Gtk2::Gdk::DragContext,PABLROD,c,delete
-Gtk2::Gdk::Event::GrabBroken,PABLROD,c,delete
-Gtk2::Gdk::Event::OwnerChange,PABLROD,c,delete
-Gtk2::Gdk::Geometry,PABLROD,c,delete
-Gtk2::Gdk::Image,PABLROD,c,delete
-Gtk2::Gdk::Input,PABLROD,c,delete
-Gtk2::Gdk::Pango::AttrEmbossColor,PABLROD,c,delete
-Gtk2::Gdk::Pango::AttrEmbossed,PABLROD,c,delete
-Gtk2::Gdk::Pango::AttrStipple,PABLROD,c,delete
-Gtk2::Gdk::PangoRenderer,PABLROD,c,delete
-Gtk2::Gdk::PixbufAnimation,PABLROD,c,delete
-Gtk2::Gdk::PixbufAnimationIter,PABLROD,c,delete
-Gtk2::Gdk::Pixbuf::Draw::Cache,PABLROD,c,delete
-Gtk2::Gdk::PixbufFormat,PABLROD,c,delete
-Gtk2::Gdk::PixbufLoader,PABLROD,c,delete
-Gtk2::Gdk::PixbufSimpleAnim,PABLROD,c,delete
-Gtk2::Gdk::Region,PABLROD,c,delete
-Gtk2::Gdk::Rgb,PABLROD,c,delete
-Gtk2::Gdk::Screen,PABLROD,c,delete
-Gtk2::Gdk::Threads,PABLROD,c,delete
-Gtk2::Gdk::X11,PABLROD,c,delete
-Gtk2::Glade,PABLROD,c,delete
-Gtk2::IconInfo,PABLROD,c,delete
-Gtk2::IconSet,PABLROD,c,delete
-Gtk2::IconSize,PABLROD,c,delete
-Gtk2::IconSource,PABLROD,c,delete
-Gtk2::IconTheme,PABLROD,c,delete
-Gtk2::IconView,PABLROD,c,delete
-Gtk2::ImageView::Anim,PABLROD,c,delete
-Gtk2::ImageView::Nav,PABLROD,c,delete
-Gtk2::ImageView::ScrollWin,PABLROD,c,delete
-Gtk2::ImageView::Tool,PABLROD,c,delete
-Gtk2::ImageView::Tool::Dragger,PABLROD,c,delete
-Gtk2::ImageView::Tool::Painter,PABLROD,c,delete
-Gtk2::ImageView::Tool::Selector,PABLROD,c,delete
-Gtk2::ImageView::Zoom,PABLROD,c,delete
-Gtk2::InfoBar,PABLROD,c,delete
-Gtk2::LinkButton,PABLROD,c,delete
-Gtk2::MenuToolButton,PABLROD,c,delete
-Gtk2::OffscreenWindow,PABLROD,c,delete
-Gtk2::Orientable,PABLROD,c,delete
-Gtk2::PageSetup,PABLROD,c,delete
-Gtk2::Pango::AttrBackground,PABLROD,c,delete
-Gtk2::Pango::AttrColor,PABLROD,c,delete
-Gtk2::Pango::AttrFallback,PABLROD,c,delete
-Gtk2::Pango::AttrFamily,PABLROD,c,delete
-Gtk2::Pango::AttrFontDesc,PABLROD,c,delete
-Gtk2::Pango::AttrForeground,PABLROD,c,delete
-Gtk2::Pango::AttrGravity,PABLROD,c,delete
-Gtk2::Pango::AttrGravityHint,PABLROD,c,delete
-Gtk2::Pango::Attribute,PABLROD,c,delete
-Gtk2::Pango::AttrInt,PABLROD,c,delete
-Gtk2::Pango::AttrIterator,PABLROD,c,delete
-Gtk2::Pango::AttrLanguage,PABLROD,c,delete
-Gtk2::Pango::AttrLetterSpacing,PABLROD,c,delete
-Gtk2::Pango::AttrList,PABLROD,c,delete
-Gtk2::Pango::AttrRise,PABLROD,c,delete
-Gtk2::Pango::AttrScale,PABLROD,c,delete
-Gtk2::Pango::AttrShape,PABLROD,c,delete
-Gtk2::Pango::AttrSize,PABLROD,c,delete
-Gtk2::Pango::AttrStretch,PABLROD,c,delete
-Gtk2::Pango::AttrStrikethrough,PABLROD,c,delete
-Gtk2::Pango::AttrStrikethroughColor,PABLROD,c,delete
-Gtk2::Pango::AttrString,PABLROD,c,delete
-Gtk2::Pango::AttrStyle,PABLROD,c,delete
-Gtk2::Pango::AttrUnderline,PABLROD,c,delete
-Gtk2::Pango::AttrUnderlineColor,PABLROD,c,delete
-Gtk2::Pango::AttrVariant,PABLROD,c,delete
-Gtk2::Pango::AttrWeight,PABLROD,c,delete
-Gtk2::Pango::Cairo,PABLROD,c,delete
-Gtk2::Pango::Cairo::Context,PABLROD,c,delete
-Gtk2::Pango::Cairo::Font,PABLROD,c,delete
-Gtk2::Pango::Cairo::FontMap,PABLROD,c,delete
-Gtk2::Pango::Color,PABLROD,c,delete
-Gtk2::Pango::Font,PABLROD,c,delete
-Gtk2::Pango::FontFace,PABLROD,c,delete
-Gtk2::Pango::FontFamily,PABLROD,c,delete
-Gtk2::Pango::FontMap,PABLROD,c,delete
-Gtk2::Pango::Fontset,PABLROD,c,delete
-Gtk2::Pango::Gravity,PABLROD,c,delete
-Gtk2::Pango::LayoutIter,PABLROD,c,delete
-Gtk2::Pango::LayoutLine,PABLROD,c,delete
-Gtk2::Pango::Matrix,PABLROD,c,delete
-Gtk2::Pango::Renderer,PABLROD,c,delete
-Gtk2::Pango::Script,PABLROD,c,delete
-Gtk2::Pango::ScriptIter,PABLROD,c,delete
-Gtk2::Pango::TabArray,PABLROD,c,delete
-Gtk2::PaperSize,PABLROD,c,delete
-Gtk2::Print,PABLROD,c,delete
-Gtk2::PrintContext,PABLROD,c,delete
-Gtk2::PrintOperation,PABLROD,c,delete
-Gtk2::PrintOperationPreview,PABLROD,c,delete
-Gtk2::PrintSettings,PABLROD,c,delete
-Gtk2::RadioAction,PABLROD,c,delete
-Gtk2::RadioToolButton,PABLROD,c,delete
-Gtk2::RcStyle,PABLROD,c,delete
-Gtk2::RecentAction,PABLROD,c,delete
-Gtk2::RecentChooser,PABLROD,c,delete
-Gtk2::RecentChooserDialog,PABLROD,c,delete
-Gtk2::RecentChooserMenu,PABLROD,c,delete
-Gtk2::RecentChooserWidget,PABLROD,c,delete
-Gtk2::RecentFilter,PABLROD,c,delete
-Gtk2::RecentInfo,PABLROD,c,delete
-Gtk2::RecentManager,PABLROD,c,delete
-Gtk2::ScaleButton,PABLROD,c,delete
-Gtk2::Selection,PABLROD,c,delete
-Gtk2::SeparatorToolItem,PABLROD,c,delete
-Gtk2::Sexy::IconEntry,PABLROD,c,delete
-Gtk2::Sexy::SpellEntry,PABLROD,c,delete
-Gtk2::Sexy::Tooltip,PABLROD,c,delete
-Gtk2::Sexy::TreeView,PABLROD,c,delete
-Gtk2::Sexy::UrlLabel,PABLROD,c,delete
-Gtk2::SourceView2::Buffer,PABLROD,c,delete
-Gtk2::SourceView2::Iter,PABLROD,c,delete
-Gtk2::SourceView2::Language,PABLROD,c,delete
-Gtk2::SourceView2::LanguageManager,PABLROD,c,delete
-Gtk2::SourceView2::Mark,PABLROD,c,delete
-Gtk2::SourceView2::PrintCompositor,PABLROD,c,delete
-Gtk2::SourceView2::Style,PABLROD,c,delete
-Gtk2::SourceView2::StyleScheme,PABLROD,c,delete
-Gtk2::SourceView2::StyleSchemeManager,PABLROD,c,delete
-Gtk2::SourceView2::View,PABLROD,c,delete
-Gtk2::Spinner,PABLROD,c,delete
-Gtk2::StatusIcon,PABLROD,c,delete
-Gtk2::TargetList,PABLROD,c,delete
-Gtk2::TextAttributes,PABLROD,c,delete
-Gtk2::TextChildAnchor,PABLROD,c,delete
-Gtk2::ToggleAction,PABLROD,c,delete
-Gtk2::ToggleToolButton,PABLROD,c,delete
-Gtk2::ToolButton,PABLROD,c,delete
-Gtk2::ToolItem,PABLROD,c,delete
-Gtk2::ToolItemGroup,PABLROD,c,delete
-Gtk2::ToolPalette,PABLROD,c,delete
-Gtk2::ToolShell,PABLROD,c,delete
-Gtk2::Tooltip,PABLROD,c,delete
-Gtk2::TreeDragDest,PABLROD,c,delete
-Gtk2::TreeDragSource,PABLROD,c,delete
-Gtk2::TreeModelFilter,PABLROD,c,delete
-Gtk2::TreeRowReference,PABLROD,c,delete
-Gtk2::TreeSortable,PABLROD,c,delete
-Gtk2::UIManager,PABLROD,c,delete
-Gtk2::UniqueApp,PABLROD,c,delete
-Gtk2::UniqueBackend,PABLROD,c,delete
-Gtk2::UniqueMessageData,PABLROD,c,delete
-Gtk2::WebKit::Download,PABLROD,c,delete
-Gtk2::WebKit::GeolocationPolicyDecision,PABLROD,c,delete
-Gtk2::WebKit::NetworkRequest,PABLROD,c,delete
-Gtk2::WebKit::NetworkResponse,PABLROD,c,delete
-Gtk2::WebKit::SecurityOrigin,PABLROD,c,delete
-Gtk2::WebKit::WebBackForwardList,PABLROD,c,delete
-Gtk2::WebKit::WebDatabase,PABLROD,c,delete
-Gtk2::WebKit::WebDataSource,PABLROD,c,delete
-Gtk2::WebKit::WebFrame,PABLROD,c,delete
-Gtk2::WebKit::WebHistoryItem,PABLROD,c,delete
-Gtk2::WebKit::WebInspector,PABLROD,c,delete
-Gtk2::WebKit::WebNavigationAction,PABLROD,c,delete
-Gtk2::WebKit::WebPolicyDecision,PABLROD,c,delete
-Gtk2::WebKit::WebResource,PABLROD,c,delete
-Gtk2::WebKit::WebSettings,PABLROD,c,delete
-Gtk2::WebKit::WebView,PABLROD,c,delete
-Gtk2::WebKit::WebWindowFeatures,PABLROD,c,delete
-Gtk2::WindowGroup,PABLROD,c,delete
-GTop::Cpu,PABLROD,c,delete
-GTop::Fsusage,PABLROD,c,delete
-GTop::Loadavg,PABLROD,c,delete
-GTop::MapEntry,PABLROD,c,delete
-GTop::Mem,PABLROD,c,delete
-GTop::Mountentry,PABLROD,c,delete
-GTop::Mountlist,PABLROD,c,delete
-GTop::Netload,PABLROD,c,delete
-GTop::ProcArgs,PABLROD,c,delete
-GTop::Proclist,PABLROD,c,delete
-GTop::ProcMap,PABLROD,c,delete
-GTop::ProcMem,PABLROD,c,delete
-GTop::ProcSegment,PABLROD,c,delete
-GTop::ProcState,PABLROD,c,delete
-GTop::ProcTime,PABLROD,c,delete
-GTop::ProcUid,PABLROD,c,delete
-GTop::Swap,PABLROD,c,delete
-GTop::Uptime,PABLROD,c,delete
-gui,PABLROD,c,delete
-Hamlib,PABLROD,c,delete
-Hamlibc,PABLROD,c,delete
-Hamlib::cal_table,PABLROD,c,delete
-Hamlib::cal_table_table,PABLROD,c,delete
-Hamlib::chan_list,PABLROD,c,delete
-Hamlib::channel,PABLROD,c,delete
-Hamlib::channelArray,PABLROD,c,delete
-Hamlib::channel_cap,PABLROD,c,delete
-Hamlib::confparams,PABLROD,c,delete
-Hamlib::confparams_u,PABLROD,c,delete
-Hamlib::confparams_u_c,PABLROD,c,delete
-Hamlib::confparams_u_n,PABLROD,c,delete
-Hamlib::ext_list,PABLROD,c,delete
-Hamlib::filter_list,PABLROD,c,delete
-Hamlib::freq_range_t,PABLROD,c,delete
-Hamlib::gran,PABLROD,c,delete
-Hamlib::hamlib_port_parm,PABLROD,c,delete
-Hamlib::hamlib_port_parm_cm108,PABLROD,c,delete
-Hamlib::hamlib_port_parm_parallel,PABLROD,c,delete
-Hamlib::hamlib_port_parm_serial,PABLROD,c,delete
-Hamlib::hamlib_port_parm_usb,PABLROD,c,delete
-Hamlib::hamlib_port_post_write_date,PABLROD,c,delete
-Hamlib::hamlib_port_t,PABLROD,c,delete
-Hamlib::hamlib_port_type,PABLROD,c,delete
-Hamlib::rig,PABLROD,c,delete
-Hamlib::rig_callbacks,PABLROD,c,delete
-Hamlib::rig_caps,PABLROD,c,delete
-Hamlib::rig_state,PABLROD,c,delete
-Hamlib::rot,PABLROD,c,delete
-Hamlib::rot_caps,PABLROD,c,delete
-Hamlib::rot_state,PABLROD,c,delete
-Hamlib::toneArray,PABLROD,c,delete
-Hamlib::tuning_step_list,PABLROD,c,delete
-Hamlib::value_t,PABLROD,c,delete
-HTTP::Soup::Buffer,PABLROD,c,delete
-HTTP::Soup::Cookie,PABLROD,c,delete
-HTTP::Soup::Message,PABLROD,c,delete
-HTTP::Soup::MessageBody,PABLROD,c,delete
-HTTP::Soup::Session,PABLROD,c,delete
-HTTP::Soup::SessionAsync,PABLROD,c,delete
-ict,PABLROD,c,delete
-im,PABLROD,c,delete
-Image::Magick::Q16,PABLROD,c,delete
-Imager::Context,PABLROD,c,delete
-Imager::FillHandle,PABLROD,c,delete
-Imager::Font::FT2x,PABLROD,c,delete
-Imager::Font::T1xs,PABLROD,c,delete
-Imager::ImgRaw,PABLROD,c,delete
-Imager::Internal::Hlines,PABLROD,c,delete
-IO::AIO::GRP,PABLROD,c,delete
-IO::AIO::REQ,PABLROD,c,delete
-IO::AIO::WD,PABLROD,c,delete
-is,PABLROD,c,delete
-kb,PABLROD,c,delete
-km,PABLROD,c,delete
-le,PABLROD,c,delete
-Libnodeupdown,PABLROD,c,delete
-Lingua::Stem::Snowball::Stemmifier,PABLROD,c,delete
-List::MoreUtils_ea,PABLROD,c,delete
-List::MoreUtils_na,PABLROD,c,delete
-lj,PABLROD,c,delete
-lp,PABLROD,c,delete
-Lucy::Autobinding,PABLROD,c,delete
-Lucy::Index::BitVecDelDocs,PABLROD,c,delete
-Lucy::Index::DefaultDeletionsReader,PABLROD,c,delete
-Lucy::Index::DefaultDeletionsWriter,PABLROD,c,delete
-Lucy::Index::DefaultDocReader,PABLROD,c,delete
-Lucy::Index::DefaultHighlightReader,PABLROD,c,delete
-Lucy::Index::DefaultLexiconReader,PABLROD,c,delete
-Lucy::Index::DefaultPostingListReader,PABLROD,c,delete
-Lucy::Index::DefaultSortReader,PABLROD,c,delete
-Lucy::Index::Inverter::InverterEntry,PABLROD,c,delete
-Lucy::Index::LexIndex,PABLROD,c,delete
-Lucy::Index::PolyDeletionsReader,PABLROD,c,delete
-Lucy::Index::PolyDocReader,PABLROD,c,delete
-Lucy::Index::PolyHighlightReader,PABLROD,c,delete
-Lucy::Index::PolyLexiconReader,PABLROD,c,delete
-Lucy::Index::Posting::MatchPostingMatcher,PABLROD,c,delete
-Lucy::Index::Posting::MatchPostingWriter,PABLROD,c,delete
-Lucy::Index::PostingPool,PABLROD,c,delete
-Lucy::Index::Posting::RawPostingWriter,PABLROD,c,delete
-Lucy::Index::Posting::ScorePostingMatcher,PABLROD,c,delete
-Lucy::Index::RawLexicon,PABLROD,c,delete
-Lucy::Index::RawPosting,PABLROD,c,delete
-Lucy::Index::RawPostingList,PABLROD,c,delete
-Lucy::Index::SegLexQueue,PABLROD,c,delete
-Lucy::Index::SkipStepper,PABLROD,c,delete
-Lucy::Index::SortCache::NumericSortCache,PABLROD,c,delete
-Lucy::Index::SortCache::TextSortCache,PABLROD,c,delete
-Lucy::Index::SortFieldWriter,PABLROD,c,delete
-Lucy::Index::SortFieldWriter::ZombieKeyedHash,PABLROD,c,delete
-Lucy::Index::TermStepper,PABLROD,c,delete
-Lucy::Object::BoolNum,PABLROD,c,delete
-Lucy::Object::Float32,PABLROD,c,delete
-Lucy::Object::Float64,PABLROD,c,delete
-Lucy::Object::FloatNum,PABLROD,c,delete
-Lucy::Object::Hash::HashTombStone,PABLROD,c,delete
-Lucy::Object::Integer32,PABLROD,c,delete
-Lucy::Object::Integer64,PABLROD,c,delete
-Lucy::Object::IntNum,PABLROD,c,delete
-Lucy::Plan::NumericType,PABLROD,c,delete
-Lucy::QueryParser::ParserClause,PABLROD,c,delete
-Lucy::QueryParser::ParserToken,PABLROD,c,delete
-Lucy::Search::ANDCompiler,PABLROD,c,delete
-Lucy::Search::Collector::OffsetCollector,PABLROD,c,delete
-Lucy::Search::MatchAllCompiler,PABLROD,c,delete
-Lucy::Search::MatchAllMatcher,PABLROD,c,delete
-Lucy::Search::NoMatchCompiler,PABLROD,c,delete
-Lucy::Search::NoMatchMatcher,PABLROD,c,delete
-Lucy::Search::NOTCompiler,PABLROD,c,delete
-Lucy::Search::ORCompiler,PABLROD,c,delete
-Lucy::Search::ORMatcher,PABLROD,c,delete
-Lucy::Search::PhraseCompiler,PABLROD,c,delete
-Lucy::Search::PhraseMatcher,PABLROD,c,delete
-Lucy::Search::PolyMatcher,PABLROD,c,delete
-Lucy::Search::RangeCompiler,PABLROD,c,delete
-Lucy::Search::RangeMatcher,PABLROD,c,delete
-Lucy::Search::RequiredOptionalCompiler,PABLROD,c,delete
-Lucy::Search::SeriesMatcher,PABLROD,c,delete
-Lucy::Search::TermCompiler,PABLROD,c,delete
-Lucy::Search::TermMatcher,PABLROD,c,delete
-Lucy::Store::CompoundFileReader,PABLROD,c,delete
-Lucy::Store::CompoundFileWriter,PABLROD,c,delete
-Lucy::Store::DirHandle,PABLROD,c,delete
-Lucy::Store::FSDirHandle,PABLROD,c,delete
-Lucy::Store::LockFileLock,PABLROD,c,delete
-Lucy::Store::MockFileHandle,PABLROD,c,delete
-Lucy::Store::SharedLock,PABLROD,c,delete
-Lucy::Test::Analysis::DummyAnalyzer,PABLROD,c,delete
-Lucy::Test::Object::StupidHashCharBuf,PABLROD,c,delete
-Lucy::Test::Plan::TestArchitecture,PABLROD,c,delete
-Lucy::Test::Search::TestQueryParser,PABLROD,c,delete
-Lucy::Test::Search::TestQueryParserSyntax,PABLROD,c,delete
-Lucy::Test::TestSchema,PABLROD,c,delete
-Lucy::Test::TestUtils,PABLROD,c,delete
-Lucy::Test::Util::NumPriorityQueue,PABLROD,c,delete
-LucyX::Search::ProximityCompiler,PABLROD,c,delete
-LucyX::Search::ProximityMatcher,PABLROD,c,delete
-Lzma::Filter,PABLROD,c,delete
-Lzma::Filter::BCJ,PABLROD,c,delete
-Lzma::Filter::Delta,PABLROD,c,delete
-Lzma::Filter::Lzma,PABLROD,c,delete
-Mail::Transport::Dbx::Email,PABLROD,c,delete
-Mail::Transport::Dbx::Folder,PABLROD,c,delete
-Mail::Transport::Dbx::folder_info,PABLROD,c,delete
-Marpa::Grammar,PABLROD,c,delete
-Marpa::Recognizer,PABLROD,c,delete
-Marpa::XS,PABLROD,c,delete
-Marpa::XS::Internal::G_C,PABLROD,c,delete
-Marpa::XS::Internal::R_C,PABLROD,c,delete
-Math::Random::MT::Auto::_,PABLROD,c,delete
-mb,PABLROD,c,delete
-MeCabc,PABLROD,c,delete
-MeCab::DictionaryInfo,PABLROD,c,delete
-MeCab::Lattice,PABLROD,c,delete
-MeCab::Model,PABLROD,c,delete
-MeCab::Node,PABLROD,c,delete
-MeCab::Path,PABLROD,c,delete
-MeCab::Tagger,PABLROD,c,delete
-MemInfo_t,PABLROD,c,delete
-Mouse::Meta::Method::Accessor::XS,PABLROD,c,delete
-Mouse::Meta::Method::Constructor::XS,PABLROD,c,delete
-Mouse::Meta::Method::Destructor::XS,PABLROD,c,delete
-Net::DBus::Binding::C::Connection,PABLROD,c,delete
-Net::DBus::Binding::C::Message,PABLROD,c,delete
-Net::DBus::Binding::C::PendingCall,PABLROD,c,delete
-Net::DBus::Binding::C::Server,PABLROD,c,delete
-Net::DBus::Binding::C::Timeout,PABLROD,c,delete
-Net::DBus::Binding::C::Watch,PABLROD,c,delete
-NetSNMP::agent::netsnmp_agent_request_info,PABLROD,c,delete
-NetSNMP::agent::netsnmp_handler_registration,PABLROD,c,delete
-NetSNMP::agent::netsnmp_handler_registrationPtr,PABLROD,c,delete
-netsnmp_oidPtr,PABLROD,c,delete
-Newt::Checkbox,PABLROD,c,delete
-Newt::Component,PABLROD,c,delete
-Newt::Entry,PABLROD,c,delete
-Newt::Form,PABLROD,c,delete
-Newt::Label,PABLROD,c,delete
-Newt::Listbox,PABLROD,c,delete
-Newt::Panel,PABLROD,c,delete
-Newt::Radiogroup,PABLROD,c,delete
-Newt::Scale,PABLROD,c,delete
-Newt::Textbox,PABLROD,c,delete
-NKF,PABLROD,c,delete
-nt,PABLROD,c,delete
-OBEXFTP,PABLROD,c,delete
-OBEXFTPc,PABLROD,c,delete
-OBEXFTP::client,PABLROD,c,delete
-OpenOffice::UNO::Any,PABLROD,c,delete
-OpenOffice::UNO::Boolean,PABLROD,c,delete
-OpenOffice::UNO::Int32,PABLROD,c,delete
-OpenOffice::UNO::Int64,PABLROD,c,delete
-OpenOffice::UNO::Interface,PABLROD,c,delete
-OpenOffice::UNO::Struct,PABLROD,c,delete
-OSSP::uuid,PABLROD,c,delete
-Pango::AttrBackground,PABLROD,c,delete
-Pango::AttrColor,PABLROD,c,delete
-Pango::AttrFallback,PABLROD,c,delete
-Pango::AttrFamily,PABLROD,c,delete
-Pango::AttrFontDesc,PABLROD,c,delete
-Pango::AttrForeground,PABLROD,c,delete
-Pango::AttrGravity,PABLROD,c,delete
-Pango::AttrGravityHint,PABLROD,c,delete
-Pango::Attribute,PABLROD,c,delete
-Pango::AttrInt,PABLROD,c,delete
-Pango::AttrIterator,PABLROD,c,delete
-Pango::AttrLanguage,PABLROD,c,delete
-Pango::AttrLetterSpacing,PABLROD,c,delete
-Pango::AttrList,PABLROD,c,delete
-Pango::AttrRise,PABLROD,c,delete
-Pango::AttrScale,PABLROD,c,delete
-Pango::AttrShape,PABLROD,c,delete
-Pango::AttrSize,PABLROD,c,delete
-Pango::AttrStretch,PABLROD,c,delete
-Pango::AttrStrikethrough,PABLROD,c,delete
-Pango::AttrStrikethroughColor,PABLROD,c,delete
-Pango::AttrString,PABLROD,c,delete
-Pango::AttrStyle,PABLROD,c,delete
-Pango::AttrUnderline,PABLROD,c,delete
-Pango::AttrUnderlineColor,PABLROD,c,delete
-Pango::AttrVariant,PABLROD,c,delete
-Pango::AttrWeight,PABLROD,c,delete
-Pango::Cairo,PABLROD,c,delete
-Pango::Cairo::Context,PABLROD,c,delete
-Pango::Cairo::Font,PABLROD,c,delete
-Pango::Cairo::FontMap,PABLROD,c,delete
-Pango::Color,PABLROD,c,delete
-Pango::Context,PABLROD,c,delete
-Pango::Font,PABLROD,c,delete
-Pango::FontFace,PABLROD,c,delete
-Pango::FontFamily,PABLROD,c,delete
-Pango::FontMap,PABLROD,c,delete
-Pango::FontMetrics,PABLROD,c,delete
-Pango::Fontset,PABLROD,c,delete
-Pango::Gravity,PABLROD,c,delete
-Pango::Language,PABLROD,c,delete
-Pango::Layout,PABLROD,c,delete
-Pango::LayoutIter,PABLROD,c,delete
-Pango::LayoutLine,PABLROD,c,delete
-Pango::Matrix,PABLROD,c,delete
-Pango::Renderer,PABLROD,c,delete
-Pango::Script,PABLROD,c,delete
-Pango::ScriptIter,PABLROD,c,delete
-Pango::TabArray,PABLROD,c,delete
-pcap_send_queuePtr,PABLROD,c,delete
-PCP::LogImport,PABLROD,c,delete
-PCP::MMV,PABLROD,c,delete
-PCP::PMDA,PABLROD,c,delete
-PDF::Haru::Annotation,PABLROD,c,delete
-PDF::Haru::Destination,PABLROD,c,delete
-PDF::Haru::ExtGState,PABLROD,c,delete
-PDF::Haru::Font,PABLROD,c,delete
-PDF::Haru::Image,PABLROD,c,delete
-PDF::Haru::Outline,PABLROD,c,delete
-PDF::Haru::Page,PABLROD,c,delete
-PDL::Bad::PDL,PABLROD,c,delete
-PDL::Complex::PDL,PABLROD,c,delete
-PDL::GIS::Proj::PDL,PABLROD,c,delete
-PDL::Graphics::PGPLOT::Window::PDL,PABLROD,c,delete
-PDL::GSLMROOT,PABLROD,c,delete
-PDL::Image2D::PDL,PABLROD,c,delete
-PDL::ImageRGB::PDL,PABLROD,c,delete
-PDL::IO::FITS::PDL,PABLROD,c,delete
-PDL::IO::GD::PDL,PABLROD,c,delete
-PDL::IO::HDF::PDL,PABLROD,c,delete
-PDL::IO::HDF::SD::PDL,PABLROD,c,delete
-PDL::IO::HDF::VS,PABLROD,c,delete
-PDL::IO::HDF::VS::PDL,PABLROD,c,delete
-PDL::IO::Misc::PDL,PABLROD,c,delete
-PDL::IO::Pic::PDL,PABLROD,c,delete
-PDL::IO::Pnm::PDL,PABLROD,c,delete
-PDL::Math::PDL,PABLROD,c,delete
-PDL::MatrixOps::PDL,PABLROD,c,delete
-PDL::Ops::PDL,PABLROD,c,delete
-PDL::Primitive::PDL,PABLROD,c,delete
-PDL::Slatec::PDL,PABLROD,c,delete
-PDL::Slices::PDL,PABLROD,c,delete
-PDL::Transform::PDL,PABLROD,c,delete
-PDL::Transform::Proj4::PDL,PABLROD,c,delete
-PDL::Ufunc::PDL,PABLROD,c,delete
-PerlIO::Layer,PABLROD,c,delete
-PG_conn,PABLROD,c,delete
-PG_results,PABLROD,c,delete
-Phonon::AbstractAudioOutput,PABLROD,c,delete
-Phonon::AbstractMediaStream,PABLROD,c,delete
-Phonon::AbstractVideoOutput,PABLROD,c,delete
-Phonon::AudioDataOutput,PABLROD,c,delete
-Phonon::AudioOutput,PABLROD,c,delete
-Phonon::Capture,PABLROD,c,delete
-Phonon::Effect,PABLROD,c,delete
-Phonon::EffectParameter,PABLROD,c,delete
-Phonon::EffectWidget,PABLROD,c,delete
-Phonon::MediaController,PABLROD,c,delete
-Phonon::MediaNode,PABLROD,c,delete
-Phonon::MediaObject,PABLROD,c,delete
-Phonon::MediaSource,PABLROD,c,delete
-Phonon::Mrl,PABLROD,c,delete
-Phonon::ObjectDescriptionData,PABLROD,c,delete
-Phonon::ObjectDescriptionModelData,PABLROD,c,delete
-Phonon::Path,PABLROD,c,delete
-Phonon::SeekSlider,PABLROD,c,delete
-Phonon::StreamInterface,PABLROD,c,delete
-Phonon::VideoPlayer,PABLROD,c,delete
-Phonon::VideoWidget,PABLROD,c,delete
-Phonon::VolumeFaderEffect,PABLROD,c,delete
-Phonon::VolumeSlider,PABLROD,c,delete
-PictureAttributes_t,PABLROD,c,delete
-Point_t,PABLROD,c,delete
-POSIX::Termios,PABLROD,c,delete
-ProcInfo_t,PABLROD,c,delete
-ps,PABLROD,c,delete
-QsciAbstractAPIs,PABLROD,c,delete
-QsciAPIs,PABLROD,c,delete
-QsciCommand,PABLROD,c,delete
-QsciCommandSet,PABLROD,c,delete
-QsciDocument,PABLROD,c,delete
-QsciLexer,PABLROD,c,delete
-QsciLexerBash,PABLROD,c,delete
-QsciLexerBatch,PABLROD,c,delete
-QsciLexerCMake,PABLROD,c,delete
-QsciLexerCPP,PABLROD,c,delete
-QsciLexerCSharp,PABLROD,c,delete
-QsciLexerCSS,PABLROD,c,delete
-QsciLexerCustom,PABLROD,c,delete
-QsciLexerD,PABLROD,c,delete
-QsciLexerDiff,PABLROD,c,delete
-QsciLexerFortran,PABLROD,c,delete
-QsciLexerFortran77,PABLROD,c,delete
-QsciLexerHTML,PABLROD,c,delete
-QsciLexerIDL,PABLROD,c,delete
-QsciLexerJava,PABLROD,c,delete
-QsciLexerJavaScript,PABLROD,c,delete
-QsciLexerLua,PABLROD,c,delete
-QsciLexerMakefile,PABLROD,c,delete
-QsciLexerPascal,PABLROD,c,delete
-QsciLexerPerl,PABLROD,c,delete
-QsciLexerPostScript,PABLROD,c,delete
-QsciLexerPOV,PABLROD,c,delete
-QsciLexerProperties,PABLROD,c,delete
-QsciLexerPython,PABLROD,c,delete
-QsciLexerRuby,PABLROD,c,delete
-QsciLexerSQL,PABLROD,c,delete
-QsciLexerTCL,PABLROD,c,delete
-QsciLexerTeX,PABLROD,c,delete
-QsciLexerVHDL,PABLROD,c,delete
-QsciLexerXML,PABLROD,c,delete
-QsciLexerYAML,PABLROD,c,delete
-QsciMacro,PABLROD,c,delete
-QsciPrinter,PABLROD,c,delete
-QsciScintilla,PABLROD,c,delete
-QsciScintillaBase,PABLROD,c,delete
-QsciStyle,PABLROD,c,delete
-Qt3::Accel,PABLROD,c,delete
-Qt3::Action,PABLROD,c,delete
-Qt3::ActionGroup,PABLROD,c,delete
-Qt3::BoxLayout,PABLROD,c,delete
-Qt3::Button,PABLROD,c,delete
-Qt3::ButtonGroup,PABLROD,c,delete
-Qt3::Canvas,PABLROD,c,delete
-Qt3::CanvasEllipse,PABLROD,c,delete
-Qt3::CanvasItem,PABLROD,c,delete
-Qt3::CanvasItemList,PABLROD,c,delete
-Qt3::CanvasLine,PABLROD,c,delete
-Qt3::CanvasPixmap,PABLROD,c,delete
-Qt3::CanvasPixmapArray,PABLROD,c,delete
-Qt3::CanvasPolygon,PABLROD,c,delete
-Qt3::CanvasPolygonalItem,PABLROD,c,delete
-Qt3::CanvasRectangle,PABLROD,c,delete
-Qt3::CanvasSpline,PABLROD,c,delete
-Qt3::CanvasSprite,PABLROD,c,delete
-Qt3::CanvasText,PABLROD,c,delete
-Qt3::CanvasView,PABLROD,c,delete
-Qt3::CheckListItem,PABLROD,c,delete
-Qt3::CheckTableItem,PABLROD,c,delete
-Qt3::ColorDrag,PABLROD,c,delete
-Qt3::ComboBox,PABLROD,c,delete
-Qt3::ComboTableItem,PABLROD,c,delete
-Qt3::DataBrowser,PABLROD,c,delete
-Qt3::DataTable,PABLROD,c,delete
-Qt3::DataView,PABLROD,c,delete
-Qt3::DateEdit,PABLROD,c,delete
-Qt3::DateTimeEdit,PABLROD,c,delete
-Qt3::DateTimeEditBase,PABLROD,c,delete
-Qt3::Dns,PABLROD,c,delete
-Qt3::DockArea,PABLROD,c,delete
-Qt3::DockWindow,PABLROD,c,delete
-Qt3::DragObject,PABLROD,c,delete
-Qt3::DropSite,PABLROD,c,delete
-Qt3::EditorFactory,PABLROD,c,delete
-Qt3::FileDialog,PABLROD,c,delete
-Qt3::FileIconProvider,PABLROD,c,delete
-Qt3::FilePreview,PABLROD,c,delete
-Qt3::Frame,PABLROD,c,delete
-Qt3::Ftp,PABLROD,c,delete
-Qt3::Grid,PABLROD,c,delete
-Qt3::GridView,PABLROD,c,delete
-Qt3::GroupBox,PABLROD,c,delete
-Qt3::HBox,PABLROD,c,delete
-Qt3::HBoxLayout,PABLROD,c,delete
-Qt3::HButtonGroup,PABLROD,c,delete
-Qt3::Header,PABLROD,c,delete
-Qt3::HGroupBox,PABLROD,c,delete
-Qt3::Http,PABLROD,c,delete
-Qt3::HttpHeader,PABLROD,c,delete
-Qt3::HttpRequestHeader,PABLROD,c,delete
-Qt3::HttpResponseHeader,PABLROD,c,delete
-Qt3::IconDrag,PABLROD,c,delete
-Qt3::IconDragItem,PABLROD,c,delete
-Qt3::IconView,PABLROD,c,delete
-Qt3::IconViewItem,PABLROD,c,delete
-Qt3::ImageDrag,PABLROD,c,delete
-Qt3::ListBox,PABLROD,c,delete
-Qt3::ListBoxItem,PABLROD,c,delete
-Qt3::ListBoxPixmap,PABLROD,c,delete
-Qt3::ListBoxText,PABLROD,c,delete
-Qt3::ListView,PABLROD,c,delete
-Qt3::ListViewItem,PABLROD,c,delete
-Qt3::ListViewItemIterator,PABLROD,c,delete
-Qt3::LocalFs,PABLROD,c,delete
-Qt3::MainWindow,PABLROD,c,delete
-Qt3::MimeSourceFactory,PABLROD,c,delete
-Qt3::MultiLineEdit,PABLROD,c,delete
-Qt3::NetworkOperation,PABLROD,c,delete
-Qt3::NetworkProtocol,PABLROD,c,delete
-Qt3::PaintDeviceMetrics,PABLROD,c,delete
-Qt3::Painter,PABLROD,c,delete
-Qt3::Picture,PABLROD,c,delete
-Qt3::PointArray,PABLROD,c,delete
-Qt3::PopupMenu,PABLROD,c,delete
-Qt3::Process,PABLROD,c,delete
-Qt3::ProgressBar,PABLROD,c,delete
-Qt3::ProgressDialog,PABLROD,c,delete
-Qt3::PtrCollection,PABLROD,c,delete
-Qt3::RangeControl,PABLROD,c,delete
-Qt3::ScrollView,PABLROD,c,delete
-Qt3::Semaphore,PABLROD,c,delete
-Qt3::ServerSocket,PABLROD,c,delete
-Qt3::Shared,PABLROD,c,delete
-Qt3::Signal,PABLROD,c,delete
-Qt3::SimpleRichText,PABLROD,c,delete
-Qt3::Socket,PABLROD,c,delete
-Qt3::SocketDevice,PABLROD,c,delete
-Qt3::SqlCursor,PABLROD,c,delete
-Qt3::SqlEditorFactory,PABLROD,c,delete
-Qt3::SqlFieldInfo,PABLROD,c,delete
-Qt3::SqlForm,PABLROD,c,delete
-Qt3::SqlPropertyMap,PABLROD,c,delete
-Qt3::SqlRecordInfo,PABLROD,c,delete
-Qt3::SqlSelectCursor,PABLROD,c,delete
-Qt3::StoredDrag,PABLROD,c,delete
-Qt3::StrIList,PABLROD,c,delete
-Qt3::StrList,PABLROD,c,delete
-Qt3::StyleSheet,PABLROD,c,delete
-Qt3::StyleSheetItem,PABLROD,c,delete
-Qt3::SyntaxHighlighter,PABLROD,c,delete
-Qt3::TabDialog,PABLROD,c,delete
-Qt3::Table,PABLROD,c,delete
-Qt3::TableItem,PABLROD,c,delete
-Qt3::TableSelection,PABLROD,c,delete
-Qt3::TextBrowser,PABLROD,c,delete
-Qt3::TextDrag,PABLROD,c,delete
-Qt3::TextEdit,PABLROD,c,delete
-Qt3::TextStream,PABLROD,c,delete
-Qt3::TextView,PABLROD,c,delete
-Qt3::TimeEdit,PABLROD,c,delete
-Qt3::ToolBar,PABLROD,c,delete
-Qt3::UriDrag,PABLROD,c,delete
-Qt3::Url,PABLROD,c,delete
-Qt3::UrlOperator,PABLROD,c,delete
-Qt3::VBox,PABLROD,c,delete
-Qt3::VBoxLayout,PABLROD,c,delete
-Qt3::VButtonGroup,PABLROD,c,delete
-Qt3::VGroupBox,PABLROD,c,delete
-Qt3::WhatsThis,PABLROD,c,delete
-Qt3::WidgetStack,PABLROD,c,delete
-Qt3::Wizard,PABLROD,c,delete
-Qt::AbstractAnimation,PABLROD,c,delete
-Qt::AbstractButton,PABLROD,c,delete
-Qt::AbstractEventDispatcher,PABLROD,c,delete
-Qt::AbstractFileEngine,PABLROD,c,delete
-Qt::AbstractFileEngine::ExtensionOption,PABLROD,c,delete
-Qt::AbstractFileEngine::ExtensionReturn,PABLROD,c,delete
-Qt::AbstractFileEngineHandler,PABLROD,c,delete
-Qt::AbstractFileEngineIterator,PABLROD,c,delete
-Qt::AbstractFileEngine::MapExtensionOption,PABLROD,c,delete
-Qt::AbstractFileEngine::MapExtensionReturn,PABLROD,c,delete
-Qt::AbstractFileEngine::UnMapExtensionOption,PABLROD,c,delete
-Qt::AbstractGraphicsShapeItem,PABLROD,c,delete
-Qt::AbstractItemDelegate,PABLROD,c,delete
-Qt::AbstractItemModel,PABLROD,c,delete
-Qt::AbstractItemView,PABLROD,c,delete
-Qt::AbstractListModel,PABLROD,c,delete
-Qt::AbstractMessageHandler,PABLROD,c,delete
-Qt::AbstractNetworkCache,PABLROD,c,delete
-Qt::AbstractPageSetupDialog,PABLROD,c,delete
-Qt::AbstractPrintDialog,PABLROD,c,delete
-Qt::AbstractProxyModel,PABLROD,c,delete
-Qt::AbstractScrollArea,PABLROD,c,delete
-Qt::AbstractSlider,PABLROD,c,delete
-Qt::AbstractSocket,PABLROD,c,delete
-Qt::AbstractSpinBox,PABLROD,c,delete
-Qt::AbstractState,PABLROD,c,delete
-Qt::AbstractTableModel,PABLROD,c,delete
-Qt::AbstractTextDocumentLayout,PABLROD,c,delete
-Qt::AbstractTextDocumentLayout::PaintContext,PABLROD,c,delete
-Qt::AbstractTextDocumentLayout::Selection,PABLROD,c,delete
-Qt::AbstractTransition,PABLROD,c,delete
-Qt::AbstractUndoItem,PABLROD,c,delete
-Qt::AbstractUriResolver,PABLROD,c,delete
-Qt::AbstractVideoBuffer,PABLROD,c,delete
-Qt::AbstractVideoSurface,PABLROD,c,delete
-Qt::AbstractXmlNodeModel,PABLROD,c,delete
-Qt::AbstractXmlReceiver,PABLROD,c,delete
-Qt::Accessible,PABLROD,c,delete
-Qt::Accessible2,PABLROD,c,delete
-Qt::Accessible2Interface,PABLROD,c,delete
-Qt::Accessible2::TableModelChange,PABLROD,c,delete
-Qt::AccessibleActionInterface,PABLROD,c,delete
-Qt::AccessibleApplication,PABLROD,c,delete
-Qt::AccessibleBridge,PABLROD,c,delete
-Qt::AccessibleBridgeFactoryInterface,PABLROD,c,delete
-Qt::AccessibleBridgePlugin,PABLROD,c,delete
-Qt::AccessibleEditableTextInterface,PABLROD,c,delete
-Qt::AccessibleEvent,PABLROD,c,delete
-Qt::AccessibleFactoryInterface,PABLROD,c,delete
-Qt::AccessibleImageInterface,PABLROD,c,delete
-Qt::AccessibleInterface,PABLROD,c,delete
-Qt::AccessibleInterfaceEx,PABLROD,c,delete
-Qt::AccessibleObject,PABLROD,c,delete
-Qt::AccessibleObjectEx,PABLROD,c,delete
-Qt::AccessiblePlugin,PABLROD,c,delete
-Qt::AccessibleSimpleEditableTextInterface,PABLROD,c,delete
-Qt::AccessibleTable2CellInterface,PABLROD,c,delete
-Qt::AccessibleTable2Interface,PABLROD,c,delete
-Qt::AccessibleTableInterface,PABLROD,c,delete
-Qt::AccessibleTextInterface,PABLROD,c,delete
-Qt::AccessibleValueInterface,PABLROD,c,delete
-Qt::AccessibleWidget,PABLROD,c,delete
-Qt::AccessibleWidgetEx,PABLROD,c,delete
-Qt::Action,PABLROD,c,delete
-Qt::ActionEvent,PABLROD,c,delete
-Qt::ActionGroup,PABLROD,c,delete
-Qt::AnimationGroup,PABLROD,c,delete
-Qt::Application,PABLROD,c,delete
-Qt::AtomicInt,PABLROD,c,delete
-Qt::Audio,PABLROD,c,delete
-Qt::AudioDeviceInfo,PABLROD,c,delete
-Qt::AudioFormat,PABLROD,c,delete
-Qt::AudioInput,PABLROD,c,delete
-Qt::AudioOutput,PABLROD,c,delete
-Qt::Authenticator,PABLROD,c,delete
-Qt::BasicAtomicInt,PABLROD,c,delete
-Qt::BasicTimer,PABLROD,c,delete
-Qt::BitArray,PABLROD,c,delete
-Qt::Bitmap,PABLROD,c,delete
-Qt::BitRef,PABLROD,c,delete
-Qt::Bool,PABLROD,c,delete
-Qt::BoxLayout,PABLROD,c,delete
-Qt::Brush,PABLROD,c,delete
-Qt::Buffer,PABLROD,c,delete
-Qt::ButtonGroup,PABLROD,c,delete
-Qt::ByteArray,PABLROD,c,delete
-Qt::ByteArrayMatcher,PABLROD,c,delete
-Qt::ByteRef,PABLROD,c,delete
-Qt::CalendarWidget,PABLROD,c,delete
-Qt::Char,PABLROD,c,delete
-Qt::CharRef,PABLROD,c,delete
-Qt::CheckBox,PABLROD,c,delete
-Qt::ChildEvent,PABLROD,c,delete
-Qt::Clipboard,PABLROD,c,delete
-Qt::ClipboardEvent,PABLROD,c,delete
-Qt::CloseEvent,PABLROD,c,delete
-Qt::Color,PABLROD,c,delete
-Qt::ColorDialog,PABLROD,c,delete
-Qt::Colormap,PABLROD,c,delete
-Qt::ColumnView,PABLROD,c,delete
-Qt::ComboBox,PABLROD,c,delete
-Qt::CommandLinkButton,PABLROD,c,delete
-Qt::CommonStyle,PABLROD,c,delete
-Qt::Completer,PABLROD,c,delete
-Qt::ConicalGradient,PABLROD,c,delete
-Qt::ContextMenuEvent,PABLROD,c,delete
-Qt::CoreApplication,PABLROD,c,delete
-Qt::CryptographicHash,PABLROD,c,delete
-Qt::Cursor,PABLROD,c,delete
-Qt::DataStream,PABLROD,c,delete
-Qt::DataWidgetMapper,PABLROD,c,delete
-Qt::Date,PABLROD,c,delete
-Qt::DateEdit,PABLROD,c,delete
-Qt::DateTime,PABLROD,c,delete
-Qt::DateTimeEdit,PABLROD,c,delete
-Qt::DBus,PABLROD,c,delete
-Qt::DBusAbstractAdaptor,PABLROD,c,delete
-Qt::DBusAbstractInterface,PABLROD,c,delete
-Qt::DBusAbstractInterfaceBase,PABLROD,c,delete
-Qt::DBusArgument,PABLROD,c,delete
-Qt::DBusConnection,PABLROD,c,delete
-Qt::DBusConnectionInterface,PABLROD,c,delete
-Qt::DBusContext,PABLROD,c,delete
-Qt::DBusError,PABLROD,c,delete
-Qt::DBusInterface,PABLROD,c,delete
-Qt::DBusMessage,PABLROD,c,delete
-Qt::DBusMetaType,PABLROD,c,delete
-Qt::DBusPendingCall,PABLROD,c,delete
-Qt::DBusPendingCallWatcher,PABLROD,c,delete
-Qt::DBusServer,PABLROD,c,delete
-Qt::DBusServiceWatcher,PABLROD,c,delete
-Qt::DBusUnixFileDescriptor,PABLROD,c,delete
-Qt::DBusVirtualObject,PABLROD,c,delete
-Qt::DeclarativeComponent,PABLROD,c,delete
-Qt::DeclarativeContext,PABLROD,c,delete
-Qt::DeclarativeEngine,PABLROD,c,delete
-Qt::DeclarativeError,PABLROD,c,delete
-Qt::DeclarativeExpression,PABLROD,c,delete
-Qt::DeclarativeExtensionPlugin,PABLROD,c,delete
-Qt::DeclarativeImageProvider,PABLROD,c,delete
-Qt::DeclarativeItem,PABLROD,c,delete
-Qt::DeclarativeListReference,PABLROD,c,delete
-Qt::DeclarativeNetworkAccessManagerFactory,PABLROD,c,delete
-Qt::DeclarativeParserStatus,PABLROD,c,delete
-Qt::DeclarativeProperty,PABLROD,c,delete
-Qt::DeclarativePropertyMap,PABLROD,c,delete
-Qt::DeclarativeScriptString,PABLROD,c,delete
-Qt::DeclarativeView,PABLROD,c,delete
-Qt::DesktopServices,PABLROD,c,delete
-Qt::DesktopWidget,PABLROD,c,delete
-Qt::Dial,PABLROD,c,delete
-Qt::Dialog,PABLROD,c,delete
-Qt::DialogButtonBox,PABLROD,c,delete
-Qt::Dir,PABLROD,c,delete
-Qt::DirIterator,PABLROD,c,delete
-Qt::DirModel,PABLROD,c,delete
-Qt::DockWidget,PABLROD,c,delete
-Qt::DomAttr,PABLROD,c,delete
-Qt::DomCDATASection,PABLROD,c,delete
-Qt::DomCharacterData,PABLROD,c,delete
-Qt::DomComment,PABLROD,c,delete
-Qt::DomDocument,PABLROD,c,delete
-Qt::DomDocumentFragment,PABLROD,c,delete
-Qt::DomDocumentType,PABLROD,c,delete
-Qt::DomElement,PABLROD,c,delete
-Qt::DomEntity,PABLROD,c,delete
-Qt::DomEntityReference,PABLROD,c,delete
-Qt::DomImplementation,PABLROD,c,delete
-Qt::DomNamedNodeMap,PABLROD,c,delete
-Qt::DomNode,PABLROD,c,delete
-Qt::DomNodeList,PABLROD,c,delete
-Qt::DomNotation,PABLROD,c,delete
-Qt::DomProcessingInstruction,PABLROD,c,delete
-Qt::DomText,PABLROD,c,delete
-Qt::DoubleSpinBox,PABLROD,c,delete
-Qt::DoubleValidator,PABLROD,c,delete
-Qt::Drag,PABLROD,c,delete
-Qt::DragEnterEvent,PABLROD,c,delete
-Qt::DragLeaveEvent,PABLROD,c,delete
-Qt::DragMoveEvent,PABLROD,c,delete
-Qt::DragResponseEvent,PABLROD,c,delete
-Qt::DropEvent,PABLROD,c,delete
-Qt::DynamicPropertyChangeEvent,PABLROD,c,delete
-Qt::EasingCurve,PABLROD,c,delete
-Qt::ElapsedTimer,PABLROD,c,delete
-Qt::ErrorMessage,PABLROD,c,delete
-Qt::Event,PABLROD,c,delete
-Qt::EventLoop,PABLROD,c,delete
-Qt::EventPrivate,PABLROD,c,delete
-Qt::EventTransition,PABLROD,c,delete
-Qt::FactoryInterface,PABLROD,c,delete
-Qt::File,PABLROD,c,delete
-Qt::FileDialog,PABLROD,c,delete
-Qt::FileIconProvider,PABLROD,c,delete
-Qt::FileInfo,PABLROD,c,delete
-Qt::FileOpenEvent,PABLROD,c,delete
-Qt::FileSystemModel,PABLROD,c,delete
-Qt::FileSystemWatcher,PABLROD,c,delete
-Qt::FinalState,PABLROD,c,delete
-Qt::Flag,PABLROD,c,delete
-Qt::FocusEvent,PABLROD,c,delete
-Qt::FocusFrame,PABLROD,c,delete
-Qt::Font,PABLROD,c,delete
-Qt::FontComboBox,PABLROD,c,delete
-Qt::FontDatabase,PABLROD,c,delete
-Qt::FontDialog,PABLROD,c,delete
-Qt::FontInfo,PABLROD,c,delete
-Qt::FontMetrics,PABLROD,c,delete
-Qt::FontMetricsF,PABLROD,c,delete
-Qt::FormLayout,PABLROD,c,delete
-Qt::Frame,PABLROD,c,delete
-Qt::FSFileEngine,PABLROD,c,delete
-Qt::Ftp,PABLROD,c,delete
-Qt::FutureInterfaceBase,PABLROD,c,delete
-Qt::FutureWatcherBase,PABLROD,c,delete
-Qt::GenericArgument,PABLROD,c,delete
-Qt::GenericReturnArgument,PABLROD,c,delete
-Qt::Gesture,PABLROD,c,delete
-Qt::GestureEvent,PABLROD,c,delete
-Qt::GestureRecognizer,PABLROD,c,delete
-Qt::GL,PABLROD,c,delete
-Qt::GLBuffer,PABLROD,c,delete
-Qt::GLColormap,PABLROD,c,delete
-Qt::GLContext,PABLROD,c,delete
-Qt::GLFormat,PABLROD,c,delete
-Qt::GLFramebufferObject,PABLROD,c,delete
-Qt::GLFramebufferObjectFormat,PABLROD,c,delete
-Qt::GLPixelBuffer,PABLROD,c,delete
-Qt::GLShader,PABLROD,c,delete
-Qt::GLShaderProgram,PABLROD,c,delete
-Qt::GLWidget,PABLROD,c,delete
-Qt::GlyphRun,PABLROD,c,delete
-Qt::Gradient,PABLROD,c,delete
-Qt::GraphicsAnchor,PABLROD,c,delete
-Qt::GraphicsAnchorLayout,PABLROD,c,delete
-Qt::GraphicsBlurEffect,PABLROD,c,delete
-Qt::GraphicsColorizeEffect,PABLROD,c,delete
-Qt::GraphicsDropShadowEffect,PABLROD,c,delete
-Qt::GraphicsEffect,PABLROD,c,delete
-Qt::GraphicsEllipseItem,PABLROD,c,delete
-Qt::GraphicsGridLayout,PABLROD,c,delete
-Qt::GraphicsItem,PABLROD,c,delete
-Qt::GraphicsItemAnimation,PABLROD,c,delete
-Qt::GraphicsItemGroup,PABLROD,c,delete
-Qt::GraphicsLayout,PABLROD,c,delete
-Qt::GraphicsLayoutItem,PABLROD,c,delete
-Qt::GraphicsLinearLayout,PABLROD,c,delete
-Qt::GraphicsLineItem,PABLROD,c,delete
-Qt::GraphicsObject,PABLROD,c,delete
-Qt::GraphicsOpacityEffect,PABLROD,c,delete
-Qt::GraphicsPathItem,PABLROD,c,delete
-Qt::GraphicsPixmapItem,PABLROD,c,delete
-Qt::GraphicsPolygonItem,PABLROD,c,delete
-Qt::GraphicsProxyWidget,PABLROD,c,delete
-Qt::GraphicsRectItem,PABLROD,c,delete
-Qt::GraphicsRotation,PABLROD,c,delete
-Qt::GraphicsScale,PABLROD,c,delete
-Qt::GraphicsScene,PABLROD,c,delete
-Qt::GraphicsSceneContextMenuEvent,PABLROD,c,delete
-Qt::GraphicsSceneDragDropEvent,PABLROD,c,delete
-Qt::GraphicsSceneEvent,PABLROD,c,delete
-Qt::GraphicsSceneHelpEvent,PABLROD,c,delete
-Qt::GraphicsSceneHoverEvent,PABLROD,c,delete
-Qt::GraphicsSceneMouseEvent,PABLROD,c,delete
-Qt::GraphicsSceneMoveEvent,PABLROD,c,delete
-Qt::GraphicsSceneResizeEvent,PABLROD,c,delete
-Qt::GraphicsSceneWheelEvent,PABLROD,c,delete
-Qt::GraphicsSimpleTextItem,PABLROD,c,delete
-Qt::GraphicsSvgItem,PABLROD,c,delete
-Qt::GraphicsTextItem,PABLROD,c,delete
-Qt::GraphicsTransform,PABLROD,c,delete
-Qt::GraphicsView,PABLROD,c,delete
-Qt::GraphicsWidget,PABLROD,c,delete
-Qt::GridLayout,PABLROD,c,delete
-Qt::GroupBox,PABLROD,c,delete
-Qt::HashDummyValue,PABLROD,c,delete
-Qt::HBoxLayout,PABLROD,c,delete
-Qt::HeaderView,PABLROD,c,delete
-Qt::HelpContentItem,PABLROD,c,delete
-Qt::HelpContentModel,PABLROD,c,delete
-Qt::HelpContentWidget,PABLROD,c,delete
-Qt::HelpEngine,PABLROD,c,delete
-Qt::HelpEngineCore,PABLROD,c,delete
-Qt::HelpEvent,PABLROD,c,delete
-Qt::HelpIndexModel,PABLROD,c,delete
-Qt::HelpIndexWidget,PABLROD,c,delete
-Qt::HelpSearchEngine,PABLROD,c,delete
-Qt::HelpSearchQuery,PABLROD,c,delete
-Qt::HelpSearchQueryWidget,PABLROD,c,delete
-Qt::HelpSearchResultWidget,PABLROD,c,delete
-Qt::HideEvent,PABLROD,c,delete
-Qt::HistoryState,PABLROD,c,delete
-Qt::HostAddress,PABLROD,c,delete
-Qt::HostInfo,PABLROD,c,delete
-Qt::HoverEvent,PABLROD,c,delete
-Qt::Http,PABLROD,c,delete
-Qt::HttpHeader,PABLROD,c,delete
-Qt::HttpMultiPart,PABLROD,c,delete
-Qt::HttpPart,PABLROD,c,delete
-Qt::HttpRequestHeader,PABLROD,c,delete
-Qt::HttpResponseHeader,PABLROD,c,delete
-Qt::Icon,PABLROD,c,delete
-Qt::IconDragEvent,PABLROD,c,delete
-Qt::IconEngine,PABLROD,c,delete
-Qt::IconEngineFactoryInterface,PABLROD,c,delete
-Qt::IconEngineFactoryInterfaceV2,PABLROD,c,delete
-Qt::IconEnginePlugin,PABLROD,c,delete
-Qt::IconEnginePluginV2,PABLROD,c,delete
-Qt::IconEngineV2,PABLROD,c,delete
-Qt::IconEngineV2::AvailableSizesArgument,PABLROD,c,delete
-Qt::Image,PABLROD,c,delete
-Qt::ImageIOHandler,PABLROD,c,delete
-Qt::ImageIOHandlerFactoryInterface,PABLROD,c,delete
-Qt::ImageIOPlugin,PABLROD,c,delete
-Qt::ImageReader,PABLROD,c,delete
-Qt::ImageTextKeyLang,PABLROD,c,delete
-Qt::ImageWriter,PABLROD,c,delete
-Qt::IncompatibleFlag,PABLROD,c,delete
-Qt::InputContext,PABLROD,c,delete
-Qt::InputContextFactory,PABLROD,c,delete
-Qt::InputContextFactoryInterface,PABLROD,c,delete
-Qt::InputContextPlugin,PABLROD,c,delete
-Qt::InputDialog,PABLROD,c,delete
-Qt::InputEvent,PABLROD,c,delete
-Qt::InputMethodEvent,PABLROD,c,delete
-Qt::InputMethodEvent::Attribute,PABLROD,c,delete
-Qt::Internal,PABLROD,c,delete
-Qt::IntValidator,PABLROD,c,delete
-Qt::IODevice,PABLROD,c,delete
-Qt::IPv6Address,PABLROD,c,delete
-Qt::ItemDelegate,PABLROD,c,delete
-Qt::ItemEditorCreatorBase,PABLROD,c,delete
-Qt::ItemEditorFactory,PABLROD,c,delete
-Qt::ItemSelectionModel,PABLROD,c,delete
-Qt::ItemSelectionRange,PABLROD,c,delete
-Qt::KeyEvent,PABLROD,c,delete
-Qt::KeyEventTransition,PABLROD,c,delete
-Qt::KeySequence,PABLROD,c,delete
-Qt::Label,PABLROD,c,delete
-Qt::Latin1Char,PABLROD,c,delete
-Qt::Latin1String,PABLROD,c,delete
-Qt::Layout,PABLROD,c,delete
-Qt::LayoutItem,PABLROD,c,delete
-Qt::LCDNumber,PABLROD,c,delete
-Qt::Library,PABLROD,c,delete
-Qt::LibraryInfo,PABLROD,c,delete
-Qt::Line,PABLROD,c,delete
-Qt::LinearGradient,PABLROD,c,delete
-Qt::LineEdit,PABLROD,c,delete
-Qt::LineF,PABLROD,c,delete
-Qt::ListView,PABLROD,c,delete
-Qt::ListWidget,PABLROD,c,delete
-Qt::ListWidgetItem,PABLROD,c,delete
-Qt::Locale,PABLROD,c,delete
-Qt::LocalServer,PABLROD,c,delete
-Qt::LocalSocket,PABLROD,c,delete
-Qt::MainWindow,PABLROD,c,delete
-Qt::Margins,PABLROD,c,delete
-Qt::Matrix,PABLROD,c,delete
-Qt::Matrix4x4,PABLROD,c,delete
-Qt::MdiArea,PABLROD,c,delete
-Qt::MdiSubWindow,PABLROD,c,delete
-Qt::Menu,PABLROD,c,delete
-Qt::MenuBar,PABLROD,c,delete
-Qt::MessageBox,PABLROD,c,delete
-Qt::MetaClassInfo,PABLROD,c,delete
-Qt::MetaEnum,PABLROD,c,delete
-Qt::MetaMethod,PABLROD,c,delete
-Qt::MetaObject,PABLROD,c,delete
-Qt::MetaProperty,PABLROD,c,delete
-Qt::MetaType,PABLROD,c,delete
-Qt::MimeData,PABLROD,c,delete
-Qt::MimeSource,PABLROD,c,delete
-Qt::ModelIndex,PABLROD,c,delete
-Qt::MouseEvent,PABLROD,c,delete
-Qt::MouseEventTransition,PABLROD,c,delete
-Qt::MoveEvent,PABLROD,c,delete
-Qt::Movie,PABLROD,c,delete
-Qt::Mutex,PABLROD,c,delete
-Qt::NetworkAccessManager,PABLROD,c,delete
-Qt::NetworkAddressEntry,PABLROD,c,delete
-Qt::NetworkCacheMetaData,PABLROD,c,delete
-Qt::NetworkConfiguration,PABLROD,c,delete
-Qt::NetworkConfigurationManager,PABLROD,c,delete
-Qt::NetworkCookie,PABLROD,c,delete
-Qt::NetworkCookieJar,PABLROD,c,delete
-Qt::NetworkDiskCache,PABLROD,c,delete
-Qt::NetworkInterface,PABLROD,c,delete
-Qt::NetworkProxy,PABLROD,c,delete
-Qt::NetworkProxyFactory,PABLROD,c,delete
-Qt::NetworkProxyQuery,PABLROD,c,delete
-Qt::NetworkReply,PABLROD,c,delete
-Qt::NetworkRequest,PABLROD,c,delete
-Qt::NetworkSession,PABLROD,c,delete
-Qt::NoDebug,PABLROD,c,delete
-Qt::ObjectCleanupHandler,PABLROD,c,delete
-Qt::ObjectUserData,PABLROD,c,delete
-Qt::PageSetupDialog,PABLROD,c,delete
-Qt::PaintDevice,PABLROD,c,delete
-Qt::PaintEngine,PABLROD,c,delete
-Qt::PaintEngineState,PABLROD,c,delete
-Qt::Painter,PABLROD,c,delete
-Qt::PainterPath,PABLROD,c,delete
-Qt::PainterPath::Element,PABLROD,c,delete
-Qt::PainterPathStroker,PABLROD,c,delete
-Qt::Painter::PixmapFragment,PABLROD,c,delete
-Qt::PaintEvent,PABLROD,c,delete
-Qt::Palette,PABLROD,c,delete
-Qt::PanGesture,PABLROD,c,delete
-Qt::ParallelAnimationGroup,PABLROD,c,delete
-Qt::PauseAnimation,PABLROD,c,delete
-Qt::Pen,PABLROD,c,delete
-Qt::PersistentModelIndex,PABLROD,c,delete
-Qt::Picture,PABLROD,c,delete
-Qt::PictureFormatInterface,PABLROD,c,delete
-Qt::PictureFormatPlugin,PABLROD,c,delete
-Qt::PictureIO,PABLROD,c,delete
-Qt::PinchGesture,PABLROD,c,delete
-Qt::Pixmap,PABLROD,c,delete
-Qt::PixmapCache,PABLROD,c,delete
-Qt::PixmapCache::Key,PABLROD,c,delete
-Qt::PlainTextDocumentLayout,PABLROD,c,delete
-Qt::PlainTextEdit,PABLROD,c,delete
-Qt::PluginLoader,PABLROD,c,delete
-Qt::Point,PABLROD,c,delete
-Qt::PointF,PABLROD,c,delete
-Qt::PostEventList,PABLROD,c,delete
-Qt::PrintDialog,PABLROD,c,delete
-Qt::PrintEngine,PABLROD,c,delete
-Qt::Printer,PABLROD,c,delete
-Qt::PrinterInfo,PABLROD,c,delete
-Qt::PrintPreviewDialog,PABLROD,c,delete
-Qt::PrintPreviewWidget,PABLROD,c,delete
-Qt::Process,PABLROD,c,delete
-Qt::ProcessEnvironment,PABLROD,c,delete
-Qt::ProgressBar,PABLROD,c,delete
-Qt::ProgressDialog,PABLROD,c,delete
-Qt::PropertyAnimation,PABLROD,c,delete
-Qt::ProxyModel,PABLROD,c,delete
-Qt::ProxyStyle,PABLROD,c,delete
-Qt::PushButton,PABLROD,c,delete
-Qt::Quaternion,PABLROD,c,delete
-Qt::RadialGradient,PABLROD,c,delete
-Qt::RadioButton,PABLROD,c,delete
-Qt::RawFont,PABLROD,c,delete
-Qt::ReadLocker,PABLROD,c,delete
-Qt::ReadWriteLock,PABLROD,c,delete
-Qt::Rect,PABLROD,c,delete
-Qt::RectF,PABLROD,c,delete
-Qt::RegExp,PABLROD,c,delete
-Qt::RegExpValidator,PABLROD,c,delete
-Qt::Region,PABLROD,c,delete
-Qt::ResizeEvent,PABLROD,c,delete
-Qt::Resource,PABLROD,c,delete
-Qt::RubberBand,PABLROD,c,delete
-Qt::Runnable,PABLROD,c,delete
-Qt::Scriptable,PABLROD,c,delete
-Qt::ScriptClass,PABLROD,c,delete
-Qt::ScriptClassPropertyIterator,PABLROD,c,delete
-Qt::ScriptContext,PABLROD,c,delete
-Qt::ScriptContextInfo,PABLROD,c,delete
-Qt::ScriptEngine,PABLROD,c,delete
-Qt::ScriptEngineAgent,PABLROD,c,delete
-Qt::ScriptExtensionInterface,PABLROD,c,delete
-Qt::ScriptExtensionPlugin,PABLROD,c,delete
-Qt::ScriptString,PABLROD,c,delete
-Qt::ScriptSyntaxCheckResult,PABLROD,c,delete
-Qt::ScriptValue,PABLROD,c,delete
-Qt::ScriptValueIterator,PABLROD,c,delete
-Qt::ScrollArea,PABLROD,c,delete
-Qt::ScrollBar,PABLROD,c,delete
-Qt::Semaphore,PABLROD,c,delete
-Qt::SequentialAnimationGroup,PABLROD,c,delete
-Qt::SessionManager,PABLROD,c,delete
-Qt::Settings,PABLROD,c,delete
-Qt::SharedData,PABLROD,c,delete
-Qt::SharedMemory,PABLROD,c,delete
-Qt::Shortcut,PABLROD,c,delete
-Qt::ShortcutEvent,PABLROD,c,delete
-Qt::ShowEvent,PABLROD,c,delete
-Qt::SignalMapper,PABLROD,c,delete
-Qt::SignalTransition,PABLROD,c,delete
-Qt::SimpleXmlNodeModel,PABLROD,c,delete
-Qt::Size,PABLROD,c,delete
-Qt::SizeF,PABLROD,c,delete
-Qt::SizeGrip,PABLROD,c,delete
-Qt::SizePolicy,PABLROD,c,delete
-Qt::Slider,PABLROD,c,delete
-Qt::SocketNotifier,PABLROD,c,delete
-Qt::SortFilterProxyModel,PABLROD,c,delete
-Qt::Sound,PABLROD,c,delete
-Qt::SourceLocation,PABLROD,c,delete
-Qt::SpacerItem,PABLROD,c,delete
-Qt::SpinBox,PABLROD,c,delete
-Qt::SplashScreen,PABLROD,c,delete
-Qt::Splitter,PABLROD,c,delete
-Qt::SplitterHandle,PABLROD,c,delete
-Qt::Sql,PABLROD,c,delete
-Qt::SqlDatabase,PABLROD,c,delete
-Qt::SqlDriver,PABLROD,c,delete
-Qt::SqlDriverCreatorBase,PABLROD,c,delete
-Qt::SqlDriverFactoryInterface,PABLROD,c,delete
-Qt::SqlDriverPlugin,PABLROD,c,delete
-Qt::SqlError,PABLROD,c,delete
-Qt::SqlField,PABLROD,c,delete
-Qt::SqlIndex,PABLROD,c,delete
-Qt::SqlQuery,PABLROD,c,delete
-Qt::SqlQueryModel,PABLROD,c,delete
-Qt::SqlRecord,PABLROD,c,delete
-Qt::SqlRelation,PABLROD,c,delete
-Qt::SqlRelationalDelegate,PABLROD,c,delete
-Qt::SqlRelationalTableModel,PABLROD,c,delete
-Qt::SqlResult,PABLROD,c,delete
-Qt::SqlTableModel,PABLROD,c,delete
-Qt::Ssl,PABLROD,c,delete
-Qt::SslCertificate,PABLROD,c,delete
-Qt::SslCipher,PABLROD,c,delete
-Qt::SslConfiguration,PABLROD,c,delete
-Qt::SslError,PABLROD,c,delete
-Qt::SslKey,PABLROD,c,delete
-Qt::SslSocket,PABLROD,c,delete
-Qt::StackedLayout,PABLROD,c,delete
-Qt::StackedWidget,PABLROD,c,delete
-Qt::StandardItem,PABLROD,c,delete
-Qt::StandardItemModel,PABLROD,c,delete
-Qt::State,PABLROD,c,delete
-Qt::StateMachine,PABLROD,c,delete
-Qt::StaticText,PABLROD,c,delete
-Qt::StatusBar,PABLROD,c,delete
-Qt::StatusTipEvent,PABLROD,c,delete
-Qt::StringListModel,PABLROD,c,delete
-Qt::StringMatcher,PABLROD,c,delete
-Qt::String::Null,PABLROD,c,delete
-Qt::StringRef,PABLROD,c,delete
-Qt::Style,PABLROD,c,delete
-Qt::StyledItemDelegate,PABLROD,c,delete
-Qt::StyleFactory,PABLROD,c,delete
-Qt::StyleFactoryInterface,PABLROD,c,delete
-Qt::StyleHintReturn,PABLROD,c,delete
-Qt::StyleHintReturnMask,PABLROD,c,delete
-Qt::StyleHintReturnVariant,PABLROD,c,delete
-Qt::StyleOption,PABLROD,c,delete
-Qt::StyleOptionButton,PABLROD,c,delete
-Qt::StyleOptionComboBox,PABLROD,c,delete
-Qt::StyleOptionComplex,PABLROD,c,delete
-Qt::StyleOptionDockWidget,PABLROD,c,delete
-Qt::StyleOptionDockWidgetV2,PABLROD,c,delete
-Qt::StyleOptionFocusRect,PABLROD,c,delete
-Qt::StyleOptionFrame,PABLROD,c,delete
-Qt::StyleOptionFrameV2,PABLROD,c,delete
-Qt::StyleOptionFrameV3,PABLROD,c,delete
-Qt::StyleOptionGraphicsItem,PABLROD,c,delete
-Qt::StyleOptionGroupBox,PABLROD,c,delete
-Qt::StyleOptionHeader,PABLROD,c,delete
-Qt::StyleOptionMenuItem,PABLROD,c,delete
-Qt::StyleOptionProgressBar,PABLROD,c,delete
-Qt::StyleOptionProgressBarV2,PABLROD,c,delete
-Qt::StyleOptionRubberBand,PABLROD,c,delete
-Qt::StyleOptionSizeGrip,PABLROD,c,delete
-Qt::StyleOptionSlider,PABLROD,c,delete
-Qt::StyleOptionSpinBox,PABLROD,c,delete
-Qt::StyleOptionTab,PABLROD,c,delete
-Qt::StyleOptionTabBarBase,PABLROD,c,delete
-Qt::StyleOptionTabBarBaseV2,PABLROD,c,delete
-Qt::StyleOptionTabV2,PABLROD,c,delete
-Qt::StyleOptionTabV3,PABLROD,c,delete
-Qt::StyleOptionTabWidgetFrame,PABLROD,c,delete
-Qt::StyleOptionTabWidgetFrameV2,PABLROD,c,delete
-Qt::StyleOptionTitleBar,PABLROD,c,delete
-Qt::StyleOptionToolBar,PABLROD,c,delete
-Qt::StyleOptionToolBox,PABLROD,c,delete
-Qt::StyleOptionToolBoxV2,PABLROD,c,delete
-Qt::StyleOptionToolButton,PABLROD,c,delete
-Qt::StyleOptionViewItem,PABLROD,c,delete
-Qt::StyleOptionViewItemV2,PABLROD,c,delete
-Qt::StyleOptionViewItemV3,PABLROD,c,delete
-Qt::StyleOptionViewItemV4,PABLROD,c,delete
-Qt::StylePainter,PABLROD,c,delete
-Qt::StylePlugin,PABLROD,c,delete
-Qt::SvgGenerator,PABLROD,c,delete
-Qt::SvgRenderer,PABLROD,c,delete
-Qt::SvgWidget,PABLROD,c,delete
-Qt::SwipeGesture,PABLROD,c,delete
-Qt::SyntaxHighlighter,PABLROD,c,delete
-Qt::SysInfo,PABLROD,c,delete
-Qt::SystemLocale,PABLROD,c,delete
-Qt::SystemSemaphore,PABLROD,c,delete
-Qt::SystemTrayIcon,PABLROD,c,delete
-Qt::TabBar,PABLROD,c,delete
-Qt::TabletEvent,PABLROD,c,delete
-Qt::TableView,PABLROD,c,delete
-Qt::TableWidget,PABLROD,c,delete
-Qt::TableWidgetItem,PABLROD,c,delete
-Qt::TableWidgetSelectionRange,PABLROD,c,delete
-Qt::TabWidget,PABLROD,c,delete
-Qt::TapAndHoldGesture,PABLROD,c,delete
-Qt::TapGesture,PABLROD,c,delete
-Qt::TcpServer,PABLROD,c,delete
-Qt::TcpSocket,PABLROD,c,delete
-Qt::TemporaryFile,PABLROD,c,delete
-Qt::Test,PABLROD,c,delete
-Qt::TestAccessibility,PABLROD,c,delete
-Qt::TestAccessibilityEvent,PABLROD,c,delete
-Qt::TestData,PABLROD,c,delete
-Qt::TestDelayEvent,PABLROD,c,delete
-Qt::TestEvent,PABLROD,c,delete
-Qt::TestEventLoop,PABLROD,c,delete
-Qt::TestKeyClicksEvent,PABLROD,c,delete
-Qt::TestKeyEvent,PABLROD,c,delete
-Qt::TestMouseEvent,PABLROD,c,delete
-Qt::TextBlock,PABLROD,c,delete
-Qt::TextBlockFormat,PABLROD,c,delete
-Qt::TextBlockGroup,PABLROD,c,delete
-Qt::TextBlock::iterator,PABLROD,c,delete
-Qt::TextBlockUserData,PABLROD,c,delete
-Qt::TextBoundaryFinder,PABLROD,c,delete
-Qt::TextBrowser,PABLROD,c,delete
-Qt::TextCharFormat,PABLROD,c,delete
-Qt::TextCodec,PABLROD,c,delete
-Qt::TextCodec::ConverterState,PABLROD,c,delete
-Qt::TextCodecFactoryInterface,PABLROD,c,delete
-Qt::TextCodecPlugin,PABLROD,c,delete
-Qt::TextCursor,PABLROD,c,delete
-Qt::TextDecoder,PABLROD,c,delete
-Qt::TextDocument,PABLROD,c,delete
-Qt::TextDocumentFragment,PABLROD,c,delete
-Qt::TextDocumentWriter,PABLROD,c,delete
-Qt::TextEdit,PABLROD,c,delete
-Qt::TextEdit::ExtraSelection,PABLROD,c,delete
-Qt::TextEncoder,PABLROD,c,delete
-Qt::TextFormat,PABLROD,c,delete
-Qt::TextFragment,PABLROD,c,delete
-Qt::TextFrame,PABLROD,c,delete
-Qt::TextFrameFormat,PABLROD,c,delete
-Qt::TextFrame::iterator,PABLROD,c,delete
-Qt::TextFrameLayoutData,PABLROD,c,delete
-Qt::TextImageFormat,PABLROD,c,delete
-Qt::TextInlineObject,PABLROD,c,delete
-Qt::TextItem,PABLROD,c,delete
-Qt::TextLayout,PABLROD,c,delete
-Qt::TextLayout::FormatRange,PABLROD,c,delete
-Qt::TextLength,PABLROD,c,delete
-Qt::TextLine,PABLROD,c,delete
-Qt::TextList,PABLROD,c,delete
-Qt::TextListFormat,PABLROD,c,delete
-Qt::TextObject,PABLROD,c,delete
-Qt::TextObjectInterface,PABLROD,c,delete
-Qt::TextOption,PABLROD,c,delete
-Qt::TextOption::Tab,PABLROD,c,delete
-Qt::TextStream,PABLROD,c,delete
-Qt::TextStreamManipulator,PABLROD,c,delete
-Qt::TextTable,PABLROD,c,delete
-Qt::TextTableCell,PABLROD,c,delete
-Qt::TextTableCellFormat,PABLROD,c,delete
-Qt::TextTableFormat,PABLROD,c,delete
-Qt::Thread,PABLROD,c,delete
-Qt::TileRules,PABLROD,c,delete
-Qt::Time,PABLROD,c,delete
-Qt::TimeEdit,PABLROD,c,delete
-Qt::TimeLine,PABLROD,c,delete
-Qt::Timer,PABLROD,c,delete
-Qt::TimerEvent,PABLROD,c,delete
-Qt::ToolBar,PABLROD,c,delete
-Qt::ToolBarChangeEvent,PABLROD,c,delete
-Qt::ToolBox,PABLROD,c,delete
-Qt::ToolButton,PABLROD,c,delete
-Qt::ToolTip,PABLROD,c,delete
-Qt::TouchEvent,PABLROD,c,delete
-Qt::TouchEvent::TouchPoint,PABLROD,c,delete
-Qt::Transform,PABLROD,c,delete
-Qt::Translator,PABLROD,c,delete
-Qt::TreeView,PABLROD,c,delete
-Qt::TreeWidget,PABLROD,c,delete
-Qt::TreeWidgetItem,PABLROD,c,delete
-Qt::TreeWidgetItemIterator,PABLROD,c,delete
-Qt::UdpSocket,PABLROD,c,delete
-Qt::UiLoader,PABLROD,c,delete
-Qt::UndoCommand,PABLROD,c,delete
-Qt::UndoGroup,PABLROD,c,delete
-Qt::UndoStack,PABLROD,c,delete
-Qt::UndoView,PABLROD,c,delete
-Qt::UnixPrintWidget,PABLROD,c,delete
-Qt::Url,PABLROD,c,delete
-Qt::UrlInfo,PABLROD,c,delete
-Qt::UrlPrivate,PABLROD,c,delete
-Qt::Uuid,PABLROD,c,delete
-Qt::Validator,PABLROD,c,delete
-Qt::Variant,PABLROD,c,delete
-Qt::VariantAnimation,PABLROD,c,delete
-Qt::VariantComparisonHelper,PABLROD,c,delete
-Qt::Variant::Handler,PABLROD,c,delete
-Qt::Variant::Private,PABLROD,c,delete
-Qt::VBoxLayout,PABLROD,c,delete
-Qt::Vector2D,PABLROD,c,delete
-Qt::Vector3D,PABLROD,c,delete
-Qt::Vector4D,PABLROD,c,delete
-Qt::VideoFrame,PABLROD,c,delete
-Qt::WebDatabase,PABLROD,c,delete
-Qt::WebElement,PABLROD,c,delete
-Qt::WebElementCollection,PABLROD,c,delete
-Qt::WebElementCollection::const_iterator,PABLROD,c,delete
-Qt::WebElementCollection::iterator,PABLROD,c,delete
-Qt::WebFrame,PABLROD,c,delete
-Qt::WebHistory,PABLROD,c,delete
-Qt::WebHistoryInterface,PABLROD,c,delete
-Qt::WebHistoryItem,PABLROD,c,delete
-Qt::WebHitTestResult,PABLROD,c,delete
-Qt::WebInspector,PABLROD,c,delete
-Qt::WebPage,PABLROD,c,delete
-Qt::WebPage::ChooseMultipleFilesExtensionOption,PABLROD,c,delete
-Qt::WebPage::ChooseMultipleFilesExtensionReturn,PABLROD,c,delete
-Qt::WebPage::ErrorPageExtensionOption,PABLROD,c,delete
-Qt::WebPage::ErrorPageExtensionReturn,PABLROD,c,delete
-Qt::WebPage::ExtensionOption,PABLROD,c,delete
-Qt::WebPage::ExtensionReturn,PABLROD,c,delete
-Qt::WebPage::ViewportAttributes,PABLROD,c,delete
-Qt::WebPluginFactory,PABLROD,c,delete
-Qt::WebPluginFactory::ExtensionOption,PABLROD,c,delete
-Qt::WebPluginFactory::ExtensionReturn,PABLROD,c,delete
-Qt::WebPluginFactory::MimeType,PABLROD,c,delete
-Qt::WebPluginFactory::Plugin,PABLROD,c,delete
-Qt::WebSecurityOrigin,PABLROD,c,delete
-Qt::WebSettings,PABLROD,c,delete
-Qt::WebView,PABLROD,c,delete
-Qt::WhatsThis,PABLROD,c,delete
-Qt::WhatsThisClickedEvent,PABLROD,c,delete
-Qt::WheelEvent,PABLROD,c,delete
-Qt::Widget,PABLROD,c,delete
-Qt::WidgetAction,PABLROD,c,delete
-Qt::WidgetItem,PABLROD,c,delete
-Qt::WidgetItemV2,PABLROD,c,delete
-Qt::WindowStateChangeEvent,PABLROD,c,delete
-Qt::Wizard,PABLROD,c,delete
-Qt::WizardPage,PABLROD,c,delete
-Qt::Workspace,PABLROD,c,delete
-Qt::WriteLocker,PABLROD,c,delete
-Qt::X11EmbedContainer,PABLROD,c,delete
-Qt::X11EmbedWidget,PABLROD,c,delete
-Qt::X11Info,PABLROD,c,delete
-Qt::XmlAttributes,PABLROD,c,delete
-Qt::XmlContentHandler,PABLROD,c,delete
-Qt::XmlDeclHandler,PABLROD,c,delete
-Qt::XmlDefaultHandler,PABLROD,c,delete
-Qt::XmlDTDHandler,PABLROD,c,delete
-Qt::XmlEntityResolver,PABLROD,c,delete
-Qt::XmlErrorHandler,PABLROD,c,delete
-Qt::XmlFormatter,PABLROD,c,delete
-Qt::XmlInputSource,PABLROD,c,delete
-Qt::XmlItem,PABLROD,c,delete
-Qt::XmlLexicalHandler,PABLROD,c,delete
-Qt::XmlLocator,PABLROD,c,delete
-Qt::XmlName,PABLROD,c,delete
-Qt::XmlNamePool,PABLROD,c,delete
-Qt::XmlNamespaceSupport,PABLROD,c,delete
-Qt::XmlNodeModelIndex,PABLROD,c,delete
-Qt::XmlParseException,PABLROD,c,delete
-Qt::XmlQuery,PABLROD,c,delete
-Qt::XmlReader,PABLROD,c,delete
-Qt::XmlResultItems,PABLROD,c,delete
-Qt::XmlSchema,PABLROD,c,delete
-Qt::XmlSchemaValidator,PABLROD,c,delete
-Qt::XmlSerializer,PABLROD,c,delete
-Qt::XmlSimpleReader,PABLROD,c,delete
-Qt::XmlStreamAttribute,PABLROD,c,delete
-Qt::XmlStreamEntityDeclaration,PABLROD,c,delete
-Qt::XmlStreamEntityResolver,PABLROD,c,delete
-Qt::XmlStreamNamespaceDeclaration,PABLROD,c,delete
-Qt::XmlStreamNotationDeclaration,PABLROD,c,delete
-Qt::XmlStreamReader,PABLROD,c,delete
-Qt::XmlStreamStringRef,PABLROD,c,delete
-Qt::XmlStreamWriter,PABLROD,c,delete
-QwtAbstractScale,PABLROD,c,delete
-QwtAbstractScaleDraw,PABLROD,c,delete
-QwtAbstractSlider,PABLROD,c,delete
-QwtAlphaColorMap,PABLROD,c,delete
-QwtAnalogClock,PABLROD,c,delete
-QwtArrayData,PABLROD,c,delete
-QwtArrowButton,PABLROD,c,delete
-QwtClipper,PABLROD,c,delete
-QwtColorMap,PABLROD,c,delete
-QwtCompass,PABLROD,c,delete
-QwtCompassMagnetNeedle,PABLROD,c,delete
-QwtCompassRose,PABLROD,c,delete
-QwtCompassWindArrow,PABLROD,c,delete
-QwtCounter,PABLROD,c,delete
-QwtCPointerData,PABLROD,c,delete
-QwtCurveFitter,PABLROD,c,delete
-QwtData,PABLROD,c,delete
-QwtDial,PABLROD,c,delete
-QwtDialNeedle,PABLROD,c,delete
-QwtDialScaleDraw,PABLROD,c,delete
-QwtDialSimpleNeedle,PABLROD,c,delete
-QwtDoubleInterval,PABLROD,c,delete
-QwtDoubleRange,PABLROD,c,delete
-QwtDynGridLayout,PABLROD,c,delete
-QwtEventPattern,PABLROD,c,delete
-QwtIntervalData,PABLROD,c,delete
-QwtKnob,PABLROD,c,delete
-QwtLegend,PABLROD,c,delete
-QwtLegendItem,PABLROD,c,delete
-QwtLegendItemManager,PABLROD,c,delete
-QwtLinearColorMap,PABLROD,c,delete
-QwtLinearScaleEngine,PABLROD,c,delete
-QwtLog10ScaleEngine,PABLROD,c,delete
-QwtMagnifier,PABLROD,c,delete
-QwtMetricsMap,PABLROD,c,delete
-QwtPainter,PABLROD,c,delete
-QwtPanner,PABLROD,c,delete
-QwtPicker,PABLROD,c,delete
-QwtPickerClickPointMachine,PABLROD,c,delete
-QwtPickerClickRectMachine,PABLROD,c,delete
-QwtPickerDragPointMachine,PABLROD,c,delete
-QwtPickerDragRectMachine,PABLROD,c,delete
-QwtPickerMachine,PABLROD,c,delete
-QwtPickerPolygonMachine,PABLROD,c,delete
-QwtPlainTextEngine,PABLROD,c,delete
-QwtPlot,PABLROD,c,delete
-QwtPlotCanvas,PABLROD,c,delete
-QwtPlotCurve,PABLROD,c,delete
-QwtPlotDict,PABLROD,c,delete
-QwtPlotGrid,PABLROD,c,delete
-QwtPlotItem,PABLROD,c,delete
-QwtPlotLayout,PABLROD,c,delete
-QwtPlotMagnifier,PABLROD,c,delete
-QwtPlotMarker,PABLROD,c,delete
-QwtPlotPanner,PABLROD,c,delete
-QwtPlotPicker,PABLROD,c,delete
-QwtPlotPrintFilter,PABLROD,c,delete
-QwtPlotRasterItem,PABLROD,c,delete
-QwtPlotScaleItem,PABLROD,c,delete
-QwtPlotSpectrogram,PABLROD,c,delete
-QwtPlotZoomer,PABLROD,c,delete
-QwtPolygonFData,PABLROD,c,delete
-QwtRasterData,PABLROD,c,delete
-QwtRichTextEngine,PABLROD,c,delete
-QwtRoundScaleDraw,PABLROD,c,delete
-QwtScaleArithmetic,PABLROD,c,delete
-QwtScaleDiv,PABLROD,c,delete
-QwtScaleDraw,PABLROD,c,delete
-QwtScaleEngine,PABLROD,c,delete
-QwtScaleMap,PABLROD,c,delete
-QwtScaleTransformation,PABLROD,c,delete
-QwtScaleWidget,PABLROD,c,delete
-QwtSimpleCompassRose,PABLROD,c,delete
-QwtSlider,PABLROD,c,delete
-QwtSpline,PABLROD,c,delete
-QwtSplineCurveFitter,PABLROD,c,delete
-QwtSymbol,PABLROD,c,delete
-QwtText,PABLROD,c,delete
-QwtTextEngine,PABLROD,c,delete
-QwtTextLabel,PABLROD,c,delete
-QwtThermo,PABLROD,c,delete
-Rectangle_t,PABLROD,c,delete
-RedirectHandle_t,PABLROD,c,delete
-ROOT,PABLROD,c,delete
-ROOT::Fit::FitResult,PABLROD,c,delete
-rop,PABLROD,c,delete
-RPM2::C::DB,PABLROD,c,delete
-RPM2::C::Header,PABLROD,c,delete
-RPM2::C::PackageIterator,PABLROD,c,delete
-RPM2::C::Transaction,PABLROD,c,delete
-RPM::VersionCompare,PABLROD,c,delete
-RRDs,PABLROD,c,delete
-sbmp,PABLROD,c,delete
-ScreenPtr,PABLROD,c,delete
-Search::Xapian::DateValueRangeProcessor,PABLROD,c,delete
-Search::Xapian::NumberValueRangeProcessor,PABLROD,c,delete
-Search::Xapian::StringValueRangeProcessor,PABLROD,c,delete
-Segment_t,PABLROD,c,delete
-Sereal::Encoder::_ptabletest,PABLROD,c,delete
-SetWindowAttributes_t,PABLROD,c,delete
-SnmpSessionPtr,PABLROD,c,delete
-SOOT::API::ClassIterator,PABLROD,c,delete
-SOOT::RTXS,PABLROD,c,delete
-Statistics::CaseResampling::RdGen,PABLROD,c,delete
-sv,PABLROD,c,delete
-Sys::CPU,PABLROD,c,delete
-Sys::Guestfs,PABLROD,c,delete
-SysInfo_t,PABLROD,c,delete
-Sys::SigAction::Alarm,PABLROD,c,delete
-SystemC::Parser,PABLROD,c,delete
-ta,PABLROD,c,delete
-TApplication,PABLROD,c,delete
-TApplicationImp,PABLROD,c,delete
-TApplicationRemote,PABLROD,c,delete
-TApplicationServer,PABLROD,c,delete
-TArc,PABLROD,c,delete
-TArchiveFile,PABLROD,c,delete
-TArchiveMember,PABLROD,c,delete
-TArrayC,PABLROD,c,delete
-TArrayD,PABLROD,c,delete
-TArrayF,PABLROD,c,delete
-TArrayI,PABLROD,c,delete
-TArrayL,PABLROD,c,delete
-TArrayL64,PABLROD,c,delete
-TArrayS,PABLROD,c,delete
-TArrow,PABLROD,c,delete
-TAtomicCount,PABLROD,c,delete
-TAtt3D,PABLROD,c,delete
-TAttAxis,PABLROD,c,delete
-TAttBBox,PABLROD,c,delete
-TAttBBox2D,PABLROD,c,delete
-TAttCanvas,PABLROD,c,delete
-TAttFill,PABLROD,c,delete
-TAttImage,PABLROD,c,delete
-TAttLine,PABLROD,c,delete
-TAttMarker,PABLROD,c,delete
-TAttPad,PABLROD,c,delete
-TAttText,PABLROD,c,delete
-TAxis,PABLROD,c,delete
-TAxis3D,PABLROD,c,delete
-TBackCompFitter,PABLROD,c,delete
-TBase64,PABLROD,c,delete
-TBaseClass,PABLROD,c,delete
-TBasket,PABLROD,c,delete
-TBasketSQL,PABLROD,c,delete
-TBenchmark,PABLROD,c,delete
-TBinomialEfficiencyFitter,PABLROD,c,delete
-TBits,PABLROD,c,delete
-TBox,PABLROD,c,delete
-TBranch,PABLROD,c,delete
-TBranchClones,PABLROD,c,delete
-TBranchElement,PABLROD,c,delete
-TBranchObject,PABLROD,c,delete
-TBranchRef,PABLROD,c,delete
-TBranchSTL,PABLROD,c,delete
-TBRIK,PABLROD,c,delete
-TBrowser,PABLROD,c,delete
-TBrowserImp,PABLROD,c,delete
-TBtree,PABLROD,c,delete
-TBuffer,PABLROD,c,delete
-TBuffer3D,PABLROD,c,delete
-TBufferFile,PABLROD,c,delete
-TBufferSQL,PABLROD,c,delete
-TButton,PABLROD,c,delete
-TCanvas,PABLROD,c,delete
-TCanvasImp,PABLROD,c,delete
-TChain,PABLROD,c,delete
-TChainElement,PABLROD,c,delete
-TCint,PABLROD,c,delete
-TClass,PABLROD,c,delete
-TClassEdit,PABLROD,c,delete
-TClassGenerator,PABLROD,c,delete
-TClassMenuItem,PABLROD,c,delete
-TClassRef,PABLROD,c,delete
-TClassStreamer,PABLROD,c,delete
-TClassTable,PABLROD,c,delete
-TClassTree,PABLROD,c,delete
-TClonesArray,PABLROD,c,delete
-TCollection,PABLROD,c,delete
-TCollectionClassStreamer,PABLROD,c,delete
-TCollectionMemberStreamer,PABLROD,c,delete
-TCollectionMethodBrowsable,PABLROD,c,delete
-TCollectionPropertyBrowsable,PABLROD,c,delete
-TCollectionProxyFactory,PABLROD,c,delete
-TCollectionStreamer,PABLROD,c,delete
-TColor,PABLROD,c,delete
-TColorGradient,PABLROD,c,delete
-TColorWheel,PABLROD,c,delete
-TComplex,PABLROD,c,delete
-TCondition,PABLROD,c,delete
-TConditionImp,PABLROD,c,delete
-TCONE,PABLROD,c,delete
-TConfidenceLevel,PABLROD,c,delete
-TCONS,PABLROD,c,delete
-TContextMenu,PABLROD,c,delete
-TContextMenuImp,PABLROD,c,delete
-TControlBar,PABLROD,c,delete
-TControlBarButton,PABLROD,c,delete
-TControlBarImp,PABLROD,c,delete
-TCrown,PABLROD,c,delete
-TCTUB,PABLROD,c,delete
-TCurlyArc,PABLROD,c,delete
-TCurlyLine,PABLROD,c,delete
-TCut,PABLROD,c,delete
-TCutG,PABLROD,c,delete
-TDataMember,PABLROD,c,delete
-TDataType,PABLROD,c,delete
-TDatime,PABLROD,c,delete
-TDecompBase,PABLROD,c,delete
-TDecompBK,PABLROD,c,delete
-TDecompChol,PABLROD,c,delete
-TDecompLU,PABLROD,c,delete
-TDecompQRH,PABLROD,c,delete
-TDecompSparse,PABLROD,c,delete
-TDecompSVD,PABLROD,c,delete
-TDialogCanvas,PABLROD,c,delete
-TDiamond,PABLROD,c,delete
-TDictAttributeMap,PABLROD,c,delete
-TDictionary,PABLROD,c,delete
-TDirectory,PABLROD,c,delete
-TDirectoryFile,PABLROD,c,delete
-TEfficiency,PABLROD,c,delete
-TEllipse,PABLROD,c,delete
-TELTU,PABLROD,c,delete
-TEmulatedCollectionProxy,PABLROD,c,delete
-TEmulatedMapProxy,PABLROD,c,delete
-TEntryList,PABLROD,c,delete
-TEntryListArray,PABLROD,c,delete
-TEntryListBlock,PABLROD,c,delete
-TEntryListFromFile,PABLROD,c,delete
-TEnv,PABLROD,c,delete
-TEnvRec,PABLROD,c,delete
-TEventList,PABLROD,c,delete
-TExec,PABLROD,c,delete
-TExecImpl,PABLROD,c,delete
-TExMap,PABLROD,c,delete
-TExMapIter,PABLROD,c,delete
-Text::IconvPtr,PABLROD,c,delete
-Text::Xslate::Type::Macro,PABLROD,c,delete
-Text::Xslate::Type::Pair,PABLROD,c,delete
-TF1,PABLROD,c,delete
-TF12,PABLROD,c,delete
-TF2,PABLROD,c,delete
-TF3,PABLROD,c,delete
-TFeldmanCousins,PABLROD,c,delete
-TFile,PABLROD,c,delete
-TFileCacheRead,PABLROD,c,delete
-TFileCacheWrite,PABLROD,c,delete
-TFileCollection,PABLROD,c,delete
-TFileHandler,PABLROD,c,delete
-TFileInfo,PABLROD,c,delete
-TFileInfoMeta,PABLROD,c,delete
-TFileMergeInfo,PABLROD,c,delete
-TFileMerger,PABLROD,c,delete
-TFilePrefetch,PABLROD,c,delete
-TFileStager,PABLROD,c,delete
-TFitResult,PABLROD,c,delete
-TFitResultPtr,PABLROD,c,delete
-TFolder,PABLROD,c,delete
-TFormula,PABLROD,c,delete
-TFormulaPrimitive,PABLROD,c,delete
-TFPBlock,PABLROD,c,delete
-TFractionFitter,PABLROD,c,delete
-TFrame,PABLROD,c,delete
-TFree,PABLROD,c,delete
-TFriendElement,PABLROD,c,delete
-TFunction,PABLROD,c,delete
-TGaxis,PABLROD,c,delete
-TGenCollectionProxy,PABLROD,c,delete
-TGenPhaseSpace,PABLROD,c,delete
-TGeometry,PABLROD,c,delete
-TGLManager,PABLROD,c,delete
-TGlobal,PABLROD,c,delete
-TGLPaintDevice,PABLROD,c,delete
-TGraph,PABLROD,c,delete
-TGraph2D,PABLROD,c,delete
-TGraph2DErrors,PABLROD,c,delete
-TGraphAsymmErrors,PABLROD,c,delete
-TGraphBentErrors,PABLROD,c,delete
-TGraphDelaunay,PABLROD,c,delete
-TGraphErrors,PABLROD,c,delete
-TGraphPolar,PABLROD,c,delete
-TGraphPolargram,PABLROD,c,delete
-TGraphQQ,PABLROD,c,delete
-TGraphSmooth,PABLROD,c,delete
-TGraphTime,PABLROD,c,delete
-TGrid,PABLROD,c,delete
-TGridCollection,PABLROD,c,delete
-TGridJDL,PABLROD,c,delete
-TGridJob,PABLROD,c,delete
-TGridJobStatus,PABLROD,c,delete
-TGridJobStatusList,PABLROD,c,delete
-TGridResult,PABLROD,c,delete
-TGroupButton,PABLROD,c,delete
-TGTRA,PABLROD,c,delete
-TGuiFactory,PABLROD,c,delete
-TH1,PABLROD,c,delete
-TH1C,PABLROD,c,delete
-TH1D,PABLROD,c,delete
-TH1F,PABLROD,c,delete
-TH1I,PABLROD,c,delete
-TH1K,PABLROD,c,delete
-TH1S,PABLROD,c,delete
-TH2,PABLROD,c,delete
-TH2C,PABLROD,c,delete
-TH2D,PABLROD,c,delete
-TH2F,PABLROD,c,delete
-TH2I,PABLROD,c,delete
-TH2Poly,PABLROD,c,delete
-TH2PolyBin,PABLROD,c,delete
-TH2S,PABLROD,c,delete
-TH3,PABLROD,c,delete
-TH3C,PABLROD,c,delete
-TH3D,PABLROD,c,delete
-TH3F,PABLROD,c,delete
-TH3I,PABLROD,c,delete
-TH3S,PABLROD,c,delete
-THashList,PABLROD,c,delete
-THashTable,PABLROD,c,delete
-THashTableIter,PABLROD,c,delete
-THelix,PABLROD,c,delete
-THLimitsFinder,PABLROD,c,delete
-THn,PABLROD,c,delete
-THnBase,PABLROD,c,delete
-THnIter,PABLROD,c,delete
-THnSparse,PABLROD,c,delete
-THnSparseArrayChunk,PABLROD,c,delete
-THStack,PABLROD,c,delete
-THYPE,PABLROD,c,delete
-TImage,PABLROD,c,delete
-TImageDump,PABLROD,c,delete
-TImagePalette,PABLROD,c,delete
-TImagePlugin,PABLROD,c,delete
-Time::Moment::Internal,PABLROD,c,delete
-timespec,PABLROD,c,delete
-TIndArray,PABLROD,c,delete
-TInetAddress,PABLROD,c,delete
-TInspectCanvas,PABLROD,c,delete
-TInspectorImp,PABLROD,c,delete
-TInterpreter,PABLROD,c,delete
-TIsAProxy,PABLROD,c,delete
-TIter,PABLROD,c,delete
-TIterator,PABLROD,c,delete
-Tk::Callback,PABLROD,c,delete
-TKDE,PABLROD,c,delete
-TKDTreeBinning,PABLROD,c,delete
-Tk::Event::Source,PABLROD,c,delete
-TKey,PABLROD,c,delete
-TKeyMapFile,PABLROD,c,delete
-Tk::FontRankInfo,PABLROD,c,delete
-Tk::Interp,PABLROD,c,delete
-TLatex,PABLROD,c,delete
-TLeaf,PABLROD,c,delete
-TLeafB,PABLROD,c,delete
-TLeafC,PABLROD,c,delete
-TLeafD,PABLROD,c,delete
-TLeafElement,PABLROD,c,delete
-TLeafF,PABLROD,c,delete
-TLeafI,PABLROD,c,delete
-TLeafL,PABLROD,c,delete
-TLeafO,PABLROD,c,delete
-TLeafObject,PABLROD,c,delete
-TLeafS,PABLROD,c,delete
-TLegend,PABLROD,c,delete
-TLegendEntry,PABLROD,c,delete
-TLimit,PABLROD,c,delete
-TLimitDataSource,PABLROD,c,delete
-TLine,PABLROD,c,delete
-TLinearGradient,PABLROD,c,delete
-TLink,PABLROD,c,delete
-TList,PABLROD,c,delete
-TLockFile,PABLROD,c,delete
-TLockGuard,PABLROD,c,delete
-TLorentzRotation,PABLROD,c,delete
-TLorentzVector,PABLROD,c,delete
-TMacro,PABLROD,c,delete
-TMap,PABLROD,c,delete
-TMapFile,PABLROD,c,delete
-TMapRec,PABLROD,c,delete
-TMarker,PABLROD,c,delete
-TMarker3DBox,PABLROD,c,delete
-TMaterial,PABLROD,c,delete
-TMath,PABLROD,c,delete
-TMathText,PABLROD,c,delete
-TMatrixDEigen,PABLROD,c,delete
-TMatrixDSymEigen,PABLROD,c,delete
-TMatrixTCramerInv,PABLROD,c,delete
-TMatrixTSymCramerInv,PABLROD,c,delete
-TMD5,PABLROD,c,delete
-TMemberInspector,PABLROD,c,delete
-TMemberStreamer,PABLROD,c,delete
-TMemFile,PABLROD,c,delete
-TMessage,PABLROD,c,delete
-TMessageHandler,PABLROD,c,delete
-TMethod,PABLROD,c,delete
-TMethodArg,PABLROD,c,delete
-TMethodBrowsable,PABLROD,c,delete
-TMethodCall,PABLROD,c,delete
-TMixture,PABLROD,c,delete
-TMonitor,PABLROD,c,delete
-TMultiDimFit,PABLROD,c,delete
-TMultiGraph,PABLROD,c,delete
-TMutex,PABLROD,c,delete
-TMutexImp,PABLROD,c,delete
-TNamed,PABLROD,c,delete
-TNDArray,PABLROD,c,delete
-TNetFile,PABLROD,c,delete
-TNetFileStager,PABLROD,c,delete
-TNetSystem,PABLROD,c,delete
-TNode,PABLROD,c,delete
-TNodeDiv,PABLROD,c,delete
-TNonSplitBrowsable,PABLROD,c,delete
-TNtuple,PABLROD,c,delete
-TNtupleD,PABLROD,c,delete
-TObjArray,PABLROD,c,delete
-TObjectRefSpy,PABLROD,c,delete
-TObjectSpy,PABLROD,c,delete
-TObjectTable,PABLROD,c,delete
-TObjString,PABLROD,c,delete
-TOrdCollection,PABLROD,c,delete
-TPad,PABLROD,c,delete
-TPadPainter,PABLROD,c,delete
-TPair,PABLROD,c,delete
-TPaletteEditor,PABLROD,c,delete
-TPARA,PABLROD,c,delete
-TParallelMergingFile,PABLROD,c,delete
-TPave,PABLROD,c,delete
-TPaveClass,PABLROD,c,delete
-TPaveLabel,PABLROD,c,delete
-TPaveStats,PABLROD,c,delete
-TPavesText,PABLROD,c,delete
-TPaveText,PABLROD,c,delete
-TPCON,PABLROD,c,delete
-TPDF,PABLROD,c,delete
-TPGON,PABLROD,c,delete
-TPie,PABLROD,c,delete
-TPieSlice,PABLROD,c,delete
-TPluginHandler,PABLROD,c,delete
-TPluginManager,PABLROD,c,delete
-TPMERegexp,PABLROD,c,delete
-TPoint,PABLROD,c,delete
-TPoints,PABLROD,c,delete
-TPoints3DABC,PABLROD,c,delete
-TPointSet3D,PABLROD,c,delete
-TPolyLine,PABLROD,c,delete
-TPolyLine3D,PABLROD,c,delete
-TPolyMarker,PABLROD,c,delete
-TPolyMarker3D,PABLROD,c,delete
-TPosixCondition,PABLROD,c,delete
-TPosixMutex,PABLROD,c,delete
-TPosixThread,PABLROD,c,delete
-TPosixThreadFactory,PABLROD,c,delete
-TPostScript,PABLROD,c,delete
-TPRegexp,PABLROD,c,delete
-TPrincipal,PABLROD,c,delete
-TProcessEventTimer,PABLROD,c,delete
-TProcessID,PABLROD,c,delete
-TProcessUUID,PABLROD,c,delete
-TProfile,PABLROD,c,delete
-TProfile2D,PABLROD,c,delete
-TProfile3D,PABLROD,c,delete
-TPServerSocket,PABLROD,c,delete
-TPSocket,PABLROD,c,delete
-TQClass,PABLROD,c,delete
-TQCommand,PABLROD,c,delete
-TQConnection,PABLROD,c,delete
-TQObject,PABLROD,c,delete
-TQObjSender,PABLROD,c,delete
-TQuaternion,PABLROD,c,delete
-TQueryResult,PABLROD,c,delete
-TQUndoManager,PABLROD,c,delete
-TRadialGradient,PABLROD,c,delete
-TRandom,PABLROD,c,delete
-TRandom1,PABLROD,c,delete
-TRandom2,PABLROD,c,delete
-TRandom3,PABLROD,c,delete
-TRealData,PABLROD,c,delete
-TRedirectOutputGuard,PABLROD,c,delete
-TRef,PABLROD,c,delete
-TRefArray,PABLROD,c,delete
-TRefCnt,PABLROD,c,delete
-TRefTable,PABLROD,c,delete
-TRegexp,PABLROD,c,delete
-TRemoteObject,PABLROD,c,delete
-TRint,PABLROD,c,delete
-TRobustEstimator,PABLROD,c,delete
-TRolke,PABLROD,c,delete
-TROOT,PABLROD,c,delete
-TRootIOCtor,PABLROD,c,delete
-TRotation,PABLROD,c,delete
-TRotMatrix,PABLROD,c,delete
-TRWLock,PABLROD,c,delete
-TryCatch::XS,PABLROD,c,delete
-TS3HTTPRequest,PABLROD,c,delete
-TS3WebFile,PABLROD,c,delete
-TSecContext,PABLROD,c,delete
-TSecContextCleanup,PABLROD,c,delete
-TSelector,PABLROD,c,delete
-TSelectorCint,PABLROD,c,delete
-TSelectorList,PABLROD,c,delete
-TSelectorScalar,PABLROD,c,delete
-TSemaphore,PABLROD,c,delete
-TSeqCollection,PABLROD,c,delete
-TServerSocket,PABLROD,c,delete
-TShape,PABLROD,c,delete
-TSignalHandler,PABLROD,c,delete
-TSlider,PABLROD,c,delete
-TSliderBox,PABLROD,c,delete
-TSocket,PABLROD,c,delete
-TSortedList,PABLROD,c,delete
-TSPHE,PABLROD,c,delete
-TSpline,PABLROD,c,delete
-TSpline3,PABLROD,c,delete
-TSpline5,PABLROD,c,delete
-TSplinePoly,PABLROD,c,delete
-TSplinePoly3,PABLROD,c,delete
-TSplinePoly5,PABLROD,c,delete
-TSQLColumnInfo,PABLROD,c,delete
-TSQLMonitoringWriter,PABLROD,c,delete
-TSQLResult,PABLROD,c,delete
-TSQLRow,PABLROD,c,delete
-TSQLServer,PABLROD,c,delete
-TSQLStatement,PABLROD,c,delete
-TSQLTableInfo,PABLROD,c,delete
-TSSLSocket,PABLROD,c,delete
-TStatistic,PABLROD,c,delete
-TStdExceptionHandler,PABLROD,c,delete
-TStopwatch,PABLROD,c,delete
-TStorage,PABLROD,c,delete
-TStreamerArtificial,PABLROD,c,delete
-TStreamerBase,PABLROD,c,delete
-TStreamerBasicPointer,PABLROD,c,delete
-TStreamerBasicType,PABLROD,c,delete
-TStreamerElement,PABLROD,c,delete
-TStreamerInfo,PABLROD,c,delete
-TStreamerInfoActions,PABLROD,c,delete
-TStreamerLoop,PABLROD,c,delete
-TStreamerObject,PABLROD,c,delete
-TStreamerObjectAny,PABLROD,c,delete
-TStreamerObjectAnyPointer,PABLROD,c,delete
-TStreamerObjectPointer,PABLROD,c,delete
-TStreamerSTL,PABLROD,c,delete
-TStreamerSTLstring,PABLROD,c,delete
-TStreamerString,PABLROD,c,delete
-TString,PABLROD,c,delete
-TStringLong,PABLROD,c,delete
-TStringToken,PABLROD,c,delete
-TStyle,PABLROD,c,delete
-TSubString,PABLROD,c,delete
-TSVDUnfold,PABLROD,c,delete
-TSVG,PABLROD,c,delete
-TSysEvtHandler,PABLROD,c,delete
-TSystem,PABLROD,c,delete
-TSystemDirectory,PABLROD,c,delete
-TSystemFile,PABLROD,c,delete
-TTabCom,PABLROD,c,delete
-TTask,PABLROD,c,delete
-TTeXDump,PABLROD,c,delete
-TText,PABLROD,c,delete
-TTF,PABLROD,c,delete
-TThread,PABLROD,c,delete
-TThreadFactory,PABLROD,c,delete
-TThreadImp,PABLROD,c,delete
-TTime,PABLROD,c,delete
-TTimer,PABLROD,c,delete
-TTimeStamp,PABLROD,c,delete
-TToggle,PABLROD,c,delete
-TToggleGroup,PABLROD,c,delete
-TTRAP,PABLROD,c,delete
-TTRD1,PABLROD,c,delete
-TTRD2,PABLROD,c,delete
-TTree,PABLROD,c,delete
-TTreeCache,PABLROD,c,delete
-TTreeCacheUnzip,PABLROD,c,delete
-TTreeCloner,PABLROD,c,delete
-TTreeFriendLeafIter,PABLROD,c,delete
-TTreeResult,PABLROD,c,delete
-TTreeRow,PABLROD,c,delete
-TTreeSQL,PABLROD,c,delete
-TTUBE,PABLROD,c,delete
-TTUBS,PABLROD,c,delete
-TUDPSocket,PABLROD,c,delete
-TUnfold,PABLROD,c,delete
-TUnfoldBinning,PABLROD,c,delete
-TUnfoldDensity,PABLROD,c,delete
-TUnfoldSys,PABLROD,c,delete
-TUnixSystem,PABLROD,c,delete
-TUri,PABLROD,c,delete
-TUrl,PABLROD,c,delete
-TUUID,PABLROD,c,delete
-TVector2,PABLROD,c,delete
-TVector3,PABLROD,c,delete
-TView,PABLROD,c,delete
-TView3D,PABLROD,c,delete
-TViewer3DPad,PABLROD,c,delete
-TVirtualArray,PABLROD,c,delete
-TVirtualAuth,PABLROD,c,delete
-TVirtualBranchBrowsable,PABLROD,c,delete
-TVirtualCollectionProxy,PABLROD,c,delete
-TVirtualFFT,PABLROD,c,delete
-TVirtualFitter,PABLROD,c,delete
-TVirtualGLManip,PABLROD,c,delete
-TVirtualGLPainter,PABLROD,c,delete
-TVirtualGraphPainter,PABLROD,c,delete
-TVirtualHistPainter,PABLROD,c,delete
-TVirtualIndex,PABLROD,c,delete
-TVirtualIsAProxy,PABLROD,c,delete
-TVirtualMonitoringReader,PABLROD,c,delete
-TVirtualMonitoringWriter,PABLROD,c,delete
-TVirtualMutex,PABLROD,c,delete
-TVirtualObject,PABLROD,c,delete
-TVirtualPad,PABLROD,c,delete
-TVirtualPadEditor,PABLROD,c,delete
-TVirtualPadPainter,PABLROD,c,delete
-TVirtualPerfStats,PABLROD,c,delete
-TVirtualPS,PABLROD,c,delete
-TVirtualStreamerInfo,PABLROD,c,delete
-TVirtualTableInterface,PABLROD,c,delete
-TVirtualTreePlayer,PABLROD,c,delete
-TVirtualViewer3D,PABLROD,c,delete
-TVirtualX,PABLROD,c,delete
-tw,PABLROD,c,delete
-TWbox,PABLROD,c,delete
-TWebFile,PABLROD,c,delete
-TWebSystem,PABLROD,c,delete
-TXTRU,PABLROD,c,delete
-TZIPFile,PABLROD,c,delete
-TZIPMember,PABLROD,c,delete
-Unix::Statgrab::sg_cpu_percents,PABLROD,c,delete
-Unix::Statgrab::sg_cpu_stats,PABLROD,c,delete
-Unix::Statgrab::sg_disk_io_stats_my,PABLROD,c,delete
-Unix::Statgrab::sg_fs_stats_my,PABLROD,c,delete
-Unix::Statgrab::sg_host_info,PABLROD,c,delete
-Unix::Statgrab::sg_load_stats,PABLROD,c,delete
-Unix::Statgrab::sg_mem_stats,PABLROD,c,delete
-Unix::Statgrab::sg_network_iface_stats_my,PABLROD,c,delete
-Unix::Statgrab::sg_network_io_stats_my,PABLROD,c,delete
-Unix::Statgrab::sg_page_stats,PABLROD,c,delete
-Unix::Statgrab::sg_process_stats,PABLROD,c,delete
-Unix::Statgrab::sg_process_stats_my,PABLROD,c,delete
-Unix::Statgrab::sg_swap_stats,PABLROD,c,delete
-Unix::Statgrab::sg_user_stats,PABLROD,c,delete
-UserGroup_t,PABLROD,c,delete
-wc,PABLROD,c,delete
-WindowAttributes_t,PABLROD,c,delete
-Win::Hivex,PABLROD,c,delete
-ws,PABLROD,c,delete
-Wx::AboutDialogInfo,PABLROD,c,delete
-Wx::AcceleratorEntry,PABLROD,c,delete
-Wx::AcceleratorTable,PABLROD,c,delete
-Wx::ANIHandler,PABLROD,c,delete
-Wx::Animation,PABLROD,c,delete
-Wx::AnimationCtrl,PABLROD,c,delete
-Wx::AuiPaneInfo,PABLROD,c,delete
-Wx::AutoBufferedPaintDC,PABLROD,c,delete
-Wx::BitmapComboBox,PABLROD,c,delete
-Wx::BookCtrl,PABLROD,c,delete
-Wx::BookCtrlEvent,PABLROD,c,delete
-Wx::BufferedDC,PABLROD,c,delete
-Wx::BufferedPaintDC,PABLROD,c,delete
-Wx::BusyCursor,PABLROD,c,delete
-Wx::BusyInfo,PABLROD,c,delete
-Wx::CalendarDateAttr,PABLROD,c,delete
-Wx::CaretSuspend,PABLROD,c,delete
-Wx::ChildFocusEvent,PABLROD,c,delete
-Wx::Choicebook,PABLROD,c,delete
-Wx::ClassInfo,PABLROD,c,delete
-Wx::Clipboard,PABLROD,c,delete
-Wx::ClipboardTextEvent,PABLROD,c,delete
-Wx::CollapsiblePane,PABLROD,c,delete
-Wx::CollapsiblePaneEvent,PABLROD,c,delete
-Wx::ColourData,PABLROD,c,delete
-Wx::ColourDatabase,PABLROD,c,delete
-Wx::ColourPickerCtrl,PABLROD,c,delete
-Wx::ColourPickerEvent,PABLROD,c,delete
-Wx::ComboCtrl,PABLROD,c,delete
-Wx::ComboPopup,PABLROD,c,delete
-Wx::Command,PABLROD,c,delete
-Wx::CommandProcessor,PABLROD,c,delete
-Wx::ConfigBase,PABLROD,c,delete
-Wx::ContextHelp,PABLROD,c,delete
-Wx::ContextMenuEvent,PABLROD,c,delete
-Wx::CURHandler,PABLROD,c,delete
-Wx::DataFormat,PABLROD,c,delete
-Wx::DateSpan,PABLROD,c,delete
-Wx::DCClipper,PABLROD,c,delete
-Wx::DCOverlay,PABLROD,c,delete
-Wx::DirPickerCtrl,PABLROD,c,delete
-Wx::Display,PABLROD,c,delete
-Wx::DocTemplate,PABLROD,c,delete
-Wx::FileConfig,PABLROD,c,delete
-Wx::FileDirPickerEvent,PABLROD,c,delete
-Wx::FileHistory,PABLROD,c,delete
-Wx::FilePickerCtrl,PABLROD,c,delete
-Wx::FileSystem,PABLROD,c,delete
-Wx::FileType,PABLROD,c,delete
-Wx::FileTypeInfo,PABLROD,c,delete
-Wx::FindReplaceData,PABLROD,c,delete
-Wx::FontData,PABLROD,c,delete
-Wx::FontEnumerator,PABLROD,c,delete
-Wx::FontMapper,PABLROD,c,delete
-Wx::FontPickerCtrl,PABLROD,c,delete
-Wx::FontPickerEvent,PABLROD,c,delete
-Wx::FSFile,PABLROD,c,delete
-Wx::GBPosition,PABLROD,c,delete
-Wx::GBSizerItem,PABLROD,c,delete
-Wx::GBSpan,PABLROD,c,delete
-Wx::GCDC,PABLROD,c,delete
-Wx::GenericDirCtrl,PABLROD,c,delete
-Wx::GLContext,PABLROD,c,delete
-Wx::GraphicsContext,PABLROD,c,delete
-Wx::GraphicsMatrix,PABLROD,c,delete
-Wx::GraphicsObject,PABLROD,c,delete
-Wx::GraphicsPath,PABLROD,c,delete
-Wx::GraphicsRenderer,PABLROD,c,delete
-Wx::GridBagSizer,PABLROD,c,delete
-Wx::GridCellAttr,PABLROD,c,delete
-Wx::GridCellCoords,PABLROD,c,delete
-Wx::GridTableMessage,PABLROD,c,delete
-Wx::HelpProvider,PABLROD,c,delete
-Wx::HtmlDCRenderer,PABLROD,c,delete
-Wx::HtmlEasyPrinting,PABLROD,c,delete
-Wx::HtmlLinkInfo,PABLROD,c,delete
-Wx::HtmlPrintout,PABLROD,c,delete
-Wx::HyperlinkCtrl,PABLROD,c,delete
-Wx::HyperlinkEvent,PABLROD,c,delete
-Wx::ICOHandler,PABLROD,c,delete
-Wx::IconBundle,PABLROD,c,delete
-Wx::IconLocation,PABLROD,c,delete
-Wx::IndividualLayoutConstraint,PABLROD,c,delete
-Wx::LanguageInfo,PABLROD,c,delete
-Wx::LayoutConstraints,PABLROD,c,delete
-Wx::Listbook,PABLROD,c,delete
-Wx::ListItem,PABLROD,c,delete
-Wx::ListItemAttr,PABLROD,c,delete
-Wx::LogChain,PABLROD,c,delete
-Wx::LogNull,PABLROD,c,delete
-Wx::LogPassThrough,PABLROD,c,delete
-Wx::LogStderr,PABLROD,c,delete
-Wx::MaximizeEvent,PABLROD,c,delete
-Wx::MemoryFSHandler,PABLROD,c,delete
-Wx::MimeTypesManager,PABLROD,c,delete
-Wx::MirrorDC,PABLROD,c,delete
-Wx::MouseCaptureChangedEvent,PABLROD,c,delete
-Wx::MouseCaptureLostEvent,PABLROD,c,delete
-Wx::NativeFontInfo,PABLROD,c,delete
-Wx::NavigationKeyEvent,PABLROD,c,delete
-Wx::NumberEntryDialog,PABLROD,c,delete
-Wx::Overlay,PABLROD,c,delete
-Wx::OwnerDrawnComboBox,PABLROD,c,delete
-Wx::PageSetupDialogData,PABLROD,c,delete
-Wx::PasswordEntryDialog,PABLROD,c,delete
-Wx::PerlTestAbstractNonObject,PABLROD,c,delete
-Wx::PerlTestAbstractObject,PABLROD,c,delete
-Wx::PerlTestNonObject,PABLROD,c,delete
-Wx::PerlTestObject,PABLROD,c,delete
-Wx::PickerBase,PABLROD,c,delete
-Wx::PlFontEnumerator,PABLROD,c,delete
-Wx::PlLog,PABLROD,c,delete
-Wx::PlLogPassThrough,PABLROD,c,delete
-Wx::PlOwnerDrawnComboBox,PABLROD,c,delete
-Wx::PlPerlTestAbstractNonObject,PABLROD,c,delete
-Wx::PlPerlTestAbstractObject,PABLROD,c,delete
-Wx::PlPerlTestNonObject,PABLROD,c,delete
-Wx::PlPopupTransientWindow,PABLROD,c,delete
-Wx::PlRichTextFileHandler,PABLROD,c,delete
-Wx::PlVListBox,PABLROD,c,delete
-Wx::PlVScrolledWindow,PABLROD,c,delete
-Wx::PlWindow,PABLROD,c,delete
-Wx::Point,PABLROD,c,delete
-Wx::PopupTransientWindow,PABLROD,c,delete
-Wx::PopupWindow,PABLROD,c,delete
-Wx::PrintData,PABLROD,c,delete
-Wx::PrintDialogData,PABLROD,c,delete
-Wx::Printer,PABLROD,c,delete
-Wx::PrintFactory,PABLROD,c,delete
-Wx::PrintPaperDatabase,PABLROD,c,delete
-Wx::PropertySheetDialog,PABLROD,c,delete
-Wx::RegionIterator,PABLROD,c,delete
-Wx::RichTextAttr,PABLROD,c,delete
-Wx::RichTextFileHandler,PABLROD,c,delete
-Wx::RichTextPrintout,PABLROD,c,delete
-Wx::RichTextRange,PABLROD,c,delete
-Wx::RichTextStyleSheet,PABLROD,c,delete
-Wx::ScrollEvent,PABLROD,c,delete
-Wx::SearchCtrl,PABLROD,c,delete
-Wx::SetCursorEvent,PABLROD,c,delete
-Wx::SingleInstanceChecker,PABLROD,c,delete
-Wx::SockAddress,PABLROD,c,delete
-Wx::Sound,PABLROD,c,delete
-Wx::StandardPaths,PABLROD,c,delete
-Wx::StdDialogButtonSizer,PABLROD,c,delete
-Wx::StopWatch,PABLROD,c,delete
-Wx::SystemOptions,PABLROD,c,delete
-Wx::SystemSettings,PABLROD,c,delete
-Wx::TaskBarIconEvent,PABLROD,c,delete
-Wx::TextAttr,PABLROD,c,delete
-Wx::TextCtrlBase,PABLROD,c,delete
-Wx::TGAHandler,PABLROD,c,delete
-Wx::Thread,PABLROD,c,delete
-Wx::TimeSpan,PABLROD,c,delete
-Wx::TipProvider,PABLROD,c,delete
-Wx::Toolbook,PABLROD,c,delete
-Wx::ToolTip,PABLROD,c,delete
-Wx::Treebook,PABLROD,c,delete
-Wx::TreebookEvent,PABLROD,c,delete
-Wx::TreeItemData,PABLROD,c,delete
-Wx::Variant,PABLROD,c,delete
-Wx::VideoMode,PABLROD,c,delete
-Wx::VListBox,PABLROD,c,delete
-Wx::VScrolledWindow,PABLROD,c,delete
-Wx::WindowCreateEvent,PABLROD,c,delete
-Wx::WindowDestroyEvent,PABLROD,c,delete
-Wx::WindowDisabler,PABLROD,c,delete
-Wx::WindowUpdateLocker,PABLROD,c,delete
-Wx::Wizard,PABLROD,c,delete
-Wx::WizardEvent,PABLROD,c,delete
-Wx::WizardPage,PABLROD,c,delete
-Wx::WizardPageSimple,PABLROD,c,delete
-Wx::XmlDocument,PABLROD,c,delete
-Wx::XmlNode,PABLROD,c,delete
-Wx::XmlProperty,PABLROD,c,delete
-Wx::XmlResource,PABLROD,c,delete
-Wx::XmlResourceHandler,PABLROD,c,delete
-Wx::XmlSubclassFactory,PABLROD,c,delete
-XML::LibXML::HashTable,PABLROD,c,delete
-XML::LibXML::LibError,PABLROD,c,delete
-XML::LibXML::ParserContext,PABLROD,c,delete
-XML::LibXSLT::Stylesheet,PABLROD,c,delete
-XML::LibXSLT::TransformContext,PABLROD,c,delete
+# am,PABLROD,c,delete
+# apc,PABLROD,c,delete
+# APR::Request::Hook,PABLROD,c,delete
+# APR::Request::Parser,PABLROD,c,delete
+# arybase::mg,PABLROD,c,delete
+# Authen::Krb5::Address,PABLROD,c,delete
+# Authen::Krb5::Admin::Config,PABLROD,c,delete
+# Authen::Krb5::Admin::Key,PABLROD,c,delete
+# Authen::Krb5::Admin::Policy,PABLROD,c,delete
+# Authen::Krb5::Admin::Principal,PABLROD,c,delete
+# Authen::Krb5::AuthContext,PABLROD,c,delete
+# Authen::Krb5::Ccache,PABLROD,c,delete
+# Authen::Krb5::Creds,PABLROD,c,delete
+# Authen::Krb5::EncTktPart,PABLROD,c,delete
+# Authen::Krb5::Keyblock,PABLROD,c,delete
+# Authen::Krb5::Keytab,PABLROD,c,delete
+# Authen::Krb5::KeytabEntry,PABLROD,c,delete
+# Authen::Krb5::Principal,PABLROD,c,delete
+# Authen::Krb5::Ticket,PABLROD,c,delete
+# B::AV,PABLROD,c,delete
+# B::BINOP,PABLROD,c,delete
+# B::BM,PABLROD,c,delete
+# B::COP,PABLROD,c,delete
+# B::CV,PABLROD,c,delete
+# BDB::Cursor,PABLROD,c,delete
+# BDB::Db,PABLROD,c,delete
+# BDB::Env,PABLROD,c,delete
+# BDB::Sequence,PABLROD,c,delete
+# BDB::Txn,PABLROD,c,delete
+# BerkeleyDB::DbStream,PABLROD,c,delete
+# BerkeleyDB::Sequence,PABLROD,c,delete
+# B::FM,PABLROD,c,delete
+# B::GV,PABLROD,c,delete
+# B::GVOP,PABLROD,c,delete
+# B::HE,PABLROD,c,delete
+# B::Hooks::Toke,PABLROD,c,delete
+# B::HV,PABLROD,c,delete
+# bi,PABLROD,c,delete
+# B::IO,PABLROD,c,delete
+# B::IV,PABLROD,c,delete
+# B::LISTOP,PABLROD,c,delete
+# B::LOGOP,PABLROD,c,delete
+# B::LOOP,PABLROD,c,delete
+# B::MAGIC,PABLROD,c,delete
+# B::METHOP,PABLROD,c,delete
+# B::NV,PABLROD,c,delete
+# B::PADLIST,PABLROD,c,delete
+# B::PADNAME,PABLROD,c,delete
+# B::PADNAMELIST,PABLROD,c,delete
+# B::PADOP,PABLROD,c,delete
+# B::PMOP,PABLROD,c,delete
+# B::PV,PABLROD,c,delete
+# B::PVLV,PABLROD,c,delete
+# B::PVMG,PABLROD,c,delete
+# B::PVOP,PABLROD,c,delete
+# B::REGEXP,PABLROD,c,delete
+# B::RHE,PABLROD,c,delete
+# BSSolv,PABLROD,c,delete
+# BSSolv::expander,PABLROD,c,delete
+# BSSolv::pool,PABLROD,c,delete
+# BSSolv::repo,PABLROD,c,delete
+# B::SV,PABLROD,c,delete
+# B::UNOP,PABLROD,c,delete
+# B::UNOP_AUX,PABLROD,c,delete
+# Cairo::Context,PABLROD,c,delete
+# Cairo::FontFace,PABLROD,c,delete
+# Cairo::FontOptions,PABLROD,c,delete
+# Cairo::Format,PABLROD,c,delete
+# Cairo::FtFontFace,PABLROD,c,delete
+# Cairo::Matrix,PABLROD,c,delete
+# Cairo::Path,PABLROD,c,delete
+# Cairo::Path::Data,PABLROD,c,delete
+# Cairo::Path::Point,PABLROD,c,delete
+# Cairo::Path::Points,PABLROD,c,delete
+# Cairo::Pattern,PABLROD,c,delete
+# Cairo::RecordingSurface,PABLROD,c,delete
+# Cairo::Region,PABLROD,c,delete
+# Cairo::ScaledFont,PABLROD,c,delete
+# Cairo::Surface,PABLROD,c,delete
+# Cairo::SvgSurface,PABLROD,c,delete
+# Cairo::ToyFontFace,PABLROD,c,delete
+# ccom,PABLROD,c,delete
+# CDB_File::Maker,PABLROD,c,delete
+# Cflow,PABLROD,c,delete
+# Cflow::LocalTime,PABLROD,c,delete
+# Chemistry::OpenBabel::AliasData,PABLROD,c,delete
+# Chemistry::OpenBabel::matrix3x3,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBAtomAtomIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBAtomBondIter,PABLROD,c,delete
+# Chemistry::OpenBabel::OBAtomClassData,PABLROD,c,delete
+# Chemistry::OpenBabel::OBAtomHOF,PABLROD,c,delete
+# Chemistry::OpenBabel::OBAtomicHeatOfFormationTable,PABLROD,c,delete
+# Chemistry::OpenBabel::OBBitVec,PABLROD,c,delete
+# Chemistry::OpenBabel::OBBuilder,PABLROD,c,delete
+# Chemistry::OpenBabel::OBDescriptor,PABLROD,c,delete
+# Chemistry::OpenBabel::OBDOSData,PABLROD,c,delete
+# Chemistry::OpenBabel::OBElectronicTransitionData,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFFCalculation2,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFFCalculation3,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFFCalculation4,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFFConstraint,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFFConstraints,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFreeGrid,PABLROD,c,delete
+# Chemistry::OpenBabel::OBFreeGridPoint,PABLROD,c,delete
+# Chemistry::OpenBabel::OBGridData,PABLROD,c,delete
+# Chemistry::OpenBabel::OBMatrixData,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolAngleIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolAtomBFSIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolAtomDFSIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolAtomIter,PABLROD,c,delete
+# Chemistry::OpenBabel::OBMolBondBFSIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolBondIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolPairIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolRingIter,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBMolTorsionIter,PABLROD,c,delete
+# Chemistry::OpenBabel::OBOp,PABLROD,c,delete
+# Chemistry::OpenBabel::OBOrbital,PABLROD,c,delete
+# Chemistry::OpenBabel::OBOrbitalData,PABLROD,c,delete
+# Chemistry::OpenBabel::OBPlugin,PABLROD,c,delete
+# Chemistry::OpenBabel::_OBResidueAtomIter,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotamerList,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotationData,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotor,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotorKeys,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotorList,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotorRule,PABLROD,c,delete
+# Chemistry::OpenBabel::OBRotorRules,PABLROD,c,delete
+# Chemistry::OpenBabel::OBSmartsMatcher,PABLROD,c,delete
+# Chemistry::OpenBabel::OBVectorData,PABLROD,c,delete
+# Chemistry::OpenBabel::rotor_digit,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorOBBond,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorOBMol,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorOBResidue,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorOBRing,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorpOBGenericData,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorpOBRing,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorString,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorVector3,PABLROD,c,delete
+# Chemistry::OpenBabel::VectorVInt,PABLROD,c,delete
+# ci,PABLROD,c,delete
+# Class::MOP::Mixin::HasOverloads,PABLROD,c,delete
+# ClearSilver::CS,PABLROD,c,delete
+# ClearSilver::HDF,PABLROD,c,delete
+# cm,PABLROD,c,delete
+# ColorStruct_t,PABLROD,c,delete
+# Compress::Raw::Lzma::Decoder,PABLROD,c,delete
+# Compress::Raw::Lzma::Encoder,PABLROD,c,delete
+# Compress::Raw::Lzma::Options,PABLROD,c,delete
+# Compress::Raw::Zlib::deflateStream,PABLROD,c,delete
+# Compress::Raw::Zlib::inflateScanStream,PABLROD,c,delete
+# Compress::Raw::Zlib::inflateStream,PABLROD,c,delete
+# Config::AugeasPtr,PABLROD,c,delete
+# Convert::UUlib::Item,PABLROD,c,delete
+# CORE::GLOBAL,PABLROD,c,delete
+# cproton_perl,PABLROD,c,delete
+# cproton_perlc,PABLROD,c,delete
+# CpuInfo_t,PABLROD,c,delete
+# cqpid_perl,PABLROD,c,delete
+# cqpid_perl::Address,PABLROD,c,delete
+# cqpid_perlc,PABLROD,c,delete
+# cqpid_perl::Connection,PABLROD,c,delete
+# cqpid_perl::Duration,PABLROD,c,delete
+# cqpid_perl::Logger,PABLROD,c,delete
+# cqpid_perl::LoggerOutput,PABLROD,c,delete
+# cqpid_perl::Message,PABLROD,c,delete
+# cqpid_perl::Receiver,PABLROD,c,delete
+# cqpid_perl::Sender,PABLROD,c,delete
+# cqpid_perl::Session,PABLROD,c,delete
+# cr,PABLROD,c,delete
+# Crypt::OpenSSL::DSA::Signature,PABLROD,c,delete
+# Crypt::OpenSSL::ECDSA::ECDSA_SIG,PABLROD,c,delete
+# Crypt::OpenSSL::EC::EC_GROUP,PABLROD,c,delete
+# Crypt::OpenSSL::EC::EC_KEY,PABLROD,c,delete
+# Crypt::OpenSSL::EC::EC_POINT,PABLROD,c,delete
+# Crypt::OpenSSL::X509_CRL,PABLROD,c,delete
+# Crypt::OpenSSL::X509::Extension,PABLROD,c,delete
+# Crypt::OpenSSL::X509::Name,PABLROD,c,delete
+# Crypt::OpenSSL::X509::Name_Entry,PABLROD,c,delete
+# Crypt::OpenSSL::X509::ObjectID,PABLROD,c,delete
+# Curses::Vars,PABLROD,c,delete
+# Data::MessagePack::Unpacker,PABLROD,c,delete
+# DBD::FirebirdEmbedded::db,PABLROD,c,delete
+# DBD::FirebirdEmbedded::dr,PABLROD,c,delete
+# DBD::FirebirdEmbedded::Event,PABLROD,c,delete
+# DBD::FirebirdEmbedded::st,PABLROD,c,delete
+# DBD::Firebird::Event,PABLROD,c,delete
+# DBD::_mem::common,PABLROD,c,delete
+# DBD::SQLite2::st,PABLROD,c,delete
+# DBD::SQLite::st,PABLROD,c,delete
+# Devel::Cover::Inc,PABLROD,c,delete
+# Devel::NYTProf::Test,PABLROD,c,delete
+# Device::SerialPort::Bits,PABLROD,c,delete
+# DisplayPtr,PABLROD,c,delete
+# EV::Async,PABLROD,c,delete
+# EV::Check,PABLROD,c,delete
+# EV::Child,PABLROD,c,delete
+# EV::Embed,PABLROD,c,delete
+# Event::Event,PABLROD,c,delete
+# Event::Lib::base,PABLROD,c,delete
+# Event::Lib::Debug,PABLROD,c,delete
+# Event::Lib::event,PABLROD,c,delete
+# Event::Lib::signal,PABLROD,c,delete
+# Event::Lib::timer,PABLROD,c,delete
+# Event_t,PABLROD,c,delete
+# EV::Fork,PABLROD,c,delete
+# EV::Idle,PABLROD,c,delete
+# EV::IO,PABLROD,c,delete
+# EV::Loop,PABLROD,c,delete
+# EV::Periodic,PABLROD,c,delete
+# EV::Prepare,PABLROD,c,delete
+# EV::Signal,PABLROD,c,delete
+# EV::Stat,PABLROD,c,delete
+# EV::Timer,PABLROD,c,delete
+# EV::Watcher,PABLROD,c,delete
+# fdo,PABLROD,c,delete
+# fds,PABLROD,c,delete
+# fe,PABLROD,c,delete
+# FFI::Platypus::ABI,PABLROD,c,delete
+# FFI::Platypus::dl,PABLROD,c,delete
+# FileStat_t,PABLROD,c,delete
+# fitsfilePtr,PABLROD,c,delete
+# Foption_t,PABLROD,c,delete
+# fr,PABLROD,c,delete
+# fs,PABLROD,c,delete
+# fw,PABLROD,c,delete
+# GC,PABLROD,c,delete
+# GCValues_t,PABLROD,c,delete
+# GD::Font,PABLROD,c,delete
+# Glib::BookmarkFile,PABLROD,c,delete
+# Glib::Boxed,PABLROD,c,delete
+# Glib::Child,PABLROD,c,delete
+# Glib::Idle,PABLROD,c,delete
+# Glib::KeyFile,PABLROD,c,delete
+# Glib::Log,PABLROD,c,delete
+# Glib::MainContext,PABLROD,c,delete
+# Glib::MainLoop,PABLROD,c,delete
+# Glib::Markup,PABLROD,c,delete
+# Glib::Object::Introspection::GValueWrapper,PABLROD,c,delete
+# Glib::OptionContext,PABLROD,c,delete
+# Glib::OptionGroup,PABLROD,c,delete
+# Glib::Param::Char,PABLROD,c,delete
+# Glib::Param::Double,PABLROD,c,delete
+# Glib::Param::Enum,PABLROD,c,delete
+# Glib::Param::Flags,PABLROD,c,delete
+# Glib::Param::Float,PABLROD,c,delete
+# Glib::Param::GType,PABLROD,c,delete
+# Glib::Param::Int,PABLROD,c,delete
+# Glib::Param::Int64,PABLROD,c,delete
+# Glib::Param::Long,PABLROD,c,delete
+# Glib::ParamSpec,PABLROD,c,delete
+# Glib::Param::UChar,PABLROD,c,delete
+# Glib::Param::UInt,PABLROD,c,delete
+# Glib::Param::UInt64,PABLROD,c,delete
+# Glib::Param::ULong,PABLROD,c,delete
+# Glib::Source,PABLROD,c,delete
+# Glib::Timeout,PABLROD,c,delete
+# Glib::Type,PABLROD,c,delete
+# Glib::VariantType,PABLROD,c,delete
+# gm,PABLROD,c,delete
+# Gnome2::About,PABLROD,c,delete
+# Gnome2::App,PABLROD,c,delete
+# Gnome2::AppBar,PABLROD,c,delete
+# Gnome2::AuthenticationManager,PABLROD,c,delete
+# Gnome2::Bonobo,PABLROD,c,delete
+# Gnome2::Bonobo::Dock,PABLROD,c,delete
+# Gnome2::Bonobo::DockItem,PABLROD,c,delete
+# Gnome2::Canvas::Bpath,PABLROD,c,delete
+# Gnome2::Canvas::Item,PABLROD,c,delete
+# Gnome2::Canvas::PathDef,PABLROD,c,delete
+# Gnome2::Canvas::RichText,PABLROD,c,delete
+# Gnome2::Canvas::Shape,PABLROD,c,delete
+# Gnome2::Client,PABLROD,c,delete
+# Gnome2::ColorPicker,PABLROD,c,delete
+# Gnome2::Config,PABLROD,c,delete
+# Gnome2::Config::Iterator,PABLROD,c,delete
+# Gnome2::Config::Private,PABLROD,c,delete
+# Gnome2::DateEdit,PABLROD,c,delete
+# Gnome2::Druid,PABLROD,c,delete
+# Gnome2::DruidPage,PABLROD,c,delete
+# Gnome2::DruidPageEdge,PABLROD,c,delete
+# Gnome2::DruidPageStandard,PABLROD,c,delete
+# Gnome2::Entry,PABLROD,c,delete
+# Gnome2::FileEntry,PABLROD,c,delete
+# Gnome2::FontPicker,PABLROD,c,delete
+# Gnome2::GConf::Engine,PABLROD,c,delete
+# Gnome2::GConf::Schema,PABLROD,c,delete
+# Gnome2::Help,PABLROD,c,delete
+# Gnome2::HRef,PABLROD,c,delete
+# Gnome2::I18N,PABLROD,c,delete
+# Gnome2::IconEntry,PABLROD,c,delete
+# Gnome2::IconList,PABLROD,c,delete
+# Gnome2::IconSelection,PABLROD,c,delete
+# Gnome2::IconTextItem,PABLROD,c,delete
+# Gnome2::IconTheme,PABLROD,c,delete
+# Gnome2::ModuleInfo,PABLROD,c,delete
+# Gnome2::Pango::Language,PABLROD,c,delete
+# Gnome2::PasswordDialog,PABLROD,c,delete
+# Gnome2::PixmapEntry,PABLROD,c,delete
+# Gnome2::PopupMenu,PABLROD,c,delete
+# Gnome2::Program,PABLROD,c,delete
+# Gnome2::Score,PABLROD,c,delete
+# Gnome2::Scores,PABLROD,c,delete
+# Gnome2::Sound,PABLROD,c,delete
+# Gnome2::ThumbnailFactory,PABLROD,c,delete
+# Gnome2::UIDefs,PABLROD,c,delete
+# Gnome2::URL,PABLROD,c,delete
+# Gnome2::Util,PABLROD,c,delete
+# Gnome2::VFS::Address,PABLROD,c,delete
+# Gnome2::VFS::Application,PABLROD,c,delete
+# Gnome2::VFS::ApplicationRegistry,PABLROD,c,delete
+# Gnome2::VFS::Async,PABLROD,c,delete
+# Gnome2::VFS::Async::Handle,PABLROD,c,delete
+# Gnome2::VFS::Directory,PABLROD,c,delete
+# Gnome2::VFS::Directory::Handle,PABLROD,c,delete
+# Gnome2::VFS::DNSSD,PABLROD,c,delete
+# Gnome2::VFS::DNSSD::Browse::Handle,PABLROD,c,delete
+# Gnome2::VFS::DNSSD::Resolve::Handle,PABLROD,c,delete
+# Gnome2::VFS::Drive,PABLROD,c,delete
+# Gnome2::VFS::FileInfo,PABLROD,c,delete
+# Gnome2::VFS::Handle,PABLROD,c,delete
+# Gnome2::VFS::Mime,PABLROD,c,delete
+# Gnome2::VFS::Mime::Application,PABLROD,c,delete
+# Gnome2::VFS::Mime::Monitor,PABLROD,c,delete
+# Gnome2::VFS::Mime::Type,PABLROD,c,delete
+# Gnome2::VFS::Monitor,PABLROD,c,delete
+# Gnome2::VFS::Monitor::Handle,PABLROD,c,delete
+# Gnome2::VFS::Resolve::Handle,PABLROD,c,delete
+# Gnome2::VFS::URI,PABLROD,c,delete
+# Gnome2::VFS::Volume,PABLROD,c,delete
+# Gnome2::VFS::VolumeMonitor,PABLROD,c,delete
+# Gnome2::VFS::Xfer,PABLROD,c,delete
+# Gnome2::Vte::Terminal,PABLROD,c,delete
+# Gnome2::WindowIcon,PABLROD,c,delete
+# Gnome2::Wnck::Application,PABLROD,c,delete
+# Gnome2::Wnck::ClassGroup,PABLROD,c,delete
+# Gnome2::Wnck::Pager,PABLROD,c,delete
+# Gnome2::Wnck::Screen,PABLROD,c,delete
+# Gnome2::Wnck::Selector,PABLROD,c,delete
+# Gnome2::Wnck::Tasklist,PABLROD,c,delete
+# Gnome2::Wnck::Window,PABLROD,c,delete
+# Gnome2::Wnck::Workspace,PABLROD,c,delete
+# Goo::Cairo::Matrix,PABLROD,c,delete
+# Goo::Cairo::Pattern,PABLROD,c,delete
+# Goo::Canvas::Bounds,PABLROD,c,delete
+# Goo::Canvas::Ellipse,PABLROD,c,delete
+# Goo::Canvas::EllipseModel,PABLROD,c,delete
+# Goo::Canvas::Group,PABLROD,c,delete
+# Goo::Canvas::GroupModel,PABLROD,c,delete
+# Goo::Canvas::Image,PABLROD,c,delete
+# Goo::Canvas::ImageModel,PABLROD,c,delete
+# Goo::Canvas::Item,PABLROD,c,delete
+# Goo::Canvas::ItemModel,PABLROD,c,delete
+# Goo::Canvas::ItemSimple,PABLROD,c,delete
+# Goo::Canvas::LineDash,PABLROD,c,delete
+# Goo::Canvas::Path,PABLROD,c,delete
+# Goo::Canvas::PathModel,PABLROD,c,delete
+# Goo::Canvas::Points,PABLROD,c,delete
+# Goo::Canvas::Polyline,PABLROD,c,delete
+# Goo::Canvas::PolylineModel,PABLROD,c,delete
+# Goo::Canvas::Rect,PABLROD,c,delete
+# Goo::Canvas::RectModel,PABLROD,c,delete
+# Goo::Canvas::Style,PABLROD,c,delete
+# Goo::Canvas::Table,PABLROD,c,delete
+# Goo::Canvas::TableModel,PABLROD,c,delete
+# Goo::Canvas::Text,PABLROD,c,delete
+# Goo::Canvas::TextModel,PABLROD,c,delete
+# Goo::Canvas::Widget,PABLROD,c,delete
+# GslAccelPtr,PABLROD,c,delete
+# GslSplinePtr,PABLROD,c,delete
+# GSSAPI::Binding,PABLROD,c,delete
+# GSSAPI::Context,PABLROD,c,delete
+# GSSAPI::Cred,PABLROD,c,delete
+# GSSAPI::Name,PABLROD,c,delete
+# GStreamer::Bin,PABLROD,c,delete
+# GStreamer::Buffer,PABLROD,c,delete
+# GStreamer::Bus,PABLROD,c,delete
+# GStreamer::Caps::Any,PABLROD,c,delete
+# GStreamer::Caps::Empty,PABLROD,c,delete
+# GStreamer::Caps::Full,PABLROD,c,delete
+# GStreamer::Caps::Simple,PABLROD,c,delete
+# GStreamer::ChildProxy,PABLROD,c,delete
+# GStreamer::Clock,PABLROD,c,delete
+# GStreamer::ClockID,PABLROD,c,delete
+# GStreamer::Element,PABLROD,c,delete
+# GStreamer::ElementFactory,PABLROD,c,delete
+# GStreamer::Event,PABLROD,c,delete
+# GStreamer::Event::BufferSize,PABLROD,c,delete
+# GStreamer::Event::Custom,PABLROD,c,delete
+# GStreamer::Event::EOS,PABLROD,c,delete
+# GStreamer::Event::FlushStart,PABLROD,c,delete
+# GStreamer::Event::FlushStop,PABLROD,c,delete
+# GStreamer::Event::Navigation,PABLROD,c,delete
+# GStreamer::Event::NewSegment,PABLROD,c,delete
+# GStreamer::Event::QOS,PABLROD,c,delete
+# GStreamer::Event::Seek,PABLROD,c,delete
+# GStreamer::Event::Tag,PABLROD,c,delete
+# GStreamer::Format,PABLROD,c,delete
+# GStreamer::GhostPad,PABLROD,c,delete
+# GStreamer::Index,PABLROD,c,delete
+# GStreamer::IndexEntry,PABLROD,c,delete
+# GStreamer::IndexFactory,PABLROD,c,delete
+# GStreamer::Iterator,PABLROD,c,delete
+# GStreamer::Iterator::Tie,PABLROD,c,delete
+# GStreamer::Message,PABLROD,c,delete
+# GStreamer::Message::Application,PABLROD,c,delete
+# GStreamer::Message::AsyncDone,PABLROD,c,delete
+# GStreamer::Message::AsyncStart,PABLROD,c,delete
+# GStreamer::Message::ClockLost,PABLROD,c,delete
+# GStreamer::Message::ClockProvide,PABLROD,c,delete
+# GStreamer::Message::Custom,PABLROD,c,delete
+# GStreamer::Message::Duration,PABLROD,c,delete
+# GStreamer::Message::Element,PABLROD,c,delete
+# GStreamer::Message::EOS,PABLROD,c,delete
+# GStreamer::Message::Error,PABLROD,c,delete
+# GStreamer::Message::Latency,PABLROD,c,delete
+# GStreamer::Message::NewClock,PABLROD,c,delete
+# GStreamer::Message::SegmentDone,PABLROD,c,delete
+# GStreamer::Message::SegmentStart,PABLROD,c,delete
+# GStreamer::Message::StateChanged,PABLROD,c,delete
+# GStreamer::Message::StateDirty,PABLROD,c,delete
+# GStreamer::Message::Tag,PABLROD,c,delete
+# GStreamer::Message::Warning,PABLROD,c,delete
+# GStreamer::MiniObject,PABLROD,c,delete
+# GStreamer::Object,PABLROD,c,delete
+# GStreamer::Pad,PABLROD,c,delete
+# GStreamer::PadTemplate,PABLROD,c,delete
+# GStreamer::Pipeline,PABLROD,c,delete
+# GStreamer::Plugin,PABLROD,c,delete
+# GStreamer::PluginFeature,PABLROD,c,delete
+# GStreamer::PropertyProbe,PABLROD,c,delete
+# GStreamer::Query,PABLROD,c,delete
+# GStreamer::Query::Application,PABLROD,c,delete
+# GStreamer::Query::Convert,PABLROD,c,delete
+# GStreamer::Query::Duration,PABLROD,c,delete
+# GStreamer::Query::Position,PABLROD,c,delete
+# GStreamer::Query::Segment,PABLROD,c,delete
+# GStreamer::QueryType,PABLROD,c,delete
+# GStreamer::Registry,PABLROD,c,delete
+# GStreamer::Structure,PABLROD,c,delete
+# GStreamer::SystemClock,PABLROD,c,delete
+# GStreamer::Tag,PABLROD,c,delete
+# GStreamer::TagSetter,PABLROD,c,delete
+# GStreamer::TypeFindFactory,PABLROD,c,delete
+# GStreamer::XOverlay,PABLROD,c,delete
+# gt,PABLROD,c,delete
+# Gtk2::AboutDialog,PABLROD,c,delete
+# Gtk2::Accelerator,PABLROD,c,delete
+# Gtk2::AccelGroups,PABLROD,c,delete
+# Gtk2::Action,PABLROD,c,delete
+# Gtk2::ActionGroup,PABLROD,c,delete
+# Gtk2::Activatable,PABLROD,c,delete
+# Gtk2::Assistant,PABLROD,c,delete
+# Gtk2::Buildable,PABLROD,c,delete
+# Gtk2::Buildable::ParseContext,PABLROD,c,delete
+# Gtk2::CellLayout,PABLROD,c,delete
+# Gtk2::CellRendererAccel,PABLROD,c,delete
+# Gtk2::CellRendererCombo,PABLROD,c,delete
+# Gtk2::CellRendererProgress,PABLROD,c,delete
+# Gtk2::CellRendererSpin,PABLROD,c,delete
+# Gtk2::CellRendererSpinner,PABLROD,c,delete
+# Gtk2::CellView,PABLROD,c,delete
+# Gtk2::ColorButton,PABLROD,c,delete
+# Gtk2::ComboBox,PABLROD,c,delete
+# Gtk2::ComboBoxEntry,PABLROD,c,delete
+# Gtk2::Drag,PABLROD,c,delete
+# Gtk2::EntryBuffer,PABLROD,c,delete
+# Gtk2::EntryCompletion,PABLROD,c,delete
+# Gtk2::Expander,PABLROD,c,delete
+# Gtk2::FileChooser,PABLROD,c,delete
+# Gtk2::FileChooserButton,PABLROD,c,delete
+# Gtk2::FileChooserDialog,PABLROD,c,delete
+# Gtk2::FileChooserWidget,PABLROD,c,delete
+# Gtk2::FileFilter,PABLROD,c,delete
+# Gtk2::FontButton,PABLROD,c,delete
+# Gtk2::Gdk::Cairo::Context,PABLROD,c,delete
+# Gtk2::Gdk::Device,PABLROD,c,delete
+# Gtk2::Gdk::Display,PABLROD,c,delete
+# Gtk2::Gdk::DisplayManager,PABLROD,c,delete
+# Gtk2::Gdk::DragContext,PABLROD,c,delete
+# Gtk2::Gdk::Event::GrabBroken,PABLROD,c,delete
+# Gtk2::Gdk::Event::OwnerChange,PABLROD,c,delete
+# Gtk2::Gdk::Geometry,PABLROD,c,delete
+# Gtk2::Gdk::Image,PABLROD,c,delete
+# Gtk2::Gdk::Input,PABLROD,c,delete
+# Gtk2::Gdk::Pango::AttrEmbossColor,PABLROD,c,delete
+# Gtk2::Gdk::Pango::AttrEmbossed,PABLROD,c,delete
+# Gtk2::Gdk::Pango::AttrStipple,PABLROD,c,delete
+# Gtk2::Gdk::PangoRenderer,PABLROD,c,delete
+# Gtk2::Gdk::PixbufAnimation,PABLROD,c,delete
+# Gtk2::Gdk::PixbufAnimationIter,PABLROD,c,delete
+# Gtk2::Gdk::Pixbuf::Draw::Cache,PABLROD,c,delete
+# Gtk2::Gdk::PixbufFormat,PABLROD,c,delete
+# Gtk2::Gdk::PixbufLoader,PABLROD,c,delete
+# Gtk2::Gdk::PixbufSimpleAnim,PABLROD,c,delete
+# Gtk2::Gdk::Region,PABLROD,c,delete
+# Gtk2::Gdk::Rgb,PABLROD,c,delete
+# Gtk2::Gdk::Screen,PABLROD,c,delete
+# Gtk2::Gdk::Threads,PABLROD,c,delete
+# Gtk2::Gdk::X11,PABLROD,c,delete
+# Gtk2::Glade,PABLROD,c,delete
+# Gtk2::IconInfo,PABLROD,c,delete
+# Gtk2::IconSet,PABLROD,c,delete
+# Gtk2::IconSize,PABLROD,c,delete
+# Gtk2::IconSource,PABLROD,c,delete
+# Gtk2::IconTheme,PABLROD,c,delete
+# Gtk2::IconView,PABLROD,c,delete
+# Gtk2::ImageView::Anim,PABLROD,c,delete
+# Gtk2::ImageView::Nav,PABLROD,c,delete
+# Gtk2::ImageView::ScrollWin,PABLROD,c,delete
+# Gtk2::ImageView::Tool,PABLROD,c,delete
+# Gtk2::ImageView::Tool::Dragger,PABLROD,c,delete
+# Gtk2::ImageView::Tool::Painter,PABLROD,c,delete
+# Gtk2::ImageView::Tool::Selector,PABLROD,c,delete
+# Gtk2::ImageView::Zoom,PABLROD,c,delete
+# Gtk2::InfoBar,PABLROD,c,delete
+# Gtk2::LinkButton,PABLROD,c,delete
+# Gtk2::MenuToolButton,PABLROD,c,delete
+# Gtk2::OffscreenWindow,PABLROD,c,delete
+# Gtk2::Orientable,PABLROD,c,delete
+# Gtk2::PageSetup,PABLROD,c,delete
+# Gtk2::Pango::AttrBackground,PABLROD,c,delete
+# Gtk2::Pango::AttrColor,PABLROD,c,delete
+# Gtk2::Pango::AttrFallback,PABLROD,c,delete
+# Gtk2::Pango::AttrFamily,PABLROD,c,delete
+# Gtk2::Pango::AttrFontDesc,PABLROD,c,delete
+# Gtk2::Pango::AttrForeground,PABLROD,c,delete
+# Gtk2::Pango::AttrGravity,PABLROD,c,delete
+# Gtk2::Pango::AttrGravityHint,PABLROD,c,delete
+# Gtk2::Pango::Attribute,PABLROD,c,delete
+# Gtk2::Pango::AttrInt,PABLROD,c,delete
+# Gtk2::Pango::AttrIterator,PABLROD,c,delete
+# Gtk2::Pango::AttrLanguage,PABLROD,c,delete
+# Gtk2::Pango::AttrLetterSpacing,PABLROD,c,delete
+# Gtk2::Pango::AttrList,PABLROD,c,delete
+# Gtk2::Pango::AttrRise,PABLROD,c,delete
+# Gtk2::Pango::AttrScale,PABLROD,c,delete
+# Gtk2::Pango::AttrShape,PABLROD,c,delete
+# Gtk2::Pango::AttrSize,PABLROD,c,delete
+# Gtk2::Pango::AttrStretch,PABLROD,c,delete
+# Gtk2::Pango::AttrStrikethrough,PABLROD,c,delete
+# Gtk2::Pango::AttrStrikethroughColor,PABLROD,c,delete
+# Gtk2::Pango::AttrString,PABLROD,c,delete
+# Gtk2::Pango::AttrStyle,PABLROD,c,delete
+# Gtk2::Pango::AttrUnderline,PABLROD,c,delete
+# Gtk2::Pango::AttrUnderlineColor,PABLROD,c,delete
+# Gtk2::Pango::AttrVariant,PABLROD,c,delete
+# Gtk2::Pango::AttrWeight,PABLROD,c,delete
+# Gtk2::Pango::Cairo,PABLROD,c,delete
+# Gtk2::Pango::Cairo::Context,PABLROD,c,delete
+# Gtk2::Pango::Cairo::Font,PABLROD,c,delete
+# Gtk2::Pango::Cairo::FontMap,PABLROD,c,delete
+# Gtk2::Pango::Color,PABLROD,c,delete
+# Gtk2::Pango::Font,PABLROD,c,delete
+# Gtk2::Pango::FontFace,PABLROD,c,delete
+# Gtk2::Pango::FontFamily,PABLROD,c,delete
+# Gtk2::Pango::FontMap,PABLROD,c,delete
+# Gtk2::Pango::Fontset,PABLROD,c,delete
+# Gtk2::Pango::Gravity,PABLROD,c,delete
+# Gtk2::Pango::LayoutIter,PABLROD,c,delete
+# Gtk2::Pango::LayoutLine,PABLROD,c,delete
+# Gtk2::Pango::Matrix,PABLROD,c,delete
+# Gtk2::Pango::Renderer,PABLROD,c,delete
+# Gtk2::Pango::Script,PABLROD,c,delete
+# Gtk2::Pango::ScriptIter,PABLROD,c,delete
+# Gtk2::Pango::TabArray,PABLROD,c,delete
+# Gtk2::PaperSize,PABLROD,c,delete
+# Gtk2::Print,PABLROD,c,delete
+# Gtk2::PrintContext,PABLROD,c,delete
+# Gtk2::PrintOperation,PABLROD,c,delete
+# Gtk2::PrintOperationPreview,PABLROD,c,delete
+# Gtk2::PrintSettings,PABLROD,c,delete
+# Gtk2::RadioAction,PABLROD,c,delete
+# Gtk2::RadioToolButton,PABLROD,c,delete
+# Gtk2::RcStyle,PABLROD,c,delete
+# Gtk2::RecentAction,PABLROD,c,delete
+# Gtk2::RecentChooser,PABLROD,c,delete
+# Gtk2::RecentChooserDialog,PABLROD,c,delete
+# Gtk2::RecentChooserMenu,PABLROD,c,delete
+# Gtk2::RecentChooserWidget,PABLROD,c,delete
+# Gtk2::RecentFilter,PABLROD,c,delete
+# Gtk2::RecentInfo,PABLROD,c,delete
+# Gtk2::RecentManager,PABLROD,c,delete
+# Gtk2::ScaleButton,PABLROD,c,delete
+# Gtk2::Selection,PABLROD,c,delete
+# Gtk2::SeparatorToolItem,PABLROD,c,delete
+# Gtk2::Sexy::IconEntry,PABLROD,c,delete
+# Gtk2::Sexy::SpellEntry,PABLROD,c,delete
+# Gtk2::Sexy::Tooltip,PABLROD,c,delete
+# Gtk2::Sexy::TreeView,PABLROD,c,delete
+# Gtk2::Sexy::UrlLabel,PABLROD,c,delete
+# Gtk2::SourceView2::Buffer,PABLROD,c,delete
+# Gtk2::SourceView2::Iter,PABLROD,c,delete
+# Gtk2::SourceView2::Language,PABLROD,c,delete
+# Gtk2::SourceView2::LanguageManager,PABLROD,c,delete
+# Gtk2::SourceView2::Mark,PABLROD,c,delete
+# Gtk2::SourceView2::PrintCompositor,PABLROD,c,delete
+# Gtk2::SourceView2::Style,PABLROD,c,delete
+# Gtk2::SourceView2::StyleScheme,PABLROD,c,delete
+# Gtk2::SourceView2::StyleSchemeManager,PABLROD,c,delete
+# Gtk2::SourceView2::View,PABLROD,c,delete
+# Gtk2::Spinner,PABLROD,c,delete
+# Gtk2::StatusIcon,PABLROD,c,delete
+# Gtk2::TargetList,PABLROD,c,delete
+# Gtk2::TextAttributes,PABLROD,c,delete
+# Gtk2::TextChildAnchor,PABLROD,c,delete
+# Gtk2::ToggleAction,PABLROD,c,delete
+# Gtk2::ToggleToolButton,PABLROD,c,delete
+# Gtk2::ToolButton,PABLROD,c,delete
+# Gtk2::ToolItem,PABLROD,c,delete
+# Gtk2::ToolItemGroup,PABLROD,c,delete
+# Gtk2::ToolPalette,PABLROD,c,delete
+# Gtk2::ToolShell,PABLROD,c,delete
+# Gtk2::Tooltip,PABLROD,c,delete
+# Gtk2::TreeDragDest,PABLROD,c,delete
+# Gtk2::TreeDragSource,PABLROD,c,delete
+# Gtk2::TreeModelFilter,PABLROD,c,delete
+# Gtk2::TreeRowReference,PABLROD,c,delete
+# Gtk2::TreeSortable,PABLROD,c,delete
+# Gtk2::UIManager,PABLROD,c,delete
+# Gtk2::UniqueApp,PABLROD,c,delete
+# Gtk2::UniqueBackend,PABLROD,c,delete
+# Gtk2::UniqueMessageData,PABLROD,c,delete
+# Gtk2::WebKit::Download,PABLROD,c,delete
+# Gtk2::WebKit::GeolocationPolicyDecision,PABLROD,c,delete
+# Gtk2::WebKit::NetworkRequest,PABLROD,c,delete
+# Gtk2::WebKit::NetworkResponse,PABLROD,c,delete
+# Gtk2::WebKit::SecurityOrigin,PABLROD,c,delete
+# Gtk2::WebKit::WebBackForwardList,PABLROD,c,delete
+# Gtk2::WebKit::WebDatabase,PABLROD,c,delete
+# Gtk2::WebKit::WebDataSource,PABLROD,c,delete
+# Gtk2::WebKit::WebFrame,PABLROD,c,delete
+# Gtk2::WebKit::WebHistoryItem,PABLROD,c,delete
+# Gtk2::WebKit::WebInspector,PABLROD,c,delete
+# Gtk2::WebKit::WebNavigationAction,PABLROD,c,delete
+# Gtk2::WebKit::WebPolicyDecision,PABLROD,c,delete
+# Gtk2::WebKit::WebResource,PABLROD,c,delete
+# Gtk2::WebKit::WebSettings,PABLROD,c,delete
+# Gtk2::WebKit::WebView,PABLROD,c,delete
+# Gtk2::WebKit::WebWindowFeatures,PABLROD,c,delete
+# Gtk2::WindowGroup,PABLROD,c,delete
+# GTop::Cpu,PABLROD,c,delete
+# GTop::Fsusage,PABLROD,c,delete
+# GTop::Loadavg,PABLROD,c,delete
+# GTop::MapEntry,PABLROD,c,delete
+# GTop::Mem,PABLROD,c,delete
+# GTop::Mountentry,PABLROD,c,delete
+# GTop::Mountlist,PABLROD,c,delete
+# GTop::Netload,PABLROD,c,delete
+# GTop::ProcArgs,PABLROD,c,delete
+# GTop::Proclist,PABLROD,c,delete
+# GTop::ProcMap,PABLROD,c,delete
+# GTop::ProcMem,PABLROD,c,delete
+# GTop::ProcSegment,PABLROD,c,delete
+# GTop::ProcState,PABLROD,c,delete
+# GTop::ProcTime,PABLROD,c,delete
+# GTop::ProcUid,PABLROD,c,delete
+# GTop::Swap,PABLROD,c,delete
+# GTop::Uptime,PABLROD,c,delete
+# gui,PABLROD,c,delete
+# Hamlib,PABLROD,c,delete
+# Hamlibc,PABLROD,c,delete
+# Hamlib::cal_table,PABLROD,c,delete
+# Hamlib::cal_table_table,PABLROD,c,delete
+# Hamlib::chan_list,PABLROD,c,delete
+# Hamlib::channel,PABLROD,c,delete
+# Hamlib::channelArray,PABLROD,c,delete
+# Hamlib::channel_cap,PABLROD,c,delete
+# Hamlib::confparams,PABLROD,c,delete
+# Hamlib::confparams_u,PABLROD,c,delete
+# Hamlib::confparams_u_c,PABLROD,c,delete
+# Hamlib::confparams_u_n,PABLROD,c,delete
+# Hamlib::ext_list,PABLROD,c,delete
+# Hamlib::filter_list,PABLROD,c,delete
+# Hamlib::freq_range_t,PABLROD,c,delete
+# Hamlib::gran,PABLROD,c,delete
+# Hamlib::hamlib_port_parm,PABLROD,c,delete
+# Hamlib::hamlib_port_parm_cm108,PABLROD,c,delete
+# Hamlib::hamlib_port_parm_parallel,PABLROD,c,delete
+# Hamlib::hamlib_port_parm_serial,PABLROD,c,delete
+# Hamlib::hamlib_port_parm_usb,PABLROD,c,delete
+# Hamlib::hamlib_port_post_write_date,PABLROD,c,delete
+# Hamlib::hamlib_port_t,PABLROD,c,delete
+# Hamlib::hamlib_port_type,PABLROD,c,delete
+# Hamlib::rig,PABLROD,c,delete
+# Hamlib::rig_callbacks,PABLROD,c,delete
+# Hamlib::rig_caps,PABLROD,c,delete
+# Hamlib::rig_state,PABLROD,c,delete
+# Hamlib::rot,PABLROD,c,delete
+# Hamlib::rot_caps,PABLROD,c,delete
+# Hamlib::rot_state,PABLROD,c,delete
+# Hamlib::toneArray,PABLROD,c,delete
+# Hamlib::tuning_step_list,PABLROD,c,delete
+# Hamlib::value_t,PABLROD,c,delete
+# HTTP::Soup::Buffer,PABLROD,c,delete
+# HTTP::Soup::Cookie,PABLROD,c,delete
+# HTTP::Soup::Message,PABLROD,c,delete
+# HTTP::Soup::MessageBody,PABLROD,c,delete
+# HTTP::Soup::Session,PABLROD,c,delete
+# HTTP::Soup::SessionAsync,PABLROD,c,delete
+# ict,PABLROD,c,delete
+# im,PABLROD,c,delete
+# Image::Magick::Q16,PABLROD,c,delete
+# Imager::Context,PABLROD,c,delete
+# Imager::FillHandle,PABLROD,c,delete
+# Imager::Font::FT2x,PABLROD,c,delete
+# Imager::Font::T1xs,PABLROD,c,delete
+# Imager::ImgRaw,PABLROD,c,delete
+# Imager::Internal::Hlines,PABLROD,c,delete
+# IO::AIO::GRP,PABLROD,c,delete
+# IO::AIO::REQ,PABLROD,c,delete
+# IO::AIO::WD,PABLROD,c,delete
+# is,PABLROD,c,delete
+# kb,PABLROD,c,delete
+# km,PABLROD,c,delete
+# le,PABLROD,c,delete
+# Libnodeupdown,PABLROD,c,delete
+# Lingua::Stem::Snowball::Stemmifier,PABLROD,c,delete
+# List::MoreUtils_ea,PABLROD,c,delete
+# List::MoreUtils_na,PABLROD,c,delete
+# lj,PABLROD,c,delete
+# lp,PABLROD,c,delete
+# Lucy::Autobinding,PABLROD,c,delete
+# Lucy::Index::BitVecDelDocs,PABLROD,c,delete
+# Lucy::Index::DefaultDeletionsReader,PABLROD,c,delete
+# Lucy::Index::DefaultDeletionsWriter,PABLROD,c,delete
+# Lucy::Index::DefaultDocReader,PABLROD,c,delete
+# Lucy::Index::DefaultHighlightReader,PABLROD,c,delete
+# Lucy::Index::DefaultLexiconReader,PABLROD,c,delete
+# Lucy::Index::DefaultPostingListReader,PABLROD,c,delete
+# Lucy::Index::DefaultSortReader,PABLROD,c,delete
+# Lucy::Index::Inverter::InverterEntry,PABLROD,c,delete
+# Lucy::Index::LexIndex,PABLROD,c,delete
+# Lucy::Index::PolyDeletionsReader,PABLROD,c,delete
+# Lucy::Index::PolyDocReader,PABLROD,c,delete
+# Lucy::Index::PolyHighlightReader,PABLROD,c,delete
+# Lucy::Index::PolyLexiconReader,PABLROD,c,delete
+# Lucy::Index::Posting::MatchPostingMatcher,PABLROD,c,delete
+# Lucy::Index::Posting::MatchPostingWriter,PABLROD,c,delete
+# Lucy::Index::PostingPool,PABLROD,c,delete
+# Lucy::Index::Posting::RawPostingWriter,PABLROD,c,delete
+# Lucy::Index::Posting::ScorePostingMatcher,PABLROD,c,delete
+# Lucy::Index::RawLexicon,PABLROD,c,delete
+# Lucy::Index::RawPosting,PABLROD,c,delete
+# Lucy::Index::RawPostingList,PABLROD,c,delete
+# Lucy::Index::SegLexQueue,PABLROD,c,delete
+# Lucy::Index::SkipStepper,PABLROD,c,delete
+# Lucy::Index::SortCache::NumericSortCache,PABLROD,c,delete
+# Lucy::Index::SortCache::TextSortCache,PABLROD,c,delete
+# Lucy::Index::SortFieldWriter,PABLROD,c,delete
+# Lucy::Index::SortFieldWriter::ZombieKeyedHash,PABLROD,c,delete
+# Lucy::Index::TermStepper,PABLROD,c,delete
+# Lucy::Object::BoolNum,PABLROD,c,delete
+# Lucy::Object::Float32,PABLROD,c,delete
+# Lucy::Object::Float64,PABLROD,c,delete
+# Lucy::Object::FloatNum,PABLROD,c,delete
+# Lucy::Object::Hash::HashTombStone,PABLROD,c,delete
+# Lucy::Object::Integer32,PABLROD,c,delete
+# Lucy::Object::Integer64,PABLROD,c,delete
+# Lucy::Object::IntNum,PABLROD,c,delete
+# Lucy::Plan::NumericType,PABLROD,c,delete
+# Lucy::QueryParser::ParserClause,PABLROD,c,delete
+# Lucy::QueryParser::ParserToken,PABLROD,c,delete
+# Lucy::Search::ANDCompiler,PABLROD,c,delete
+# Lucy::Search::Collector::OffsetCollector,PABLROD,c,delete
+# Lucy::Search::MatchAllCompiler,PABLROD,c,delete
+# Lucy::Search::MatchAllMatcher,PABLROD,c,delete
+# Lucy::Search::NoMatchCompiler,PABLROD,c,delete
+# Lucy::Search::NoMatchMatcher,PABLROD,c,delete
+# Lucy::Search::NOTCompiler,PABLROD,c,delete
+# Lucy::Search::ORCompiler,PABLROD,c,delete
+# Lucy::Search::ORMatcher,PABLROD,c,delete
+# Lucy::Search::PhraseCompiler,PABLROD,c,delete
+# Lucy::Search::PhraseMatcher,PABLROD,c,delete
+# Lucy::Search::PolyMatcher,PABLROD,c,delete
+# Lucy::Search::RangeCompiler,PABLROD,c,delete
+# Lucy::Search::RangeMatcher,PABLROD,c,delete
+# Lucy::Search::RequiredOptionalCompiler,PABLROD,c,delete
+# Lucy::Search::SeriesMatcher,PABLROD,c,delete
+# Lucy::Search::TermCompiler,PABLROD,c,delete
+# Lucy::Search::TermMatcher,PABLROD,c,delete
+# Lucy::Store::CompoundFileReader,PABLROD,c,delete
+# Lucy::Store::CompoundFileWriter,PABLROD,c,delete
+# Lucy::Store::DirHandle,PABLROD,c,delete
+# Lucy::Store::FSDirHandle,PABLROD,c,delete
+# Lucy::Store::LockFileLock,PABLROD,c,delete
+# Lucy::Store::MockFileHandle,PABLROD,c,delete
+# Lucy::Store::SharedLock,PABLROD,c,delete
+# Lucy::Test::Analysis::DummyAnalyzer,PABLROD,c,delete
+# Lucy::Test::Object::StupidHashCharBuf,PABLROD,c,delete
+# Lucy::Test::Plan::TestArchitecture,PABLROD,c,delete
+# Lucy::Test::Search::TestQueryParser,PABLROD,c,delete
+# Lucy::Test::Search::TestQueryParserSyntax,PABLROD,c,delete
+# Lucy::Test::TestSchema,PABLROD,c,delete
+# Lucy::Test::TestUtils,PABLROD,c,delete
+# Lucy::Test::Util::NumPriorityQueue,PABLROD,c,delete
+# LucyX::Search::ProximityCompiler,PABLROD,c,delete
+# LucyX::Search::ProximityMatcher,PABLROD,c,delete
+# Lzma::Filter,PABLROD,c,delete
+# Lzma::Filter::BCJ,PABLROD,c,delete
+# Lzma::Filter::Delta,PABLROD,c,delete
+# Lzma::Filter::Lzma,PABLROD,c,delete
+# Mail::Transport::Dbx::Email,PABLROD,c,delete
+# Mail::Transport::Dbx::Folder,PABLROD,c,delete
+# Mail::Transport::Dbx::folder_info,PABLROD,c,delete
+# Marpa::Grammar,PABLROD,c,delete
+# Marpa::Recognizer,PABLROD,c,delete
+# Marpa::XS,PABLROD,c,delete
+# Marpa::XS::Internal::G_C,PABLROD,c,delete
+# Marpa::XS::Internal::R_C,PABLROD,c,delete
+# Math::Random::MT::Auto::_,PABLROD,c,delete
+# mb,PABLROD,c,delete
+# MeCabc,PABLROD,c,delete
+# MeCab::DictionaryInfo,PABLROD,c,delete
+# MeCab::Lattice,PABLROD,c,delete
+# MeCab::Model,PABLROD,c,delete
+# MeCab::Node,PABLROD,c,delete
+# MeCab::Path,PABLROD,c,delete
+# MeCab::Tagger,PABLROD,c,delete
+# MemInfo_t,PABLROD,c,delete
+# Mouse::Meta::Method::Accessor::XS,PABLROD,c,delete
+# Mouse::Meta::Method::Constructor::XS,PABLROD,c,delete
+# Mouse::Meta::Method::Destructor::XS,PABLROD,c,delete
+# Net::DBus::Binding::C::Connection,PABLROD,c,delete
+# Net::DBus::Binding::C::Message,PABLROD,c,delete
+# Net::DBus::Binding::C::PendingCall,PABLROD,c,delete
+# Net::DBus::Binding::C::Server,PABLROD,c,delete
+# Net::DBus::Binding::C::Timeout,PABLROD,c,delete
+# Net::DBus::Binding::C::Watch,PABLROD,c,delete
+# NetSNMP::agent::netsnmp_agent_request_info,PABLROD,c,delete
+# NetSNMP::agent::netsnmp_handler_registration,PABLROD,c,delete
+# NetSNMP::agent::netsnmp_handler_registrationPtr,PABLROD,c,delete
+# netsnmp_oidPtr,PABLROD,c,delete
+# Newt::Checkbox,PABLROD,c,delete
+# Newt::Component,PABLROD,c,delete
+# Newt::Entry,PABLROD,c,delete
+# Newt::Form,PABLROD,c,delete
+# Newt::Label,PABLROD,c,delete
+# Newt::Listbox,PABLROD,c,delete
+# Newt::Panel,PABLROD,c,delete
+# Newt::Radiogroup,PABLROD,c,delete
+# Newt::Scale,PABLROD,c,delete
+# Newt::Textbox,PABLROD,c,delete
+# NKF,PABLROD,c,delete
+# nt,PABLROD,c,delete
+# OBEXFTP,PABLROD,c,delete
+# OBEXFTPc,PABLROD,c,delete
+# OBEXFTP::client,PABLROD,c,delete
+# OpenOffice::UNO::Any,PABLROD,c,delete
+# OpenOffice::UNO::Boolean,PABLROD,c,delete
+# OpenOffice::UNO::Int32,PABLROD,c,delete
+# OpenOffice::UNO::Int64,PABLROD,c,delete
+# OpenOffice::UNO::Interface,PABLROD,c,delete
+# OpenOffice::UNO::Struct,PABLROD,c,delete
+# OSSP::uuid,PABLROD,c,delete
+# Pango::AttrBackground,PABLROD,c,delete
+# Pango::AttrColor,PABLROD,c,delete
+# Pango::AttrFallback,PABLROD,c,delete
+# Pango::AttrFamily,PABLROD,c,delete
+# Pango::AttrFontDesc,PABLROD,c,delete
+# Pango::AttrForeground,PABLROD,c,delete
+# Pango::AttrGravity,PABLROD,c,delete
+# Pango::AttrGravityHint,PABLROD,c,delete
+# Pango::Attribute,PABLROD,c,delete
+# Pango::AttrInt,PABLROD,c,delete
+# Pango::AttrIterator,PABLROD,c,delete
+# Pango::AttrLanguage,PABLROD,c,delete
+# Pango::AttrLetterSpacing,PABLROD,c,delete
+# Pango::AttrList,PABLROD,c,delete
+# Pango::AttrRise,PABLROD,c,delete
+# Pango::AttrScale,PABLROD,c,delete
+# Pango::AttrShape,PABLROD,c,delete
+# Pango::AttrSize,PABLROD,c,delete
+# Pango::AttrStretch,PABLROD,c,delete
+# Pango::AttrStrikethrough,PABLROD,c,delete
+# Pango::AttrStrikethroughColor,PABLROD,c,delete
+# Pango::AttrString,PABLROD,c,delete
+# Pango::AttrStyle,PABLROD,c,delete
+# Pango::AttrUnderline,PABLROD,c,delete
+# Pango::AttrUnderlineColor,PABLROD,c,delete
+# Pango::AttrVariant,PABLROD,c,delete
+# Pango::AttrWeight,PABLROD,c,delete
+# Pango::Cairo,PABLROD,c,delete
+# Pango::Cairo::Context,PABLROD,c,delete
+# Pango::Cairo::Font,PABLROD,c,delete
+# Pango::Cairo::FontMap,PABLROD,c,delete
+# Pango::Color,PABLROD,c,delete
+# Pango::Context,PABLROD,c,delete
+# Pango::Font,PABLROD,c,delete
+# Pango::FontFace,PABLROD,c,delete
+# Pango::FontFamily,PABLROD,c,delete
+# Pango::FontMap,PABLROD,c,delete
+# Pango::FontMetrics,PABLROD,c,delete
+# Pango::Fontset,PABLROD,c,delete
+# Pango::Gravity,PABLROD,c,delete
+# Pango::Language,PABLROD,c,delete
+# Pango::Layout,PABLROD,c,delete
+# Pango::LayoutIter,PABLROD,c,delete
+# Pango::LayoutLine,PABLROD,c,delete
+# Pango::Matrix,PABLROD,c,delete
+# Pango::Renderer,PABLROD,c,delete
+# Pango::Script,PABLROD,c,delete
+# Pango::ScriptIter,PABLROD,c,delete
+# Pango::TabArray,PABLROD,c,delete
+# pcap_send_queuePtr,PABLROD,c,delete
+# PCP::LogImport,PABLROD,c,delete
+# PCP::MMV,PABLROD,c,delete
+# PCP::PMDA,PABLROD,c,delete
+# PDF::Haru::Annotation,PABLROD,c,delete
+# PDF::Haru::Destination,PABLROD,c,delete
+# PDF::Haru::ExtGState,PABLROD,c,delete
+# PDF::Haru::Font,PABLROD,c,delete
+# PDF::Haru::Image,PABLROD,c,delete
+# PDF::Haru::Outline,PABLROD,c,delete
+# PDF::Haru::Page,PABLROD,c,delete
+# PDL::Bad::PDL,PABLROD,c,delete
+# PDL::Complex::PDL,PABLROD,c,delete
+# PDL::GIS::Proj::PDL,PABLROD,c,delete
+# PDL::Graphics::PGPLOT::Window::PDL,PABLROD,c,delete
+# PDL::GSLMROOT,PABLROD,c,delete
+# PDL::Image2D::PDL,PABLROD,c,delete
+# PDL::ImageRGB::PDL,PABLROD,c,delete
+# PDL::IO::FITS::PDL,PABLROD,c,delete
+# PDL::IO::GD::PDL,PABLROD,c,delete
+# PDL::IO::HDF::PDL,PABLROD,c,delete
+# PDL::IO::HDF::SD::PDL,PABLROD,c,delete
+# PDL::IO::HDF::VS,PABLROD,c,delete
+# PDL::IO::HDF::VS::PDL,PABLROD,c,delete
+# PDL::IO::Misc::PDL,PABLROD,c,delete
+# PDL::IO::Pic::PDL,PABLROD,c,delete
+# PDL::IO::Pnm::PDL,PABLROD,c,delete
+# PDL::Math::PDL,PABLROD,c,delete
+# PDL::MatrixOps::PDL,PABLROD,c,delete
+# PDL::Ops::PDL,PABLROD,c,delete
+# PDL::Primitive::PDL,PABLROD,c,delete
+# PDL::Slatec::PDL,PABLROD,c,delete
+# PDL::Slices::PDL,PABLROD,c,delete
+# PDL::Transform::PDL,PABLROD,c,delete
+# PDL::Transform::Proj4::PDL,PABLROD,c,delete
+# PDL::Ufunc::PDL,PABLROD,c,delete
+# PerlIO::Layer,PABLROD,c,delete
+# PG_conn,PABLROD,c,delete
+# PG_results,PABLROD,c,delete
+# Phonon::AbstractAudioOutput,PABLROD,c,delete
+# Phonon::AbstractMediaStream,PABLROD,c,delete
+# Phonon::AbstractVideoOutput,PABLROD,c,delete
+# Phonon::AudioDataOutput,PABLROD,c,delete
+# Phonon::AudioOutput,PABLROD,c,delete
+# Phonon::Capture,PABLROD,c,delete
+# Phonon::Effect,PABLROD,c,delete
+# Phonon::EffectParameter,PABLROD,c,delete
+# Phonon::EffectWidget,PABLROD,c,delete
+# Phonon::MediaController,PABLROD,c,delete
+# Phonon::MediaNode,PABLROD,c,delete
+# Phonon::MediaObject,PABLROD,c,delete
+# Phonon::MediaSource,PABLROD,c,delete
+# Phonon::Mrl,PABLROD,c,delete
+# Phonon::ObjectDescriptionData,PABLROD,c,delete
+# Phonon::ObjectDescriptionModelData,PABLROD,c,delete
+# Phonon::Path,PABLROD,c,delete
+# Phonon::SeekSlider,PABLROD,c,delete
+# Phonon::StreamInterface,PABLROD,c,delete
+# Phonon::VideoPlayer,PABLROD,c,delete
+# Phonon::VideoWidget,PABLROD,c,delete
+# Phonon::VolumeFaderEffect,PABLROD,c,delete
+# Phonon::VolumeSlider,PABLROD,c,delete
+# PictureAttributes_t,PABLROD,c,delete
+# Point_t,PABLROD,c,delete
+# POSIX::Termios,PABLROD,c,delete
+# ProcInfo_t,PABLROD,c,delete
+# ps,PABLROD,c,delete
+# QsciAbstractAPIs,PABLROD,c,delete
+# QsciAPIs,PABLROD,c,delete
+# QsciCommand,PABLROD,c,delete
+# QsciCommandSet,PABLROD,c,delete
+# QsciDocument,PABLROD,c,delete
+# QsciLexer,PABLROD,c,delete
+# QsciLexerBash,PABLROD,c,delete
+# QsciLexerBatch,PABLROD,c,delete
+# QsciLexerCMake,PABLROD,c,delete
+# QsciLexerCPP,PABLROD,c,delete
+# QsciLexerCSharp,PABLROD,c,delete
+# QsciLexerCSS,PABLROD,c,delete
+# QsciLexerCustom,PABLROD,c,delete
+# QsciLexerD,PABLROD,c,delete
+# QsciLexerDiff,PABLROD,c,delete
+# QsciLexerFortran,PABLROD,c,delete
+# QsciLexerFortran77,PABLROD,c,delete
+# QsciLexerHTML,PABLROD,c,delete
+# QsciLexerIDL,PABLROD,c,delete
+# QsciLexerJava,PABLROD,c,delete
+# QsciLexerJavaScript,PABLROD,c,delete
+# QsciLexerLua,PABLROD,c,delete
+# QsciLexerMakefile,PABLROD,c,delete
+# QsciLexerPascal,PABLROD,c,delete
+# QsciLexerPerl,PABLROD,c,delete
+# QsciLexerPostScript,PABLROD,c,delete
+# QsciLexerPOV,PABLROD,c,delete
+# QsciLexerProperties,PABLROD,c,delete
+# QsciLexerPython,PABLROD,c,delete
+# QsciLexerRuby,PABLROD,c,delete
+# QsciLexerSQL,PABLROD,c,delete
+# QsciLexerTCL,PABLROD,c,delete
+# QsciLexerTeX,PABLROD,c,delete
+# QsciLexerVHDL,PABLROD,c,delete
+# QsciLexerXML,PABLROD,c,delete
+# QsciLexerYAML,PABLROD,c,delete
+# QsciMacro,PABLROD,c,delete
+# QsciPrinter,PABLROD,c,delete
+# QsciScintilla,PABLROD,c,delete
+# QsciScintillaBase,PABLROD,c,delete
+# QsciStyle,PABLROD,c,delete
+# Qt3::Accel,PABLROD,c,delete
+# Qt3::Action,PABLROD,c,delete
+# Qt3::ActionGroup,PABLROD,c,delete
+# Qt3::BoxLayout,PABLROD,c,delete
+# Qt3::Button,PABLROD,c,delete
+# Qt3::ButtonGroup,PABLROD,c,delete
+# Qt3::Canvas,PABLROD,c,delete
+# Qt3::CanvasEllipse,PABLROD,c,delete
+# Qt3::CanvasItem,PABLROD,c,delete
+# Qt3::CanvasItemList,PABLROD,c,delete
+# Qt3::CanvasLine,PABLROD,c,delete
+# Qt3::CanvasPixmap,PABLROD,c,delete
+# Qt3::CanvasPixmapArray,PABLROD,c,delete
+# Qt3::CanvasPolygon,PABLROD,c,delete
+# Qt3::CanvasPolygonalItem,PABLROD,c,delete
+# Qt3::CanvasRectangle,PABLROD,c,delete
+# Qt3::CanvasSpline,PABLROD,c,delete
+# Qt3::CanvasSprite,PABLROD,c,delete
+# Qt3::CanvasText,PABLROD,c,delete
+# Qt3::CanvasView,PABLROD,c,delete
+# Qt3::CheckListItem,PABLROD,c,delete
+# Qt3::CheckTableItem,PABLROD,c,delete
+# Qt3::ColorDrag,PABLROD,c,delete
+# Qt3::ComboBox,PABLROD,c,delete
+# Qt3::ComboTableItem,PABLROD,c,delete
+# Qt3::DataBrowser,PABLROD,c,delete
+# Qt3::DataTable,PABLROD,c,delete
+# Qt3::DataView,PABLROD,c,delete
+# Qt3::DateEdit,PABLROD,c,delete
+# Qt3::DateTimeEdit,PABLROD,c,delete
+# Qt3::DateTimeEditBase,PABLROD,c,delete
+# Qt3::Dns,PABLROD,c,delete
+# Qt3::DockArea,PABLROD,c,delete
+# Qt3::DockWindow,PABLROD,c,delete
+# Qt3::DragObject,PABLROD,c,delete
+# Qt3::DropSite,PABLROD,c,delete
+# Qt3::EditorFactory,PABLROD,c,delete
+# Qt3::FileDialog,PABLROD,c,delete
+# Qt3::FileIconProvider,PABLROD,c,delete
+# Qt3::FilePreview,PABLROD,c,delete
+# Qt3::Frame,PABLROD,c,delete
+# Qt3::Ftp,PABLROD,c,delete
+# Qt3::Grid,PABLROD,c,delete
+# Qt3::GridView,PABLROD,c,delete
+# Qt3::GroupBox,PABLROD,c,delete
+# Qt3::HBox,PABLROD,c,delete
+# Qt3::HBoxLayout,PABLROD,c,delete
+# Qt3::HButtonGroup,PABLROD,c,delete
+# Qt3::Header,PABLROD,c,delete
+# Qt3::HGroupBox,PABLROD,c,delete
+# Qt3::Http,PABLROD,c,delete
+# Qt3::HttpHeader,PABLROD,c,delete
+# Qt3::HttpRequestHeader,PABLROD,c,delete
+# Qt3::HttpResponseHeader,PABLROD,c,delete
+# Qt3::IconDrag,PABLROD,c,delete
+# Qt3::IconDragItem,PABLROD,c,delete
+# Qt3::IconView,PABLROD,c,delete
+# Qt3::IconViewItem,PABLROD,c,delete
+# Qt3::ImageDrag,PABLROD,c,delete
+# Qt3::ListBox,PABLROD,c,delete
+# Qt3::ListBoxItem,PABLROD,c,delete
+# Qt3::ListBoxPixmap,PABLROD,c,delete
+# Qt3::ListBoxText,PABLROD,c,delete
+# Qt3::ListView,PABLROD,c,delete
+# Qt3::ListViewItem,PABLROD,c,delete
+# Qt3::ListViewItemIterator,PABLROD,c,delete
+# Qt3::LocalFs,PABLROD,c,delete
+# Qt3::MainWindow,PABLROD,c,delete
+# Qt3::MimeSourceFactory,PABLROD,c,delete
+# Qt3::MultiLineEdit,PABLROD,c,delete
+# Qt3::NetworkOperation,PABLROD,c,delete
+# Qt3::NetworkProtocol,PABLROD,c,delete
+# Qt3::PaintDeviceMetrics,PABLROD,c,delete
+# Qt3::Painter,PABLROD,c,delete
+# Qt3::Picture,PABLROD,c,delete
+# Qt3::PointArray,PABLROD,c,delete
+# Qt3::PopupMenu,PABLROD,c,delete
+# Qt3::Process,PABLROD,c,delete
+# Qt3::ProgressBar,PABLROD,c,delete
+# Qt3::ProgressDialog,PABLROD,c,delete
+# Qt3::PtrCollection,PABLROD,c,delete
+# Qt3::RangeControl,PABLROD,c,delete
+# Qt3::ScrollView,PABLROD,c,delete
+# Qt3::Semaphore,PABLROD,c,delete
+# Qt3::ServerSocket,PABLROD,c,delete
+# Qt3::Shared,PABLROD,c,delete
+# Qt3::Signal,PABLROD,c,delete
+# Qt3::SimpleRichText,PABLROD,c,delete
+# Qt3::Socket,PABLROD,c,delete
+# Qt3::SocketDevice,PABLROD,c,delete
+# Qt3::SqlCursor,PABLROD,c,delete
+# Qt3::SqlEditorFactory,PABLROD,c,delete
+# Qt3::SqlFieldInfo,PABLROD,c,delete
+# Qt3::SqlForm,PABLROD,c,delete
+# Qt3::SqlPropertyMap,PABLROD,c,delete
+# Qt3::SqlRecordInfo,PABLROD,c,delete
+# Qt3::SqlSelectCursor,PABLROD,c,delete
+# Qt3::StoredDrag,PABLROD,c,delete
+# Qt3::StrIList,PABLROD,c,delete
+# Qt3::StrList,PABLROD,c,delete
+# Qt3::StyleSheet,PABLROD,c,delete
+# Qt3::StyleSheetItem,PABLROD,c,delete
+# Qt3::SyntaxHighlighter,PABLROD,c,delete
+# Qt3::TabDialog,PABLROD,c,delete
+# Qt3::Table,PABLROD,c,delete
+# Qt3::TableItem,PABLROD,c,delete
+# Qt3::TableSelection,PABLROD,c,delete
+# Qt3::TextBrowser,PABLROD,c,delete
+# Qt3::TextDrag,PABLROD,c,delete
+# Qt3::TextEdit,PABLROD,c,delete
+# Qt3::TextStream,PABLROD,c,delete
+# Qt3::TextView,PABLROD,c,delete
+# Qt3::TimeEdit,PABLROD,c,delete
+# Qt3::ToolBar,PABLROD,c,delete
+# Qt3::UriDrag,PABLROD,c,delete
+# Qt3::Url,PABLROD,c,delete
+# Qt3::UrlOperator,PABLROD,c,delete
+# Qt3::VBox,PABLROD,c,delete
+# Qt3::VBoxLayout,PABLROD,c,delete
+# Qt3::VButtonGroup,PABLROD,c,delete
+# Qt3::VGroupBox,PABLROD,c,delete
+# Qt3::WhatsThis,PABLROD,c,delete
+# Qt3::WidgetStack,PABLROD,c,delete
+# Qt3::Wizard,PABLROD,c,delete
+# Qt::AbstractAnimation,PABLROD,c,delete
+# Qt::AbstractButton,PABLROD,c,delete
+# Qt::AbstractEventDispatcher,PABLROD,c,delete
+# Qt::AbstractFileEngine,PABLROD,c,delete
+# Qt::AbstractFileEngine::ExtensionOption,PABLROD,c,delete
+# Qt::AbstractFileEngine::ExtensionReturn,PABLROD,c,delete
+# Qt::AbstractFileEngineHandler,PABLROD,c,delete
+# Qt::AbstractFileEngineIterator,PABLROD,c,delete
+# Qt::AbstractFileEngine::MapExtensionOption,PABLROD,c,delete
+# Qt::AbstractFileEngine::MapExtensionReturn,PABLROD,c,delete
+# Qt::AbstractFileEngine::UnMapExtensionOption,PABLROD,c,delete
+# Qt::AbstractGraphicsShapeItem,PABLROD,c,delete
+# Qt::AbstractItemDelegate,PABLROD,c,delete
+# Qt::AbstractItemModel,PABLROD,c,delete
+# Qt::AbstractItemView,PABLROD,c,delete
+# Qt::AbstractListModel,PABLROD,c,delete
+# Qt::AbstractMessageHandler,PABLROD,c,delete
+# Qt::AbstractNetworkCache,PABLROD,c,delete
+# Qt::AbstractPageSetupDialog,PABLROD,c,delete
+# Qt::AbstractPrintDialog,PABLROD,c,delete
+# Qt::AbstractProxyModel,PABLROD,c,delete
+# Qt::AbstractScrollArea,PABLROD,c,delete
+# Qt::AbstractSlider,PABLROD,c,delete
+# Qt::AbstractSocket,PABLROD,c,delete
+# Qt::AbstractSpinBox,PABLROD,c,delete
+# Qt::AbstractState,PABLROD,c,delete
+# Qt::AbstractTableModel,PABLROD,c,delete
+# Qt::AbstractTextDocumentLayout,PABLROD,c,delete
+# Qt::AbstractTextDocumentLayout::PaintContext,PABLROD,c,delete
+# Qt::AbstractTextDocumentLayout::Selection,PABLROD,c,delete
+# Qt::AbstractTransition,PABLROD,c,delete
+# Qt::AbstractUndoItem,PABLROD,c,delete
+# Qt::AbstractUriResolver,PABLROD,c,delete
+# Qt::AbstractVideoBuffer,PABLROD,c,delete
+# Qt::AbstractVideoSurface,PABLROD,c,delete
+# Qt::AbstractXmlNodeModel,PABLROD,c,delete
+# Qt::AbstractXmlReceiver,PABLROD,c,delete
+# Qt::Accessible,PABLROD,c,delete
+# Qt::Accessible2,PABLROD,c,delete
+# Qt::Accessible2Interface,PABLROD,c,delete
+# Qt::Accessible2::TableModelChange,PABLROD,c,delete
+# Qt::AccessibleActionInterface,PABLROD,c,delete
+# Qt::AccessibleApplication,PABLROD,c,delete
+# Qt::AccessibleBridge,PABLROD,c,delete
+# Qt::AccessibleBridgeFactoryInterface,PABLROD,c,delete
+# Qt::AccessibleBridgePlugin,PABLROD,c,delete
+# Qt::AccessibleEditableTextInterface,PABLROD,c,delete
+# Qt::AccessibleEvent,PABLROD,c,delete
+# Qt::AccessibleFactoryInterface,PABLROD,c,delete
+# Qt::AccessibleImageInterface,PABLROD,c,delete
+# Qt::AccessibleInterface,PABLROD,c,delete
+# Qt::AccessibleInterfaceEx,PABLROD,c,delete
+# Qt::AccessibleObject,PABLROD,c,delete
+# Qt::AccessibleObjectEx,PABLROD,c,delete
+# Qt::AccessiblePlugin,PABLROD,c,delete
+# Qt::AccessibleSimpleEditableTextInterface,PABLROD,c,delete
+# Qt::AccessibleTable2CellInterface,PABLROD,c,delete
+# Qt::AccessibleTable2Interface,PABLROD,c,delete
+# Qt::AccessibleTableInterface,PABLROD,c,delete
+# Qt::AccessibleTextInterface,PABLROD,c,delete
+# Qt::AccessibleValueInterface,PABLROD,c,delete
+# Qt::AccessibleWidget,PABLROD,c,delete
+# Qt::AccessibleWidgetEx,PABLROD,c,delete
+# Qt::Action,PABLROD,c,delete
+# Qt::ActionEvent,PABLROD,c,delete
+# Qt::ActionGroup,PABLROD,c,delete
+# Qt::AnimationGroup,PABLROD,c,delete
+# Qt::Application,PABLROD,c,delete
+# Qt::AtomicInt,PABLROD,c,delete
+# Qt::Audio,PABLROD,c,delete
+# Qt::AudioDeviceInfo,PABLROD,c,delete
+# Qt::AudioFormat,PABLROD,c,delete
+# Qt::AudioInput,PABLROD,c,delete
+# Qt::AudioOutput,PABLROD,c,delete
+# Qt::Authenticator,PABLROD,c,delete
+# Qt::BasicAtomicInt,PABLROD,c,delete
+# Qt::BasicTimer,PABLROD,c,delete
+# Qt::BitArray,PABLROD,c,delete
+# Qt::Bitmap,PABLROD,c,delete
+# Qt::BitRef,PABLROD,c,delete
+# Qt::Bool,PABLROD,c,delete
+# Qt::BoxLayout,PABLROD,c,delete
+# Qt::Brush,PABLROD,c,delete
+# Qt::Buffer,PABLROD,c,delete
+# Qt::ButtonGroup,PABLROD,c,delete
+# Qt::ByteArray,PABLROD,c,delete
+# Qt::ByteArrayMatcher,PABLROD,c,delete
+# Qt::ByteRef,PABLROD,c,delete
+# Qt::CalendarWidget,PABLROD,c,delete
+# Qt::Char,PABLROD,c,delete
+# Qt::CharRef,PABLROD,c,delete
+# Qt::CheckBox,PABLROD,c,delete
+# Qt::ChildEvent,PABLROD,c,delete
+# Qt::Clipboard,PABLROD,c,delete
+# Qt::ClipboardEvent,PABLROD,c,delete
+# Qt::CloseEvent,PABLROD,c,delete
+# Qt::Color,PABLROD,c,delete
+# Qt::ColorDialog,PABLROD,c,delete
+# Qt::Colormap,PABLROD,c,delete
+# Qt::ColumnView,PABLROD,c,delete
+# Qt::ComboBox,PABLROD,c,delete
+# Qt::CommandLinkButton,PABLROD,c,delete
+# Qt::CommonStyle,PABLROD,c,delete
+# Qt::Completer,PABLROD,c,delete
+# Qt::ConicalGradient,PABLROD,c,delete
+# Qt::ContextMenuEvent,PABLROD,c,delete
+# Qt::CoreApplication,PABLROD,c,delete
+# Qt::CryptographicHash,PABLROD,c,delete
+# Qt::Cursor,PABLROD,c,delete
+# Qt::DataStream,PABLROD,c,delete
+# Qt::DataWidgetMapper,PABLROD,c,delete
+# Qt::Date,PABLROD,c,delete
+# Qt::DateEdit,PABLROD,c,delete
+# Qt::DateTime,PABLROD,c,delete
+# Qt::DateTimeEdit,PABLROD,c,delete
+# Qt::DBus,PABLROD,c,delete
+# Qt::DBusAbstractAdaptor,PABLROD,c,delete
+# Qt::DBusAbstractInterface,PABLROD,c,delete
+# Qt::DBusAbstractInterfaceBase,PABLROD,c,delete
+# Qt::DBusArgument,PABLROD,c,delete
+# Qt::DBusConnection,PABLROD,c,delete
+# Qt::DBusConnectionInterface,PABLROD,c,delete
+# Qt::DBusContext,PABLROD,c,delete
+# Qt::DBusError,PABLROD,c,delete
+# Qt::DBusInterface,PABLROD,c,delete
+# Qt::DBusMessage,PABLROD,c,delete
+# Qt::DBusMetaType,PABLROD,c,delete
+# Qt::DBusPendingCall,PABLROD,c,delete
+# Qt::DBusPendingCallWatcher,PABLROD,c,delete
+# Qt::DBusServer,PABLROD,c,delete
+# Qt::DBusServiceWatcher,PABLROD,c,delete
+# Qt::DBusUnixFileDescriptor,PABLROD,c,delete
+# Qt::DBusVirtualObject,PABLROD,c,delete
+# Qt::DeclarativeComponent,PABLROD,c,delete
+# Qt::DeclarativeContext,PABLROD,c,delete
+# Qt::DeclarativeEngine,PABLROD,c,delete
+# Qt::DeclarativeError,PABLROD,c,delete
+# Qt::DeclarativeExpression,PABLROD,c,delete
+# Qt::DeclarativeExtensionPlugin,PABLROD,c,delete
+# Qt::DeclarativeImageProvider,PABLROD,c,delete
+# Qt::DeclarativeItem,PABLROD,c,delete
+# Qt::DeclarativeListReference,PABLROD,c,delete
+# Qt::DeclarativeNetworkAccessManagerFactory,PABLROD,c,delete
+# Qt::DeclarativeParserStatus,PABLROD,c,delete
+# Qt::DeclarativeProperty,PABLROD,c,delete
+# Qt::DeclarativePropertyMap,PABLROD,c,delete
+# Qt::DeclarativeScriptString,PABLROD,c,delete
+# Qt::DeclarativeView,PABLROD,c,delete
+# Qt::DesktopServices,PABLROD,c,delete
+# Qt::DesktopWidget,PABLROD,c,delete
+# Qt::Dial,PABLROD,c,delete
+# Qt::Dialog,PABLROD,c,delete
+# Qt::DialogButtonBox,PABLROD,c,delete
+# Qt::Dir,PABLROD,c,delete
+# Qt::DirIterator,PABLROD,c,delete
+# Qt::DirModel,PABLROD,c,delete
+# Qt::DockWidget,PABLROD,c,delete
+# Qt::DomAttr,PABLROD,c,delete
+# Qt::DomCDATASection,PABLROD,c,delete
+# Qt::DomCharacterData,PABLROD,c,delete
+# Qt::DomComment,PABLROD,c,delete
+# Qt::DomDocument,PABLROD,c,delete
+# Qt::DomDocumentFragment,PABLROD,c,delete
+# Qt::DomDocumentType,PABLROD,c,delete
+# Qt::DomElement,PABLROD,c,delete
+# Qt::DomEntity,PABLROD,c,delete
+# Qt::DomEntityReference,PABLROD,c,delete
+# Qt::DomImplementation,PABLROD,c,delete
+# Qt::DomNamedNodeMap,PABLROD,c,delete
+# Qt::DomNode,PABLROD,c,delete
+# Qt::DomNodeList,PABLROD,c,delete
+# Qt::DomNotation,PABLROD,c,delete
+# Qt::DomProcessingInstruction,PABLROD,c,delete
+# Qt::DomText,PABLROD,c,delete
+# Qt::DoubleSpinBox,PABLROD,c,delete
+# Qt::DoubleValidator,PABLROD,c,delete
+# Qt::Drag,PABLROD,c,delete
+# Qt::DragEnterEvent,PABLROD,c,delete
+# Qt::DragLeaveEvent,PABLROD,c,delete
+# Qt::DragMoveEvent,PABLROD,c,delete
+# Qt::DragResponseEvent,PABLROD,c,delete
+# Qt::DropEvent,PABLROD,c,delete
+# Qt::DynamicPropertyChangeEvent,PABLROD,c,delete
+# Qt::EasingCurve,PABLROD,c,delete
+# Qt::ElapsedTimer,PABLROD,c,delete
+# Qt::ErrorMessage,PABLROD,c,delete
+# Qt::Event,PABLROD,c,delete
+# Qt::EventLoop,PABLROD,c,delete
+# Qt::EventPrivate,PABLROD,c,delete
+# Qt::EventTransition,PABLROD,c,delete
+# Qt::FactoryInterface,PABLROD,c,delete
+# Qt::File,PABLROD,c,delete
+# Qt::FileDialog,PABLROD,c,delete
+# Qt::FileIconProvider,PABLROD,c,delete
+# Qt::FileInfo,PABLROD,c,delete
+# Qt::FileOpenEvent,PABLROD,c,delete
+# Qt::FileSystemModel,PABLROD,c,delete
+# Qt::FileSystemWatcher,PABLROD,c,delete
+# Qt::FinalState,PABLROD,c,delete
+# Qt::Flag,PABLROD,c,delete
+# Qt::FocusEvent,PABLROD,c,delete
+# Qt::FocusFrame,PABLROD,c,delete
+# Qt::Font,PABLROD,c,delete
+# Qt::FontComboBox,PABLROD,c,delete
+# Qt::FontDatabase,PABLROD,c,delete
+# Qt::FontDialog,PABLROD,c,delete
+# Qt::FontInfo,PABLROD,c,delete
+# Qt::FontMetrics,PABLROD,c,delete
+# Qt::FontMetricsF,PABLROD,c,delete
+# Qt::FormLayout,PABLROD,c,delete
+# Qt::Frame,PABLROD,c,delete
+# Qt::FSFileEngine,PABLROD,c,delete
+# Qt::Ftp,PABLROD,c,delete
+# Qt::FutureInterfaceBase,PABLROD,c,delete
+# Qt::FutureWatcherBase,PABLROD,c,delete
+# Qt::GenericArgument,PABLROD,c,delete
+# Qt::GenericReturnArgument,PABLROD,c,delete
+# Qt::Gesture,PABLROD,c,delete
+# Qt::GestureEvent,PABLROD,c,delete
+# Qt::GestureRecognizer,PABLROD,c,delete
+# Qt::GL,PABLROD,c,delete
+# Qt::GLBuffer,PABLROD,c,delete
+# Qt::GLColormap,PABLROD,c,delete
+# Qt::GLContext,PABLROD,c,delete
+# Qt::GLFormat,PABLROD,c,delete
+# Qt::GLFramebufferObject,PABLROD,c,delete
+# Qt::GLFramebufferObjectFormat,PABLROD,c,delete
+# Qt::GLPixelBuffer,PABLROD,c,delete
+# Qt::GLShader,PABLROD,c,delete
+# Qt::GLShaderProgram,PABLROD,c,delete
+# Qt::GLWidget,PABLROD,c,delete
+# Qt::GlyphRun,PABLROD,c,delete
+# Qt::Gradient,PABLROD,c,delete
+# Qt::GraphicsAnchor,PABLROD,c,delete
+# Qt::GraphicsAnchorLayout,PABLROD,c,delete
+# Qt::GraphicsBlurEffect,PABLROD,c,delete
+# Qt::GraphicsColorizeEffect,PABLROD,c,delete
+# Qt::GraphicsDropShadowEffect,PABLROD,c,delete
+# Qt::GraphicsEffect,PABLROD,c,delete
+# Qt::GraphicsEllipseItem,PABLROD,c,delete
+# Qt::GraphicsGridLayout,PABLROD,c,delete
+# Qt::GraphicsItem,PABLROD,c,delete
+# Qt::GraphicsItemAnimation,PABLROD,c,delete
+# Qt::GraphicsItemGroup,PABLROD,c,delete
+# Qt::GraphicsLayout,PABLROD,c,delete
+# Qt::GraphicsLayoutItem,PABLROD,c,delete
+# Qt::GraphicsLinearLayout,PABLROD,c,delete
+# Qt::GraphicsLineItem,PABLROD,c,delete
+# Qt::GraphicsObject,PABLROD,c,delete
+# Qt::GraphicsOpacityEffect,PABLROD,c,delete
+# Qt::GraphicsPathItem,PABLROD,c,delete
+# Qt::GraphicsPixmapItem,PABLROD,c,delete
+# Qt::GraphicsPolygonItem,PABLROD,c,delete
+# Qt::GraphicsProxyWidget,PABLROD,c,delete
+# Qt::GraphicsRectItem,PABLROD,c,delete
+# Qt::GraphicsRotation,PABLROD,c,delete
+# Qt::GraphicsScale,PABLROD,c,delete
+# Qt::GraphicsScene,PABLROD,c,delete
+# Qt::GraphicsSceneContextMenuEvent,PABLROD,c,delete
+# Qt::GraphicsSceneDragDropEvent,PABLROD,c,delete
+# Qt::GraphicsSceneEvent,PABLROD,c,delete
+# Qt::GraphicsSceneHelpEvent,PABLROD,c,delete
+# Qt::GraphicsSceneHoverEvent,PABLROD,c,delete
+# Qt::GraphicsSceneMouseEvent,PABLROD,c,delete
+# Qt::GraphicsSceneMoveEvent,PABLROD,c,delete
+# Qt::GraphicsSceneResizeEvent,PABLROD,c,delete
+# Qt::GraphicsSceneWheelEvent,PABLROD,c,delete
+# Qt::GraphicsSimpleTextItem,PABLROD,c,delete
+# Qt::GraphicsSvgItem,PABLROD,c,delete
+# Qt::GraphicsTextItem,PABLROD,c,delete
+# Qt::GraphicsTransform,PABLROD,c,delete
+# Qt::GraphicsView,PABLROD,c,delete
+# Qt::GraphicsWidget,PABLROD,c,delete
+# Qt::GridLayout,PABLROD,c,delete
+# Qt::GroupBox,PABLROD,c,delete
+# Qt::HashDummyValue,PABLROD,c,delete
+# Qt::HBoxLayout,PABLROD,c,delete
+# Qt::HeaderView,PABLROD,c,delete
+# Qt::HelpContentItem,PABLROD,c,delete
+# Qt::HelpContentModel,PABLROD,c,delete
+# Qt::HelpContentWidget,PABLROD,c,delete
+# Qt::HelpEngine,PABLROD,c,delete
+# Qt::HelpEngineCore,PABLROD,c,delete
+# Qt::HelpEvent,PABLROD,c,delete
+# Qt::HelpIndexModel,PABLROD,c,delete
+# Qt::HelpIndexWidget,PABLROD,c,delete
+# Qt::HelpSearchEngine,PABLROD,c,delete
+# Qt::HelpSearchQuery,PABLROD,c,delete
+# Qt::HelpSearchQueryWidget,PABLROD,c,delete
+# Qt::HelpSearchResultWidget,PABLROD,c,delete
+# Qt::HideEvent,PABLROD,c,delete
+# Qt::HistoryState,PABLROD,c,delete
+# Qt::HostAddress,PABLROD,c,delete
+# Qt::HostInfo,PABLROD,c,delete
+# Qt::HoverEvent,PABLROD,c,delete
+# Qt::Http,PABLROD,c,delete
+# Qt::HttpHeader,PABLROD,c,delete
+# Qt::HttpMultiPart,PABLROD,c,delete
+# Qt::HttpPart,PABLROD,c,delete
+# Qt::HttpRequestHeader,PABLROD,c,delete
+# Qt::HttpResponseHeader,PABLROD,c,delete
+# Qt::Icon,PABLROD,c,delete
+# Qt::IconDragEvent,PABLROD,c,delete
+# Qt::IconEngine,PABLROD,c,delete
+# Qt::IconEngineFactoryInterface,PABLROD,c,delete
+# Qt::IconEngineFactoryInterfaceV2,PABLROD,c,delete
+# Qt::IconEnginePlugin,PABLROD,c,delete
+# Qt::IconEnginePluginV2,PABLROD,c,delete
+# Qt::IconEngineV2,PABLROD,c,delete
+# Qt::IconEngineV2::AvailableSizesArgument,PABLROD,c,delete
+# Qt::Image,PABLROD,c,delete
+# Qt::ImageIOHandler,PABLROD,c,delete
+# Qt::ImageIOHandlerFactoryInterface,PABLROD,c,delete
+# Qt::ImageIOPlugin,PABLROD,c,delete
+# Qt::ImageReader,PABLROD,c,delete
+# Qt::ImageTextKeyLang,PABLROD,c,delete
+# Qt::ImageWriter,PABLROD,c,delete
+# Qt::IncompatibleFlag,PABLROD,c,delete
+# Qt::InputContext,PABLROD,c,delete
+# Qt::InputContextFactory,PABLROD,c,delete
+# Qt::InputContextFactoryInterface,PABLROD,c,delete
+# Qt::InputContextPlugin,PABLROD,c,delete
+# Qt::InputDialog,PABLROD,c,delete
+# Qt::InputEvent,PABLROD,c,delete
+# Qt::InputMethodEvent,PABLROD,c,delete
+# Qt::InputMethodEvent::Attribute,PABLROD,c,delete
+# Qt::Internal,PABLROD,c,delete
+# Qt::IntValidator,PABLROD,c,delete
+# Qt::IODevice,PABLROD,c,delete
+# Qt::IPv6Address,PABLROD,c,delete
+# Qt::ItemDelegate,PABLROD,c,delete
+# Qt::ItemEditorCreatorBase,PABLROD,c,delete
+# Qt::ItemEditorFactory,PABLROD,c,delete
+# Qt::ItemSelectionModel,PABLROD,c,delete
+# Qt::ItemSelectionRange,PABLROD,c,delete
+# Qt::KeyEvent,PABLROD,c,delete
+# Qt::KeyEventTransition,PABLROD,c,delete
+# Qt::KeySequence,PABLROD,c,delete
+# Qt::Label,PABLROD,c,delete
+# Qt::Latin1Char,PABLROD,c,delete
+# Qt::Latin1String,PABLROD,c,delete
+# Qt::Layout,PABLROD,c,delete
+# Qt::LayoutItem,PABLROD,c,delete
+# Qt::LCDNumber,PABLROD,c,delete
+# Qt::Library,PABLROD,c,delete
+# Qt::LibraryInfo,PABLROD,c,delete
+# Qt::Line,PABLROD,c,delete
+# Qt::LinearGradient,PABLROD,c,delete
+# Qt::LineEdit,PABLROD,c,delete
+# Qt::LineF,PABLROD,c,delete
+# Qt::ListView,PABLROD,c,delete
+# Qt::ListWidget,PABLROD,c,delete
+# Qt::ListWidgetItem,PABLROD,c,delete
+# Qt::Locale,PABLROD,c,delete
+# Qt::LocalServer,PABLROD,c,delete
+# Qt::LocalSocket,PABLROD,c,delete
+# Qt::MainWindow,PABLROD,c,delete
+# Qt::Margins,PABLROD,c,delete
+# Qt::Matrix,PABLROD,c,delete
+# Qt::Matrix4x4,PABLROD,c,delete
+# Qt::MdiArea,PABLROD,c,delete
+# Qt::MdiSubWindow,PABLROD,c,delete
+# Qt::Menu,PABLROD,c,delete
+# Qt::MenuBar,PABLROD,c,delete
+# Qt::MessageBox,PABLROD,c,delete
+# Qt::MetaClassInfo,PABLROD,c,delete
+# Qt::MetaEnum,PABLROD,c,delete
+# Qt::MetaMethod,PABLROD,c,delete
+# Qt::MetaObject,PABLROD,c,delete
+# Qt::MetaProperty,PABLROD,c,delete
+# Qt::MetaType,PABLROD,c,delete
+# Qt::MimeData,PABLROD,c,delete
+# Qt::MimeSource,PABLROD,c,delete
+# Qt::ModelIndex,PABLROD,c,delete
+# Qt::MouseEvent,PABLROD,c,delete
+# Qt::MouseEventTransition,PABLROD,c,delete
+# Qt::MoveEvent,PABLROD,c,delete
+# Qt::Movie,PABLROD,c,delete
+# Qt::Mutex,PABLROD,c,delete
+# Qt::NetworkAccessManager,PABLROD,c,delete
+# Qt::NetworkAddressEntry,PABLROD,c,delete
+# Qt::NetworkCacheMetaData,PABLROD,c,delete
+# Qt::NetworkConfiguration,PABLROD,c,delete
+# Qt::NetworkConfigurationManager,PABLROD,c,delete
+# Qt::NetworkCookie,PABLROD,c,delete
+# Qt::NetworkCookieJar,PABLROD,c,delete
+# Qt::NetworkDiskCache,PABLROD,c,delete
+# Qt::NetworkInterface,PABLROD,c,delete
+# Qt::NetworkProxy,PABLROD,c,delete
+# Qt::NetworkProxyFactory,PABLROD,c,delete
+# Qt::NetworkProxyQuery,PABLROD,c,delete
+# Qt::NetworkReply,PABLROD,c,delete
+# Qt::NetworkRequest,PABLROD,c,delete
+# Qt::NetworkSession,PABLROD,c,delete
+# Qt::NoDebug,PABLROD,c,delete
+# Qt::ObjectCleanupHandler,PABLROD,c,delete
+# Qt::ObjectUserData,PABLROD,c,delete
+# Qt::PageSetupDialog,PABLROD,c,delete
+# Qt::PaintDevice,PABLROD,c,delete
+# Qt::PaintEngine,PABLROD,c,delete
+# Qt::PaintEngineState,PABLROD,c,delete
+# Qt::Painter,PABLROD,c,delete
+# Qt::PainterPath,PABLROD,c,delete
+# Qt::PainterPath::Element,PABLROD,c,delete
+# Qt::PainterPathStroker,PABLROD,c,delete
+# Qt::Painter::PixmapFragment,PABLROD,c,delete
+# Qt::PaintEvent,PABLROD,c,delete
+# Qt::Palette,PABLROD,c,delete
+# Qt::PanGesture,PABLROD,c,delete
+# Qt::ParallelAnimationGroup,PABLROD,c,delete
+# Qt::PauseAnimation,PABLROD,c,delete
+# Qt::Pen,PABLROD,c,delete
+# Qt::PersistentModelIndex,PABLROD,c,delete
+# Qt::Picture,PABLROD,c,delete
+# Qt::PictureFormatInterface,PABLROD,c,delete
+# Qt::PictureFormatPlugin,PABLROD,c,delete
+# Qt::PictureIO,PABLROD,c,delete
+# Qt::PinchGesture,PABLROD,c,delete
+# Qt::Pixmap,PABLROD,c,delete
+# Qt::PixmapCache,PABLROD,c,delete
+# Qt::PixmapCache::Key,PABLROD,c,delete
+# Qt::PlainTextDocumentLayout,PABLROD,c,delete
+# Qt::PlainTextEdit,PABLROD,c,delete
+# Qt::PluginLoader,PABLROD,c,delete
+# Qt::Point,PABLROD,c,delete
+# Qt::PointF,PABLROD,c,delete
+# Qt::PostEventList,PABLROD,c,delete
+# Qt::PrintDialog,PABLROD,c,delete
+# Qt::PrintEngine,PABLROD,c,delete
+# Qt::Printer,PABLROD,c,delete
+# Qt::PrinterInfo,PABLROD,c,delete
+# Qt::PrintPreviewDialog,PABLROD,c,delete
+# Qt::PrintPreviewWidget,PABLROD,c,delete
+# Qt::Process,PABLROD,c,delete
+# Qt::ProcessEnvironment,PABLROD,c,delete
+# Qt::ProgressBar,PABLROD,c,delete
+# Qt::ProgressDialog,PABLROD,c,delete
+# Qt::PropertyAnimation,PABLROD,c,delete
+# Qt::ProxyModel,PABLROD,c,delete
+# Qt::ProxyStyle,PABLROD,c,delete
+# Qt::PushButton,PABLROD,c,delete
+# Qt::Quaternion,PABLROD,c,delete
+# Qt::RadialGradient,PABLROD,c,delete
+# Qt::RadioButton,PABLROD,c,delete
+# Qt::RawFont,PABLROD,c,delete
+# Qt::ReadLocker,PABLROD,c,delete
+# Qt::ReadWriteLock,PABLROD,c,delete
+# Qt::Rect,PABLROD,c,delete
+# Qt::RectF,PABLROD,c,delete
+# Qt::RegExp,PABLROD,c,delete
+# Qt::RegExpValidator,PABLROD,c,delete
+# Qt::Region,PABLROD,c,delete
+# Qt::ResizeEvent,PABLROD,c,delete
+# Qt::Resource,PABLROD,c,delete
+# Qt::RubberBand,PABLROD,c,delete
+# Qt::Runnable,PABLROD,c,delete
+# Qt::Scriptable,PABLROD,c,delete
+# Qt::ScriptClass,PABLROD,c,delete
+# Qt::ScriptClassPropertyIterator,PABLROD,c,delete
+# Qt::ScriptContext,PABLROD,c,delete
+# Qt::ScriptContextInfo,PABLROD,c,delete
+# Qt::ScriptEngine,PABLROD,c,delete
+# Qt::ScriptEngineAgent,PABLROD,c,delete
+# Qt::ScriptExtensionInterface,PABLROD,c,delete
+# Qt::ScriptExtensionPlugin,PABLROD,c,delete
+# Qt::ScriptString,PABLROD,c,delete
+# Qt::ScriptSyntaxCheckResult,PABLROD,c,delete
+# Qt::ScriptValue,PABLROD,c,delete
+# Qt::ScriptValueIterator,PABLROD,c,delete
+# Qt::ScrollArea,PABLROD,c,delete
+# Qt::ScrollBar,PABLROD,c,delete
+# Qt::Semaphore,PABLROD,c,delete
+# Qt::SequentialAnimationGroup,PABLROD,c,delete
+# Qt::SessionManager,PABLROD,c,delete
+# Qt::Settings,PABLROD,c,delete
+# Qt::SharedData,PABLROD,c,delete
+# Qt::SharedMemory,PABLROD,c,delete
+# Qt::Shortcut,PABLROD,c,delete
+# Qt::ShortcutEvent,PABLROD,c,delete
+# Qt::ShowEvent,PABLROD,c,delete
+# Qt::SignalMapper,PABLROD,c,delete
+# Qt::SignalTransition,PABLROD,c,delete
+# Qt::SimpleXmlNodeModel,PABLROD,c,delete
+# Qt::Size,PABLROD,c,delete
+# Qt::SizeF,PABLROD,c,delete
+# Qt::SizeGrip,PABLROD,c,delete
+# Qt::SizePolicy,PABLROD,c,delete
+# Qt::Slider,PABLROD,c,delete
+# Qt::SocketNotifier,PABLROD,c,delete
+# Qt::SortFilterProxyModel,PABLROD,c,delete
+# Qt::Sound,PABLROD,c,delete
+# Qt::SourceLocation,PABLROD,c,delete
+# Qt::SpacerItem,PABLROD,c,delete
+# Qt::SpinBox,PABLROD,c,delete
+# Qt::SplashScreen,PABLROD,c,delete
+# Qt::Splitter,PABLROD,c,delete
+# Qt::SplitterHandle,PABLROD,c,delete
+# Qt::Sql,PABLROD,c,delete
+# Qt::SqlDatabase,PABLROD,c,delete
+# Qt::SqlDriver,PABLROD,c,delete
+# Qt::SqlDriverCreatorBase,PABLROD,c,delete
+# Qt::SqlDriverFactoryInterface,PABLROD,c,delete
+# Qt::SqlDriverPlugin,PABLROD,c,delete
+# Qt::SqlError,PABLROD,c,delete
+# Qt::SqlField,PABLROD,c,delete
+# Qt::SqlIndex,PABLROD,c,delete
+# Qt::SqlQuery,PABLROD,c,delete
+# Qt::SqlQueryModel,PABLROD,c,delete
+# Qt::SqlRecord,PABLROD,c,delete
+# Qt::SqlRelation,PABLROD,c,delete
+# Qt::SqlRelationalDelegate,PABLROD,c,delete
+# Qt::SqlRelationalTableModel,PABLROD,c,delete
+# Qt::SqlResult,PABLROD,c,delete
+# Qt::SqlTableModel,PABLROD,c,delete
+# Qt::Ssl,PABLROD,c,delete
+# Qt::SslCertificate,PABLROD,c,delete
+# Qt::SslCipher,PABLROD,c,delete
+# Qt::SslConfiguration,PABLROD,c,delete
+# Qt::SslError,PABLROD,c,delete
+# Qt::SslKey,PABLROD,c,delete
+# Qt::SslSocket,PABLROD,c,delete
+# Qt::StackedLayout,PABLROD,c,delete
+# Qt::StackedWidget,PABLROD,c,delete
+# Qt::StandardItem,PABLROD,c,delete
+# Qt::StandardItemModel,PABLROD,c,delete
+# Qt::State,PABLROD,c,delete
+# Qt::StateMachine,PABLROD,c,delete
+# Qt::StaticText,PABLROD,c,delete
+# Qt::StatusBar,PABLROD,c,delete
+# Qt::StatusTipEvent,PABLROD,c,delete
+# Qt::StringListModel,PABLROD,c,delete
+# Qt::StringMatcher,PABLROD,c,delete
+# Qt::String::Null,PABLROD,c,delete
+# Qt::StringRef,PABLROD,c,delete
+# Qt::Style,PABLROD,c,delete
+# Qt::StyledItemDelegate,PABLROD,c,delete
+# Qt::StyleFactory,PABLROD,c,delete
+# Qt::StyleFactoryInterface,PABLROD,c,delete
+# Qt::StyleHintReturn,PABLROD,c,delete
+# Qt::StyleHintReturnMask,PABLROD,c,delete
+# Qt::StyleHintReturnVariant,PABLROD,c,delete
+# Qt::StyleOption,PABLROD,c,delete
+# Qt::StyleOptionButton,PABLROD,c,delete
+# Qt::StyleOptionComboBox,PABLROD,c,delete
+# Qt::StyleOptionComplex,PABLROD,c,delete
+# Qt::StyleOptionDockWidget,PABLROD,c,delete
+# Qt::StyleOptionDockWidgetV2,PABLROD,c,delete
+# Qt::StyleOptionFocusRect,PABLROD,c,delete
+# Qt::StyleOptionFrame,PABLROD,c,delete
+# Qt::StyleOptionFrameV2,PABLROD,c,delete
+# Qt::StyleOptionFrameV3,PABLROD,c,delete
+# Qt::StyleOptionGraphicsItem,PABLROD,c,delete
+# Qt::StyleOptionGroupBox,PABLROD,c,delete
+# Qt::StyleOptionHeader,PABLROD,c,delete
+# Qt::StyleOptionMenuItem,PABLROD,c,delete
+# Qt::StyleOptionProgressBar,PABLROD,c,delete
+# Qt::StyleOptionProgressBarV2,PABLROD,c,delete
+# Qt::StyleOptionRubberBand,PABLROD,c,delete
+# Qt::StyleOptionSizeGrip,PABLROD,c,delete
+# Qt::StyleOptionSlider,PABLROD,c,delete
+# Qt::StyleOptionSpinBox,PABLROD,c,delete
+# Qt::StyleOptionTab,PABLROD,c,delete
+# Qt::StyleOptionTabBarBase,PABLROD,c,delete
+# Qt::StyleOptionTabBarBaseV2,PABLROD,c,delete
+# Qt::StyleOptionTabV2,PABLROD,c,delete
+# Qt::StyleOptionTabV3,PABLROD,c,delete
+# Qt::StyleOptionTabWidgetFrame,PABLROD,c,delete
+# Qt::StyleOptionTabWidgetFrameV2,PABLROD,c,delete
+# Qt::StyleOptionTitleBar,PABLROD,c,delete
+# Qt::StyleOptionToolBar,PABLROD,c,delete
+# Qt::StyleOptionToolBox,PABLROD,c,delete
+# Qt::StyleOptionToolBoxV2,PABLROD,c,delete
+# Qt::StyleOptionToolButton,PABLROD,c,delete
+# Qt::StyleOptionViewItem,PABLROD,c,delete
+# Qt::StyleOptionViewItemV2,PABLROD,c,delete
+# Qt::StyleOptionViewItemV3,PABLROD,c,delete
+# Qt::StyleOptionViewItemV4,PABLROD,c,delete
+# Qt::StylePainter,PABLROD,c,delete
+# Qt::StylePlugin,PABLROD,c,delete
+# Qt::SvgGenerator,PABLROD,c,delete
+# Qt::SvgRenderer,PABLROD,c,delete
+# Qt::SvgWidget,PABLROD,c,delete
+# Qt::SwipeGesture,PABLROD,c,delete
+# Qt::SyntaxHighlighter,PABLROD,c,delete
+# Qt::SysInfo,PABLROD,c,delete
+# Qt::SystemLocale,PABLROD,c,delete
+# Qt::SystemSemaphore,PABLROD,c,delete
+# Qt::SystemTrayIcon,PABLROD,c,delete
+# Qt::TabBar,PABLROD,c,delete
+# Qt::TabletEvent,PABLROD,c,delete
+# Qt::TableView,PABLROD,c,delete
+# Qt::TableWidget,PABLROD,c,delete
+# Qt::TableWidgetItem,PABLROD,c,delete
+# Qt::TableWidgetSelectionRange,PABLROD,c,delete
+# Qt::TabWidget,PABLROD,c,delete
+# Qt::TapAndHoldGesture,PABLROD,c,delete
+# Qt::TapGesture,PABLROD,c,delete
+# Qt::TcpServer,PABLROD,c,delete
+# Qt::TcpSocket,PABLROD,c,delete
+# Qt::TemporaryFile,PABLROD,c,delete
+# Qt::Test,PABLROD,c,delete
+# Qt::TestAccessibility,PABLROD,c,delete
+# Qt::TestAccessibilityEvent,PABLROD,c,delete
+# Qt::TestData,PABLROD,c,delete
+# Qt::TestDelayEvent,PABLROD,c,delete
+# Qt::TestEvent,PABLROD,c,delete
+# Qt::TestEventLoop,PABLROD,c,delete
+# Qt::TestKeyClicksEvent,PABLROD,c,delete
+# Qt::TestKeyEvent,PABLROD,c,delete
+# Qt::TestMouseEvent,PABLROD,c,delete
+# Qt::TextBlock,PABLROD,c,delete
+# Qt::TextBlockFormat,PABLROD,c,delete
+# Qt::TextBlockGroup,PABLROD,c,delete
+# Qt::TextBlock::iterator,PABLROD,c,delete
+# Qt::TextBlockUserData,PABLROD,c,delete
+# Qt::TextBoundaryFinder,PABLROD,c,delete
+# Qt::TextBrowser,PABLROD,c,delete
+# Qt::TextCharFormat,PABLROD,c,delete
+# Qt::TextCodec,PABLROD,c,delete
+# Qt::TextCodec::ConverterState,PABLROD,c,delete
+# Qt::TextCodecFactoryInterface,PABLROD,c,delete
+# Qt::TextCodecPlugin,PABLROD,c,delete
+# Qt::TextCursor,PABLROD,c,delete
+# Qt::TextDecoder,PABLROD,c,delete
+# Qt::TextDocument,PABLROD,c,delete
+# Qt::TextDocumentFragment,PABLROD,c,delete
+# Qt::TextDocumentWriter,PABLROD,c,delete
+# Qt::TextEdit,PABLROD,c,delete
+# Qt::TextEdit::ExtraSelection,PABLROD,c,delete
+# Qt::TextEncoder,PABLROD,c,delete
+# Qt::TextFormat,PABLROD,c,delete
+# Qt::TextFragment,PABLROD,c,delete
+# Qt::TextFrame,PABLROD,c,delete
+# Qt::TextFrameFormat,PABLROD,c,delete
+# Qt::TextFrame::iterator,PABLROD,c,delete
+# Qt::TextFrameLayoutData,PABLROD,c,delete
+# Qt::TextImageFormat,PABLROD,c,delete
+# Qt::TextInlineObject,PABLROD,c,delete
+# Qt::TextItem,PABLROD,c,delete
+# Qt::TextLayout,PABLROD,c,delete
+# Qt::TextLayout::FormatRange,PABLROD,c,delete
+# Qt::TextLength,PABLROD,c,delete
+# Qt::TextLine,PABLROD,c,delete
+# Qt::TextList,PABLROD,c,delete
+# Qt::TextListFormat,PABLROD,c,delete
+# Qt::TextObject,PABLROD,c,delete
+# Qt::TextObjectInterface,PABLROD,c,delete
+# Qt::TextOption,PABLROD,c,delete
+# Qt::TextOption::Tab,PABLROD,c,delete
+# Qt::TextStream,PABLROD,c,delete
+# Qt::TextStreamManipulator,PABLROD,c,delete
+# Qt::TextTable,PABLROD,c,delete
+# Qt::TextTableCell,PABLROD,c,delete
+# Qt::TextTableCellFormat,PABLROD,c,delete
+# Qt::TextTableFormat,PABLROD,c,delete
+# Qt::Thread,PABLROD,c,delete
+# Qt::TileRules,PABLROD,c,delete
+# Qt::Time,PABLROD,c,delete
+# Qt::TimeEdit,PABLROD,c,delete
+# Qt::TimeLine,PABLROD,c,delete
+# Qt::Timer,PABLROD,c,delete
+# Qt::TimerEvent,PABLROD,c,delete
+# Qt::ToolBar,PABLROD,c,delete
+# Qt::ToolBarChangeEvent,PABLROD,c,delete
+# Qt::ToolBox,PABLROD,c,delete
+# Qt::ToolButton,PABLROD,c,delete
+# Qt::ToolTip,PABLROD,c,delete
+# Qt::TouchEvent,PABLROD,c,delete
+# Qt::TouchEvent::TouchPoint,PABLROD,c,delete
+# Qt::Transform,PABLROD,c,delete
+# Qt::Translator,PABLROD,c,delete
+# Qt::TreeView,PABLROD,c,delete
+# Qt::TreeWidget,PABLROD,c,delete
+# Qt::TreeWidgetItem,PABLROD,c,delete
+# Qt::TreeWidgetItemIterator,PABLROD,c,delete
+# Qt::UdpSocket,PABLROD,c,delete
+# Qt::UiLoader,PABLROD,c,delete
+# Qt::UndoCommand,PABLROD,c,delete
+# Qt::UndoGroup,PABLROD,c,delete
+# Qt::UndoStack,PABLROD,c,delete
+# Qt::UndoView,PABLROD,c,delete
+# Qt::UnixPrintWidget,PABLROD,c,delete
+# Qt::Url,PABLROD,c,delete
+# Qt::UrlInfo,PABLROD,c,delete
+# Qt::UrlPrivate,PABLROD,c,delete
+# Qt::Uuid,PABLROD,c,delete
+# Qt::Validator,PABLROD,c,delete
+# Qt::Variant,PABLROD,c,delete
+# Qt::VariantAnimation,PABLROD,c,delete
+# Qt::VariantComparisonHelper,PABLROD,c,delete
+# Qt::Variant::Handler,PABLROD,c,delete
+# Qt::Variant::Private,PABLROD,c,delete
+# Qt::VBoxLayout,PABLROD,c,delete
+# Qt::Vector2D,PABLROD,c,delete
+# Qt::Vector3D,PABLROD,c,delete
+# Qt::Vector4D,PABLROD,c,delete
+# Qt::VideoFrame,PABLROD,c,delete
+# Qt::WebDatabase,PABLROD,c,delete
+# Qt::WebElement,PABLROD,c,delete
+# Qt::WebElementCollection,PABLROD,c,delete
+# Qt::WebElementCollection::const_iterator,PABLROD,c,delete
+# Qt::WebElementCollection::iterator,PABLROD,c,delete
+# Qt::WebFrame,PABLROD,c,delete
+# Qt::WebHistory,PABLROD,c,delete
+# Qt::WebHistoryInterface,PABLROD,c,delete
+# Qt::WebHistoryItem,PABLROD,c,delete
+# Qt::WebHitTestResult,PABLROD,c,delete
+# Qt::WebInspector,PABLROD,c,delete
+# Qt::WebPage,PABLROD,c,delete
+# Qt::WebPage::ChooseMultipleFilesExtensionOption,PABLROD,c,delete
+# Qt::WebPage::ChooseMultipleFilesExtensionReturn,PABLROD,c,delete
+# Qt::WebPage::ErrorPageExtensionOption,PABLROD,c,delete
+# Qt::WebPage::ErrorPageExtensionReturn,PABLROD,c,delete
+# Qt::WebPage::ExtensionOption,PABLROD,c,delete
+# Qt::WebPage::ExtensionReturn,PABLROD,c,delete
+# Qt::WebPage::ViewportAttributes,PABLROD,c,delete
+# Qt::WebPluginFactory,PABLROD,c,delete
+# Qt::WebPluginFactory::ExtensionOption,PABLROD,c,delete
+# Qt::WebPluginFactory::ExtensionReturn,PABLROD,c,delete
+# Qt::WebPluginFactory::MimeType,PABLROD,c,delete
+# Qt::WebPluginFactory::Plugin,PABLROD,c,delete
+# Qt::WebSecurityOrigin,PABLROD,c,delete
+# Qt::WebSettings,PABLROD,c,delete
+# Qt::WebView,PABLROD,c,delete
+# Qt::WhatsThis,PABLROD,c,delete
+# Qt::WhatsThisClickedEvent,PABLROD,c,delete
+# Qt::WheelEvent,PABLROD,c,delete
+# Qt::Widget,PABLROD,c,delete
+# Qt::WidgetAction,PABLROD,c,delete
+# Qt::WidgetItem,PABLROD,c,delete
+# Qt::WidgetItemV2,PABLROD,c,delete
+# Qt::WindowStateChangeEvent,PABLROD,c,delete
+# Qt::Wizard,PABLROD,c,delete
+# Qt::WizardPage,PABLROD,c,delete
+# Qt::Workspace,PABLROD,c,delete
+# Qt::WriteLocker,PABLROD,c,delete
+# Qt::X11EmbedContainer,PABLROD,c,delete
+# Qt::X11EmbedWidget,PABLROD,c,delete
+# Qt::X11Info,PABLROD,c,delete
+# Qt::XmlAttributes,PABLROD,c,delete
+# Qt::XmlContentHandler,PABLROD,c,delete
+# Qt::XmlDeclHandler,PABLROD,c,delete
+# Qt::XmlDefaultHandler,PABLROD,c,delete
+# Qt::XmlDTDHandler,PABLROD,c,delete
+# Qt::XmlEntityResolver,PABLROD,c,delete
+# Qt::XmlErrorHandler,PABLROD,c,delete
+# Qt::XmlFormatter,PABLROD,c,delete
+# Qt::XmlInputSource,PABLROD,c,delete
+# Qt::XmlItem,PABLROD,c,delete
+# Qt::XmlLexicalHandler,PABLROD,c,delete
+# Qt::XmlLocator,PABLROD,c,delete
+# Qt::XmlName,PABLROD,c,delete
+# Qt::XmlNamePool,PABLROD,c,delete
+# Qt::XmlNamespaceSupport,PABLROD,c,delete
+# Qt::XmlNodeModelIndex,PABLROD,c,delete
+# Qt::XmlParseException,PABLROD,c,delete
+# Qt::XmlQuery,PABLROD,c,delete
+# Qt::XmlReader,PABLROD,c,delete
+# Qt::XmlResultItems,PABLROD,c,delete
+# Qt::XmlSchema,PABLROD,c,delete
+# Qt::XmlSchemaValidator,PABLROD,c,delete
+# Qt::XmlSerializer,PABLROD,c,delete
+# Qt::XmlSimpleReader,PABLROD,c,delete
+# Qt::XmlStreamAttribute,PABLROD,c,delete
+# Qt::XmlStreamEntityDeclaration,PABLROD,c,delete
+# Qt::XmlStreamEntityResolver,PABLROD,c,delete
+# Qt::XmlStreamNamespaceDeclaration,PABLROD,c,delete
+# Qt::XmlStreamNotationDeclaration,PABLROD,c,delete
+# Qt::XmlStreamReader,PABLROD,c,delete
+# Qt::XmlStreamStringRef,PABLROD,c,delete
+# Qt::XmlStreamWriter,PABLROD,c,delete
+# QwtAbstractScale,PABLROD,c,delete
+# QwtAbstractScaleDraw,PABLROD,c,delete
+# QwtAbstractSlider,PABLROD,c,delete
+# QwtAlphaColorMap,PABLROD,c,delete
+# QwtAnalogClock,PABLROD,c,delete
+# QwtArrayData,PABLROD,c,delete
+# QwtArrowButton,PABLROD,c,delete
+# QwtClipper,PABLROD,c,delete
+# QwtColorMap,PABLROD,c,delete
+# QwtCompass,PABLROD,c,delete
+# QwtCompassMagnetNeedle,PABLROD,c,delete
+# QwtCompassRose,PABLROD,c,delete
+# QwtCompassWindArrow,PABLROD,c,delete
+# QwtCounter,PABLROD,c,delete
+# QwtCPointerData,PABLROD,c,delete
+# QwtCurveFitter,PABLROD,c,delete
+# QwtData,PABLROD,c,delete
+# QwtDial,PABLROD,c,delete
+# QwtDialNeedle,PABLROD,c,delete
+# QwtDialScaleDraw,PABLROD,c,delete
+# QwtDialSimpleNeedle,PABLROD,c,delete
+# QwtDoubleInterval,PABLROD,c,delete
+# QwtDoubleRange,PABLROD,c,delete
+# QwtDynGridLayout,PABLROD,c,delete
+# QwtEventPattern,PABLROD,c,delete
+# QwtIntervalData,PABLROD,c,delete
+# QwtKnob,PABLROD,c,delete
+# QwtLegend,PABLROD,c,delete
+# QwtLegendItem,PABLROD,c,delete
+# QwtLegendItemManager,PABLROD,c,delete
+# QwtLinearColorMap,PABLROD,c,delete
+# QwtLinearScaleEngine,PABLROD,c,delete
+# QwtLog10ScaleEngine,PABLROD,c,delete
+# QwtMagnifier,PABLROD,c,delete
+# QwtMetricsMap,PABLROD,c,delete
+# QwtPainter,PABLROD,c,delete
+# QwtPanner,PABLROD,c,delete
+# QwtPicker,PABLROD,c,delete
+# QwtPickerClickPointMachine,PABLROD,c,delete
+# QwtPickerClickRectMachine,PABLROD,c,delete
+# QwtPickerDragPointMachine,PABLROD,c,delete
+# QwtPickerDragRectMachine,PABLROD,c,delete
+# QwtPickerMachine,PABLROD,c,delete
+# QwtPickerPolygonMachine,PABLROD,c,delete
+# QwtPlainTextEngine,PABLROD,c,delete
+# QwtPlot,PABLROD,c,delete
+# QwtPlotCanvas,PABLROD,c,delete
+# QwtPlotCurve,PABLROD,c,delete
+# QwtPlotDict,PABLROD,c,delete
+# QwtPlotGrid,PABLROD,c,delete
+# QwtPlotItem,PABLROD,c,delete
+# QwtPlotLayout,PABLROD,c,delete
+# QwtPlotMagnifier,PABLROD,c,delete
+# QwtPlotMarker,PABLROD,c,delete
+# QwtPlotPanner,PABLROD,c,delete
+# QwtPlotPicker,PABLROD,c,delete
+# QwtPlotPrintFilter,PABLROD,c,delete
+# QwtPlotRasterItem,PABLROD,c,delete
+# QwtPlotScaleItem,PABLROD,c,delete
+# QwtPlotSpectrogram,PABLROD,c,delete
+# QwtPlotZoomer,PABLROD,c,delete
+# QwtPolygonFData,PABLROD,c,delete
+# QwtRasterData,PABLROD,c,delete
+# QwtRichTextEngine,PABLROD,c,delete
+# QwtRoundScaleDraw,PABLROD,c,delete
+# QwtScaleArithmetic,PABLROD,c,delete
+# QwtScaleDiv,PABLROD,c,delete
+# QwtScaleDraw,PABLROD,c,delete
+# QwtScaleEngine,PABLROD,c,delete
+# QwtScaleMap,PABLROD,c,delete
+# QwtScaleTransformation,PABLROD,c,delete
+# QwtScaleWidget,PABLROD,c,delete
+# QwtSimpleCompassRose,PABLROD,c,delete
+# QwtSlider,PABLROD,c,delete
+# QwtSpline,PABLROD,c,delete
+# QwtSplineCurveFitter,PABLROD,c,delete
+# QwtSymbol,PABLROD,c,delete
+# QwtText,PABLROD,c,delete
+# QwtTextEngine,PABLROD,c,delete
+# QwtTextLabel,PABLROD,c,delete
+# QwtThermo,PABLROD,c,delete
+# Rectangle_t,PABLROD,c,delete
+# RedirectHandle_t,PABLROD,c,delete
+# ROOT,PABLROD,c,delete
+# ROOT::Fit::FitResult,PABLROD,c,delete
+# rop,PABLROD,c,delete
+# RPM2::C::DB,PABLROD,c,delete
+# RPM2::C::Header,PABLROD,c,delete
+# RPM2::C::PackageIterator,PABLROD,c,delete
+# RPM2::C::Transaction,PABLROD,c,delete
+# RPM::VersionCompare,PABLROD,c,delete
+# RRDs,PABLROD,c,delete
+# sbmp,PABLROD,c,delete
+# ScreenPtr,PABLROD,c,delete
+# Search::Xapian::DateValueRangeProcessor,PABLROD,c,delete
+# Search::Xapian::NumberValueRangeProcessor,PABLROD,c,delete
+# Search::Xapian::StringValueRangeProcessor,PABLROD,c,delete
+# Segment_t,PABLROD,c,delete
+# Sereal::Encoder::_ptabletest,PABLROD,c,delete
+# SetWindowAttributes_t,PABLROD,c,delete
+# SnmpSessionPtr,PABLROD,c,delete
+# SOOT::API::ClassIterator,PABLROD,c,delete
+# SOOT::RTXS,PABLROD,c,delete
+# Statistics::CaseResampling::RdGen,PABLROD,c,delete
+# sv,PABLROD,c,delete
+# Sys::CPU,PABLROD,c,delete
+# Sys::Guestfs,PABLROD,c,delete
+# SysInfo_t,PABLROD,c,delete
+# Sys::SigAction::Alarm,PABLROD,c,delete
+# SystemC::Parser,PABLROD,c,delete
+# ta,PABLROD,c,delete
+# TApplication,PABLROD,c,delete
+# TApplicationImp,PABLROD,c,delete
+# TApplicationRemote,PABLROD,c,delete
+# TApplicationServer,PABLROD,c,delete
+# TArc,PABLROD,c,delete
+# TArchiveFile,PABLROD,c,delete
+# TArchiveMember,PABLROD,c,delete
+# TArrayC,PABLROD,c,delete
+# TArrayD,PABLROD,c,delete
+# TArrayF,PABLROD,c,delete
+# TArrayI,PABLROD,c,delete
+# TArrayL,PABLROD,c,delete
+# TArrayL64,PABLROD,c,delete
+# TArrayS,PABLROD,c,delete
+# TArrow,PABLROD,c,delete
+# TAtomicCount,PABLROD,c,delete
+# TAtt3D,PABLROD,c,delete
+# TAttAxis,PABLROD,c,delete
+# TAttBBox,PABLROD,c,delete
+# TAttBBox2D,PABLROD,c,delete
+# TAttCanvas,PABLROD,c,delete
+# TAttFill,PABLROD,c,delete
+# TAttImage,PABLROD,c,delete
+# TAttLine,PABLROD,c,delete
+# TAttMarker,PABLROD,c,delete
+# TAttPad,PABLROD,c,delete
+# TAttText,PABLROD,c,delete
+# TAxis,PABLROD,c,delete
+# TAxis3D,PABLROD,c,delete
+# TBackCompFitter,PABLROD,c,delete
+# TBase64,PABLROD,c,delete
+# TBaseClass,PABLROD,c,delete
+# TBasket,PABLROD,c,delete
+# TBasketSQL,PABLROD,c,delete
+# TBenchmark,PABLROD,c,delete
+# TBinomialEfficiencyFitter,PABLROD,c,delete
+# TBits,PABLROD,c,delete
+# TBox,PABLROD,c,delete
+# TBranch,PABLROD,c,delete
+# TBranchClones,PABLROD,c,delete
+# TBranchElement,PABLROD,c,delete
+# TBranchObject,PABLROD,c,delete
+# TBranchRef,PABLROD,c,delete
+# TBranchSTL,PABLROD,c,delete
+# TBRIK,PABLROD,c,delete
+# TBrowser,PABLROD,c,delete
+# TBrowserImp,PABLROD,c,delete
+# TBtree,PABLROD,c,delete
+# TBuffer,PABLROD,c,delete
+# TBuffer3D,PABLROD,c,delete
+# TBufferFile,PABLROD,c,delete
+# TBufferSQL,PABLROD,c,delete
+# TButton,PABLROD,c,delete
+# TCanvas,PABLROD,c,delete
+# TCanvasImp,PABLROD,c,delete
+# TChain,PABLROD,c,delete
+# TChainElement,PABLROD,c,delete
+# TCint,PABLROD,c,delete
+# TClass,PABLROD,c,delete
+# TClassEdit,PABLROD,c,delete
+# TClassGenerator,PABLROD,c,delete
+# TClassMenuItem,PABLROD,c,delete
+# TClassRef,PABLROD,c,delete
+# TClassStreamer,PABLROD,c,delete
+# TClassTable,PABLROD,c,delete
+# TClassTree,PABLROD,c,delete
+# TClonesArray,PABLROD,c,delete
+# TCollection,PABLROD,c,delete
+# TCollectionClassStreamer,PABLROD,c,delete
+# TCollectionMemberStreamer,PABLROD,c,delete
+# TCollectionMethodBrowsable,PABLROD,c,delete
+# TCollectionPropertyBrowsable,PABLROD,c,delete
+# TCollectionProxyFactory,PABLROD,c,delete
+# TCollectionStreamer,PABLROD,c,delete
+# TColor,PABLROD,c,delete
+# TColorGradient,PABLROD,c,delete
+# TColorWheel,PABLROD,c,delete
+# TComplex,PABLROD,c,delete
+# TCondition,PABLROD,c,delete
+# TConditionImp,PABLROD,c,delete
+# TCONE,PABLROD,c,delete
+# TConfidenceLevel,PABLROD,c,delete
+# TCONS,PABLROD,c,delete
+# TContextMenu,PABLROD,c,delete
+# TContextMenuImp,PABLROD,c,delete
+# TControlBar,PABLROD,c,delete
+# TControlBarButton,PABLROD,c,delete
+# TControlBarImp,PABLROD,c,delete
+# TCrown,PABLROD,c,delete
+# TCTUB,PABLROD,c,delete
+# TCurlyArc,PABLROD,c,delete
+# TCurlyLine,PABLROD,c,delete
+# TCut,PABLROD,c,delete
+# TCutG,PABLROD,c,delete
+# TDataMember,PABLROD,c,delete
+# TDataType,PABLROD,c,delete
+# TDatime,PABLROD,c,delete
+# TDecompBase,PABLROD,c,delete
+# TDecompBK,PABLROD,c,delete
+# TDecompChol,PABLROD,c,delete
+# TDecompLU,PABLROD,c,delete
+# TDecompQRH,PABLROD,c,delete
+# TDecompSparse,PABLROD,c,delete
+# TDecompSVD,PABLROD,c,delete
+# TDialogCanvas,PABLROD,c,delete
+# TDiamond,PABLROD,c,delete
+# TDictAttributeMap,PABLROD,c,delete
+# TDictionary,PABLROD,c,delete
+# TDirectory,PABLROD,c,delete
+# TDirectoryFile,PABLROD,c,delete
+# TEfficiency,PABLROD,c,delete
+# TEllipse,PABLROD,c,delete
+# TELTU,PABLROD,c,delete
+# TEmulatedCollectionProxy,PABLROD,c,delete
+# TEmulatedMapProxy,PABLROD,c,delete
+# TEntryList,PABLROD,c,delete
+# TEntryListArray,PABLROD,c,delete
+# TEntryListBlock,PABLROD,c,delete
+# TEntryListFromFile,PABLROD,c,delete
+# TEnv,PABLROD,c,delete
+# TEnvRec,PABLROD,c,delete
+# TEventList,PABLROD,c,delete
+# TExec,PABLROD,c,delete
+# TExecImpl,PABLROD,c,delete
+# TExMap,PABLROD,c,delete
+# TExMapIter,PABLROD,c,delete
+# Text::IconvPtr,PABLROD,c,delete
+# Text::Xslate::Type::Macro,PABLROD,c,delete
+# Text::Xslate::Type::Pair,PABLROD,c,delete
+# TF1,PABLROD,c,delete
+# TF12,PABLROD,c,delete
+# TF2,PABLROD,c,delete
+# TF3,PABLROD,c,delete
+# TFeldmanCousins,PABLROD,c,delete
+# TFile,PABLROD,c,delete
+# TFileCacheRead,PABLROD,c,delete
+# TFileCacheWrite,PABLROD,c,delete
+# TFileCollection,PABLROD,c,delete
+# TFileHandler,PABLROD,c,delete
+# TFileInfo,PABLROD,c,delete
+# TFileInfoMeta,PABLROD,c,delete
+# TFileMergeInfo,PABLROD,c,delete
+# TFileMerger,PABLROD,c,delete
+# TFilePrefetch,PABLROD,c,delete
+# TFileStager,PABLROD,c,delete
+# TFitResult,PABLROD,c,delete
+# TFitResultPtr,PABLROD,c,delete
+# TFolder,PABLROD,c,delete
+# TFormula,PABLROD,c,delete
+# TFormulaPrimitive,PABLROD,c,delete
+# TFPBlock,PABLROD,c,delete
+# TFractionFitter,PABLROD,c,delete
+# TFrame,PABLROD,c,delete
+# TFree,PABLROD,c,delete
+# TFriendElement,PABLROD,c,delete
+# TFunction,PABLROD,c,delete
+# TGaxis,PABLROD,c,delete
+# TGenCollectionProxy,PABLROD,c,delete
+# TGenPhaseSpace,PABLROD,c,delete
+# TGeometry,PABLROD,c,delete
+# TGLManager,PABLROD,c,delete
+# TGlobal,PABLROD,c,delete
+# TGLPaintDevice,PABLROD,c,delete
+# TGraph,PABLROD,c,delete
+# TGraph2D,PABLROD,c,delete
+# TGraph2DErrors,PABLROD,c,delete
+# TGraphAsymmErrors,PABLROD,c,delete
+# TGraphBentErrors,PABLROD,c,delete
+# TGraphDelaunay,PABLROD,c,delete
+# TGraphErrors,PABLROD,c,delete
+# TGraphPolar,PABLROD,c,delete
+# TGraphPolargram,PABLROD,c,delete
+# TGraphQQ,PABLROD,c,delete
+# TGraphSmooth,PABLROD,c,delete
+# TGraphTime,PABLROD,c,delete
+# TGrid,PABLROD,c,delete
+# TGridCollection,PABLROD,c,delete
+# TGridJDL,PABLROD,c,delete
+# TGridJob,PABLROD,c,delete
+# TGridJobStatus,PABLROD,c,delete
+# TGridJobStatusList,PABLROD,c,delete
+# TGridResult,PABLROD,c,delete
+# TGroupButton,PABLROD,c,delete
+# TGTRA,PABLROD,c,delete
+# TGuiFactory,PABLROD,c,delete
+# TH1,PABLROD,c,delete
+# TH1C,PABLROD,c,delete
+# TH1D,PABLROD,c,delete
+# TH1F,PABLROD,c,delete
+# TH1I,PABLROD,c,delete
+# TH1K,PABLROD,c,delete
+# TH1S,PABLROD,c,delete
+# TH2,PABLROD,c,delete
+# TH2C,PABLROD,c,delete
+# TH2D,PABLROD,c,delete
+# TH2F,PABLROD,c,delete
+# TH2I,PABLROD,c,delete
+# TH2Poly,PABLROD,c,delete
+# TH2PolyBin,PABLROD,c,delete
+# TH2S,PABLROD,c,delete
+# TH3,PABLROD,c,delete
+# TH3C,PABLROD,c,delete
+# TH3D,PABLROD,c,delete
+# TH3F,PABLROD,c,delete
+# TH3I,PABLROD,c,delete
+# TH3S,PABLROD,c,delete
+# THashList,PABLROD,c,delete
+# THashTable,PABLROD,c,delete
+# THashTableIter,PABLROD,c,delete
+# THelix,PABLROD,c,delete
+# THLimitsFinder,PABLROD,c,delete
+# THn,PABLROD,c,delete
+# THnBase,PABLROD,c,delete
+# THnIter,PABLROD,c,delete
+# THnSparse,PABLROD,c,delete
+# THnSparseArrayChunk,PABLROD,c,delete
+# THStack,PABLROD,c,delete
+# THYPE,PABLROD,c,delete
+# TImage,PABLROD,c,delete
+# TImageDump,PABLROD,c,delete
+# TImagePalette,PABLROD,c,delete
+# TImagePlugin,PABLROD,c,delete
+# Time::Moment::Internal,PABLROD,c,delete
+# timespec,PABLROD,c,delete
+# TIndArray,PABLROD,c,delete
+# TInetAddress,PABLROD,c,delete
+# TInspectCanvas,PABLROD,c,delete
+# TInspectorImp,PABLROD,c,delete
+# TInterpreter,PABLROD,c,delete
+# TIsAProxy,PABLROD,c,delete
+# TIter,PABLROD,c,delete
+# TIterator,PABLROD,c,delete
+# Tk::Callback,PABLROD,c,delete
+# TKDE,PABLROD,c,delete
+# TKDTreeBinning,PABLROD,c,delete
+# Tk::Event::Source,PABLROD,c,delete
+# TKey,PABLROD,c,delete
+# TKeyMapFile,PABLROD,c,delete
+# Tk::FontRankInfo,PABLROD,c,delete
+# Tk::Interp,PABLROD,c,delete
+# TLatex,PABLROD,c,delete
+# TLeaf,PABLROD,c,delete
+# TLeafB,PABLROD,c,delete
+# TLeafC,PABLROD,c,delete
+# TLeafD,PABLROD,c,delete
+# TLeafElement,PABLROD,c,delete
+# TLeafF,PABLROD,c,delete
+# TLeafI,PABLROD,c,delete
+# TLeafL,PABLROD,c,delete
+# TLeafO,PABLROD,c,delete
+# TLeafObject,PABLROD,c,delete
+# TLeafS,PABLROD,c,delete
+# TLegend,PABLROD,c,delete
+# TLegendEntry,PABLROD,c,delete
+# TLimit,PABLROD,c,delete
+# TLimitDataSource,PABLROD,c,delete
+# TLine,PABLROD,c,delete
+# TLinearGradient,PABLROD,c,delete
+# TLink,PABLROD,c,delete
+# TList,PABLROD,c,delete
+# TLockFile,PABLROD,c,delete
+# TLockGuard,PABLROD,c,delete
+# TLorentzRotation,PABLROD,c,delete
+# TLorentzVector,PABLROD,c,delete
+# TMacro,PABLROD,c,delete
+# TMap,PABLROD,c,delete
+# TMapFile,PABLROD,c,delete
+# TMapRec,PABLROD,c,delete
+# TMarker,PABLROD,c,delete
+# TMarker3DBox,PABLROD,c,delete
+# TMaterial,PABLROD,c,delete
+# TMath,PABLROD,c,delete
+# TMathText,PABLROD,c,delete
+# TMatrixDEigen,PABLROD,c,delete
+# TMatrixDSymEigen,PABLROD,c,delete
+# TMatrixTCramerInv,PABLROD,c,delete
+# TMatrixTSymCramerInv,PABLROD,c,delete
+# TMD5,PABLROD,c,delete
+# TMemberInspector,PABLROD,c,delete
+# TMemberStreamer,PABLROD,c,delete
+# TMemFile,PABLROD,c,delete
+# TMessage,PABLROD,c,delete
+# TMessageHandler,PABLROD,c,delete
+# TMethod,PABLROD,c,delete
+# TMethodArg,PABLROD,c,delete
+# TMethodBrowsable,PABLROD,c,delete
+# TMethodCall,PABLROD,c,delete
+# TMixture,PABLROD,c,delete
+# TMonitor,PABLROD,c,delete
+# TMultiDimFit,PABLROD,c,delete
+# TMultiGraph,PABLROD,c,delete
+# TMutex,PABLROD,c,delete
+# TMutexImp,PABLROD,c,delete
+# TNamed,PABLROD,c,delete
+# TNDArray,PABLROD,c,delete
+# TNetFile,PABLROD,c,delete
+# TNetFileStager,PABLROD,c,delete
+# TNetSystem,PABLROD,c,delete
+# TNode,PABLROD,c,delete
+# TNodeDiv,PABLROD,c,delete
+# TNonSplitBrowsable,PABLROD,c,delete
+# TNtuple,PABLROD,c,delete
+# TNtupleD,PABLROD,c,delete
+# TObjArray,PABLROD,c,delete
+# TObjectRefSpy,PABLROD,c,delete
+# TObjectSpy,PABLROD,c,delete
+# TObjectTable,PABLROD,c,delete
+# TObjString,PABLROD,c,delete
+# TOrdCollection,PABLROD,c,delete
+# TPad,PABLROD,c,delete
+# TPadPainter,PABLROD,c,delete
+# TPair,PABLROD,c,delete
+# TPaletteEditor,PABLROD,c,delete
+# TPARA,PABLROD,c,delete
+# TParallelMergingFile,PABLROD,c,delete
+# TPave,PABLROD,c,delete
+# TPaveClass,PABLROD,c,delete
+# TPaveLabel,PABLROD,c,delete
+# TPaveStats,PABLROD,c,delete
+# TPavesText,PABLROD,c,delete
+# TPaveText,PABLROD,c,delete
+# TPCON,PABLROD,c,delete
+# TPDF,PABLROD,c,delete
+# TPGON,PABLROD,c,delete
+# TPie,PABLROD,c,delete
+# TPieSlice,PABLROD,c,delete
+# TPluginHandler,PABLROD,c,delete
+# TPluginManager,PABLROD,c,delete
+# TPMERegexp,PABLROD,c,delete
+# TPoint,PABLROD,c,delete
+# TPoints,PABLROD,c,delete
+# TPoints3DABC,PABLROD,c,delete
+# TPointSet3D,PABLROD,c,delete
+# TPolyLine,PABLROD,c,delete
+# TPolyLine3D,PABLROD,c,delete
+# TPolyMarker,PABLROD,c,delete
+# TPolyMarker3D,PABLROD,c,delete
+# TPosixCondition,PABLROD,c,delete
+# TPosixMutex,PABLROD,c,delete
+# TPosixThread,PABLROD,c,delete
+# TPosixThreadFactory,PABLROD,c,delete
+# TPostScript,PABLROD,c,delete
+# TPRegexp,PABLROD,c,delete
+# TPrincipal,PABLROD,c,delete
+# TProcessEventTimer,PABLROD,c,delete
+# TProcessID,PABLROD,c,delete
+# TProcessUUID,PABLROD,c,delete
+# TProfile,PABLROD,c,delete
+# TProfile2D,PABLROD,c,delete
+# TProfile3D,PABLROD,c,delete
+# TPServerSocket,PABLROD,c,delete
+# TPSocket,PABLROD,c,delete
+# TQClass,PABLROD,c,delete
+# TQCommand,PABLROD,c,delete
+# TQConnection,PABLROD,c,delete
+# TQObject,PABLROD,c,delete
+# TQObjSender,PABLROD,c,delete
+# TQuaternion,PABLROD,c,delete
+# TQueryResult,PABLROD,c,delete
+# TQUndoManager,PABLROD,c,delete
+# TRadialGradient,PABLROD,c,delete
+# TRandom,PABLROD,c,delete
+# TRandom1,PABLROD,c,delete
+# TRandom2,PABLROD,c,delete
+# TRandom3,PABLROD,c,delete
+# TRealData,PABLROD,c,delete
+# TRedirectOutputGuard,PABLROD,c,delete
+# TRef,PABLROD,c,delete
+# TRefArray,PABLROD,c,delete
+# TRefCnt,PABLROD,c,delete
+# TRefTable,PABLROD,c,delete
+# TRegexp,PABLROD,c,delete
+# TRemoteObject,PABLROD,c,delete
+# TRint,PABLROD,c,delete
+# TRobustEstimator,PABLROD,c,delete
+# TRolke,PABLROD,c,delete
+# TROOT,PABLROD,c,delete
+# TRootIOCtor,PABLROD,c,delete
+# TRotation,PABLROD,c,delete
+# TRotMatrix,PABLROD,c,delete
+# TRWLock,PABLROD,c,delete
+# TryCatch::XS,PABLROD,c,delete
+# TS3HTTPRequest,PABLROD,c,delete
+# TS3WebFile,PABLROD,c,delete
+# TSecContext,PABLROD,c,delete
+# TSecContextCleanup,PABLROD,c,delete
+# TSelector,PABLROD,c,delete
+# TSelectorCint,PABLROD,c,delete
+# TSelectorList,PABLROD,c,delete
+# TSelectorScalar,PABLROD,c,delete
+# TSemaphore,PABLROD,c,delete
+# TSeqCollection,PABLROD,c,delete
+# TServerSocket,PABLROD,c,delete
+# TShape,PABLROD,c,delete
+# TSignalHandler,PABLROD,c,delete
+# TSlider,PABLROD,c,delete
+# TSliderBox,PABLROD,c,delete
+# TSocket,PABLROD,c,delete
+# TSortedList,PABLROD,c,delete
+# TSPHE,PABLROD,c,delete
+# TSpline,PABLROD,c,delete
+# TSpline3,PABLROD,c,delete
+# TSpline5,PABLROD,c,delete
+# TSplinePoly,PABLROD,c,delete
+# TSplinePoly3,PABLROD,c,delete
+# TSplinePoly5,PABLROD,c,delete
+# TSQLColumnInfo,PABLROD,c,delete
+# TSQLMonitoringWriter,PABLROD,c,delete
+# TSQLResult,PABLROD,c,delete
+# TSQLRow,PABLROD,c,delete
+# TSQLServer,PABLROD,c,delete
+# TSQLStatement,PABLROD,c,delete
+# TSQLTableInfo,PABLROD,c,delete
+# TSSLSocket,PABLROD,c,delete
+# TStatistic,PABLROD,c,delete
+# TStdExceptionHandler,PABLROD,c,delete
+# TStopwatch,PABLROD,c,delete
+# TStorage,PABLROD,c,delete
+# TStreamerArtificial,PABLROD,c,delete
+# TStreamerBase,PABLROD,c,delete
+# TStreamerBasicPointer,PABLROD,c,delete
+# TStreamerBasicType,PABLROD,c,delete
+# TStreamerElement,PABLROD,c,delete
+# TStreamerInfo,PABLROD,c,delete
+# TStreamerInfoActions,PABLROD,c,delete
+# TStreamerLoop,PABLROD,c,delete
+# TStreamerObject,PABLROD,c,delete
+# TStreamerObjectAny,PABLROD,c,delete
+# TStreamerObjectAnyPointer,PABLROD,c,delete
+# TStreamerObjectPointer,PABLROD,c,delete
+# TStreamerSTL,PABLROD,c,delete
+# TStreamerSTLstring,PABLROD,c,delete
+# TStreamerString,PABLROD,c,delete
+# TString,PABLROD,c,delete
+# TStringLong,PABLROD,c,delete
+# TStringToken,PABLROD,c,delete
+# TStyle,PABLROD,c,delete
+# TSubString,PABLROD,c,delete
+# TSVDUnfold,PABLROD,c,delete
+# TSVG,PABLROD,c,delete
+# TSysEvtHandler,PABLROD,c,delete
+# TSystem,PABLROD,c,delete
+# TSystemDirectory,PABLROD,c,delete
+# TSystemFile,PABLROD,c,delete
+# TTabCom,PABLROD,c,delete
+# TTask,PABLROD,c,delete
+# TTeXDump,PABLROD,c,delete
+# TText,PABLROD,c,delete
+# TTF,PABLROD,c,delete
+# TThread,PABLROD,c,delete
+# TThreadFactory,PABLROD,c,delete
+# TThreadImp,PABLROD,c,delete
+# TTime,PABLROD,c,delete
+# TTimer,PABLROD,c,delete
+# TTimeStamp,PABLROD,c,delete
+# TToggle,PABLROD,c,delete
+# TToggleGroup,PABLROD,c,delete
+# TTRAP,PABLROD,c,delete
+# TTRD1,PABLROD,c,delete
+# TTRD2,PABLROD,c,delete
+# TTree,PABLROD,c,delete
+# TTreeCache,PABLROD,c,delete
+# TTreeCacheUnzip,PABLROD,c,delete
+# TTreeCloner,PABLROD,c,delete
+# TTreeFriendLeafIter,PABLROD,c,delete
+# TTreeResult,PABLROD,c,delete
+# TTreeRow,PABLROD,c,delete
+# TTreeSQL,PABLROD,c,delete
+# TTUBE,PABLROD,c,delete
+# TTUBS,PABLROD,c,delete
+# TUDPSocket,PABLROD,c,delete
+# TUnfold,PABLROD,c,delete
+# TUnfoldBinning,PABLROD,c,delete
+# TUnfoldDensity,PABLROD,c,delete
+# TUnfoldSys,PABLROD,c,delete
+# TUnixSystem,PABLROD,c,delete
+# TUri,PABLROD,c,delete
+# TUrl,PABLROD,c,delete
+# TUUID,PABLROD,c,delete
+# TVector2,PABLROD,c,delete
+# TVector3,PABLROD,c,delete
+# TView,PABLROD,c,delete
+# TView3D,PABLROD,c,delete
+# TViewer3DPad,PABLROD,c,delete
+# TVirtualArray,PABLROD,c,delete
+# TVirtualAuth,PABLROD,c,delete
+# TVirtualBranchBrowsable,PABLROD,c,delete
+# TVirtualCollectionProxy,PABLROD,c,delete
+# TVirtualFFT,PABLROD,c,delete
+# TVirtualFitter,PABLROD,c,delete
+# TVirtualGLManip,PABLROD,c,delete
+# TVirtualGLPainter,PABLROD,c,delete
+# TVirtualGraphPainter,PABLROD,c,delete
+# TVirtualHistPainter,PABLROD,c,delete
+# TVirtualIndex,PABLROD,c,delete
+# TVirtualIsAProxy,PABLROD,c,delete
+# TVirtualMonitoringReader,PABLROD,c,delete
+# TVirtualMonitoringWriter,PABLROD,c,delete
+# TVirtualMutex,PABLROD,c,delete
+# TVirtualObject,PABLROD,c,delete
+# TVirtualPad,PABLROD,c,delete
+# TVirtualPadEditor,PABLROD,c,delete
+# TVirtualPadPainter,PABLROD,c,delete
+# TVirtualPerfStats,PABLROD,c,delete
+# TVirtualPS,PABLROD,c,delete
+# TVirtualStreamerInfo,PABLROD,c,delete
+# TVirtualTableInterface,PABLROD,c,delete
+# TVirtualTreePlayer,PABLROD,c,delete
+# TVirtualViewer3D,PABLROD,c,delete
+# TVirtualX,PABLROD,c,delete
+# tw,PABLROD,c,delete
+# TWbox,PABLROD,c,delete
+# TWebFile,PABLROD,c,delete
+# TWebSystem,PABLROD,c,delete
+# TXTRU,PABLROD,c,delete
+# TZIPFile,PABLROD,c,delete
+# TZIPMember,PABLROD,c,delete
+# Unix::Statgrab::sg_cpu_percents,PABLROD,c,delete
+# Unix::Statgrab::sg_cpu_stats,PABLROD,c,delete
+# Unix::Statgrab::sg_disk_io_stats_my,PABLROD,c,delete
+# Unix::Statgrab::sg_fs_stats_my,PABLROD,c,delete
+# Unix::Statgrab::sg_host_info,PABLROD,c,delete
+# Unix::Statgrab::sg_load_stats,PABLROD,c,delete
+# Unix::Statgrab::sg_mem_stats,PABLROD,c,delete
+# Unix::Statgrab::sg_network_iface_stats_my,PABLROD,c,delete
+# Unix::Statgrab::sg_network_io_stats_my,PABLROD,c,delete
+# Unix::Statgrab::sg_page_stats,PABLROD,c,delete
+# Unix::Statgrab::sg_process_stats,PABLROD,c,delete
+# Unix::Statgrab::sg_process_stats_my,PABLROD,c,delete
+# Unix::Statgrab::sg_swap_stats,PABLROD,c,delete
+# Unix::Statgrab::sg_user_stats,PABLROD,c,delete
+# UserGroup_t,PABLROD,c,delete
+# wc,PABLROD,c,delete
+# WindowAttributes_t,PABLROD,c,delete
+# Win::Hivex,PABLROD,c,delete
+# ws,PABLROD,c,delete
+# Wx::AboutDialogInfo,PABLROD,c,delete
+# Wx::AcceleratorEntry,PABLROD,c,delete
+# Wx::AcceleratorTable,PABLROD,c,delete
+# Wx::ANIHandler,PABLROD,c,delete
+# Wx::Animation,PABLROD,c,delete
+# Wx::AnimationCtrl,PABLROD,c,delete
+# Wx::AuiPaneInfo,PABLROD,c,delete
+# Wx::AutoBufferedPaintDC,PABLROD,c,delete
+# Wx::BitmapComboBox,PABLROD,c,delete
+# Wx::BookCtrl,PABLROD,c,delete
+# Wx::BookCtrlEvent,PABLROD,c,delete
+# Wx::BufferedDC,PABLROD,c,delete
+# Wx::BufferedPaintDC,PABLROD,c,delete
+# Wx::BusyCursor,PABLROD,c,delete
+# Wx::BusyInfo,PABLROD,c,delete
+# Wx::CalendarDateAttr,PABLROD,c,delete
+# Wx::CaretSuspend,PABLROD,c,delete
+# Wx::ChildFocusEvent,PABLROD,c,delete
+# Wx::Choicebook,PABLROD,c,delete
+# Wx::ClassInfo,PABLROD,c,delete
+# Wx::Clipboard,PABLROD,c,delete
+# Wx::ClipboardTextEvent,PABLROD,c,delete
+# Wx::CollapsiblePane,PABLROD,c,delete
+# Wx::CollapsiblePaneEvent,PABLROD,c,delete
+# Wx::ColourData,PABLROD,c,delete
+# Wx::ColourDatabase,PABLROD,c,delete
+# Wx::ColourPickerCtrl,PABLROD,c,delete
+# Wx::ColourPickerEvent,PABLROD,c,delete
+# Wx::ComboCtrl,PABLROD,c,delete
+# Wx::ComboPopup,PABLROD,c,delete
+# Wx::Command,PABLROD,c,delete
+# Wx::CommandProcessor,PABLROD,c,delete
+# Wx::ConfigBase,PABLROD,c,delete
+# Wx::ContextHelp,PABLROD,c,delete
+# Wx::ContextMenuEvent,PABLROD,c,delete
+# Wx::CURHandler,PABLROD,c,delete
+# Wx::DataFormat,PABLROD,c,delete
+# Wx::DateSpan,PABLROD,c,delete
+# Wx::DCClipper,PABLROD,c,delete
+# Wx::DCOverlay,PABLROD,c,delete
+# Wx::DirPickerCtrl,PABLROD,c,delete
+# Wx::Display,PABLROD,c,delete
+# Wx::DocTemplate,PABLROD,c,delete
+# Wx::FileConfig,PABLROD,c,delete
+# Wx::FileDirPickerEvent,PABLROD,c,delete
+# Wx::FileHistory,PABLROD,c,delete
+# Wx::FilePickerCtrl,PABLROD,c,delete
+# Wx::FileSystem,PABLROD,c,delete
+# Wx::FileType,PABLROD,c,delete
+# Wx::FileTypeInfo,PABLROD,c,delete
+# Wx::FindReplaceData,PABLROD,c,delete
+# Wx::FontData,PABLROD,c,delete
+# Wx::FontEnumerator,PABLROD,c,delete
+# Wx::FontMapper,PABLROD,c,delete
+# Wx::FontPickerCtrl,PABLROD,c,delete
+# Wx::FontPickerEvent,PABLROD,c,delete
+# Wx::FSFile,PABLROD,c,delete
+# Wx::GBPosition,PABLROD,c,delete
+# Wx::GBSizerItem,PABLROD,c,delete
+# Wx::GBSpan,PABLROD,c,delete
+# Wx::GCDC,PABLROD,c,delete
+# Wx::GenericDirCtrl,PABLROD,c,delete
+# Wx::GLContext,PABLROD,c,delete
+# Wx::GraphicsContext,PABLROD,c,delete
+# Wx::GraphicsMatrix,PABLROD,c,delete
+# Wx::GraphicsObject,PABLROD,c,delete
+# Wx::GraphicsPath,PABLROD,c,delete
+# Wx::GraphicsRenderer,PABLROD,c,delete
+# Wx::GridBagSizer,PABLROD,c,delete
+# Wx::GridCellAttr,PABLROD,c,delete
+# Wx::GridCellCoords,PABLROD,c,delete
+# Wx::GridTableMessage,PABLROD,c,delete
+# Wx::HelpProvider,PABLROD,c,delete
+# Wx::HtmlDCRenderer,PABLROD,c,delete
+# Wx::HtmlEasyPrinting,PABLROD,c,delete
+# Wx::HtmlLinkInfo,PABLROD,c,delete
+# Wx::HtmlPrintout,PABLROD,c,delete
+# Wx::HyperlinkCtrl,PABLROD,c,delete
+# Wx::HyperlinkEvent,PABLROD,c,delete
+# Wx::ICOHandler,PABLROD,c,delete
+# Wx::IconBundle,PABLROD,c,delete
+# Wx::IconLocation,PABLROD,c,delete
+# Wx::IndividualLayoutConstraint,PABLROD,c,delete
+# Wx::LanguageInfo,PABLROD,c,delete
+# Wx::LayoutConstraints,PABLROD,c,delete
+# Wx::Listbook,PABLROD,c,delete
+# Wx::ListItem,PABLROD,c,delete
+# Wx::ListItemAttr,PABLROD,c,delete
+# Wx::LogChain,PABLROD,c,delete
+# Wx::LogNull,PABLROD,c,delete
+# Wx::LogPassThrough,PABLROD,c,delete
+# Wx::LogStderr,PABLROD,c,delete
+# Wx::MaximizeEvent,PABLROD,c,delete
+# Wx::MemoryFSHandler,PABLROD,c,delete
+# Wx::MimeTypesManager,PABLROD,c,delete
+# Wx::MirrorDC,PABLROD,c,delete
+# Wx::MouseCaptureChangedEvent,PABLROD,c,delete
+# Wx::MouseCaptureLostEvent,PABLROD,c,delete
+# Wx::NativeFontInfo,PABLROD,c,delete
+# Wx::NavigationKeyEvent,PABLROD,c,delete
+# Wx::NumberEntryDialog,PABLROD,c,delete
+# Wx::Overlay,PABLROD,c,delete
+# Wx::OwnerDrawnComboBox,PABLROD,c,delete
+# Wx::PageSetupDialogData,PABLROD,c,delete
+# Wx::PasswordEntryDialog,PABLROD,c,delete
+# Wx::PerlTestAbstractNonObject,PABLROD,c,delete
+# Wx::PerlTestAbstractObject,PABLROD,c,delete
+# Wx::PerlTestNonObject,PABLROD,c,delete
+# Wx::PerlTestObject,PABLROD,c,delete
+# Wx::PickerBase,PABLROD,c,delete
+# Wx::PlFontEnumerator,PABLROD,c,delete
+# Wx::PlLog,PABLROD,c,delete
+# Wx::PlLogPassThrough,PABLROD,c,delete
+# Wx::PlOwnerDrawnComboBox,PABLROD,c,delete
+# Wx::PlPerlTestAbstractNonObject,PABLROD,c,delete
+# Wx::PlPerlTestAbstractObject,PABLROD,c,delete
+# Wx::PlPerlTestNonObject,PABLROD,c,delete
+# Wx::PlPopupTransientWindow,PABLROD,c,delete
+# Wx::PlRichTextFileHandler,PABLROD,c,delete
+# Wx::PlVListBox,PABLROD,c,delete
+# Wx::PlVScrolledWindow,PABLROD,c,delete
+# Wx::PlWindow,PABLROD,c,delete
+# Wx::Point,PABLROD,c,delete
+# Wx::PopupTransientWindow,PABLROD,c,delete
+# Wx::PopupWindow,PABLROD,c,delete
+# Wx::PrintData,PABLROD,c,delete
+# Wx::PrintDialogData,PABLROD,c,delete
+# Wx::Printer,PABLROD,c,delete
+# Wx::PrintFactory,PABLROD,c,delete
+# Wx::PrintPaperDatabase,PABLROD,c,delete
+# Wx::PropertySheetDialog,PABLROD,c,delete
+# Wx::RegionIterator,PABLROD,c,delete
+# Wx::RichTextAttr,PABLROD,c,delete
+# Wx::RichTextFileHandler,PABLROD,c,delete
+# Wx::RichTextPrintout,PABLROD,c,delete
+# Wx::RichTextRange,PABLROD,c,delete
+# Wx::RichTextStyleSheet,PABLROD,c,delete
+# Wx::ScrollEvent,PABLROD,c,delete
+# Wx::SearchCtrl,PABLROD,c,delete
+# Wx::SetCursorEvent,PABLROD,c,delete
+# Wx::SingleInstanceChecker,PABLROD,c,delete
+# Wx::SockAddress,PABLROD,c,delete
+# Wx::Sound,PABLROD,c,delete
+# Wx::StandardPaths,PABLROD,c,delete
+# Wx::StdDialogButtonSizer,PABLROD,c,delete
+# Wx::StopWatch,PABLROD,c,delete
+# Wx::SystemOptions,PABLROD,c,delete
+# Wx::SystemSettings,PABLROD,c,delete
+# Wx::TaskBarIconEvent,PABLROD,c,delete
+# Wx::TextAttr,PABLROD,c,delete
+# Wx::TextCtrlBase,PABLROD,c,delete
+# Wx::TGAHandler,PABLROD,c,delete
+# Wx::Thread,PABLROD,c,delete
+# Wx::TimeSpan,PABLROD,c,delete
+# Wx::TipProvider,PABLROD,c,delete
+# Wx::Toolbook,PABLROD,c,delete
+# Wx::ToolTip,PABLROD,c,delete
+# Wx::Treebook,PABLROD,c,delete
+# Wx::TreebookEvent,PABLROD,c,delete
+# Wx::TreeItemData,PABLROD,c,delete
+# Wx::Variant,PABLROD,c,delete
+# Wx::VideoMode,PABLROD,c,delete
+# Wx::VListBox,PABLROD,c,delete
+# Wx::VScrolledWindow,PABLROD,c,delete
+# Wx::WindowCreateEvent,PABLROD,c,delete
+# Wx::WindowDestroyEvent,PABLROD,c,delete
+# Wx::WindowDisabler,PABLROD,c,delete
+# Wx::WindowUpdateLocker,PABLROD,c,delete
+# Wx::Wizard,PABLROD,c,delete
+# Wx::WizardEvent,PABLROD,c,delete
+# Wx::WizardPage,PABLROD,c,delete
+# Wx::WizardPageSimple,PABLROD,c,delete
+# Wx::XmlDocument,PABLROD,c,delete
+# Wx::XmlNode,PABLROD,c,delete
+# Wx::XmlProperty,PABLROD,c,delete
+# Wx::XmlResource,PABLROD,c,delete
+# Wx::XmlResourceHandler,PABLROD,c,delete
+# Wx::XmlSubclassFactory,PABLROD,c,delete
+# XML::LibXML::HashTable,PABLROD,c,delete
+# XML::LibXML::LibError,PABLROD,c,delete
+# XML::LibXML::ParserContext,PABLROD,c,delete
+# XML::LibXSLT::Stylesheet,PABLROD,c,delete
+# XML::LibXSLT::TransformContext,PABLROD,c,delete
+Authen::Krb5::KeyBlock,PABLROD,f,delete
+Authen::Krb5::KeyBlock,PABLROD,c,delete
+Hamlib::Rig,PABLROD,f,delete
+Hamlib::Rig,PABLROD,c,delete
+Hamlib::Rot,PABLROD,f,delete
+Hamlib::Rot,PABLROD,c,delete
+Sane,PABLROD,f,delete
+Sane,PABLROD,c,delete
