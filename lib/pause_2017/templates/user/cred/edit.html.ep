@@ -117,7 +117,7 @@ my public email address<br>
 my secret email address<br>
 <%= radio_button "pause99_edit_cred_cpan_mail_alias" => "none",
     checked => "checked",
-%>neither nor<br>
+%> neither nor<br>
 </td></tr>
 
 % if ($pause->{HiddenUser}{ustatus} ne "active") {
