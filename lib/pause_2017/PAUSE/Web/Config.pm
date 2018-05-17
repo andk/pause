@@ -335,6 +335,7 @@ our %Actions = (
     priv => "user",
     cat => "User/06Account/01",
     desc => "Edit your user name, your email addresses (both public and secret one), change the URL of your homepage.",
+    method => 'POST',
     x_csrf_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
