@@ -15,11 +15,14 @@ sub register {
     my $action = $c->stash('.pause')->{Action};
     my $requested_action = $url->query->param('ACTION') // '';
     $url->query->param(ACTION => $action) if $action && $action ne $requested_action;
+    $url->query->remove('ABRA');
     $url;
   });
   $app->helper(my_full_url => sub {
     my $c = shift;
-    Mojo::URL->new($c->req->env->{REQUEST_URI})->base($c->req->url->to_abs->base)->to_abs;
+    my $url = Mojo::URL->new($c->req->env->{REQUEST_URI})->base($c->req->url->to_abs->base)->to_abs;
+    $url->query->remove('ABRA');
+    $url;
   });
 }
 
