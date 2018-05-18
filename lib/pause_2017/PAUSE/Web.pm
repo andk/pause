@@ -64,6 +64,13 @@ sub startup {
       }
     }
   }
+  # change_passwd is public when it is used for password recovery
+  my $action = $app->pause->config->action('change_passwd');
+  for my $method (qw/get post/) {
+    my $route = $public->$method("/change_passwd");
+    $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
+    $route->to($action->{x_mojo_to});
+  }
 
   # Private/User Menu
   my $private = $r->under("/authenquery")->to("root#auth");
