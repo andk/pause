@@ -372,6 +372,15 @@ sub change_passwd {
           my $header = {Subject => "Password Update"};
           my $mailbody = $c->render_to_string("email/user/change_passwd", format => "email");
           $mgr->send_mail_multi(\@to, $header, $mailbody);
+
+          # Remove used token
+          $sql = qq{DELETE FROM abrakadabra WHERE user = ?};
+          $rc = $dbh->do($sql, undef, $u->{userid});
+          die PAUSE::Web::Exception
+              ->new(ERROR =>
+                    sprintf qq[Could not delete token: '%s'], $dbh->errstr
+                   ) unless $rc;
+          $mgr->log({level => 'info', message => "Removed used token for $u->{userid}" });
         } else {
           die PAUSE::Web::Exception
               ->new(ERROR => "The two passwords didn't match.");
