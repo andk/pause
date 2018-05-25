@@ -162,6 +162,11 @@ sub operating_model {
   $c->serve_pause_doc("doc/operating-model.md")
 }
 
+sub privacy_policy {
+  my $c = shift;
+  $c->serve_pause_doc("doc/privacy-policy.md")
+}
+
 sub pumpkin {
   my $c = shift;
   my $pause = $c->stash(".pause");

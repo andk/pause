@@ -76,6 +76,14 @@ our %Actions = (
     desc => "How the PAUSE admins run PAUSE",
     has_title => 1,
   },
+  pause_privacy_policy => {
+    x_mojo_to => "public#privacy_policy",
+    verb => "PAUSE Privacy Policy",
+    priv => "public",
+    cat => "01self/04c",
+    desc => "Your rights as a user of PAUSE",
+    has_title => 1,
+  },
   who_pumpkin => {
     x_mojo_to => "public#pumpkin",
     verb => "List of pumpkins",
