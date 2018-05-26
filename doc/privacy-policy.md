@@ -102,7 +102,7 @@ which is mirrored onto all CPAN mirrors.
 It will remain in your author directory, and thus on CPAN,
 until you delete it via the PAUSE web interface.
 There are a small number of circumstances
-when a file in your author directory may be remove by the PAUSE admins;
+when a file in your author directory may be removed by the PAUSE admins;
 these are documented in the PAUSE Operating Model.
 PAUSE records a timestamp for the date and time
 when the file was uploaded and a "checksum"
