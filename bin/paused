@@ -548,7 +548,8 @@ has entered CPAN as
 
   my $di = CPAN::DistnameInfo->new($hash->{uriid});
   my $distname = $di->dist if $di;
-  if ($distname) {
+  # 2018-08-15: there are no cpan testers yet for perl6
+  if ($distname && ! $hash->{is_perl6}) {
     $blurb .= qq{
 CPAN Testers will start reporting results in an hour or so:
 
