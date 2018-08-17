@@ -144,9 +144,16 @@ sub new {
   bless \%args, $class;
 }
 
+sub set_credentials {
+  my $self = shift;
+  note "log in as ".$self->{user};
+  $self->{mech}->credentials($self->{user}, $self->{pass});
+}
+
 sub get_ok {
   my ($self, $url, @args) = @_;
 
+  $self->set_credentials if $self->{user};
   my $res = $self->{mech}->get($url, @args);
   ok $res->is_success, "GET $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
@@ -158,14 +165,14 @@ sub get_ok {
 sub user_get_ok {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTUSER", "test");
+  $self->set_credentials if $self->{user};
   $self->get_ok($url, @args);
 }
 
 sub admin_get_ok {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTADMIN", "test");
+  $self->set_credentials if $self->{user};
   $self->get_ok($url, @args);
 }
 
@@ -183,14 +190,14 @@ sub post_ok {
 sub user_post_ok {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTUSER", "test");
+  $self->set_credentials if $self->{user};
   $self->post_ok($url, @args);
 }
 
 sub admin_post_ok {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTADMIN", "test");
+  $self->set_credentials if $self->{user};
   $self->post_ok($url, @args);
 }
 
@@ -213,14 +220,14 @@ sub safe_post_ok {
 sub user_safe_post_ok {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTUSER", "test");
+  $self->set_credentials if $self->{user};
   $self->safe_post_ok($url, @args);
 }
 
 sub admin_safe_post_ok {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTADMIN", "test");
+  $self->set_credentials if $self->{user};
   $self->safe_post_ok($url, @args);
 }
 
