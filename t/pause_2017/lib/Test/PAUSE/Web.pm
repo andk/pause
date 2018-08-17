@@ -323,6 +323,22 @@ sub copy_to_authors_dir {
   path($file)->copy($destination);
 }
 
+sub save_to_authors_dir {
+  my ($self, $user, $file, $body) = @_;
+  my $userhome = PAUSE::user2dir($user);
+  my $destination = path("$PAUSE::Config->{MLROOT}/$userhome");
+  $destination->mkpath;
+  note "save $file to $destination";
+  path("$destination/$file")->spew($body);
+}
+
+sub remove_authors_dir {
+  my ($self, $user) = @_;
+  my $userhome = PAUSE::user2dir($user);
+  my $destination = path("$PAUSE::Config->{MLROOT}/$userhome");
+  $destination->remove_tree;
+}
+
 sub deliveries { map { $_->{email}->cast('Email::MIME') } Email::Sender::Simple->default_transport->deliveries }
 sub clear_deliveries { Email::Sender::Simple->default_transport->clear_deliveries }
 sub note_deliveries { note "-- email begin --\n".$_->as_string."\n-- email end --\n\n" for shift->deliveries }
