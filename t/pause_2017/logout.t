@@ -14,10 +14,7 @@ subtest 'logout 1: redirect with Cookie' => sub {
         my $t = Test::PAUSE::Web->new(user => $user);
         $t->get_ok("$path");
         my $res = $t->get("$path?logout=1$rand");
-    SKIP: {
-        skip "FIXME: Not found?", 1;
         is $res->code => HTTP_UNAUTHORIZED;
-        }
     }
 };
 
