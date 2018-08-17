@@ -165,6 +165,7 @@ sub get_ok {
 sub post_ok {
   my ($self, $url, @args) = @_;
 
+  $self->set_credentials if $self->{user};
   my $res = $self->{mech}->post($url, @args);
   ok $res->is_success, "POST $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
@@ -176,6 +177,7 @@ sub post_ok {
 sub safe_post_ok {
   my ($self, $url, @args) = @_;
 
+  $self->set_credentials if $self->{user};
   my $res = $self->{mech}->get($url);
   ok $res->is_success, "GET $url";
   my $token = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]')->attr('value');
