@@ -157,7 +157,7 @@ sub get {
   $self->set_credentials if $self->{user};
   my $res = $self->{mech}->get($url, @args);
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
   $res;
 }
 
@@ -177,7 +177,7 @@ sub post {
   $self->set_credentials if $self->{user};
   my $res = $self->{mech}->post($url, @args);
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
   $res;
 }
 
@@ -276,9 +276,9 @@ sub copy_to_authors_dir {
   path($file)->copy($destination);
 }
 
-sub deliveries { Email::Sender::Simple->default_transport->deliveries }
+sub deliveries { map { $_->{email}->cast('Email::MIME') } Email::Sender::Simple->default_transport->deliveries }
 sub clear_deliveries { Email::Sender::Simple->default_transport->clear_deliveries }
-sub note_deliveries { note "-- email begin --\n".$_->{email}->as_string."\n-- email end --\n\n" for shift->deliveries }
+sub note_deliveries { note "-- email begin --\n".$_->as_string."\n-- email end --\n\n" for shift->deliveries }
 
 END { $TmpDir->remove_tree if $TmpDir }
 
