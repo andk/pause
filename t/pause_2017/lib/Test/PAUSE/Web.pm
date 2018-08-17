@@ -33,6 +33,7 @@ $INC{"PrivatePAUSE.pm"} = 1;
 $ENV{EMAIL_SENDER_TRANSPORT} = "Test";
 
 require PAUSE;
+require PAUSE::Web::Config;
 
 $PAUSE::Config->{DOCUMENT_ROOT} = "$AppRoot/htdocs";
 $PAUSE::Config->{PID_DIR} = $TestRoot;
@@ -167,6 +168,7 @@ sub get_ok {
   $self->clear_deliveries;
   my $res = $self->get($url, @args);
   ok $res->is_success, "GET $url";
+  $self->title_is_ok($url);
   $self->note_deliveries;
   $self;
 }
@@ -187,6 +189,7 @@ sub post_ok {
   $self->clear_deliveries;
   my $res = $self->post($url, @args);
   ok $res->is_success, "POST $url";
+  $self->title_is_ok($url);
   $self->note_deliveries;
   $self;
 }
@@ -211,6 +214,7 @@ sub post_with_token_ok {
   $self->clear_deliveries;
   my $res = $self->post_with_token($url, @args);
   ok $res->is_success, "POST $url";
+  $self->title_is_ok($url);
   $self->note_deliveries;
   $self;
 }
@@ -264,6 +268,23 @@ sub text_like {
     fail "'$selector' is not found";
   }
   $self;
+}
+
+sub title_is_ok {
+  my ($self, $url) = @_;
+  return if $self->dom->at('p.error_message'); # ignore if error
+  return if $self->{mech}->content_type !~ /html/i;
+
+  my ($action) = $url =~ /ACTION=(\w+)/;
+  $action ||= $url; # in case action is passed as url
+  return if $action =~ /^select_(user|ml_action)$/;
+  my $conf = PAUSE::Web::Config->action($action);
+  return if $conf->{has_title}; # uses different title from its data source
+
+  my $title = $conf->{verb};
+  return unless $title; # maybe top page
+
+  $self->text_is("h2.firstheader", $title);
 }
 
 sub file_to_upload {
