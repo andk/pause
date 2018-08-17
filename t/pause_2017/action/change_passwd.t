@@ -22,6 +22,18 @@ subtest 'get' => sub {
     }
 };
 
+subtest 'get: public without ABRA' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        next if $user; # public only
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->authen_dbh->do('TRUNCATE abrakadabra');
+        my $res = $t->get("$path?ACTION=change_passwd");
+        is $res->code => 401;
+        # note $t->content;
+    }
+};
+
 subtest 'get: public with ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
@@ -72,6 +84,21 @@ subtest 'post_with_token: basic' => sub {
     }
 };
 
+subtest 'post_with_token: public without ABRA' => sub {
+    Test::PAUSE::Web->setup;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        next if $user; # public only
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->authen_dbh->do('TRUNCATE abrakadabra');
+
+        my %form = %$default;
+        my $res = $t->post_with_token("$path?ACTION=change_passwd", \%form);
+        is $res->code => 401;
+        # note $t->content;
+    }
+};
+
 subtest 'post_with_token: public with ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
@@ -95,6 +122,33 @@ subtest 'post_with_token: public with ABRA' => sub {
         # No links should keep ABRA (71a745d)
         my @links = map {$_->attr('href')} $t->dom->at('a');
         ok !grep {$_ =~ /ABRA=/} @links;
+
+        # Used ABRA is gone (8234a6a)
+        my $res = $t->post_with_token("$path?ACTION=change_passwd&ABRA=$chuser.$chpass", \%form);
+        ok !$res->is_success;
+        is $res->code => 401;
+    }
+};
+
+subtest 'post_with_token: public with incorrect ABRA' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        next if $user; # public only
+        my $t = Test::PAUSE::Web->new(user => $user);
+
+        my $chuser = 'TESTUSER';
+        my $chpass = 'testpassword';
+        $t->authen_dbh->do('TRUNCATE abrakadabra');
+        ok $t->authen_db->insert('abrakadabra', {
+            user => $chuser,
+            chpasswd => $chpass,
+            expires => Time::Piece->new(time + 3600)->strftime('%Y-%m-%d %H:%M:%S'),
+        });
+
+        my %form = %$default;
+        my $res = $t->post_with_token("$path?ACTION=change_passwd&ABRA=$chuser.wrong$chpass", \%form);
+        is $res->code => 401;
+        # note $t->content;
     }
 };
 
