@@ -55,6 +55,7 @@ sub authenticate {
 
   my $cookie;
   my $uri = $req->path || "";
+  $uri = "/pause".$uri unless $uri =~ m!/pause/!; # add mount point
   my $args = $req->uri->query || "";
   warn "WATCH: uri[$uri]args[$args]";
   if ($cookie = $req->headers->header('Cookie')) {
