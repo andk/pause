@@ -21,23 +21,21 @@ LOG
 }
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->user_get_ok("/pause/authenquery?ACTION=tail_logfile");
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("/pause/authenquery?ACTION=tail_logfile");
         # note $t->content;
     }
 };
 
 subtest 'post: basic' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
 
         my %form = %$default;
-        $t->$method("$path?ACTION=tail_logfile", \%form);
+        $t->post_ok("$path?ACTION=tail_logfile", \%form);
         # note $t->content;
     }
 };

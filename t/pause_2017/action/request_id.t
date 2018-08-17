@@ -16,11 +16,10 @@ my $default = {
 Test::PAUSE::Web->setup;
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=request_id")
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("$path?ACTION=request_id")
           ->text_is("h2.firstheader", "Request PAUSE account");
         # note $t->content;
     }
@@ -28,12 +27,11 @@ subtest 'get' => sub {
 
 subtest 'post: basic' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = %$default;
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_like("pre.email_sent", qr/Subject: PAUSE ID request \(NEWUSER/);
         is $t->deliveries => 2, "two deliveries (one for admin, one for requester)";
@@ -43,15 +41,14 @@ subtest 'post: basic' => sub {
 
 subtest 'post: thank you, bot' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             url => 'http://host/path',
         );
-        $t->$method("$path?ACTION=request_id", \%form);
+        $t->post_ok("$path?ACTION=request_id", \%form);
         is $t->content => "Thank you!";
         ok !$t->deliveries, "no deliveries";
         # note $t->content;
@@ -60,15 +57,14 @@ subtest 'post: thank you, bot' => sub {
 
 subtest 'post: no space in full name' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_fullname => 'FULLNAME',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/Name does not look like a full civil name/);
@@ -79,15 +75,14 @@ subtest 'post: no space in full name' => sub {
 
 subtest 'post: no full name' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_fullname => '',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply a name/);
@@ -98,15 +93,14 @@ subtest 'post: no full name' => sub {
 
 subtest 'post: no email' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_email => '',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply an email address/);
@@ -117,15 +111,14 @@ subtest 'post: no email' => sub {
 
 subtest 'post: rational is too short' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_rationale => 'rationale',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/this looks a\s+bit too short/);
@@ -137,15 +130,14 @@ subtest 'post: rational is too short' => sub {
 # XXX: might be better to ignore other attributes (or YAGNI)
 subtest 'post: rational has html links' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_rationale => '<a href="link">',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/Please do not use HTML links/);
@@ -156,10 +148,9 @@ subtest 'post: rational has html links' => sub {
 
 subtest 'post: multiple links' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_rationale => <<'SPAM',
@@ -167,7 +158,7 @@ http://spam/path
 http://spam/path
 SPAM
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/Please do not include more than one URL/);
@@ -178,15 +169,14 @@ SPAM
 
 subtest 'post: no rationale' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_rationale => '',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply a short description/);
@@ -197,15 +187,14 @@ subtest 'post: no rationale' => sub {
 
 subtest 'post: userid is taken' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_userid => 'TESTUSER',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/The userid TESTUSER is already taken/);
@@ -216,15 +205,14 @@ subtest 'post: userid is taken' => sub {
 
 subtest 'post: invalid userid' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_userid => 'INV#LID',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/The userid INV#LID does not match/);
@@ -235,15 +223,14 @@ subtest 'post: invalid userid' => sub {
 
 subtest 'post: no userid' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_userid => '',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply a desired user-ID/);
@@ -254,10 +241,9 @@ subtest 'post: no userid' => sub {
 
 subtest 'post: lots of .info' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_rationale => <<'SPAM',
@@ -268,7 +254,7 @@ ttp://spam.info
 ttp://spam.info
 SPAM
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/rationale looks like spam/);
         ok !$t->deliveries, "no deliveries";
@@ -278,16 +264,15 @@ SPAM
 
 subtest 'post: interesting .cn homepage' => sub {
     local $PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_request_id_homepage => 'http://some.cn/index.htm',
             pause99_request_id_rationale => 'interesting site',
         );
-        $t->$method("$path?ACTION=request_id", \%form)
+        $t->post_ok("$path?ACTION=request_id", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/rationale looks like spam/);
         ok !$t->deliveries, "no deliveries";

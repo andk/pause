@@ -12,20 +12,18 @@ my $default = {
 Test::PAUSE::Web->setup;
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=reset_version");
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("$path?ACTION=reset_version");
         # note $t->content;
     }
 };
 
 subtest 'post: basic' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
-        my ($method, $path, $user) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
 
         $t->mod_dbh->do("TRUNCATE packages");
         $t->mod_db->insert('packages', {
@@ -42,7 +40,7 @@ subtest 'post: basic' => sub {
         });
 
         my %form = %$default;
-        $t->$method("$path?ACTION=reset_version", \%form);
+        $t->post_ok("$path?ACTION=reset_version", \%form);
         # note $t->content;
     }
 };
