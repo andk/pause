@@ -147,7 +147,7 @@ sub new {
   my $app = do "$AppRoot/$psgi";
 
   $args{mech} = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
-  if (!$INC{'Devel/Cover.pm'} and !$ENV{TRAVIS} and eval {require LWP::ConsoleLogger::Easy; 1}) {
+  if (!$INC{'Devel/Cover.pm'} and !$ENV{TRAVIS} and $ENV{HARNESS_VERBOSE} and eval {require LWP::ConsoleLogger::Easy; 1}) {
     LWP::ConsoleLogger::Easy::debug_ua($args{mech});
   }
   $args{pass} ||= "test" if $args{user};
