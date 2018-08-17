@@ -164,6 +164,7 @@ sub get {
 sub get_ok {
   my ($self, $url, @args) = @_;
 
+  $self->clear_deliveries;
   my $res = $self->get($url, @args);
   ok $res->is_success, "GET $url";
   $self->note_deliveries;
@@ -183,6 +184,7 @@ sub post {
 sub post_ok {
   my ($self, $url, @args) = @_;
 
+  $self->clear_deliveries;
   my $res = $self->post($url, @args);
   ok $res->is_success, "POST $url";
   $self->note_deliveries;
@@ -203,6 +205,7 @@ sub post_with_token {
 sub post_with_token_ok {
   my ($self, $url, @args) = @_;
 
+  $self->clear_deliveries;
   my $res = $self->post_with_token($url, @args);
   ok $res->is_success, "POST $url";
   $self->note_deliveries;
