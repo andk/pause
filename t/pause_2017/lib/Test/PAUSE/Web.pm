@@ -151,43 +151,62 @@ sub set_credentials {
   $self->{mech}->credentials($self->{user}, $self->{pass});
 }
 
-sub get_ok {
+sub get {
   my ($self, $url, @args) = @_;
 
   $self->set_credentials if $self->{user};
   my $res = $self->{mech}->get($url, @args);
-  ok $res->is_success, "GET $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
 }
 
-sub post_ok {
+sub post {
   my ($self, $url, @args) = @_;
 
   $self->set_credentials if $self->{user};
   my $res = $self->{mech}->post($url, @args);
-  ok $res->is_success, "POST $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $res;
+}
+
+sub get_ok {
+  my ($self, $url, @args) = @_;
+
+  my $res = $self->get($url, @args);
+  ok $res->is_success, "GET $url";
   $self->note_deliveries;
   $self;
+}
+
+sub safe_post {
+  my ($self, $url, @args) = @_;
+
+  my $res = $self->get($url);
+  return $res unless $res->is_success;
+  my $token = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]')->attr('value');
+  $args[0]->{csrf_token} = $token if @args and ref $args[0] eq 'HASH';
+
+  $res = $self->post($url, @args);
 }
 
 sub safe_post_ok {
   my ($self, $url, @args) = @_;
 
-  $self->set_credentials if $self->{user};
-  my $res = $self->{mech}->get($url);
-  ok $res->is_success, "GET $url";
-  my $token = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]')->attr('value');
-  $args[0]->{csrf_token} = $token if @args and ref $args[0] eq 'HASH';
-
-  $res = $self->{mech}->post($url, @args);
+  my $res = $self->safe_post($url, @args);
   ok $res->is_success, "POST $url";
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $res;
+}
+
+sub post_ok {
+  my ($self, $url, @args) = @_;
+
+  my $res = $self->post($url, @args);
+  ok $res->is_success, "POST $url";
   $self->note_deliveries;
   $self;
 }
