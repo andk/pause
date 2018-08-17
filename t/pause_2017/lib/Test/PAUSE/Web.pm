@@ -189,7 +189,7 @@ sub post_ok {
   $self;
 }
 
-sub safe_post {
+sub post_with_token {
   my ($self, $url, @args) = @_;
 
   my $res = $self->get($url);
@@ -200,10 +200,10 @@ sub safe_post {
   $res = $self->post($url, @args);
 }
 
-sub safe_post_ok {
+sub post_with_token_ok {
   my ($self, $url, @args) = @_;
 
-  my $res = $self->safe_post($url, @args);
+  my $res = $self->post_with_token($url, @args);
   ok $res->is_success, "POST $url";
   $self->note_deliveries;
   $self;
