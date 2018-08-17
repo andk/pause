@@ -251,7 +251,7 @@ sub text_is {
   my $at = $self->dom->at($selector);
   if ($at) {
     my $text = $at->all_text // '';
-    is $text => $expects;
+    is $text => $expects, "$selector is $expects";
   } else {
     fail "'$selector' is not found";
   }
@@ -263,7 +263,7 @@ sub text_like {
   my $at = $self->dom->at($selector);
   if ($at) {
     my $text = $at->all_text // '';
-    like $text => $expects;
+    like $text => $expects, "$selector like $expects";
   } else {
     fail "'$selector' is not found";
   }
@@ -275,7 +275,7 @@ sub text_unlike {
   my $at = $self->dom->at($selector);
   if ($at) {
     my $text = $at->all_text // '';
-    unlike $text => $expects;
+    unlike $text => $expects, "$selector unlike $expects";
   } else {
     fail "'$selector' is not found";
   }
