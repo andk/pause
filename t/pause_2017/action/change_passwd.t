@@ -34,13 +34,13 @@ subtest 'post: basic' => sub {
     }
 };
 
-subtest 'safe_post: basic' => sub {
+subtest 'post_with_token: basic' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
         my %form = %$default;
         my $t = Test::PAUSE::Web->new(user => $user);
-        $t->safe_post_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
           ->text_is("h2.firstheader", "Change Password")
           ->text_like("p.password_stored", qr/New password stored/);
         is $t->deliveries => 1, "one delivery for admin";
@@ -48,7 +48,7 @@ subtest 'safe_post: basic' => sub {
     }
 };
 
-subtest 'safe_post: passwords mismatch' => sub {
+subtest 'post_with_token: passwords mismatch' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
@@ -57,7 +57,7 @@ subtest 'safe_post: passwords mismatch' => sub {
             %$default,
             pause99_change_passwd_pw2 => "wrong_pass",
         );
-        $t->safe_post_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/The two passwords didn't match./);
         ok !$t->deliveries, "no delivery for admin";
@@ -65,7 +65,7 @@ subtest 'safe_post: passwords mismatch' => sub {
     }
 };
 
-subtest 'safe_post: only one password' => sub {
+subtest 'post_with_token: only one password' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
@@ -74,7 +74,7 @@ subtest 'safe_post: only one password' => sub {
             %$default,
             pause99_change_passwd_pw2 => undef,
         );
-        $t->safe_post_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/You need to fill in the same password in both fields./);
         ok !$t->deliveries, "no delivery for admin";
@@ -82,7 +82,7 @@ subtest 'safe_post: only one password' => sub {
     }
 };
 
-subtest 'safe_post: no password' => sub {
+subtest 'post_with_token: no password' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
@@ -92,7 +92,7 @@ subtest 'safe_post: no password' => sub {
             pause99_change_passwd_pw1 => undef,
             pause99_change_passwd_pw2 => undef,
         );
-        $t->safe_post_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/Please fill in the form with passwords./);
         ok !$t->deliveries, "no delivery for admin";

@@ -36,13 +36,13 @@ subtest 'post: basic' => sub {
     }
 };
 
-subtest 'safe_post: basic' => sub {
+subtest 'post_with_token: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
         my $t = Test::PAUSE::Web->new(user => $user);
 
         my %form = %$default;
-        $t->safe_post_ok("$path?ACTION=edit_cred", \%form);
+        $t->post_with_token_ok("$path?ACTION=edit_cred", \%form);
         # note $t->content;
     }
 };
