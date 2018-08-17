@@ -128,19 +128,20 @@ sub setup { # better to use Test::mysqld
 }
 
 sub new {
-  my $class = shift;
+  my ($class, %args) = @_;
 
   my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2017.psgi";
   my $app = do "$AppRoot/$psgi";
 
-  my $mech = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
+  $args{mech} = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
   if (!$INC{'Devel/Cover.pm'} and !$ENV{TRAVIS} and eval {require LWP::ConsoleLogger::Easy; 1}) {
-    LWP::ConsoleLogger::Easy::debug_ua($mech);
+    LWP::ConsoleLogger::Easy::debug_ua($args{mech});
   }
+  $args{pass} ||= "test" if $args{user};
 
   $class->clear_deliveries;
 
-  bless {mech => $mech}, $class;
+  bless \%args, $class;
 }
 
 sub get_ok {
