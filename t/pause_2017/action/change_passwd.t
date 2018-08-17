@@ -16,8 +16,7 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
         my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=change_passwd")
-          ->text_is("h2.firstheader", "Change Password");
+        $t->get_ok("$path?ACTION=change_passwd");
         # note $t->content;
     }
 };
@@ -41,7 +40,6 @@ subtest 'post_with_token: basic' => sub {
         my %form = %$default;
         my $t = Test::PAUSE::Web->new(user => $user);
         $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
-          ->text_is("h2.firstheader", "Change Password")
           ->text_like("p.password_stored", qr/New password stored/);
         is $t->deliveries => 1, "one delivery for admin";
         # note $t->content;

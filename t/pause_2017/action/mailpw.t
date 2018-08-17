@@ -15,8 +15,7 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=mailpw")
-          ->text_is("h2.firstheader", "Forgot Password?");
+        $t->get_ok("$path?ACTION=mailpw");
         #note $t->content;
     }
 };
@@ -28,7 +27,6 @@ subtest 'post: basic' => sub {
         my %form = %$default;
         $t->authen_dbh->do("TRUNCATE abrakadabra");
         $t->post_ok("$path?ACTION=mailpw", \%form)
-          ->text_is("h2.firstheader", "Forgot Password?")
           ->text_like("p.form_response", qr/A token to change the password/);
         # note $t->content;
     }
@@ -90,7 +88,6 @@ subtest 'no secretmail' => sub {
         $t->authen_dbh->do("TRUNCATE abrakadabra");
         $t->authen_db->update('usertable', {secretemail => undef}, {user => "TESTUSER"});
         $t->post_ok("$path?ACTION=mailpw", \%form)
-          ->text_is("h2.firstheader", "Forgot Password?")
           ->text_like("p.form_response", qr/A token to change the password/);
         # note $t->content;
     }
@@ -129,7 +126,6 @@ subtest 'user without an entry in usertable: has email' => sub {
         $t->authen_db->delete('usertable', {user => 'OTHERUSER'});
         ok !@{ $t->authen_db->select('usertable', ['user'], {user => 'OTHERUSER'}) // [] };
         $t->post_ok("$path?ACTION=mailpw", \%form)
-          ->text_is("h2.firstheader", "Forgot Password?")
           ->text_like("p.form_response", qr/A token to change the password/);
 
         # new usertable entry is created

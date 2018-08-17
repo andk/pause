@@ -19,8 +19,7 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=request_id")
-          ->text_is("h2.firstheader", "Request PAUSE account");
+        $t->get_ok("$path?ACTION=request_id");
         # note $t->content;
     }
 };
@@ -31,7 +30,6 @@ subtest 'post: basic' => sub {
         my $t = Test::PAUSE::Web->new(user => $user);
         my %form = %$default;
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_like("pre.email_sent", qr/Subject: PAUSE ID request \(NEWUSER/);
         is $t->deliveries => 2, "two deliveries (one for admin, one for requester)";
         # note $t->content;
@@ -62,7 +60,6 @@ subtest 'post: no space in full name' => sub {
             pause99_request_id_fullname => 'FULLNAME',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/Name does not look like a full civil name/);
         ok !$t->deliveries, "no deliveries";
@@ -79,7 +76,6 @@ subtest 'post: no full name' => sub {
             pause99_request_id_fullname => '',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply a name/);
         ok !$t->deliveries, "no deliveries";
@@ -96,7 +92,6 @@ subtest 'post: no email' => sub {
             pause99_request_id_email => '',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply an email address/);
         ok !$t->deliveries, "no deliveries";
@@ -113,7 +108,6 @@ subtest 'post: rational is too short' => sub {
             pause99_request_id_rationale => 'rationale',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/this looks a\s+bit too short/);
         ok !$t->deliveries, "no deliveries";
@@ -131,7 +125,6 @@ subtest 'post: rational has html links' => sub {
             pause99_request_id_rationale => '<a href="link">',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/Please do not use HTML links/);
         ok !$t->deliveries, "no deliveries";
@@ -151,7 +144,6 @@ http://spam/path
 SPAM
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/Please do not include more than one URL/);
         ok !$t->deliveries, "no deliveries";
@@ -168,7 +160,6 @@ subtest 'post: no rationale' => sub {
             pause99_request_id_rationale => '',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply a short description/);
         ok !$t->deliveries, "no deliveries";
@@ -185,7 +176,6 @@ subtest 'post: userid is taken' => sub {
             pause99_request_id_userid => 'TESTUSER',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/The userid TESTUSER is already taken/);
         ok !$t->deliveries, "no deliveries";
@@ -202,7 +192,6 @@ subtest 'post: invalid userid' => sub {
             pause99_request_id_userid => 'INV#LID',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/The userid INV#LID does not match/);
         ok !$t->deliveries, "no deliveries";
@@ -219,7 +208,6 @@ subtest 'post: no userid' => sub {
             pause99_request_id_userid => '',
         );
         $t->post_ok("$path?ACTION=request_id", \%form)
-          ->text_is("h2.firstheader", "Request PAUSE account")
           ->text_is("h3", "Error processing form")
           ->text_like("ul.errors li", qr/You must supply a desired user-ID/);
         ok !$t->deliveries, "no deliveries";
