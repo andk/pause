@@ -128,7 +128,13 @@ sub reset_fixture {
   { # mod.users
     $self->mod_dbh->do(qq{TRUNCATE users});
     for my $user ("TESTUSER", "TESTADMIN") {
-      $self->mod_db->insert('users', {userid => $user, email => $TestEmail});
+      $self->mod_db->insert('users', {
+        userid => $user,
+        fullname => "$user Name",
+        email => $TestEmail,
+        cpan_mail_alias => 'secr',
+        isa_list => '',
+      });
     }
   }
   $self;
