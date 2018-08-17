@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Test::PAUSE::Web;
+use Time::Piece;
 use utf8;
 
 my $default = {
@@ -21,14 +22,39 @@ subtest 'get' => sub {
     }
 };
 
+subtest 'get: public with ABRA' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        next if $user; # public only
+        my $t = Test::PAUSE::Web->new(user => $user);
+
+        my $chuser = 'TESTUSER';
+        my $chpass = 'testpassword';
+        $t->authen_dbh->do('TRUNCATE abrakadabra');
+        ok $t->authen_db->insert('abrakadabra', {
+            user => $chuser,
+            chpasswd => $chpass,
+            expires => Time::Piece->new(time + 3600)->strftime('%Y-%m-%d %H:%M:%S'),
+        });
+
+        $t->get_ok("$path?ACTION=change_passwd&ABRA=$chuser.$chpass");
+        # note $t->content;
+
+        # No links should keep ABRA (71a745d)
+        my @links = map {$_->attr('href')} $t->dom->at('a');
+        ok !grep {$_ =~ /ABRA=/} @links;
+    }
+};
+
 subtest 'post: basic' => sub {
-    plan skip_all => 'SKIP for now';
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
         my %form = %$default;
         my $t = Test::PAUSE::Web->new(user => $user);
-        $t->post_ok("$path?ACTION=change_passwd", \%form);
+        my $res = $t->post("$path?ACTION=change_passwd", \%form);
+        ok !$res->is_success && $res->code == 403, "Forbidden";
+        like $res->content => qr/Failed CSRF check/;
         # note $t->content;
     }
 };
@@ -43,6 +69,32 @@ subtest 'post_with_token: basic' => sub {
           ->text_like("p.password_stored", qr/New password stored/);
         is $t->deliveries => 1, "one delivery for admin";
         # note $t->content;
+    }
+};
+
+subtest 'post_with_token: public with ABRA' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        next if $user; # public only
+        my $t = Test::PAUSE::Web->new(user => $user);
+
+        my $chuser = 'TESTUSER';
+        my $chpass = 'testpassword';
+        $t->authen_dbh->do('TRUNCATE abrakadabra');
+        ok $t->authen_db->insert('abrakadabra', {
+            user => $chuser,
+            chpasswd => $chpass,
+            expires => Time::Piece->new(time + 3600)->strftime('%Y-%m-%d %H:%M:%S'),
+        });
+
+        my %form = %$default;
+        $t->post_with_token_ok("$path?ACTION=change_passwd&ABRA=$chuser.$chpass", \%form);
+        $t->text_like("p.password_stored", qr/New password stored/);
+        # note $t->content;
+
+        # No links should keep ABRA (71a745d)
+        my @links = map {$_->attr('href')} $t->dom->at('a');
+        ok !grep {$_ =~ /ABRA=/} @links;
     }
 };
 
