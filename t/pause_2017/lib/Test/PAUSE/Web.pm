@@ -158,6 +158,14 @@ sub get {
   my $res = $self->{mech}->get($url, @args);
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $res;
+}
+
+sub get_ok {
+  my ($self, $url, @args) = @_;
+
+  my $res = $self->get($url, @args);
+  ok $res->is_success, "GET $url";
   $self->note_deliveries;
   $self;
 }
@@ -172,11 +180,11 @@ sub post {
   $res;
 }
 
-sub get_ok {
+sub post_ok {
   my ($self, $url, @args) = @_;
 
-  my $res = $self->get($url, @args);
-  ok $res->is_success, "GET $url";
+  my $res = $self->post($url, @args);
+  ok $res->is_success, "POST $url";
   $self->note_deliveries;
   $self;
 }
@@ -196,16 +204,6 @@ sub safe_post_ok {
   my ($self, $url, @args) = @_;
 
   my $res = $self->safe_post($url, @args);
-  ok $res->is_success, "POST $url";
-  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
-  $res;
-}
-
-sub post_ok {
-  my ($self, $url, @args) = @_;
-
-  my $res = $self->post($url, @args);
   ok $res->is_success, "POST $url";
   $self->note_deliveries;
   $self;
