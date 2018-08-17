@@ -231,55 +231,21 @@ sub admin_safe_post_ok {
   $self->safe_post_ok($url, @args);
 }
 
-sub tests_for_get {
+sub tests_for {
   my ($self, $permission) = @_;
   my @tests;
   if ($permission eq "public") {
     push @tests, (
-      [get_ok       => "/pause/query"],
-      [user_get_ok  => "/pause/query"],
-      [admin_get_ok => "/pause/query"],
+      ["/pause/query"],
+      ["/pause/query", "TESTUSER"],
+      ["/pause/query", "TESTADMIN"],
     );
   }
   if ($permission ne "admin") {
-    push @tests, [user_get_ok => "/pause/authenquery", "TESTUSER"];
+    push @tests, ["/pause/authenquery", "TESTUSER"];
   }
-  push @tests, [admin_get_ok => "/pause/authenquery", "TESTADMIN"];
-  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
-}
-
-sub tests_for_post {
-  my ($self, $permission) = @_;
-  my @tests;
-  if ($permission eq "public") {
-    push @tests, (
-      [post_ok       => "/pause/query"],
-      [user_post_ok  => "/pause/query"],
-      [admin_post_ok => "/pause/query"],
-    );
-  }
-  if ($permission ne "admin") {
-    push @tests, [user_post_ok => "/pause/authenquery", "TESTUSER"];
-  }
-  push @tests, [admin_post_ok => "/pause/authenquery", "TESTADMIN"];
-  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
-}
-
-sub tests_for_safe_post {
-  my ($self, $permission) = @_;
-  my @tests;
-  if ($permission eq "public") {
-    push @tests, (
-      [safe_post_ok       => "/pause/query"],
-      [user_safe_post_ok  => "/pause/query"],
-      [admin_safe_post_ok => "/pause/query"],
-    );
-  }
-  if ($permission ne "admin") {
-    push @tests, [user_safe_post_ok => "/pause/authenquery", "TESTUSER"];
-  }
-  push @tests, [admin_safe_post_ok => "/pause/authenquery", "TESTADMIN"];
-  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
+  push @tests, ["/pause/authenquery", "TESTADMIN"];
+  $ENV{PAUSE_WEB_TEST_ALL} && wantarray ? @tests : $tests[0];
 }
 
 sub content {
