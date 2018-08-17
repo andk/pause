@@ -196,7 +196,10 @@ sub post_with_token {
 
   my $res = $self->get($url);
   return $res unless $res->is_success;
-  my $token = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]')->attr('value');
+  my $input = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]');
+  my $token = $input ? $input->attr('value') : '';
+  ok $token, "Got a CSRF token";
+  @args = {} if !@args;
   $args[0]->{csrf_token} = $token if @args and ref $args[0] eq 'HASH';
 
   $res = $self->post($url, @args);
