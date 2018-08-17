@@ -20,22 +20,20 @@ my $default = {
 Test::PAUSE::Web->setup;
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('admin')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=select_ml_action");
+    for my $test (Test::PAUSE::Web->tests_for('admin')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("$path?ACTION=select_ml_action");
         # note $t->content;
     }
 };
 
 subtest 'post: basic' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('admin')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('admin')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
 
-        $t->$method("$path?ACTION=add_user", $mailing_list);
+        $t->post_ok("$path?ACTION=add_user", $mailing_list);
 
         $t->mod_db->insert("list2user", {
             maillistid => "MAILLIST",
@@ -43,7 +41,7 @@ subtest 'post: basic' => sub {
         }, {ignore => 1});
 
         my %form = %$default;
-        $t->$method("$path?ACTION=select_ml_action", \%form);
+        $t->post_ok("$path?ACTION=select_ml_action", \%form);
         # note $t->content;
     }
 };

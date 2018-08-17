@@ -13,22 +13,19 @@ my $default = {
 Test::PAUSE::Web->setup;
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('user')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=peek_perms");
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("$path?ACTION=peek_perms");
         # note $t->content;
     }
 };
 
-#subtest 'post: basic' => sub {
-{
-    for my $test (Test::PAUSE::Web->tests_for_post('user')) {
-        my ($method, $path, $user) = @$test;
-        note "$method for $path";
+subtest 'post: basic' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
 
-        my $t = Test::PAUSE::Web->new;
+        my $t = Test::PAUSE::Web->new(user => $user);
 
         $t->mod_dbh->do("TRUNCATE primeur");
         $t->mod_db->insert("primeur", {
@@ -44,7 +41,7 @@ subtest 'get' => sub {
             %$default,
             pause99_peek_perms_by => $user,
         );
-        $t->$method("$path?ACTION=peek_perms", \%form);
+        $t->post_ok("$path?ACTION=peek_perms", \%form);
         # note $t->content;
     }
 };

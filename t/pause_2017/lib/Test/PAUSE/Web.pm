@@ -33,6 +33,7 @@ $INC{"PrivatePAUSE.pm"} = 1;
 $ENV{EMAIL_SENDER_TRANSPORT} = "Test";
 
 require PAUSE;
+require PAUSE::Web::Config;
 
 $PAUSE::Config->{DOCUMENT_ROOT} = "$AppRoot/htdocs";
 $PAUSE::Config->{PID_DIR} = $TestRoot;
@@ -56,6 +57,7 @@ $PAUSE::Config->{INCOMING} = "file://$TestRoot/incoming/";
 $PAUSE::Config->{INCOMING_LOC} = "$TestRoot/incoming/";
 $PAUSE::Config->{PAUSE_LOG} = "$TestRoot/log/paused.log";
 $PAUSE::Config->{PAUSE_LOG_DIR} = "$TestRoot/log";
+$PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
 
 # These will get changed every time you run setup()
 $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = "";
@@ -100,11 +102,17 @@ sub setup { # better to use Test::mysqld
   undef $ModDBH;
   undef $ModDB;
 
+  $class->reset_fixture;
+}
+
+sub reset_fixture {
+  my $self = shift;
+
   # test fixture
   { # authen_pause.usertable
-    $class->authen_dbh->do(qq{TRUNCATE usertable});
+    $self->authen_dbh->do(qq{TRUNCATE usertable});
     for my $user ("TESTUSER", "TESTADMIN") {
-      $class->authen_db->insert('usertable', {
+      $self->authen_db->insert('usertable', {
         user => $user,
         password => PAUSE::Crypt::hash_password("test"),
         secretemail => $TestEmail,
@@ -114,164 +122,129 @@ sub setup { # better to use Test::mysqld
     }
   }
   { # authen_pause.grouptable
-    $class->authen_dbh->do(qq{TRUNCATE grouptable});
-    $class->authen_db->insert('grouptable', {user => "TESTADMIN", ugroup => "admin"});
+    $self->authen_dbh->do(qq{TRUNCATE grouptable});
+    $self->authen_db->insert('grouptable', {user => "TESTADMIN", ugroup => "admin"});
   }
   { # mod.users
-    $class->mod_dbh->do(qq{TRUNCATE users});
+    $self->mod_dbh->do(qq{TRUNCATE users});
     for my $user ("TESTUSER", "TESTADMIN") {
-      $class->mod_db->insert('users', {userid => $user, email => $TestEmail});
+      $self->mod_db->insert('users', {
+        userid => $user,
+        fullname => "$user Name",
+        email => $TestEmail,
+        cpan_mail_alias => 'secr',
+        isa_list => '',
+      });
     }
   }
-
-  return 1;
+  $self;
 }
 
 sub new {
-  my $class = shift;
+  my ($class, %args) = @_;
 
   my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2017.psgi";
   my $app = do "$AppRoot/$psgi";
 
-  my $mech = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
+  $args{mech} = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
   if (!$INC{'Devel/Cover.pm'} and !$ENV{TRAVIS} and eval {require LWP::ConsoleLogger::Easy; 1}) {
-    LWP::ConsoleLogger::Easy::debug_ua($mech);
+    LWP::ConsoleLogger::Easy::debug_ua($args{mech});
   }
+  $args{pass} ||= "test" if $args{user};
 
   $class->clear_deliveries;
 
-  bless {mech => $mech}, $class;
+  bless \%args, $class;
+}
+
+sub set_credentials {
+  my $self = shift;
+  note "log in as ".$self->{user};
+  $self->{mech}->credentials($self->{user}, $self->{pass});
+}
+
+sub get {
+  my ($self, $url, @args) = @_;
+
+  $self->set_credentials if $self->{user};
+  my $res = $self->{mech}->get($url, @args);
+  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
+  $res;
 }
 
 sub get_ok {
   my ($self, $url, @args) = @_;
 
-  my $res = $self->{mech}->get($url, @args);
+  $self->clear_deliveries;
+  my $res = $self->get($url, @args);
   ok $res->is_success, "GET $url";
-  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $self->title_is_ok($url);
   $self->note_deliveries;
   $self;
 }
 
-sub user_get_ok {
+sub post {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTUSER", "test");
-  $self->get_ok($url, @args);
-}
-
-sub admin_get_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->{mech}->credentials("TESTADMIN", "test");
-  $self->get_ok($url, @args);
+  $self->set_credentials if $self->{user};
+  my $res = $self->{mech}->post($url, @args);
+  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
+  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
+  $res;
 }
 
 sub post_ok {
   my ($self, $url, @args) = @_;
 
-  my $res = $self->{mech}->post($url, @args);
+  $self->clear_deliveries;
+  my $res = $self->post($url, @args);
   ok $res->is_success, "POST $url";
-  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $self->title_is_ok($url);
   $self->note_deliveries;
   $self;
 }
 
-sub user_post_ok {
+sub post_with_token {
   my ($self, $url, @args) = @_;
 
-  $self->{mech}->credentials("TESTUSER", "test");
-  $self->post_ok($url, @args);
-}
-
-sub admin_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->{mech}->credentials("TESTADMIN", "test");
-  $self->post_ok($url, @args);
-}
-
-sub safe_post_ok {
-  my ($self, $url, @args) = @_;
-
-  my $res = $self->{mech}->get($url);
-  ok $res->is_success, "GET $url";
-  my $token = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]')->attr('value');
+  my $res = $self->get($url);
+  return $res unless $res->is_success;
+  my $input = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]');
+  my $token = $input ? $input->attr('value') : '';
+  ok $token, "Got a CSRF token";
+  @args = {} if !@args;
   $args[0]->{csrf_token} = $token if @args and ref $args[0] eq 'HASH';
 
-  $res = $self->{mech}->post($url, @args);
+  $res = $self->post($url, @args);
+}
+
+sub post_with_token_ok {
+  my ($self, $url, @args) = @_;
+
+  $self->clear_deliveries;
+  my $res = $self->post_with_token($url, @args);
   ok $res->is_success, "POST $url";
-  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
-  ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
+  $self->title_is_ok($url);
   $self->note_deliveries;
   $self;
 }
 
-sub user_safe_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->{mech}->credentials("TESTUSER", "test");
-  $self->safe_post_ok($url, @args);
-}
-
-sub admin_safe_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->{mech}->credentials("TESTADMIN", "test");
-  $self->safe_post_ok($url, @args);
-}
-
-sub tests_for_get {
+sub tests_for {
   my ($self, $permission) = @_;
   my @tests;
   if ($permission eq "public") {
     push @tests, (
-      [get_ok       => "/pause/query"],
-      [user_get_ok  => "/pause/query"],
-      [admin_get_ok => "/pause/query"],
+      ["/pause/query"],
+      ["/pause/query", "TESTUSER"],
+      ["/pause/query", "TESTADMIN"],
     );
   }
   if ($permission ne "admin") {
-    push @tests, [user_get_ok => "/pause/authenquery", "TESTUSER"];
+    push @tests, ["/pause/authenquery", "TESTUSER"];
   }
-  push @tests, [admin_get_ok => "/pause/authenquery", "TESTADMIN"];
-  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
-}
-
-sub tests_for_post {
-  my ($self, $permission) = @_;
-  my @tests;
-  if ($permission eq "public") {
-    push @tests, (
-      [post_ok       => "/pause/query"],
-      [user_post_ok  => "/pause/query"],
-      [admin_post_ok => "/pause/query"],
-    );
-  }
-  if ($permission ne "admin") {
-    push @tests, [user_post_ok => "/pause/authenquery", "TESTUSER"];
-  }
-  push @tests, [admin_post_ok => "/pause/authenquery", "TESTADMIN"];
-  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
-}
-
-sub tests_for_safe_post {
-  my ($self, $permission) = @_;
-  my @tests;
-  if ($permission eq "public") {
-    push @tests, (
-      [safe_post_ok       => "/pause/query"],
-      [user_safe_post_ok  => "/pause/query"],
-      [admin_safe_post_ok => "/pause/query"],
-    );
-  }
-  if ($permission ne "admin") {
-    push @tests, [user_safe_post_ok => "/pause/authenquery", "TESTUSER"];
-  }
-  push @tests, [admin_safe_post_ok => "/pause/authenquery", "TESTADMIN"];
-  $ENV{PAUSE_WEB_TEST_ALL} ? @tests : $tests[0];
+  push @tests, ["/pause/authenquery", "TESTADMIN"];
+  $ENV{PAUSE_WEB_TEST_ALL} && wantarray ? @tests : $tests[0];
 }
 
 sub content {
@@ -289,7 +262,7 @@ sub text_is {
   my $at = $self->dom->at($selector);
   if ($at) {
     my $text = $at->all_text // '';
-    is $text => $expects;
+    is $text => $expects, "$selector is $expects";
   } else {
     fail "'$selector' is not found";
   }
@@ -301,11 +274,40 @@ sub text_like {
   my $at = $self->dom->at($selector);
   if ($at) {
     my $text = $at->all_text // '';
-    like $text => $expects;
+    like $text => $expects, "$selector like $expects";
   } else {
     fail "'$selector' is not found";
   }
   $self;
+}
+
+sub text_unlike {
+  my ($self, $selector, $expects) = @_;
+  my $at = $self->dom->at($selector);
+  if ($at) {
+    my $text = $at->all_text // '';
+    unlike $text => $expects, "$selector unlike $expects";
+  } else {
+    fail "'$selector' is not found";
+  }
+  $self;
+}
+
+sub title_is_ok {
+  my ($self, $url) = @_;
+  return if $self->dom->at('p.error_message'); # ignore if error
+  return if $self->{mech}->content_type !~ /html/i;
+
+  my ($action) = $url =~ /ACTION=(\w+)/;
+  $action ||= $url; # in case action is passed as url
+  return if $action =~ /^select_(user|ml_action)$/;
+  my $conf = PAUSE::Web::Config->action($action);
+  return if $conf->{has_title}; # uses different title from its data source
+
+  my $title = $conf->{verb};
+  return unless $title; # maybe top page
+
+  $self->text_is("h2.firstheader", $title);
 }
 
 sub file_to_upload {
@@ -321,9 +323,25 @@ sub copy_to_authors_dir {
   path($file)->copy($destination);
 }
 
-sub deliveries { Email::Sender::Simple->default_transport->deliveries }
+sub save_to_authors_dir {
+  my ($self, $user, $file, $body) = @_;
+  my $userhome = PAUSE::user2dir($user);
+  my $destination = path("$PAUSE::Config->{MLROOT}/$userhome");
+  $destination->mkpath;
+  note "save $file to $destination";
+  path("$destination/$file")->spew($body);
+}
+
+sub remove_authors_dir {
+  my ($self, $user) = @_;
+  my $userhome = PAUSE::user2dir($user);
+  my $destination = path("$PAUSE::Config->{MLROOT}/$userhome");
+  $destination->remove_tree;
+}
+
+sub deliveries { map { $_->{email}->cast('Email::MIME') } Email::Sender::Simple->default_transport->deliveries }
 sub clear_deliveries { Email::Sender::Simple->default_transport->clear_deliveries }
-sub note_deliveries { note "-- email begin --\n".$_->{email}->as_string."\n-- email end --\n\n" for shift->deliveries }
+sub note_deliveries { note "-- email begin --\n".$_->as_string."\n-- email end --\n\n" for shift->deliveries }
 
 END { $TmpDir->remove_tree if $TmpDir }
 

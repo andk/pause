@@ -10,7 +10,7 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=pause_04about");
+        $t->get_ok("$path?ACTION=pause_privacy_policy");
         # note $t->content;
     }
 };

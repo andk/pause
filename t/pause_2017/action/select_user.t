@@ -7,11 +7,10 @@ use utf8;
 Test::PAUSE::Web->setup;
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('admin')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=select_user");
+    for my $test (Test::PAUSE::Web->tests_for('admin')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("$path?ACTION=select_user");
         # note $t->content;
     }
 };

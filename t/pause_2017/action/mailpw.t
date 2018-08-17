@@ -12,73 +12,66 @@ my $default = {
 Test::PAUSE::Web->setup;
 
 subtest 'get' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_get('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
-        $t->$method("$path?ACTION=mailpw")
-          ->text_is("h2.firstheader", "Forgot Password?");
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->get_ok("$path?ACTION=mailpw");
         #note $t->content;
     }
 };
 
 subtest 'post: basic' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = %$default;
         $t->authen_dbh->do("TRUNCATE abrakadabra");
-        $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is("h2.firstheader", "Forgot Password?")
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_like("p.form_response", qr/A token to change the password/);
         # note $t->content;
     }
 };
 
 subtest 'got an email instead of a userid' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_mailpw_1 => 'INV@LID',
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
-        $t->$method("$path?ACTION=mailpw", \%form)
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/Please supply a userid/s);
     }
 };
 
 subtest 'invalid userid' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_mailpw_1 => 'INV#LID',
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
-        $t->$method("$path?ACTION=mailpw", \%form)
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/A userid of INV#LID is not allowed/s);
     }
 };
 
 subtest 'cannot find a userid' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
             pause99_mailpw_1 => 'NOTFOUND',
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
-        $t->$method("$path?ACTION=mailpw", \%form)
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/Cannot find a userid.+NOTFOUND/s);
         # note $t->content;
@@ -86,17 +79,15 @@ subtest 'cannot find a userid' => sub {
 };
 
 subtest 'no secretmail' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
             %$default,
         );
         $t->authen_dbh->do("TRUNCATE abrakadabra");
         $t->authen_db->update('usertable', {secretemail => undef}, {user => "TESTUSER"});
-        $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is("h2.firstheader", "Forgot Password?")
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_like("p.form_response", qr/A token to change the password/);
         # note $t->content;
     }
@@ -105,15 +96,14 @@ subtest 'no secretmail' => sub {
 };
 
 subtest 'requested recently' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = %$default;
         $t->authen_dbh->do("TRUNCATE abrakadabra");
-        $t->$method("$path?ACTION=mailpw", \%form)
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_like("p.form_response", qr/A token to change the password/);
-        $t->$method("$path?ACTION=mailpw", \%form)
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/A token for TESTUSER that allows/s);
         # note $t->content;
@@ -121,10 +111,9 @@ subtest 'requested recently' => sub {
 };
 
 subtest 'user without an entry in usertable: has email' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('admin')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('admin')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
           %$default,
           pause99_mailpw_1 => "OTHERUSER",
@@ -136,8 +125,7 @@ subtest 'user without an entry in usertable: has email' => sub {
         }, {replace => 1});
         $t->authen_db->delete('usertable', {user => 'OTHERUSER'});
         ok !@{ $t->authen_db->select('usertable', ['user'], {user => 'OTHERUSER'}) // [] };
-        $t->$method("$path?ACTION=mailpw", \%form)
-          ->text_is("h2.firstheader", "Forgot Password?")
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_like("p.form_response", qr/A token to change the password/);
 
         # new usertable entry is created
@@ -147,10 +135,9 @@ subtest 'user without an entry in usertable: has email' => sub {
 };
 
 subtest 'user without an entry in usertable: without email' => sub {
-    for my $test (Test::PAUSE::Web->tests_for_post('admin')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('admin')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
         my %form = (
           %$default,
           pause99_mailpw_1 => "OTHERUSER",
@@ -162,7 +149,7 @@ subtest 'user without an entry in usertable: without email' => sub {
         }, {replace => 1});
         $t->authen_db->delete('usertable', {user => 'OTHERUSER'});
         ok !@{ $t->authen_db->select('usertable', ['user'], {user => 'OTHERUSER'}) // [] };
-        $t->$method("$path?ACTION=mailpw", \%form)
+        $t->post_ok("$path?ACTION=mailpw", \%form)
           ->text_is('h2', 'Error')
           ->text_like('p.error_message', qr/A userid of OTHERUSER\s+is not known/s);
 

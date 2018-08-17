@@ -21,21 +21,20 @@ subtest 'get' => sub {
         ugroup => "baz",
     });
 
-    for my $test (Test::PAUSE::Web->tests_for_get('public')) {
-        my ($method, $path) = @$test;
-        note "$method for $path";
-        my $t = Test::PAUSE::Web->new;
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
 
-        $t->$method("$path?ACTION=who_pumpkin")
+        $t->get_ok("$path?ACTION=who_pumpkin")
           ->text_like("body", qr/Registered pumpkins:\s+BAR, FOO/);
 
-        $t->$method("$path?ACTION=who_pumpkin&OF=YAML");
+        $t->get_ok("$path?ACTION=who_pumpkin&OF=YAML");
         my $list_amp = YAML::Syck::Load( $t->content );
         is_deeply( $list_amp, [qw/BAR FOO/], "YAML output works" );
 
     SKIP: {
         skip "; is not supported anymore", 1;
-        $t->$method("$path?ACTION=who_pumpkin;OF=YAML");
+        $t->get_ok("$path?ACTION=who_pumpkin;OF=YAML");
         my $list_sem = YAML::Syck::Load( $t->content );
         is_deeply( $list_sem, [qw/BAR FOO/], "YAML output works" );
         }
