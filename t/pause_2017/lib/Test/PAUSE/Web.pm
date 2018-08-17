@@ -102,11 +102,17 @@ sub setup { # better to use Test::mysqld
   undef $ModDBH;
   undef $ModDB;
 
+  $class->reset_fixture;
+}
+
+sub reset_fixture {
+  my $self = shift;
+
   # test fixture
   { # authen_pause.usertable
-    $class->authen_dbh->do(qq{TRUNCATE usertable});
+    $self->authen_dbh->do(qq{TRUNCATE usertable});
     for my $user ("TESTUSER", "TESTADMIN") {
-      $class->authen_db->insert('usertable', {
+      $self->authen_db->insert('usertable', {
         user => $user,
         password => PAUSE::Crypt::hash_password("test"),
         secretemail => $TestEmail,
@@ -116,17 +122,16 @@ sub setup { # better to use Test::mysqld
     }
   }
   { # authen_pause.grouptable
-    $class->authen_dbh->do(qq{TRUNCATE grouptable});
-    $class->authen_db->insert('grouptable', {user => "TESTADMIN", ugroup => "admin"});
+    $self->authen_dbh->do(qq{TRUNCATE grouptable});
+    $self->authen_db->insert('grouptable', {user => "TESTADMIN", ugroup => "admin"});
   }
   { # mod.users
-    $class->mod_dbh->do(qq{TRUNCATE users});
+    $self->mod_dbh->do(qq{TRUNCATE users});
     for my $user ("TESTUSER", "TESTADMIN") {
-      $class->mod_db->insert('users', {userid => $user, email => $TestEmail});
+      $self->mod_db->insert('users', {userid => $user, email => $TestEmail});
     }
   }
-
-  return 1;
+  $self;
 }
 
 sub new {
