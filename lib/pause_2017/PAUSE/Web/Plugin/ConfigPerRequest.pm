@@ -229,7 +229,7 @@ sub _set_allowed_actions {
 
     } else {
       die  PAUSE::Web::Exception->new(ERROR => "You tried to authenticate the
-parameter ABRA=$param, but the database doesn't know about this token.");
+parameter ABRA=$param, but the database doesn't know about this token.", HTTP_STATUS => 401);
     }
     $allow_action{"mailpw"} = undef;
     push @allow_submit, "mailpw";

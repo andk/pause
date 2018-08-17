@@ -315,7 +315,8 @@ sub change_passwd {
   my $mgr = $c->app->pause;
   my $req = $c->req;
 
-  my $u = $c->active_user_record;
+  my $u = eval { $c->active_user_record };
+  die PAUSE::Web::Exception->new(ERROR => "User not found", HTTP_STATUS => 401) if $@;
 
   if (uc $req->method eq 'POST' and $req->param("pause99_change_passwd_sub")) {
     if (my $pw1 = $req->param("pause99_change_passwd_pw1")) {
