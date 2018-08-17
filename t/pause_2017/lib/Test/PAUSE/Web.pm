@@ -162,20 +162,6 @@ sub get_ok {
   $self;
 }
 
-sub user_get_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->set_credentials if $self->{user};
-  $self->get_ok($url, @args);
-}
-
-sub admin_get_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->set_credentials if $self->{user};
-  $self->get_ok($url, @args);
-}
-
 sub post_ok {
   my ($self, $url, @args) = @_;
 
@@ -185,20 +171,6 @@ sub post_ok {
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
-}
-
-sub user_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->set_credentials if $self->{user};
-  $self->post_ok($url, @args);
-}
-
-sub admin_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->set_credentials if $self->{user};
-  $self->post_ok($url, @args);
 }
 
 sub safe_post_ok {
@@ -215,20 +187,6 @@ sub safe_post_ok {
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->{email}->as_string} $self->deliveries;
   $self->note_deliveries;
   $self;
-}
-
-sub user_safe_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->set_credentials if $self->{user};
-  $self->safe_post_ok($url, @args);
-}
-
-sub admin_safe_post_ok {
-  my ($self, $url, @args) = @_;
-
-  $self->set_credentials if $self->{user};
-  $self->safe_post_ok($url, @args);
 }
 
 sub tests_for {
