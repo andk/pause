@@ -56,6 +56,7 @@ $PAUSE::Config->{INCOMING} = "file://$TestRoot/incoming/";
 $PAUSE::Config->{INCOMING_LOC} = "$TestRoot/incoming/";
 $PAUSE::Config->{PAUSE_LOG} = "$TestRoot/log/paused.log";
 $PAUSE::Config->{PAUSE_LOG_DIR} = "$TestRoot/log";
+$PAUSE::Config->{RECAPTCHA_ENABLED} = 0;
 
 # These will get changed every time you run setup()
 $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME} = "";
