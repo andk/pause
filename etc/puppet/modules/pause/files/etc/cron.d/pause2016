@@ -23,4 +23,4 @@ PATH=/opt/perl/current/bin:/usr/bin:/bin:/home/puppet/pause/cron:/usr/sbin
 46 0,6,12,18 * * *    root  perl -I/home/puppet/pause/lib /home/puppet/pause/bin/indexscripts.pl    >/home/puppet/pause/bin/indexscripts.pl.out 2>&1
 7 2   * * 0           root  perl -I/home/puppet/pause/lib /home/puppet/pause/bin/indexscripts.pl -f
 4,11,19,26,34,42,49,56 * * * * root  zsh /home/puppet/pause/cron/assert-paused-running.zsh
-29 4 22 2,4,6,8,10,12 *        root  cd /home/andreas/src/certbot/ && ./certbot-auto renew --renew-hook /etc/perlbal/restarter.sh
+35 20 13,28 * *         root  cd /home/andreas/src/certbot/ && ./certbot-auto renew --renew-hook /etc/perlbal/restarter.sh
