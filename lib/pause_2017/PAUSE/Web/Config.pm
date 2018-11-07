@@ -28,6 +28,8 @@ our %Actions = (
     priv => "public",
     cat => "00urg/01",
     desc => "A passwordmailer that sends you a password that enables you to set a new password.",
+    method => 'POST',
+    x_csrf_protection => 1,
     x_form => {
       ABRA => {form_type => "hidden_field"},
       pause99_mailpw_1 => {form_type => "text_field"},
