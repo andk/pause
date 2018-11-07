@@ -1,5 +1,6 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
+%= csrf_field
 
 <input type="hidden" name="ABRA" value="<%= param("ABRA") %>">
 

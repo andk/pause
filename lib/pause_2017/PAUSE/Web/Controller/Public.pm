@@ -22,7 +22,7 @@ sub mailpw {
   # this parameter is there, we are asked to send a token. Otherwise
   # they only want to see the password-requesting form.
   $param = $req->param("pause99_mailpw_1");
-  if ( $param ) {
+  if ( uc $req->method eq 'POST' and $param ) {
     $param = uc($param);
     unless ($param =~ /^[A-Z\-]+$/) {
       if ($param =~ /@/) {
