@@ -6246,11 +6246,12 @@ __END__
 # XML::LibXML::ParserContext,PABLROD,c,delete
 # XML::LibXSLT::Stylesheet,PABLROD,c,delete
 # XML::LibXSLT::TransformContext,PABLROD,c,delete
-Authen::Krb5::KeyBlock,PABLROD,f,delete
-Authen::Krb5::KeyBlock,PABLROD,c,delete
-Hamlib::Rig,PABLROD,f,delete
-Hamlib::Rig,PABLROD,c,delete
-Hamlib::Rot,PABLROD,f,delete
-Hamlib::Rot,PABLROD,c,delete
-Sane,PABLROD,f,delete
-Sane,PABLROD,c,delete
+# Authen::Krb5::KeyBlock,PABLROD,f,delete
+# Authen::Krb5::KeyBlock,PABLROD,c,delete
+# Hamlib::Rig,PABLROD,f,delete
+# Hamlib::Rig,PABLROD,c,delete
+# Hamlib::Rot,PABLROD,f,delete
+# Hamlib::Rot,PABLROD,c,delete
+# Sane,PABLROD,f,delete
+# Sane,PABLROD,c,delete
+Text::MediawikiFormat::Block,DPRICE,c,f
