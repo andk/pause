@@ -368,7 +368,7 @@ sub whois {
   my $stu = $Dbh->prepare(
     "SELECT userid,   fullname, email,
             isa_list, homepage, asciiname,
-            introduced  FROM users ORDER BY fullname"
+            introduced, ustatus  FROM users ORDER BY fullname"
   );
   $stu->execute;
 
@@ -463,6 +463,13 @@ sub whois {
         if $row[4];
       $xml .= qq{  <introduced>} . $row[6] . qq{</introduced>\n}
         if $row[6];
+
+      # row[7]: ustatus, that should only be exposed if it's "nologin" or "deleted"
+      if ($row[7] eq 'delete') {
+        $xml .= qq{  <deleted>1</deleted>\n}; # should expose changed (= when deleted?)
+      } elsif ($row[7] eq 'nologin') {
+        $xml .= qq{  <nologin>1</nologin>\n};
+      }
 
       $xml .= $xml_has_cpandir;
       $xml .= qq{ </cpanid>\n};
