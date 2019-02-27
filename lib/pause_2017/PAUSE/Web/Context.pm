@@ -1,6 +1,7 @@
 package PAUSE::Web::Context;
 
 use Mojo::Base -base;
+use Mojo::ByteStream;
 use Log::Dispatch::Config;
 use Encode;
 use Sys::Hostname ();
@@ -186,7 +187,20 @@ sub send_mail {
         Data::Dumper->new([$header,$blurb],[qw(header blurb)])
               ->Indent(1)->Useqq(1)->Dump;
   }
-  $self->mailer->send($email);
+  eval {
+    $self->mailer->send($email);
+  };
+  if (my $error = $@) {
+    if ($error->isa('Email::Sender::Failure')) {
+      warn "Sendmail error: $error";
+      die PAUSE::Web::Exception->new(ERROR => Mojo::ByteStream->new(<<"ERROR_END"));
+Sorry, the PAUSE failed to send an email.<br />
+Administration has been notified.
+ERROR_END
+    } else {
+      die $error;
+    }
+  }
   1;
 }
 
