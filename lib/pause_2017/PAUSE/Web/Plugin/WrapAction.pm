@@ -22,7 +22,7 @@ sub _wrap {
   if ($@) {
     if (UNIVERSAL::isa($@, "PAUSE::Web::Exception")) {
       if ($@->{ERROR}) {
-        $@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR};
+        $@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR} eq 'ARRAY';
         push @{$pause->{ERROR}}, @{$@->{ERROR}};
         require Data::Dumper;
         print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$pause->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump; # XXX
