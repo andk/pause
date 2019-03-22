@@ -44,6 +44,14 @@ sub index {
 
 sub auth {
   my $c = shift;
+  my $pause = $c->stash(".pause");
+  unless (grep{ $pause->{Action} eq $_ } @{$pause->{allow_action}}) {
+    my $user = $pause->{User}{userid};
+    my $action = $pause->{Action};
+    warn "$user tried disallowed $action";
+    $c->rendered(403);
+    return 0;
+  }
   return 1;
 }
 
