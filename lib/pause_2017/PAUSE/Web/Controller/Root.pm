@@ -49,8 +49,7 @@ sub auth {
   unless (grep{ $action eq $_ } @{$pause->{allow_action}}) {
     my $user = $pause->{User}{userid};
     warn "$user tried disallowed $action";
-    $c->rendered(403);
-    return 0;
+    die PAUSE::Web::Exception->new(ERROR => "Forbidden", HTTP_STATUS => 403);
   }
   return 1;
 }
