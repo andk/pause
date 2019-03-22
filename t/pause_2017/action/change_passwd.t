@@ -29,7 +29,7 @@ subtest 'get: public without ABRA' => sub {
         my $t = Test::PAUSE::Web->new(user => $user);
         $t->authen_dbh->do('TRUNCATE abrakadabra');
         my $res = $t->get("$path?ACTION=change_passwd");
-        is $res->code => 401;
+        is $res->code => 403;
         # note $t->content;
     }
 };
@@ -94,7 +94,7 @@ subtest 'post_with_token: public without ABRA' => sub {
 
         my %form = %$default;
         my $res = $t->post_with_token("$path?ACTION=change_passwd", \%form);
-        is $res->code => 401;
+        is $res->code => 403;
         # note $t->content;
     }
 };
