@@ -41,4 +41,22 @@ subtest 'unknown user' => sub {
     is $res->code => HTTP_UNAUTHORIZED;
 };
 
+subtest 'disallowed action for an anonymous user' => sub {
+    my $test = Test::PAUSE::Web->tests_for('user');
+    my ($path, $user) = @$test;
+    my $t = Test::PAUSE::Web->new;
+    my $res = $t->get("/authenquery/?ACTION=add_user");;
+    ok !$res->is_success;
+    is $res->code => HTTP_FORBIDDEN;
+};
+
+subtest 'disallowed action for a user' => sub {
+    my $test = Test::PAUSE::Web->tests_for('user');
+    my ($path, $user) = @$test;
+    my $t = Test::PAUSE::Web->new(user => $user);
+    my $res = $t->get("/authenquery/?ACTION=add_user");;
+    ok !$res->is_success;
+    is $res->code => HTTP_FORBIDDEN;
+};
+
 done_testing;
