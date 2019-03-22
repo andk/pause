@@ -223,6 +223,7 @@ sub _set_allowed_actions {
       # TUT: by setting $pause->{User}{userid}, we can let change_passwd
       # know who we are dealing with
       $pause->{User}{userid} = $user;
+      $userid = $user;
 
       # TUT: Let's pretend they requested change_passwd. I guess, if we
       # would drop that line, it would still work, but I like redundant
