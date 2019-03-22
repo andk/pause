@@ -153,7 +153,9 @@ sub _set_allowed_actions {
                    "request_id",
                   );
 
+  my $userid = '';
   if ($pause->{User} && $pause->{User}{userid} && $pause->{User}{userid} ne "-") {
+    $userid = $pause->{User}{userid};
 
     # warn "userid[$pause->{User}{userid}]";
 
@@ -247,8 +249,13 @@ parameter ABRA=$param, but the database doesn't know about this token.", HTTP_ST
 
   $param = $req->param("ACTION");
   # warn "ACTION-param[$param]req[$req]";
-  if ($param && exists $allow_action{$param}) {
-    $pause->{Action} = $param;
+  if ($param) {
+    if (exists $allow_action{$param}) {
+      $pause->{Action} = $param;
+    } else {
+      warn "$userid tried disallowed action: $param";
+      die PAUSE::Web::Exception->new(ERROR => "Forbidden", HTTP_STATUS => 403);
+    }
   } else {
     # ...they might ask for it in a submit button
   ACTION: for my $action (@allow_submit) {
@@ -309,6 +316,10 @@ parameter ABRA=$param, but the database doesn't know about this token.", HTTP_ST
     }
   }
   $action = $pause->{Action};
+  if ($action && !exists $allow_action{$action}) {
+    warn "$userid tried disallowed action: $action";
+    die PAUSE::Web::Exception->new(ERROR => "Forbidden", HTTP_STATUS => 403);
+  }
   # warn "action[$action]";
 }
 

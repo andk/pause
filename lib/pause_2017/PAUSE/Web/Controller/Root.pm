@@ -44,13 +44,6 @@ sub index {
 
 sub auth {
   my $c = shift;
-  my $pause = $c->stash(".pause");
-  my $action = $pause->{Action} or return 1; # no action (= top page) is ok
-  unless (grep{ $action eq $_ } @{$pause->{allow_action}}) {
-    my $user = $pause->{User}{userid};
-    warn "$user tried disallowed $action";
-    die PAUSE::Web::Exception->new(ERROR => "Forbidden", HTTP_STATUS => 403);
-  }
   return 1;
 }
 
