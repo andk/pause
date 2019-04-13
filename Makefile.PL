@@ -100,6 +100,9 @@ WriteMakefile(
     HTTP::Tiny
     IO::Socket::SSL
     Net::SSLeay
+    Mojolicious
+    Mojolicious::Plugin::WithCSRFProtection
+    MojoX::Log::Dispatch::Simple
 )},
               SIGN => 1,
               test => { RECURSIVE_TEST_FILES => 1 },
