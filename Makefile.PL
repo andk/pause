@@ -8,7 +8,7 @@ WriteMakefile(
               ABSTRACT_FROM => 'lib/PAUSE.pod',
               AUTHOR        => 'Andreas Koenig <andreas.koenig.7os6VVqR@franz.ak.mind.de>',
               LICENSE       => 'perl',
-              PREREQ_PM     => { (map +($_ => 0), qw(
+              PREREQ_PM     => { map +($_ => 0), qw(
     Apache::Session::Counted
     BSD::Resource
     Capture::Tiny
@@ -96,11 +96,9 @@ WriteMakefile(
     XML::SAX::Base
     XML::SAX::Writer
     YAML::XS
-)),
-(
-    'HTTP::Tiny' => '0.059',
-    'IO::Socket::SSL' => '1.56',
-    'Net::SSLeay' => '1.49',
+    HTTP::Tiny
+    IO::Socket::SSL
+    Net::SSLeay
 )},
               SIGN => 1,
               test => { RECURSIVE_TEST_FILES => 1 },
