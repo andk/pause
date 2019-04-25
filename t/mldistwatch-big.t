@@ -202,7 +202,7 @@ subtest "case mismatch, authorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
+  $pause->file_updated_ok(
     $result->tmpdir
            ->file(qw(cpan modules 02packages.details.txt.gz)),
     "our indexer indexed",
@@ -216,15 +216,14 @@ subtest "case mismatch, authorized for original" => sub {
       { package => 'Jenkins::Hack2', version => '0.12'  },
       { package => 'Mooooooose',     version => '0.02'  },
       { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
   $result->email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
-      { subject => 'PAUSE upload indexing error' },
+      { subject => 'PAUSE indexer report OPRIME/xform-rollout-2.00.tar.gz' },
     ],
   );
 };
@@ -247,8 +246,8 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
       { package => 'Jenkins::Hack2', version => '0.12'  },
       { package => 'Mooooooose',     version => '0.02'  },
       { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
@@ -283,14 +282,13 @@ subtest "don't allow upload on permissions case conflict" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
       { package => 'Mooooooose',     version => '0.02'  },
       { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
@@ -320,8 +318,8 @@ subtest "distname/pkgname permission check" => sub {
       { package => 'Jenkins::Hack2', version => '0.12'  },
       { package => 'Mooooooose',     version => '0.02'  },
       { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
       { package => 'Y',              version => 2       },
+      { package => 'xform::rollout', version => '2.00'  },
     ],
   );
 
@@ -334,8 +332,8 @@ subtest "distname/pkgname permission check" => sub {
 };
 
 subtest "check comaintainers" => sub {
-
   my $result = $pause->test_reindex;
+
   TODO: {
     local $TODO = "Default permissions for new modules to be implemented";
     $result->perm_list_ok(
@@ -346,8 +344,8 @@ subtest "check comaintainers" => sub {
         'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
         'Mooooooose'      => { f => 'AAARGH' },
         'Mooooooose::Role' => { f => 'AAARGH', c => [qw/MERCKX/] },
-        'XForm::Rollout'  => { f => 'OPRIME' },
         'Y',              => { f => 'XYZZY' },
+        'xform::rollout'  => { f => 'OPRIME' },
       }
     );
   };
@@ -378,6 +376,7 @@ subtest "comaint upload" => sub {
       'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },   # changed from { f => 'AAARGH', c => [qw/MERCKX/] }
       'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },  # new
       'xform::rollout'  => { f => 'OPRIME' },
+      'XForm::Rollout'  => { f => 'OPRIME' },
       'Y',              => { f => 'XYZZY' },
     }
   );
@@ -398,6 +397,7 @@ subtest "other comaint upload" => sub {
       'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
       'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
       'xform::rollout'  => { f => 'OPRIME' },
+      'XForm::Rollout'  => { f => 'OPRIME' },
       'Y',              => { f => 'XYZZY' },
     }
   );
