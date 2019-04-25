@@ -435,7 +435,6 @@ sub update_package {
   # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-07/msg01579.html
   # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-08/msg00062.html
 
-
   if (! $distorperlok) {
   } elsif ($isa_regular_perl) {
       if ($older_isa_regular_perl) {

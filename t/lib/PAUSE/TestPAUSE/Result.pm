@@ -127,7 +127,7 @@ sub perm_list_ok {
   }
 
   is_deeply(\%permissions, $want, "permissions look correct in 06perms")
-  or diag explain(\%permissions);
+    or diag explain(\%permissions);
 }
 
 has deliveries => (
