@@ -352,7 +352,8 @@ subtest "don't allow upload on permissions case conflict" => sub {
 
   $result->email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/Bug-Gold-9.002.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report XYZZY/Bug-Gold-9.002.tar.gz' },
+      { subject => 'PAUSE upload indexing error' },
     ],
   );
 };
