@@ -172,6 +172,63 @@ sub userid_has_permissions_on_package {
   return($has_perms || $has_primary);
 }
 
+sub canonicalize_module_casing {
+  my ($self, $package) = @_;
+
+  my $dbh = $self->dbh_callback->();
+  my $users = $dbh->selectall_arrayref(
+    qq{
+      SELECT perms.userid, COUNT(primeur.userid) AS is_primary
+      FROM perms
+      LEFT JOIN primeur
+        ON  LOWER(primeur.package) = LOWER(perms.package)
+        AND primeur.userid = perms.userid
+      WHERE LOWER(perms.package) = LOWER(?)
+      GROUP BY perms.userid, LOWER(perms.package)
+    },
+    { Slice => {} },
+    $package,
+  );
+
+  $dbh->do(
+    qq{DELETE FROM perms   WHERE LOWER(package) = LOWER(?)},
+    undef,
+    $package,
+  );
+
+  $dbh->do(
+    qq{DELETE FROM primeur WHERE LOWER(package) = LOWER(?)},
+    undef,
+    $package,
+  );
+
+  for my $user (@$users) {
+    $dbh->do(
+      "INSERT INTO perms (package, userid) VALUES (?, ?)",
+      undef,
+      $package, $user->{userid},
+    );
+
+    if ($user->{is_primary}) {
+      $dbh->do(
+        "INSERT INTO primeur (package, userid) VALUES (?, ?)",
+        undef,
+        $package, $user->{userid},
+      );
+    }
+  }
+
+  $dbh->do(
+    qq{
+      UPDATE packages SET package = ? WHERE LOWER(package) = LOWER(?);
+    },
+    undef,
+    ($package) x 6,
+  );
+
+  return;
+}
+
 sub verbose {
     my ($self, $level, @what) = @_;
     PAUSE->log($self, $level, @what);

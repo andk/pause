@@ -371,6 +371,8 @@ sub _do_the_database_work {
       $dbh->rollback;
     }
 
+    $dio->normalize_package_casing;
+
     return 1;
   };
 
