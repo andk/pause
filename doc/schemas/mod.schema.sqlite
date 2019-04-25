@@ -130,6 +130,7 @@ CREATE TABLE packages (
   package varchar(128) NOT NULL DEFAULT '',
   version varchar(16) NOT NULL DEFAULT '',
   dist varchar(128) NOT NULL DEFAULT '',
+  distname varchar(128) NOT NULL DEFAULT '',
   file varchar(128) NOT NULL DEFAULT '',
   filemtime varchar(10) NOT NULL DEFAULT '',
   pause_reg varchar(10) NOT NULL DEFAULT '',
@@ -137,6 +138,8 @@ CREATE TABLE packages (
   status enum(7) NOT NULL DEFAULT 'index',
   PRIMARY KEY (package)
 );
+
+CREATE INDEX distname ON packages (distname);
 
 --
 -- Table: perms

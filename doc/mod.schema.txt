@@ -221,12 +221,14 @@ CREATE TABLE packages (
   package varchar(128) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
   version varchar(16) NOT NULL DEFAULT '',
   dist varchar(128) NOT NULL DEFAULT '',
+  distname varchar(128) NOT NULL DEFAULT '',
   `file` varchar(128) NOT NULL DEFAULT '',
   filemtime varchar(10) NOT NULL DEFAULT '',
   pause_reg varchar(10) NOT NULL DEFAULT '',
   `comment` varchar(255) NOT NULL DEFAULT '',
   `status` enum('index','noindex') NOT NULL DEFAULT 'index',
-  PRIMARY KEY (package)
+  PRIMARY KEY (package),
+  KEY distname (distname)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
