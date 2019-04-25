@@ -1,0 +1,82 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_share_perms_makeco")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li>Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></li>
+%       } elsif ($_->{duplicated}) {
+<li><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %>: skipping</li>
+%       } else {
+<li>Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>.</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p>You need to select one or more packages and enter a userid.
+ Nothing done.</p>
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+
+<h3>Select a co-maintainer</h3>
+<p>Please select one or
+more namespaces for which you want to select a
+co-maintainer, enter the CPAN userid of the co-maintainer
+into the text field and press <i>Make Co-Maintainer</i></p>
+
+<p>Select one or more namespaces:</p>
+<div id="packages">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="package">Package</th>
+      <th class="sort" data-sort="dist">Indexed Distribution</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{mods}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_share_perms_makeco_m" => $_ %></td>
+      <td class="package"><%= $_ %></td>
+      <td class="dist"><%= $pause->{dist_for_package}{$_} %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+<p>Select a userid:<br>
+<%= text_field "pause99_share_perms_makeco_a", size => 15, maxlength => 9 %>
+
+</p><p>
+<input type="submit" name="SUBMIT_pause99_share_perms_makeco"
+ value="Make Co-Maintainer"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('packages', {
+  valueNames: ['package', 'dist'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
+
+% } else {
+<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+% }

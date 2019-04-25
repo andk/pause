@@ -8,6 +8,8 @@ use Test::WWW::Mechanize::PSGI;
 use Class::MOP::Class;
 use Plack::Test::MockHTTP;
 use Capture::Tiny qw/capture_stderr/;
+use Path::Tiny;
+our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->realpath;
 
 =head1 SYNOPSIS
 
@@ -50,7 +52,7 @@ sub authen_dbh {
 sub _build_authen_db {
     my $self = shift;
     my $db   = pause_1999::Test::MySQL->new(
-        schemas => ['doc/authen_pause.schema.txt'] );
+        schemas => ["$AppRoot/doc/authen_pause.schema.txt"] );
     pause_1999::Test::Config->set_authen_db($db);
     return $db;
 }
@@ -68,14 +70,14 @@ sub mod_dbh {
 sub _build_mod_db {
     my $self = shift;
     my $db
-        = pause_1999::Test::MySQL->new( schemas => ['doc/mod.schema.txt'] );
+        = pause_1999::Test::MySQL->new( schemas => ["$AppRoot/doc/mod.schema.txt"] );
     pause_1999::Test::Config->set_mod_db($db);
     return $db;
 }
 
 has 'plack_app' => (
     is => 'ro',
-    default => sub { Plack::Util::load_psgi 'app.psgi' },
+    default => sub { Plack::Util::load_psgi "$AppRoot/app.psgi" },
 );
 
 has 'plack_test' => (

@@ -1,0 +1,34 @@
+% my $pause = stash(".pause") || {};
+%
+% #-----------------------------------------------------------------
+%
+Record update in the PAUSE uploads database:
+
+% if ($pause->{selected}) {
+<%== sprintf("%12s: [%s]", "uriid", $pause->{selected}{uriid} %>
+%   for my $field (qw(
+%     uri
+%     nosuccesstime
+%     nosuccesscount
+%     changed
+%     changedby
+%   )) {
+%     my $fieldname = "pause99_edit_uris_$field";
+%     my $param = param($fieldname);
+%     if ($param ne $pause->{selected}{$field}) {
+<%== sprintf("%12s: [%s]", $field, $param) %> was [<%= $pause->{selected}{$field} %>]
+%     } else {
+<%== sprintf("%12s: [%s]", $field, $pause->{selected}{$field} %>
+%     }
+%   }
+%   if ($pause->{changed}) {
+
+Data entered by <%== $pause->{User}{fullname} %> (<%== $pause->{User}{userid} %>).
+Please check if they are correct.
+
+Thanks,
+--
+The PAUSE
+%   }
+% }
+

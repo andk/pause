@@ -1,0 +1,43 @@
+% my $pause = stash(".pause") || {};
+
+% if (param("SUBMIT_pause99_share_perms_remopr")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (!@{$pause->{results} || []}) {
+<p>You need to select one or more packages. Nothing done.</p>
+%   } else {
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<p>Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></p>
+%       } else {
+<p>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</p>
+%       }
+%     }
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+
+<h3>Give up maintainership status</h3>
+<p>Please select one or more namespaces for which you
+want to give up primary maintainership status and press
+<i>Give Up Maintainership Status</i>. Note: you keep co-maintainer
+status after this move. If you want to get rid of that too,
+please visit <a href="<%= my_url->query([pause99_share_perms_remome => 1]) %>">Give up
+co-maintainership status</a> next.</p>
+
+<p>Select one or more namespaces:</p><p>
+<%= select_field "pause99_share_perms_pr_m" => $pause->{mods},
+  multilple => "multiple",
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
+=%>
+
+</p><p>
+<input type="submit" name="SUBMIT_pause99_share_perms_remopr"
+ value="Give Up Maintainership Status"></p>
+
+% } else {
+<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+% }
+

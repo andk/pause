@@ -2,6 +2,6 @@ dispatchers = file
 
 file.class = Log::Dispatch::File
 file.min_level = debug
-file.filename = /var/log/PAUSE-plack/error_log
+file.filename = /var/log/PAUSE-plack/error_log_mojo
 file.mode = append
 file.format = [%d{%Y-%m-%d %H:%M:%S}] [%p] %m%n

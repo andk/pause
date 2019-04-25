@@ -1,0 +1,46 @@
+% my $pause = stash(".pause") || {};
+
+% if (param("SUBMIT_pause99_share_perms_movepr")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+%     for my $res (@{$pause->{results}}) {
+%       if ($res->{error}) {
+<p>Error trying to make <%= $res->{user} %> primary maintainer of                    <%= $res->{mod} %>: <%= $res->{error} %></p>\n";
+%       } else {
+<p>Made <%= $res->{user} %> primary maintainer of <%= $res->{mod} %>.</p>
+%       }
+%     }
+%   } else {
+<p>You need to select one or more packages and enter a userid.
+Nothing done.</p>
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods}}) {
+<h3>Pass maintainership status</h3><p>Please select one
+or more namespaces for which you want to pass primary
+maintainership status, enter the CPAN userid of the new
+maintainer into the text field and press <i>Pass Maintainership
+Status</i>. Note: you keep co-maintainer status after this move.
+If you want to get rid of that too, please visit <a
+href="<%= my_url->query([pause99_share_perms_remome => 1]) %>">Give up
+co-maintainership status</a> next.</p>
+
+<p>Select one or more namespaces:</p><p>
+<%= select_field "pause99_share_perms_pr_m" => $pause->{mods},
+  multiple => "multiple",
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
+=%>
+
+</p>
+<p>Select a userid:<br>
+<%= text_field "pause99_share_perms_movepr_a", size => 15, maxlength => 9 =%>
+</p><p>
+<input type="submit" name="SUBMIT_pause99_share_perms_movepr" value="Pass Maintainership Status"></p>
+
+% } else {
+<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+% }
+

@@ -1,0 +1,28 @@
+Things I hope to have done at PTS and afterwards:
+
+- Finish porting pause_1999::fixup (see below)
+- Write more tests, especially using latin-1 (and Asian/Emoji) characters
+- Replace "require ..." with "use ..." to preload
+- Move lib/pause_2017/t/ directory into t/ when tests are ready for travis.ci
+- Wrap <%= %> stuff with <span class="..."> to make them easier to find/test (by Mech/Web::Scraper etc)
+- Port spurious warn and print STDERR to ->log(level => "debug", ...)
+- Replace YAML::Syck with something else
+- Kill PAUSE::Web::Exception where appropriate, most of which can be replaced with return + $pause->{some_flags} + template blocks
+- Add csrf_token where necessary (add_uri shouldn't have it yet, and some other pages too, or at least without prior discussion because some people use scripts to modify their PAUSE data)
+- Consider removing/replacing some plugins
+- Replace XHTML with HTML5 if time permits, to remove a dirty hack on TagHelpers
+- Incorporate fixes that have been merged to Andreas' master
+
+- Drop HTTP support
+- Remove modulelist related stuff
+
+Things that'll take more time to address (to avoid double encoding etc):
+
+- Replace PAUSE::Web::Util::Encode with plain Encode
+- Replace $mgr->fetchrow with $sth->fetchrow_*
+- PAUSE seems to have data that don't work with newer MySQL (because of stricter datetime format etc)
+
+Things that need discussion
+
+- It would be nice if we can directly use some of the paused/mldistwatch features in the web UI tests 
+- Pagers and table sorters, to make frequent uploaders (probably) happy => as long as javascript is not used (Andreas' strong preference)

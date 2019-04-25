@@ -1,0 +1,39 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+Welcome <%== $pause->{fullname} %>,
+
+PAUSE, the Perl Authors Upload Server, has a userid for you:
+
+    <%== $pause->{userid} %>
+
+Once you've gone through the procedure of password approval (see the
+separate mail you should receive about right now), this userid will be
+the one that you can use to upload your work or edit your credentials
+in the PAUSE database.
+
+This is what we have stored in the database now:
+
+  Name:      <%== $pause->{fullname} // '' %>
+  email:     <%== $pause->{email} // '' %>
+  homepage:  <%== $pause->{homepage} // '' %>
+
+Please note that your email address is exposed in various listings and
+database dumps. You can register with both a public and a secret email
+if you want to protect yourself from SPAM. If you want to do this,
+please visit
+  <%== my_full_url->path("/pause/authenquery")->query(ACTION => "edit_cred" )->scheme("https") %>
+or
+  <%== my_full_url->path("/pause/authenquery")->query(ACTION => "edit_cred" )->scheme("http") %>
+
+If you need any further information, please visit
+  $CPAN/modules/04pause.html.
+If this doesn't answer your questions, contact modules@perl.org.
+
+Before uploading your first module, we strongly encourage you to discuss
+your module idea on PrePAN at http://prepan.org/ to get feedback from
+experienced Perl developers.
+
+Thank you for your prospective contributions,
+The Pause Team

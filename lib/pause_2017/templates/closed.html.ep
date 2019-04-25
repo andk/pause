@@ -1,0 +1,7 @@
+<html><head><title>PAUSE CLOSED</title></head>
+<body>
+<h1>Closed for Maintainance</h1>
+%= include '_closed';
+<p>Andreas Koenig</p>
+</body>
+</html>

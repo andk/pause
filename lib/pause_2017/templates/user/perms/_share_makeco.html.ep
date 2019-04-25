@@ -1,0 +1,49 @@
+% my $pause = stash(".pause") || {};
+
+% if (param("SUBMIT_pause99_share_perms_makeco")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<p>Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
+%       } elsif ($_->{duplicated}) {
+<p><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %>: skipping</p>
+
+%       } else {
+"<p>Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>.</p>\n";
+%       }
+%     }
+%   } else {
+<p>You need to select one or more packages and enter a userid.
+ Nothing done.</p>
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+
+<h3>Select a co-maintainer</h3>
+<p>Please select one or
+more namespaces for which you want to select a
+co-maintainer, enter the CPAN userid of the co-maintainer
+into the text field and press <i>Make Co-Maintainer</i></p>
+
+<p>Select one or more namespaces:</p><p>
+
+<%= select_field "pause99_share_perms_makeco_m" => $pause->{mods},
+  multiple => "multiple",
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
+=%>
+
+</p>
+<p>Select a userid:<br>
+<%= text_field "pause99_share_perms_makeco_a", size => 15, maxlength => 9 %>
+
+</p><p>
+<input type="submit" name="SUBMIT_pause99_share_perms_makeco"
+ value="Make Co-Maintainer"></p>
+
+% } else {
+<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+% }

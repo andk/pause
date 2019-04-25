@@ -30,6 +30,7 @@ WriteMakefile(
     Email::Address
     Email::MIME
     Email::Sender::Simple
+    EV
     File::Copy::Recursive
     File::pushd
     File::Rsync::Mirror::Recentfile
@@ -54,6 +55,11 @@ WriteMakefile(
     Module::Faker::Dist
     Module::Signature
     Moo
+    Mojolicious
+    Mojolicious::Plugin::WithCSRFProtection
+    Mojo::File
+    MojoX::Log::Dispatch::Simple
+    Moo
     MooseX::StrictConstructor
     Net::FTP
     Parse::CPAN::Packages
@@ -66,6 +72,7 @@ WriteMakefile(
     Plack::Middleware::ReverseProxy
     Plack::Middleware::ServerStatus::Tiny
     Set::Crontab
+    SQL::Maker
     String::Random
     Test::Class
     Test::Deep
@@ -74,6 +81,7 @@ WriteMakefile(
     Test::mysqld
     Test::WWW::Mechanize::PSGI
     Text::Format
+    Text::Markdown::Hoedown
     Text::Metaphone
     Text::Soundex
     Text::Unidecode
@@ -89,8 +97,15 @@ WriteMakefile(
     XML::SAX::Base
     XML::SAX::Writer
     YAML::XS
+    HTTP::Tiny
+    IO::Socket::SSL
+    Net::SSLeay
+    Mojolicious
+    Mojolicious::Plugin::WithCSRFProtection
+    MojoX::Log::Dispatch::Simple
 )},
               SIGN => 1,
+              test => { RECURSIVE_TEST_FILES => 1 },
               ($ExtUtils::MakeMaker::VERSION >= 6.4502 ?
                (META_ADD => {
                              resources => {

@@ -163,6 +163,10 @@ $PAUSE::Config ||=
      MIN_MTIME_CHECKSUMS => 1300000000, # invent a threshold for oldest mtime
      HAVE_PERLBAL => 1,
      ZCAT_PATH  => (List::Util::first { -x $_ } ("/bin/zcat", "/usr/bin/zcat" )),
+     RECAPTCHA_ENABLED => 0,
+     RECAPTCHA_SITE_KEY => "6LdJt1QUAAAAABMhjL0Vb7oOPIxaL52ZwjhHuHtm",
+     # RECAPTCHA_SECRET_KEY => "",  # this should be set in PrivatePAUSE.pm
+     RECAPTCHA_DAILY_LIMIT => 100, # above this, revert to manual approval
     };
 
 unless ($INC{"PrivatePAUSE.pm"}) { # reload within apache

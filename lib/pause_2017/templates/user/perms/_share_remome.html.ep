@@ -1,0 +1,40 @@
+% my $pause = stash(".pause") || {};
+
+% if (param("SUBMIT_pause99_share_perms_remome")) {
+%   if ($pause->{error}) {
+<p><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<p>Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
+%       } else {
+<p>Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
+%       }
+%     }
+%   } else {
+<p>You need to select one or more packages. Nothing done.</p>
+%   }
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+<h3>Give up co-maintainer status</h3>
+<p>Please select one or
+more namespaces for which you want to be removed from
+the co-maintainer table and press <i>Give Up</i></p>
+
+<p>Select one or more namespaces:</p><p>
+
+<%= select_field "pause99_share_perms_remome_m" => $pause->{mods},
+  multiple => "multiple",
+  size => (@{$pause->{mods}} > 18 ? 15 : scalar @{$pause->{mods}}),
+=%>
+
+</p>
+<p>
+<input type="submit" name="SUBMIT_pause99_share_perms_remome"
+ value="Give Up"></p>
+
+% } else {
+<p>Sorry, <%= $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
+% }

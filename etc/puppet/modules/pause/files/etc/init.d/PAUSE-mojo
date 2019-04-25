@@ -1,0 +1,86 @@
+#!/opt/perl/current/bin/perl
+
+# INIT Info Generated at Sat Apr 23 13:17:44 2016 with Daemon::Control DEV
+
+### BEGIN INIT INFO
+# Provides:          PAUSE-mojo
+# Required-Start:    $syslog $remote_fs
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: PAUSE-Mojo
+# Description:       PAUSE-Mojo web program
+### END INIT INFO`
+
+use strict;
+# use FindBin;
+use Daemon::Control;
+
+my $name = 'PAUSE-mojo';
+# note: hist*rical raisins; keep the directory, change the filenames
+my $logdirbasename = "PAUSE-plack";
+my $psgi = "/home/puppet/pause-charsbar/app_2017.psgi";
+(my $starman = $^X) =~ s{/perl[^/]*$}{/starman};
+
+exit My::Daemon::Control->new({
+    name        => $name,
+    lsb_start   => '$syslog $remote_fs',
+    lsb_stop    => '$syslog',
+    lsb_sdesc   => 'PAUSE-Mojo',
+    lsb_desc    => 'PAUSE-Mojo web program',
+
+    program     => $starman,
+    program_args => [
+        $psgi,
+        '--workers',    15,
+        '--listen',     ":81",
+        '--user',       'apache',
+        '--group',      'apache',
+        '--preload-app',
+        '--env',        'production',
+        '--access-log', "/var/log/$logdirbasename/access_log_mojo",
+    ],
+
+    pid_file    => "/var/run/$name.pid",
+    stderr_file => "/var/log/$logdirbasename/error_log_mojo_stdx",
+    stdout_file => "/var/log/$logdirbasename/error_log_mojo_stdx",
+
+    fork        => 2,
+
+})->run;
+
+{
+    package My::Daemon::Control;
+    use base 'Daemon::Control';
+    # See https://github.com/miyagawa/Starman/issues/94
+    # and https://github.com/miyagawa/Starman/issues/106
+    # why checking for a working psgi is a good idea.
+    sub do_reload {
+        my $self = shift;
+        my $psgi_file = $self->program_args->[0];
+        my $child_pid = fork;
+        die if !defined $child_pid;
+        if ($child_pid == 0) {
+            require Plack::Util;
+            Plack::Util::load_psgi($psgi_file);
+            exit 0;
+        }
+        waitpid $child_pid, 0;
+        if ($? != 0) {
+            die "load_psgi of $psgi_file failed";
+        }
+        $self->SUPER::do_reload();
+    }
+}
+
+__END__
+
+=head1 INSTALLATION
+
+As root / into puppet:
+
+    chmod 755 /etc/init.d/PAUSE-mojo
+    update-rc.d PAUSE-mojo defaults # Debian
+    chkconfig --add PAUSE-mojo      # RedHat
+
+=cut

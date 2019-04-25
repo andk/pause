@@ -1,0 +1,33 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $mgr = $c->app->pause;
+% if ($pause->{User}{fullname}) {
+<h2 class="firstheader">Hi <%= $pause->{User}{fullname} %>,<br>please choose an action from the menu.</h2>
+% } else {
+<h2 class="firstheader">Please choose an action from the menu.</h2>
+% }
+
+<p>The usermenu to the left shows all menus available to
+you, the table below shows descriptions for all menues available
+to anybody on PAUSE.</p>
+
+% my $alter = 1;
+<table border="0" bgcolor="black" cellspacing="0" cellpadding="0">
+<tr><td>
+<table bgcolor="white" border="0" cellspacing="1" cellpadding="2">
+<tr class="alternate<%= $alter++ % 2 + 1 %>"><th>Action</th><th>Group</th><th>Description</th></tr>
+% for my $group ($mgr->config->all_groups) {
+  % my @names = $mgr->config->action_names_for($group);
+  % for my $action ($mgr->config->sort_allowed_group_actions($group, \@names)) {
+<tr class="alternate<%= $alter++ % 2 + 1 %>">
+<td><b><%= $action->{verb} %></b><!-- (<%= $action->{name} %>) --></td>
+<td><%= b($action->{priv} || "N/A") %></td>
+<td><%= b($action->{desc} || "N/A") %></td>
+</tr>
+  % }
+% }
+</table>
+</td></tr>
+</table>
+
+

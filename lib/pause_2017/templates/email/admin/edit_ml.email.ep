@@ -1,0 +1,25 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+Record update in the PAUSE mailinglists database:
+
+<%== sprintf "%12s: [%s]", "userid", $pause->{selected}{maillistid} %>
+% for my $field (qw(maillistname address subscribe)) {
+%   my $fieldname = "pause99_edit_ml_$field";
+%   my $param = param($fieldname);
+%   if ($param ne $pause->{selected}{$field}) {
+<%== sprintf "%12s: [%s]", $field, $param %> was [<%== $pause->{selected}{$field} %>]
+%   } else {
+<%== sprintf "%12s: [%s]", $field, $pause->{selected}{$field} %>
+%   }
+% }
+% if ($pause->{changed}) {
+
+Data entered by <%= $pause->{User}{fullname} %>.
+Please check if they are correct.
+
+Thanks,
+--
+The PAUSE
+% }

@@ -1,0 +1,202 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+% if (param("pause99_add_user_userid")) {
+%   unless (@{$pause->{error} || []}) {
+%     if (my @urows = @{$pause->{urows} || []}) { # Soundex found something
+
+<h3>Not submitting <i><%= $pause->{userid} %></i>, maybe we have a duplicate here</h3>
+<p><%= $pause->{s_package} %> converted the fullname [<b><%= $pause->{fullname} %></b>] to [<%= $pause->{s_code} %>]</p>
+<table border="1">
+<tr><td>userid</td>
+<td>fullname</td>
+<td>(public) email</td>
+<td>other</td>
+</tr>
+%       for my $row (map { $_->{line} } sort { $b->{score} <=> $a->{score} } @urows) {
+<tr>
+%         if ($row->{same_userid}) {
+<td><b><%= $row->{userid} %></b></td>
+%         } elsif ($row->{userid}) {
+<td><%= $row->{userid} %></td>
+%         } else {
+<td>&#160;</td>
+%         }
+
+%         if ($row->{same_fullname}) {
+<td><b><%= $row->{fullname} %></b></td>
+%         } elsif ($row->{surname}) {
+<td><%= $row->{before_surname} %><b><%= $row->{surname} %></b><%= $row->{after_surname} %></td>
+%         } elsif ($row->{fullname}) {
+<td><%= $row->{fullname} %></td>
+%         } else {
+<td>&#160;</td>
+%         }
+
+%         if ($row->{same_email}) {
+<td><b><%= $row->{email_parts}[0] %><br>@<%= $row->{email_parts}[1] %></b></td>
+%         } else {
+<td><%= $row->{email_parts}[0] %><br>@<%= $row->{email_parts}[1] %></td>
+%         }
+
+<td>
+%         if ($row->{same_secretemail}) {
+secret&#160;email:&#160;<span style="color: <%= $pause->{se_color} %>"><b><%= $row->{secretemail} %></b></span><br>
+%         } elsif ($row->{secretemail}) {
+secret&#160;email:&#160;<span style="color: <%= $pause->{se_color} %>"><%= $row->{secret_email} %></span><br>
+%         }
+
+%         if ($row->{same_homepage}) {
+homepage:&#160;<b><%= $row->{homepage} %></b><br>
+%         } elsif ($row->{homepage}) {
+homepage:&#160;<%= $row->{homepage} %><br>
+%         }
+
+%         if ($row->{introduced}) {
+%           my $time = $row->{introduced};
+%           $time =~ s/\s/\&#160;/g;
+introduced&#160;on:&#160;<%= $time %><br>
+%         }
+
+%         if ($row->{changed}) {
+%           my $time = $row->{changed};
+%           $time =~ s/\s/\&#160;/g;
+changed&#160;on:&#160;<%= $time %>&#160;by&#160;<%= $row->{changedby} %><br>
+%         } else {
+changed&#160;by&#160;<%= $row->{changedby} %><br>
+%         }
+</td>
+</tr>
+%       }
+</table>
+%     }
+%   }
+
+%   if ($pause->{doit}) {
+%     if ($pause->{succeeded}) {
+
+<h3>Submitting query</h3>
+<p>New user creation succeeded.</p>
+
+%       if ($pause->{subscribe}) { # mailing list
+<p>Mailing list entered by <%= $pause->{User}{fullname} %>:</p>
+<p>Userid: <%= $pause->{userid} %></p>
+<p>Name: <%= $pause->{maillistname} %></p>
+<p>Description: <%= $pause->{subscribe} %></p>
+%       } else { # new user
+
+Sending separate mails to: <%= $pause->{send_to} %>
+<pre>
+From: <%= $PAUSE::Config->{UPLOAD} %>
+Subject: <%= $pause->{subject} %>
+
+<%= $pause->{blurb} %>
+</pre>
+%       }
+%     } else {
+<p><b>Query [<%= $pause->{query} %>] failed. Reason:</b></p><p><%= $pause->{query_error} %></p>
+
+%     }
+
+Content of user record in table <i>users</i>:<br>
+%     if ($pause->{usertable}) {
+<table border="1">
+%       for (sort keys %{$pause->{usertable}}) {
+<tr><td><%= $_ %></td><td><%= $pause->{usertable}{$_} || b("&#160;") %></td></tr>
+%       }
+</table>
+%     }
+
+%   } elsif (my @errors = @{$pause->{error} || []}) {
+<h3>Error processing form</h3>
+%     for my $error (@errors) {
+<ul><li>
+%       if ($error->{invalid}) {
+<b>userid[<%= $pause->{userid} %>]</b> does not match
+<b><%= $c->app->pause->config->valid_userid %></b>.
+%       } elsif ($error->{no_fullname}) {
+No fullname, nothing done.
+%       }
+</li></ul>
+%     }
+<p>Please retry.</p>
+%   }
+% }
+
+<h3>Add a user or mailinglist</h3>
+
+<%= submit_button "  Insert with soundex care  ",
+    name => "SUBMIT_pause99_add_user_Soundex",
+=%>
+<%= submit_button "  Insert with metaphone care  ",
+    name => "SUBMIT_pause99_add_user_Metaphone",
+=%>
+<%= submit_button "  Insert most definitely  ",
+    name => "SUBMIT_pause99_add_user_Definitely",
+=%>
+
+<br>
+
+userid (entering lowercase is OK, but it will be uppercased by the server):<br>
+
+<%= text_field "pause99_add_user_userid",
+    size => 12,
+    maxlength => 9,
+=%>
+
+<br>
+
+full name (mailinglist name):<br>
+
+<%= text_field "pause99_add_user_fullname",
+    size => 50,
+    maxlength => 50
+=%>
+
+<br>
+
+email address (for mailing lists this is the real address):<br>
+
+<%= text_field "pause99_add_user_email",
+    size => 50,
+    maxlength => 50,
+=%>
+
+<br>
+
+homepage url (ignored for mailing lists):<br>
+
+<%= text_field "pause99_add_user_homepage",
+    size => 50,
+    maxlength => 256
+=%>
+
+<br>
+
+subscribe information if this user is a mailing list
+(leave blank for ordinary users):<br>
+
+<%= text_field "pause99_add_user_subscribe",
+    size => 50,
+    maxlength => 256,
+=%>
+
+<br>
+
+<%= submit_button "  Insert with soundex care  ",
+    name => "SUBMIT_pause99_add_user_Soundex",
+=%>
+<%= submit_button "  Insert with metaphone care  ",
+    name => "SUBMIT_pause99_add_user_Metaphone",
+=%>
+<%= submit_button "  Insert most definitely  ",
+    name => "SUBMIT_pause99_add_user_Definitely",
+=%>
+
+<br>
+
+<p>If this is a bad request: <a href="<%= my_url->query(
+  ACTION => "manage_id_requests",
+  subaction => "delete",
+  USERID => $pause->{userid},
+) %>">Delete the ID request</a></p>

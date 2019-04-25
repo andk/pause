@@ -1,0 +1,54 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my %ALL = %{$pause->{all} || {}};
+% my $json_encoder = JSON::XS->new->indent->canonical;
+
+<p>View all pending applications for new user IDs and for modules registrations</p>
+
+<div id="requests">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="sort" data-sort="type">Type</th>
+      <th class="sort" data-sort="userid">Userid</th>
+      <th class="sort asc" data-sort="time">Time</th>
+      <th>Raw Session</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+% for my $k (sort { $ALL{$b}{type} cmp $ALL{$a}{type} || $ALL{$b}{mtime} <=> $ALL{$a}{mtime} } keys %ALL) {
+    <tr>
+      <td class="type"><%= $ALL{$k}{type} %></td>
+      <td class="userid"><%= $ALL{$k}{session}{APPLY}{userid} %></td>
+      <td class="time"><%= POSIX::strftime("%FT%TZ", gmtime $ALL{$k}{mtime}) %></td>
+      <td class="session"><pre><%= do {
+        my $json = $json_encoder->encode($ALL{$k}{session});
+        $json =~ s/\\n/\n/g;
+        $json;
+      } %></pre></td>
+      <td>
+        <a href="<%= my_url->query(
+          ACTION => (exists $ALL{$k}{session}{APPLY}{fullname} ? "add_user" : "add_mod"),
+          USERID => $ALL{$k}{session}{_session_id},
+          (exists $ALL{$k}{session}{APPLY}{fullname} ? "SUBMIT_pause99_add_user_sub" : "SUBMIT_pause99_add_mod_preview") => 1
+        ) %>">Go To Registration</a>
+        <br>
+        <a href="<%= my_url->query(
+          ACTION => "manage_id_requests",
+          subaction => "delete",
+          USERID => $ALL{$k}{session}{_session_id},
+        ) %>">Delete Registration</a>
+      </td>
+    </tr>
+% }
+  </tbody>
+</table>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var requestList = new List('requests', {valueNames: ['type', 'userid', 'session']});
+% end
+% end
