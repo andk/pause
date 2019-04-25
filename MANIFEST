@@ -22,9 +22,7 @@ cron/publish-crontab.pl
 cron/restart-httpd
 cron/rm_stale_links
 cron/run_mirrors.sh
-cron/svn-dump.pl
 cron/sync-04pause.pl
-cron/sync-incoming.sh
 cron/update-checksums.pl
 doc/authen_pause.schema.txt
 doc/franz_to_kbx.plan
@@ -93,11 +91,9 @@ lib/perl_pause/disabled.pm
 lib/perl_pause/disabled2.pm
 Makefile.PL
 MANIFEST			This list of files
-META.yml
 mirror/.cvsignore
 mirror/mirror.defaults
 mirror/mymirror.config
 one-off-utils/fill_users_with_ustatus.pl
 one-off-utils/README
-SIGNATURE
 t/0-signature.t
