@@ -653,6 +653,12 @@ sub index_status {
   $dio->index_status(@_);
 }
 
+sub get_index_status_status {
+  my ($self) = @_;
+
+  return $self->dist->{INDEX_STATUS}{ $self->{PACKAGE} }{status};
+}
+
 sub add_indexing_warning {
   my($self) = shift;
   my $dio;
@@ -754,7 +760,7 @@ sub checkin {
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
 
-  $self->checkin_into_primeur; # called in void context!
+  $self->dist->{CHECKINS}{ lc $package }{$package} = $self->{PMFILE};
 
   my $row = $dbh->selectrow_hashref(
     qq{
@@ -766,22 +772,19 @@ sub checkin {
     $package
   );
 
-
   if ($row) {
-
       # We know this package from some time ago
-
       $self->update_package($row);
-
   } else {
-
       # we hear for the first time about this package
-
       $self->insert_into_package;
+  }
 
+  my $status = $self->get_index_status_status;
+  if (! $status or $status == PAUSE::mldistwatch::Constants::OK) {
+      $self->checkin_into_primeur; # called in void context!
   }
 
 }
 
 1;
-
