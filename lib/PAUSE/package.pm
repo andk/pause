@@ -3,6 +3,7 @@ use warnings;
 package PAUSE::package;
 use vars qw($AUTOLOAD);
 use PAUSE::mldistwatch::Constants;
+use CPAN::DistnameInfo;
 
 =comment
 
@@ -671,7 +672,8 @@ sub insert_into_package {
   my $dist = $self->{DIST};
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
-  my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg) VALUES (?,?,?,?,?,?) };
+  my $distname = CPAN::DistnameInfo->new($dist)->dist;
+  my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg, distname) VALUES (?,?,?,?,?,?,?) };
   $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . "\n");
 
   return unless $self->_version_ok($pp, $package, $dist);
@@ -683,6 +685,7 @@ sub insert_into_package {
             $pp->{infile},
             $pp->{filemtime},
             $self->dist->{TIME},
+            $distname,
           );
   $self->index_status($package,
                       $pp->{version},
