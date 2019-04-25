@@ -161,21 +161,18 @@ sub perm_check {
 
       if (PAUSE::isa_regular_perl($dist)) {
           # seems ok: perl is always right
+      } elsif (@owned && ! @owned_exact) {
+          # Case mismatch.  Let's correct.
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
           my $owner = eval { $self->hub->permissions->get_package_first_come_any_case($package) }
                     // "unknown";
 
-          my $not_owner = qq{Not indexed because permission missing.
+          my $error   = "not owner";
+          my $message = qq{Not indexed because permission missing.
 Current registered primary maintainer is $owner.
 Hint: you can always find the legitimate maintainer(s) on PAUSE under
 "View Permissions".};
-
-          # XXX: display canonical case -- rjbs, 2014-03-13
-          my $case_bad  = qq{Not indexed because of case mismatch.};
-
-          my $message = @owned ? $case_bad : $not_owner;
-          my $error   = @owned ? "case mismatch" : "not owner";
 
           $self->index_status($package,
                               $pp->{version},
