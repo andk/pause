@@ -105,30 +105,6 @@ subtest "add comaintainer" => sub {
   );
 };
 
-subtest "add historic content" => sub {
-  $DB::single=1;
-  my $result = $pause->test_reindex;
-  my $dbh = $result->connect_mod_db;
-  $dbh->do("INSERT INTO packages ('package','version','dist','status','file') VALUES ('Bug::gold','0.001','O/OP/OPRIME/Bug-gold-0.001.tar.gz','index','notexists')");
-  my $time = time;
-  $dbh->do("INSERT INTO distmtimes ('dist','distmtime') VALUES ('O/OP/OPRIME/Bug-gold-0.001.tar.gz','$time')");
-  open my $fh, ">", $pause->tmpdir->file(qw(cpan authors id O OP OPRIME Bug-gold-0.001.tar.gz)) or die "Could not open: $!";
-  print $fh qq<fake tarball>;
-  close $fh or die "Could not close: $!";
-  $result = $pause->test_reindex;
-  $result->package_list_ok(
-    [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.11'  },
-      { package => 'Mooooooose',     version => '0.01'  },
-      { package => 'XForm::Rollout', version => '1.00'  },
-      { package => 'Y',              version => 2       },
-    ]
-  );
-};
-
 subtest "reindexing" => sub {
   $pause->import_author_root('corpus/mld/002/authors');
 
@@ -143,7 +119,6 @@ subtest "reindexing" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
@@ -176,7 +151,6 @@ subtest "distname/pkgname permission mismatch" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
@@ -237,7 +211,6 @@ subtest "case mismatch, authorized for original" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
@@ -269,7 +242,6 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
@@ -311,7 +283,6 @@ subtest "perl-\\d should not get indexed" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
@@ -370,7 +341,6 @@ subtest "distname/pkgname permission check" => sub {
   $result->package_list_ok(
     [
       { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Bug::gold',      version => '0.001' },
       { package => 'Hall::MtKing',   version => '0.01'  },
       { package => 'Jenkins::Hack',  version => '0.12'  },
       { package => 'Jenkins::Hack2', version => '0.12'  },
@@ -422,40 +392,41 @@ subtest "comaint upload" => sub {
   # -rw-rw-r--   colin/colin        48 Jenkins-Hack-0.13/lib/Jenkins/Hack.pm
 
   my $result = $pause->test_reindex;
-    $result->perm_list_ok(
-      {
-        'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
-        'Hall::MtKing'    => { f => 'XYZZY' },
-        'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },         # new
-        'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },         # changed from { f => 'AAARGH' }
-        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },   # changed from { f => 'AAARGH', c => [qw/MERCKX/] }
-        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },  # new
-        'XForm::Rollout'  => { f => 'OPRIME' },
-        'Y',              => { f => 'XYZZY' },
-      }
-    );
+
+  $result->perm_list_ok(
+    {
+      'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
+      'Hall::MtKing'    => { f => 'XYZZY' },
+      'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },         # new
+      'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },         # changed from { f => 'AAARGH' }
+      'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },   # changed from { f => 'AAARGH', c => [qw/MERCKX/] }
+      'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },  # new
+      'xform::rollout'  => { f => 'OPRIME' },
+      'Y',              => { f => 'XYZZY' },
+    }
+  );
 };
 
 subtest "other comaint upload" => sub {
 
   $pause->import_author_root('corpus/mld/009/authors');
   my $result = $pause->test_reindex;
-    $result->perm_list_ok(
-      {
-        'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
-        'Hall::MtKing'    => { f => 'XYZZY' },
-        'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-        'XForm::Rollout'  => { f => 'OPRIME' },
-        'Y',              => { f => 'XYZZY' },
-      }
-    );
+  $result->perm_list_ok(
+    {
+      'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
+      'Hall::MtKing'    => { f => 'XYZZY' },
+      'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
+      'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+      'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+      'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
+      'xform::rollout'  => { f => 'OPRIME' },
+      'Y',              => { f => 'XYZZY' },
+    }
+  );
 };
 done_testing;
 

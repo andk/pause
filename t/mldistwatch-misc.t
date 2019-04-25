@@ -325,6 +325,39 @@ subtest "check perl6 distribution indexing" => sub {
   );
 };
 
+subtest "sort of case-conflicted packages is stable" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my $result = $pause->test_reindex;
+  my $dbh = $result->connect_mod_db;
+
+  $dbh->do("INSERT INTO packages ('package','version','dist','status','file') VALUES ('Bug::Gold','1.001','O/OP/OPRIME/Bug-Gold-1.001.tar.gz','index','notexists')");
+  $dbh->do("INSERT INTO packages ('package','version','dist','status','file') VALUES ('Bug::gold','0.001','O/OP/OPRIME/Bug-gold-0.001.tar.gz','index','notexists')");
+
+  my $now  = time - 86400;
+  my $then = time - 86400*30;
+
+  $dbh->do("INSERT INTO distmtimes ('dist','distmtime') VALUES ('O/OP/OPRIME/Bug-gold-0.001.tar.gz','$then')");
+  $dbh->do("INSERT INTO distmtimes ('dist','distmtime') VALUES ('O/OP/OPRIME/Bug-Gold-1.001.tar.gz','$now')");
+
+  for my $fn (qw(Bug-gold-0.001.tar.gz Bug-Gold-1.001.tar.gz)) {
+    my $dir = $pause->tmpdir->subdir( qw(cpan authors id O OP OPRIME) );
+    $dir->mkpath;
+
+    open my $fh, ">", $dir->file($fn) or die "Could not open: $!";
+    print $fh qq<fake tarball>;
+    close $fh or die "Could not close: $!";
+  }
+
+  $result = $pause->test_reindex;
+  $result->package_list_ok(
+    [
+      { package => 'Bug::Gold',      version => '1.001' },
+      { package => 'Bug::gold',      version => '0.001' },
+    ]
+  );
+};
+
 done_testing;
 
 # Local Variables:
