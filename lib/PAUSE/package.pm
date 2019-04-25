@@ -493,6 +493,9 @@ $oldversion, so not indexing seems okay.},
                               qq{Not indexed because $ofile in $odist
 has a higher version number ($oldversion)},
                               );
+
+          delete $self->dist->{CHECKINS}{ lc $package }{ $package };
+
           $self->alert(qq{decreasing VERSION number [$pp->{version}]
 in package[$package]
 dist[$dist]
