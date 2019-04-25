@@ -40,6 +40,7 @@ WriteMakefile(
     HTML::Entities
     HTTP::Date
     HTTP::Request::Common
+    HTTP::Tiny
     IO::Socket::SSL
     IPC::Cmd
     IPC::Run3
@@ -57,11 +58,10 @@ WriteMakefile(
     Moo
     Mojolicious
     Mojolicious::Plugin::WithCSRFProtection
-    Mojo::File
     MojoX::Log::Dispatch::Simple
-    Moo
     MooseX::StrictConstructor
     Net::FTP
+    Net::SSLeay
     Parse::CPAN::Packages
     Parse::CPAN::Perms
     Path::Class
@@ -97,12 +97,6 @@ WriteMakefile(
     XML::SAX::Base
     XML::SAX::Writer
     YAML::XS
-    HTTP::Tiny
-    IO::Socket::SSL
-    Net::SSLeay
-    Mojolicious
-    Mojolicious::Plugin::WithCSRFProtection
-    MojoX::Log::Dispatch::Simple
 )},
               SIGN => 1,
               test => { RECURSIVE_TEST_FILES => 1 },
