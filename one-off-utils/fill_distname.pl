@@ -15,14 +15,15 @@ my $db = DBI->connect(
                      );
 
 my $ct = 0;
-my $dists = $db->selectcol_arrayref("SELECT DISTINCT(dist) FROM packages WHERE distname = '' OR distname IS NULL");
-my $total = @$dists;
-my $sth = $db->prepare("UPDATE packages SET distname=? WHERE dist=?");
+my $rows = $db->selectall_arrayref("SELECT dist, package FROM packages WHERE distname = '' OR distname IS NULL");
+my $total = @$rows;
+my $sth = $db->prepare("UPDATE packages SET distname=? WHERE package=?");
 $db->{AutoCommit} = 0;
-for my $dist (@$dists) {
+for my $row (@$rows) {
+    my ($dist, $package) = @$row;
     my $name = CPAN::DistnameInfo->new($dist)->dist;
-    $sth->execute($name, $dist);
-    if (++$ct % 100 == 0) {
+    $sth->execute($name, $package);
+    if (++$ct % 1000 == 0) {
         print "done $ct / $total\n";
         $db->commit;
     }
