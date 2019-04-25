@@ -1,5 +1,7 @@
 package pause_1999::Test::MySQL;
 
+use Test::Requires qw(Test::mysqld);
+
 use Moose;
 use Test::mysqld;
 use Test::More;
