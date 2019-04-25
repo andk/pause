@@ -713,13 +713,17 @@ sub checkin_into_primeur {
   # print ">>>>>>>>checkin_into_primeur not yet implemented<<<<<<<<\n";
 
   my $userid;
-  my $dio = $self->parent->parent;
-  if (exists $dio->{META_CONTENT}{x_authority}) {
+  my $dio = $self->dist;
+
+  if (defined $dio->{META_CONTENT}{x_authority}) {
       $userid = $dio->{META_CONTENT}{x_authority};
       $userid =~ s/^cpan://i;
       # FIXME: if this ends up being blank we should probably die?
       # validate userid existing
   } else {
+      if (exists $dio->{META_CONTENT}{x_authority}) {
+          $self->verbose(1, "x_authority was present but undefined; ignoring!");
+      }
       # look to the existing main package.
       if(lc($self->{MAIN_PACKAGE}) eq lc($package)) {
           $userid = $self->{USERID} or die;
@@ -729,6 +733,8 @@ sub checkin_into_primeur {
           die "Shouldn't reach here: userid unknown" unless $userid;
       }
   }
+
+  Carp::confess("no userid!?") unless defined $userid;
 
   my $plan = $self->hub->permissions->plan_set_first_come($userid, $package);
   $plan->();
