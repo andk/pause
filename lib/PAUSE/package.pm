@@ -409,6 +409,7 @@ sub update_package {
       $something1 eq $something2 && !$older_isa_regular_perl;
 
   $self->verbose(1, "New package data: package[$package]infile[$pp->{infile}]".
+                  "version[$pp->{version}]".
                   "distorperlok[$distorperlok]oldversion[$oldversion]".
                   "odist[$odist]\n");
 
