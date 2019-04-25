@@ -100,7 +100,7 @@ sub _build_db_root {
 }
 
 sub add_first_come {
-  my ($self, $package, $userid) = @_;
+  my ($self, $userid, $package) = @_;
 
   my $dir = $self->db_root;
   my $dbh = DBI->connect(
@@ -112,17 +112,16 @@ sub add_first_come {
 
   $dbh->do(
     q{
-      INSERT INTO primeur (package, userid) VALUES (?, ?);
-      INSERT INTO perms   (package, userid) VALUES (?, ?);
+      INSERT INTO primeur (userid, package) VALUES (?, ?);
+      INSERT INTO perms   (userid, package) VALUES (?, ?);
     },
     undef,
-    uc $userid, $package,
-    uc $userid, $package,
+    (uc $userid, $package) x 2,
   );
 }
 
 sub add_comaint {
-  my ($self, $package, $userid) = @_;
+  my ($self, $userid, $package) = @_;
 
   my $dir = $self->db_root;
   my $dbh = DBI->connect(
@@ -134,10 +133,11 @@ sub add_comaint {
 
   $dbh->do(
     q{
-      INSERT INTO perms (package, userid) VALUES (?, ?);
+      INSERT INTO perms (userid, package) VALUES (?, ?);
     },
     undef,
-    uc $userid, $package,
+    uc $userid,
+    $package,
   );
 }
 

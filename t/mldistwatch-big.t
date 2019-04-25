@@ -87,8 +87,7 @@ subtest "add comaintainer" => sub {
   );
   for my $comaint (@comaintainers)
   {
-    $dbh->do("INSERT INTO perms   (package, userid) VALUES (?,?)", {}, @$comaint)
-        or die "couldn't insert!";
+    $pause->add_comaint($comaint->[1], $comaint->[0]);
   }
 
   $result = $pause->test_reindex;
