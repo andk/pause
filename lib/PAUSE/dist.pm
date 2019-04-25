@@ -40,6 +40,26 @@ sub ignoredist {
   return;
 }
 
+sub normalize_package_casing {
+  my ($self) = @_;
+
+  for my $lc_package (keys %{ $self->{CHECKINS} }) {
+    my %pkg_checkins = %{ $self->{CHECKINS}{$lc_package} };
+
+    my (@forms) = sort keys %pkg_checkins;
+
+    if (@forms == 1) {
+      $self->verbose(1, "Ensuring canonicalized case of $forms[0]");
+      $self->hub->permissions->canonicalize_module_casing($forms[0]);
+      return;
+    }
+
+    $self->verbose(1, "Case conflict resolved by LAST-RESORT: [@forms] -> $forms[0]");
+    my $form = $forms[0];
+    $self->hub->permissions->canonicalize_module_casing($forms[0]);
+  }
+}
+
 sub delete_goner {
   my $self = shift;
   my $dist = $self->{DIST};
