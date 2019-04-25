@@ -42,6 +42,7 @@ subtest "first indexing" => sub {
       { package => 'Y',              version => 2       },
     ],
   );
+
   $result->perm_list_ok(
     {
       'Bug::Gold'       => { f => 'OPRIME' },
@@ -74,7 +75,6 @@ subtest "first indexing" => sub {
 };
 
 subtest "add comaintainer" => sub {
-
   my $result = $pause->test_reindex;
   my $dbh = $result->connect_mod_db;
   my @comaintainers = (
@@ -268,32 +268,6 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
       { subject => 'PAUSE upload indexing error' },
     ],
   );
-};
-
-subtest "perl-\\d should not get indexed" => sub {
-  $pause->import_author_root('corpus/mld/006/authors');
-
-  my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
-  $result->package_list_ok(
-    [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
-      { package => 'Y',              version => 2       },
-    ],
-  );
-
-  # TODO: send a report saying 'no perl-X allowed'
 };
 
 subtest "don't allow upload on permissions case conflict" => sub {

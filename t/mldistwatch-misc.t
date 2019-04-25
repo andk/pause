@@ -32,6 +32,32 @@ subtest "do not index bare .pm but report rejection" => sub {
   );
 };
 
+subtest "perl-\\d should not get indexed" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  $pause->upload_author_fake(PLUGH => {
+    name      => 'Soft-Ware',
+    version   => 2,
+    packages  => [ 'Soft::Ware' ],
+  });
+
+  $pause->upload_author_fake(PLUGH => {
+    name      => 'perl',
+    version   => 6,
+    packages  => [ 'perl::rocks' ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok(
+    [
+      { package => 'Soft::Ware',      version => '2' },
+    ],
+  );
+
+  # TODO: send a report saying 'no perl-X allowed'
+};
+
 subtest "should index single-life dev vers. modules in perl dist" => sub {
   plan skip_all => "this test only run when perl-5.20.2.tar.gz found"
     unless -e 'perl-5.20.2.tar.gz';
