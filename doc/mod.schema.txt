@@ -296,7 +296,7 @@ CREATE TABLE uris (
 CREATE TABLE `users` (
   `userid` char(10) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
   `ustatus` enum('unused','active','delete','nologin') NOT NULL DEFAULT 'unused',
-  `ustatus_ch` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `ustatus_ch` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `email` char(255) NOT NULL DEFAULT '',
   `cpan_mail_alias` enum('none','publ','secr') NOT NULL DEFAULT 'none',
   `homepage` char(255) NOT NULL DEFAULT '',
