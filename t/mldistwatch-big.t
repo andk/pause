@@ -331,26 +331,6 @@ subtest "distname/pkgname permission check" => sub {
   );
 };
 
-subtest "check comaintainers" => sub {
-  my $result = $pause->test_reindex;
-
-  TODO: {
-    local $TODO = "Default permissions for new modules to be implemented";
-    $result->perm_list_ok(
-      {
-        'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
-        'Hall::MtKing'    => { f => 'XYZZY' },
-        'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-        'Mooooooose'      => { f => 'AAARGH' },
-        'Mooooooose::Role' => { f => 'AAARGH', c => [qw/MERCKX/] },
-        'Y',              => { f => 'XYZZY' },
-        'xform::rollout'  => { f => 'OPRIME' },
-      }
-    );
-  };
-};
-
 subtest "comaint upload" => sub {
 
   $pause->import_author_root('corpus/mld/008/authors');
