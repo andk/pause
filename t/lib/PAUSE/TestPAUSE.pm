@@ -150,19 +150,28 @@ sub import_author_root {
 }
 
 sub upload_author_fake {
-  my ($self, $author, $fake) = @_;
+  my ($self, $author, $fake, $extra) = @_;
 
   require Module::Faker; # We require 0.020 -- rjbs, 2019-04-25
 
-  my $dist;
   if (ref $fake) {
-    local $fake->{author} = $author;
-    $dist = Module::Faker::Dist->from_struct($fake);
+    $fake->{cpan_author} //= $author;
+    Carp::croak("use more_meta, not 3rd parameter, for faker here") if $extra;
   } else {
-    # Fake is list Foo-Bar-1.23
-    my $string = "$author\_$fake.tar.gz.dist";
-    $dist = Module::Faker::Dist->from_file($string);
+    my ($name, $version) = $fake =~ /\A (.+) - ([^-]+) \z/x;
+
+    Carp::croak("bogus fake dist name: $fake")
+      unless defined $name and defined $version;
+
+    $fake = {
+      cpan_author => $author,
+      name        => $name,
+      version     => $version,
+      ($extra ? %$extra : ()),
+    };
   }
+
+  my $dist = Module::Faker::Dist->from_struct($fake);
 
   my $cpan_root   = File::Spec->catdir($self->tmpdir, 'cpan');
   my $author_root = File::Spec->catdir($cpan_root, qw(authors id));
