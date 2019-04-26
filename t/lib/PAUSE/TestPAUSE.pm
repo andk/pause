@@ -158,6 +158,11 @@ sub upload_author_fake {
     $fake->{cpan_author} //= $author;
     Carp::croak("use more_meta, not 3rd parameter, for faker here") if $extra;
   } else {
+    my $ext = "tar.gz";
+    if ($fake =~ s/\.(tar\.gz|zip)\z//) {
+      $ext = $1;
+    }
+
     my ($name, $version) = $fake =~ /\A (.+) - ([^-]+) \z/x;
 
     Carp::croak("bogus fake dist name: $fake")
@@ -167,6 +172,7 @@ sub upload_author_fake {
       cpan_author => $author,
       name        => $name,
       version     => $version,
+      archive_ext => $ext,
       ($extra ? %$extra : ()),
     };
   }
