@@ -6,33 +6,56 @@ use lib 't/lib';
 
 use File::pushd;
 use File::Temp ();
+use JSON;
 use Getopt::Long::Descriptive;
 use Path::Class;
 use PAUSE::TestPAUSE;
 use Parse::CPAN::Packages;
 use Parse::CPAN::Perms;
 
+# Hey, wouldn't it be cool if there was a --starting-cpan option to say "clone
+# this whole [mini]cpan mirror and load its 02 and 06 and then inject stuff
+# into that.  Then you could see "what would happen in production?" (Almost.)
+# -- rjbs, 2019-04-26
+
 my ($opt, $usage) = describe_options(
-  '%c %o [USER:]DISTFILE...',
-  [ 'dir=s',        'target directory; by default uses a tempdir' ],
-  [ 'verbose|v',    'print logs to STDERR as it goes'             ],
-  [ 'shell!',       'run a shell in the directory; default: true',
-                    { default => 1 } ],
-  [ 'dists-from=s', 'program to run to get dist names'            ],
-  [ 'each',         'index after each' ],
-  [ 'packages|p=s', '02packages file to prefill packages table'   ],
-  [ 'perms|P=s',    '06perms file to prefill mods/primeur/perms'  ],
+  '%c %o TYPE:WHAT...',
+
+  [ 'dir=s',          'target directory; by default uses a tempdir' ],
+  [ 'verbose|v',      'print logs to STDERR as it goes'             ],
+
+  [ 'packages|p=s',   '02packages file to prefill packages table'   ],
+  [ 'perms|P=s',      '06perms file to prefill mods/primeur/perms'  ],
+  [ 'default-user=s', 'default PAUSEID for uploads; default: LOCAL',
+                      { default => 'LOCAL' } ],
+
+  [ 'each',           'index at start and after each upload'        ],
+
+  [ 'shell!',         'run a shell in the directory; default: true',
+                      { default => 1 } ],
+  [],
+  [ <<'EOT' ],
+Other than the --switches, arguments are instructions in one of the forms
+below.  For those that list PAUSEID, it may be omitted, and the default
+user is used instead.
+
+Valid instructions are:
+
+  form                | meaning
+  --------------------+-----------------------------------------------
+  "-"                 | reindex now
+  file:PAUSEID:FILE   | upload the named file as the named PAUSE user
+  fake:PAUSEID:FILE   | generate a dist based on the given filename
+  json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
+  perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
+  fdir:DIRECTORY      | flat dir: upload all the files as the default user
+  cmd:"program"       | run the program, which should print out instructions
+
+EOT
 );
 
-my @uploads;
-if ($opt->dists_from) {
-  my $cmd = $opt->dists_from;
-  @uploads = `$cmd`;
-  chomp @uploads;
-} else {
-  $usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
-    unless @uploads = @ARGV;
-}
+$usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
+  unless my @instructions = @ARGV;
 
 my $dir = $opt->dir;
 my $tmpdir;
@@ -139,27 +162,100 @@ if ($opt->perms) {
   });
 }
 
-my $just_reindexed;
+my $JSON = JSON->new->relaxed(1);
 
-UPLOAD: for my $upload (@uploads) {
-  if ($upload eq '-') {
+my $index_clean;
+
+INSTRUCTION: while (my $instruction = shift @instructions) {
+  # file:PAUSEID:FILE   | upload the named file as the named PAUSE user
+  # cmd:"program"       | run the program, which should print out filenames
+  # fake:PAUSEID:FILE   | generate a dist based on the given filename
+  # json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
+  # perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
+
+  if ($instruction eq '-') {
     $pause->test_reindex;
-    $just_reindexed = 1;
-    next UPLOAD;
+    $index_clean = 1;
+    next INSTRUCTION;
   }
 
-  $pause->test_reindex if $opt->each;
+  if ($opt->each && ! $index_clean) {
+    $pause->test_reindex;
+    $index_clean = 1
+  }
 
-  my ($user, $distfile) = split /:/, $upload, 2;
-  ($user, $distfile) = (LOCAL => $user) unless defined $distfile;
+  my ($type, $rest) = split /:/, $instruction, 2;
 
-  $pause->upload_author_file($user => $distfile);
-  print {$log_fh} ">>>> Just uploaded $user/$distfile\n";
-  print {*STDERR} ">>>> Just uploaded $user/$distfile\n" if $opt->verbose;
-  $just_reindexed = 0;
+  if ($type eq 'cmd') {
+    my @lines = `$rest`;
+    chomp @lines;
+
+    print {$log_fh} ">>>> ran `$rest` and unshifted results to queue: @lines\n";
+    print {*STDERR} ">>>> ran `$rest` and unshifted results to queue: @lines\n"
+      if $opt->verbose;
+
+    unshift @instructions, @lines;
+    next INSTRUCTION;
+  }
+
+  if ($type eq 'fdir') {
+    $rest =~ s/\A~/$ENV{HOME}/; # for my own sake -- rjbs, 2019-04-26
+    my @to_inject = map {; "file:$_" } grep {; -f } <$rest/*>;
+
+    print {$log_fh} ">>>> files found in $rest and to be added: @to_inject\n";
+    print {*STDERR} ">>>> files found in $rest and to be added: @to_inject\n"
+      if $opt->verbose;
+
+    unshift @instructions, @to_inject;
+    next INSTRUCTION;
+  }
+
+  my ($lhs, $rhs) = split /:/, $rest, 2;
+  my $user  = defined $rhs ? $lhs : $opt->default_user;
+  my $param = defined $rhs ? $rhs : $lhs;
+
+  if ($type eq 'fake') {
+    $pause->upload_author_fake($user => $param);
+    $index_clean = 0;
+    print {$log_fh} ">>>> Just uploaded fake from $user/$param\n";
+    print {*STDERR} ">>>> Just uploaded fake from $user/$param\n" if $opt->verbose;
+    next;
+  }
+
+  if ($type eq 'file') {
+    $param =~ s/\A~/$ENV{HOME}/; # for my own sake -- rjbs, 2019-04-26
+    $pause->upload_author_file($user => $param);
+    $index_clean = 0;
+    print {$log_fh} ">>>> Just uploaded $user/$param\n";
+    print {*STDERR} ">>>> Just uploaded $user/$param\n" if $opt->verbose;
+    next;
+  }
+
+  my $data = $type eq 'json' ? $JSON->decode($param)
+           : $type eq 'perl' ? insane_safe_eval($param)
+           : die "didn't recognize instruction type: $instruction\n";
+
+  $pause->upload_author_fake($user => $data);
+  $index_clean = 0;
+  print {$log_fh} ">>>> Just uploaded fake for $user/$param\n";
+  print {*STDERR} ">>>> Just uploaded fake for $user/$param\n" if $opt->verbose;
 }
 
-$pause->test_reindex unless $just_reindexed;
+sub insane_safe_eval {
+  my ($perl) = @_;
+  my $pid = open my $fh, '-|',
+    $^X, '-MJSON', '-E', "say encode_json($perl)";
+
+  die "couldn't spawn $^X: $!" unless $pid;
+
+  my $json = do { local $/; <$fh> };
+
+  close $fh or die "error closing pipe: $!";
+
+  $JSON->decode($json);
+}
+
+$pause->test_reindex unless $index_clean;
 
 close $log_fh or warn "error closing $dir/pause.log: $!";
 
