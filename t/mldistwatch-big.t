@@ -209,7 +209,6 @@ subtest "don't allow upload on permissions case conflict" => sub {
   );
 };
 
-
 subtest "case mismatch, authorized for original" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
