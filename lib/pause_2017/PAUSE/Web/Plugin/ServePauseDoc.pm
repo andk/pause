@@ -23,6 +23,7 @@ sub _serve_pause_doc {
     if ($name =~ /\.md$/) {
       require Text::Markdown::Hoedown;
       $html = Text::Markdown::Hoedown::markdown($html);
+      $html =~ s!<h([1-6]) id="toc_([0-9]+)">(.*?)</h\1>!qq{<h$1 id="} . _toc($2, $3) . qq{">$3</h$1>}!ge;
     }
     last;
   }
@@ -39,6 +40,14 @@ sub _serve_pause_doc {
 
   $c->stash(".pause")->{doc} = $html;
   $c->render("pause_doc");
+}
+
+sub _toc {
+  my ($num, $text) = @_;
+  $text = lc $text;
+  $text =~ s/[^a-z0-9_]+/_/g;
+  $text =~ s/(^_+|_+$)//g;
+  $text;
 }
 
 1;
