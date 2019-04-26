@@ -14,10 +14,10 @@ use PAUSE::TestPAUSE;
 
 use Test::More;
 
-my $pause = PAUSE::TestPAUSE->init_new;
-$pause->import_author_root('corpus/mld/001/authors');
-
 subtest "first indexing" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->import_author_root('corpus/mld/001/authors');
+
   my $result = $pause->test_reindex;
 
   $pause->file_updated_ok(
@@ -71,93 +71,80 @@ subtest "first indexing" => sub {
       "we now have a master commit",
     );
   };
-
 };
 
-subtest "add comaintainer" => sub {
-  my $result = $pause->test_reindex;
-  my $dbh = $result->connect_mod_db;
-  my @comaintainers = (
-    [qw/Bug::Gold ATRION/],
-    [qw/Jenkins::Hack ONE/],
-    [qw/Jenkins::Hack TWO/],
-    [qw/Jenkins::Hack2 OOOPPP/],
-    [qw/Mooooooose MERCKX/],
-    [qw/Mooooooose BOONEN/],
-  );
-  for my $comaint (@comaintainers)
-  {
-    $pause->add_comaint($comaint->[1], $comaint->[0]);
-  }
+for my $uploader (qw(FCOME CMAINT)) {
+  subtest "new module added by $uploader are copied to comaints" => sub {
+    my $pause = PAUSE::TestPAUSE->init_new;
 
-  $result = $pause->test_reindex;
+    $pause->upload_author_fake(FCOME => 'Elk-0.01');
 
-  $result->perm_list_ok(
+    $pause->test_reindex->package_list_ok([
+      { package => 'Elk',             version => '0.01'  },
+    ]);
+
+    $pause->add_comaint(CMAINT  => 'Elk');
+    $pause->add_comaint(THIRD   => 'Elk');
+
+    $pause->test_reindex->perm_list_ok({
+      'Elk'             => { f => 'FCOME', c => [qw/CMAINT THIRD/] },
+    });
+
+    $pause->upload_author_fake($uploader => {
+      name      => 'Elk',
+      version   => 0.02,
+      packages  => [ qw(Elk Elk::Role) ],
+    });
+
     {
-      'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
-      'Hall::MtKing'    => { f => 'XYZZY' },
-      'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-      'Jenkins::Hack2'  => { c => [qw/OOOPPP/] },
-      'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-      'XForm::Rollout'  => { f => 'OPRIME' },
-      'Y',              => { f => 'XYZZY' },
+      my $result = $pause->test_reindex;
+
+      $pause->file_updated_ok(
+        $result->tmpdir
+               ->file(qw(cpan modules 02packages.details.txt.gz)),
+        "our indexer indexed",
+      );
+
+      $result->package_list_ok(
+        [
+          { package => 'Elk',             version => '0.02'  },
+          { package => 'Elk::Role',       version => '0.02'  },
+        ],
+      );
+
+      $pause->test_reindex->perm_list_ok({
+        'Elk'             => { f => 'FCOME', c => [qw/CMAINT THIRD/] },
+        'Elk::Role'       => { f => 'FCOME', c => [qw/CMAINT THIRD/] },
+      });
+
+      $result->email_ok(
+        [
+          { subject => "PAUSE indexer report $uploader/Elk-0.02.tar.gz" },
+        ],
+      );
     }
-  );
-};
+  };
+}
 
-subtest "reindexing" => sub {
-  $pause->import_author_root('corpus/mld/002/authors');
+subtest "require permission on main module" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
 
-  my $result = $pause->test_reindex;
+  $pause->upload_author_fake(UMAGNUS => 'XForm-Rollout-1.00');
 
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  $pause->test_reindex->package_list_ok([
+    { package => 'XForm::Rollout', version => '1.00' },
+  ]);
 
-  $result->package_list_ok(
-    [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
-      { package => 'Y',              version => 2       },
-    ],
-  );
-
-  $result->email_ok(
-    [
-      { subject => 'PAUSE indexer report MERCKX/Mooooooose-0.02.tar.gz' },
-      { subject => 'PAUSE indexer report OOOPPP/Jenkins-Hack-0.12.tar.gz' },
-      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
-    ],
-  );
-};
-
-subtest "distname/pkgname permission mismatch" => sub {
-  $pause->import_author_root('corpus/mld/003/authors');
+  $pause->upload_author_fake(UMAGNUS => {
+    name      => 'XFR',
+    version   => '2.000',
+    packages  => 'XForm::Rollout',
+  });
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
-  $result->package_list_ok(
-    [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
-      { package => 'Y',              version => 2       },
+  $result->package_list_ok([
+      { package => 'XForm::Rollout', version => '1.00'  },
     ],
   );
 
@@ -185,7 +172,7 @@ subtest "distname/pkgname permission mismatch" => sub {
                 qr/
                   \s+the\s+other\s+way\s+round
                   .+
-                  xform-rollout-\.\.\.
+                  XForm-Rollout-\.\.\.
                   /xs,
               "email looks right",
             );
@@ -197,8 +184,44 @@ subtest "distname/pkgname permission mismatch" => sub {
   );
 };
 
+subtest "don't allow upload on permissions case conflict" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  $pause->upload_author_fake(OPRIME => 'XForm-Rollout-1.00');
+
+  $pause->test_reindex->package_list_ok([
+    { package => 'XForm::Rollout', version => '1.00' },
+  ]);
+
+  $pause->upload_author_fake(XYZZY => 'xform-rollout-2.00');
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'XForm::Rollout', version => '1.00' },
+  ]);
+
+  $result->email_ok(
+    [
+      { subject => 'Failed: PAUSE indexer report XYZZY/xform-rollout-2.00.tar.gz' },
+      { subject => 'PAUSE upload indexing error' },
+    ],
+  );
+};
+
+
 subtest "case mismatch, authorized for original" => sub {
-  $pause->import_author_root('corpus/mld/004/authors');
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  $pause->upload_author_fake(OPRIME => 'XForm-Rollout-1.00');
+
+  $pause->test_reindex->package_list_ok(
+    [
+      { package => 'XForm::Rollout', version => '1.00'  },
+    ],
+  );
+
+  $pause->upload_author_fake(OPRIME => 'xform-rollout-2.00');
 
   my $result = $pause->test_reindex;
 
@@ -210,13 +233,6 @@ subtest "case mismatch, authorized for original" => sub {
 
   $result->package_list_ok(
     [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'Y',              version => 2       },
       { package => 'xform::rollout', version => '2.00'  },
     ],
   );
@@ -229,31 +245,32 @@ subtest "case mismatch, authorized for original" => sub {
 };
 
 subtest "case mismatch, authorized for original, desc. version" => sub {
-  $pause->import_author_root('corpus/mld/005/authors');
+  # Don't be tricked by case mismatch into indexing something we shouldn't.
+  # Moreover, don't report that the problem is the case change, which might be
+  # authorized, when the problem is the descending version. -- rjbs, 2019-04-26
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  $pause->upload_author_fake(OPRIME => 'XForm-Rollout-1.00');
+
+  $pause->test_reindex->package_list_ok(
+    [
+      { package => 'XForm::Rollout', version => '1.00'  },
+    ],
+  );
+
+  $pause->upload_author_fake(OPRIME => 'xform-rollout-0.99');
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
   $result->package_list_ok(
     [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
+      { package => 'XForm::Rollout', version => '1.00'  },
     ],
   );
 
   $result->email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OPRIME/XForm-Rollout-1.00a.tar.gz',
+      { subject => 'Failed: PAUSE indexer report OPRIME/xform-rollout-0.99.tar.gz',
         callbacks => [
           sub {
             like(
@@ -266,118 +283,6 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
       },
       { subject => 'PAUSE upload indexing error' },
     ],
-  );
-};
-
-subtest "don't allow upload on permissions case conflict" => sub {
-  $pause->import_author_root('corpus/mld/007/authors');
-
-  my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
-  $result->package_list_ok(
-    [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
-    ],
-  );
-
-  $result->email_ok(
-    [
-      { subject => 'Failed: PAUSE indexer report XYZZY/Bug-Gold-9.002.tar.gz' },
-      { subject => 'PAUSE upload indexing error' },
-    ],
-  );
-};
-
-subtest "distname/pkgname permission check" => sub {
-  $pause->import_author_root('corpus/mld/006-distname/authors');
-
-  my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
-  $result->package_list_ok(
-    [
-      { package => 'Bug::Gold',      version => '9.001' },
-      { package => 'Hall::MtKing',   version => '0.01'  },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'Y',              version => 2       },
-      { package => 'xform::rollout', version => '2.00'  },
-    ],
-  );
-
-  $result->email_ok(
-    [
-      { subject => 'Failed: PAUSE indexer report OPRIME/Y-3.tar.gz' },
-      { subject => 'PAUSE upload indexing error' },
-    ],
-  );
-};
-
-subtest "comaint upload" => sub {
-  $pause->import_author_root('corpus/mld/008/authors');
-  # BOONEN:
-  # -rw-rw-r--   colin/colin        52 Mooooooose-0.03/lib/Mooooooose/Trait.pm
-  # -rw-rw-r--   colin/colin        51 Mooooooose-0.03/lib/Mooooooose/Role.pm
-  # -rw-rw-r--   colin/colin        45 Mooooooose-0.03/lib/Mooooooose.pm
-  # ONE:
-  # -rw-rw-r--   colin/colin        49 Jenkins-Hack-0.13/lib/Jenkins/Hack2.pm
-  # -rw-rw-r--   colin/colin        55 Jenkins-Hack-0.13/lib/Jenkins/Hack/Utils.pm
-  # -rw-rw-r--   colin/colin        48 Jenkins-Hack-0.13/lib/Jenkins/Hack.pm
-
-  my $result = $pause->test_reindex;
-
-  $result->perm_list_ok(
-    {
-      'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
-      'Hall::MtKing'    => { f => 'XYZZY' },
-      'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-      'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-      'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },         # new
-      'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },         # changed from { f => 'AAARGH' }
-      'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },   # changed from { f => 'AAARGH', c => [qw/MERCKX/] }
-      'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },  # new
-      'xform::rollout'  => { f => 'OPRIME' },
-      'XForm::Rollout'  => { f => 'OPRIME' },
-      'Y',              => { f => 'XYZZY' },
-    }
-  );
-};
-
-subtest "other comaint upload" => sub {
-  $pause->import_author_root('corpus/mld/009/authors');
-  my $result = $pause->test_reindex;
-  $result->perm_list_ok(
-    {
-      'Bug::Gold'       => { f => 'OPRIME', c => ['ATRION'] },
-      'Hall::MtKing'    => { f => 'XYZZY' },
-      'Jenkins::Hack'   => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-      'Jenkins::Hack2'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-      'Jenkins::Hack::Utils'  => { f => 'OOOPPP', c => [qw/ONE TWO/] },
-      'Mooooooose'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-      'Mooooooose::Role'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-      'Mooooooose::Trait'      => { f => 'AAARGH', c => [qw/BOONEN MERCKX/] },
-      'xform::rollout'  => { f => 'OPRIME' },
-      'XForm::Rollout'  => { f => 'OPRIME' },
-      'Y',              => { f => 'XYZZY' },
-    }
   );
 };
 
