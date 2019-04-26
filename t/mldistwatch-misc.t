@@ -83,14 +83,12 @@ sub refused_index_test {
 
   if (ref $arg eq 'CODE') {
     $arg = {
-      before => $arg,
-      author_root => 'corpus/mld/001/authors',
+      before  => $arg,
+      uploads => [
+        OPRIME => 'XForm-Rollout-1.234',
+      ],
       want_package_list => [
-        { package => 'Hall::MtKing',   version => '0.01'  },
-        { package => 'Jenkins::Hack',  version => '0.11'  },
-        { package => 'Mooooooose',     version => '0.01'  },
-        { package => 'XForm::Rollout', version => '1.00'  },
-        { package => 'Y',              version => 2       },
+        { package => 'XForm::Rollout', version => '1.234' },
       ],
     };
   }
@@ -105,8 +103,15 @@ sub refused_index_test {
       undef,
     ) or die "can't connect to db at $db_file: $DBI::errstr";
 
-    $arg->{before}->($dbh);
-    $pause->import_author_root($arg->{author_root});
+    $arg->{before}->($pause, $dbh);
+
+    if ($arg->{uploads}) {
+      my @uploads = @{ $arg->{uploads} };
+      while (my ($uploader, $upload) = splice @uploads, 0, 2) {
+        $pause->upload_author_fake($uploader, $upload);
+      }
+    }
+
     my $result = $pause->test_reindex;
 
     $result->package_list_ok($arg->{want_package_list});
@@ -116,33 +121,36 @@ sub refused_index_test {
 };
 
 subtest "cannot steal a library when primeur+perms exist" => refused_index_test(sub {
-  my ($dbh) = @_;
-  $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
-    or die "couldn't insert!";
-  $dbh->do("INSERT INTO perms   (package, userid) VALUES ('Bug::Gold','ATRION')")
-    or die "couldn't insert!";
+  my ($pause) = @_;
+  $pause->add_first_come('ATRION', 'Bug::Gold');
 });
 
 subtest "cannot steal a library when only primeur exists" => refused_index_test(sub {
-  my ($dbh) = @_;
+  my ($pause, $dbh) = @_;
   $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
 });
 
 subtest "cannot steal a library when only perms exist" => refused_index_test(sub {
-  my ($dbh) = @_;
+  my ($pause, $dbh) = @_;
   $dbh->do("INSERT INTO perms (package, userid) VALUES ('Bug::Gold','ATRION')")
     or die "couldn't insert!";
 });
 
 subtest "cannot steal a library via copy-main-perms mechanism" => refused_index_test({
-  author_root => 'corpus/mld/009/authors',
+  uploads     => [
+    HAXOR => {
+      name      => 'Jenkins-Hack',
+      version   => 0.14,
+      packages  => [ qw( Jenkins::Hack Jenkins::Hack2 Jenkins::Hack::Utils ) ],
+    },
+  ],
   want_package_list => [
     { package => 'Jenkins::Hack',         version => '0.14' },
     { package => 'Jenkins::Hack::Utils',  version => '0.14' },
   ],
   before      => sub {
-    my ($dbh) = @_;
+    my ($pause, $dbh) = @_;
     $dbh->do("INSERT INTO perms (package, userid) VALUES ('Jenkins::Hack2','ATRION')")
       or die "couldn't insert!";
   },
