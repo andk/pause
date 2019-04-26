@@ -79,6 +79,7 @@ WriteMakefile(
     Test::FITesque::Fixture
     Test::MockObject
     Test::mysqld
+    Test::Requires
     Test::WWW::Mechanize::PSGI
     Text::Format
     Text::Markdown::Hoedown
