@@ -157,6 +157,8 @@ sub examine_fio {
             # We don't need to account for single- versus dual-life, because
             # the check for dual-life packages still applies elsewhere.
             # -- rjbs, 2015-04-18
+            $self->verbose(1, "found dev version $self->{VERSION} in $pmfile; skipping the whole file");
+
             delete $self->{DIO};    # circular reference
             return;
         }
