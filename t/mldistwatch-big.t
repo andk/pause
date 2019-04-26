@@ -332,7 +332,6 @@ subtest "distname/pkgname permission check" => sub {
 };
 
 subtest "comaint upload" => sub {
-
   $pause->import_author_root('corpus/mld/008/authors');
   # BOONEN:
   # -rw-rw-r--   colin/colin        52 Mooooooose-0.03/lib/Mooooooose/Trait.pm
@@ -363,7 +362,6 @@ subtest "comaint upload" => sub {
 };
 
 subtest "other comaint upload" => sub {
-
   $pause->import_author_root('corpus/mld/009/authors');
   my $result = $pause->test_reindex;
   $result->perm_list_ok(
@@ -382,6 +380,7 @@ subtest "other comaint upload" => sub {
     }
   );
 };
+
 done_testing;
 
 # Local Variables:
