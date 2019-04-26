@@ -35,11 +35,7 @@ subtest "do not index bare .pm but report rejection" => sub {
 subtest "perl-\\d should not get indexed" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
-  $pause->upload_author_fake(PLUGH => {
-    name      => 'Soft-Ware',
-    version   => 2,
-    packages  => [ 'Soft::Ware' ],
-  });
+  $pause->upload_author_fake(PLUGH => 'Soft-Ware-2');
 
   $pause->upload_author_fake(PLUGH => {
     name      => 'perl',
@@ -158,46 +154,40 @@ subtest "cannot steal a library via copy-main-perms mechanism" => refused_index_
 
 subtest "do not index if meta has release_status <> stable" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/002/authors');
+  $pause->upload_author_fake(OPRIME => 'XForm-Rollout-1.202');
+  $pause->upload_author_fake(OPRIME => 'Pie-Eater-1.23');
+
+  {
+    my $result = $pause->test_reindex;
+
+    $result->email_ok([
+      { subject => 'PAUSE indexer report OPRIME/Pie-Eater-1.23.tar.gz' },
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.202.tar.gz' },
+    ]);
+
+    $result->package_list_ok([
+      { package => 'Pie::Eater',      version => '1.23'  },
+      { package => 'XForm::Rollout',  version => '1.202'  },
+    ]);
+  }
+
+  $pause->upload_author_fake(OPRIME => 'XForm-Rollout-1.203');
+  $pause->upload_author_fake(
+    OPRIME => 'Pie-Eater-1.24',
+    { release_status => 'unstable' },
+  );
 
   my $result = $pause->test_reindex;
 
-  $result->email_ok(
-    [
-      { subject => 'PAUSE indexer report MERCKX/Mooooooose-0.02.tar.gz' },
-      { subject => 'PAUSE indexer report OOOPPP/Jenkins-Hack-0.12.tar.gz' },
-      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
-    ],
-  );
-
-  $pause->file_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
-  $pause->import_author_root('corpus/mld/unstable/authors');
-
-  $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
-
-  $result->package_list_ok(
-    [
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'XForm::Rollout', version => '1.01'  },
-    ],
-  );
+  $result->package_list_ok([
+    { package => 'Pie::Eater',      version => '1.23'  },
+    { package => 'XForm::Rollout',  version => '1.203'  },
+  ]);
 
   $result->email_ok(
     [
       {
-        subject => 'Failed: PAUSE indexer report RJBS/fewer-0.202.tar.gz',
+        subject => 'Failed: PAUSE indexer report OPRIME/Pie-Eater-1.24.tar.gz',
         callbacks => [
           sub {
             like(
@@ -208,34 +198,34 @@ subtest "do not index if meta has release_status <> stable" => sub {
           }
         ],
       },
+      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.203.tar.gz' },
     ],
   );
 };
 
 subtest "warn when pkg and module match only case insensitively" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/002/authors');
-  $pause->import_author_root('corpus/mld/pkg-mod-case/authors');
+
+  $pause->upload_author_fake(RJBS => {
+    name      => 'fewer',
+    version   => 0.202,
+    packages  => [
+      More  => { in_file => 'lib/more.pm' },
+      Fewer => { in_file => 'lib/fewer.pm' },
+    ]
+  });
 
   my $result = $pause->test_reindex;
 
   $result->package_list_ok(
     [
-      { package => 'Fewer',          version => '0.202' },
-      { package => 'Jenkins::Hack',  version => '0.12'  },
-      { package => 'Jenkins::Hack2', version => '0.12'  },
-      { package => 'Mooooooose',     version => '0.02'  },
-      { package => 'Mooooooose::Role', version => '0.02'  },
-      { package => 'More',           version => '0.202' },
-      { package => 'XForm::Rollout', version => '1.01'  },
+      { package => 'Fewer', version => '0.202' },
+      { package => 'More',  version => '0.202' },
     ],
   );
 
   $result->email_ok(
     [
-      { subject => 'PAUSE indexer report MERCKX/Mooooooose-0.02.tar.gz' },
-      { subject => 'PAUSE indexer report OOOPPP/Jenkins-Hack-0.12.tar.gz' },
-      { subject => 'PAUSE indexer report OPRIME/XForm-Rollout-1.01.tar.gz' },
       { subject => 'PAUSE indexer report RJBS/fewer-0.202.tar.gz',
         callbacks => [
           sub {
