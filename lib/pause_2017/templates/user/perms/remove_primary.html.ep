@@ -4,21 +4,23 @@
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 
 % if (param("SUBMIT_pause99_share_perms_remopr")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (@{$pause->{results} || []}) {
       <ul>
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
-<li>Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></li>
+<li class="error">Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></li>
 %       } else {
-<li>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</li>
+<li class="result">Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</li>
 %       }
 %     }
       </ul>
 %   } else {
-<p>You need to select one or more packages. Nothing done.</p>
+<p class="warning">You need to select one or more packages. Nothing done.</p>
 %   }
+</div>
 <hr>
 % }
 
