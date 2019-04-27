@@ -156,3 +156,7 @@ input, textarea { background: #fff; }
 td.checkbox { padding: 0em; text-align: center; vertical-align: middle; }
 .http_upload { background: #e0ffff; }
 .url_upload { background: #ffe0ff; }
+
+p.notice {
+  font-weight: bold;
+}

@@ -1,0 +1,94 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_move_dist_primary")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for my $res (@{$pause->{results}}) {
+%       if ($res->{error}) {
+<li class="error">Error trying to make <%= $res->{user} %> primary maintainer of <%= $res->{mod} %> (<%= $res->{dist} %>): <%= $res->{error} %></li>";
+%       } else {
+<li class="result">Made <%= $res->{user} %> primary maintainer of <%= $res->{mod} %> (<%= $res->{dist} %>).</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more distributions and enter a userid.
+Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{dists} || []}) {
+<h3>Pass maintainership status</h3><p>Please select one
+or more distributions for which you want to pass primary
+maintainership status, enter the CPAN userid of the new
+maintainer into the text field and press <i>Pass Maintainership
+Status</i>. Note: you keep co-maintainer status after this move.
+If you want to get rid of that too, please visit <a
+href="<%= my_url->query(ACTION => 'remove_dist_primary') %>">Give up
+co-maintainership status</a> next.</p>
+
+<p class="notice">You can only transfer what you actually own.
+If multiple owners are listed, you (or the person you are going to
+transfer the distribution) need to ask those owners to transfer
+their permissions as well.</p>
+
+<p class="notice">If you need finer control (eg. to transfer only a small part of
+a distribution you and other people own, for clarity's sake), visit
+<a href="<%= my_url->query(ACTION => 'move_primary') %>">
+Transfer Primary Permissions per module</a> page.</p>
+
+<p>Select one or more distributions:</p><p>
+<div id="dists">
+<input class="search" placeholder="Filter">
+<ul class="pagination paginationTop"></ul>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="dist">Distribution</th>
+      <th class="sort asc" data-sort="owners">Owners</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{dists}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_move_dist_primary_d" => $_->[0] %></td>
+      <td class="dist"><%= $_->[0] %><% if ($_->[1] =~ /,/) { %> (incomplete ownership)<% } %></td>
+      <td class="owners"><%= $_->[1] %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<ul class="pagination paginationBottom"></ul>
+<p>Select a userid:<br>
+<%= text_field "pause99_move_dist_primary_a", size => 15, maxlength => 9 =%>
+</p><p>
+<input type="submit" name="SUBMIT_pause99_move_dist_primary" value="Pass Maintainership Status"></p>
+
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('dists', {
+  valueNames: ['dist', 'owners'],
+  page: 300,
+  pagination: [
+    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
+    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
+  ]
+});
+% end
+% end
+
+% } else {
+<p>Sorry, there are no distributions registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
+% }
+

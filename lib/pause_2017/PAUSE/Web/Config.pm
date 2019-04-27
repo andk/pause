@@ -283,6 +283,91 @@ our %Actions = (
       SUBMIT_pause99_share_perms_remome => {form_type => "submit_button"},
     },
   },
+  peek_dist_perms => {
+    x_mojo_to => "user-distperms#peek",
+    verb => "View Permissions",
+    priv => "user",
+    cat => "User/04Permissions/01",
+    desc => "Whose uploads of what are being indexed on PAUSE",
+    method => 'POST',
+    x_form => {
+      pause99_peek_dist_perms_by => {form_type => "select_field"},
+      pause99_peek_dist_perms_query => {form_type => "text_field"},
+      pause99_peek_dist_perms_sub => {form_type => "submit_button"},
+    },
+  },
+  move_dist_primary => {
+    x_mojo_to => "user-distperms#move_dist_primary",
+    verb => "Transfer Primary Permissions",
+    priv => "user",
+    cat => "User/04Permissions/02",
+    desc => "Transfer distribution's primary maintainership status to somebody else (you become co-maintainer).",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_make_dist_primary_d => {form_type => "select_field"},
+      pause99_make_dist_primary_a => {form_type => "text_field"},
+      SUBMIT_pause99_make_dist_primary => {form_type => "submit_button"},
+    },
+  },
+  remove_dist_primary => {
+    x_mojo_to => "user-distperms#remove_dist_primary",
+    verb => "Give up Primary Permissions",
+    priv => "user",
+    cat => "User/04Permissions/03",
+    desc => "Give up distribution's primary maintainership status (abandoning it without transfering it to someone else).",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_remove_dist_primary_d => {form_type => "select_field"},
+      SUBMIT_pause99_remove_dist_primary => {form_type => "select_field"},
+    },
+  },
+  make_dist_comaint => {
+    x_mojo_to => "user-distperms#make_dist_comaint",
+    verb => "Add Comaintainers",
+    priv => "user",
+    cat => "User/04Permissions/04",
+    desc => "Make somebody else co-maintainer of a distribution.",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_make_dist_comaint_d => {form_type => "select_field"},
+      pause99_make_dist_comaint_a => {form_type => "text_field"},
+      SUBMIT_pause99_make_dist_comaint => {form_type => "submit_button"},
+    },
+  },
+  remove_dist_comaint => {
+    x_mojo_to => "user-distperms#remove_dist_comaint",
+    verb => "Remove Comaintainers",
+    priv => "user",
+    cat => "User/04Permissions/05",
+    desc => "Remove a distribution's co-maintainer.",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_remove_dist_comaint_tuples => {form_type => "select_field"},
+      SUBMIT_pause99_remove_dist_comaint => {form_type => "submit_button"},
+    },
+  },
+  giveup_dist_comaint => {
+    x_mojo_to => "user-distperms#giveup_dist_comaint",
+    verb => "Give up co-maintainership status",
+    priv => "user",
+    cat => "User/04Permissions/06",
+    desc => "Give up distribution's co-maintainership status.",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_giveup_dist_comaint_d => {form_type => "select_field"},
+      SUBMIT_pause99_giveup_dist_comaint => {form_type => "submit_button"},
+    },
+  },
 
   # User/Util
 
@@ -465,6 +550,11 @@ our @AllowAdminTakeover = qw(
   make_comaint
   remove_comaint
   giveup_comaint
+  move_dist_primary
+  remove_dist_primary
+  make_dist_comaint
+  remove_dist_comaint
+  giveup_dist_comaint
 );
 
 our @AllowMlreprTakeover = qw(
@@ -476,6 +566,11 @@ our @AllowMlreprTakeover = qw(
   make_comaint
   remove_comaint
   giveup_comaint
+  move_dist_primary
+  remove_dist_primary
+  make_dist_comaint
+  remove_dist_comaint
+  giveup_dist_comaint
 );
 
 sub allow_admin_takeover { @AllowAdminTakeover }
