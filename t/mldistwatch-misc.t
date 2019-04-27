@@ -337,6 +337,51 @@ subtest "check overlong versions" => sub {
   );
 };
 
+subtest "case-changing imports" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  $pause->add_first_come(FCOME  => 'Foo::Bar');
+  $pause->add_comaint(   CMAINT => 'Foo::Bar');
+
+  subtest "first step: initial upload" => sub {
+    {
+      $pause->upload_author_fake(FCOME => {
+        name    => 'Foo-Bar',
+        version => '0.001',
+        packages => [ 'Foo::Bar' ],
+      });
+
+      my $result = $pause->test_reindex;
+
+      $result->package_list_ok([
+        { package => 'Foo::Bar', version => '0.001'  }
+      ]);
+
+      $result->perm_list_ok({
+        'Foo::Bar' => { f => 'FCOME', c => ['CMAINT'] },
+      });
+    }
+
+    {
+      $pause->upload_author_fake(FCOME => {
+        name    => 'Foo-Bar',
+        version => '0.002',
+        packages => [ 'foo::bar' ],
+      });
+
+      my $result = $pause->test_reindex;
+
+      $result->package_list_ok([
+        { package => 'foo::bar', version => '0.002'  }
+      ]);
+
+      $result->perm_list_ok({
+        'foo::bar' => { f => 'FCOME', c => ['CMAINT'] },
+      });
+    }
+  };
+};
+
 subtest "check perl6 distribution indexing" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/perl6/authors');
