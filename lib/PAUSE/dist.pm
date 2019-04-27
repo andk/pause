@@ -1137,11 +1137,14 @@ sub lock {
     $dist,
   );
   return 1 if $rows_affected > 0;
-  my $sth = $dbh->prepare("SELECT * FROM distmtimes WHERE dist=?");
-  $sth->execute($dist);
-  if ($sth->rows) {
-    my $row = $sth->fetchrow_hashref();
 
+  my $row = $dbh->selectrow_hashref(
+    "SELECT * FROM distmtimes WHERE dist=?",
+    undef,
+    $dist,
+  );
+
+  if ($row) {
     $Logger->log([
       "can't get lock, current record is: %s",
       $row,
