@@ -1,19 +1,21 @@
 % my $pause = stash(".pause") || {};
 
 % if (param("SUBMIT_pause99_share_perms_remome")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (@{$pause->{results} || []}) {
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
-<p>Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
+<p class="error">Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } else {
-<p>Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
+<p class="result">Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
 %       }
 %     }
 %   } else {
-<p>You need to select one or more packages. Nothing done.</p>
+<p class="warning">You need to select one or more packages. Nothing done.</p>
 %   }
+</div>
 <hr>
 % }
 
@@ -22,6 +24,11 @@
 <p>Please select one or
 more namespaces for which you want to be removed from
 the co-maintainer table and press <i>Give Up</i></p>
+
+<p class="notice">If you want to give up comaintainership for all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'giveup_dist_comaint') %>">
+Give up Co-maintainership status per distribution</a> page.</p>
 
 <p>Select one or more namespaces:</p><p>
 
@@ -36,5 +43,5 @@ the co-maintainer table and press <i>Give Up</i></p>
  value="Give Up"></p>
 
 % } else {
-<p>Sorry, <%= $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
+<p>Sorry, <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
 % }

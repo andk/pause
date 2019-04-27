@@ -2,10 +2,10 @@
 % my $pause = stash(".pause") || {};
 
 <p>Query the <code>perms</code> table by author or by
-module. Select the option and fill in a module name or
-user ID as appropriate. The answer is all modules that an
+distribution. Select the option and fill in a distribution name or
+user ID as appropriate. The answer is all distributions that an
 user ID is registered for or all user IDs registered for a
-module, as appropriate.</p>
+distribution, as appropriate.</p>
 
 <p>Registration comes in one of two types: type
 <b>first-come</b> is the automatic registration on a
@@ -22,8 +22,13 @@ upload a module in that namespace but also be accepted by
 the indexer. In other words, the indexer will not ignore
 uploads for that namespace by that person.</p>
 
-<p class="notice">If the list is too long, visit <a href="<%= my_url->query(ACTION => 'peek_dist_perms') %>">
-View permission per distribution</a> page.</p>
+<p class="notice">Permission is granted per namespace,
+not per distribution. So you might not have enough
+permission to upload a distribution or grant permissions to
+other people if you are listed here (when you have permissions for
+only a part of the distribution). If you want more detailed
+information, visit <a href="<%= my_url->query(ACTION => 'peek_perms') %>">
+View permission per module</a> page.</p>
 
 <p>The
 contents of the tables presented on this page are mostly
@@ -31,15 +36,15 @@ generated automatically, so please report any errors you
 observe to <%= "@{$PAUSE::Config->{ADMINS}}" %> so that the tables
 can be corrected.--Thank you!</p><p>
 
-<%= select_field 'pause99_peek_perms_by' => [
-  ["for a module--exact match" => "me"],
-  [qq{for a module--SQL "LIKE" match} => "ml"],
+<%= select_field 'pause99_peek_distperms_by' => [
+  ["for a distribution--exact match" => "de"],
+  [qq{for a distribution--SQL "LIKE" match} => "dl"],
   ["of an author" => "a"],
 ], size => 1 =%>
 
-<%= text_field 'pause99_peek_perms_query', size => 44, maxlength => 112, =%>
+<%= text_field 'pause99_peek_distperms_query', size => 44, maxlength => 112, =%>
 
-<input type="submit" name="pause99_peek_perms_sub" value="Submit">
+<input type="submit" name="pause99_peek_distperms_sub" value="Submit">
 
 </p>
 % if (@{$pause->{rows} || []}) {
@@ -57,18 +62,31 @@ can be corrected.--Thank you!</p><p>
   <tbody class="list">
 %   for my $row (@{$pause->{rows}}) {
     <tr>
-      <td class="module"><a href="<%= my_url->query([
-        pause99_peek_perms_by => "me",
-        pause99_peek_perms_query => $row->[0],
-        pause99_peek_perms_sub => 1,
+      <td class="dist"><a href="<%= my_url->query([
+        pause99_peek_distperms_by => "de",
+        pause99_peek_distperms_query => $row->[0],
+        pause99_peek_distperms_sub => 1,
       ]) %>"><%= $row->[0] %></a></td>
-      <td class="userid"><a href="<%= my_url->query([
-        pause99_peek_perms_by => "a",
-        pause99_peek_perms_query => $row->[1],
-        pause99_peek_perms_sub => 1,
-      ]) %>"><%= $row->[1] %></a></td>
-      <td class="type"><%= $row->[2] %></td>
-      <td class="owner"><%= $row->[3] %></td>
+      <td class="owner">
+%     my @owners = split /,/, $row->[1] // '';
+%     while(my $owner = shift @owners) {
+        <a href="<%= my_url->query([
+          pause99_peek_distperms_by => "a",
+          pause99_peek_distperms_query => $owner,
+          pause99_peek_distperms_sub => 1,
+        ]) %>"><%= $owner %></a><% if (@owners) { %>,<% } %>
+%     }
+      </td>
+      <td class="comaint">
+%     my @comaints = split /,/, $row->[2] // '';
+%     while(my $comaint = shift @comaints) {
+        <a href="<%= my_url->query([
+          pause99_peek_distperms_by => "a",
+          pause99_peek_distperms_query => $comaint,
+          pause99_peek_distperms_sub => 1,
+        ]) %>"><%= $comaint %></a><% if (@comaints) { %>,<% } %>
+%     }
+      </td>
     </tr>
 % }
   </tbody>
@@ -76,9 +94,9 @@ can be corrected.--Thank you!</p><p>
 <ul class="pagination paginationBottom"></ul>
 <p><a href="<%= my_url->query([
   OF => "YAML",
-  pause99_peek_perms_sub => 1,
-  pause99_peek_perms_by => param("pause99_peek_perms_by"),
-  pause_peek_perms_query => param("pause99_peek_perms_query")],
+  pause99_peek_distperms_sub => 1,
+  pause99_peek_distperms_by => param("pause99_peek_distperms_by"),
+  pause_peek_distperms_query => param("pause99_peek_distperms_query")],
 ) %>" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
 </a></p>
@@ -87,7 +105,7 @@ can be corrected.--Thank you!</p><p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('perms', {
-  valueNames: ['module', 'userid', 'type', 'owner'],
+  valueNames: ['dist', 'owner', 'comaint'],
   page: 300,
   pagination: [
     {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},

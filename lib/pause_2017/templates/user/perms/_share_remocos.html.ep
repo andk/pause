@@ -1,21 +1,23 @@
 % my $pause = stash(".pause") || {};
 
 % if (param("SUBMIT_pause99_share_perms_remocos")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (@{$pause->{results} || []}) {
 %     for (@{$pause->{results}}) {
 %       if ($_->{not_exists}) {
-<p>Cannot handle tuple <i><%= $_->{mod} %></i>. If you believe, this is a bug, please complain.</p>
+<p class="error">Cannot handle tuple <i><%= $_->{mod} %></i>. If you believe, this is a bug, please complain.</p>
 %       } elsif ($_->{error}) {
-<p>Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
+<p class="error">Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } else {
-<p>Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
+<p class="result">Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</p>
 %       }
 %     }
 %   } else {
-<p>You need to select one or more packages. Nothing done.</p>
+<p class="warning">You need to select one or more packages. Nothing done.</p>
 %   }
+</div>
 <hr>
 % }
 
@@ -27,6 +29,11 @@ maintainers besides yourself. Every line denotes a tuple
 of a namespace and a userid. Select those that you want to
 remove and press <i>Remove</i></p><p>
 
+<p class="notice">If you want to remove comaintainers from all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'remove_dist_comaint') %>">
+Remove Comaintainers per distribution</a> page.</p>
+
 <%= select_field "pause99_share_perms_remocos_tuples" => $pause->{mods},
   multiple => "multiple",
   size => (@{$pause->{mods}} > 18 ? 15 : scalar (@{$pause->{mods}})),
@@ -37,5 +44,5 @@ remove and press <i>Remove</i></p><p>
  value="Remove"></p>
 
 % } else {
-<p>There are no co-maintainers registered to any of <%= $pause->{User}{userid} %>'s modules.</p>
+<p>There are no co-maintainers registered to any of <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>'s modules.</p>
 % }

@@ -1,23 +1,25 @@
 % my $pause = stash(".pause") || {};
 
 % if (param("SUBMIT_pause99_share_perms_makeco")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (@{$pause->{results} || []}) {
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
-<p>Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
+<p class="error">Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } elsif ($_->{duplicated}) {
-<p><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %>: skipping</p>
+<p class="warning"><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %>: skipping</p>
 
 %       } else {
-"<p>Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>.</p>\n";
+<p class="result">Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>.</p>
 %       }
 %     }
 %   } else {
-<p>You need to select one or more packages and enter a userid.
+<p class="warning">You need to select one or more packages and enter a userid.
  Nothing done.</p>
 %   }
+</div>
 <hr>
 % }
 
@@ -28,6 +30,19 @@
 more namespaces for which you want to select a
 co-maintainer, enter the CPAN userid of the co-maintainer
 into the text field and press <i>Make Co-Maintainer</i></p>
+
+<p class="notice">If you are open to someone else asking for your first-come
+permissions, but you wish to decide on any such request, you
+can give a co-maint to a special user called
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_2_handoff">HANDOFF</a>.</p>
+
+<p class="notice">You can also grant co-maint to
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_3_needhelp">NEEDHELP</a>
+if you would like additional volunteers to help you work on a particular module.</p>
+
+<p class="notice">If you want to add comaintainers for all the modules in a
+distribution, visit <a href="<%= my_url->query(ACTION => 'make_dist_comaint') %>">
+Add Comaintainers per distribution</a> page.</p>
 
 <p>Select one or more namespaces:</p><p>
 
@@ -45,5 +60,5 @@ into the text field and press <i>Make Co-Maintainer</i></p>
  value="Make Co-Maintainer"></p>
 
 % } else {
-<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+<p>Sorry, there are no modules registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
 % }

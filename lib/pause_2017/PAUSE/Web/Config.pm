@@ -163,21 +163,22 @@ our %Actions = (
 
   peek_perms => {
     x_mojo_to => "user-perms#peek",
-    verb => "View Permissions",
+    verb => "View Permissions per module",
     priv => "user",
-    cat => "User/04Permissions/01",
+    cat => "User/04Permissions/11",
     desc => "Whose uploads of what are being indexed on PAUSE",
     x_form => {
       pause99_peek_perms_by => {form_type => "select_field"},
       pause99_peek_perms_query => {form_type => "text_field"},
       pause99_peek_perms_sub => {form_type => "submit_button"},
     },
+    display => 0,
   },
   share_perms => {
     x_mojo_to => "user-perms#share",
-    verb => "Change Permissions",
+    verb => "Change Permissions per module",
     priv => "user",
-    cat => "User/04Permissions/02",
+    cat => "User/04Permissions/12",
     desc => "Enable other users to upload a module for any of your namespaces, manage your own permissions.",
     method => 'POST',
     x_form => {
@@ -218,10 +219,11 @@ our %Actions = (
   },
   move_primary => {
     x_mojo_to => "user-perms#move_primary",
-    verb => "Transfer Primary Permissions",
+    verb => "Transfer Primary Permissions per module",
     priv => "user",
-    cat => "User/04Permissions/03",
+    cat => "User/04Permissions/13",
     desc => "Transfer primary maintainership status to somebody else (you become co-maintainer).",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       lsw => {form_type => "hidden_field"},
@@ -229,26 +231,30 @@ our %Actions = (
       pause99_share_perms_movepr_a => {form_type => "text_field"},
       SUBMIT_pause99_share_perms_movepr => {form_type => "submit_button"},
     },
+    display => 0,
   },
   remove_primary => {
     x_mojo_to => "user-perms#remove_primary",
-    verb => "Give up Primary Permissions",
+    verb => "Give up Primary Permissions per module",
     priv => "user",
-    cat => "User/04Permissions/04",
+    cat => "User/04Permissions/14",
     desc => "Give up primary maintainership status (abandoning it without transfering it to someone else).",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       lsw => {form_type => "hidden_field"},
       pause99_share_perms_pr_m => {form_type => "select_field"},
       SUBMIT_pause99_share_perms_remopr => {form_type => "select_field"},
     },
+    display => 0,
   },
   make_comaint => {
     x_mojo_to => "user-perms#make_comaint",
-    verb => "Add Comaintainers",
+    verb => "Add Comaintainers per module",
     priv => "user",
-    cat => "User/04Permissions/05",
+    cat => "User/04Permissions/15",
     desc => "Make somebody else co-maintainer.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       lsw => {form_type => "hidden_field"},
@@ -256,31 +262,121 @@ our %Actions = (
       pause99_share_perms_makeco_a => {form_type => "text_field"},
       SUBMIT_pause99_share_perms_makeco => {form_type => "submit_button"},
     },
+    display => 0,
   },
   remove_comaint => {
     x_mojo_to => "user-perms#remove_comaint",
-    verb => "Remove Comaintainers",
+    verb => "Remove Comaintainers per module",
     priv => "user",
-    cat => "User/04Permissions/06",
+    cat => "User/04Permissions/16",
     desc => "Remove a co-maintainer.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       lsw => {form_type => "hidden_field"},
       pause99_share_perms_remocos_tuples => {form_type => "select_field"},
       SUBMIT_pause99_share_perms_remocos => {form_type => "submit_button"},
     },
+    display => 0,
   },
   giveup_comaint => {
     x_mojo_to => "user-perms#giveup_comaint",
-    verb => "Give up co-maintainership status",
+    verb => "Give up (Module's) co-maintainership status",
     priv => "user",
-    cat => "User/04Permissions/07",
+    cat => "User/04Permissions/17",
     desc => "Give up co-maintainership status.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       lsw => {form_type => "hidden_field"},
       pause99_share_perms_remome_m => {form_type => "select_field"},
       SUBMIT_pause99_share_perms_remome => {form_type => "submit_button"},
+    },
+    display => 0,
+  },
+  peek_dist_perms => {
+    x_mojo_to => "user-distperms#peek",
+    verb => "View Permissions",
+    priv => "user",
+    cat => "User/04Permissions/01",
+    desc => "Whose uploads of what are being indexed on PAUSE",
+    method => 'POST',
+    x_form => {
+      pause99_peek_dist_perms_by => {form_type => "select_field"},
+      pause99_peek_dist_perms_query => {form_type => "text_field"},
+      pause99_peek_dist_perms_sub => {form_type => "submit_button"},
+    },
+  },
+  move_dist_primary => {
+    x_mojo_to => "user-distperms#move_dist_primary",
+    verb => "Transfer Primary Permissions",
+    priv => "user",
+    cat => "User/04Permissions/02",
+    desc => "Transfer distribution's primary maintainership status to somebody else (you become co-maintainer).",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_make_dist_primary_d => {form_type => "select_field"},
+      pause99_make_dist_primary_a => {form_type => "text_field"},
+      SUBMIT_pause99_make_dist_primary => {form_type => "submit_button"},
+    },
+  },
+  remove_dist_primary => {
+    x_mojo_to => "user-distperms#remove_dist_primary",
+    verb => "Give up Primary Permissions",
+    priv => "user",
+    cat => "User/04Permissions/03",
+    desc => "Give up distribution's primary maintainership status (abandoning it without transfering it to someone else).",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_remove_dist_primary_d => {form_type => "select_field"},
+      SUBMIT_pause99_remove_dist_primary => {form_type => "select_field"},
+    },
+  },
+  make_dist_comaint => {
+    x_mojo_to => "user-distperms#make_dist_comaint",
+    verb => "Add Comaintainers",
+    priv => "user",
+    cat => "User/04Permissions/04",
+    desc => "Make somebody else co-maintainer of a distribution.",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_make_dist_comaint_d => {form_type => "select_field"},
+      pause99_make_dist_comaint_a => {form_type => "text_field"},
+      SUBMIT_pause99_make_dist_comaint => {form_type => "submit_button"},
+    },
+  },
+  remove_dist_comaint => {
+    x_mojo_to => "user-distperms#remove_dist_comaint",
+    verb => "Remove Comaintainers",
+    priv => "user",
+    cat => "User/04Permissions/05",
+    desc => "Remove a distribution's co-maintainer.",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_remove_dist_comaint_tuples => {form_type => "select_field"},
+      SUBMIT_pause99_remove_dist_comaint => {form_type => "submit_button"},
+    },
+  },
+  giveup_dist_comaint => {
+    x_mojo_to => "user-distperms#giveup_dist_comaint",
+    verb => "Give up co-maintainership status",
+    priv => "user",
+    cat => "User/04Permissions/06",
+    desc => "Give up distribution's co-maintainership status.",
+    method => 'POST',
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      lsw => {form_type => "hidden_field"},
+      pause99_giveup_dist_comaint_d => {form_type => "select_field"},
+      SUBMIT_pause99_giveup_dist_comaint => {form_type => "submit_button"},
     },
   },
 
@@ -465,6 +561,11 @@ our @AllowAdminTakeover = qw(
   make_comaint
   remove_comaint
   giveup_comaint
+  move_dist_primary
+  remove_dist_primary
+  make_dist_comaint
+  remove_dist_comaint
+  giveup_dist_comaint
 );
 
 our @AllowMlreprTakeover = qw(
@@ -476,6 +577,11 @@ our @AllowMlreprTakeover = qw(
   make_comaint
   remove_comaint
   giveup_comaint
+  move_dist_primary
+  remove_dist_primary
+  make_dist_comaint
+  remove_dist_comaint
+  giveup_dist_comaint
 );
 
 sub allow_admin_takeover { @AllowAdminTakeover }

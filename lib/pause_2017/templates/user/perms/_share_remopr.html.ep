@@ -1,19 +1,21 @@
 % my $pause = stash(".pause") || {};
 
 % if (param("SUBMIT_pause99_share_perms_remopr")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (!@{$pause->{results} || []}) {
-<p>You need to select one or more packages. Nothing done.</p>
+<p class="warning">You need to select one or more packages. Nothing done.</p>
 %   } else {
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
-<p>Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></p>
+<p class="error">Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } else {
-<p>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</p>
+<p class="result">Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</p>
 %       }
 %     }
 %   }
+</div>
 <hr>
 % }
 
@@ -27,6 +29,11 @@ status after this move. If you want to get rid of that too,
 please visit <a href="<%= my_url->query([pause99_share_perms_remome => 1]) %>">Give up
 co-maintainership status</a> next.</p>
 
+<p class="notice">If you want to give up comaintainership for all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'giveup_dist_comaint') %>">
+Give up Co-maintainership status per distribution</a> page.</p>
+
 <p>Select one or more namespaces:</p><p>
 <%= select_field "pause99_share_perms_pr_m" => $pause->{mods},
   multilple => "multiple",
@@ -38,6 +45,6 @@ co-maintainership status</a> next.</p>
  value="Give Up Maintainership Status"></p>
 
 % } else {
-<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+<p>Sorry, there are no modules registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
 % }
 

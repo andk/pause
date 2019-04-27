@@ -3,7 +3,7 @@
 
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 
-% if (param("SUBMIT_pause99_share_perms_makeco")) {
+% if (param("SUBMIT_pause99_make_dist_comaint")) {
 <div class="response">
 %   if ($pause->{error}) {
 <p class="error"><%= $pause->{error} %></p>
@@ -11,27 +11,27 @@
       <ul>
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
-<li class="error">Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></li>
+<li class="error">Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>): <%= $_->{error} %></li>
 %       } elsif ($_->{duplicated}) {
-<li class="warning"><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %>: skipping</li>
+<li class="warning"><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %> (<%= $_->{dist} %>): skipping</li>
 %       } else {
-<li class="result">Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %>.</li>
+<li class="result">Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>).</li>
 %       }
 %     }
       </ul>
 %   } else {
-<p class="warning">You need to select one or more packages and enter a userid.
+<p class="warning">You need to select one or more distributions and enter a userid.
  Nothing done.</p>
 %   }
 </div>
 <hr>
 % }
 
-% if (@{$pause->{mods} || []}) {
+% if (@{$pause->{dists} || []}) {
 
 <h3>Select a co-maintainer</h3>
 <p>Please select one or
-more namespaces for which you want to select a
+more distributions for which you want to select a
 co-maintainer, enter the CPAN userid of the co-maintainer
 into the text field and press <i>Make Co-Maintainer</i></p>
 
@@ -40,49 +40,51 @@ permissions, but you wish to decide on any such request, you
 can give a co-maint to a special user called
 <a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_2_handoff">HANDOFF</a>.</p>
 
-<p class="notice">You can also grant co-maint to
+<p class="notice">You can also grant co-maint to 
 <a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_3_needhelp">NEEDHELP</a>
 if you would like additional volunteers to help you work on a particular module.</p>
 
-<p class="notice">If you want to add comaintainers for all the modules in a
-distribution, visit <a href="<%= my_url->query(ACTION => 'make_dist_comaint') %>">
-Add Comaintainers per distribution</a> page.</p>
+<p class="notice">If you need finer control (eg. to add comaintainers for only
+a small part of a distribution just to allow them to handle RT tickets
+while prohibiting them to upload the distribution), visit
+<a href="<%= my_url->query(ACTION => 'make_comaint') %>">
+Add Comaintainers per module</a> page.</p>
 
-<p>Select one or more namespaces:</p>
-<div id="packages">
+<p>Select one or more distributions:</p>
+<div id="dists">
 <input class="search" placeholder="Filter">
 <ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
       <th></th>
-      <th class="sort asc" data-sort="package">Package</th>
-      <th class="sort" data-sort="dist">Indexed Distribution</th>
+      <th class="sort" data-sort="dist">Distribution</th>
+      <th class="sort" data-sort="owners">Owners</th>
     </tr>
   </thead>
   <tbody class="list">
-  % for (@{$pause->{mods}}) {
+  % for (@{$pause->{dists}}) {
     <tr>
-      <td class="checkbox"><%= check_box "pause99_share_perms_makeco_m" => $_ %></td>
-      <td class="package"><%= $_ %></td>
-      <td class="dist"><%= $pause->{dist_for_package}{$_} %></td>
+      <td class="checkbox"><%= check_box "pause99_make_dist_comaint_d" => $_->[0] %></td>
+      <td class="dist"><%= $_->[0] %><% if (($_->[1] // '') =~ /,/) { %> (incomplete ownership)<% } %></td>
+      <td class="owners"><%= $_->[1] %></td>
     </tr>
   % }
   </tbody>
 </table>
 <ul class="pagination paginationBottom"></ul>
 <p>Select a userid:<br>
-<%= text_field "pause99_share_perms_makeco_a", size => 15, maxlength => 9 %>
+<%= text_field "pause99_make_dist_comaint_a", size => 15, maxlength => 9 %>
 
 </p><p>
-<input type="submit" name="SUBMIT_pause99_share_perms_makeco"
+<input type="submit" name="SUBMIT_pause99_make_dist_comaint"
  value="Make Co-Maintainer"></p>
 </div>
 % content_for javascript => begin
 %= javascript "/list.min.js"
 %= javascript begin
-var List = new List('packages', {
-  valueNames: ['package', 'dist'],
+var List = new List('dists', {
+  valueNames: ['dist','owners'],
   page: 300,
   pagination: [
     {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
@@ -93,5 +95,5 @@ var List = new List('packages', {
 % end
 
 % } else {
-<p>Sorry, there are no modules registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
+<p>Sorry, there are no distributions registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
 % }
