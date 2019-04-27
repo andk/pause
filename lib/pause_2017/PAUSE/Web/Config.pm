@@ -172,7 +172,6 @@ our %Actions = (
       pause99_peek_perms_query => {form_type => "text_field"},
       pause99_peek_perms_sub => {form_type => "submit_button"},
     },
-    display => 0,
   },
   share_perms => {
     x_mojo_to => "user-perms#share",
@@ -231,7 +230,6 @@ our %Actions = (
       pause99_share_perms_movepr_a => {form_type => "text_field"},
       SUBMIT_pause99_share_perms_movepr => {form_type => "submit_button"},
     },
-    display => 0,
   },
   remove_primary => {
     x_mojo_to => "user-perms#remove_primary",
@@ -246,7 +244,6 @@ our %Actions = (
       pause99_share_perms_pr_m => {form_type => "select_field"},
       SUBMIT_pause99_share_perms_remopr => {form_type => "select_field"},
     },
-    display => 0,
   },
   make_comaint => {
     x_mojo_to => "user-perms#make_comaint",
@@ -262,7 +259,6 @@ our %Actions = (
       pause99_share_perms_makeco_a => {form_type => "text_field"},
       SUBMIT_pause99_share_perms_makeco => {form_type => "submit_button"},
     },
-    display => 0,
   },
   remove_comaint => {
     x_mojo_to => "user-perms#remove_comaint",
@@ -277,7 +273,6 @@ our %Actions = (
       pause99_share_perms_remocos_tuples => {form_type => "select_field"},
       SUBMIT_pause99_share_perms_remocos => {form_type => "submit_button"},
     },
-    display => 0,
   },
   giveup_comaint => {
     x_mojo_to => "user-perms#giveup_comaint",
@@ -292,7 +287,6 @@ our %Actions = (
       pause99_share_perms_remome_m => {form_type => "select_field"},
       SUBMIT_pause99_share_perms_remome => {form_type => "submit_button"},
     },
-    display => 0,
   },
   peek_dist_perms => {
     x_mojo_to => "user-distperms#peek",
@@ -306,6 +300,7 @@ our %Actions = (
       pause99_peek_dist_perms_query => {form_type => "text_field"},
       pause99_peek_dist_perms_sub => {form_type => "submit_button"},
     },
+    display => 0,
   },
   move_dist_primary => {
     x_mojo_to => "user-distperms#move_dist_primary",
@@ -321,6 +316,7 @@ our %Actions = (
       pause99_make_dist_primary_a => {form_type => "text_field"},
       SUBMIT_pause99_make_dist_primary => {form_type => "submit_button"},
     },
+    display => 0,
   },
   remove_dist_primary => {
     x_mojo_to => "user-distperms#remove_dist_primary",
@@ -335,6 +331,7 @@ our %Actions = (
       pause99_remove_dist_primary_d => {form_type => "select_field"},
       SUBMIT_pause99_remove_dist_primary => {form_type => "select_field"},
     },
+    display => 0,
   },
   make_dist_comaint => {
     x_mojo_to => "user-distperms#make_dist_comaint",
@@ -350,6 +347,7 @@ our %Actions = (
       pause99_make_dist_comaint_a => {form_type => "text_field"},
       SUBMIT_pause99_make_dist_comaint => {form_type => "submit_button"},
     },
+    display => 0,
   },
   remove_dist_comaint => {
     x_mojo_to => "user-distperms#remove_dist_comaint",
@@ -364,6 +362,7 @@ our %Actions = (
       pause99_remove_dist_comaint_tuples => {form_type => "select_field"},
       SUBMIT_pause99_remove_dist_comaint => {form_type => "submit_button"},
     },
+    display => 0,
   },
   giveup_dist_comaint => {
     x_mojo_to => "user-distperms#giveup_dist_comaint",
@@ -378,6 +377,7 @@ our %Actions = (
       pause99_giveup_dist_comaint_d => {form_type => "select_field"},
       SUBMIT_pause99_giveup_dist_comaint => {form_type => "submit_button"},
     },
+    display => 0,
   },
 
   # User/Util
