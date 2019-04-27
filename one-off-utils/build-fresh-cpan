@@ -47,6 +47,7 @@ Valid instructions are:
   fake:PAUSEID:FILE   | generate a dist based on the given filename
   json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
   perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
+  adir:DIRECTORY      | author dir: a dir with A/AB/ABC/F-B-1.0.tar.gz files
   fdir:DIRECTORY      | flat dir: upload all the files as the default user
   prog:file           | read a file containing a list of instructions
   cmd:"program"       | run the program, which should print out instructions
@@ -68,6 +69,9 @@ unless ($dir) {
   $dir = "$tmpdir";
 }
 
+# Probably stupid. -- rjbs, 2019-04-27
+$ENV{TEST_VERBOSE} = 1 if $opt->verbose;
+
 my $pause = PAUSE::TestPAUSE->init_new({
   tmpdir                 => dir($dir),
   email_sender_transport => 'Maildir',
@@ -75,16 +79,6 @@ my $pause = PAUSE::TestPAUSE->init_new({
     dir => "$dir/Maildir", # Capital M to keep rjbs happy
   },
 });
-
-open my $log_fh, '>', "$dir/pause.log"
-  or die "can't open $dir/pause.log for writing: $!\n";
-
-$pause->pause_config_overrides->{LOG_CALLBACK} = sub {
-  my (undef, undef, @what) = @_;
-  push @what, "\n" unless $what[-1] =~ m{\n$};
-  print {$log_fh} @what;
-  print STDERR @what if $opt->verbose;
-};
 
 if ($opt->packages) {
   $pause->with_our_config(sub {
@@ -196,9 +190,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
 
     unfold_lines(\@lines);
 
-    print {$log_fh} ">>>> ran `$rest` and unshifted results to queue\n";
-    print {*STDERR} ">>>> ran `$rest` and unshifted results to queue\n"
-      if $opt->verbose;
+    $pause->logger->log([ "FRESH: ran `$rest`, unshifting %s", \@lines ]);
 
     unshift @instructions, @lines;
     next INSTRUCTION;
@@ -210,9 +202,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
 
     unfold_lines(\@lines);
 
-    print {$log_fh} ">>>> read '$rest' and unshifted results to queue\n";
-    print {*STDERR} ">>>> read '$rest' and unshifted results to queue\n"
-      if $opt->verbose;
+    $pause->logger->log([ "FRESH: processed $rest, unshifting %s", \@lines ]);
 
     unshift @instructions, @lines;
     next INSTRUCTION;
@@ -222,11 +212,20 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     $rest =~ s/\A~/$ENV{HOME}/; # for my own sake -- rjbs, 2019-04-26
     my @to_inject = map {; "file:$_" } grep {; -f } <$rest/*>;
 
-    print {$log_fh} ">>>> files found in $rest and to be added: @to_inject\n";
-    print {*STDERR} ">>>> files found in $rest and to be added: @to_inject\n"
-      if $opt->verbose;
+    $pause->logger->log([ "FRESH: processed $rest, adding %s", \@to_inject ]);
 
     unshift @instructions, @to_inject;
+    next INSTRUCTION;
+  }
+
+  if ($type eq 'adir') {
+    $rest =~ s/\A~/$ENV{HOME}/; # for my own sake -- rjbs, 2019-04-26
+    $pause->import_author_root($rest);
+
+    $pause->logger->log([ "FRESH: importing author dir $rest" ]);
+
+    $index_clean = 0;
+
     next INSTRUCTION;
   }
 
@@ -237,8 +236,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
   if ($type eq 'fake') {
     $pause->upload_author_fake($user => $param);
     $index_clean = 0;
-    print {$log_fh} ">>>> Just uploaded fake from $user/$param\n";
-    print {*STDERR} ">>>> Just uploaded fake from $user/$param\n" if $opt->verbose;
+    $pause->logger->log([ "FRESH: just uploaded fake from $user/$param" ]);
     next;
   }
 
@@ -246,8 +244,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     $param =~ s/\A~/$ENV{HOME}/; # for my own sake -- rjbs, 2019-04-26
     $pause->upload_author_file($user => $param);
     $index_clean = 0;
-    print {$log_fh} ">>>> Just uploaded $user/$param\n";
-    print {*STDERR} ">>>> Just uploaded $user/$param\n" if $opt->verbose;
+    $pause->logger->log([ "FRESH: just uploaded $user/$param" ]);
     next;
   }
 
@@ -257,8 +254,8 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
 
   $pause->upload_author_fake($user => $data);
   $index_clean = 0;
-  print {$log_fh} ">>>> Just uploaded fake for $user/$param\n";
-  print {*STDERR} ">>>> Just uploaded fake for $user/$param\n" if $opt->verbose;
+
+  $pause->logger->log([ "FRESH: just uploaded $user/$param" ]);
 }
 
 sub insane_safe_eval {
@@ -276,8 +273,6 @@ sub insane_safe_eval {
 }
 
 $pause->test_reindex unless $index_clean;
-
-close $log_fh or warn "error closing $dir/pause.log: $!";
 
 if ($opt->shell) {
   my $chdir_guard = pushd($dir);
