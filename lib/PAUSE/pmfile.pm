@@ -46,7 +46,7 @@ sub simile {
       "result of simile(): %s", {
         file    => $file,
         package => $package,
-        ret     => $ret,
+        ret     => 0+$ret,
       },
     ]);
 
@@ -101,19 +101,19 @@ sub filter_ppps {
                         for my $ve (@$v) {
                             $ve =~ s|::$||;
                             if ($ppp =~ /^$ve$rest/){
-                                $Logger->log("no_index rule on $k/$ve; skipping $ppp");
+                                $Logger->log("no_index rule on $k $ve; skipping $ppp");
                                 next MANI;
                             } else {
-                                $Logger->log_debug("no_index rule on $k/$ve; NOT skipping $ppp");
+                                $Logger->log_debug("no_index rule on $k $ve; NOT skipping $ppp");
                             }
                         }
                     } else {
                         $v =~ s|::$||;
                         if ($ppp =~ /^$v$rest/){
-                            $Logger->log("no_index rule on $k/$v; skipping $ppp");
+                            $Logger->log("no_index rule on $k $v; skipping $ppp");
                             next MANI;
                         } else {
-                            $Logger->log_debug("no_index rule on $k/$v; NOT skipping $ppp");
+                            $Logger->log_debug("no_index rule on $k $v; NOT skipping $ppp");
                         }
                     }
                 }

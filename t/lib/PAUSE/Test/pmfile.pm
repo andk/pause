@@ -97,7 +97,7 @@ sub filter_ppps :Test :Plan(2) {
   my ($self, $no_index, $expect) = @_;
   $self->{pmfile}{META_CONTENT}{no_index} = $no_index;
 
-  local $Logger = test_logger();
+  local $Logger = test_logger;
 
   my @res = $self->{pmfile}->filter_ppps($ppp);
   cmp_deeply(
@@ -105,19 +105,17 @@ sub filter_ppps :Test :Plan(2) {
     $expect->{skip} ? [] : [$ppp],
     "expected result",
   );
-  if ($expect->{reason}) {
-    my $reason = $expect->{reason};
-    if ($no_index) {
-      $reason = ($expect->{skip})
-              ? "Skipping ppp[$ppp] $reason"
-              : "NOT skipping ppp[$ppp] $reason";
-    }
+
+  if ($expect->{skip}) {
+    my ($type, $value) = %$no_index;
+    $value = $value->[0] if ref $value;
+    $value =~ s/::\z// if $type eq 'namespace';
 
     cmp_deeply(
         $Logger->events,
         [
-            superhashof({ message => $reason }),
-            superhashof({ message => "Result of filter_ppps: res[@res]" }),
+            superhashof({
+              message => re(qr{no_index rule on $type $value; skipping $ppp}) }),
         ]
     );
   } else {
@@ -140,7 +138,7 @@ sub simile :Test :Plan(2) {
       $Logger->events,
       [ superhashof({
           message =>
-            "Result of simile(): file[$file] package[$package] ret[$ret]\n",
+          qq!result of simile(): {{{"file": "$file", "package": "$package", "ret": $ret}}}!
         })
       ]
   );
@@ -162,8 +160,12 @@ sub examine_fio :Test :Plan(3) {
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");
 
   cmp_deeply(
-      $Logger->events->[3],
-      superhashof({ message => "Will check keys_ppp[My::Dist]\n" }),
+    $Logger->events,
+    [
+      ignore(),
+      superhashof({ message => re(qr/will examine packages: \Q{{["My::Dist"]}}\E\z/) }),
+    ],
+    "we see the event log we expected",
   );
 
   cmp_deeply(
