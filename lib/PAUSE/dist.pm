@@ -795,17 +795,10 @@ sub _index_by_files {
   my ($self, $pmfiles, $provides) = @_;
   my $dist = $self->{DIST};
 
-  my $binary_dist;
-  # ftp://ftp.funet.fi/pub/CPAN/modules/05bindist.convention.html
-  $binary_dist = 1 if $dist =~ /\d-bin-\d+-/i;
   my $main_package = $self->_package_governing_permission;
 
   for my $pmfile (@$pmfiles) {
-    if ($binary_dist) {
-      next unless $pmfile =~ /\b(Binary|Port)\b/; # XXX filename good,
-      # package would be
-      # better
-    } elsif ($pmfile =~ m|/blib/|) {
+    if ($pmfile =~ m|/blib/|) {
       $self->alert("blib directory detected ($pmfile)");
       next;
     }
