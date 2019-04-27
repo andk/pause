@@ -9,7 +9,6 @@ use File::Temp ();
 use JSON;
 use Getopt::Long::Descriptive 0.104; # verbatim spacers -- rjbs, 2019-04-27
 use Path::Class;
-use PAUSE::TestPAUSE;
 use Parse::CPAN::Packages;
 use Parse::CPAN::Perms;
 
@@ -57,6 +56,8 @@ EOT
 $usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
   unless my @instructions = @ARGV;
 
+require PAUSE::TestPAUSE;
+
 my $dir = $opt->dir;
 my $tmpdir;
 unless ($dir) {
@@ -84,7 +85,7 @@ $pause->pause_config_overrides->{LOG_CALLBACK} = sub {
 
 if ($opt->packages) {
   $pause->with_our_config(sub {
-    my $dbh = PAUSE::dbh;
+    my $dbh = PAUSE::dbh();
 
     my $p = Parse::CPAN::Packages->new($opt->packages);
 
@@ -115,7 +116,7 @@ if ($opt->packages) {
 
 if ($opt->perms) {
   $pause->with_our_config(sub {
-    my $dbh = PAUSE::dbh;
+    my $dbh = PAUSE::dbh();
 
     my $p = Parse::CPAN::Perms->new($opt->perms);
 
