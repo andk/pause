@@ -47,6 +47,6 @@ Transfer Primary Permissions per distribution</a> page.</p>
 <input type="submit" name="SUBMIT_pause99_share_perms_movepr" value="Pass Maintainership Status"></p>
 
 % } else {
-<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+<p>Sorry, there are no modules registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
 % }
 

@@ -43,5 +43,5 @@ Give up Co-maintainership status per distribution</a> page.</p>
  value="Give Up"></p>
 
 % } else {
-<p>Sorry, <%= $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
+<p>Sorry, <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
 % }

@@ -78,5 +78,5 @@ var List = new List('packages', {
 % end
 
 % } else {
-<p>Sorry, <%= $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
+<p>Sorry, <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %> does not seem to be co-maintainer of any module.</p>
 % }
