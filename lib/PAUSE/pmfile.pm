@@ -41,7 +41,15 @@ sub simile {
         # Apache::mod_perl_guide stuffs it into Version.pm
         $ret = 1 if lc $file eq 'version';
     }
-    $Logger->log("Result of simile(): file[$file] package[$package] ret[$ret]\n");
+
+    $Logger->log([
+      "result of simile(): %s", {
+        file    => $file,
+        package => $package,
+        ret     => $ret,
+      },
+    ]);
+
     $ret;
 }
 
@@ -93,31 +101,31 @@ sub filter_ppps {
                         for my $ve (@$v) {
                             $ve =~ s|::$||;
                             if ($ppp =~ /^$ve$rest/){
-                                $Logger->log("Skipping ppp[$ppp] due to ve[$ve]");
+                                $Logger->log("no_index rule on $k/$ve; skipping $ppp");
                                 next MANI;
                             } else {
-                                $Logger->log("NOT skipping ppp[$ppp] due to ve[$ve]");
+                                $Logger->log_debug("no_index rule on $k/$ve; NOT skipping $ppp");
                             }
                         }
                     } else {
                         $v =~ s|::$||;
                         if ($ppp =~ /^$v$rest/){
-                            $Logger->log("Skipping ppp[$ppp] due to v[$v]");
+                            $Logger->log("no_index rule on $k/$v; skipping $ppp");
                             next MANI;
                         } else {
-                            $Logger->log("NOT skipping ppp[$ppp] due to v[$v]");
+                            $Logger->log_debug("no_index rule on $k/$v; NOT skipping $ppp");
                         }
                     }
                 }
             } else {
-                $Logger->log("No keyword 'no_index' or 'private' in META_CONTENT");
+                $Logger->log_debug("no no_index or private in META_CONTENT");
             }
         } else {
             # $Logger->log("no META_CONTENT"); # too noisy
         }
         push @res, $ppp;
     }
-    $Logger->log("Result of filter_ppps: res[@res]");
+
     @res;
 }
 
@@ -125,9 +133,12 @@ sub filter_ppps {
 sub examine_fio {
     # fio: file object
     my $self = shift;
+
     my $dist = $self->{DIO}{DIST};
     my $dbh = $self->connect;
     my $pmfile = $self->{PMFILE};
+
+    local $Logger = $Logger->proxy({ proxy_prefix => "$pmfile: " });
 
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
@@ -135,7 +146,8 @@ sub examine_fio {
     unless ($self->version_from_meta_ok) {
         my $version;
         unless (eval { $version = $self->parse_version; 1 }) {
-          $Logger->log( "error with version in $pmfile: $@");
+          my $error = $@;
+          $Logger->log([ "error with version: %s", $error ]);
           return;
         }
 
@@ -155,7 +167,7 @@ sub examine_fio {
             # We don't need to account for single- versus dual-life, because
             # the check for dual-life packages still applies elsewhere.
             # -- rjbs, 2015-04-18
-            $Logger->log( "found dev version $self->{VERSION} in $pmfile; skipping the whole file");
+            $Logger->log("skipping file because of dev version: $self->{VERSION}");
 
             delete $self->{DIO};    # circular reference
             return;
@@ -164,7 +176,8 @@ sub examine_fio {
 
     my($ppp) = $self->packages_per_pmfile;
     my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
-    $Logger->log("Will check keys_ppp[@keys_ppp]\n");
+
+    $Logger->log([ "will examine packages: %s", \@keys_ppp ]);
 
     #
     # Immediately after each package (pmfile) examined contact
@@ -283,7 +296,8 @@ sub packages_per_pmfile {
                             }
 
                             unless (eval { $version = $self->normalize_version($v); 1 }) {
-                              $Logger->log( "error with version in $pmfile: $@");
+                              my $error = $@;
+                              $Logger->log([ "error with version: $error" ]);
                               next;
                             }
                             $ppp->{$pkg}{version} = $version;
@@ -523,7 +537,7 @@ sub normalize_version {
     $v = "undef" unless defined $v;
     my $dv = Dumpvalue->new;
     my $sdv = $dv->stringify($v,1); # second argument prevents ticks
-    $Logger->log("Result of normalize_version: sdv[$sdv]\n");
+    $Logger->log("result of normalize_version: $sdv");
 
     return $v if $v eq "undef";
     return $v if $v =~ /^\{.*\}$/; # JSON object

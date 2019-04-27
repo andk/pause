@@ -49,13 +49,18 @@ sub init_new {
 }
 
 has logger => (
-  is  => 'ro',
+  is    => 'ro',
+  lazy  => 1,
   default => sub {
     PAUSE::Logger->default_logger_class->new({
       ident     => 'TestPAUSE',
       facility  => undef,
       to_self   => 1,
       to_stderr => $ENV{TEST_VERBOSE} ? 1 : 0,
+
+      to_file   => 1,
+      log_path  => $_[0]->tmpdir,
+      log_file  => "pause.log",
     });
   }
 );

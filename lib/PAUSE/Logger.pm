@@ -4,6 +4,7 @@ package PAUSE::Logger;
 use parent 'Log::Dispatchouli::Global';
 
 use Log::Dispatchouli 2.002;
+use Time::HiRes ();
 
 sub logger_globref {
   no warnings 'once';
@@ -23,6 +24,21 @@ sub default_logger_args {
 {
   package PAUSE::Logger::_Logger;
   use parent 'Log::Dispatchouli';
+
+  sub new {
+    my ($class, $arg) = @_;
+    $arg->{file_format} //= sub {
+      my ($sec, $usec) = Time::HiRes::gettimeofday;
+      my @time = localtime $sec;
+      sprintf "%4u-%02u-%02u %02u:%02u:%02u.%04u %s\n",
+        $time[5]+1900,
+        @time[4,3,2,1,0],
+        int($usec/1000),
+        $_[0]
+    };
+
+    $class->SUPER::new($arg);
+  }
 
   sub env_prefix { 'PAUSE_LOG' }
 }

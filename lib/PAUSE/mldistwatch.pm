@@ -41,6 +41,7 @@ use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
 use PAUSE::MailAddress ();
 use PAUSE::PermsManager ();
+use Process::Status ();
 use Safe;
 use Text::Format;
 
@@ -125,8 +126,10 @@ sub reindex {
     $self->connect;
 
     $self->init_all();
-    $Logger->log_debug("Registering new users\n");
+
+    $Logger->log_debug("registering new users");
     $self->set_ustatus_to_active();
+
     my $testdir = File::Temp::tempdir(
                                       "mldistwatch_work_XXXX",
                                       DIR => "/tmp",
@@ -163,10 +166,7 @@ sub rewrite_indexes {
     $self->rewrite03();
     $self->rewrite06();
     $self->rewrite07();
-    $Logger->log( sprintf(
-                              "Finished rewrite03 and everything at %s\n",
-                              scalar localtime
-                             ));
+    $Logger->log("finished rewriting indexes");
 
     $self->git->commit({ m => "indexer run at $^T, pid $$" })
         if $self->git->status->is_dirty;
@@ -219,7 +219,7 @@ sub set_ustatus_to_active {
     while (my $file = each %{$self->{ALLfound}}) {
         my($user) = $file =~ m|./../([^/]+)/|;
         unless (defined $user){
-            $Logger->log("Warning: user not defined for file[$file]\n");
+            $Logger->log("Warning: $file: could not determine user");
             next;
         }
         next if exists $active->{$user};
@@ -228,12 +228,19 @@ sub set_ustatus_to_active {
     $self->filter_dups(\@new_active_users);
     $self->debug_mem;
     return unless @new_active_users;
-    $Logger->log_debug("Info: new_active_users[@new_active_users]");
-    my $sth = $db->prepare("UPDATE users
-SET ustatus='active', ustatus_ch=? WHERE ustatus<>'nologin' AND userid=?");
+
+    $Logger->log_debug([ "marking users active: %s", \@new_active_users ]);
+
+    my $sth = $db->prepare(
+      "UPDATE users
+      SET ustatus='active', ustatus_ch=?
+      WHERE ustatus<>'nologin' AND userid=?"
+    );
+
     for my $user (@new_active_users) {
         $sth->execute(PAUSE->_now_string, $user);
     }
+
     $sth->finish;
 }
 
@@ -254,9 +261,9 @@ sub disconnect {
 
 sub init_all {
     my $self = shift;
-    $Logger->log_debug("Running manifind\n");
+    $Logger->log_debug("running manifind");
     $self->{ALLfound} = $self->manifind;
-    $Logger->log_debug("Collecting distmtimes from DB\n");
+    $Logger->log_debug("collecting distmtimes from database");
     $self->{ALLlasttime} = $self->dbfind;
 }
 
@@ -333,7 +340,7 @@ sub _do_the_database_work {
 
     my $dbh = $self->connect;
     unless ($dbh->begin_work) {
-      $Logger->log("Couldn't begin transaction!");
+      $Logger->log("couldn't begin transaction!");
       return 1;
     }
 
@@ -374,7 +381,8 @@ sub _do_the_database_work {
   };
 
   my $err = $@;
-  # Remember, $ok here only means "did the db work die," not "did we
+
+  # Remember, $ok here only means "did the db work complete," not "did we
   # successfully index stuff." -- rjbs, 2018-04-19
   if ( !$ok ) {
     # Rethrow any errors that weren't from the database
@@ -382,8 +390,9 @@ sub _do_the_database_work {
 
     # $err should have a value if !$ok, but just in case not
     $err ||= "unknown error";
-    $Logger->log_debug( "Error with database work: $err");
+    $Logger->log_debug("error with database work: $err");
   }
+
   return $ok;
 }
 
@@ -420,14 +429,16 @@ sub maybe_index_dist {
                                DIST   => $dist,
                               );
 
+    local $Logger = $Logger->proxy({ proxy_prefix => "$dist: " });
+
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
-        $Logger->log_debug( "skipping $dist: $skip_reason");
+        $Logger->log_debug("skipping: $skip_reason");
         delete $self->{ALLlasttime}{$dist};
         delete $self->{ALLfound}{$dist};
         return;
     }
 
-    $Logger->log("Examining $dist ...\n");
+    $Logger->log("beginning examination");
     $0 = "mldistwatch: $dist";
 
     # >99% of all distros are already registered by the
@@ -482,7 +493,7 @@ sub maybe_index_dist {
       last if $db_ok;
       $self->disconnect;
       if ($attempt == 3) {
-        $Logger->log_debug( "tried $attempt times to do db work, but all failed");
+        $Logger->log_debug("tried $attempt times to do db work, but all failed");
         $dio->alert("database errors while indexing");
         $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
       }
@@ -501,7 +512,6 @@ sub check_for_new {
     my($self,$testdir) = @_;
     local $/ = "";
     my $dbh = $self->connect;
-    my %alerts;
     my @all;
     my($fh) = File::Temp->new(
                               DIR => "/tmp",
@@ -517,14 +527,24 @@ sub check_for_new {
         $self->filter_dups(\@all);
         $self->debug_mem;
     }
+
     my $all = scalar @all;
+
     die "Panic: unusual small number of files involved ($all)"
         if !$self->{PICK} && ! $self->_newcountokay($all);
-    $Logger->log_debug( "Starting BIGLOOP over $all files\n");
+
+    unless (@all) {
+      $Logger->log_debug("BIGLOOP: no files to process!");
+      return;
+    }
+
+    $Logger->log_debug("BIGLOOP: will process $all files");
+
+    my %alerts;
   BIGLOOP: for (my $i=0;scalar @all;$i++, $self->empty_dir($testdir)) {
         my $dist = shift @all;
 
-        $Logger->log_debug(". $dist ..") if $i%256 == 0;
+        $Logger->log_debug("BIGLOOP: [$i/$all] $dist") if $i%256 == 0;
 
         my @alerts = $self->maybe_index_dist($dist);
         $alerts{ $dist } = \@alerts if @alerts;
@@ -542,8 +562,7 @@ sub handle_alerts {
     return unless keys %$alerts;
 
     if ($PAUSE::Config->{TESTHOST} || $self->{OPT}{testhost}) {
-      my $dists = join q{, }, sort keys %$alerts;
-      $Logger->log( "Sending alerts for $dists");
+      $Logger->log([ "sending alerts for %s", [ keys %$alerts ] ]);
       return;
     }
 
@@ -600,8 +619,13 @@ sub _install {
   my $target = "$MLROOT/../../modules/$fn";
   my $temp   = "$target.new";
 
-  File::Copy::copy($src, $temp) or
-      $Logger->log("Couldn't copy to '$temp': $!");
+  unless (File::Copy::copy($src, $temp)) {
+    $Logger->log([
+      "couldn't copy: %s",
+      { src => $src, dst => $temp, err => "$!" },
+    ]);
+  }
+
   rename $temp, $target
       or die "error renaming $target.new to $target: $!";
 }
@@ -611,7 +635,7 @@ sub rewrite02 {
     #
     # Rewriting 02packages.details.txt
     #
-    $Logger->log("Entering rewrite02\n");
+    $Logger->log("rewriting 02packages");
 
     my $dbh = $self->connect;
     my $MLROOT = $self->mlroot;
@@ -639,7 +663,7 @@ sub rewrite02 {
     $sth->execute;
     my(@row,@listing02);
     my $numrows = $sth->rows;
-    $Logger->log_debug("Number of indexed packages: $numrows");
+    $Logger->log_debug("number of indexed packages: $numrows");
     while (@row = $sth->fetchrow_array) {
         my($one,$two);
         my $infile = $row[0];
@@ -687,7 +711,7 @@ Last-Updated: $date\n\n};
             print $F $header;
             print $F $list;
         } else {
-            $Logger->log("Couldn't open $repfile for writing 02packages: $!\n");
+            $Logger->log("couldn't open $repfile for writing 02packages: $!");
         }
         close $F or die "Couldn't close: $!";
         $self->git->add({}, '02packages.details.txt');
@@ -696,9 +720,9 @@ Last-Updated: $date\n\n};
 
         PAUSE::newfile_hook($repfile);
         0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
-            or $Logger->log("Couldn't gzip for some reason");
+            or $Logger->log([ "couldn't gzip $repfile: %s", Process::Status->as_struct ]);
         rename "$repfile.gz.new", "$repfile.gz" or
-            $Logger->log("Couldn't rename to '$repfile.gz': $!");
+            $Logger->log("couldn't rename to $repfile.gz: $!");
         PAUSE::newfile_hook("$repfile.gz");
     }
 }
@@ -708,7 +732,7 @@ sub rewrite01 {
     #
     # Rewriting 01modules.index.html
     #
-    $Logger->log( "Entering rewrite01\n");
+    $Logger->log_debug("entering rewrite01");
     my $dbh = $self->connect;
 
     my $MLROOT = $self->mlroot;
@@ -723,10 +747,10 @@ sub rewrite01 {
             }
             close $fh;
         } else {
-            $Logger->log("Couldn't open $repfile $!\n");
+            $Logger->log("couldn't open $repfile $!");
         }
     } else {
-        $Logger->log("No 01modules exist; won't try to read it");
+        $Logger->log("no 01modules exist; won't try to read it");
     }
     my(%firstlevel,%achapter);
     my $sth = $dbh->prepare("SELECT modid, chapterid FROM mods");
@@ -838,15 +862,13 @@ sub rewrite01 {
                 $pkg{chapter} = $chaptitle[$pkg{chapterid}]
             } else {
                 $pkg{chapter} = "99_Not_In_Modulelist";
-                $Logger->log("Found no chapterid for $pkg{rootpack}\n");
+                $Logger->log("found no chapterid for $pkg{rootpack}");
             }
         } else {
             $pkg{chapter} = "99_Not_In_Modulelist";
-            $Logger->log("Found no chapter for $pkg{rootpack}\n");
+            $Logger->log("found no chapter for $pkg{rootpack}");
         }
 
-        # XXX need to split progress tracking from logging -- dagolden, 2011-08-13
-        $Logger->log_debug(".") if !($i % 16);
         if ($MAINTAIN_SYMLINKTREE) {
             my $bymod = "$MLROOT/../../modules/".
                 "by-module/$pkg{rootpack}/$pkg{filenameonly}";
@@ -897,7 +919,7 @@ sub rewrite01 {
                                  );
         }
     }
-    $Logger->log(sprintf "cared about %d symlinks", scalar @symlinklog);
+    $Logger->log([ "symlinks updated: %d", 0+@symlinklog ]);
     {
         if ($self->{OPT}{symlinkinventory}
             and
@@ -985,7 +1007,7 @@ category    maintainer
             PAUSE::newfile_hook($repfile);
             $self->write_01sorted(\@listing01);
         } else {
-            $Logger->log("Couldn't open 01modules...\n");
+            $Logger->log("couldn't open 01modules: $!");
         }
     }
 }
@@ -1123,7 +1145,7 @@ maintainer
     my $MLROOT = $self->mlroot;
 
     my $rssfile = "$MLROOT/../../modules/01modules.mtime.rss";
-    # $Logger->log("Writing $rssfile\n");
+    # $Logger->log("writing $rssfile");
     if (open my $F, ">", "$rssfile.new") {
         print $F $rss;
         close $F;
@@ -1134,7 +1156,7 @@ maintainer
     }
 
     my $repfile = "$MLROOT/../../modules/01modules.mtime.html";
-    # $Logger->log("Writing $repfile\n");
+    # $Logger->log("writing $repfile");
     if (open my $F, ">", "$repfile.new") {
         print $F $html;
         close $F;
@@ -1150,7 +1172,7 @@ sub rewrite03 {
     #
     # Rewriting 03modlist.data
     #
-    $Logger->log("Entering rewrite03\n");
+    $Logger->log_debug("entering rewrite03");
 
     my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/03modlist.data";
@@ -1172,10 +1194,10 @@ sub rewrite03 {
           }
           close $fh;
         } else {
-            $Logger->log("Couldn't open $repfile $!\n");
+            $Logger->log("couldn't open $repfile $!");
         }
     } else {
-        $Logger->log("No 03modlists exist; won't try to read it");
+        $Logger->log("no 03modlists exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
 
@@ -1210,16 +1232,16 @@ Date:        %s
             print $F $header;
             print $F $list;
         } else {
-            $Logger->log("Couldn't open >03...\n");
+            $Logger->log("couldn't open $repfile.new: $!");
         }
         close $F or die "Couldn't close: $!";
         rename "$repfile.new", $repfile or
-            $Logger->log("Couldn't rename to '$repfile': $!");
+            $Logger->log("couldn't rename to $repfile: $!");
         PAUSE::newfile_hook($repfile);
         0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
-            or $Logger->log("Couldn't gzip for some reason");
+            or $Logger->log([ "couldn't gzip $repfile: %s", Process::Status->as_struct ]);
         rename "$repfile.gz.new", "$repfile.gz" or
-            $Logger->log("Couldn't rename to '$repfile.gz': $!");
+            $Logger->log("couldn't rename to '$repfile.gz': $!");
         PAUSE::newfile_hook("$repfile.gz");
     }
 }
@@ -1229,7 +1251,7 @@ sub rewrite06 {
     #
     # Rewriting 06perms.txt
     #
-    $Logger->log("Entering rewrite06\n");
+    $Logger->log_debug("entering rewrite06");
 
     my $MLROOT = $self->mlroot;
     my $repfile = "$MLROOT/../../modules/06perms.txt";
@@ -1247,10 +1269,10 @@ sub rewrite06 {
             }
             close $fh;
         } else {
-            $Logger->log("Couldn't open $repfile $!\n");
+            $Logger->log("couldn't open $repfile: $!");
         }
     } else {
-        $Logger->log("No 06perms.txt.gz exist; won't try to read it");
+        $Logger->log("no 06perms.txt.gz exist; won't try to read it");
     }
     my $date = HTTP::Date::time2str();
     my $dbh = $self->connect;
@@ -1288,7 +1310,7 @@ Date:        %s
         }
     }
     if ($list eq $olist) {
-        $Logger->log("06perms.txt has not changed; won't rewrite\n");
+        $Logger->log("06perms.txt has not changed; won't rewrite");
     } else {
         my $F;
         my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
@@ -1296,16 +1318,16 @@ Date:        %s
             print $F $header;
             print $F $list;
         } else {
-            $Logger->log("Couldn't open >06...\n");
+            $Logger->log("couldn't open $gitfile: $!");
         }
         close $F or die "Couldn't close: $!";
         $self->git->add({}, '06perms.txt');
         $self->_install($gitfile);
         PAUSE::newfile_hook($repfile);
         0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
-            or $Logger->log("Couldn't gzip for some reason");
+            or $Logger->log([ "couldn't gzip $repfile: %s", Process::Status->as_struct ]);
         rename "$repfile.gz.new", "$repfile.gz" or
-            $Logger->log("Couldn't rename to '$repfile.gz': $!");
+            $Logger->log("couldn't rename to $repfile.gz: $!");
         PAUSE::newfile_hook("$repfile.gz");
     }
 }
@@ -1314,56 +1336,76 @@ sub rewrite07 {
     my($self) = @_;
     my $fromdir = $PAUSE::Config->{FTP_RUN} or $Logger->log("FTP_RUN not defined");
     $fromdir .= "/mirroryaml";
-    -d $fromdir or $Logger->log("Directory '$fromdir' not found");
+    -d $fromdir or $Logger->log("FTP_RUN directory [$fromdir] does not exist");
     my $mlroot = $self->mlroot or $Logger->log("MLROOT not defined");
     my $todir = "$mlroot/../../modules";
-    -d $todir or $Logger->log("Directory '$todir' not found");
+    -d $todir or $Logger->log("mirror list target directory [$todir] does not exist");
     for my $exte (qw(json yml)) {
         my $f = "$fromdir/mirror.$exte";
         my $t = "$todir/07mirror.$exte";
         next unless -e $f;
-        rename $f, $t or $Logger->log("Could not rename $f -> $t: $!");
+        rename $f, $t or $Logger->log([
+          "couldn't rename: %s",
+          { old => $f, new => $t, err => "$!" },
+        ]);
         PAUSE::newfile_hook($t);
     }
 }
 
 sub chdir_ln_chdir {
-    my($self,$postdir,$from,$to,$log) = @_;
+    my ($self, $postdir, $link_target, $link_name, $log) = @_;
     chdir $postdir or die "Couln't chdir to $postdir";
-    my($dir) = File::Basename::dirname($to);
+    my($dir) = File::Basename::dirname($link_name);
     mkpath $dir;
     chdir $dir or die "Couldn't chdir to $dir $!";
     my $pwd = Cwd::cwd();
-    unless (-e $from){
+
+    unless (-e $link_target){
         require Carp;
-        Carp::confess("not exists: from[$from]dir[$dir]pwd[$pwd]");
+        Carp::confess("symlnk target $link_target does not exist in $pwd");
         # return;
     }
-    if (-l $from) {
-        $Logger->log("Won't create symlink[$to] to symlink[$from] in pwd[$pwd]\n");
+
+    if (-l $link_target) {
+        $Logger->log([
+          "won't create symlink to symlink: %s",
+          { name => $link_name, target => $link_target, pwd => $pwd },
+        ]);
         return;
     }
-    $to = File::Basename::basename($to);
-    push @$log, { postdir => $postdir, from => $from, to => $to };
-    if (-l $to) {
-        my($foundlink) = readlink $to or die "Couldn't read link $to in $dir";
-        if ($foundlink eq $from) {
-            # $Logger->log_debug("Keeping old symlink $from in dir $dir file $to\n");
+
+    $link_target = File::Basename::basename($link_target);
+
+    # The from/to names are prexisting, and I didn't dig into how they're used.
+    # I think they are *bad* names, because I think of a link going /from/ its
+    # name /to/ its target, but for now, I will not throw myself down this
+    # rabbit hole. -- rjbs, 2019-04-27
+    push @$log, { postdir => $postdir, from => $link_target, to => $link_name };
+
+    if (-l $link_name) {
+        my ($foundlink) = readlink $link_name or die "couldn't read link $link_name in $dir";
+        if ($foundlink eq $link_target) {
+            $Logger->log_debug([
+              "symlink already existed: %s",
+              { name => $link_name, target => $link_target, dir => $dir },
+            ]);
             return;
         }
     }
-    if (-l $to) {
-        $Logger->log( qq{Unlinking symlink $to in $dir\n});
-        unlink $to or die qq{Couldn\'t unlink $to $!};
-    } elsif (-f $to) {
-        $Logger->log( "Unlinking file $to in dir $dir\n");
-        unlink $to or die qq{Couldn\'t unlink $to $!};
-    } elsif (-d $to) {
-        $Logger->log("ALERT: Have to rmtree $to in dir $dir\n");
-        rmtree $to;
+    if (-l $link_name or -f $link_name) {
+        $Logger->log([
+          "unlinking about-to-be-replaced entity: %s",
+          { name => $link_name, dir => $dir },
+        ]);
+        unlink $link_name or die qq{couldn't unlink $link_name: $!};
+    } elsif (-d $link_name) {
+        $Logger->log("ALERT: Have to rmtree $link_name in $dir");
+        rmtree $link_name;
     }
-    symlink $from, $to or die "Couldn't symlink $from, $to $!";
-    chdir $postdir or die "Couldn't chdir to $postdir $!"
+    symlink $link_target, $link_name
+      or die "couldn't symlink($link_target, $link_name): $!";
+
+    chdir $postdir or die "couldn't chdir to $postdir: $!"
 }
 
 sub as_ds {
