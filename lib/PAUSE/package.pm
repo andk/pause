@@ -615,7 +615,7 @@ has the same version number and the distro has a more recent modification time.}
               ) {
 
           $Logger->log([
-            "warning: not similie, but was similie some time earlier: %s",
+            "warning: not simile, but was simile some time earlier: %s",
             $pp
           ]);
 
