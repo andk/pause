@@ -161,21 +161,18 @@ sub perm_check {
 
       if (PAUSE::isa_regular_perl($dist)) {
           # seems ok: perl is always right
+      } elsif (@owned && ! @owned_exact) {
+          # Case mismatch.  Let's correct.
       } elsif (! (@owned && @owned_exact)) {
           # we must not index this and we have to inform somebody
           my $owner = eval { $self->hub->permissions->get_package_first_come_any_case($package) }
                     // "unknown";
 
-          my $not_owner = qq{Not indexed because permission missing.
+          my $error   = "not owner";
+          my $message = qq{Not indexed because permission missing.
 Current registered primary maintainer is $owner.
 Hint: you can always find the legitimate maintainer(s) on PAUSE under
 "View Permissions".};
-
-          # XXX: display canonical case -- rjbs, 2014-03-13
-          my $case_bad  = qq{Not indexed because of case mismatch.};
-
-          my $message = @owned ? $case_bad : $not_owner;
-          my $error   = @owned ? "case mismatch" : "not owner";
 
           $self->index_status($package,
                               $pp->{version},
@@ -409,6 +406,7 @@ sub update_package {
       $something1 eq $something2 && !$older_isa_regular_perl;
 
   $self->verbose(1, "New package data: package[$package]infile[$pp->{infile}]".
+                  "version[$pp->{version}]".
                   "distorperlok[$distorperlok]oldversion[$oldversion]".
                   "odist[$odist]\n");
 
@@ -434,7 +432,6 @@ sub update_package {
   # relevant postings/threads:
   # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-07/msg01579.html
   # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-08/msg00062.html
-
 
   if (! $distorperlok) {
   } elsif ($isa_regular_perl) {
@@ -496,6 +493,9 @@ $oldversion, so not indexing seems okay.},
                               qq{Not indexed because $ofile in $odist
 has a higher version number ($oldversion)},
                               );
+
+          delete $self->dist->{CHECKINS}{ lc $package }{ $package };
+
           $self->alert(qq{decreasing VERSION number [$pp->{version}]
 in package[$package]
 dist[$dist]
@@ -653,6 +653,12 @@ sub index_status {
   $dio->index_status(@_);
 }
 
+sub get_index_status_status {
+  my ($self) = @_;
+
+  return $self->dist->{INDEX_STATUS}{ $self->{PACKAGE} }{status};
+}
+
 sub add_indexing_warning {
   my($self) = shift;
   my $dio;
@@ -716,13 +722,17 @@ sub checkin_into_primeur {
   # print ">>>>>>>>checkin_into_primeur not yet implemented<<<<<<<<\n";
 
   my $userid;
-  my $dio = $self->parent->parent;
-  if (exists $dio->{META_CONTENT}{x_authority}) {
+  my $dio = $self->dist;
+
+  if (defined $dio->{META_CONTENT}{x_authority}) {
       $userid = $dio->{META_CONTENT}{x_authority};
       $userid =~ s/^cpan://i;
       # FIXME: if this ends up being blank we should probably die?
       # validate userid existing
   } else {
+      if (exists $dio->{META_CONTENT}{x_authority}) {
+          $self->verbose(1, "x_authority was present but undefined; ignoring!");
+      }
       # look to the existing main package.
       if(lc($self->{MAIN_PACKAGE}) eq lc($package)) {
           $userid = $self->{USERID} or die;
@@ -732,6 +742,8 @@ sub checkin_into_primeur {
           die "Shouldn't reach here: userid unknown" unless $userid;
       }
   }
+
+  Carp::confess("no userid!?") unless defined $userid;
 
   my $plan = $self->hub->permissions->plan_set_first_come($userid, $package);
   $plan->();
@@ -748,7 +760,7 @@ sub checkin {
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
 
-  $self->checkin_into_primeur; # called in void context!
+  $self->dist->{CHECKINS}{ lc $package }{$package} = $self->{PMFILE};
 
   my $row = $dbh->selectrow_hashref(
     qq{
@@ -760,22 +772,19 @@ sub checkin {
     $package
   );
 
-
   if ($row) {
-
       # We know this package from some time ago
-
       $self->update_package($row);
-
   } else {
-
       # we hear for the first time about this package
-
       $self->insert_into_package;
+  }
 
+  my $status = $self->get_index_status_status;
+  if (! $status or $status == PAUSE::mldistwatch::Constants::OK) {
+      $self->checkin_into_primeur; # called in void context!
   }
 
 }
 
 1;
-

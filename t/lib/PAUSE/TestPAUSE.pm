@@ -99,12 +99,95 @@ sub _build_db_root {
   return $db_root;
 }
 
+sub add_first_come {
+  my ($self, $userid, $package) = @_;
+
+  my $dir = $self->db_root;
+  my $dbh = DBI->connect(
+    "dbi:SQLite:dbname=$dir/mod.sqlite",
+    undef,
+    undef,
+    { RaiseError => 1 },
+  );
+
+  $dbh->do(
+    q{
+      INSERT INTO primeur (userid, package) VALUES (?, ?);
+      INSERT INTO perms   (userid, package) VALUES (?, ?);
+    },
+    undef,
+    (uc $userid, $package) x 2,
+  );
+}
+
+sub add_comaint {
+  my ($self, $userid, $package) = @_;
+
+  my $dir = $self->db_root;
+  my $dbh = DBI->connect(
+    "dbi:SQLite:dbname=$dir/mod.sqlite",
+    undef,
+    undef,
+    { RaiseError => 1 },
+  );
+
+  $dbh->do(
+    q{
+      INSERT INTO perms (userid, package) VALUES (?, ?);
+    },
+    undef,
+    uc $userid,
+    $package,
+  );
+}
+
 sub import_author_root {
   my ($self, $author_root) = @_;
 
   my $cpan_root = File::Spec->catdir($self->tmpdir, 'cpan');
   my $ml_root = File::Spec->catdir($cpan_root, qw(authors id));
   dircopy($author_root, $ml_root);
+}
+
+sub upload_author_fake {
+  my ($self, $author, $fake, $extra) = @_;
+
+  require Module::Faker; # We require 0.020 -- rjbs, 2019-04-25
+
+  if (ref $fake) {
+    $fake->{cpan_author} //= $author;
+    Carp::croak("use more_meta, not 3rd parameter, for faker here") if $extra;
+  } else {
+    my $ext = "tar.gz";
+    if ($fake =~ s/\.(tar\.gz|zip)\z//) {
+      $ext = $1;
+    }
+
+    my ($name, $version) = $fake =~ /\A (.+) - ([^-]+) \z/x;
+
+    Carp::croak("bogus fake dist name: $fake")
+      unless defined $name and defined $version;
+
+    $fake = {
+      cpan_author => $author,
+      name        => $name,
+      version     => $version,
+      archive_ext => $ext,
+      ($extra ? %$extra : ()),
+    };
+  }
+
+  my $dist = Module::Faker::Dist->from_struct($fake);
+
+  my $cpan_root   = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $author_root = File::Spec->catdir($cpan_root, qw(authors id));
+
+  $dist->make_archive({
+    dir           => $author_root,
+    author_prefix => 1,
+  });
+
+  return;
 }
 
 sub upload_author_file {

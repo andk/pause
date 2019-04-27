@@ -16,7 +16,12 @@ use Test::More;
 
 subtest "retry indexing on db failure" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/009/authors');
+
+  $pause->upload_author_fake(PAUSEID => {
+    name      => 'Jenkins-Hack',
+    version   => 0.14,
+    packages  => [ qw( Jenkins::Hack Jenkins::Hack2 Jenkins::Hack::Utils ) ],
+  });
 
   local $PAUSE::Config->{PRE_DB_WORK_CALLBACK} = sub {
     state $x = 1;
@@ -38,7 +43,12 @@ subtest "retry indexing on db failure" => sub {
 
 subtest "retry indexing on db failure, only three times" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/009/authors');
+
+  $pause->upload_author_fake(PAUSEID => {
+    name      => 'Jenkins-Hack',
+    version   => 0.14,
+    packages  => [ qw( Jenkins::Hack Jenkins::Hack2 Jenkins::Hack::Utils ) ],
+  });
 
   my $x = 0;
   local $PAUSE::Config->{PRE_DB_WORK_CALLBACK} = sub {
@@ -57,7 +67,7 @@ subtest "retry indexing on db failure, only three times" => sub {
 
   $result->email_ok(
     [
-      { subject => 'Failed: PAUSE indexer report OOOPPP/Jenkins-Hack-0.14.tar.gz',
+      { subject => 'Failed: PAUSE indexer report PAUSEID/Jenkins-Hack-0.14.tar.gz',
         callbacks => [
           sub {
             my $index = index $_[0]->{email}->object->body_str,

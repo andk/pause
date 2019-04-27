@@ -118,15 +118,16 @@ sub perm_list_ok {
     push(@header, $_), next if 1../^\s*$/;
     chomp;
     my ($m, $u, $p) = split(/,/, $_);
-    if($p eq 'c') {
-      push @{$permissions{$m}->{$p}}, $u;
-    } else {
+    if($p eq 'f') {
       $permissions{$m}->{$p} = $u;
+    } else {
+      $permissions{$m}{$p} //= [];
+      @{$permissions{$m}{$p}} = sort {$a cmp $b } (@{$permissions{$m}{$p}}, $u);
     }
   }
 
   is_deeply(\%permissions, $want, "permissions look correct in 06perms")
-  or diag explain(\%permissions);
+    or diag explain(\%permissions);
 }
 
 has deliveries => (

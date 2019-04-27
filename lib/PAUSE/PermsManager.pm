@@ -123,6 +123,8 @@ sub plan_set_first_come {
 sub plan_set_comaint {
   my ($self, $userid, $package) = @_;
 
+  Carp::confess("can't plan to set comaint to undef") unless defined $userid;
+
   return sub {
     my $dbh = $self->dbh_callback->();
     my $log_prefix = shift || "";
