@@ -13,6 +13,8 @@ use Exporter qw/import/;
 use Test::PAUSE::MySQL;
 use Email::Sender::Simple;
 use Mojo::DOM;
+use URI;
+use URI::QueryParam;
 
 our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->realpath;
 #our $AppRoot = path(__FILE__)->parent->parent->parent->parent->parent->parent->parent->realpath;
@@ -167,6 +169,11 @@ sub get {
   my ($self, $url, @args) = @_;
 
   $self->set_credentials if $self->{user};
+  if (@args and ref $args[0] eq 'HASH') {
+    my $params = shift @args;
+    $url = URI->new($url);
+    $url->query_param($_ => $params->{$_}) for keys %$params;
+  }
   my $res = $self->{mech}->get($url, @args);
   unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
