@@ -31,7 +31,7 @@ my ($opt, $usage) = describe_options(
   [ 'stdin|I',        'read instructions from STDIN to run before ARGV' ],
   [ 'each',           'index at start and after each upload'        ],
 
-  [ 'shell!',         'run a shell in the directory; default: true',
+  [ 'shell!',         'add an implicit "shell" as last instruction; on by default',
                       { default => 1 } ],
   [],
   [ \<<'EOT' ],
@@ -41,20 +41,28 @@ user is used instead.
 
 Valid instructions are:
 
-  form                | meaning
-  --------------------+-----------------------------------------------
-  index               | reindex now
-  file:PAUSEID:FILE   | upload the named file as the named PAUSE user
-  fake:PAUSEID:FILE   | generate a dist based on the given filename
-  json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
-  perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
-  adir:DIRECTORY      | author dir: a dir with A/AB/ABC/F-B-1.0.tar.gz files
-  fdir:DIRECTORY      | flat dir: upload all the files as the default user
-  prog:file           | read a file containing a list of instructions
-  cmd:"program"       | run the program, which should print out instructions
+  form                   | meaning
+  -----------------------+-----------------------------------------------
+  reindex                | reindex now
+  reindex:FILE           | reindex just one file
+                         |
+  perms:PAUSEID:PKG:PERM | set perm (f or c or 0) for PAUSEID on PKG
+                         |
+  file:PAUSEID:FILE      | upload the named file as the named PAUSE user
+  fake:PAUSEID:FILE      | generate a dist based on the given filename
+  json:PAUSEID:JSON      | interpret the given JSON string as a faker struct
+  perl:PAUSEID:PERL      | interpret the given Perl string as a faker struct
+                         |
+  adir:DIRECTORY         | author dir: dir with A/AB/ABC/Dist-1.0.tar.gz files
+  fdir:DIRECTORY         | flat dir: upload all the files as default user
+                         |
+  prog:file              | read a file containing a list of instructions
+  progcmd:"program"      | run program, which should print out instructions
+  cmd                    | run a command in the working directory
+  shell                  | run a shell in the working directory
 
-prog and cmd output can split instructions across multiple lines.  Lines that
-begin with whitespace will be appended to the line preceding them.
+prog and progcmd output can split instructions across multiple lines.  Lines
+that begin with whitespace will be appended to the line preceding them.
 EOT
 );
 
@@ -176,26 +184,80 @@ my $JSON = JSON->new->relaxed(1);
 my $index_clean;
 
 INSTRUCTION: while (my $instruction = shift @instructions) {
-  # file:PAUSEID:FILE   | upload the named file as the named PAUSE user
-  # cmd:"program"       | run the program, which should print out filenames
-  # fake:PAUSEID:FILE   | generate a dist based on the given filename
-  # json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
-  # perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
-
-  if ($instruction eq 'index') {
+  if ($instruction eq 'reindex') {
+    $pause->logger->log("FRESH: performing a reindex");
     $pause->test_reindex;
     $index_clean = 1;
     next INSTRUCTION;
   }
 
-  if ($opt->each && ! $index_clean) {
-    $pause->test_reindex;
-    $index_clean = 1
+  if ($instruction eq 'shell') {
+    my $chdir_guard = pushd($dir);
+    $pause->logger->log("FRESH: running a shell ($ENV{SHELL})");
+    system($ENV{SHELL});
+    next INSTRUCTION;
   }
 
   my ($type, $rest) = split /\s*:\s*/, $instruction, 2;
 
   if ($type eq 'cmd') {
+    $pause->logger->log("FRESH: running command [$rest]");
+    my $chdir_guard = pushd($dir);
+    system($rest);
+    next INSTRUCTION;
+  }
+
+  if ($type eq 'reindex') {
+    $pause->logger->log("FRESH: performing pick reindex of $rest");
+    $pause->test_reindex({ pick => [$rest] });
+    next INSTRUCTION;
+  }
+
+  # perms:PAUSEID:PKG:PERM | set perm (f or c or 0) for PAUSEID on PKG
+  if ($type eq 'perms') {
+    my @rest = split /(?<!:)\s*:\s*(?!:)/, $rest;
+    my ($user, $package, $perm)
+      = @rest == 2 ? ($opt->default_user, @rest)
+      : @rest == 3 ? (@rest)
+      : die "incomprehensible instruction: $instruction\n";
+
+    die "bogus permission type ($perm) in $instruction\n"
+      unless $perm eq 'f' or $perm eq 'c' or $perm eq '0';
+
+    $pause->with_our_config(sub {
+      my $dbh = PAUSE::dbh();
+      $dbh->begin_work;
+      for my $table (qw(primeur perms)) {
+        $dbh->do(
+          "DELETE FROM $table WHERE package = ? AND userid = ?",
+          undef,
+          $package,
+          $user,
+        );
+      }
+
+      my @tables = $perm eq 'f' ? (qw(primeur perms))
+                 : $perm eq 'c' ? (qw(        perms))
+                 :                ();
+
+      for my $table (@tables) {
+        $dbh->do(
+          "INSERT INTO $table (package, userid) VALUES (?, ?)",
+          undef,
+          $package,
+          $user,
+        );
+      }
+
+      $dbh->commit;
+    });
+
+    $pause->logger->log("FRESH: set $user permissions on $package to $perm");
+
+    next INSTRUCTION;
+  }
+
+  if ($type eq 'progcmd') {
     my @lines = `$rest`;
     chomp @lines;
 
@@ -267,6 +329,18 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
   $index_clean = 0;
 
   $pause->logger->log([ "FRESH: just uploaded $user/$param" ]);
+} continue {
+  if ($opt->each && ! $index_clean) {
+    $pause->test_reindex;
+    $index_clean = 1
+  }
+}
+
+$pause->test_reindex unless $index_clean;
+
+if ($opt->shell) {
+  my $chdir_guard = pushd($dir);
+  system($ENV{SHELL});
 }
 
 sub insane_safe_eval {
@@ -281,13 +355,6 @@ sub insane_safe_eval {
   close $fh or die "error closing pipe: $!";
 
   $JSON->decode($json);
-}
-
-$pause->test_reindex unless $index_clean;
-
-if ($opt->shell) {
-  my $chdir_guard = pushd($dir);
-  system($ENV{SHELL});
 }
 
 sub unfold_lines {
