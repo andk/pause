@@ -625,17 +625,19 @@ has the same version number and the distro has a more recent modification time.}
 
   if ($ok) {
       my $query = qq{SELECT package, version, dist from  packages WHERE LOWER(package) = LOWER(?)};
-      my($pkg_recs) = $dbh->selectall_arrayref($query,undef,$package);
+      my($pkg_recs) = $dbh->selectall_arrayref($query,{ Slice => {} },$package);
       if (@$pkg_recs > 1) {
-          my $rec0 = join "|", @{$pkg_recs->[0]};
-          my $rec1 = join "|", @{$pkg_recs->[1]};
+          $Logger->log([
+              "conflicting records exist in packages table, won't index: %s",
+              [ @$pkg_recs ],
+          ]);
+
           $self->index_status
               ($package,
                "undef",
                $pp->{infile},
                PAUSE::mldistwatch::Constants::EDBCONFLICT,
-               qq{Indexing failed because of conflicting record for
-($rec0) vs ($rec1).
+               qq{Indexing failed because of conflicting records for $package.
 Please report the case to the PAUSE admins at modules\@perl.org.},
               );
           $ok = 0;
@@ -644,8 +646,8 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
   return unless $self->_version_ok($pp, $package, $dist);
 
-  if ($ok) {
 
+  if ($ok) {
       my $query = qq{
         UPDATE  packages
         SET     package = ?, version = ?, dist = ?, file = ?,
