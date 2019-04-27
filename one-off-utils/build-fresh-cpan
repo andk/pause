@@ -28,6 +28,7 @@ my ($opt, $usage) = describe_options(
   [ 'default-user=s', 'default PAUSEID for uploads; default: LOCAL',
                       { default => 'LOCAL' } ],
 
+  [ 'stdin|I',        'read instructions from STDIN to run before ARGV' ],
   [ 'each',           'index at start and after each upload'        ],
 
   [ 'shell!',         'run a shell in the directory; default: true',
@@ -42,7 +43,7 @@ Valid instructions are:
 
   form                | meaning
   --------------------+-----------------------------------------------
-  "-"                 | reindex now
+  index               | reindex now
   file:PAUSEID:FILE   | upload the named file as the named PAUSE user
   fake:PAUSEID:FILE   | generate a dist based on the given filename
   json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
@@ -57,8 +58,18 @@ begin with whitespace will be appended to the line preceding them.
 EOT
 );
 
-$usage->die({ pre_text => "you didn't give any distfiles!\n\n" })
-  unless my @instructions = @ARGV;
+my @instructions = @ARGV;
+
+if ($opt->stdin) {
+  my @lines = <STDIN>;
+  chomp @lines;
+  unfold_lines(\@lines);
+
+  unshift @instructions, @lines;
+}
+
+$usage->die({ pre_text => "you didn't give any instructions!\n\n" })
+  unless @instructions;
 
 require PAUSE::TestPAUSE;
 
@@ -171,7 +182,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
   # json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
   # perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
 
-  if ($instruction eq '-') {
+  if ($instruction eq 'index') {
     $pause->test_reindex;
     $index_clean = 1;
     next INSTRUCTION;
@@ -182,7 +193,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     $index_clean = 1
   }
 
-  my ($type, $rest) = split /:/, $instruction, 2;
+  my ($type, $rest) = split /\s*:\s*/, $instruction, 2;
 
   if ($type eq 'cmd') {
     my @lines = `$rest`;
@@ -229,7 +240,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     next INSTRUCTION;
   }
 
-  my ($lhs, $rhs) = split /:/, $rest, 2;
+  my ($lhs, $rhs) = split /\s*:\s*/, $rest, 2;
   my $user  = defined $rhs ? $lhs : $opt->default_user;
   my $param = defined $rhs ? $rhs : $lhs;
 
