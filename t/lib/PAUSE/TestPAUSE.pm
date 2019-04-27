@@ -209,12 +209,10 @@ sub upload_author_fake {
   my $cpan_root   = File::Spec->catdir($self->tmpdir, 'cpan');
   my $author_root = File::Spec->catdir($cpan_root, qw(authors id));
 
-  $dist->make_archive({
+  return $dist->make_archive({
     dir           => $author_root,
     author_prefix => 1,
   });
-
-  return;
 }
 
 sub upload_author_file {
@@ -232,6 +230,8 @@ sub upload_author_file {
 
   make_path( $author_dir );
   fcopy($file, $author_dir);
+
+  return File::Spec->catfile($author_dir, $file);
 }
 
 has pause_config_overrides => (

@@ -41,25 +41,25 @@ user is used instead.
 
 Valid instructions are:
 
-  form                   | meaning
-  -----------------------+-----------------------------------------------
-  reindex                | reindex now
-  reindex:FILE           | reindex just one file
-                         |
-  perms:PAUSEID:PKG:PERM | set perm (f or c or 0) for PAUSEID on PKG
-                         |
-  file:PAUSEID:FILE      | upload the named file as the named PAUSE user
-  fake:PAUSEID:FILE      | generate a dist based on the given filename
-  json:PAUSEID:JSON      | interpret the given JSON string as a faker struct
-  perl:PAUSEID:PERL      | interpret the given Perl string as a faker struct
-                         |
-  adir:DIRECTORY         | author dir: dir with A/AB/ABC/Dist-1.0.tar.gz files
-  fdir:DIRECTORY         | flat dir: upload all the files as default user
-                         |
-  prog:file              | read a file containing a list of instructions
-  progcmd:"program"      | run program, which should print out instructions
-  cmd                    | run a command in the working directory
-  shell                  | run a shell in the working directory
+  form                  | meaning
+  ----------------------+-----------------------------------------------
+  index                 | index now
+  index:FILE            | index just one file
+                        |
+  perm:PAUSEID:PKG:PERM | set perm (f or c or 0) for PAUSEID on PKG
+                        |
+  file:PAUSEID:FILE     | upload the named file as the named PAUSE user
+  fake:PAUSEID:FILE     | generate a dist based on the given filename
+  json:PAUSEID:JSON     | interpret the given JSON string as a faker struct
+  perl:PAUSEID:PERL     | interpret the given Perl string as a faker struct
+                        |
+  adir:DIRECTORY        | author dir: dir with A/AB/ABC/Dist-1.0.tar.gz files
+  fdir:DIRECTORY        | flat dir: upload all the files as default user
+                        |
+  prog:file             | read a file containing a list of instructions
+  progcmd:"program"     | run program, which should print out instructions
+  cmd                   | run a command in the working directory
+  shell                 | run a shell in the working directory
 
 prog and progcmd output can split instructions across multiple lines.  Lines
 that begin with whitespace will be appended to the line preceding them.
@@ -184,8 +184,8 @@ my $JSON = JSON->new->relaxed(1);
 my $index_clean;
 
 INSTRUCTION: while (my $instruction = shift @instructions) {
-  if ($instruction eq 'reindex') {
-    $pause->logger->log("FRESH: performing a reindex");
+  if ($instruction eq 'index') {
+    $pause->logger->log("FRESH: indexing");
     $pause->test_reindex;
     $index_clean = 1;
     next INSTRUCTION;
@@ -207,13 +207,18 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     next INSTRUCTION;
   }
 
-  if ($type eq 'reindex') {
-    $pause->logger->log("FRESH: performing pick reindex of $rest");
+  if ($type eq 'index') {
+    $pause->logger->log("FRESH: pick-indexing $rest");
+
+    $pause->with_our_config(sub {
+      my $dbh = PAUSE::dbh();
+      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $rest);
+    });
     $pause->test_reindex({ pick => [$rest] });
     next INSTRUCTION;
   }
 
-  if ($type eq 'perms') {
+  if ($type eq 'perm') {
     my @rest = split /(?<!:)\s*:\s*(?!:)/, $rest;
     my ($user, $package, $perm)
       = @rest == 2 ? ($opt->default_user, @rest)
@@ -307,17 +312,17 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
   my $param = defined $rhs ? $rhs : $lhs;
 
   if ($type eq 'fake') {
-    $pause->upload_author_fake($user => $param);
+    my $file = pause_rel($pause->upload_author_fake($user => $param));
+    $pause->logger->log([ "FRESH: just uploaded fake: $file" ]);
     $index_clean = 0;
-    $pause->logger->log([ "FRESH: just uploaded fake from $user/$param" ]);
     next;
   }
 
   if ($type eq 'file') {
     $param =~ s/\A~/$ENV{HOME}/; # for my own sake -- rjbs, 2019-04-26
-    $pause->upload_author_file($user => $param);
+    my $file = pause_rel($pause->upload_author_file($user => $param));
+    $pause->logger->log([ "FRESH: just uploaded $file" ]);
     $index_clean = 0;
-    $pause->logger->log([ "FRESH: just uploaded $user/$param" ]);
     next;
   }
 
@@ -325,10 +330,10 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
            : $type eq 'perl' ? insane_safe_eval($param)
            : die "didn't recognize instruction type: $instruction\n";
 
-  $pause->upload_author_fake($user => $data);
-  $index_clean = 0;
+  my $file = pause_rel($pause->upload_author_fake($user => $data));
+  $pause->logger->log([ "FRESH: just uploaded $file" ]);
 
-  $pause->logger->log([ "FRESH: just uploaded $user/$param" ]);
+  $index_clean = 0;
 } continue {
   if ($opt->each && ! $index_clean) {
     $pause->test_reindex;
@@ -341,6 +346,11 @@ $pause->test_reindex unless $index_clean;
 if ($opt->shell) {
   my $chdir_guard = pushd($dir);
   system($ENV{SHELL});
+}
+
+sub pause_rel {
+  my ($path) = @_;
+  File::Spec->abs2rel($path, $pause->tmpdir);
 }
 
 sub insane_safe_eval {
