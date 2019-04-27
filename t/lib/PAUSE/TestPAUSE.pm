@@ -332,6 +332,12 @@ sub test_reindex {
 
     die "stray mail in test mail trap before reindex" if @stray_mail;
 
+    if ($arg->{pick}) {
+      my $dbh = PAUSE::dbh();
+      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
+        for @{ $arg->{pick} };
+    }
+
     PAUSE::mldistwatch->new({
       sleep => 0,
       ($arg->{pick} ? (pick => $arg->{pick}) : ()),

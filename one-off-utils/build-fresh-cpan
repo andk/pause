@@ -209,11 +209,6 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
 
   if ($type eq 'index') {
     $pause->logger->log("FRESH: pick-indexing $rest");
-
-    $pause->with_our_config(sub {
-      my $dbh = PAUSE::dbh();
-      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $rest);
-    });
     $pause->test_reindex({ pick => [$rest] });
     next INSTRUCTION;
   }
