@@ -24,6 +24,9 @@ upload a module in that namespace but also be accepted by
 the indexer. In other words, the indexer will not ignore
 uploads for that namespace by that person.</p>
 
+<p class="notice">If the list is too long, visit <a href="<%= my_url->query(ACTION => 'peek_dist_perms') %>">
+View permission per distribution</a> page.</p>
+
 <p>The
 contents of the tables presented on this page are mostly
 generated automatically, so please report any errors you

@@ -29,6 +29,11 @@ maintainers besides yourself. Every line denotes a tuple
 of a namespace and a userid. Select those that you want to
 remove and press <i>Remove</i></p><p>
 
+<p class="notice">If you want to remove comaintainers from all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'remove_dist_comaint') %>">
+Remove Comaintainers per distribution</a> page.</p>
+
 <%= select_field "pause99_share_perms_remocos_tuples" => $pause->{mods},
   multiple => "multiple",
   size => (@{$pause->{mods}} > 18 ? 15 : scalar (@{$pause->{mods}})),

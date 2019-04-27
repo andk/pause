@@ -34,6 +34,11 @@ maintainers besides yourself. Every line denotes a tuple
 of a namespace and a userid. Select those that you want to
 remove and press <i>Remove</i></p>
 
+<p class="notice">If you want to remove comaintainers from all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'remove_dist_comaint') %>">
+Remove Comaintainers per distribution</a> page.</p>
+
 <div id="packages">
 <input class="search" placeholder="Filter">
 <ul class="pagination paginationTop"></ul>
