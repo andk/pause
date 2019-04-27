@@ -609,14 +609,17 @@ has the same version number and the distro has a more recent modification time.}
       if ($self->{FIO}{DIO}{VERSION_FROM_META_OK}) {
           # nothing to argue at the moment, e.g. lib_pm.PL
       } elsif (
-                ! $pp->{simile}
+                ! $pp->{basename_matches_package}
                 &&
-                (!$fio || $fio->simile($ofile,$package)) # if we have no fio, we can't check simile
+                PAUSE->basename_matches_package($ofile,$package)
               ) {
 
           $Logger->log([
-            "warning: not simile, but was simile some time earlier: %s",
-            $pp
+            "warning: basename does not match package, but it used to: %s", {
+              package => $package,
+              old_file => $ofile,
+              new_file => $pp->{infile},
+            }
           ]);
 
           $ok = 0;

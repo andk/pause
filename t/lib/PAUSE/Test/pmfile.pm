@@ -124,21 +124,21 @@ sub filter_ppps :Test :Plan(2) {
   }
 }
 
-sub simile :Test :Plan(2) {
+sub basename_matches_package :Test :Plan(2) {
   my ($self, $file, $package, $ret) = @_;
 
   local $Logger = test_logger();
 
   my $label = "$file and $package are "
-    . ($ret ? "" : "not ") . "similes";
-  ok( $self->{pmfile}->simile($file, $package) == $ret, $label );
+    . ($ret ? "" : "not ") . "basename_matches_package";
+  ok( PAUSE->basename_matches_package($file, $package) == $ret, $label );
   $file =~ s/\.pm$//;
 
   cmp_deeply(
       $Logger->events,
       [ superhashof({
           message =>
-          qq!result of simile(): {{{"file": "$file", "package": "$package", "ret": $ret}}}!
+          qq!result of basename_matches_package: {{{"file": "$file", "package": "$package", "ret": $ret}}}!
         })
       ]
   );
@@ -152,12 +152,6 @@ sub examine_fio :Test :Plan(3) {
 
   $pmfile->{PMFILE} = $self->fake_dist_dir->file('lib/My/Dist.pm')->stringify;
   $pmfile->examine_fio;
-
-#  $self->{dist}->next_call_ok(connect => []);
-#  $self->{dist}->next_call_ok(version_from_meta_ok => []);
-#  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
-#  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in META_CONTENT");
-#  $self->{dist}->verbose_ok(1, "res[My::Dist]");
 
   cmp_deeply(
     $Logger->events,
@@ -183,8 +177,8 @@ sub examine_fio :Test :Plan(3) {
       parsed => 1,
       filemtime => (stat $pmfile->{PMFILE})[9],
       infile    => $pmfile->{PMFILE},
-      simile    => $pmfile->{PMFILE},
       pause_reg => $self->{dist}{TIME},
+      basename_matches_package => $pmfile->{PMFILE},
     },
     "correct package PP",
   );
@@ -211,8 +205,8 @@ sub packages_per_pmfile :Test :Plan(3) {
              { version => $version,
                filemtime => 42,
                infile => $pmfile,
-               simile => $pmfile,
                parsed => 1,
+               basename_matches_package => $pmfile,
              },
              "correct version in packages_per_pmfile: $version",
             );

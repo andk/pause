@@ -28,32 +28,6 @@ sub new {
 }
 
 # package PAUSE::pmfile;
-sub simile {
-    my($self,$file,$package) = @_;
-    # MakeMaker gives them the chance to have the file Simple.pm in
-    # this directory but have the package HTML::Simple in it.
-    # Afaik, they wouldn't be able to do so with deeper nested packages
-    $file =~ s|.*/||;
-    $file =~ s|\.pm(?:\.PL)?||;
-    my $ret = $package =~ m/\b\Q$file\E$/;
-    $ret ||= 0;
-    unless ($ret) {
-        # Apache::mod_perl_guide stuffs it into Version.pm
-        $ret = 1 if lc $file eq 'version';
-    }
-
-    $Logger->log([
-      "result of simile(): %s", {
-        file    => $file,
-        package => $package,
-        ret     => 0+$ret,
-      },
-    ]);
-
-    $ret;
-}
-
-# package PAUSE::pmfile;
 sub alert {
     my $self = shift;
     my $what = shift;
@@ -284,8 +258,8 @@ sub packages_per_pmfile {
             #restriction
             $ppp->{$pkg}{parsed}++;
             $ppp->{$pkg}{infile} = $pmfile;
-            if ($self->simile($pmfile,$pkg)) {
-                $ppp->{$pkg}{simile} = $pmfile;
+            if (PAUSE->basename_matches_package($pmfile,$pkg)) {
+                $ppp->{$pkg}{basename_matches_package} = $pmfile;
                 if ($self->version_from_meta_ok) {
                     my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
@@ -320,7 +294,7 @@ sub packages_per_pmfile {
                                     ($version||"")
                                         gt $ppp->{$pkg}{version};
                 }
-            } else {        # not simile
+            } else {        # not basename_matches_package
                 #### it comes later, it would be nonsense
                 #### to set to "undef". MM_Unix gives us
                 #### the best we can reasonably consider

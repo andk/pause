@@ -155,6 +155,32 @@ unless ($INC{"PrivatePAUSE.pm"}) { # reload within apache
   }
 }
 
+sub basename_matches_package {
+    my ($class, $file, $package) = @_;
+
+    # MakeMaker gives them the chance to have the file Simple.pm in
+    # this directory but have the package HTML::Simple in it.
+    # Afaik, they wouldn't be able to do so with deeper nested packages
+    $file =~ s|.*/||;
+    $file =~ s|\.pm(?:\.PL)?||;
+    my $ret = $package =~ m/\b\Q$file\E$/;
+    $ret ||= 0;
+    unless ($ret) {
+        # Apache::mod_perl_guide stuffs it into Version.pm
+        $ret = 1 if lc $file eq 'version';
+    }
+
+    $Logger->log([
+      "result of basename_matches_package: %s", {
+        file    => $file,
+        package => $package,
+        ret     => 0+$ret,
+      },
+    ]);
+
+    $ret;
+}
+
 =pod
 
 The following $PAUSE::Config keys are defined in PrivatePAUSE.pm:
