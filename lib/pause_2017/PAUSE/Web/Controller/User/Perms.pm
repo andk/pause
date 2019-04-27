@@ -453,7 +453,7 @@ sub _share_remocos {
         for my $sel (@sel) {
           my($selmod,$otheruser) = $sel =~ /^(\S+)\s--\s(\S+)$/;
           die PAUSE::Web::Exception
-              ->new(ERROR => "You do not seem to be owner of $selmod")
+              ->new(ERROR => "You do not seem to be owner of $selmod.")
                   unless exists $all_mods->{$selmod};
           unless (exists $all_comaints->{$sel}) {
             push @results, {
