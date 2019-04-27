@@ -223,7 +223,7 @@ sub canonicalize_module_casing {
       UPDATE packages SET package = ? WHERE LOWER(package) = LOWER(?);
     },
     undef,
-    ($package) x 6,
+    ($package) x 2,
   );
 
   return;
