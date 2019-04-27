@@ -48,8 +48,11 @@ Valid instructions are:
   json:PAUSEID:JSON   | interpret the given JSON string as a faker struct
   perl:PAUSEID:PERL   | interpret the given Perl string as a faker struct
   fdir:DIRECTORY      | flat dir: upload all the files as the default user
+  prog:file           | read a file containing a list of instructions
   cmd:"program"       | run the program, which should print out instructions
 
+prog and cmd output can split instructions across multiple lines.  Lines that
+begin with whitespace will be appended to the line preceding them.
 EOT
 );
 
@@ -191,8 +194,24 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     my @lines = `$rest`;
     chomp @lines;
 
-    print {$log_fh} ">>>> ran `$rest` and unshifted results to queue: @lines\n";
-    print {*STDERR} ">>>> ran `$rest` and unshifted results to queue: @lines\n"
+    unfold_lines(\@lines);
+
+    print {$log_fh} ">>>> ran `$rest` and unshifted results to queue\n";
+    print {*STDERR} ">>>> ran `$rest` and unshifted results to queue\n"
+      if $opt->verbose;
+
+    unshift @instructions, @lines;
+    next INSTRUCTION;
+  }
+
+  if ($type eq 'prog') {
+    my @lines = grep {; chomp; length && ! /^#/ }
+                split /\n/, file($rest)->slurp;
+
+    unfold_lines(\@lines);
+
+    print {$log_fh} ">>>> read '$rest' and unshifted results to queue\n";
+    print {*STDERR} ">>>> read '$rest' and unshifted results to queue\n"
       if $opt->verbose;
 
     unshift @instructions, @lines;
@@ -263,6 +282,15 @@ close $log_fh or warn "error closing $dir/pause.log: $!";
 if ($opt->shell) {
   my $chdir_guard = pushd($dir);
   system($ENV{SHELL});
+}
+
+sub unfold_lines {
+  my ($lines) = @_;
+  for my $i (reverse 1 .. $#$lines) {
+    next unless $lines->[$i] =~ /^\s/;
+    $lines->[$i - 1] .= $lines->[$i];
+    splice @$lines, $i, 1;
+  }
 }
 
 sub dbh_do {
