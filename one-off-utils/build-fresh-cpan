@@ -213,7 +213,6 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
     next INSTRUCTION;
   }
 
-  # perms:PAUSEID:PKG:PERM | set perm (f or c or 0) for PAUSEID on PKG
   if ($type eq 'perms') {
     my @rest = split /(?<!:)\s*:\s*(?!:)/, $rest;
     my ($user, $package, $perm)
@@ -258,7 +257,8 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
   }
 
   if ($type eq 'progcmd') {
-    my @lines = `$rest`;
+    my @lines = grep {; chomp; length && ! /^#/ }
+                `$rest`;
     chomp @lines;
 
     unfold_lines(\@lines);
