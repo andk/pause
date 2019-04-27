@@ -353,19 +353,13 @@ subtest "case-changing imports" => sub {
 
       my $result = $pause->test_reindex;
 
-      # my $pkgs = $result->packages_data;
-      # my @rows = map {; [ $_->package, $_->version ] } $pkgs->packages;
-      # diag explain(\@rows);
+      $result->package_list_ok([
+        { package => 'Foo::Bar', version => '0.001'  }
+      ]);
 
-      $result->package_list_ok(
-        [ { package => 'Foo::Bar', version => '0.001'  } ],
-      );
-
-      $result->perm_list_ok(
-        {
-          'Foo::Bar' => { f => 'FCOME', c => ['CMAINT'] },
-        }
-      );
+      $result->perm_list_ok({
+        'Foo::Bar' => { f => 'FCOME', c => ['CMAINT'] },
+      });
     }
 
     {
@@ -377,15 +371,13 @@ subtest "case-changing imports" => sub {
 
       my $result = $pause->test_reindex;
 
-      $result->package_list_ok(
-        [ { package => 'foo::bar', version => '0.002'  } ],
-      );
+      $result->package_list_ok([
+        { package => 'foo::bar', version => '0.002'  }
+      ]);
 
-      $result->perm_list_ok(
-        {
-          'foo::bar' => { f => 'FCOME', c => ['CMAINT'] },
-        }
-      );
+      $result->perm_list_ok({
+        'foo::bar' => { f => 'FCOME', c => ['CMAINT'] },
+      });
     }
   };
 };
