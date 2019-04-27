@@ -4,22 +4,24 @@
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 
 % if (param("SUBMIT_pause99_share_perms_movepr")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (@{$pause->{results} || []}) {
       <ul>
 %     for my $res (@{$pause->{results}}) {
 %       if ($res->{error}) {
-<li>Error trying to make <%= $res->{user} %> primary maintainer of <%= $res->{mod} %>: <%= $res->{error} %></li>";
+<li class="error">Error trying to make <%= $res->{user} %> primary maintainer of <%= $res->{mod} %>: <%= $res->{error} %></li>";
 %       } else {
-<li>Made <%= $res->{user} %> primary maintainer of <%= $res->{mod} %>.</li>
+<li class="result">Made <%= $res->{user} %> primary maintainer of <%= $res->{mod} %>.</li>
 %       }
 %     }
       </ul>
 %   } else {
-<p>You need to select one or more packages and enter a userid.
+<p class="warning">You need to select one or more packages and enter a userid.
 Nothing done.</p>
 %   }
+</div>
 <hr>
 % }
 

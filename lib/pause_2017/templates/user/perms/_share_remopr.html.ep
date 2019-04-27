@@ -1,19 +1,21 @@
 % my $pause = stash(".pause") || {};
 
 % if (param("SUBMIT_pause99_share_perms_remopr")) {
+<div class="response">
 %   if ($pause->{error}) {
-<p><%= $pause->{error} %></p>
+<p class="error"><%= $pause->{error} %></p>
 %   } elsif (!@{$pause->{results} || []}) {
-<p>You need to select one or more packages. Nothing done.</p>
+<p class="warning">You need to select one or more packages. Nothing done.</p>
 %   } else {
 %     for (@{$pause->{results}}) {
 %       if ($_->{error}) {
-<p>Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></p>
+<p class="error">Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></p>
 %       } else {
-<p>Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</p>
+<p class="result">Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</p>
 %       }
 %     }
 %   }
+</div>
 <hr>
 % }
 
