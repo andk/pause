@@ -299,7 +299,8 @@ sub with_our_config {
 }
 
 sub test_reindex {
-  my ($self, $code) = @_;
+  my ($self, $arg) = @_;
+  $arg //= {};
 
   $self->with_our_config(sub {
     my $self = shift;
@@ -331,9 +332,12 @@ sub test_reindex {
 
     die "stray mail in test mail trap before reindex" if @stray_mail;
 
-    PAUSE::mldistwatch->new({ sleep => 0 })->reindex;
+    PAUSE::mldistwatch->new({
+      sleep => 0,
+      ($arg->{pick} ? (pick => $arg->{pick}) : ()),
+    })->reindex;
 
-    $code->($self->tmpdir) if $code;
+    $arg->{after}->($self->tmpdir) if $arg->{after};
 
     my @deliveries = Email::Sender::Simple->default_transport->deliveries;
 
