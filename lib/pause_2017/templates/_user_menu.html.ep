@@ -26,6 +26,7 @@
 %       warn "action[$action->{name}] has no priv!";
 %       $action->{priv} = "admin";
 %     }
+%     next if defined $action->{display} && !$action->{display};
 %
 %     my $verbose = $action->{verb} if exists $action->{verb};
 %     $verbose ||= $action->{name};

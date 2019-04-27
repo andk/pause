@@ -19,6 +19,7 @@ to anybody on PAUSE.</p>
 % for my $group ($mgr->config->all_groups) {
   % my @names = $mgr->config->action_names_for($group);
   % for my $action ($mgr->config->sort_allowed_group_actions($group, \@names)) {
+    % next if defined $action->{display} and !$action->{display};
 <tr class="alternate<%= $alter++ % 2 + 1 %>">
 <td><b><%= $action->{verb} %></b><!-- (<%= $action->{name} %>) --></td>
 <td><%= b($action->{priv} || "N/A") %></td>
