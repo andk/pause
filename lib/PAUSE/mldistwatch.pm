@@ -432,7 +432,7 @@ sub maybe_index_dist {
     local $Logger = $Logger->proxy({ proxy_prefix => "$dist: " });
 
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
-        $Logger->log_debug("skipping: $skip_reason");
+        $Logger->log("skipping: $skip_reason");
         delete $self->{ALLlasttime}{$dist};
         delete $self->{ALLfound}{$dist};
         return;
