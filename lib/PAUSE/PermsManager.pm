@@ -5,6 +5,8 @@ use warnings;
 package PAUSE::PermsManager;
 
 use Moo;
+
+use PAUSE::Logger '$Logger';
 use PAUSE ();
 
 has dbh_callback => (
@@ -87,7 +89,7 @@ sub plan_package_permission_copy {
       my $err   = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      $self->verbose( 1,
+      $Logger->log(
           "Insert into perms package[$dst]mods_userid"
           . "[$mods_userid]ret[$ret]err[$err]\n" );
     }
@@ -112,7 +114,7 @@ sub plan_set_first_come {
     my $ret = $dbh->do("INSERT INTO primeur (package, userid) VALUES (?,?)", undef, $package, $userid);
     my $err = $@;
     $ret //= "";
-    $self->verbose(1,
+    $Logger->log(
                   "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
                   "err[$err]\n");
     return 1;
@@ -135,7 +137,7 @@ sub plan_set_comaint {
     my $ret = $dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", undef, $package, $userid);
     my $err = $@;
     $ret //= "";
-    $self->verbose(1,
+    $Logger->log(
                   "${log_prefix}Inserted into perms package[$package]userid[$userid]ret[$ret]".
                   "err[$err]\n");
     return 1;
@@ -227,11 +229,6 @@ sub canonicalize_module_casing {
   );
 
   return;
-}
-
-sub verbose {
-    my ($self, $level, @what) = @_;
-    PAUSE->log($self, $level, @what);
 }
 
 1;

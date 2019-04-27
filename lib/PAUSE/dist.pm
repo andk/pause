@@ -11,6 +11,8 @@ use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
 use JSON::XS ();
 
+use PAUSE::Logger '$Logger';
+
 sub DESTROY {}
 
 sub new {
@@ -28,7 +30,7 @@ sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};
   if ($dist =~ m|/\.|) {
-    $self->verbose(1,"Warning: dist[$dist] has illegal filename\n");
+    $Logger->log("Warning: dist[$dist] has illegal filename\n");
     return 1;
   }
   return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
@@ -49,12 +51,16 @@ sub normalize_package_casing {
     my (@forms) = sort keys %pkg_checkins;
 
     if (@forms == 1) {
-      $self->verbose(1, "Ensuring canonicalized case of $forms[0]");
+      $Logger->log("Ensuring canonicalized case of $forms[0]");
       $self->hub->permissions->canonicalize_module_casing($forms[0]);
       return;
     }
 
-    $self->verbose(1, "Case conflict resolved by LAST-RESORT: [@forms] -> $forms[0]");
+    $Logger->log([
+      "Case conflict resolved by LAST-RESORT: %s -> %s",
+      \@forms,
+      $forms[0],
+    ]);
     my $form = $forms[0];
     $self->hub->permissions->canonicalize_module_casing($forms[0]);
   }
@@ -64,7 +70,7 @@ sub delete_goner {
   my $self = shift;
   my $dist = $self->{DIST};
   if ($self->hub->{PICK} && $self->hub->{PICK}{$dist}) {
-    $self->verbose(1,"Warning: parameter pick '$dist' refers to a goner, ignoring");
+    $Logger->log("Warning: parameter pick '$dist' refers to a goner, ignoring");
     return;
   }
   my $dbh = $self->connect;
@@ -85,7 +91,7 @@ sub writechecksum {
     $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
   eval { CPAN::Checksums::updatedir($dir); };
   if ($@) {
-    $self->verbose(1,"CPAN::Checksums::updatedir died with error[$@]");
+    $Logger->log("CPAN::Checksums::updatedir died with error[$@]");
     return; # a die might cause even more trouble
   }
   return unless -e "$dir/CHECKSUMS"; # e.g. only files-to-ignore
@@ -138,7 +144,7 @@ sub mtime_ok {
         PAUSE->_time_string($mtime),
         $dist,
       );
-      $self->verbose(1,"Assigned mtime '$mtime' to dist '$dist'\n");
+      $Logger->log("Assigned mtime '$mtime' to dist '$dist'\n");
       return 1;
     }
   }
@@ -175,7 +181,7 @@ sub untar {
   open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
-      $self->verbose(1,"*** ALERT: Updir detected in $dist!\n\n");
+      $Logger->log("*** ALERT: Updir detected in $dist!\n\n");
       $self->alert("Updir detected!");
       $self->{COULD_NOT_UNTAR}++;
       return;
@@ -186,7 +192,7 @@ sub untar {
   }
   $self->{PERL_MAJOR_VERSION} = 5 unless defined $self->{PERL_MAJOR_VERSION};
   unless (close TARTEST) {
-    $self->verbose(1,"Could not untar $dist!\n");
+    $Logger->log("Could not untar $dist!\n");
     $self->alert("Could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return;
@@ -195,14 +201,14 @@ sub untar {
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
     $tar_opt = "xjf";
   }
-  $self->verbose(1,"Going to untar. Running '$tarbin' '$tar_opt' '$MLROOT/$dist'\n");
+  $Logger->log("Going to untar. Running '$tarbin' '$tar_opt' '$MLROOT/$dist'\n");
   unless (system($tarbin,$tar_opt,"$MLROOT/$dist")==0) {
-    $self->verbose(1, "Some error occurred during unzipping. Let's retry with -v:\n");
+    $Logger->log( "Some error occurred during unzipping. Let's retry with -v:\n");
     unless (system("$tarbin v$tar_opt $MLROOT/$dist")==0) {
-      $self->verbose(1, "Some error occurred during unzipping again; giving up\n");
+      $Logger->log( "Some error occurred during unzipping again; giving up\n");
     }
   }
-  $self->verbose(1,"Untarred '$MLROOT/$dist'\n");
+  $Logger->log("Untarred '$MLROOT/$dist'\n");
   return 1;
 }
 
@@ -232,16 +238,16 @@ sub _examine_regular_perl {
 
   if ($has_pumpking_bit){
     $skip = 0;
-    $self->verbose(1,"Perl dist $dist from trusted user $u");
+    $Logger->log("Perl dist $dist from trusted user $u");
   } else {
     $skip = 1;
-    $self->verbose(1,"*** ALERT: Perl dist $dist from untrusted user $u. Skip set to [$skip]\n");
+    $Logger->log("*** ALERT: Perl dist $dist from untrusted user $u. Skip set to [$skip]\n");
   }
 
   if ($dist =~ $SUFFQR) {
     $suffix = $1;
   } else {
-    $self->verbose(1,"A perl distro ($dist) with an unusual suffix!\n");
+    $Logger->log("A perl distro ($dist) with an unusual suffix!\n");
     $self->alert("A perl distro ($dist) with an unusual suffix!");
   }
   unless ($skip) {
@@ -273,14 +279,14 @@ sub examine_dist {
   }
 
   if ($self->isa_dev_version) {
-    $self->verbose(1,"Dist '$dist' is a developer release\n");
+    $Logger->log("Dist '$dist' is a developer release\n");
     $self->{SUFFIX} = "N/A";
     $self->{SKIP}   = 1;
     return;
   }
 
   if ($dist =~ m|/perl-\d+|) {
-    $self->verbose(1,"Dist '$dist' is an unofficial perl-like release\n");
+    $Logger->log("Dist '$dist' is an unofficial perl-like release\n");
     $self->{SUFFIX} = "N/A";
     $self->{SKIP}   = 1;
     return;
@@ -290,7 +296,7 @@ sub examine_dist {
     $suffix = $1;
     $skip = 1 unless $self->untar;
   } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
-    $self->verbose(1,"Dist '$dist' is a single-.pm-file upload\n");
+    $Logger->log("Dist '$dist' is a single-.pm-file upload\n");
     $suffix = "N/A";
     $skip   = 1;
     $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
@@ -299,13 +305,13 @@ sub examine_dist {
     my $unzipbin = $self->hub->{UNZIPBIN};
     my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
     unless (system($system)==0) {
-      $self->verbose(1,
+      $Logger->log(
         "Some error occurred during unzippping. ".
         "Let's read unzip -t:\n");
       system("$unzipbin -t $MLROOT/$dist");
     }
   } else {
-    $self->verbose(1,"File '$dist' does not resemble a distribution");
+    $Logger->log("File '$dist' does not resemble a distribution");
     $skip = 1;
   }
 
@@ -544,7 +550,7 @@ sub mail_summary {
         $Lstatus = $status;
       }
     } else {
-      $self->verbose(1,
+      $Logger->log(
         sprintf "st[%s]\n", (Data::Dumper::Dumper($inxst) =~ s/\v+\z//r)
       );
       if ($pmfiles > 0 || $self->{REASON_TO_SKIP}) {
@@ -608,7 +614,7 @@ sub mail_summary {
 
     sendmail($email);
 
-    $self->verbose(1,"Sent \"indexer report\" mail about $substrdistro\n");
+    $Logger->log("Sent \"indexer report\" mail about $substrdistro\n");
   }
 }
 
@@ -681,7 +687,7 @@ sub check_multiple_root {
   my %seen;
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
   if (@top > 1) {
-    $self->verbose(1,"HAS_MULTIPLE_ROOT: top[@top]");
+    $Logger->log("HAS_MULTIPLE_ROOT: top[@top]");
     $self->{HAS_MULTIPLE_ROOT} = \@top;
   } else {
     $self->{DISTROOT} = $top[0];
@@ -729,7 +735,7 @@ sub check_world_writable {
       )) {
       push @wwfixingerrors, "error during 'tar ...': $!";
     }
-    $self->verbose(1,"HAS_WORLD_WRITABLE: ww[@ww]");
+    $Logger->log("HAS_WORLD_WRITABLE: ww[@ww]");
     $self->{HAS_WORLD_WRITABLE} = \@ww;
     if (@wwfixingerrors) {
       $self->{HAS_WORLD_WRITABLE_FIXINGERRORS} = \@wwfixingerrors;
@@ -772,32 +778,32 @@ sub filter_pms {
             for my $ve (@$v) {
               $ve =~ s|/+$||;
               if ($inmf =~ /^$ve$rest/){
-                $self->verbose(1,"Skipping inmf[$inmf] due to ve[$ve]");
+                $Logger->log("Skipping inmf[$inmf] due to ve[$ve]");
                 next MANI;
               } else {
-                $self->verbose(1,"NOT skipping inmf[$inmf] due to ve[$ve]");
+                $Logger->log("NOT skipping inmf[$inmf] due to ve[$ve]");
               }
             }
           } else {
             $v =~ s|/+$||;
             if ($inmf =~ /^$v$rest/){
-              $self->verbose(1,"Skipping inmf[$inmf] due to v[$v]");
+              $Logger->log("Skipping inmf[$inmf] due to v[$v]");
               next MANI;
             } else {
-              $self->verbose(1,"NOT skipping inmf[$inmf] due to v[$v]");
+              $Logger->log("NOT skipping inmf[$inmf] due to v[$v]");
             }
           }
         }
       } else {
         # noisy:
-        # $self->verbose(1,"no keyword 'no_index' or 'private' in META_CONTENT");
+        # $Logger->log("no keyword 'no_index' or 'private' in META_CONTENT");
       }
     } else {
-      # $self->verbose(1,"no META_CONTENT"); # too noisy
+      # $Logger->log("no META_CONTENT"); # too noisy
     }
     push @pmfile, $mf;
   }
-  $self->verbose(1,"Finished with pmfile[@pmfile]\n");
+  $Logger->log("Finished with pmfile[@pmfile]\n");
   \@pmfile;
 }
 
@@ -936,17 +942,17 @@ sub read_dist {
   my $ok = eval { @manifind = sort keys %{ExtUtils::Manifest::manifind()}; 1 };
   $self->{MANIFOUND} = \@manifind;
   unless ($ok) {
-    $self->verbose(1,"Errors in manifind: $@");
+    $Logger->log("Errors in manifind: $@");
     return;
   }
 
   my $manifound = @manifind;
   my $dist = $self->{DIST};
   unless (@manifind){
-    $self->verbose(1,"NO FILES! in dist $dist?");
+    $Logger->log("NO FILES! in dist $dist?");
     return;
   }
-  $self->verbose(1,"Found $manifound files in dist $dist, first $manifind[0]\n");
+  $Logger->log("Found $manifound files in dist $dist, first $manifind[0]\n");
 }
 
 sub extract_readme_and_meta {
@@ -981,7 +987,7 @@ sub extract_readme_and_meta {
     PAUSE::newfile_hook("$MLROOT/$sans.readme");
   } else {
     $self->{README} = "No README found";
-    $self->verbose(1,"No readme in $dist\n");
+    $Logger->log("No readme in $dist\n");
   }
   my ($json, $yaml);
   if ($self->perl_major_version == 6) {
@@ -997,7 +1003,7 @@ sub extract_readme_and_meta {
 
   unless ($json || $yaml) {
     $self->{METAFILE} = "No META.yml or META.json found";
-    $self->verbose(1,"No META.yml or META.json in $dist");
+    $Logger->log("No META.yml or META.json in $dist");
     return;
   }
 
@@ -1021,7 +1027,7 @@ sub extract_readme_and_meta {
         $self->{META_CONTENT} = Parse::CPAN::Meta->load_file($metafile); 1
       };
       unless ($ok) {
-        $self->verbose(1,"Error while parsing $metafile: $@");
+        $Logger->log("Error while parsing $metafile: $@");
         $self->{META_CONTENT} = {};
         $self->{METAFILE} = "$metafile found but error "
                           . "encountered while loading: $@";
@@ -1038,12 +1044,12 @@ sub write_updated_meta6_json {
   my $json = JSON::XS->new->utf8->canonical->pretty;
 
   open my $meta_fh, '<', $metafile
-    or $self->verbose(1,"Failed to open META6.json file for reading $!");
+    or $Logger->log("Failed to open META6.json file for reading $!");
   my $meta = eval {
     $json->decode(join '', <$meta_fh>);
   };
   if ($@) {
-    $self->verbose(1,"Failed to parse META6.json file: $@");
+    $Logger->log("Failed to parse META6.json file: $@");
     File::Copy::copy $metafile, "$MLROOT/$sans.meta";
     return;
   }
@@ -1052,9 +1058,9 @@ sub write_updated_meta6_json {
   $meta->{'source-url'} = $PAUSE::Config->{PUB_MODULE_URL} . $dist;
 
   open $meta_fh, '>', "$MLROOT/$sans.meta"
-    or $self->verbose(1,"Failed to open Perl 6 meta file for writing: $!");
+    or $Logger->log("Failed to open Perl 6 meta file for writing: $!");
   print { $meta_fh } $json->encode($meta)
-    or $self->verbose(1,"Failed to write Perl 6 meta file: $!");
+    or $Logger->log("Failed to write Perl 6 meta file: $!");
   close $meta_fh;
 }
 
@@ -1087,15 +1093,10 @@ sub version_from_meta_ok {
   return($self->{VERSION_FROM_META_OK} = 1);
 }
 
-sub verbose {
-  my($self,$level,@what) = @_;
-  $self->hub->verbose($level,@what);
-}
-
 sub lock {
   my($self) = @_;
   if ($self->hub->{'SKIP-LOCKING'}) {
-    $self->verbose(1,"Forcing indexing without a lock");
+    $Logger->log("Forcing indexing without a lock");
     return 1;
   }
   my $dist = $self->{DIST};
@@ -1114,7 +1115,7 @@ sub lock {
   if ($sth->rows) {
     my $row = $sth->fetchrow_hashref();
     require Data::Dumper;
-    $self->verbose(1,
+    $Logger->log(
       sprintf(
         "Cannot get lock, current record is[%s]",
         Data::Dumper->new([$row],
@@ -1122,7 +1123,7 @@ sub lock {
         )->Indent(1)->Useqq(1)->Dump,
       ));
   } else {
-    $self->verbose(1,"Weird: first we get no lock, then the record is gone???");
+    $Logger->log("Weird: first we get no lock, then the record is gone???");
   }
   return;
 }
@@ -1170,7 +1171,7 @@ sub p6_index_dist {
   my $ret  = $dbh->do($p6dists, undef, @args);
   pop @args; # we do not use the "now string" in the sprintf below
   push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
-  $self->verbose(1,
+  $Logger->log(
     sprintf("Inserted into p6dists name[%s]auth[%s]ver[%s]tarball[%s]ret[%s]err[%s]\n", @args));
 
   return "ERROR in dist $dist: " . $dbh->errstr unless $ret;
@@ -1182,7 +1183,7 @@ sub p6_index_dist {
     @args = ($namespace, $dist);
     $ret  = $dbh->do($p6provides, undef, @args);
     push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
-    $self->verbose(1,
+    $Logger->log(
       sprintf("Inserted into p6provides name[%s]tarball[%s]ret[%s]err[%s]\n", @args));
   }
   return "ERROR in dist $dist: " . $dbh->errstr unless $ret;
@@ -1201,12 +1202,12 @@ sub p6_index_dist {
       @args = ($1, $dist);
       $ret  = $dbh->do($p6binaries, undef, @args);
       push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
-      $self->verbose(1,
+      $Logger->log(
         sprintf("Inserted into p6binaries name[%s]tarball[%s]ret[%s]err[%s]\n", @args));
     }
   }
   unless (close TARTEST) {
-    $self->verbose(1,"Could not untar $dist!\n");
+    $Logger->log("Could not untar $dist!\n");
     $self->alert("Could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return "ERROR: Could not untar $dist!";

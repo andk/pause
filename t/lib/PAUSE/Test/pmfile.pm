@@ -8,6 +8,16 @@ use base qw(Test::FITesque::Fixture);
 use Test::More;
 use Test::Deep;
 
+# This one, we don't expect to be used.  In a weird world, we'd mark it fatal
+# or something so we could say "nothing should log outside of test code."
+# -- rjbs, 2019-04-27
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'TestPAUSE',
+  facility  => undef,
+  to_self   => 0,
+  to_stderr => 0,
+} };
+
 use Test::MockObject;
 use Test::MockObject::Extends;
 use PAUSE::mldistwatch;
@@ -72,13 +82,22 @@ sub dist_mock :Test :Plan(1) {
   $self->dist_mock_ok($method, \@args);
 }
 
+sub test_logger {
+  return PAUSE::Logger->default_logger_class->new({
+    ident     => 'TestPAUSE',
+    facility  => undef,
+    log_pid   => 0,
+    to_self   => 1,
+    to_stderr => $ENV{TEST_VERBOSE} ? 1 : 0,
+  });
+}
+
 my $ppp = 'My::Package';
 sub filter_ppps :Test :Plan(2) {
   my ($self, $no_index, $expect) = @_;
   $self->{pmfile}{META_CONTENT}{no_index} = $no_index;
 
-  my @verbose;
-  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+  local $Logger = test_logger();
 
   my @res = $self->{pmfile}->filter_ppps($ppp);
   cmp_deeply(
@@ -95,14 +114,14 @@ sub filter_ppps :Test :Plan(2) {
     }
 
     cmp_deeply(
-        \@verbose,
+        $Logger->events,
         [
-            [1, $reason],
-            [1, "Result of filter_ppps: res[@res]"],
+            superhashof({ message => $reason }),
+            superhashof({ message => "Result of filter_ppps: res[@res]" }),
         ]
     );
   } else {
-    ok(!@verbose, "no verbose() call");
+    ok(! @{ $Logger->events }, "no logging");
     $self->{dist}->clear;
   }
 }
@@ -110,16 +129,20 @@ sub filter_ppps :Test :Plan(2) {
 sub simile :Test :Plan(2) {
   my ($self, $file, $package, $ret) = @_;
 
-  my @verbose;
-  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+  local $Logger = test_logger();
 
   my $label = "$file and $package are "
     . ($ret ? "" : "not ") . "similes";
   ok( $self->{pmfile}->simile($file, $package) == $ret, $label );
   $file =~ s/\.pm$//;
+
   cmp_deeply(
-      shift(@verbose),
-      [1, "Result of simile(): file[$file] package[$package] ret[$ret]\n"],
+      $Logger->events,
+      [ superhashof({
+          message =>
+            "Result of simile(): file[$file] package[$package] ret[$ret]\n",
+        })
+      ]
   );
 }
 
@@ -127,21 +150,22 @@ sub examine_fio :Test :Plan(3) {
   my ($self) = @_;
   my $pmfile = $self->{pmfile};
 
-  my @verbose = ();
-  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+  local $Logger = test_logger();
 
   $pmfile->{PMFILE} = $self->fake_dist_dir->file('lib/My/Dist.pm')->stringify;
   $pmfile->examine_fio;
-  shift @verbose for 1..3; # skip over some irrelevant logging
+
 #  $self->{dist}->next_call_ok(connect => []);
 #  $self->{dist}->next_call_ok(version_from_meta_ok => []);
 #  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
 #  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in META_CONTENT");
 #  $self->{dist}->verbose_ok(1, "res[My::Dist]");
+
   cmp_deeply(
-      shift(@verbose),
-      [1, "Will check keys_ppp[My::Dist]\n"],
+      $Logger->events->[3],
+      superhashof({ message => "Will check keys_ppp[My::Dist]\n" }),
   );
+
   cmp_deeply(
     [ @{$PACKAGE}{ qw(PACKAGE DIST FIO PMFILE USERID META_CONTENT) } ],
     [

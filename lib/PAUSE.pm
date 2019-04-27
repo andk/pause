@@ -10,7 +10,7 @@ it. Before you *use* a function here, please ask about its status.
 
 =cut
 
-# nono for non-CGI: use CGI::Switch ();
+use PAUSE::Logger '$Logger';
 
 use File::Basename ();
 use Compress::Zlib ();
@@ -102,33 +102,6 @@ $PAUSE::Config ||=
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
      INCOMING => $IS_PAUSE_US ? 'ftp://localhost/incoming/' : 'ftp://pause.perl.org/incoming/',
      INCOMING_LOC => '/home/ftp/incoming/',
-     LOG_CALLBACK => sub {
-       # $entity: entity from which to grab log configuration
-       # $level: level by which logs are filtered
-       # @what: messages being logged
-       my($entity,$level,@what) = @_;
-       unless (@what) {
-         @what = ("warning: verbose called without \@what: ", $level);
-         $level = 1;
-       }
-       return if $level > ($entity->{VERBOSE}||0);
-       unless (exists $entity->{INTRODUCED}) {
-         my $now = scalar localtime;
-         require Data::Dumper;
-         unshift @what, "Running $0, $Id, $now",
-           Data::Dumper->new([$entity],[qw()])->Indent(1)->Useqq(1)->Dump;
-         $entity->{INTRODUCED} = undef;
-       }
-       push @what, "\n" unless $what[-1] =~ m{\n$};
-       my $logfh;
-       if (my $logfile = $entity->{OPT}{logfile}) {
-         open $logfh, ">>", $logfile or die;
-         unshift @what, scalar localtime;
-       } else {
-         $logfh = *STDOUT;
-       }
-       print $logfh @what;
-     },
      MAIL_MAILER => ["sendmail"],
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
@@ -263,11 +236,6 @@ sub filehash {
   sha1: $sha1hexdigest
 };
   return $ret;
-}
-
-sub log {
-    my ($self, @arg) = @_;
-    $PAUSE::Config->{LOG_CALLBACK}->(@arg);
 }
 
 sub dbh {

@@ -2,6 +2,9 @@ use strict;
 use warnings;
 package PAUSE::package;
 use vars qw($AUTOLOAD);
+
+use PAUSE::Logger '$Logger';
+
 use PAUSE::mldistwatch::Constants;
 use CPAN::DistnameInfo;
 
@@ -51,11 +54,6 @@ package in packages  package in primeur
 
 =cut
 
-sub verbose {
-  my($self,$level,@what) = @_;
-  PAUSE->log($self, $level, @what);
-}
-
 sub parent {
   my($self) = @_;
   $self->{FIO} || $self->{DIO};
@@ -96,7 +94,7 @@ sub give_regdowner_perms {
 
   return if lc $main_package eq lc $package;
 
-  $self->verbose(1, "Granting permissions of main_mackage[$main_package] to package[$package]");
+  $Logger->log( "Granting permissions of main_mackage[$main_package] to package[$package]");
   my $changer = $self->hub->permissions->plan_package_permission_copy($main_package, $package);
   $changer->();
 
@@ -199,7 +197,7 @@ owner[$owner]
       $plan_set_comaint ->("(uploader)");
 
   }
-  $self->verbose(1,sprintf( # just for debugging
+  $Logger->log(sprintf( # just for debugging
                             "02maybe: %-25s %10s %-16s (%s) %s\n",
                             $package,
                             $pp->{version},
@@ -256,7 +254,7 @@ sub examine_pkg {
   # should they be cought earlier? Maybe.
   # but as an ultimate sanity check suggested by Richard Soderberg
   if ($self->_pkg_name_insane) {
-      $self->verbose(1,"Package[$package] did not pass the ultimate sanity check");
+      $Logger->log("Package[$package] did not pass the ultimate sanity check");
       delete $self->{FIO};    # circular reference
       return;
   }
@@ -379,7 +377,7 @@ sub update_package {
     qw( package version dist filemtime file )
   };
 
-  $self->verbose(1,"Old package data: opack[$opack]oldversion[$oldversion]".
+  $Logger->log("Old package data: opack[$opack]oldversion[$oldversion]".
                   "odist[$odist]ofiletime[$ofilemtime]ofile[$ofile]\n");
   my $MLROOT = $self->mlroot;
   my $odistmtime = (stat "$MLROOT/$odist")[9];
@@ -405,7 +403,7 @@ sub update_package {
   $distorperlok ||= $something1 && $something2 &&
       $something1 eq $something2 && !$older_isa_regular_perl;
 
-  $self->verbose(1, "New package data: package[$package]infile[$pp->{infile}]".
+  $Logger->log( "New package data: package[$package]infile[$pp->{infile}]".
                   "version[$pp->{version}]".
                   "distorperlok[$distorperlok]oldversion[$oldversion]".
                   "odist[$odist]\n");
@@ -480,7 +478,7 @@ $oldversion, so not indexing seems okay.},
       );
   } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
       # higher VERSION here
-      $self->verbose(1, "Package '$package' has newer version ".
+      $Logger->log( "Package '$package' has newer version ".
                       "[$pp->{version} > $oldversion] $dist wins\n");
       $ok++;
   } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
@@ -525,7 +523,7 @@ pmfile[$pmfile]
       if ($pp->{version} eq "undef"||$pp->{version} == 0) { # no version here,
           if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
               # XXX needs better logging message -- dagolden, 2011-08-13
-              $self->verbose(1, "$package noversion comp $dist vs $odist: >=\n");
+              $Logger->log( "$package noversion comp $dist vs $odist: >=\n");
               $ok++;
           } else {
               $self->index_status(
@@ -541,7 +539,7 @@ also has a zero version number and the distro has a more recent modification tim
                 ->vcmp($pp->{version},
                       $oldversion)==0) {    # equal version here
           # XXX needs better logging message -- dagolden, 2011-08-13
-          $self->verbose(1, "$package version eq comp $dist vs $odist\n");
+          $Logger->log( "$package version eq comp $dist vs $odist\n");
           if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
               $ok++;
           } else {
@@ -555,7 +553,7 @@ has the same version number and the distro has a more recent modification time.}
                                   );
           }
       } else {
-          $self->verbose(1, "Nothing interesting in dist[$dist]package[$package]\n");
+          $Logger->log( "Nothing interesting in dist[$dist]package[$package]\n");
       }
   }
 
@@ -569,11 +567,11 @@ has the same version number and the distro has a more recent modification time.}
                 &&
                 (!$fio || $fio->simile($ofile,$package)) # if we have no fio, we can't check simile
               ) {
-          $self->verbose(1,
+          $Logger->log(
                           "Warning: we ARE NOT simile BUT WE HAVE BEEN ".
                           "simile some time earlier:\n");
           # XXX need a better way to log data -- dagolden, 2011-08-13
-          $self->verbose(1,Data::Dumper::Dumper($pp), "\n");
+          $Logger->log(Data::Dumper::Dumper($pp), "\n");
           $ok = 0;
       }
   }
@@ -603,7 +601,7 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
       my $query = qq{UPDATE packages SET package = ?, version = ?, dist = ?, file = ?,
 filemtime = ?, pause_reg = ? WHERE LOWER(package) = LOWER(?)};
-      $self->verbose(1,"Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . ",$package\n");
+      $Logger->log("Updating package: [$query]$package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . ",$package\n");
       my $rows_affected = eval { $dbh->do
                                      ($query,
                                       undef,
@@ -680,7 +678,7 @@ sub insert_into_package {
   my $pmfile = $self->{PMFILE};
   my $distname = CPAN::DistnameInfo->new($dist)->dist;
   my $query = qq{INSERT INTO packages (package, version, dist, file, filemtime, pause_reg, distname) VALUES (?,?,?,?,?,?,?) };
-  $self->verbose(1,"Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . "\n");
+  $Logger->log("Inserting package: [$query] $package,$pp->{version},$dist,$pp->{infile},$pp->{filemtime}," . $self->dist->{TIME} . "\n");
 
   return unless $self->_version_ok($pp, $package, $dist);
   $dbh->do($query,
@@ -731,7 +729,7 @@ sub checkin_into_primeur {
       # validate userid existing
   } else {
       if (exists $dio->{META_CONTENT}{x_authority}) {
-          $self->verbose(1, "x_authority was present but undefined; ignoring!");
+          $Logger->log( "x_authority was present but undefined; ignoring!");
       }
       # look to the existing main package.
       if(lc($self->{MAIN_PACKAGE}) eq lc($package)) {

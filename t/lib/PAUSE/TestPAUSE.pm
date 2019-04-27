@@ -14,6 +14,16 @@ use File::Temp ();
 use File::Which;
 use Path::Class;
 
+# This one, we don't expect to be used.  In a weird world, we'd mark it fatal
+# or something so we could say "nothing should log outside of test code."
+# -- rjbs, 2019-04-27
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'TestPAUSE',
+  facility  => undef,
+  to_self   => 0,
+  to_stderr => 1,
+} };
+
 use PAUSE;
 use PAUSE::mldistwatch;
 use PAUSE::TestPAUSE::Result;
@@ -37,6 +47,18 @@ sub init_new {
   }
   return $self;
 }
+
+has logger => (
+  is  => 'ro',
+  default => sub {
+    PAUSE::Logger->default_logger_class->new({
+      ident     => 'TestPAUSE',
+      facility  => undef,
+      to_self   => 1,
+      to_stderr => $ENV{TEST_VERBOSE} ? 1 : 0,
+    });
+  }
+);
 
 has _tmpdir_obj => (
   is       => 'ro',
@@ -252,12 +274,6 @@ sub _build_pause_config_overrides {
     ML_MIN_INDEX_LINES => 0,
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
-
-    LOG_CALLBACK       => $ENV{TEST_VERBOSE}
-                        ? sub { my (undef, undef, @what) = @_;
-                                push @what, "\n" unless $what[-1] =~ m{\n$};
-                                print STDERR @what;  }
-                        : sub { },
   };
 
   return $overrides;
@@ -271,6 +287,8 @@ sub with_our_config {
     %{ $PAUSE::Config },
     %{ $self->pause_config_overrides },
   };
+
+  local $Logger = $self->logger;
 
   $code->($self);
 }
