@@ -34,6 +34,16 @@ status after this move. If you want to get rid of that too,
 please visit <a href="<%= my_url->query(ACTION => "remove_comaint") %>">Give up
 co-maintainership status</a> next.</p>
 
+<p class="notice">If you are not willing to maitain a distribution,
+you are strongly advised to <a href="<%= my_url->query(ACTION => 'move_primary') %>">
+transfer your permissions</a> to a special user called
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_1_adoptme">ADOPTME</a>.
+<i>(In the near future, PAUSE will automatically do this for you.)</i></p>
+
+<p class="notice">If you want to give up all the modules in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'remove_dist_primary') %>">
+Give up Primary Permissions per distribution</a> page.</p>
+
 <p>Select one or more namespaces:</p>
 <div id="packages">
 <input class="search" placeholder="Filter">

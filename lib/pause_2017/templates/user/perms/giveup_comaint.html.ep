@@ -30,6 +30,11 @@
 more namespaces for which you want to be removed from
 the co-maintainer table and press <i>Give Up</i></p>
 
+<p class="notice">If you want to give up comaintainership for all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'giveup_dist_comaint') %>">
+Give up Co-maintainership status per distribution</a> page.</p>
+
 <p>Select one or more namespaces:</p>
 
 <div id="packages">
