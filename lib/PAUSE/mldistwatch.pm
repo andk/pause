@@ -847,7 +847,7 @@ sub rewrite01 {
             my $d = CPAN::DistnameInfo->new("authors/id/$pkg{dist}");
             my $exte = $d->extension;
             unless ($exte) {
-                warn "Warning: undetermined extension on '$pkg{dist}'";
+                $Logger->log("Warning: undetermined extension on '$pkg{dist}'");
             }
             ($pkg{readme} = $pkg{dist}) =~
                 s/\.\Q$exte\E/.readme/;
