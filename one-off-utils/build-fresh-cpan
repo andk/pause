@@ -7,7 +7,7 @@ use lib 't/lib';
 use File::pushd;
 use File::Temp ();
 use JSON;
-use Getopt::Long::Descriptive;
+use Getopt::Long::Descriptive 0.104; # verbatim spacers -- rjbs, 2019-04-27
 use Path::Class;
 use PAUSE::TestPAUSE;
 use Parse::CPAN::Packages;
@@ -34,7 +34,7 @@ my ($opt, $usage) = describe_options(
   [ 'shell!',         'run a shell in the directory; default: true',
                       { default => 1 } ],
   [],
-  [ <<'EOT' ],
+  [ \<<'EOT' ],
 Other than the --switches, arguments are instructions in one of the forms
 below.  For those that list PAUSEID, it may be omitted, and the default
 user is used instead.
