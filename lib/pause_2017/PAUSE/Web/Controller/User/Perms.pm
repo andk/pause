@@ -254,6 +254,7 @@ sub _share_movepr {
     }
   }
 
+  $all_mods = $c->all_pmods_not_mmods($u); # again
   my @all_mods = sort keys %$all_mods;
   $pause->{mods} = \@all_mods;
 
@@ -324,6 +325,7 @@ sub _share_remopr {
     };
   }
 
+  $all_mods = $c->all_pmods_not_mmods($u); # again
   my @all_mods = sort keys %$all_mods;
   $pause->{mods} = \@all_mods;
 
@@ -486,6 +488,7 @@ sub _share_remocos {
     }
   }
 
+  $all_comaints = $c->all_comaints($all_mods,$u); # again
   my @all = sort keys %$all_comaints;
   $pause->{mods} = \@all;
 }
