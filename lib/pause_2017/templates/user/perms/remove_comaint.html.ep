@@ -83,5 +83,5 @@ var List = new List('packages', {
 % end
 
 % } else {
-<p>There are no co-maintainers registered to any of <%= $pause->{User}{userid} %>'s modules.</p>
+<p>There are no co-maintainers registered to any of <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>'s modules.</p>
 % }

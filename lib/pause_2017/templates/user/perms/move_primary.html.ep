@@ -83,6 +83,6 @@ var List = new List('packages', {
 % end
 
 % } else {
-<p>Sorry, there are no modules registered belonging to <%= $pause->{User}{userid} %>.</p>
+<p>Sorry, there are no modules registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
 % }
 
