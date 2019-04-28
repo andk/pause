@@ -1374,7 +1374,7 @@ sub chdir_ln_chdir {
         return;
     }
 
-    $link_target = File::Basename::basename($link_target);
+    $link_name = File::Basename::basename($link_name);
 
     # The from/to names are prexisting, and I didn't dig into how they're used.
     # I think they are *bad* names, because I think of a link going /from/ its
