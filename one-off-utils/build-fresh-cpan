@@ -58,7 +58,7 @@ Valid instructions are:
                         |
   prog:file             | read a file containing a list of instructions
   progcmd:"program"     | run program, which should print out instructions
-  cmd                   | run a command in the working directory
+  cmd:"program"         | run a command in the working directory
   shell                 | run a shell in the working directory
 
 prog and progcmd output can split instructions across multiple lines.  Lines
