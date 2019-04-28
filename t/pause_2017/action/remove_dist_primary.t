@@ -65,6 +65,15 @@ subtest 'normal case' => sub {
                 'Removed primary maintainership of TESTADMIN from Module::Admin::Bar (Module-Admin).',
                 'Removed primary maintainership of TESTADMIN from Module::Admin::Foo (Module-Admin).',
             ]);
+
+            # really transferred to ADOPTME?
+            $t->get_ok("$path?ACTION=peek_dist_perms", {
+                pause99_peek_dist_perms_query => "ADOPTME",
+                pause99_peek_dist_perms_by => "a",
+                pause99_peek_dist_perms_sub => 1,
+            });
+            my @adoptme_dists = map {$_->all_text} $t->dom->find('td.dist')->each;
+            cmp_set(\@adoptme_dists, [qw/Module-Admin/]) or note explain \@adoptme_dists;
         }
         if ($user eq 'TESTUSER') {
             cmp_bag(\@dists, [qw/
@@ -74,6 +83,15 @@ subtest 'normal case' => sub {
                 'Removed primary maintainership of TESTUSER from Module::User::Bar (Module-User).',
                 'Removed primary maintainership of TESTUSER from Module::User::Foo (Module-User).',
             ]);
+
+            # really transferred to ADOPTME?
+            $t->get_ok("$path?ACTION=peek_dist_perms", {
+                pause99_peek_dist_perms_query => "ADOPTME",
+                pause99_peek_dist_perms_by => "a",
+                pause99_peek_dist_perms_sub => 1,
+            });
+            my @adoptme_dists = map {$_->all_text} $t->dom->find('td.dist')->each;
+            cmp_set(\@adoptme_dists, [qw/Module-User/]) or note explain \@adoptme_dists;
         }
         # note $t->content;
     }
