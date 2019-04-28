@@ -72,7 +72,7 @@ on test => sub {
     requires 'File::pushd';
     requires 'HTTP::Status';
     requires 'LWP::UserAgent';
-    requires 'Module::Faker::Dist', '0.021';
+    requires 'Module::Faker::Dist', '0.022';
     requires 'Mojo::Base';
     requires 'Moose';
     requires 'MooseX::StrictConstructor';
