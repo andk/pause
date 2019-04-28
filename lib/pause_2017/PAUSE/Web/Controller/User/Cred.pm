@@ -40,7 +40,7 @@ sub edit {
       $pause->{secret_is_cpan_alias} = 1;
     } elsif (defined $wantsecretemail && $wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
       $pause->{invalid_secret} = 1;
-    } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/) {
+    } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/ && $wantemail ne 'CENSORED') {
       $pause->{invalid_public} = 1;
     } else {
       $consistentsubmit = 1;
