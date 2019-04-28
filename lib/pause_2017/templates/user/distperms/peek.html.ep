@@ -36,15 +36,15 @@ generated automatically, so please report any errors you
 observe to <%= "@{$PAUSE::Config->{ADMINS}}" %> so that the tables
 can be corrected.--Thank you!</p><p>
 
-<%= select_field 'pause99_peek_distperms_by' => [
+<%= select_field 'pause99_peek_dist_perms_by' => [
   ["for a distribution--exact match" => "de"],
   [qq{for a distribution--SQL "LIKE" match} => "dl"],
   ["of an author" => "a"],
 ], size => 1 =%>
 
-<%= text_field 'pause99_peek_distperms_query', size => 44, maxlength => 112, =%>
+<%= text_field 'pause99_peek_dist_perms_query', size => 44, maxlength => 112, =%>
 
-<input type="submit" name="pause99_peek_distperms_sub" value="Submit">
+<input type="submit" name="pause99_peek_dist_perms_sub" value="Submit">
 
 </p>
 % if (@{$pause->{rows} || []}) {
@@ -63,17 +63,17 @@ can be corrected.--Thank you!</p><p>
 %   for my $row (@{$pause->{rows}}) {
     <tr>
       <td class="dist"><a href="<%= my_url->query([
-        pause99_peek_distperms_by => "de",
-        pause99_peek_distperms_query => $row->[0],
-        pause99_peek_distperms_sub => 1,
+        pause99_peek_dist_perms_by => "de",
+        pause99_peek_dist_perms_query => $row->[0],
+        pause99_peek_dist_perms_sub => 1,
       ]) %>"><%= $row->[0] %></a></td>
       <td class="owner">
 %     my @owners = split /,/, $row->[1] // '';
 %     while(my $owner = shift @owners) {
         <a href="<%= my_url->query([
-          pause99_peek_distperms_by => "a",
-          pause99_peek_distperms_query => $owner,
-          pause99_peek_distperms_sub => 1,
+          pause99_peek_dist_perms_by => "a",
+          pause99_peek_dist_perms_query => $owner,
+          pause99_peek_dist_perms_sub => 1,
         ]) %>"><%= $owner %></a><% if (@owners) { %>,<% } %>
 %     }
       </td>
@@ -81,9 +81,9 @@ can be corrected.--Thank you!</p><p>
 %     my @comaints = split /,/, $row->[2] // '';
 %     while(my $comaint = shift @comaints) {
         <a href="<%= my_url->query([
-          pause99_peek_distperms_by => "a",
-          pause99_peek_distperms_query => $comaint,
-          pause99_peek_distperms_sub => 1,
+          pause99_peek_dist_perms_by => "a",
+          pause99_peek_dist_perms_query => $comaint,
+          pause99_peek_dist_perms_sub => 1,
         ]) %>"><%= $comaint %></a><% if (@comaints) { %>,<% } %>
 %     }
       </td>
@@ -94,9 +94,9 @@ can be corrected.--Thank you!</p><p>
 <ul class="pagination paginationBottom"></ul>
 <p><a href="<%= my_url->query([
   OF => "YAML",
-  pause99_peek_distperms_sub => 1,
-  pause99_peek_distperms_by => param("pause99_peek_distperms_by"),
-  pause_peek_distperms_query => param("pause99_peek_distperms_query")],
+  pause99_peek_dist_perms_sub => 1,
+  pause99_peek_dist_perms_by => param("pause99_peek_dist_perms_by"),
+  pause_peek_dist_perms_query => param("pause99_peek_dist_perms_query")],
 ) %>" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
 </a></p>
