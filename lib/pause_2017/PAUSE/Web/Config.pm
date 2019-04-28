@@ -294,7 +294,6 @@ our %Actions = (
     priv => "user",
     cat => "User/04Permissions/01",
     desc => "Whose uploads of what are being indexed on PAUSE",
-    method => 'POST',
     x_form => {
       pause99_peek_dist_perms_by => {form_type => "select_field"},
       pause99_peek_dist_perms_query => {form_type => "text_field"},
