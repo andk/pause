@@ -55,7 +55,7 @@ sub normalize_package_casing {
     if (@forms == 1) {
       $Logger->log("ensuring canonicalized case of $forms[0]");
       $self->hub->permissions->canonicalize_module_casing($forms[0]);
-      return;
+      next;
     }
 
     $Logger->log([
