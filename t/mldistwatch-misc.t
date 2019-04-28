@@ -463,6 +463,37 @@ subtest "sort of case-conflicted packages is stable" => sub {
   );
 };
 
+subtest "we should not identify version comparison as assignment" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(PERSON => 'Version-Cmp-1.234.tar.gz', {
+    append => [
+      {
+        file => "lib/Version/Cmp/Example.pm",
+        content => <<'EOT',
+use strict;
+use warnings;
+package Version::Cmp::Example;
+1 if $Version::Cmp::Example::VERSION >= 2.0;
+$VERSION = '0.003';
+1;
+EOT
+      }
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'Version::Cmp',           version => '1.234'  },
+    { package => 'Version::Cmp::Example',  version => '0.003'  }
+  ]);
+
+  $result->perm_list_ok({
+    'Version::Cmp'          => { f => 'PERSON' },
+    'Version::Cmp::Example' => { f => 'PERSON' },
+  });
+};
+
 done_testing;
 
 # Local Variables:
