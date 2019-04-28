@@ -286,12 +286,19 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 subtest "sometimes, provides fields are empty" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
-  # Key points:
-  #   1. dist version 0.50
-  #   2. meta provides has...
-  #     a. package Provides::NoFile in a named file with version 1.5
-  #     b. package Provides::NoFile::Nowhere with an undef file entry
-  $pause->upload_author_file(MYSTERIO => 'corpus/Provides-NoFile-0.50.tar.gz');
+  $pause->upload_author_fake(
+    MYSTERIO => 'Provides-NoFile-0.50.tar.gz',
+    {
+      meta_munger => sub {
+        $_[0]{provides} = {
+          "Provides::NoFile" => { file => "lib/Provides/NoFile.pm", version => "1.5" },
+          "Provides::NoFile::Nowhere" => { file => undef },
+        };
+
+        return $_[0];
+      },
+    }
+  );
 
   my $result = $pause->test_reindex;
 
