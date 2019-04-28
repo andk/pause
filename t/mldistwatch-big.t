@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.10.1;
+use v5.36.0;
 use lib 't/lib';
 use lib 't/privatelib'; # Stub PrivatePAUSE
 
@@ -250,12 +250,19 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
 subtest "sometimes, provides fields are empty" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
-  # Key points:
-  #   1. dist version 0.50
-  #   2. meta provides has...
-  #     a. package Provides::NoFile in a named file with version 1.5
-  #     b. package Provides::NoFile::Nowhere with an undef file entry
-  $pause->upload_author_file(MYSTERIO => 'corpus/Provides-NoFile-0.50.tar.gz');
+  $pause->upload_author_fake(
+    MYSTERIO => 'Provides-NoFile-0.50.tar.gz',
+    {
+      meta_munger => sub ($meta, @) {
+        $meta->{provides} = {
+          "Provides::NoFile" => { file => "lib/Provides/NoFile.pm", version => "1.5" },
+          "Provides::NoFile::Nowhere" => { file => undef },
+        };
+
+        return $meta;
+      },
+    }
+  );
 
   my $result = $pause->test_reindex;
 
