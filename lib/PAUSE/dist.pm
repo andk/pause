@@ -869,8 +869,14 @@ sub _index_by_meta {
   my $main_package = $self->_package_governing_permission;
 
   my @packages =  map {[ $_ => $provides->{$_ }]} sort keys %$provides;
-  for (@packages) {
+  PACKAGE: for (@packages) {
     my ( $k, $v ) = @$_;
+
+    unless (ref $v and length $v->{file}) {
+      $Logger->log([ "badly formed provides metadata for package %s: %s", $k, $v ]);
+      next PACKAGE;
+    }
+
     $v->{infile} = "$v->{file}";
     my @stat = stat File::Spec->catfile($self->{DISTROOT}, $v->{file});
     if (@stat) {
