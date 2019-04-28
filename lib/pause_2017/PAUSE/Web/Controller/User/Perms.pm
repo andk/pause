@@ -295,14 +295,14 @@ sub _share_remopr {
       if (@selmods = @{$req->every_param("pause99_share_perms_pr_m")}
          ) {
         local($db->{RaiseError}) = 0;
-        my $sth = $db->prepare("DELETE FROM primeur WHERE userid=? AND package=?");
+        my $sth = $db->prepare("UPDATE primeur SET userid = ? WHERE userid=? AND package=?");
 
         my @results;
         for my $selmod (@selmods) {
           die PAUSE::Web::Exception
               ->new(ERROR => "You do not seem to be maintainer of $selmod")
                   unless exists $all_mods->{$selmod};
-          my $ret = $sth->execute($u->{userid},$selmod);
+          my $ret = $sth->execute('ADOPTME',$u->{userid},$selmod);
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";

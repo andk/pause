@@ -195,7 +195,7 @@ sub remove_dist_primary {
       if (@seldists = @{$req->every_param("pause99_remove_dist_primary_d")}
          ) {
         local($db->{RaiseError}) = 0;
-        my $sth = $db->prepare("DELETE FROM primeur WHERE userid=? AND package=?");
+        my $sth = $db->prepare("UPDATE primeur SET userid=? WHERE userid=? AND package=?");
 
         my @results;
         for my $seldist (@seldists) {
@@ -208,7 +208,7 @@ sub remove_dist_primary {
               WHERE packages.distname=? AND primeur.userid=?},
             undef, $seldist, $u->{userid});
           for my $selmod (@$mods) {
-            my $ret = $sth->execute($u->{userid},$selmod);
+            my $ret = $sth->execute('ADOPTME',$u->{userid},$selmod);
             my $err = "";
             $err = $db->errstr unless defined $ret;
             $ret ||= "";
