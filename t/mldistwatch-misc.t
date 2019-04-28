@@ -371,24 +371,28 @@ subtest "case-changing imports" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
   $pause->add_first_come(FCOME  => 'Foo::Bar');
+  $pause->add_first_come(FCOME  => 'Foo::Bar::Baz');
   $pause->add_comaint(   CMAINT => 'Foo::Bar');
+  $pause->add_comaint(   CMAINT => 'Foo::Bar::Baz');
 
   subtest "first step: initial upload" => sub {
     {
       $pause->upload_author_fake(FCOME => {
         name    => 'Foo-Bar',
         version => '0.001',
-        packages => [ 'Foo::Bar' ],
+        packages => [ qw( Foo::Bar Foo::Bar::Baz ) ],
       });
 
       my $result = $pause->test_reindex;
 
       $result->package_list_ok([
-        { package => 'Foo::Bar', version => '0.001'  }
+        { package => 'Foo::Bar',      version => '0.001'  },
+        { package => 'Foo::Bar::Baz', version => '0.001'  }
       ]);
 
       $result->perm_list_ok({
-        'Foo::Bar' => { f => 'FCOME', c => ['CMAINT'] },
+        'Foo::Bar'      => { f => 'FCOME', c => ['CMAINT'] },
+        'Foo::Bar::Baz' => { f => 'FCOME', c => ['CMAINT'] },
       });
     }
 
@@ -396,17 +400,19 @@ subtest "case-changing imports" => sub {
       $pause->upload_author_fake(FCOME => {
         name    => 'Foo-Bar',
         version => '0.002',
-        packages => [ 'foo::bar' ],
+        packages => [ qw( foo::bar foo::bar::baz ) ],
       });
 
       my $result = $pause->test_reindex;
 
       $result->package_list_ok([
-        { package => 'foo::bar', version => '0.002'  }
+        { package => 'foo::bar',      version => '0.002'  },
+        { package => 'foo::bar::baz', version => '0.002'  }
       ]);
 
       $result->perm_list_ok({
-        'foo::bar' => { f => 'FCOME', c => ['CMAINT'] },
+        'foo::bar'      => { f => 'FCOME', c => ['CMAINT'] },
+        'foo::bar::baz' => { f => 'FCOME', c => ['CMAINT'] },
       });
     }
   };
