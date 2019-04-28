@@ -482,15 +482,21 @@ sub all_pdists {
   my $mgr = $c->app->pause;
   my $db = $mgr->connect;
   my(%all_dists);
+# XXX: This query was too slow under mysql 5.1...
+#    qq{SELECT packages.distname, GROUP_CONCAT(DISTINCT p3.userid ORDER BY p3.userid)
+#       FROM packages JOIN primeur ON primeur.userid = ? AND primeur.package=packages.package
+#       LEFT JOIN packages AS p2 ON packages.distname = p2.distname
+#       LEFT JOIN primeur AS p3 ON p2.package = p3.package GROUP BY packages.distname});
   my $sth2 = $db->prepare(
-    qq{SELECT packages.distname, GROUP_CONCAT(DISTINCT p3.userid ORDER BY p3.userid)
-       FROM packages JOIN primeur ON primeur.userid = ? AND primeur.package=packages.package
-       LEFT JOIN packages AS p2 ON packages.distname = p2.distname
-       LEFT JOIN primeur AS p3 ON p2.package = p3.package GROUP BY packages.distname});
+    qq{SELECT packages.distname
+       FROM packages JOIN primeur ON primeur.userid = ? AND primeur.package=packages.package});
   $sth2->execute($u->{userid});
-  while (my($distname, $owners) = $mgr->fetchrow($sth2, "fetchrow_array")) {
+  while (my($distname) = $mgr->fetchrow($sth2, "fetchrow_array")) {
     next if $distname eq '';
-    $all_dists{$distname} = $owners;
+    my $owners = $db->selectcol_arrayref(
+      qq{SELECT DISTINCT(userid) FROM primeur JOIN packages ON packages.distname = ? AND primeur.package = packages.package},
+      undef, $distname);
+    $all_dists{$distname} = join ',', @$owners;
   }
   $sth2->finish;
   \%all_dists;
