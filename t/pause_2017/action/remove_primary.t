@@ -67,6 +67,15 @@ subtest 'normal case' => sub {
             eq_or_diff(\@results, [
                 'Removed primary maintainership of TESTADMIN from Module::Admin::Bar.',
             ]);
+
+            # really transferred to ADOPTME?
+            $t->get_ok("$path?ACTION=peek_perms", {
+                pause99_peek_perms_query => "ADOPTME",
+                pause99_peek_perms_by => "a",
+                pause99_peek_perms_sub => 1,
+            });
+            my @adoptme_modules = map {$_->all_text} $t->dom->find('td.module')->each;
+            cmp_set(\@adoptme_modules, [qw/Module::Admin::Bar/]) or note explain \@adoptme_modules;
         }
         if ($user eq 'TESTUSER') {
             cmp_bag(\@modules, [qw/
@@ -76,6 +85,15 @@ subtest 'normal case' => sub {
             eq_or_diff(\@results, [
                 'Removed primary maintainership of TESTUSER from Module::User::Bar.',
             ]);
+
+            # really transferred to ADOPTME?
+            $t->get_ok("$path?ACTION=peek_perms", {
+                pause99_peek_perms_query => "ADOPTME",
+                pause99_peek_perms_by => "a",
+                pause99_peek_perms_sub => 1,
+            });
+            my @adoptme_modules = map {$_->all_text} $t->dom->find('td.module')->each;
+            cmp_set(\@adoptme_modules, [qw/Module::User::Bar/]) or note explain \@adoptme_modules;
         }
         # note $t->content;
     }
