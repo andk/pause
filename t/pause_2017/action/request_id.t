@@ -99,6 +99,22 @@ subtest 'post: no email' => sub {
     }
 };
 
+subtest 'post: invalid email' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('public')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        my %form = (
+            %$default,
+            pause99_request_id_email => 'no email',
+        );
+        $t->post_ok("$path?ACTION=request_id", \%form)
+          ->text_is("h3", "Error processing form")
+          ->text_like("ul.errors li", qr/Your email address doesn't look like valid email address./);
+        ok !$t->deliveries, "no deliveries";
+        # note $t->content;
+    }
+};
+
 subtest 'post: rational is too short' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
