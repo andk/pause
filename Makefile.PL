@@ -48,6 +48,7 @@ WriteMakefile(
     Log::Dispatch
     Log::Dispatch::Config
     Log::Dispatchouli
+    Log::Dispatchouli::Global
     LWP::UserAgent
     LWP::Protocol::https
     Digest::MD5

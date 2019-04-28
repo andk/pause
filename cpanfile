@@ -42,6 +42,7 @@ requires 'Plack::Request';
 requires 'Plack::App::Directory::Apaxy';
 requires 'Plack::Middleware::ReverseProxy';
 requires 'Plack::Middleware::ServerStatus::Tiny';
+requires 'Process::Status';
 requires 'Set::Crontab';
 requires 'String::Random';
 requires 'Text::Format';
@@ -70,7 +71,7 @@ on test => sub {
     requires 'File::pushd';
     requires 'HTTP::Status';
     requires 'LWP::UserAgent';
-    requires 'Module::Faker::Dist';
+    requires 'Module::Faker::Dist', '0.21';
     requires 'Mojo::Base';
     requires 'Moose';
     requires 'MooseX::StrictConstructor';
