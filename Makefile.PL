@@ -47,6 +47,7 @@ WriteMakefile(
     JSON::XS
     Log::Dispatch
     Log::Dispatch::Config
+    Log::Dispatchouli::Global
     LWP::UserAgent
     LWP::Protocol::https
     Digest::MD5
@@ -71,6 +72,7 @@ WriteMakefile(
     Plack::Middleware::Auth::Basic
     Plack::Middleware::ReverseProxy
     Plack::Middleware::ServerStatus::Tiny
+    Process::Status
     Set::Crontab
     SQL::Maker
     String::Random
