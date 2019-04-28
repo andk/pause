@@ -420,4 +420,17 @@ sub file_not_updated_ok {
   return $ok;
 }
 
+sub run_shell {
+  my ($self) = @_;
+
+  my $chdir_guard = pushd($self->tmpdir);
+
+  $self->logger->log_fatal([ "\$ENV{SHELL} %s is not runnable", $ENV{SHELL} ])
+    unless $ENV{SHELL} && -x $ENV{SHELL};
+
+  $self->logger->log("running a shell ($ENV{SHELL})");
+  system($ENV{SHELL});
+  Process::Status->assert_ok($ENV{SHELL});
+}
+
 1;

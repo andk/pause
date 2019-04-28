@@ -192,9 +192,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
   }
 
   if ($instruction eq 'shell') {
-    my $chdir_guard = pushd($dir);
-    $pause->logger->log("FRESH: running a shell ($ENV{SHELL})");
-    system($ENV{SHELL});
+    $pause->run_shell;
     next INSTRUCTION;
   }
 
@@ -339,8 +337,7 @@ INSTRUCTION: while (my $instruction = shift @instructions) {
 $pause->test_reindex unless $index_clean;
 
 if ($opt->shell) {
-  my $chdir_guard = pushd($dir);
-  system($ENV{SHELL});
+  $pause->run_shell;
 }
 
 sub pause_rel {
