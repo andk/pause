@@ -34,16 +34,22 @@ status after this move. If you want to get rid of that too,
 please visit <a href="<%= my_url->query(ACTION => "remove_dist_comaint") %>">Give up
 co-maintainership status</a> next.</p>
 
-<p class="notice">If you are not willing to maitain a distribution,
-you are strongly advised to <a href="<%= my_url->query(ACTION => 'move_dist_primary') %>">
-transfer your permissions</a> to a special user called
+<p class="notice">Giving up primary permissions now means that the permissions are
+transferred to a special user called
 <a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_1_adoptme">ADOPTME</a>.
-<i>(In the near future, PAUSE will automatically do this for you.)</i>
 </p>
 
 <p class="notice">You can only give up what you actually own.
 If multiple owners are listed, those owners keep their primary
-maintainership for their part of the distribution.</p>
+maintainership for their part of the distribution. In this case,
+you are strongly advised to
+<a href="<%= my_url->query(ACTION => "move_dist_primary") %>">transfer your primary permissions</a>
+to one of the other owners.</p>
+
+<p class="notice">
+If you have are unsure about what to do, or have any questions,
+please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.org</a>.
+</p>
 
 <p class="notice">If you need finer control (eg. to give up only a small part of
 a distribution for whatever reasons), visit
