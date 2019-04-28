@@ -1,30 +1,30 @@
 -
   - ~
-  - { skip: 0, reason: "No keyword 'no_index' or 'private' in META_CONTENT" }
+  - { skip: 0 }
 
 -
   - { namespace: 'My::' }
-  - { skip: 1, reason: "due to v[My]" }
+  - { skip: 1 }
 -
   - { namespace: [ 'My::' ] }
-  - { skip: 1, reason: "due to ve[My]" }
+  - { skip: 1 }
 -
   - { package: 'My::Package' }
-  - { skip: 1, reason: "due to v[My::Package]" }
+  - { skip: 1 }
 -
   - { package: [ 'My::Package' ] }
-  - { skip: 1, reason: "due to ve[My::Package]" }
+  - { skip: 1 }
 
 -
   - { namespace: 'Your::' }
-  - { skip: 0, reason: "due to v[Your]" }
+  - { skip: 0 }
 -
   - { namespace: ['Your::'] }
-  - { skip: 0, reason: "due to ve[Your]" }
+  - { skip: 0 }
 -
   - { package: 'Your::Package' }
-  - { skip: 0, reason: "due to v[Your::Package]" }
+  - { skip: 0 }
 -
   - { package: ['Your::Package'] }
-  - { skip: 0, reason: "due to ve[Your::Package]" }
+  - { skip: 0 }
 

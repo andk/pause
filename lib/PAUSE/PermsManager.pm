@@ -5,6 +5,8 @@ use warnings;
 package PAUSE::PermsManager;
 
 use Moo;
+
+use PAUSE::Logger '$Logger';
 use PAUSE ();
 
 has dbh_callback => (
@@ -87,9 +89,14 @@ sub plan_package_permission_copy {
       my $err   = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
-      $self->verbose( 1,
-          "Insert into perms package[$dst]mods_userid"
-          . "[$mods_userid]ret[$ret]err[$err]\n" );
+      $Logger->log([
+        "inserted into perms: %s", {
+          package => $dst,
+          userid  => $mods_userid,
+          ret     => $ret,
+          err     => $err,
+        },
+      ]);
     }
 
     return 1;
@@ -112,9 +119,16 @@ sub plan_set_first_come {
     my $ret = $dbh->do("INSERT INTO primeur (package, userid) VALUES (?,?)", undef, $package, $userid);
     my $err = $@;
     $ret //= "";
-    $self->verbose(1,
-                  "Inserted into primeur package[$package]userid[$userid]ret[$ret]".
-                  "err[$err]\n");
+
+    $Logger->log([
+      "inserted into primeur: %s", {
+        package => $package,
+        userid  => $userid,
+        ret     => $ret,
+        err     => $err,
+      },
+    ]);
+
     return 1;
   };
 }
@@ -127,17 +141,25 @@ sub plan_set_comaint {
 
   return sub {
     my $dbh = $self->dbh_callback->();
-    my $log_prefix = shift || "";
-    $log_prefix .= " " if length $log_prefix;
+    my $reason = shift;
+
     # we disable errors so that the insert emulates an upsert
     local ( $dbh->{RaiseError} ) = 0;
     local ( $dbh->{PrintError} ) = 0;
     my $ret = $dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", undef, $package, $userid);
     my $err = $@;
     $ret //= "";
-    $self->verbose(1,
-                  "${log_prefix}Inserted into perms package[$package]userid[$userid]ret[$ret]".
-                  "err[$err]\n");
+
+    $Logger->log([
+      "inserted into perms: %s", {
+        package => $package,
+        userid  => $userid,
+        reason  => $reason,
+        ret     => $ret,
+        err     => $err,
+      },
+    ]);
+
     return 1;
   };
 }
@@ -227,11 +249,6 @@ sub canonicalize_module_casing {
   );
 
   return;
-}
-
-sub verbose {
-    my ($self, $level, @what) = @_;
-    PAUSE->log($self, $level, @what);
 }
 
 1;

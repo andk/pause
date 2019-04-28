@@ -8,6 +8,16 @@ use base qw(Test::FITesque::Fixture);
 use Test::More;
 use Test::Deep;
 
+# This one, we don't expect to be used.  In a weird world, we'd mark it fatal
+# or something so we could say "nothing should log outside of test code."
+# -- rjbs, 2019-04-27
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'TestPAUSE',
+  facility  => undef,
+  to_self   => 0,
+  to_stderr => 0,
+} };
+
 use Test::MockObject;
 use Test::MockObject::Extends;
 use PAUSE::mldistwatch;
@@ -72,13 +82,22 @@ sub dist_mock :Test :Plan(1) {
   $self->dist_mock_ok($method, \@args);
 }
 
+sub test_logger {
+  return PAUSE::Logger->default_logger_class->new({
+    ident     => 'TestPAUSE',
+    facility  => undef,
+    log_pid   => 0,
+    to_self   => 1,
+    to_stderr => $ENV{TEST_VERBOSE} ? 1 : 0,
+  });
+}
+
 my $ppp = 'My::Package';
 sub filter_ppps :Test :Plan(2) {
   my ($self, $no_index, $expect) = @_;
   $self->{pmfile}{META_CONTENT}{no_index} = $no_index;
 
-  my @verbose;
-  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+  local $Logger = test_logger;
 
   my @res = $self->{pmfile}->filter_ppps($ppp);
   cmp_deeply(
@@ -86,40 +105,42 @@ sub filter_ppps :Test :Plan(2) {
     $expect->{skip} ? [] : [$ppp],
     "expected result",
   );
-  if ($expect->{reason}) {
-    my $reason = $expect->{reason};
-    if ($no_index) {
-      $reason = ($expect->{skip})
-              ? "Skipping ppp[$ppp] $reason"
-              : "NOT skipping ppp[$ppp] $reason";
-    }
+
+  if ($expect->{skip}) {
+    my ($type, $value) = %$no_index;
+    $value = $value->[0] if ref $value;
+    $value =~ s/::\z// if $type eq 'namespace';
 
     cmp_deeply(
-        \@verbose,
+        $Logger->events,
         [
-            [1, $reason],
-            [1, "Result of filter_ppps: res[@res]"],
+            superhashof({
+              message => re(qr{no_index rule on $type $value; skipping $ppp}) }),
         ]
     );
   } else {
-    ok(!@verbose, "no verbose() call");
+    ok(! @{ $Logger->events }, "no logging");
     $self->{dist}->clear;
   }
 }
 
-sub simile :Test :Plan(2) {
+sub basename_matches_package :Test :Plan(2) {
   my ($self, $file, $package, $ret) = @_;
 
-  my @verbose;
-  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+  local $Logger = test_logger();
 
   my $label = "$file and $package are "
-    . ($ret ? "" : "not ") . "similes";
-  ok( $self->{pmfile}->simile($file, $package) == $ret, $label );
+    . ($ret ? "" : "not ") . "basename_matches_package";
+  ok( PAUSE->basename_matches_package($file, $package) == $ret, $label );
   $file =~ s/\.pm$//;
+
   cmp_deeply(
-      shift(@verbose),
-      [1, "Result of simile(): file[$file] package[$package] ret[$ret]\n"],
+      $Logger->events,
+      [ superhashof({
+          message =>
+          qq!result of basename_matches_package: {{{"file": "$file", "package": "$package", "ret": $ret}}}!
+        })
+      ]
   );
 }
 
@@ -127,21 +148,20 @@ sub examine_fio :Test :Plan(3) {
   my ($self) = @_;
   my $pmfile = $self->{pmfile};
 
-  my @verbose = ();
-  local $PAUSE::Config->{LOG_CALLBACK} = sub { shift; push @verbose, [@_] };
+  local $Logger = test_logger();
 
   $pmfile->{PMFILE} = $self->fake_dist_dir->file('lib/My/Dist.pm')->stringify;
   $pmfile->examine_fio;
-  shift @verbose for 1..3; # skip over some irrelevant logging
-#  $self->{dist}->next_call_ok(connect => []);
-#  $self->{dist}->next_call_ok(version_from_meta_ok => []);
-#  $self->{dist}->verbose_ok(1, "simile: file[Dist] package[My::Dist] ret[1]\n");
-#  $self->{dist}->verbose_ok(1, "no keyword 'no_index' or 'private' in META_CONTENT");
-#  $self->{dist}->verbose_ok(1, "res[My::Dist]");
+
   cmp_deeply(
-      shift(@verbose),
-      [1, "Will check keys_ppp[My::Dist]\n"],
+    $Logger->events,
+    [
+      ignore(),
+      superhashof({ message => re(qr/will examine packages: \Q{{["My::Dist"]}}\E\z/) }),
+    ],
+    "we see the event log we expected",
   );
+
   cmp_deeply(
     [ @{$PACKAGE}{ qw(PACKAGE DIST FIO PMFILE USERID META_CONTENT) } ],
     [
@@ -157,8 +177,8 @@ sub examine_fio :Test :Plan(3) {
       parsed => 1,
       filemtime => (stat $pmfile->{PMFILE})[9],
       infile    => $pmfile->{PMFILE},
-      simile    => $pmfile->{PMFILE},
       pause_reg => $self->{dist}{TIME},
+      basename_matches_package => $pmfile->{PMFILE},
     },
     "correct package PP",
   );
@@ -185,8 +205,8 @@ sub packages_per_pmfile :Test :Plan(3) {
              { version => $version,
                filemtime => 42,
                infile => $pmfile,
-               simile => $pmfile,
                parsed => 1,
+               basename_matches_package => $pmfile,
              },
              "correct version in packages_per_pmfile: $version",
             );

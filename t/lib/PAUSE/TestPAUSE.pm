@@ -14,6 +14,16 @@ use File::Temp ();
 use File::Which;
 use Path::Class;
 
+# This one, we don't expect to be used.  In a weird world, we'd mark it fatal
+# or something so we could say "nothing should log outside of test code."
+# -- rjbs, 2019-04-27
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'TestPAUSE',
+  facility  => undef,
+  to_self   => 0,
+  to_stderr => 1,
+} };
+
 use PAUSE;
 use PAUSE::mldistwatch;
 use PAUSE::TestPAUSE::Result;
@@ -37,6 +47,23 @@ sub init_new {
   }
   return $self;
 }
+
+has logger => (
+  is    => 'ro',
+  lazy  => 1,
+  default => sub {
+    PAUSE::Logger->default_logger_class->new({
+      ident     => 'TestPAUSE',
+      facility  => undef,
+      to_self   => 1,
+      to_stderr => $ENV{TEST_VERBOSE} ? 1 : 0,
+
+      to_file   => 1,
+      log_path  => $_[0]->tmpdir,
+      log_file  => "pause.log",
+    });
+  }
+);
 
 has _tmpdir_obj => (
   is       => 'ro',
@@ -182,12 +209,10 @@ sub upload_author_fake {
   my $cpan_root   = File::Spec->catdir($self->tmpdir, 'cpan');
   my $author_root = File::Spec->catdir($cpan_root, qw(authors id));
 
-  $dist->make_archive({
+  return $dist->make_archive({
     dir           => $author_root,
     author_prefix => 1,
   });
-
-  return;
 }
 
 sub upload_author_file {
@@ -205,6 +230,8 @@ sub upload_author_file {
 
   make_path( $author_dir );
   fcopy($file, $author_dir);
+
+  return File::Spec->catfile($author_dir, $file);
 }
 
 has pause_config_overrides => (
@@ -252,12 +279,6 @@ sub _build_pause_config_overrides {
     ML_MIN_INDEX_LINES => 0,
     MOD_DATA_SOURCE_NAME => "$dsnbase/mod.sqlite",
     PID_DIR              => $pid_dir,
-
-    LOG_CALLBACK       => $ENV{TEST_VERBOSE}
-                        ? sub { my (undef, undef, @what) = @_;
-                                push @what, "\n" unless $what[-1] =~ m{\n$};
-                                print STDERR @what;  }
-                        : sub { },
   };
 
   return $overrides;
@@ -272,11 +293,14 @@ sub with_our_config {
     %{ $self->pause_config_overrides },
   };
 
+  local $Logger = $self->logger;
+
   $code->($self);
 }
 
 sub test_reindex {
-  my ($self, $code) = @_;
+  my ($self, $arg) = @_;
+  $arg //= {};
 
   $self->with_our_config(sub {
     my $self = shift;
@@ -308,9 +332,18 @@ sub test_reindex {
 
     die "stray mail in test mail trap before reindex" if @stray_mail;
 
-    PAUSE::mldistwatch->new({ sleep => 0 })->reindex;
+    if ($arg->{pick}) {
+      my $dbh = PAUSE::dbh();
+      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
+        for @{ $arg->{pick} };
+    }
 
-    $code->($self->tmpdir) if $code;
+    PAUSE::mldistwatch->new({
+      sleep => 0,
+      ($arg->{pick} ? (pick => $arg->{pick}) : ()),
+    })->reindex;
+
+    $arg->{after}->($self->tmpdir) if $arg->{after};
 
     my @deliveries = Email::Sender::Simple->default_transport->deliveries;
 

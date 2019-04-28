@@ -41,7 +41,7 @@ sub run {
           [ $run_class, $data->{args} || {} ],
           map { [ $method, @$_ ] } @{$data->{tests}}
         }
-      } 
+      }
       map {
         my $method = basename($_, '.yaml');
         map {

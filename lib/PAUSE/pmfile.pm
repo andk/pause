@@ -3,6 +3,9 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
+
+use PAUSE::Logger '$Logger';
+
 use PAUSE ();
 
 BEGIN { die "Version of version.pm too low ($version::VERSION), does not define STRICT"
@@ -18,33 +21,10 @@ sub hub  { $_[0]{DIO}{HUB} }
 
 sub DESTROY {}
 
-sub verbose {
-    my($self,$level,@what) = @_;
-    PAUSE->log($self, $level, @what);
-}
-
 # package PAUSE::pmfile;
 sub new {
     my($me) = shift;
     bless { @_ }, ref($me) || $me;
-}
-
-# package PAUSE::pmfile;
-sub simile {
-    my($self,$file,$package) = @_;
-    # MakeMaker gives them the chance to have the file Simple.pm in
-    # this directory but have the package HTML::Simple in it.
-    # Afaik, they wouldn't be able to do so with deeper nested packages
-    $file =~ s|.*/||;
-    $file =~ s|\.pm(?:\.PL)?||;
-    my $ret = $package =~ m/\b\Q$file\E$/;
-    $ret ||= 0;
-    unless ($ret) {
-        # Apache::mod_perl_guide stuffs it into Version.pm
-        $ret = 1 if lc $file eq 'version';
-    }
-    $self->verbose(1,"Result of simile(): file[$file] package[$package] ret[$ret]\n");
-    $ret;
 }
 
 # package PAUSE::pmfile;
@@ -95,31 +75,31 @@ sub filter_ppps {
                         for my $ve (@$v) {
                             $ve =~ s|::$||;
                             if ($ppp =~ /^$ve$rest/){
-                                $self->verbose(1,"Skipping ppp[$ppp] due to ve[$ve]");
+                                $Logger->log("no_index rule on $k $ve; skipping $ppp");
                                 next MANI;
                             } else {
-                                $self->verbose(1,"NOT skipping ppp[$ppp] due to ve[$ve]");
+                                $Logger->log_debug("no_index rule on $k $ve; NOT skipping $ppp");
                             }
                         }
                     } else {
                         $v =~ s|::$||;
                         if ($ppp =~ /^$v$rest/){
-                            $self->verbose(1,"Skipping ppp[$ppp] due to v[$v]");
+                            $Logger->log("no_index rule on $k $v; skipping $ppp");
                             next MANI;
                         } else {
-                            $self->verbose(1,"NOT skipping ppp[$ppp] due to v[$v]");
+                            $Logger->log_debug("no_index rule on $k $v; NOT skipping $ppp");
                         }
                     }
                 }
             } else {
-                $self->verbose(1,"No keyword 'no_index' or 'private' in META_CONTENT");
+                $Logger->log_debug("no no_index or private in META_CONTENT");
             }
         } else {
-            # $self->verbose(1,"no META_CONTENT"); # too noisy
+            # $Logger->log("no META_CONTENT"); # too noisy
         }
         push @res, $ppp;
     }
-    $self->verbose(1,"Result of filter_ppps: res[@res]");
+
     @res;
 }
 
@@ -127,9 +107,12 @@ sub filter_ppps {
 sub examine_fio {
     # fio: file object
     my $self = shift;
+
     my $dist = $self->{DIO}{DIST};
     my $dbh = $self->connect;
     my $pmfile = $self->{PMFILE};
+
+    local $Logger = $Logger->proxy({ proxy_prefix => "$pmfile: " });
 
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
@@ -137,7 +120,8 @@ sub examine_fio {
     unless ($self->version_from_meta_ok) {
         my $version;
         unless (eval { $version = $self->parse_version; 1 }) {
-          $self->verbose(1, "error with version in $pmfile: $@");
+          my $error = $@;
+          $Logger->log([ "error with version: %s", $error ]);
           return;
         }
 
@@ -157,7 +141,7 @@ sub examine_fio {
             # We don't need to account for single- versus dual-life, because
             # the check for dual-life packages still applies elsewhere.
             # -- rjbs, 2015-04-18
-            $self->verbose(1, "found dev version $self->{VERSION} in $pmfile; skipping the whole file");
+            $Logger->log("skipping file because of dev version: $self->{VERSION}");
 
             delete $self->{DIO};    # circular reference
             return;
@@ -166,7 +150,8 @@ sub examine_fio {
 
     my($ppp) = $self->packages_per_pmfile;
     my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
-    $self->verbose(1,"Will check keys_ppp[@keys_ppp]\n");
+
+    $Logger->log([ "will examine packages: %s", \@keys_ppp ]);
 
     #
     # Immediately after each package (pmfile) examined contact
@@ -273,8 +258,8 @@ sub packages_per_pmfile {
             #restriction
             $ppp->{$pkg}{parsed}++;
             $ppp->{$pkg}{infile} = $pmfile;
-            if ($self->simile($pmfile,$pkg)) {
-                $ppp->{$pkg}{simile} = $pmfile;
+            if (PAUSE->basename_matches_package($pmfile,$pkg)) {
+                $ppp->{$pkg}{basename_matches_package} = $pmfile;
                 if ($self->version_from_meta_ok) {
                     my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
@@ -285,7 +270,8 @@ sub packages_per_pmfile {
                             }
 
                             unless (eval { $version = $self->normalize_version($v); 1 }) {
-                              $self->verbose(1, "error with version in $pmfile: $@");
+                              my $error = $@;
+                              $Logger->log([ "error with version: $error" ]);
                               next;
                             }
                             $ppp->{$pkg}{version} = $version;
@@ -308,7 +294,7 @@ sub packages_per_pmfile {
                                     ($version||"")
                                         gt $ppp->{$pkg}{version};
                 }
-            } else {        # not simile
+            } else {        # not basename_matches_package
                 #### it comes later, it would be nonsense
                 #### to set to "undef". MM_Unix gives us
                 #### the best we can reasonably consider
@@ -320,7 +306,7 @@ sub packages_per_pmfile {
             $ppp->{$pkg}{filemtime} = $filemtime;
             $ppp->{$pkg}{pause_reg} = time;
         } else {
-            # $self->verbose(2,"no pkg found");
+            # $Logger->log_debug("no pkg found");
         }
     }
 
@@ -525,7 +511,7 @@ sub normalize_version {
     $v = "undef" unless defined $v;
     my $dv = Dumpvalue->new;
     my $sdv = $dv->stringify($v,1); # second argument prevents ticks
-    $self->verbose(1,"Result of normalize_version: sdv[$sdv]\n");
+    $Logger->log("result of normalize_version: $sdv");
 
     return $v if $v eq "undef";
     return $v if $v =~ /^\{.*\}$/; # JSON object
