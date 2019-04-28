@@ -128,7 +128,6 @@ our %Actions = (
     priv => "user",
     cat => "User/01Files/02show",
     desc => "find . -ls resemblance",
-    method => 'POST',
   },
   edit_uris => {
     x_mojo_to => "user#edit_uris",
@@ -136,6 +135,7 @@ our %Actions = (
     priv => "user",
     cat => "User/01Files/03rep",
     desc => "When an upload you requested hangs for some reason, you can go here and edit the file to be uploaded.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       pause99_edit_uris_3 => {form_type => "select_field"}, # distributions
@@ -398,6 +398,7 @@ our %Actions = (
     priv => "user",
     cat => "User/05Utils/02",
     desc => "Tell the indexer to index a file again (e.g. after a change in the perms table)",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       SUBMIT_pause99_reindex_delete => {form_type => "submit_button"},
@@ -410,6 +411,7 @@ our %Actions = (
     priv => "user",
     cat => "User/05Utils/02",
     desc => "Overrule the record of the current version number of a module that the indexer uses and set it to 'undef'",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       SUBMIT_pause99_reset_version_forget => {form_type => "submit_button"},
@@ -470,6 +472,7 @@ our %Actions = (
     priv => "mlrepr",
     cat => "09root/02",
     desc => "Representatives of mailing lists have their special menu here.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "select_field"},
       ACTIONREQ => {form_type => "select_field"},
@@ -490,6 +493,7 @@ our %Actions = (
     priv => "admin",
     cat => "01usr/01add",
     desc => "Admins can add users or mailinglists.",
+    method => 'POST',
     x_form => {
       SUBMIT_pause99_add_user_Soundex => {form_type => "submit_button"},
       SUBMIT_pause99_add_user_Metaphone => {form_type => "submit_button"},
@@ -508,6 +512,7 @@ our %Actions = (
     priv => "admin",
     cat => "01usr/01rej",
     desc => "show/reject open registration requests",
+    method => 'POST',
   },
   edit_ml => {
     x_mojo_to => "admin#edit_ml",
@@ -515,6 +520,7 @@ our %Actions = (
     priv => "admin",
     cat => "01usr/02",
     desc => "Admins and mailing list representatives can change the name, address and description of a mailing list.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       pause99_edit_ml_3 => {form_type => "select_field"}, # mailing lists
@@ -538,6 +544,7 @@ our %Actions = (
     priv => "admin",
     cat => "01usr/03",
     desc => "Admins can access PAUSE as-if they were somebody else. Here they select a user/action pair.",
+    method => 'POST',
     x_form => {
       HIDDENNAME => {form_type => "select_field"},
       ACTIONREQ => {form_type => "select_field"},
