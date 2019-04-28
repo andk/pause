@@ -16,6 +16,10 @@ sub default_logger_class { 'PAUSE::Logger::_Logger' }
 sub default_logger_args {
   return {
     ident     => "PAUSE",
+
+    # to turn on syslogging...
+    # facility => 'daemon', # where "daemon" is whatever syslog facility you want
+
     to_stderr => $_[0]->default_logger_class->env_value('STDERR') // 1,
     to_self   => $_[0]->default_logger_class->env_value('TO_SELF') ? 1 : 0,
   }
