@@ -154,7 +154,13 @@ sub reindex {
       }
       # delete from distmtimes where distmtimes.dist like '%SREZIC%Tk-DateE%';
       my $ret = $sth->execute("$userhome/$f");
-      $blurb .= "\$CPAN/authors/id/$userhome/$f\n";
+      if ($ret > 0) {
+        $blurb .= "\$CPAN/authors/id/$userhome/$f\n";
+      } else {
+        $blurb .= "WARNING: $userhome/$f has never been indexed.\n"
+               .  "(Maybe it's not a stable release and will not get (re)indexed.)\n";
+        next;
+      }
     }
   }
   if ($blurb) {
