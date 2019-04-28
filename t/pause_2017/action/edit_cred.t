@@ -47,4 +47,19 @@ subtest 'post_with_token: basic' => sub {
     }
 };
 
+subtest 'post_with_token: edit with CENSORED email' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new(user => $user);
+
+        Test::PAUSE::Web->setup;
+        $t->mod_db->update('users', { email => 'CENSORED' }, { userid => $user });
+        my %form = (%$default, pause99_edit_cred_email => 'CENSORED');
+        $t->post_with_token_ok("$path?ACTION=edit_cred", \%form);
+        my @deliveries = $t->deliveries;
+        like $deliveries[0]->as_string => qr/\[CENSORED\]/;
+        # note $t->content;
+    }
+};
+
 done_testing;
