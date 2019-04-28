@@ -339,8 +339,10 @@ sub packages_per_pmfile {
               return $ver if version::is_lax($ver);
             }
 
-            # next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
-            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+            # We only care about lines that appear to be assignments to, but
+            # not comparisons to, VERSION.
+            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
+
             my $current_parsed_line = $_;
             my $eval = qq{
           package ExtUtils::MakeMaker::_version;
