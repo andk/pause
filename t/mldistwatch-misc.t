@@ -304,6 +304,36 @@ subtest "check various forms of version" => sub {
   );
 };
 
+subtest "version assigned to a blob as a ref" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(LUNATIC => 'Globby-Version-1.234.tar.gz', {
+    append => [
+      {
+        file => "lib/Globby/Version/Example.pm",
+        content => <<'EOT',
+use strict;
+use warnings;
+package Globby::Version::Example;
+*VERSION = \'0.003';
+1;
+EOT
+      }
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'Globby::Version',           version => '1.234'  },
+    { package => 'Globby::Version::Example',  version => '0.003'  }
+  ]);
+
+  $result->perm_list_ok({
+    'Globby::Version' => { f => 'LUNATIC' },
+    'Globby::Version::Example' => { f => 'LUNATIC' },
+  });
+};
+
 subtest "check overlong versions" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/long-version/authors');
