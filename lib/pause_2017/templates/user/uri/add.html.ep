@@ -70,7 +70,7 @@ only) within a few hours after uploading and will put the
 topmost README file as, say, Foo-Bar-3.14.readme into your
 directory. <b>Hint:</b> if you're looking for an even more
 convenient way to upload files than this form, you can try the
-<a href="http://search.cpan.org/dist/cpan-upload-http/">cpan-upload-http</a> script.
+<a href="https://metacpan.org/release/CPAN-Uploader">cpan-upload</a> script.
 </p>
 
 <h3>Target Directory</h3><p> If you want to load the
