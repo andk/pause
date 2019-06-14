@@ -49,6 +49,18 @@ implemented it:
 
         f       downgrade m=>f or upgrade c=>f
 
+head2 EXAMPLES
+
+ AI::nnflex,CCOLBOURN,f,delete
+ AI::NNFlex,CCOLBOURN,m,f
+ Tk::Pod,TKML,m,c
+ Tk::Statusbar,ZABEL,m,delete
+ Time::Format,ROODE,c,f
+ JSON::Assert,SGREEN,f,add
+ Net::MAC::Vendor,ETHER,f,add
+ Sane,PABLROD,f,delete
+ Algorithm::LCS,ADOPTME,f,add
+
 =cut
 
 use FindBin;
@@ -201,4 +213,6 @@ while (<DATA>) {
 # End:
 
 __END__
-urpmi,TVIGNAUD,f,add
+Dist::Surveyor::DB_File,ADOPTME,f,add
+Dist::Surveyor::Inquiry,ADOPTME,f,add
+Dist::Surveyor::MakeCpan,ADOPTME,f,add
