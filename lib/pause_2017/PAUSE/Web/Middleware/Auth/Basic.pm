@@ -70,6 +70,7 @@ sub authenticate {
       return $res;
     }
   }
+  warn "WATCH: uri[$uri]args[$args]";
   if ($args) {
     my $logout;
     if ( my $logout = $req->query_parameters->get('logout') ) {
@@ -97,10 +98,13 @@ sub authenticate {
     }
   }
 
+  warn "WATCH: uri[$uri]args[$args]";
   my $auth = $env->{HTTP_AUTHORIZATION} or return HTTP_UNAUTHORIZED;
   return HTTP_UNAUTHORIZED unless $auth =~ /^Basic (.*)$/i; #decline if not Basic
-  my($user_sent, $sent_pw) = split /:/, (MIME::Base64::decode($1) || ":"), 2;
+  my $basic = $1;
+  my($user_sent, $sent_pw) = split /:/, (MIME::Base64::decode($basic) || ":"), 2;
 
+  warn "WATCH: uri[$uri]args[$args]";
   my $attr = {
     data_source => $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
     username    => $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
