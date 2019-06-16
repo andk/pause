@@ -30,6 +30,10 @@ sub call {
     );
   }
 
+  Log::Dispatch::Config->instance->log(
+    level => 'debug',
+    message => "res $res",
+  );
   return $res->finalize if ref $res;
   return $self->unauthorized($env) unless $res == HTTP_OK;
   return $self->app->($env);
