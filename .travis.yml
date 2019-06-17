@@ -1,6 +1,6 @@
 language: perl
 perl:
-  - "5.14"
+  - "5.16"
 
 sudo: required
 
