@@ -7,6 +7,7 @@ use PAUSE ();
 use PAUSE::Crypt;
 use Plack::Request;
 use DBI;
+use Carp ();
 
 has "context";
 
@@ -30,9 +31,10 @@ sub call {
     );
   }
 
+  my $stack = Carp::longmess("res $res");
   Log::Dispatch::Config->instance->log(
     level => 'debug',
-    message => "res $res",
+    message => "stack=>$stack",
   );
   return $res->finalize if ref $res;
   return $self->unauthorized($env) unless $res == HTTP_OK;
