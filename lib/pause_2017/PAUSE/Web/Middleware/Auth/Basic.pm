@@ -23,6 +23,7 @@ sub call {
     );
   };
 
+  warn "before authentication";
   my $res = eval { $self->authenticate($env) };
   if ($@) {
     Log::Dispatch::Config->instance->log(
@@ -31,11 +32,6 @@ sub call {
     );
   }
 
-  my $stack = Carp::longmess("res $res");
-  Log::Dispatch::Config->instance->log(
-    level => 'debug',
-    message => "stack=>$stack",
-  );
   return $res->finalize if ref $res;
   return $self->unauthorized($env) unless $res == HTTP_OK;
   return $self->app->($env);
