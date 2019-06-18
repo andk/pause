@@ -139,12 +139,14 @@ sub authenticate {
   my $sth;
   unless ($sth = $dbh->prepare($statement)) {
     Log::Dispatch::Config->instance->log(level => 'error', message => "can not prepare statement: $DBI::errstr". $req->path);
+    $sth->finish;
     $dbh->disconnect;
     return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
   }
   for my $user (@try_user){
     unless ($sth->execute($user)) {
       Log::Dispatch::Config->instance->log(level => 'error', message => " can not execute statement: $DBI::errstr" . $req->path);
+      $sth->finish;
       $dbh->disconnect;
       return $req->new_response(HTTP_INTERNAL_SERVER_ERROR);
     }
