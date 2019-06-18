@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/lib/", "$FindBin::Bin/lib/pause_2017", "$FindBin::Bin/../
 use Plack::Builder;
 use Plack::App::Directory::Apaxy;
 use Path::Tiny;
+Log::Dispatch::Config->configure("$FindBin::Bin/etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
 
 my $AppRoot = path(__FILE__)->parent->realpath;
 $ENV{MOJO_REVERSE_PROXY} = 1;
@@ -18,9 +19,6 @@ use PAUSE::Web;
 use PAUSE::Web::App::Index;
 use PAUSE::Web::App::Disabled;
 
-my $context = PAUSE::Web::Context->new(root => $AppRoot);
-$context->init;
-
 use BSD::Resource ();
 #BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CPU(),
 #                         60*10, 60*10);
@@ -28,6 +26,11 @@ use BSD::Resource ();
 #                         40*1024*1024, 40*1024*1024);
 BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CORE(),
                          40*1024*1024, 40*1024*1024);
+
+my $builder = eval {
+
+my $context = PAUSE::Web::Context->new(root => $AppRoot);
+$context->init;
 
 my $pause_app = PAUSE::Web->new(pause => $context);
 my $index_app = PAUSE::Web::App::Index->new->to_app;
@@ -64,3 +67,14 @@ builder {
     mount '/' => builder { $index_app };
   }
 };
+
+};
+
+if ($@) {
+  Log::Dispatch::Config->instance->log(
+    level => 'error',
+    message => "$@",
+  );
+}
+
+$builder;
