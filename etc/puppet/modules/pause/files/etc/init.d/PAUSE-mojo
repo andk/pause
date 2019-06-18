@@ -32,7 +32,7 @@ exit My::Daemon::Control->new({
     program     => $starman,
     program_args => [
         $psgi,
-        '--workers',    15,
+        '--workers',    5,
         '--listen',     ":81",
         '--user',       'apache',
         '--group',      'apache',
