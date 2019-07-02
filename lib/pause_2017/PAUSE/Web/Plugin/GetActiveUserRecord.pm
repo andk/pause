@@ -162,6 +162,15 @@ sub _get {
 
       $pause->{User} = $mgr->fetchrow($sth1, "fetchrow_hashref");
       $sth1->finish;
+
+      my $dbh2 = $mgr->authen_connect;
+      my $sth2 = $dbh2->prepare("SELECT secretemail
+                                 FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
+                                 WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
+      $sth2->execute($pause->{User}{userid});
+      my $row = $mgr->fetchrow($sth2, "fetchrow_hashref");
+      $pause->{User}{secretemail} = $row->{secretemail};
+      $sth2->finish;
     }
     %$user = (%{$pause->{User}||{}}, %{$pause->{UserSecrets}||{}});
   }
