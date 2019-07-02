@@ -84,6 +84,26 @@ subtest 'post_with_token: basic' => sub {
     }
 };
 
+subtest 'post_with_token: user with CENSORED email' => sub {
+    Test::PAUSE::Web->setup;
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        $user = "TESTCNSRD" if $user eq "TESTUSER";
+
+        my %form = %$default;
+        my $t = Test::PAUSE::Web->new(user => $user);
+        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
+          ->text_like("p.password_stored", qr/New password stored/);
+        my @deliveries = $t->deliveries;
+        is @deliveries => 1, "one delivery for admin";
+        my $email = $deliveries[0]->as_string;
+        unlike $email => qr/CENSORED/;
+        like $email => qr/testcnsrd\@localhost/;
+        note $email;
+        # note $t->content;
+    }
+};
+
 subtest 'post_with_token: public without ABRA' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('public')) {

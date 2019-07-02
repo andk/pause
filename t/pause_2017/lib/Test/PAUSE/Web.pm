@@ -113,7 +113,7 @@ sub reset_fixture {
   # test fixture
   { # authen_pause.usertable
     $self->authen_dbh->do(qq{TRUNCATE usertable});
-    for my $user ("TESTUSER", "TESTUSER2", "TESTUSER3", "TESTUSER4", "TESTADMIN") {
+    for my $user ("TESTUSER", "TESTUSER2", "TESTUSER3", "TESTUSER4", "TESTADMIN", "TESTCNSRD") {
       $self->authen_db->insert('usertable', {
         user => $user,
         password => PAUSE::Crypt::hash_password("test"),
@@ -129,11 +129,11 @@ sub reset_fixture {
   }
   { # mod.users
     $self->mod_dbh->do(qq{TRUNCATE users});
-    for my $user ("TESTUSER", "TESTUSER2", "TESTUSER3", "TESTUSER4", "TESTADMIN") {
+    for my $user ("TESTUSER", "TESTUSER2", "TESTUSER3", "TESTUSER4", "TESTADMIN", "TESTCNSRD") {
       $self->mod_db->insert('users', {
         userid => $user,
         fullname => "$user Name",
-        email => lc($user) . '@localhost',
+        email => ($user eq "TESTCNSRD" ? "CENSORED" : (lc($user) . '@localhost')),
         cpan_mail_alias => 'secr',
         isa_list => '',
       });
