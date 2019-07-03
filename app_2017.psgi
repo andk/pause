@@ -7,9 +7,9 @@ use lib "$FindBin::Bin/lib/", "$FindBin::Bin/lib/pause_2017", "$FindBin::Bin/../
 use Plack::Builder;
 use Plack::App::Directory::Apaxy;
 use Path::Tiny;
-Log::Dispatch::Config->configure("$FindBin::Bin/etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
-
 my $AppRoot = path(__FILE__)->parent->realpath;
+Log::Dispatch::Config->configure("$AppRoot/etc/plack_log.conf.".($ENV{PLACK_ENV} // 'development'));
+
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $ENV{MOJO_HOME} = $AppRoot;
 
