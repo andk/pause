@@ -405,6 +405,14 @@ sub whois {
         defined && /[^\000-\177]/ && Encode::_utf8_on($_);
       }
     }
+
+    # We should not expose the detail of deleted (or nologin) accounts
+    # except for userid (0).
+    if ($row[7] eq 'delete' or $row[7] eq 'nologin') {
+      $row[1] = 'Deleted' if $row[7] eq 'delete';
+      @row[2..6] = ();
+    }
+
     my $address;
 
     #0=userid, 1=fullname, 2=email, 3=isa_list, 4=homepage, 5=asciiname
@@ -446,7 +454,7 @@ sub whois {
       # address[2]: mailto
       # $address[2] = qq{<a href="mailto:$row[2]">&lt;$row[2]&gt;</a>};
       # now without mailto
-      $address[2] = qq{&lt;} . escapeHTML($row[2]) . qq{&gt;};
+      $address[2] = qq{&lt;} . escapeHTML($row[2]) . qq{&gt;} if $row[2];
       print FH qq{<a id="$name" name="$name"></a>}, join(" ", @address), "\n";
 
       # and now for XML
@@ -589,7 +597,7 @@ sub mailrc {
 
   my @list;
   my $stu = $Dbh->prepare(
-    "SELECT userid, fullname, email, asciiname
+    "SELECT userid, fullname, email, asciiname, ustatus
                              FROM users
                              WHERE isa_list=''
                              ORDER BY userid"
@@ -603,6 +611,14 @@ sub mailrc {
         defined && /[^\000-\177]/ && Encode::_utf8_on($_);
       }
     }
+
+    # We should not expose the detail of deleted (or nologin) account
+    # (or maybe we can just remove them from mailrc?)
+    if ($r[4] eq 'delete' or $r[4] eq 'nologin') {
+      $r[1] = 'Deleted' if $r[4] eq 'delete';
+      @r[2..3] = ();
+    }
+
     $r[2] ||= sprintf q{%s@cpan.org}, lc($r[0]);
 
     # replace fullname with asciiname if we have one
@@ -669,7 +685,7 @@ sub authors {
   }
 
   my $authors = $Dbh->selectall_arrayref(
-    "SELECT userid, email, fullname, homepage
+    "SELECT userid, email, fullname, homepage, ustatus
                              FROM users
                              ORDER BY userid
     /*UNION
@@ -691,6 +707,14 @@ sub authors {
       s/\t/ /g for @$author[0,1,2];
       s/\t/%09/g for $author->[3];
     }
+
+    # We should not expose the detail of deleted (or nologin) accounts
+    my $ustatus = pop @$author;
+    if ($ustatus eq 'delete' or $ustatus eq 'nologin') {
+      $author->[1] = $author->[3] = '';
+      $author->[2] = 'Deleted' if $ustatus eq 'delete';
+    }
+
     $author->[1] ||= sprintf q{%s@cpan.org}, lc($author->[0]);
 
     $list .= (join qq{\t}, @$author) . "\n";
