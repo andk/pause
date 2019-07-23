@@ -4,7 +4,7 @@
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 <p>Note: resetting versions is a major inconvenience for
 module users. This page will probably be withdrawn from PAUSE if
-the perl community does not want to allow falling version numbers
+the perl community does not want to allow decreasing version numbers
 on the CPAN. For now: use with care. Thanks.</p>
 
 <p>Below you see the packages and version numbers that
