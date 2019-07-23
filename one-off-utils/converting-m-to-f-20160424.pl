@@ -213,6 +213,4 @@ while (<DATA>) {
 # End:
 
 __END__
-Dist::Surveyor::DB_File,ADOPTME,f,add
-Dist::Surveyor::Inquiry,ADOPTME,f,add
-Dist::Surveyor::MakeCpan,ADOPTME,f,add
+Plack::Middleware::LogErrors::LogHandle,ADOPTME,f,delete
