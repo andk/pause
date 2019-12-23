@@ -185,7 +185,7 @@ of/inside Perl itself. It does not stand for "development" or
 
 Sys is a complete disaster. Adding Sys:: in front of something is
 completely redundant. We are sorry it ever got used. Yes, we know
-there's Sys::Syslog in the core, and we are we ashamed because of it.
+there's Sys::Syslog in the core, and we are ashamed because of it.
 
 Text is most often very low in information, too. If your module is
 working with a natural language or languages, use "Lingua::". 
@@ -195,7 +195,7 @@ for example.  If you are thinking of using "Text" because your data is
 
 =head1 Unicode and unicore are off-limits
 
-Unicore/unicore is reserved for the use of the Perl core for Unicode
+Unicode/unicore is reserved for the use of the Perl core for Unicode
 things.
 
 =head2 Avoid API, Interface, and the like
