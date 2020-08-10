@@ -149,8 +149,9 @@ Please don't abuse this.
   they are archives of everything that has ever been released to CPAN.
   Deleting a file from your author directory will not result in it
   being removed from BackPAN sites.
-* If a portion of your upload is offensive, illegal,
-  or infringes on someone else's legal rights,
+* If a portion of your upload is offensive, is illegal,
+  infringes on someone else's legal rights, poses an unwarranted security
+  risk, or is otherwise deemed damaging to the CPAN ecosystem,
   the PAUSE admins may delete a file from your author directory.
   Where appropriate,
   the PAUSE admins may try to remove it from BackPAN sites as well
@@ -217,8 +218,9 @@ in your upload will be considered for inclusion in the CPAN Index.
   PAUSE sends you an email which lets you know what packages were found,
   and which of them were indexed.
 * Indexing permissions may be revoked (or transferred)
-  if the name of the package is offensive, illegal,
-  or infringes on someone's or some company's rights.
+  if the package or package name is offensive, is illegal,
+  infringes on someone else's legal rights, poses an unwarranted security
+  risk, or is otherwise deemed damaging to the CPAN ecosystem.
 * Indexing permissions aren't the only factor that controls
   whether a package will be added to the index.
   The other factors are listed in §3.5. below.
