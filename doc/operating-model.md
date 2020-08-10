@@ -1,7 +1,7 @@
 ﻿
 # The PAUSE Operating Model
 
-## Version 2
+## Version 3
 
 
 This document defines the operating model under which
