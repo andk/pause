@@ -1,7 +1,7 @@
 ﻿
 # The PAUSE Operating Model
 
-## Version 2
+## Version 4
 
 
 This document defines the operating model under which
@@ -149,8 +149,9 @@ Please don't abuse this.
   they are archives of everything that has ever been released to CPAN.
   Deleting a file from your author directory will not result in it
   being removed from BackPAN sites.
-* If a portion of your upload is offensive, illegal,
-  or infringes on someone else's legal rights,
+* If a portion of your upload is offensive, is illegal,
+  infringes on someone else's legal rights, or poses
+  an unwarranted security risk,
   the PAUSE admins may delete a file from your author directory.
   Where appropriate,
   the PAUSE admins may try to remove it from BackPAN sites as well
@@ -219,6 +220,8 @@ in your upload will be considered for inclusion in the CPAN Index.
 * Indexing permissions may be revoked (or transferred)
   if the name of the package is offensive, illegal,
   or infringes on someone's or some company's rights.
+* Indexing permissions may be revoked if portions of your upload pose
+  an unwarranted security risk.
 * Indexing permissions aren't the only factor that controls
   whether a package will be added to the index.
   The other factors are listed in §3.5. below.
@@ -1112,3 +1115,29 @@ but not radically changed.
 
 Changes from one version to the next will be recorded here.
 
+### Version 1
+
+    commit 9ddb13ba2030c1eea4da0ee9249c0d002256e6eb
+    Author: Neil Bowers <neil@bowers.com>
+    Date:   Sun Oct 22 21:33:19 2017 +0100
+
+    First public version of operating model document
+
+### Version 2
+
+    commit baa9d0ba58fc8fb2302842d94dbe04403c116d65
+    Author: Andreas Koenig <andk@cpan.org>
+    Date:   Thu Oct 26 22:14:12 2017 +0200
+
+    Replace NOTRANSFER with NOXFER
+
+    - NOTRANSFER hit a limit on the length of CPAN usernames
+    - meanwhile account NOXFER is created
+
+### Version 3
+
+Withdrawn
+
+### Version 4
+
+This version
