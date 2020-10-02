@@ -212,10 +212,10 @@ while (<DATA>) {
 # cperl-indent-level: 4
 # End:
 
-__END__
-#XML::EP::Processor::XSLTParser,JWIED,f,add
 #XML::LibXML::Iterator,PAJAS,f,add
 #MHonArc,EHOOD,f,add
-
-Module::CoreList,P5P,f,add
+#Module::CoreList,P5P,f,add
+__END__
+MIME::Base64,P5P,f,add
+MIME::Base64,P5P,c,add
 
