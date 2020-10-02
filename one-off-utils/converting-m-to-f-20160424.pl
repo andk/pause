@@ -213,9 +213,9 @@ while (<DATA>) {
 # End:
 
 __END__
-#XML::EP::Processor::XSLT,JWIED,f,add
-#XML::EP::Processor::EmbPerl,JWIED,f,add
 #XML::EP::Processor::XSLTParser,JWIED,f,add
 #XML::LibXML::Iterator,PAJAS,f,add
+#MHonArc,EHOOD,f,add
 
-MHonArc,EHOOD,f,add
+Module::CoreList,P5P,f,add
+
