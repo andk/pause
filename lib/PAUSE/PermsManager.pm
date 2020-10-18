@@ -200,16 +200,22 @@ sub canonicalize_module_casing {
   my $dbh = $self->dbh_callback->();
   my $users = $dbh->selectall_arrayref(
     qq{
-      SELECT perms.userid, COUNT(primeur.userid) AS is_primary
-      FROM perms
-      LEFT JOIN primeur
-        ON  LOWER(primeur.package) = LOWER(perms.package)
-        AND primeur.userid = perms.userid
-      WHERE LOWER(perms.package) = LOWER(?)
-      GROUP BY perms.userid, LOWER(perms.package)
+        SELECT
+            primeur.userid,
+            1 AS is_primary
+            FROM primeur
+            WHERE LOWER(primeur.package) = LOWER(?)
+        UNION
+        SELECT
+            perms.userid,
+            0 AS is_primary
+            FROM perms
+            WHERE lower(perms.package) = LOWER(?)
+                AND perms.userid NOT IN (SELECT userid FROM primeur WHERE lower(package) = LOWER(?))
+        ;
     },
     { Slice => {} },
-    $package,
+    ($package) x 3
   );
 
   $dbh->do(
