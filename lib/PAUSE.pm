@@ -76,7 +76,7 @@ $PAUSE::Config ||=
      # to:
      FTP_RUN => qq{/home/ftp/run},
      ABRA_EXPIRATION => 86400/4,
-     ADMIN => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neil@neilb.org},
+     ADMIN => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neilb@neilb.org},
      ADMINS => [qq(modules\@perl.org)],
      ANON_FTP_PASS => qq{k\@pause.perl.org},
      AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
