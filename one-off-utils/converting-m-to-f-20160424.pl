@@ -216,6 +216,4 @@ while (<DATA>) {
 #MHonArc,EHOOD,f,add
 #Module::CoreList,P5P,f,add
 __END__
-MIME::Base64,P5P,f,add
-MIME::Base64,P5P,c,add
-
+libapreq2,ISAAC,f,add
