@@ -216,4 +216,4 @@ while (<DATA>) {
 #MHonArc,EHOOD,f,add
 #Module::CoreList,P5P,f,add
 __END__
-libapreq2,ISAAC,f,add
+pyperl,GAAS,c,add
