@@ -16,7 +16,7 @@ eval {require Time::Duration};
 our $HAVE_TIME_DURATION = !$@;
 
 our $Valid_Userid = qr/^[A-Z]{3,9}$/;
-our $Yours = "Thanks,\n-- \nThe PAUSE\n";
+our $Yours = "Thanks,\n-- \nThe PAUSE Team\n";
 
 use utf8; # must be after the qr// for perl-5.6.1
 
@@ -1699,7 +1699,7 @@ into $her directory. The request used the following parameters:});
     }
     $mailblurb .= "\n";
     $mailblurb .= $self->wrappar($success);
-    $mailblurb .= "\n\nThanks for your contribution,\n-- \nThe PAUSE\n";
+    $mailblurb .= "\n\nThanks for your contribution,\n-- \nThe PAUSE Team\n";
 #    my $header = {
 #		  To => qq{$PAUSE::Config->{ADMIN}, $u->{email}, $mgr->{User}{email}},
 #		  Subject => qq{Notification from PAUSE},
@@ -4399,7 +4399,7 @@ PAUSE. See https://$server/pause/authenquery?ACTION=edit_mod
 
 Thanks for registering,
 -- 
-The PAUSE
+The PAUSE Team
 };
 
     my($blurb) = join "", @blurb;
@@ -4961,7 +4961,7 @@ $ml_entry
 
 Thanks for registering,
 -- 
-The PAUSE
+The PAUSE Team
 
 PS: The following links are only valid for module list maintainers:
 
