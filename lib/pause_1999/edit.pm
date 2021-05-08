@@ -918,7 +918,7 @@ Data were entered by $mgr->{User}{userid} ($mgr->{User}{fullname}).
 Please check if they are correct.
 
 Thanks,
-The Pause
+The PAUSE Team
 };
 	# warn "sql[$sql]mailblurb[$mailblurb]";
 	# die;
@@ -1320,7 +1320,7 @@ No action is required, but it would be a good idea if somebody
 would check the correctness of the new password.
 
 Thanks,
-The Pause
+The PAUSE Team
 },
                                   $mgr->{User}->{userid},
                                   $mgr->{User}{fullname}||"fullname N/A",
@@ -2107,7 +2107,7 @@ http://%s/pause/authenquery?ACTION=delete_files
     push @blurb, $blurb;
     push @blurb, scalar $tf->format(qq{Note: to encourage deletions, all of past CPAN
 glory is collected on http://history.perl.org/backpan/});
-    push @blurb, qq{The Pause};
+    push @blurb, qq{The PAUSE Team};
     # $blurb = Text::Format->new("firstIndent"=>0,)->paragraphs(@blurb);
     $blurb = join "\n", @blurb;
 
@@ -2447,7 +2447,7 @@ If you need any further information, please visit
 If this doesn't answer your questions, contact modules\@perl.org.
 
 Thank you for your prospective contributions,
-The Pause Team
+The PAUSE Team
 };
 
       my($memo) = $req->param('pause99_add_user_memo');
