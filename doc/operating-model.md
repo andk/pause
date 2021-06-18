@@ -338,7 +338,7 @@ This makes the situation clearer to everyone.
 At some point after that we may change PAUSE so that
 when giving up a first-come permission,
 you're informed who else has permissions,
-and given the option of transferring first-come to one of them. 
+and given the option of transferring first-come to one of them.
 
 
 ### 3.2. Admin indexing permission
@@ -559,7 +559,7 @@ or have them downgraded.
 
 If the current maintainer(s) for a package *are* responsive,
 but you don't like what they're doing with it,
-the PAUSE admins will not consider requests for a permissions transfer/upgrade. 
+the PAUSE admins will not consider requests for a permissions transfer/upgrade.
 
 > For example:
 a group of users of a module don't like the direction the first-come,
@@ -830,7 +830,7 @@ and has indexing permission on all core modules.
 See §4.8 below,
 on what happens when a CPAN module is proposed to become a core module
 (be included with Perl itself).
- 
+
 
 ### 4.6. When a CPAN author passes away
 
@@ -1018,7 +1018,7 @@ so have the same basic copyright laws.
   (Security and identity-related actions may be exempted as appropriate).
   In the early days of CPAN, there was a "module list",
   and to get on that list you sent email to this address.
-  The maintenance of that list evolved into the PAUSE admins of today. 
+  The maintenance of that list evolved into the PAUSE admins of today.
 * Admins should not transfer package indexing permissions to themselves
   without prior notification of other admins.
   Where possible, ask another admin to make the transfer.
@@ -1032,7 +1032,7 @@ so have the same basic copyright laws.
   and should always be respectful of other members of the Perl community,
   whether acting as a PAUSE admin or not.
 
-### 6.3. Contacting PAUSE administrators 
+### 6.3. Contacting PAUSE administrators
 
 There are two mailing lists for the PAUSE admins:
 
