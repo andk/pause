@@ -216,4 +216,5 @@ while (<DATA>) {
 #MHonArc,EHOOD,f,add
 #Module::CoreList,P5P,f,add
 __END__
-pyperl,GAAS,c,f
+encoding::warnings,AUDREYT,f,delete
+encoding::warnings,P5P,f,add
