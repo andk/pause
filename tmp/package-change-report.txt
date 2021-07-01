@@ -1,0 +1,196 @@
+EdTrace.pm:518:1:0:		$code = "package ___junkit; $preamble \$return = Devel::EdTrace::___split_screen(\$width, q$input_line, q$eval_input_line) . \"\\n\"";
+EdTrace.pm:522:1:0:		$code = "package ___junkit; $preamble \$return = Devel::EdTrace::___split_screen(\$width, q$input_line, qq$eval_input_line) . \"\\n\"";
+EventServer.pm:261:1:0:	    	'printf("package Errno;\n");',"\n\t",
+EventServer.pm:292:1:0:	    	'printf("package Wait;\n");',"\n\t",
+ExecCmds.pm:1578:1:0:			$str = 'package NN;' .
+ExecCmds.pm:1598:1:0:				$str = "package NN; use vars qw/$pvar/;\n$left = " . $str;
+ExecCmds.pm:1603:1:0:				$str = "package NN; " . $str;
+OCV.pm:345:1:0:	eval '{package IO::Socket; sub connected { 1 } }';
+Oracle.pm:7955:1:0:              'Yes, I can execute package DBMS_SPACE'
+Simple.pm:17:1:0:    q( package Net::IMAP::Simple::_message;
+SimpleCDB.pm:78:1:0:	eval 'package POSIX; sub EWOULDBLOCK() { 11 } ' 
+lib/Apache/Voodoo/Install/Config.pm:76:1:0:	print OUT "package Apache::Voodoo::MyConfig;\n";
+lib/Apache/XPP/Cache.pm:123:1:0:	eval "package Apache::XPP::Cache::_firesafe; require $mod";
+lib/Apache2/Build.pm:993:1:0:    my $package = 'package Apache2::BuildConfig';
+lib/App/RSS2Leafnode.pm:396:1:0:  if (! defined (do { package App::RSS2Leafnode::Conf;
+lib/App/Upfiles.pm:199:1:0:  if (! defined (do { package App::Upfiles::Conf;
+lib/App/XUL.pm:251:1:0:		'package Eventhandlers;'."\n".
+lib/App/cpanminus/fatscript.pm:19536:1:0:    my $module  = shift || croak 'find_module_by_name() requires a package name';
+lib/App/cpanminus/fatscript.pm:9501:1:0:  C<L</prereqs>> key.  It provides a list of package requirements
+lib/App/perlmv.pm:322:1:0:    eval "package App::perlmv::code; $code";
+lib/App/perlmv.pm:332:1:0:    eval "package App::perlmv::code; $code";
+lib/App/perlmv.pm:344:1:0:    my $res = eval "package App::perlmv::code; $code";
+lib/Audio/Nama/Memoize.pm:33:1:0:	map{package Audio::Nama::Track; memoize($_) } @track_functions;
+lib/Audio/Nama/Memoize.pm:37:1:0:	map{package Audio::Nama::Track; unmemoize ($_)} @track_functions;
+lib/Audio/Nama/Memoize.pm:41:1:0:	map{package Audio::Nama::Wav; unmemoize ($_); memoize($_) } 
+lib/Audio/Nama/Memoize.pm:54:1:0:	map{package Audio::Nama::Wav; memoize($_) } @wav_functions;
+lib/AutoSplit.pm:350:1:0:    $def_package or die "Can't find 'package Name;' in $filename\n";
+lib/CGI/AppToolkit.pm:108:1:0:    	eval "package CGI::AppToolkit::Data::_firesafe; require CGI::AppToolkit::Data::$kind";
+lib/CGI/AppToolkit.pm:143:1:0:		eval 'package CGI::AppToolkit::_firesafe; use CGI::AppToolkit::Template;';
+lib/CGI/AppToolkit.pm:57:1:0:		eval 'package CGI::AppToolkit::_firesafe; use DBI;';
+lib/CGI/AppToolkit.pm:84:1:0:			eval "package CGI::AppToolkit::Data::_firesafe; require CGI::AppToolkit::Data::Automorph";
+lib/CPAN/Mini/ProjectDocs.pm:350:1:0:	if($record->{'package name'} eq $module)
+lib/CPAN/Mini/ProjectDocs.pm:453:1:0:	push @modules, $record->{'package name'} ;
+lib/CPAN/Mini/ProjectDocs.pm:455:1:0:	my $first_letter = substr($record->{'package name'}, 0, 1) ;
+lib/CPAN/PackageDetails/Entries.pm:211:1:0:		$args{'package name'} = $args{package_name};
+lib/CPAN/PackageDetails/Entries.pm:218:1:0:		$warning = "add_entry has a problem parsing [$args{'version'}] for package [$args{'package name'}]: [$warning] I'm using [$parsed] as the version for [$args{'package name'}].";
+lib/CPAN/PackageDetails/Entries.pm:226:1:0:	unless( defined $args{'package name'} ) {
+lib/CPAN/PackageDetails/Entries.pm:231:1:0:	unless( $args{'package name'} =~ m/
+lib/CPAN/PackageDetails/Entries.pm:240:1:0:		croak "Package name [$args{'package name'}] looks suspicious. Not adding it!";
+lib/CPAN/PackageDetails/Entries.pm:244:1:0:	if( $self->allow_packages_only_once and $self->already_added( $args{'package name'} ) ) {
+lib/CPAN/PackageDetails/Entries.pm:245:1:0:		croak "$args{'package name'} was already added to CPAN::PackageDetails!";
+lib/CPAN/PackageDetails/Entries.pm:252:1:0:		$args{'package name'}
+lib/CPAN/PackageDetails/Entry.pm:63:1:0:sub package_name { $_[0]->{'package name'}          }
+lib/CPAN/PackageDetails/PerlHash.pm:205:1:0:		$args{'package name'} = $args{package_name};
+lib/CPAN/PackageDetails/PerlHash.pm:212:1:0:		$warning = "add_entry has a problem parsing [$args{'version'}] for package [$args{'package name'}]: [$warning] I'm using [$parsed] as the version for [$args{'package name'}].";
+lib/CPAN/PackageDetails/PerlHash.pm:220:1:0:	unless( defined $args{'package name'} ) {
+lib/CPAN/PackageDetails/PerlHash.pm:225:1:0:	unless( $args{'package name'} =~ m/
+lib/CPAN/PackageDetails/PerlHash.pm:234:1:0:		croak "Package name [$args{'package name'}] looks suspicious. Not adding it!";
+lib/CPAN/PackageDetails/PerlHash.pm:238:1:0:	if( $self->allow_packages_only_once and $self->already_added( $args{'package name'} ) ) {
+lib/CPAN/PackageDetails/PerlHash.pm:239:1:0:		croak "$args{'package name'} was already added to CPAN::PackageDetails!";
+lib/CPAN/PackageDetails/PerlHash.pm:245:1:0:		$args{'package name'}
+lib/CPAN/PackageDetails/Redis.pm:212:1:0:		$args{'package name'} = $args{package_name};
+lib/CPAN/PackageDetails/Redis.pm:219:1:0:		$warning = "add_entry has a problem parsing [$args{'version'}] for package [$args{'package name'}]: [$warning] I'm using [$parsed] as the version for [$args{'package name'}].";
+lib/CPAN/PackageDetails/Redis.pm:228:1:0:	unless( defined $args{'package name'} )
+lib/CPAN/PackageDetails/Redis.pm:234:1:0:	unless( $args{'package name'} =~ m/
+lib/CPAN/PackageDetails/Redis.pm:244:1:0:		croak "Package name [$args{'package name'}] looks suspicious. Not adding it!";
+lib/CPAN/PackageDetails/Redis.pm:248:1:0:	if( $self->allow_packages_only_once and $self->already_added( $args{'package name'} ) )
+lib/CPAN/PackageDetails/Redis.pm:250:1:0:		croak "$args{'package name'} was already added to CPAN::PackageDetails!";
+lib/CPAN/PackageDetails/Redis.pm:256:1:0:		$args{'package name'}
+lib/Carrot/Diversity/English/Global_Variables.pm:88:1:0:		"package main_ {",
+lib/Carrot/Modularity/Subroutine/Autoload/Directory.pm:75:1:0:		'package '
+lib/Carrot/Personality/Valued/Perl5/Eval_Error.pm:191:1:0:	} elsif ($$this =~ m{Global symbol "\$\w+" requires explicit package name})
+lib/Catalog/db.pm:117:1:0:	    eval "package Catalog::db::_firesafe; require $package";
+lib/Catalog/db.pm:50:1:0:    eval "package Catalog::db::_firesafe; require $db_package";
+lib/Catalog/db/mysql.pm:51:1:0:    eval "package Catalog::db::mysql::_firesafe; require $hook_class";
+lib/Catalyst/Controller/LeakTracker.pm:145:1:0:    $c->response->body( "" . do { package Catalyst::Controller::LeakTracker::Template;
+lib/Catalyst/Controller/LeakTracker.pm:207:1:0:    $c->response->body( "" . do { package Catalyst::Controller::LeakTracker::Template;
+lib/Catalyst/Controller/LeakTracker.pm:363:1:0:    $c->res->body( "" . do { package Catalyst::Controller::LeakTracker::Template;
+lib/CfgTie/TieRCService.pm:503:1:0:   my $X="package CfgTie::TieRCServ_rec;\n";
+lib/Class/DBI/DDL.pm:195:1:0:	eval qq(package Class::DBI::DDL::_safe; require Class::DBI::DDL::$driver_name);
+lib/Class/HPLOO.pm:43:1:0:      eval('package Class::HPLOO::Base ;') if !defined *{'Class::HPLOO::Base::'} ;
+lib/Config/Maker.pm:131:1:0:	my @r = eval qq/package Config::Maker::Eval; $_[0]/;
+lib/Config/Maker.pm:135:1:0:	my $r = eval qq/package Config::Maker::Eval; $_[0]/;
+lib/Config/Maker.pm:139:1:0:	eval qq/package Config::Maker::Eval; $_[0]/;
+lib/Constant/Generator.pm:28:1:0:    $pkg || croak 'no package name';
+lib/DBD/Teradata.pm:4248:1:0:1;package DBD::Teradata::GetInfo;
+lib/DBIx/Schema/Changelog/Command/Driver.pm:26:1:0:    default => q~package DBIx::Schema::Changelog::Driver::{0};
+lib/DBIx/Schema/Changelog/Command/File.pm:26:1:0:    default => q~package DBIx::Schema::Changelog::File::{0};
+lib/DBIx/SystemCatalog.pm:116:1:0:		eval "package DBIx::SystemCatalog::_safe; require $driver_name";
+lib/Dancer2/Plugin/Locale.pm:77:1:0:        eval "package Dancer2::Plugin::Locale::Obj::$tag;use base 'Dancer2::Plugin::Locale::Obj';our \$Encoding='utf8';our \%Lexicon;package Dancer2::Plugin::Locale;";
+lib/Data/FormValidator/Constraints.pm:70:1:0:            eval "package Data::FormValidator::Constraints; $code";
+lib/Date/Object.pm:199:1:0:    } }  { package Date::Object::HPLOO_TIESCALAR ;
+lib/Date/Object.pm:67:1:0:    eval('package Class::HPLOO::Base ;
+lib/Devel/Leak/Module.pm:74:1:0:	my %parts = map { $_ => 1 } (@_ ? @_ : qw{ namespace package module });
+lib/Devel/REPL/Plugin/Perl5db.pm:20:1:0:"package Devel::REPL::Plugin::Packages::DefaultScratchpad;
+lib/Devel/REPL/Plugin/Trepan.pm:20:1:0:"package Devel::REPL::Plugin::Packages::DefaultScratchpad;
+lib/Devel/Trepan/DB/Eval.pm:197:1:0:    doit  'package foo; 1';
+lib/Dist/Inkt/Role/WriteMakefilePL.pm:120:1:0:			. "{ package MY; use File::ShareDir::Install qw(postamble) };\n";
+lib/Dist/Zilla/Plugin/PodLoom.pm:85:1:0:  my $result = eval "package Dist::Zilla::Plugin::PodLoom::_eval; $code";
+lib/DynaLoader/Functions.pm:302:1:0:			eval { package DynaLoader; do $bs; };
+lib/EB/Locale.pm:63:1:0:	eval 'sub _T { package Locale::Messages; turn_utf_8_on(gettext($_[0])) }';
+lib/Error/Base/Cookbook.pm:284:1:0:            bless frames eval file line package sub
+lib/Error/Base/Cookbook.pm:477:1:0:            bless frames eval file line package sub
+lib/ExtUtils/Command/MM.pm:173:1:0:WARNING: I have found an old package in
+lib/FAQ/OMatic/install.pm:1674:1:0:	print CONFIG "package FAQ::OMatic::Config;\n";
+lib/FWS/V2/Admin.pm:2392:1:0:            if ( $self->_pullDistFile( $imageBaseURL . '/current_frameworksitescom.pm', $self->{fileSecurePath} . '/FWS', $distFile, "package FWS::V2;\n" ) ) {
+lib/Games/Perlwar/AgentEval.pm:132:1:0:'end of package Games::Perlwar::AgentEval';
+lib/Games/Worms/Board.pm:159:1:0:    eval "package Nullius; use $module";
+lib/Getargs/Long.pm:381:1:0::			package Getargs::Long::_;
+lib/HTML/Dojo.pm:193:1:0:        $SRC_DATA = eval { package HTML::Dojo::src; <DATA> };
+lib/HTML/Dojo.pm:257:1:0:        $COMMON_DATA = eval { package HTML::Dojo::common; <DATA> };
+lib/HTML/Dojo.pm:283:1:0:        $EDITIONS_DATA = eval { package HTML::Dojo::editions; <DATA> };
+lib/HTML/Dojo.pm:309:1:0:        $SRC_DATA = eval { package HTML::Dojo::src; <DATA> };
+lib/HTML/EP/Explorer/Install.pm:88:1:0:    my $d = "package HTML::EP::Explorer::Config;\nuse vars qw(\$config);\n"
+lib/HTML/EP/Glimpse/Install.pm:124:1:0:    my $d = "package HTML::EP::Glimpse::Config;\nuse vars qw(\$config);\n"
+lib/HTML/Merge/Compile.pm:210:1:0:				my $text = "package HTML::Merge::Ext;
+lib/HTML/Prototype/Useful.pm:9:1:0:our $prototype_useful = do { package HTML::Prototype::Useful::Js; local $/; <DATA> };
+lib/HTML/String/TT/Directive.pm:11:1:0:        s/sub {/sub { package HTML::String::TT::_TMPL; use HTML::String::Overload { ignore => { q{Template::Provider} => 1, q{Template::Directive} => 1, q{Template::Document} => 1, q{Template::Plugins} => 1 } };/;
+lib/Haineko/CLI/Setup.pm:110:1:0:        $filehandle->print( 'package Haineko::CLI::Setup::Data;'."\n" );
+lib/Hardware/Vhdl/Automake/Project.pm:110:1:0:    grep { $_->type eq 'package body' } $self->designunits;
+lib/Hints/Base.pm:43:1:0:		eval "package Hints::Base::_safe; require $nextname;";
+lib/IO/Event.pm:1193:1:0:}{package IO::Event::Socket::INET;
+lib/IO/Event.pm:127:1:0:}{package IO::Event::Common;
+lib/IO/Event/AnyEvent.pm:146:1:0:}{package IO::Event::AnyEvent::Wrapper;
+lib/IO/Event/Emulate.pm:192:1:0:}{package IO::Event::Emulate::Timer;
+lib/IO/Event/Emulate.pm:377:1:0:}{package IO::Event::Emulate::Idle;
+lib/Inline.pm:1831:1:0:The NAME must match the current package name:
+lib/JSON.pm:326:1:0:        eval 'package JSON::PP::Boolean';
+lib/LaTeXML/Core/Definition/Constructor/Compiler.pm:47:1:0:    " package LaTeXML::Package::Pool;\n"
+lib/Language/Tea/Pad.pm:33:1:0:    my $cmd = 'package '
+lib/LibZip/Build/Package.pm:193:1:0:return q`{package Carp;
+lib/LibZip/Build/Package.pm:259:1:0:return q`{package LibZip::LZW;
+lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/Constants.pm:218:1:0:	my $const = "package Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants ;\n" ;
+lib/List/MoreUtils/XS.pm:39:1:0:    my $pp_stuff = join( "\n", "use List::MoreUtils::PP;", "package List::MoreUtils;", @pp_imp );
+lib/LoadHtml.pm:596:1:0:	$expn = 'package htmlpage; ' . $expn;
+lib/Locale/Maketext/Utils/Mock.pm:25:1:0:        eval "package Locale::Maketext::Utils::Mock::$loc_tag;use base 'Locale::Maketext::Utils::Mock';our \%Lexicon;package Locale::Maketext::Utils::Mock;";
+lib/Mail/IspMailGate/Install.pm:375:1:0:    $dump = "package Mail::IspMailGate::Config;\n\n" . $dump;
+lib/MasonX/Interp/WithCallbacks.pm:42:1:0:      descr     => 'Default package key'
+lib/Math/Algebra/Symbols.pm:102:1:0:  my $s = "package XXXX;\n". <<'END';
+lib/Math/Algebra/Symbols/Sum.pm:1653:1:0:  my $s = "package XXXX;\n". <<'END';
+lib/Math/Algebra/Symbols/Symbols.pm:102:1:0:  my $s = "package XXXX;\n". <<'END';
+lib/Math/NumSeq/Expression.pm:330:1:0:    $subr = eval "package Math::NumSeq::Expression::LanguageExpr;
+lib/Metrics.pm:517:1:0:                print $OUT "package CVS::Metrics;\n";
+lib/Mo/Moose.pm:3:1:0:*{$M.'Moose::e'}=sub{my($P,$e)=@_;$P=~s/::$//;%$e=(M=>1);require Moose;Moose->import({into=>$P});Moose::Util::MetaRole::apply_metaroles(for=>$P,class_metaroles=>{attribute=>['Attr::Trait']},)};BEGIN{package Attr::Trait;use Moose::Role;around _process_options=>sub{my$orig=shift;my$c=shift;my($n,$o)=@_;$o->{is}||='rw';$o->{lazy}||=1 if defined$o->{default}or defined$o->{builder};$c->$orig(@_)};$INC{'Attr/Trait.pm'}=1}
+lib/Mo/Mouse.pm:3:1:0:*{$M.'Mouse::e'}=sub{my($P,$e)=@_;$P=~s/::$//;%$e=(M=>1);require Mouse;require Mouse::Util::MetaRole;Mouse->import({into=>$P});Mouse::Util::MetaRole::apply_metaroles(for=>$P,class_metaroles=>{attribute=>['Attr::Trait']},)};BEGIN{package Attr::Trait;use Mouse::Role;around _process_options=>sub{my$orig=shift;my$c=shift;my($n,$o)=@_;$o->{is}||='rw';$o->{lazy}||=1 if defined$o->{default}or defined$o->{builder};$c->$orig(@_)};$INC{'Attr/Trait.pm'}=1}
+lib/Module/Install/Gloom.pm:23:1:0:    $code =~ s/package Gloom;/package $module;/;
+lib/Module/Metadata.pm:429:1:0:  my $module  = shift || croak 'find_module_by_name() requires a package name';
+lib/Mojar/Config.pm:22:1:0:  my $config = eval sprintf '%s%s%s', 'package Mojar::Config::Sandbox;',
+lib/Mojolicious/Plugin/Config.pm:18:1:0:    = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
+lib/Net/FullAuto/FA_Core.pm:3144:1:0:my $showmins=sub { package showmins;
+lib/Net/FullAuto/FA_Core.pm:3175:1:0:my $hours=sub { package hours;
+lib/Net/FullAuto/FA_Core.pm:3186:1:0:my $cal_months=sub { package cal_months;
+lib/Net/FullAuto/FA_Core.pm:3202:1:0:my $fulldays=sub { package fulldays;
+lib/Net/FullAuto/FA_Core.pm:9533:1:0:      print FD "package fa_global;";
+lib/Net/SSLeay/OO/Functions.pm:57:1:0:		print STDERR "destination package undefined; next\n"
+lib/No/Worries/Log.pm:108:1:0:        "package No::Worries::Log::Filter;",
+lib/ObjStore/Posh/Cursor.pm:46:1:0:    my $to_eval = "no strict; package input;\n
+lib/PBJ/JNI/Callback.pm:31:1:0:  eval { package MAIN; $ret = &$method; };
+lib/PLP.pm:245:1:0:		eval qq{ package PLP::Script; no warnings; $PLP::code; };
+lib/PLP.pm:248:1:0:		eval   { package PLP::Script; no warnings; $_->() for reverse @PLP::END };
+lib/PLP/Functions.pm:21:1:0:	eval 'package PLP::Script; no warnings; ' . PLP::source($PLP::file, 0, join ' ', (caller)[2,1]);
+lib/Package/Variant.pm:34:1:0:    croak qq{Value $arg_count in 'importing' is not a package string},
+lib/Perl/APIReference/V5_016_000.pm:3897:1:0:    padadd_OUR          redundantly specifies if it\'s a package var
+lib/Perl/APIReference/V5_018_000.pm:4166:1:0:    padadd_OUR          redundantly specifies if it\'s a package var
+lib/Perl/APIReference/V5_020_000.pm:4507:1:0:    padadd_OUR          redundantly specifies if it\'s a package var
+lib/Perl/APIReference/V5_020_001.pm:4526:1:0:    padadd_OUR          redundantly specifies if it\'s a package var
+lib/Perl/APIReference/V5_020_002.pm:3613:1:0:    padadd_OUR          redundantly specifies if it\'s a package var
+lib/Perl/Critic/Policy/Documentation/RequirePackageMatchesPodName.pm:19:1:0:    q{Pod NAME on line %d does not match the package declaration};
+lib/Perl/Critic/Policy/Modules/RequireFilenameMatchesPackage.pm:19:1:0:Readonly::Scalar my $EXPL => q{Correct the filename or package statement};
+lib/Perl/Critic/Policy/logicLAB/ModuleBlacklist.pm:73:1:0:        carp 'Unable to locate package keyword';
+lib/Perl/Critic/Policy/logicLAB/RequirePackageNamePattern.pm:92:1:0:        carp 'Unable to locate package keyword';
+lib/PkgForge/App/Incoming.pm:17:1:0:sub abstract { return q{Process the incoming package queue} };
+lib/Poet/t/PSGIHandler.pm:16:1:0:write_file( $poet->lib_path("TestApp/Foo.pm"), "package TestApp::Foo;\nsub bar {}\n1;\n" );
+lib/Poet/t/Subclassing.pm:11:1:0:        join( "\n", "package TestApp::Cache;", "use Poet::Moose;", "extends 'Poet::Cache';" ) );
+lib/Poet/t/Subclassing.pm:15:1:0:            "package TestApp::Import;",
+lib/Poet/t/Subclassing.pm:26:1:0:            "package TestApp::Log;",
+lib/Psh/Completion.pm:358:1:0:		    caller import local my package use
+lib/Rex/CLI.pm:305:1:0:        my @rex_code = ("package Rex::Test::Rexfile::Syntax;");
+lib/Rex/WebUI/Model/RexInterface.pm:169:1:0:	eval "package Rex::CLI; use Rex -base; $rexfile";
+lib/Safe/World.pm:442:1:0:    $this->{SAFE}->reval(q`package WORLDSHARE ;`);
+lib/Slay/Makefile.pm:227:1:0:		$incfile = eval qq(package Slay::Makefile::Eval; "$incfile");
+lib/Slay/Makefile.pm:493:1:0:    my @val = eval "${ld}package Slay::Makefile::Eval; $strict $perl";
+lib/Template/Alloy/Compile.pm:561:1:0:${indent}${INDENT}package Template::Alloy::Perl;
+lib/Template/Declare/TagSet/RDF/EM.pm:15:1:0:        optionsURL    package    requires
+lib/Template/Directive.pm:842:1:0:    my \$output = "package Template::Perl;\\n";
+lib/Test/Import.pm:32:1:0:        like $@, qr{explicit package name}, 'dies with the right error message';
+lib/Test/StructuredObject/TestSuite.pm:57:1:0:  eval( 'package Test::StructuredObject::TestSuite::linearize_note_eval;'
+lib/Text/Query.pm:84:1:0:    eval "package Text::Query::_firesafe; require $package";
+lib/Text/Restructured/Writer.pm:226:1:0:    my $sub = "package Text::Restructured::Writer::Eval;sub $subname {\n $str}";
+lib/Text/Tradition/Collation/Reading.pm:204:1:0:			warn "No morphology package installed; DROPPING lexemes";
+lib/Wx/ActiveX.pm:376:1:0:    push (@output, q(package Wx::ActiveX; 
+lib/XML/EP/Install.pm:24:1:0:     (print $fh "package XML::EP::Config;\n\$XML::EP::Config::config = $dump\n") and
+lib/XML/XSH/Functions.pm:1599:1:0:  eval "package XML::XSH::Map; no strict 'vars'; $expr";
+lib/XML/XSH/Functions.pm:1622:1:0:      my $result=eval "package XML::XSH::Map; no strict 'vars'; $perl";
+lib/XML/XSH/Functions.pm:2695:1:0:    my @result=eval("package XML::XSH::Map; no strict 'vars'; $_[0]");
+lib/XML/XSH/Functions.pm:2699:1:0:    my $result=eval("package XML::XSH::Map; no strict 'vars'; $_[0]");
+lib/XML/XSH/Functions.pm:3453:1:0:    $sub=eval("package XML::XSH::Map; no strict; sub $code");
+lib/XML/XSH/Functions.pm:3461:1:0:    $sub=eval("package XML::XSH::Map; no strict; sub { $code }");
+lib/XML/XSH2/Functions.pm:236:1:0:  my $p="package XML::XSH2::Map; no strict qw(vars); \$Lexical::Alias::SWAP=0; use utf8;";
+lib/Xmms.pm:1155:1:0:    eval "{package Xmms; no strict; qq($string)}";
+lib/Xmms.pm:297:1:0:    eval "package readline;\n@code"; die $@ if $@;
+lib/Xmms.pm:302:1:0:	eval "{package Xmms; no strict; @_}";
+lib/Zoidberg/Shell.pm:199:1:0:		eval q{package Main; our $SCRIPT = $file; do $file; die $@ if $@ };
+lib/Zoidberg/Utils.pm:78:1:0:		eval q{package Main; $ref = do $file; die $@ if $@ };
+lib/dan.pm:30:1:0:        eval "package the; sub Dan { shift; return wantarray ? \@_ : \$_[0] } 1;";
+typesafety.pm:1695:1:0:sub package  :lvalue { $_[0]->[1] }          
