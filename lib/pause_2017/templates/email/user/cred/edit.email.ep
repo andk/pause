@@ -15,4 +15,4 @@ Data were entered by <%== $pause->{User}{userid} %> (<%== $pause->{User}{fullnam
 Please check if they are correct.
 
 Thanks,
-The Pause
+The PAUSE Team
