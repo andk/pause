@@ -92,7 +92,7 @@ sub writechecksum {
   local($CPAN::Checksums::SIGNING_KEY) =
     $PAUSE::Config->{CHECKSUMS_SIGNING_KEY};
 
-  unless (eval { CPAN::Checksums::updatedir($dir); 1 }) {
+  unless (eval { CPAN::Checksums::updatedir($dir, $self->mlroot); 1 }) {
     my $error = $@;
     $Logger->log([ "CPAN::Checksums::updatedir died with error: %s", $error ]);
     return; # a die might cause even more trouble
