@@ -163,7 +163,7 @@ find(sub {
              "'$old_checksums_old': $!";
          $yaml->{start} = time;
        }
-       my $ret = eval { CPAN::Checksums::updatedir($ffname); };
+       my $ret = eval { CPAN::Checksums::updatedir($ffname, $root); };
        if ($@) {
          warn "error[$@] in checksums file[$ffname]: must unlink";
          unlink "$ffname/CHECKSUMS";
