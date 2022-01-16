@@ -692,7 +692,7 @@ sub rewrite02 {
       unless $numlines >= $PAUSE::Config->{ML_MIN_INDEX_LINES};
 
     my $header = qq{File:         02packages.details.txt
-URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+URL:          http://www.cpan.org/modules/02packages.details.txt
 Description:  Package names found in directory \$CPAN/authors/id/
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
