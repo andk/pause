@@ -25,8 +25,6 @@ subtest "PAUSE::filehash md5sum/sha1sum" => sub {
 
   file: t//data/files/somefile.txt
   size: 12 bytes
-   md5: d7e288e2c268b456c3892c3f297dad3a
-  sha1: a80338ff32a9b2d4550be8ceb93921f1ce73b343
 sha256: f4094f79a8979ace80cc375ab6c1dc640cceee36249ce03928d7e54f7ad66234
 EOF
 

@@ -17,14 +17,12 @@ use Compress::Zlib ();
 use Cwd ();
 use DBI ();
 use Exporter;
-use Fcntl qw(:flock SEEK_SET);
+use Fcntl qw(:flock);
 my $HAVE_RECENTFILE = eval {require File::Rsync::Mirror::Recentfile; 1;};
 use File::Spec ();
 use IO::File ();
 use List::Util ();
-use Digest::MD5 ();
 use Digest::SHA ();
-use Digest::SHA1 ();
 use Mail::Send ();
 use Sys::Hostname ();
 use Time::Piece;
@@ -235,7 +233,7 @@ sub downtimeinfo {
 
 sub filehash {
   my($file) = @_;
-  my($ret,$authorfile,$size,$md5,$sha,$sha1,$hexdigest,$shahexdigest,$sha1hexdigest);
+  my($ret,$authorfile,$size,$sha,$shahexdigest);
   $ret = "";
   if (substr($file,0,length($Config->{MLROOT})) eq $Config->{MLROOT}) {
     $authorfile = "\$CPAN/authors/id/" .
@@ -244,27 +242,17 @@ sub filehash {
     $authorfile = $file;
   }
   $size = -s $file;
-  $md5 = Digest::MD5->new;
   $sha = Digest::SHA->new('sha256');
-  $sha1 = Digest::SHA1->new;
   local *HANDLE;
   unless ( open HANDLE, "< $file\0" ){
     $ret .= "An error occurred, couldn't open $file: $!"
   }
-  $md5->addfile(*HANDLE);
-  seek(HANDLE, SEEK_SET, 0);
   $sha->addfile(*HANDLE);
-  seek(HANDLE, SEEK_SET, 0);
-  $sha1->addfile(*HANDLE);
   close HANDLE;
-  $hexdigest = $md5->hexdigest;
   $shahexdigest = $sha->hexdigest;
-  $sha1hexdigest = $sha1->hexdigest;
   $ret .= qq{
   file: $authorfile
   size: $size bytes
-   md5: $hexdigest
-  sha1: $sha1hexdigest
 sha256: $shahexdigest
 };
   return $ret;

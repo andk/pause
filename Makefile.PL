@@ -51,9 +51,7 @@ WriteMakefile(
     Log::Dispatchouli::Global
     LWP::UserAgent
     LWP::Protocol::https
-    Digest::MD5
     Digest::SHA
-    Digest::SHA1
     Mail::Mailer
     Mail::Send
     Module::Faker::Dist
