@@ -26,6 +26,7 @@ use IO::File ();
 use IPC::Run3 ();
 use LWP ();
 use Digest::MD5 ();
+use Digest::SHA ();
 use Digest::SHA1 ();
 use Mail::Send ();
 use PAUSE::MailAddress ();
@@ -505,6 +506,7 @@ sub welcome_file {
   $hash->{dgot} = $self->{NOW};
   $self->logge("Info: Got $hash->{uriid} (size $size)");
   my $md5 = Digest::MD5->new;
+  my $sha = Digest::SHA->new('sha256');
   my $sha1 = Digest::SHA1->new;
   my $handle = IO::File->new;
   unless ( $handle->open("<$PAUSE::Config->{MLROOT}$hash->{uriid}\0") ){
@@ -512,9 +514,12 @@ sub welcome_file {
   }
   $md5->addfile($handle);
   $handle->seek(SEEK_SET, 0);
+  $sha->addfile($handle);
+  $handle->seek(SEEK_SET, 0);
   $sha1->addfile($handle);
   $handle->close;
   my $hexdigest = $md5->hexdigest;
+  my $shahexdigest = $sha->hexdigest;
   my $sha1hexdigest = $sha1->hexdigest;
   my($userid) = PAUSE::dir2user($hash->{uriid});
   my $sth2 = $self->{STH2};
@@ -544,6 +549,7 @@ has entered CPAN as
   size: $size bytes
    md5: $hexdigest
   sha1: $sha1hexdigest
+sha256: $shahexdigest
 };
 
   my $di = CPAN::DistnameInfo->new($hash->{uriid});
