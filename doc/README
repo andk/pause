@@ -43,7 +43,7 @@ Also, user ID's need to be B<UPPER-CASE> in both 'authen_pause' and 'mod'.
 You can set up the mod database from scratch like this:
 
   mysqladmin -uroot -p create mod
-  mysql      -uroot -p authen_pause < doc/mod.schema.txt
+  mysql      -uroot -p mod < doc/mod.schema.txt
 
 However, if you want to start with a copy of PAUSE's existing database,
 you can create the database, rsync a backup and restore it -- but beware
