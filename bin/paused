@@ -155,7 +155,9 @@ sub loop () { # we're NOT called as a method
 
   our $UA;
   unless ($UA) {
-    $UA =  LWP::UserAgent->new;
+    $UA =  LWP::UserAgent->new(
+      ssl_opts => { SSL_version => "TLSv12" },
+    );
     $UA->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
   }
 
@@ -677,7 +679,10 @@ sub getit {
   }
 
   our $UA;
-  my $response = $UA->request($request,$tpath);
+  my $response = $UA->request(
+    $request,
+    $tpath,
+  );
 
   if ($response->code == &HTTP::Status::RC_NOT_MODIFIED) {
     $self->logge("Alert: no mirror: RC_NOT_MODIFIED for $tpath");
