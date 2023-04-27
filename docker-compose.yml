@@ -1,0 +1,59 @@
+version: "3"
+services:
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        hostname: pause.localhost
+        ports:
+            - 80:80
+            - 443:443
+        depends_on:
+            - app
+        volumes:
+            - ./htdocs:/var/www/html/
+            - ./docker/tmp/ftp:/home/ftp
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+            - ./docker/nginx/ssl/server.key.txt:/etc/nginx/ssl/server.key
+            - ./docker/nginx/ssl/server.crt.txt:/etc/nginx/ssl/server.crt
+            - ./docker/nginx/ssl/server.csr.txt:/etc/nginx/ssl/server.csr
+            - ./docker/nginx/ssl/server.password:/etc/nginx/ssl/server.password
+    app:
+        build: ./docker/app
+        container_name: app
+        ports:
+            - 5000:5000
+        volumes:
+            - .:/home/k/pause
+            - ./docker/app/PrivatePAUSE.pm:/home/k/pause/privatelib/PrivatePAUSE.pm
+            - ./docker/tmp/log:/var/log
+            - ./docker/tmp/ftp:/home/ftp
+            - ./docker/gnupg:/root/.gnupg
+            - ./docker/app/gnupg.tar.gz:/root/gnupg.tar.gz
+        environment:
+            PAUSE_DEV_ROOT: /home/k/pause
+            PAUSE_DEV_EMAIL: pause@localhost.localdomain
+            PAUSE_DEV_DBUSER: pause
+            PAUSE_DEV_DBPASS: test
+            MH_SENDMAIL_SMTP_ADDR: mail:1025
+            GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
+        depends_on:
+            - mysql
+    mysql:
+        image: mysql:5.7
+        container_name: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: test
+            MYSQL_USER: pause
+            MYSQL_PASSWORD: test
+            MYSQL_DATABASE: pause
+        expose:
+            - 3306
+    mail:
+        image: mailhog/mailhog
+        container_name: mailhog
+        ports:
+            - 1025:1025
+            - 8025:8025
+        environment:
+            MH_STORAGE: maildir
+            MH_MAILDIR_PATH: /tmp
