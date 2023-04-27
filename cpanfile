@@ -29,7 +29,6 @@ requires 'LWP';
 requires 'List::MoreUtils';
 requires 'Log::Dispatch::Config';
 requires 'Log::Dispatchouli';
-requires 'Mail::Send';
 requires 'Module::Signature';
 requires 'MojoX::Log::Dispatch::Simple';
 requires 'Mojolicious';

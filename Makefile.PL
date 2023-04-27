@@ -53,7 +53,6 @@ WriteMakefile(
     LWP::Protocol::https
     Digest::SHA
     Mail::Mailer
-    Mail::Send
     Module::Faker::Dist
     Module::Signature
     Moo
