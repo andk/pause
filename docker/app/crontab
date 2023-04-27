@@ -1,0 +1,2 @@
+*/5  * * * *   perl /home/k/pause/cron/mldistwatch --logfile /var/log/mldistwatch.cron.log
+*/30 * * * *   perl /home/k/pause/cron/cron-daily.pl

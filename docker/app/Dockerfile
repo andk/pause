@@ -3,7 +3,7 @@ WORKDIR /home/k/pause
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive DEBCONF_NOWARNINGS=yes \
     apt-get --no-install-recommends -y install \
-    build-essential curl perl ssh git gpg gpg-agent openssl unzip ca-certificates \
+    build-essential curl perl ssh git gpg gpg-agent openssl unzip ca-certificates cron \
     libssl-dev zlib1g-dev libexpat1-dev libxml2-dev libmariadb-dev-compat \
     default-mysql-client \
 	golang \

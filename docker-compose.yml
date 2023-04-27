@@ -29,6 +29,7 @@ services:
             - ./docker/tmp/ftp:/home/ftp
             - ./docker/gnupg:/root/.gnupg
             - ./docker/app/gnupg.tar.gz:/root/gnupg.tar.gz
+            - ./docker/app/crontab:/var/spool/cron/crontabs/root
         environment:
             PAUSE_DEV_ROOT: /home/k/pause
             PAUSE_DEV_EMAIL: pause@localhost.localdomain
