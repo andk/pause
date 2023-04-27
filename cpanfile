@@ -32,7 +32,7 @@ requires 'Log::Dispatchouli';
 requires 'Mail::Send';
 requires 'Module::Signature';
 requires 'MojoX::Log::Dispatch::Simple';
-requires 'Mojolicious';
+requires 'Mojolicious', '== 8.72';
 requires 'Mojolicious::Plugin::WithCSRFProtection';
 requires 'Net::SSLeay', '1.49';
 requires 'Parse::CPAN::Packages';
