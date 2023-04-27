@@ -14,7 +14,6 @@ if ! mysql -h mysql -u pause --password=test pause -e 'SELECT 1 FROM applymod' >
 	mysql -h mysql -u pause --password=test pause < ./doc/mod.schema.txt
 fi
 
-echo "HEY!"
 cd /root
 tar xf /root/gnupg.tar.gz
 cp -R /root/gnupg/* /root/.gnupg/
