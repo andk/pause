@@ -67,8 +67,9 @@ subtest "first indexing" => sub {
 
   subtest "meagre git tests" => sub {
     ok(
-      -e $result->tmpdir->file('git/.git/refs/heads/master'),
-      "we now have a master commit",
+      -e $result->tmpdir->file('git/.git/refs/heads/master')
+        || -e $result->tmpdir->file('git/.git/refs/heads/main'),
+      "we now have a master or main commit",
     );
   };
 };
