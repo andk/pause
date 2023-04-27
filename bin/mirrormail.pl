@@ -14,11 +14,13 @@ an alert.
 
 =cut
 
+use strict;
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
-use strict;
-use Mail::Send;
+use Email::Sender::Simple ();
+use Email::MIME;
 use DBI;
 
 my $subject;
@@ -66,7 +68,7 @@ for my $line (split /\n/, $stdin) {
       $send_hash = 0;
     }
   } elsif (
-           $send_hash && $line =~ /^Got \S+ as (\S+)/ 
+           $send_hash && $line =~ /^Got \S+ as (\S+)/
            ||
            $send_hash && $line =~ /^Got (\S+)/
           ) {
@@ -108,21 +110,26 @@ push @recipients, $PAUSE::Config->{ADMIN} if $to_cpan_admin;
 $report .= "\n";
 
 if ($do_send) {
-  my $msg = Mail::Send->new(
-			    To => join(
-				       ",",
-				       @argv,
-				       @recipients
-				      ),
-			    Subject => "CPAN mirror: $subject"
-			   );
-  $msg->add("From", "PAUSE <$PAUSE::Config->{UPLOAD}>");
-  $msg->add("Reply-To", $PAUSE::Config->{CPAN_TESTERS})
-      if $cc_cpan_testers;
-  warn "opening sendmail for $msg\n";
-  my $fh  = $msg->open('sendmail');
-  print $fh $report, $stdin;
-  $fh->close;
+  my $email = Email::MIME->create(
+    attributes => {
+      content_type  => 'text/plain',
+      charset       => 'utf-8',
+      encoding      => '8bit',
+    },
+    header_str => [
+      Subject => "CPAN mirror: $subject",
+      To      => join(",", @argv, @recipients),
+      From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+
+      ($cc_cpan_testers ?
+        ("Reply-To"  => $PAUSE::Config->{CPAN_TESTERS})
+        : ()),
+    ],
+    body_str => "$report $stdin",
+  );
+
+  warn "going to send message\n";
+  Email::Sender::Simple->send($email);
 } else {
   warn "\nMirror message seems to be boring report[$report]stdin[$stdin]";
 }
