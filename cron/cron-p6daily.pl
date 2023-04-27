@@ -6,12 +6,15 @@ use PAUSE ();
 
 use File::Basename ();
 use DBI;
-use Mail::Send     ();
+use Email::MIME;
 use File::Find     ();
 use FileHandle     ();
 use File::Copy     ();
 use HTML::Entities ();
 use IO::File       ();
+
+use Email::Sender::Simple ();
+
 use strict;
 use vars qw( $last_str $last_time $SUBJECT @listing $Dbh);
 
@@ -54,14 +57,22 @@ exit;
 
 sub send_the_mail {
   $SUBJECT ||= "cron-p6daily.pl";
-  my $MSG = Mail::Send->new(
-    Subject => $SUBJECT,
-    To      => $PAUSE::Config->{ADMIN}
+
+  my $email = Email::MIME->create(
+    attributes => {
+      content_type  => 'text/plain',
+      charset       => 'utf-8',
+      encoding      => '8bit',
+    },
+    header_str => [
+      Subject => $SUBJECT,
+      To      => $PAUSE::Config->{ADMIN},
+      From    => "cron daemon cron-p6daily.pl <upload>",
+    ],
+    body_str => join(q{}, @blurb),
   );
-  $MSG->add("From", "cron daemon cron-p6daily.pl <upload>");
-  my $FH = $MSG->open('sendmail');
-  print $FH join "", @blurb;
-  $FH->close;
+
+  Email::Sender::Simple->send($email);
 }
 
 sub p6dists {
