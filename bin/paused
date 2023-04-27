@@ -26,7 +26,8 @@ use IO::File ();
 use IPC::Run3 ();
 use LWP ();
 use Digest::SHA ();
-use Mail::Send ();
+use Email::MIME ();
+use Email::Sender::Simple ();
 use PAUSE::MailAddress ();
 use POSIX ":sys_wait_h";
 use Path::Tiny;
@@ -124,21 +125,27 @@ our %hp_inside;
 
 sub send {
   my($self,$header,$blurb) = @_;
-  my(%tosubj);
-  for my $h (qw(To Subject)) {
-    $tosubj{$h} = delete $header->{$h};
-  }
-  my $msg = Mail::Send->new(%tosubj);
-  if (%$header) {
-    $msg->add(%$header);
-  }
-  $msg->add("From" => "PAUSE <$PAUSE::Config->{UPLOAD}>") unless exists $header->{From};
-  $msg->add("Content-Type" => "Text/Plain; Charset=UTF-8");
-  $msg->add("MIME-Version" => "1.0");
-  $msg->add("Content-Transfer-Encoding" => "8bit");
-  my $fh = $msg->open('sendmail');
-  print $fh $blurb;
-  close $fh;
+
+  my %from  = exists $header->{From}
+            ? ()
+            : (From => "PAUSE <$PAUSE::Config->{UPLOAD}>");
+
+  my $email = Email::MIME->create(
+    attributes => {
+      content_type  => 'text/plain',
+      charset       => 'utf-8',
+      encoding      => '8bit',
+    },
+    header_str => [
+      To      => delete $header->{To},
+      Subject => delete $header->{Subject},
+      %from,
+      %$header,
+    ],
+    body_str => $blurb,
+  );
+
+  Email::Sender::Simple->send($email);
 }
 
 package mypause_daemon_inspector;
