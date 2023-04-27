@@ -100,7 +100,6 @@ Mail::Field 1.02
 Mail::Header 1.01
 Mail::Internet 1.23
 Mail::Mailer 1.07
-Mail::Send 1.04
 Mail::Util 1.10
 Net::Cmd 2.00
 Net::Domain 2.00

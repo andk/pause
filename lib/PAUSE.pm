@@ -23,7 +23,6 @@ use File::Spec ();
 use IO::File ();
 use List::Util ();
 use Digest::SHA ();
-use Mail::Send ();
 use Sys::Hostname ();
 use Time::Piece;
 use YAML::Syck;
