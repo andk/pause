@@ -50,6 +50,10 @@ sub connect_mod_db {
 sub packages_data {
   my ($self) = @_;
 
+  unless (-e $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz))) {
+    return Parse::CPAN::Packages->new("Description:");
+  }
+
   return Parse::CPAN::Packages->new(
     q{} . $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
   );
