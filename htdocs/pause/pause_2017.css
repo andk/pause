@@ -160,3 +160,19 @@ td.checkbox { padding: 0em; text-align: center; vertical-align: middle; }
 p.notice {
   font-weight: bold;
 }
+div.info {
+  color: #004085;
+  background-color: #cce5ff;
+  border-color: #b8daff;
+}
+div.error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+div.messagebox {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}

@@ -11,37 +11,46 @@
 </h3>
 
 % if (param("pause99_edit_cred_sub")) {
-%   if ($pause->{no_email}) {
-<b>ERROR</b>: Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.<hr>
-%   } elsif ($pause->{no_public_email}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your public email address but your public email address is left blank. Please either pick a different choice for the alias or fill in a public email address.<hr>
-%   } elsif ($pause->{public_is_cpan_alias}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your public email address but your public email address field contains <%= $cpan_alias %>. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable public email address.<hr>
-%   } elsif ($pause->{no_secret_email}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.<hr>
-%   } elsif ($pause->{secret_is_cpan_alias}) {
-<b>ERROR</b>: You chose your email alias on CPAN to point to your secret email address but your secret email address field contains <%= $cpan_alias %>. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.<hr>
-%   } elsif ($pause->{invalid_secret}) {
-<b>ERROR</b>: Your secret email address doesn't look like valid email address.<hr>
-%   } elsif ($pause->{invalid_public}) {
-<b>ERROR</b>: Your public email address doesn't look like valid email address.<hr>
-%   } else {
-
-%     if ($pause->{not_ascii}) {
-<b>ERROR</b>: Your asciiname seems to contain non-ascii characters.
+%   if (my $error = $pause->{error}) {
+<div class="messagebox error">
+<b>ERROR</b>:
+%     if ($error->{no_email}) {
+Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.
+%     } elsif ($error->{no_public_email}) {
+You chose your email alias on CPAN to point to your public email address but your public email address is left blank. Please either pick a different choice for the alias or fill in a public email address.
+%     } elsif ($error->{public_is_cpan_alias}) {
+You chose your email alias on CPAN to point to your public email address but your public email address field contains <%= $cpan_alias %>. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable public email address.
+%     } elsif ($error->{no_secret_email}) {
+You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.
+%     } elsif ($error->{secret_is_cpan_alias}) {
+You chose your email alias on CPAN to point to your secret email address but your secret email address field contains <%= $cpan_alias %>. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.
+%     } elsif ($error->{invalid_secret}) {
+Your secret email address doesn't look like valid email address.
+%     } elsif ($error->{invalid_public}) {
+Your public email address doesn't look like valid email address.
+%     } elsif ($error->{not_ascii}) {
+Your asciiname seems to contain non-ascii characters.
 %     }
+</div>
+<hr>
 %   }
 % }
 
 % if ($pause->{consistentsubmit}) {
 %   for my $table ("users", $PAUSE::Config->{AUTHEN_USER_TABLE}) {
 %     if ($pause->{registered}{$table}) {
-The new data are registered in table <%= $table %>.<hr>
+<div class="messagebox info">
+The new data are registered in table <%= $table %>.
+</div>
+<hr>
 
 %     }
 %   }
 %   if (!$pause->{saw_a_change}) {
-No change seen, nothing done.<hr>
+<div class="messagebox info">
+No change seen, nothing done.
+</div>
+<hr>
 %   }
 % }
 
