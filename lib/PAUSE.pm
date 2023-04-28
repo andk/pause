@@ -563,6 +563,8 @@ sub may_overwrite_file {
   return 1 if $filename =~ /\.
     ( html
     | txt
+    | mkdn
+    | md
     | xml
     | yml
     | json
