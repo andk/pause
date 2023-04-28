@@ -494,6 +494,42 @@ EOT
   });
 };
 
+subtest "tarbombs" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  $pause->upload_author_file('WEIRDO', 'corpus/tarbombs/Tarbomb-0.001.tar.gz');
+  $pause->upload_author_file('WEIRDO', 'corpus/tarbombs/Xyzzy-1.000.tar.gz');
+
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  my $tarbomb_message = sub {
+    like(
+      $_[0]{email}->object->body_str,
+      qr/common top-level directory/,
+      "email contains ETARBOMB string",
+    );
+  };
+
+  $result->email_ok(
+    [
+      {
+        subject  => 'Failed: PAUSE indexer report WEIRDO/Tarbomb-0.001.tar.gz',
+        callbacks => [ $tarbomb_message ],
+      },
+      {
+        subject  => 'Failed: PAUSE indexer report WEIRDO/Xyzzy-1.000.tar.gz',
+        callbacks => [ $tarbomb_message ],
+      },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:

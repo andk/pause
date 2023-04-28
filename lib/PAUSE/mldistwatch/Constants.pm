@@ -13,6 +13,7 @@ use constant EMISSPERM => 20;
 use constant ELONGVERSION => 13;
 use constant EBADVERSION => 12;
 use constant EPARSEVERSION => 10;
+use constant ETARBOMB    => 8;
 use constant E_DB_XACTFAIL => 7;
 use constant EMETAUNSTABLE => 6;
 use constant EBAREPMFILE => 5;
@@ -37,6 +38,7 @@ our $heading = {
   EOPENFILE() => "Problem while reading the distribtion",
   EMETAUNSTABLE() => "META release_status is not stable, will not index",
   EPARSEVERSION() => "Version parsing problem",
+  ETARBOMB() => "Archive contents aren't all under a common top-level directory",
   EVERFALLING() => "Decreasing version number",
   OK() => "Successfully indexed",
 };
@@ -48,5 +50,3 @@ sub heading ($) {
 }
 
 1;
-
-
