@@ -457,20 +457,18 @@ sub maybe_index_dist {
         }
     }
 
-    $dio->examine_dist; # checks for perl, developer, version, etc. and untars
+    for my $method (qw( examine_dist read_dist extract_readme_and_meta )) {
+      $dio->$method;
+      if ($dio->skip) {
+          delete $self->{ALLlasttime}{$dist};
+          delete $self->{ALLfound}{$dist};
 
-    if ($dio->skip) {
-        delete $self->{ALLlasttime}{$dist};
-        delete $self->{ALLfound}{$dist};
-
-        if ($dio->{REASON_TO_SKIP}) {
-          $dio->mail_summary;
-        }
-        return;
+          if ($dio->{REASON_TO_SKIP}) {
+              $dio->mail_summary;
+          }
+          return;
+      }
     }
-
-    $dio->read_dist;
-    $dio->extract_readme_and_meta;
 
     if ($dio->{META_CONTENT}{distribution_type}
         && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
