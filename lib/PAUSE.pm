@@ -556,7 +556,23 @@ sub isa_regular_perl {
 sub may_overwrite_file {
   my ($filename) = @_;
 
-  return $filename =~ /(readme|\.html|\.txt|\.[xy]ml|\.json|\.[pr]df|\.pod)(\.gz|\.bz2)?$/i;
+  my $is_archive = $filename =~ s/\.(gz|bz2)$//i;
+
+  return 1 if $filename =~ /readme$/i;
+
+  return 1 if $filename =~ /\.
+    ( html
+    | txt
+    | xml
+    | yml
+    | json
+    | pdf
+    | rdf
+    | pod
+    )
+  $/ix;
+
+  return;
 }
 
 package PAUSE::DBError;
