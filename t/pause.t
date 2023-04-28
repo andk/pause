@@ -30,4 +30,29 @@ EOF
 
 };
 
+subtest "PAUSE::may_overwrite_file" => sub {
+  my @may = qw(
+    readme
+    README
+    README.md
+    docs.txt
+    spec.mkdn
+    01-Super-Important.pdf
+  );
+
+  my @maynt = qw(
+    Dist-Zilla
+    Dist-Zilla.pm
+    Dist-Zilla.tar
+  );
+
+  for my $file (map {; $_, "$_.gz", "$_.bz2" } @may) {
+    ok(PAUSE::may_overwrite_file($file), "may overwrite $file");
+  }
+
+  for my $file (map {; $_, "$_.gz", "$_.bz2" } @maynt) {
+    ok(!PAUSE::may_overwrite_file($file), "may not overwrite $file");
+  }
+};
+
 done_testing;
