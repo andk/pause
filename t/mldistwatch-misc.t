@@ -519,6 +519,38 @@ EOT
   });
 };
 
+subtest "do not index dists without META file" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(PERSON => 'Not-Very-Meta-1.234.tar.gz', {
+    omitted_files => [ qw( META.yml META.json ) ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  my $nometa = sub {
+    like(
+      $_[0]{email}->object->body_str,
+      qr/\QDistribution included neither META.json nor META.yml/,
+      "email contains ENOMETAFILE string",
+    );
+  };
+
+  $result->email_ok(
+    [
+      {
+        subject  => 'Failed: PAUSE indexer report PERSON/Not-Very-Meta-1.234.tar.gz',
+        callbacks => [ $nometa ],
+      },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
