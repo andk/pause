@@ -579,6 +579,11 @@ sub mail_summary {
                  .  qq{made by logging into https://pause.perl.org/\n\n};
 
           $status_over_all = "Failed";
+        } elsif ($self->{REASON_TO_SKIP} == PAUSE::mldistwatch::Constants::ENOMETAFILE) {
+          push @m,  qq{This distribution was not indexed because it did not\n}
+                 .  qq{contain a META.yml or META.json file.\n\n};
+
+          $status_over_all = "Failed";
         } elsif ($self->version_from_meta_ok) {
 
           push @m,  qq{Nothing in this distro has been \n}
@@ -1035,6 +1040,8 @@ sub extract_readme_and_meta {
 
   unless ($json || $yaml) {
     $self->{METAFILE} = "No META.yml or META.json found";
+    $self->{SKIP}     = 1;
+    $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::ENOMETAFILE;
     $Logger->log("no META.yml or META.json found");
     return;
   }
