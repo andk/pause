@@ -581,6 +581,29 @@ subtest "do not index dists without META file" => sub {
   );
 };
 
+subtest "very small version number (as numeric literal)" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(PERSON => 'Tiny-Version-1.002.tar.gz', {
+    packages => [
+      'Tiny::Version' => {
+        version => '0.000001',
+        layout  => { version => 'our-literal' },
+      },
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+            ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  local $TODO = "sending a useful warning here is more or less impossible";
+  fail("assert a report was sent with an explanation");
+};
+
 done_testing;
 
 # Local Variables:
