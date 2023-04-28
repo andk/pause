@@ -26,6 +26,7 @@ requires 'IPC::Run3';
 requires 'JSON';
 requires 'JSON::XS';
 requires 'LWP';
+requires 'LWP::Protocol::https';
 requires 'List::MoreUtils';
 requires 'Log::Dispatch::Config';
 requires 'Log::Dispatchouli';
