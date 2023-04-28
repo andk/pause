@@ -553,6 +553,12 @@ sub isa_regular_perl {
   return scalar $filename =~ $ISA_REGULAR_PERL;
 }
 
+sub may_overwrite_file {
+  my ($filename) = @_;
+
+  return $filename =~ /(readme|\.html|\.txt|\.[xy]ml|\.json|\.[pr]df|\.pod)(\.gz|\.bz2)?$/i;
+}
+
 package PAUSE::DBError;
 
 sub new {
