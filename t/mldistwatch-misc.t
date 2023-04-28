@@ -250,7 +250,16 @@ subtest "warn when pkg and module match only case insensitively" => sub {
 
 subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/pkg-block/authors');
+  $pause->upload_author_fake(RJBS => {
+    name      => 'Pkg-Name',
+    version   => '1.000',
+    packages  => [
+      'Pkg::Name'             => { version => '1.000', style => 'legacy' },
+      'Pkg::NameBlock'        => { version => '1.000', style => 'legacy_block' },
+      'Pkg::NameVersion'      => { version => '1.000', style => 'statement' },
+      'Pkg::NameVersionBlock' => { version => '1.000', style => 'block' },
+    ]
+  });
 
   my $result = $pause->test_reindex;
 
@@ -272,7 +281,18 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
 
 subtest "check various forms of version" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/bad-version/authors');
+  $pause->upload_author_fake(RJBS => {
+    name      => 'VVVVVV',
+    version   => '6.666',
+    packages  => [
+      'VVVVVV'          => { version => '6.666'      },
+      'VVVVVV::Bogus'   => { version => '6.666june6' },
+      'VVVVVV::Dev'     => { version => '6.66_6'     },
+      'VVVVVV::Lax'     => { version => '6.006006'   },
+      'VVVVVV::VString' => { version => 'v6.6.6', style => 'legacy_literal' },
+    ]
+  });
+
   my $result = $pause->test_reindex;
 
   $pause->file_updated_ok(
@@ -336,7 +356,12 @@ EOT
 
 subtest "check overlong versions" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
-  $pause->import_author_root('corpus/mld/long-version/authors');
+  $pause->upload_author_fake(RJBS => {
+    name    => 'VTooLong',
+    version => '1.2345678901234567',
+    packages => [ qw( VTooLong ) ],
+  });
+
   my $result = $pause->test_reindex;
 
   $pause->file_not_updated_ok(
