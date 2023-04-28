@@ -799,6 +799,39 @@ subtest "indexer ran, but nothing indexed" => sub {
   );
 };
 
+subtest "very small version number (as numeric literal)" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(PERSON => 'Tiny-Version-1.002.tar.gz', {
+    packages => [
+      'Tiny::Version' => {
+        version => '0.000001',
+        layout  => { version => 'our-literal' },
+      },
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->assert_index_not_updated;
+
+  $result->email_ok(
+    [
+      {
+        subject  => 'Failed: PAUSE indexer report PERSON/Tiny-Version-1.002.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->object->body_str,
+              qr/perl turned it into\s+"1e-06"/,
+              "email explains the numeric literal problem",
+            );
+          },
+        ],
+      },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:

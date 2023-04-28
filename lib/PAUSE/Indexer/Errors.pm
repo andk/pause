@@ -300,6 +300,22 @@ pkg_error version_invalid => {
   }
 };
 
+pkg_error version_numeric_literal => {
+  header  => 'Not indexed because version is a very small or large number.',
+  body    => sub {
+    my ($arg) = @_;
+
+    _assert_args_present(version_numeric_literal => $arg, [ qw(version) ]);
+
+    return <<~"EOF";
+      The version in the file is a bare number, not a string, and it is so
+      small or so large that perl turned it into "$arg->{version}", which is
+      not a valid version string.  Quote the version in your source, like
+      \$VERSION = '0.000001', so that it is stored as a string.
+      EOF
+  },
+};
+
 pkg_error version_openerr => {
   header  => 'Not indexed because of version handling error.',
   body    => <<~'EOF',
