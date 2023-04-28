@@ -175,7 +175,7 @@ sub get {
     $url->query_param($_ => $params->{$_}) for keys %$params;
   }
   my $res = $self->{mech}->get($url, @args);
-  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
+  unlike $res->decoded_content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
   $res;
 }
@@ -196,7 +196,7 @@ sub post {
 
   $self->set_credentials if $self->{user};
   my $res = $self->{mech}->post($url, @args);
-  unlike $res->content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
+  unlike $res->decoded_content => qr/(?:HASH|ARRAY|SCALAR|CODE)\(/; # most likely stringified reference
   ok !grep /(?:HASH|ARRAY|SCALAR|CODE)\(/, map {$_->as_string} $self->deliveries;
   $res;
 }
@@ -217,7 +217,7 @@ sub post_with_token {
 
   my $res = $self->get($url);
   return $res unless $res->is_success;
-  my $input = Mojo::DOM->new($res->content)->at('input[name="csrf_token"]');
+  my $input = Mojo::DOM->new($res->decoded_content)->at('input[name="csrf_token"]');
   my $token = $input ? $input->attr('value') : '';
   ok $token, "Got a CSRF token";
   @args = {} if !@args;
