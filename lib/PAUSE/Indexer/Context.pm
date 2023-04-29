@@ -2,6 +2,10 @@ package PAUSE::Indexer::Context;
 use v5.12.0;
 use Moo;
 
+use PAUSE::Indexer::Abort;
+use PAUSE::Indexer::Errors;
+use PAUSE::Logger '$Logger';
+
 has package_warnings => (
   is => 'bare',
   reader  => '_package_warnings',
@@ -56,6 +60,39 @@ sub alert {
 sub all_alerts {
   my ($self) = @_;
   return $self->_alerts->@*;
+}
+
+has dist_errors => (
+  is      => 'bare',
+  reader  => '_dist_errors',
+  default => sub {  []  },
+);
+
+sub add_dist_error {
+  my ($self, $error) = @_;
+
+  $error = ref $error ? $error : { ident => $error, message => $error };
+
+  $Logger->log("adding dist error: " . ($error->{ident} // $error->{message}));
+  push $self->_dist_errors->@*, $error;
+
+  return $error;
+}
+
+sub dist_errors {
+  my ($self) = @_;
+  return $self->_dist_errors->@*;
+}
+
+sub abort_indexing {
+  my ($self, $error) = @_;
+
+  $error = $self->add_dist_error($error);
+
+  die PAUSE::Indexer::Abort->new({
+    message => $error->{message},
+    public  => $error->{public},
+  });
 }
 
 no Moo;
