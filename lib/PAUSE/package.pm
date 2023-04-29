@@ -72,14 +72,6 @@ sub new {
 }
 
 # package PAUSE::package;
-sub alert {
-  my $self = shift;
-  my $what = shift;
-  my $parent = $self->parent;
-  $parent->alert($what);
-}
-
-# package PAUSE::package;
 # return value nonsensical
 # XXX needs case check
 sub give_regdowner_perms {
@@ -179,7 +171,7 @@ Hint: you can always find the legitimate maintainer(s) on PAUSE under
                               PAUSE::mldistwatch::Constants::EMISSPERM,
                               $message,
                               );
-          $self->alert(qq{$error:
+          $ctx->alert(qq{$error:
 package[$package]
 version[$pp->{version}]
 file[$pp->{infile}]
@@ -353,7 +345,7 @@ sub _version_ok {
                         $errno,
                         $error,
                         );
-    $self->alert(qq{$error:
+    $ctx->alert(qq{$error:
 package[$package]
 version[$pp->{version}]
 file[$pp->{infile}]
@@ -524,7 +516,7 @@ has a higher version number ($oldversion)},
 
           delete $self->dist->{CHECKINS}{ lc $package }{ $package };
 
-          $self->alert(qq{decreasing VERSION number [$pp->{version}]
+          $ctx->alert(qq{decreasing VERSION number [$pp->{version}]
 in package[$package]
 dist[$dist]
 oldversion[$oldversion]
@@ -534,7 +526,7 @@ pmfile[$pmfile]
           $ok++;          # new on 2002-08-01
       } else {
           # we get a different result now than we got in a previous run
-          $self->alert("Taking back previous version calculation. odist[$odist]oversion[$oldversion]dist[$dist]version[$pp->{version}].");
+          $ctx->alert("Taking back previous version calculation. odist[$odist]oversion[$oldversion]dist[$dist]version[$pp->{version}].");
           $ok++;
       }
   } else {

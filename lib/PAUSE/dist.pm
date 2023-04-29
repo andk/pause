@@ -157,22 +157,8 @@ sub mtime_ok {
   return;
 }
 
-sub alert {
-  my ($self, $what) = @_;
-
-  $self->{ALERT} //= [];
-  1 while chomp $what;
-  push @{ $self->{ALERT} }, $what;
-  return;
-}
-
-sub all_alerts {
-  my ($self, $ctx) = @_;
-  return @{ $self->{ALERT} // [] };
-}
-
 sub untar {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my $dist = $self->{DIST};
   local *TARTEST;
   my $tarbin = $self->hub->{TARBIN};
@@ -185,7 +171,7 @@ sub untar {
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
       $Logger->log("*** ALERT: updir detected!");
-      $self->alert("updir detected!");
+      $ctx->alert("updir detected!");
       $self->{COULD_NOT_UNTAR}++;
       return;
     }
@@ -196,7 +182,7 @@ sub untar {
   $self->{PERL_MAJOR_VERSION} = 5 unless defined $self->{PERL_MAJOR_VERSION};
   unless (close TARTEST) {
     $Logger->log("could not untar $dist!");
-    $self->alert("could not untar!");
+    $ctx->alert("could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return;
   }
@@ -244,7 +230,7 @@ sub skip { shift->{SKIP} }
 my $SUFFQR = qr/\.(tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z)$/;
 
 sub _examine_regular_perl {
-  my ($self) = @_;
+  my ($self, $ctx) = @_;
   my ($suffix, $skip);
 
   my $dist = $self->{DIST};
@@ -265,10 +251,10 @@ sub _examine_regular_perl {
     $suffix = $1;
   } else {
     $Logger->log("perl distro ($dist) with an unusual suffix!");
-    $self->alert("perl distro ($dist) with an unusual suffix!");
+    $ctx->alert("perl distro ($dist) with an unusual suffix!");
   }
   unless ($skip) {
-    $skip = 1 unless $self->untar;
+    $skip = 1 unless $self->untar($ctx);
   }
 
   return ($suffix, $skip);
@@ -289,7 +275,7 @@ sub examine_dist {
   $suffix = $skip = "";
 
   if (PAUSE::isa_regular_perl($dist)) {
-    ($suffix, $skip) = $self->_examine_regular_perl;
+    ($suffix, $skip) = $self->_examine_regular_perl($ctx);
     $self->{SUFFIX} = $suffix;
     $self->{SKIP}   = $skip;
     return;
@@ -311,7 +297,7 @@ sub examine_dist {
 
   if ($dist =~ $SUFFQR) {
     $suffix = $1;
-    $skip = 1 unless $self->untar;
+    $skip = 1 unless $self->untar($ctx);
   } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
     $Logger->log("dist is a single-.pm-file upload");
     $suffix = "N/A";
@@ -495,7 +481,7 @@ sub mail_summary {
     } else {
 
       my $err = join "\n", @{$self->{HAS_WORLD_WRITABLE_FIXINGERRORS}||[]};
-      $self->alert("Fixing a world-writable tarball failed: $err");
+      $ctx->alert("Fixing a world-writable tarball failed: $err");
 
     }
 
@@ -844,7 +830,7 @@ sub _index_by_files {
 
   for my $pmfile (@$pmfiles) {
     if ($pmfile =~ m|/blib/|) {
-      $self->alert("blib directory detected ($pmfile)");
+      $ctx->alert("blib directory detected ($pmfile)");
       next;
     }
 
@@ -942,7 +928,7 @@ sub examine_pms {
   if ($indexing_method) {
     $self->$indexing_method($ctx, $pmfiles, $provides);
   } else {
-    $self->alert("Couldn't determine an indexing method!");
+    $ctx->alert("Couldn't determine an indexing method!");
   }
 }
 
@@ -1185,7 +1171,7 @@ sub p6_dist_meta_ok {
 }
 
 sub p6_index_dist {
-  my $self   = shift;
+  my ($self, $ctx) = @_;
   my $dbh    = $self->connect;
   my $dist   = $self->{DIST};
   my $MLROOT = $self->mlroot;
@@ -1262,7 +1248,7 @@ sub p6_index_dist {
   }
   unless (close TARTEST) {
     $Logger->log("could not untar!");
-    $self->alert("Could not untar!");
+    $ctx->alert("Could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return "ERROR: Could not untar $dist!";
   }

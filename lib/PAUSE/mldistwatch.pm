@@ -353,15 +353,15 @@ sub _do_the_database_work {
     # Either we're doing Perl 6...
     if ($dio->perl_major_version == 6) {
       if ($dio->p6_dist_meta_ok) {
-        if (my $err = $dio->p6_index_dist) {
-          $dio->alert($err);
+        if (my $err = $dio->p6_index_dist($ctx)) {
+          $ctx->alert($err);
           $dbh->rollback;
         } else {
           $dbh->commit;
         }
       }
       else {
-        $dio->alert("Meta information of Perl 6 dist is invalid");
+        $ctx->alert("Meta information of Perl 6 dist is invalid");
         $dbh->rollback;
       }
 
@@ -378,7 +378,7 @@ sub _do_the_database_work {
 
       $dbh->commit;
     } else {
-      $dio->alert("Uploading user has no permissions on package $main_pkg");
+      $ctx->alert("Uploading user has no permissions on package $main_pkg");
       $dio->{NO_DISTNAME_PERMISSION} = 1;
       $dbh->rollback;
     }
@@ -506,7 +506,7 @@ sub maybe_index_dist {
       $self->disconnect;
       if ($attempt == 3) {
         $Logger->log_debug("tried $attempt times to do db work, but all failed");
-        $dio->alert("database errors while indexing");
+        $ctx->alert("database errors while indexing");
         $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
       }
     }
@@ -515,9 +515,7 @@ sub maybe_index_dist {
     $self->sleep;
     $dio->set_indexed($ctx);
 
-    my @alerts = $dio->all_alerts($ctx);
-    return unless @alerts;
-    return @alerts;
+    return $ctx->all_alerts;
 }
 
 sub check_for_new {
