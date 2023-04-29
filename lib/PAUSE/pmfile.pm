@@ -27,14 +27,6 @@ sub new {
     bless { @_ }, ref($me) || $me;
 }
 
-# package PAUSE::pmfile;
-sub alert {
-    my $self = shift;
-    my $what = shift;
-    my $dio = $self->{DIO};
-    $dio->alert($what);
-}
-
 sub connect {
     my($self) = @_;
     my $dio = $self->{DIO};
