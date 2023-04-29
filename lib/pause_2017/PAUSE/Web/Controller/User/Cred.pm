@@ -29,19 +29,19 @@ sub edit {
     my $wantalias = $req->param("pause99_edit_cred_cpan_mail_alias");
     my $addr_spec = $Email::Address::addr_spec;
     if ($wantemail=~/^\s*$/ && $wantsecretemail=~/^\s*$/) {
-      $pause->{no_email} = 1;
+      $pause->{error}{no_email} = 1;
     } elsif ($wantalias eq "publ" && $wantemail=~/^\s*$/) {
-      $pause->{no_public_email} = 1;
+      $pause->{error}{no_public_email} = 1;
     } elsif ($wantalias eq "publ" && $wantemail=~/\Q$cpan_alias\E/i) {
-      $pause->{public_is_cpan_alias} = 1;
+      $pause->{error}{public_is_cpan_alias} = 1;
     } elsif ($wantalias eq "secr" && $wantsecretemail=~/^\s*$/) {
-      $pause->{no_secret_email} = 1;
+      $pause->{error}{no_secret_email} = 1;
     } elsif ($wantalias eq "secr" && $wantsecretemail=~/\Q$cpan_alias\E/i) {
-      $pause->{secret_is_cpan_alias} = 1;
+      $pause->{error}{secret_is_cpan_alias} = 1;
     } elsif (defined $wantsecretemail && $wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
-      $pause->{invalid_secret} = 1;
+      $pause->{error}{invalid_secret} = 1;
     } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/ && $wantemail ne 'CENSORED') {
-      $pause->{invalid_public} = 1;
+      $pause->{error}{invalid_public} = 1;
     } else {
       $consistentsubmit = 1;
     }
@@ -50,7 +50,7 @@ sub edit {
       # more testing: make sure that we have in asciiname only ascii
       if (my $wantasciiname = $req->param("pause99_edit_cred_asciiname")) {
         if ($wantasciiname =~ /[^\040-\177]/) {
-          $pause->{not_ascii} = 1;
+          $pause->{error}{not_ascii} = 1;
           $consistentsubmit = 0;
         } else {
           # set asciiname to empty if it equals fullname
