@@ -163,10 +163,6 @@ sub basename_matches_package {
     $file =~ s|\.pm(?:\.PL)?||;
     my $ret = $package =~ m/\b\Q$file\E$/;
     $ret ||= 0;
-    unless ($ret) {
-        # Apache::mod_perl_guide stuffs it into Version.pm
-        $ret = 1 if lc $file eq 'version';
-    }
 
     $Logger->log([
       "result of basename_matches_package: %s", {
