@@ -31,14 +31,14 @@ sub _get {
   {
     my $uc_hidden_user = uc $hidden_user;
     unless ($uc_hidden_user eq $hidden_user) {
-      $c->app->pause->log({level => 'error', message => "Warning: Had to uc the hidden_user $hidden_user" });
+      $c->app->pause->log({level => 'warn', message => "Warning: Had to uc the hidden_user $hidden_user" });
       $hidden_user = $uc_hidden_user;
     }
   }
 
   my $user = {};
   my $userid = $pause->{User}{userid} // '';
-  $mgr->log({level => 'error', message => sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]where[%s]",
+  $mgr->log({level => 'info', message => sprintf("Watch: mgr/User/userid[%s]hidden_user[%s]mgr/UserGroups[%s]caller[%s]where[%s]",
     $userid,
     $hidden_user,
     join(":", keys %{$pause->{UserGroups} || {}}),
