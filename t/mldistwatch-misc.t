@@ -254,10 +254,10 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
     name      => 'Pkg-Name',
     version   => '1.000',
     packages  => [
-      'Pkg::Name'             => { version => '1.000', style => 'legacy' },
-      'Pkg::NameBlock'        => { version => '1.000', style => 'legacy_block' },
-      'Pkg::NameVersion'      => { version => '1.000', style => 'statement' },
-      'Pkg::NameVersionBlock' => { version => '1.000', style => 'block' },
+      'Pkg::Name'             => { version => '1.000' },
+      'Pkg::NameBlock'        => { version => '1.000', layout => { style => 'block' } },
+      'Pkg::NameVersion'      => { version => '1.000', layout => { version => 'inline' } },
+      'Pkg::NameVersionBlock' => { version => '1.000', layout => { style => 'block', version => 'inline' } },
     ]
   });
 
@@ -289,7 +289,7 @@ subtest "check various forms of version" => sub {
       'VVVVVV::Bogus'   => { version => '6.666june6' },
       'VVVVVV::Dev'     => { version => '6.66_6'     },
       'VVVVVV::Lax'     => { version => '6.006006'   },
-      'VVVVVV::VString' => { version => 'v6.6.6', style => 'legacy_literal' },
+      'VVVVVV::VString' => { version => 'v6.6.6', layout => { version => 'our-literal' } },
     ]
   });
 
