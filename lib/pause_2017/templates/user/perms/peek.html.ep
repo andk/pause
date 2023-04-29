@@ -45,7 +45,6 @@ can be corrected.--Thank you!</p><p>
 % if (@{$pause->{rows} || []}) {
 <div id="perms">
 <input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -73,7 +72,6 @@ can be corrected.--Thank you!</p><p>
 % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 <p><a href="<%= my_url->query([
   OF => "YAML",
   pause99_peek_perms_sub => 1,
@@ -87,12 +85,7 @@ can be corrected.--Thank you!</p><p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('perms', {
-  valueNames: ['module', 'userid', 'type', 'owner'],
-  page: 300,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
-  ]
+  valueNames: ['module', 'userid', 'type', 'owner']
 });
 % end
 % end

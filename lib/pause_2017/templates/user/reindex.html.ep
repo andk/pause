@@ -26,7 +26,6 @@
 <div id="files">
 <input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex">
 <input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -43,19 +42,13 @@
 % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 <p><input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex"></p>
 </div>
 % content_for javascript => begin
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('files', {
-  valueNames: ['file'],
-  page: 300,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
-  ]
+  valueNames: ['file']
 });
 % end
 % end

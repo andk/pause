@@ -39,7 +39,6 @@ Give up Co-maintainership status per distribution</a> page.</p>
 
 <div id="packages">
 <input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -58,7 +57,6 @@ Give up Co-maintainership status per distribution</a> page.</p>
   % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 <p>
 <input type="submit" name="SUBMIT_pause99_share_perms_remome"
  value="Give Up"></p>
@@ -67,12 +65,7 @@ Give up Co-maintainership status per distribution</a> page.</p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('packages', {
-  valueNames: ['package', 'dist'],
-  page: 300,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
-  ]
+  valueNames: ['package', 'dist']
 });
 % end
 % end

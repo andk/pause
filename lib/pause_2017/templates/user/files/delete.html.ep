@@ -8,7 +8,6 @@
 % if (%$files) {
 <div id="files">
 <input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete"><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete"><input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -29,7 +28,6 @@
 % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 
 <p><input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete"><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete"></p>
 </div>
@@ -37,12 +35,7 @@
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('files', {
-  valueNames: ['file', 'size', 'modified'],
-  page: 500,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 7, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 7, outerWindow: 1}
-  ]
+  valueNames: ['file', 'size', 'modified']
 });
 % end
 % end

@@ -5,7 +5,6 @@
 
 <div id="emails">
 <input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -22,7 +21,6 @@
 % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 
 <p><a href="<%= my_url->query(ACTION => "email_for_admin", OF => "YAML") %>" style="text-decoration: none;"><span class="orange_button">YAML</span>
 </a></p>
@@ -31,12 +29,7 @@
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('emails', {
-  valueNames: ['userid', 'email'],
-  page: 300,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
-  ]
+  valueNames: ['userid', 'email']
 });
 % end
 % end
