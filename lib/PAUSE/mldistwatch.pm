@@ -471,7 +471,15 @@ sub maybe_index_dist {
         }
     }
 
-    for my $method (qw( examine_dist read_dist extract_readme_and_meta )) {
+    for my $method (qw(
+      examine_dist
+      read_dist
+      extract_readme_and_meta
+      check_indexability
+      check_blib
+      check_multiple_root
+      check_world_writable
+    )) {
       $dio->$method($ctx);
       if ($dio->skip) {
           delete $self->{ALLlasttime}{$dist};
@@ -483,22 +491,6 @@ sub maybe_index_dist {
           return;
       }
     }
-
-    if ($dio->{META_CONTENT}{distribution_type}
-        && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
-        return;
-    }
-
-    if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
-        # META.json / META.yml declares it's not stable; do not index!
-        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
-        $dio->mail_summary($ctx);
-        return;
-    }
-
-    $dio->check_blib($ctx);
-    $dio->check_multiple_root($ctx);
-    $dio->check_world_writable($ctx);
 
     for my $attempt (1 .. 3) {
       my $db_ok = $self->_do_the_database_work($ctx, $dio);
