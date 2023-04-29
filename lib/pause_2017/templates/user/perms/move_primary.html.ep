@@ -42,7 +42,6 @@ Transfer Primary Permissions per distribution</a> page.</p>
 <p>Select one or more namespaces:</p><p>
 <div id="packages">
 <input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -61,7 +60,6 @@ Transfer Primary Permissions per distribution</a> page.</p>
   % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 <p>Select a userid:<br>
 <%= text_field "pause99_share_perms_movepr_a", size => 15, maxlength => 9 =%>
 </p><p>
@@ -72,12 +70,7 @@ Transfer Primary Permissions per distribution</a> page.</p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('packages', {
-  valueNames: ['package', 'dist'],
-  page: 300,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
-  ]
+  valueNames: ['package', 'dist']
 });
 % end
 % end

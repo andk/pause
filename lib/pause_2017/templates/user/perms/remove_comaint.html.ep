@@ -41,7 +41,6 @@ Remove Comaintainers per distribution</a> page.</p>
 
 <div id="packages">
 <input class="search" placeholder="Filter">
-<ul class="pagination paginationTop"></ul>
 <table class="table compact">
   <thead>
     <tr>
@@ -63,7 +62,6 @@ Remove Comaintainers per distribution</a> page.</p>
   % }
   </tbody>
 </table>
-<ul class="pagination paginationBottom"></ul>
 <p>
 <input type="submit" name="SUBMIT_pause99_share_perms_remocos"
  value="Remove"></p>
@@ -72,12 +70,7 @@ Remove Comaintainers per distribution</a> page.</p>
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('packages', {
-  valueNames: ['pacakge', 'dist', 'userid'],
-  page: 300,
-  pagination: [
-    {name: 'paginationTop', paginationClass: 'paginationTop', innerWindow: 5, outerWindow: 1},
-    {name: 'paginationBottom', paginationClass: 'paginationBottom', innerWindow: 5, outerWindow: 1}
-  ]
+  valueNames: ['pacakge', 'dist', 'userid']
 });
 % end
 % end
