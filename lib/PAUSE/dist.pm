@@ -168,7 +168,7 @@ sub alert {
 }
 
 sub all_alerts {
-  my ($self) = @_;
+  my ($self, $ctx) = @_;
   return @{ $self->{ALERT} // [] };
 }
 
@@ -285,7 +285,7 @@ sub isa_dev_version {
 }
 
 sub examine_dist {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   my $dist = $self->{DIST};
   my $MLROOT = $self->mlroot;
   my($suffix,$skip);
@@ -358,7 +358,7 @@ sub mlroot {
 }
 
 sub mail_summary {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   my $distro = $self->{DIST};
   my $author = $self->{USERID};
   my @m;
@@ -367,7 +367,7 @@ sub mail_summary {
     "The following report has been written by the PAUSE namespace indexer.\n",
     "Please contact modules\@perl.org if there are any open questions.\n";
 
-  if ($self->has_indexing_warnings) {
+  if ($self->has_indexing_warnings($ctx)) {
     push @m,
       "\nWARNING:  Some irregularities were found while indexing your\n",
         "          distribution.  See below for more details.\n";
@@ -387,7 +387,7 @@ sub mail_summary {
   my $asciiname = $u->{asciiname} // $u->{fullname} // "name unknown";
   my $substrdistro = substr $distro, 5;
   my($distrobasename) = $substrdistro =~ m|.*/(.*)|;
-  my $versions_from_meta = $self->version_from_meta_ok ? "yes" : "no";
+  my $versions_from_meta = $self->version_from_meta_ok($ctx) ? "yes" : "no";
   my $parse_cpan_meta_version = Parse::CPAN::Meta->VERSION;
 
   # This can occur when, for example, the "distribution" is Foo.pm.gz — of
@@ -561,7 +561,7 @@ sub mail_summary {
         $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
         push @m, sprintf("     module : %s\n",  $p);
 
-        if (my @warnings = $self->indexing_warnings_for_package($p)) {
+        if (my @warnings = $self->indexing_warnings_for_package($ctx, $p)) {
           push @m, map {;
                  sprintf("     WARNING: %s\n", $_) } @warnings;
         }
@@ -590,7 +590,7 @@ sub mail_summary {
         } elsif ($self->{REASON_TO_SKIP}) {
           # The reason we skipped this dist is already at the top of the
           # report.  Don't tack on a guess.
-        } elsif ($self->version_from_meta_ok) {
+        } elsif ($self->version_from_meta_ok($ctx)) {
 
           push @m,  qq{Nothing in this distro has been \n}
                  .  qq{indexed, because according to META.yml this\n}
@@ -649,7 +649,8 @@ sub mail_summary {
 }
 
 sub index_status {
-  my($self,$pack,$version,$infile,$status,$verb_status) = @_;
+  my ($self, $ctx, $pack, $version, $infile, $status, $verb_status) = @_;
+
   $self->{INDEX_STATUS}{$pack} = {
     version => $version,
     infile => $infile,
@@ -659,19 +660,19 @@ sub index_status {
 }
 
 sub add_indexing_warning {
-  my($self,$pack,$warning) = @_;
+  my ($self, $ctx, $pack, $warning) = @_;
 
   push @{ $self->{INDEX_WARNINGS}{$pack} }, $warning;
   return;
 }
 
 sub indexing_warnings_for_package {
-  my($self,$pack) = @_;
+  my ($self, $ctx, $pack) = @_;
   return @{ $self->{INDEX_WARNINGS}{$pack} // [] };
 }
 
 sub has_indexing_warnings {
-  my ($self) = @_;
+  my ($self, $ctx) = @_;
   my $i;
   my $warnings = $self->{INDEX_WARNINGS};
 
@@ -688,7 +689,7 @@ sub malformed_provides_names {
 }
 
 sub check_blib {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}) {
     $self->{HAS_BLIB}++;
     return;
@@ -722,7 +723,7 @@ sub check_blib {
 }
 
 sub check_multiple_root {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   my %seen;
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
   if (@top > 1) {
@@ -734,7 +735,7 @@ sub check_multiple_root {
 }
 
 sub check_world_writable {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   my @files = @{$self->{MANIFOUND}};
   my @dirs = List::MoreUtils::uniq map {File::Basename::dirname($_) . "/"} @files;
   my $Ldirs = @dirs;
@@ -785,7 +786,7 @@ sub check_world_writable {
 }
 
 sub filter_pms {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   my @pmfile;
 
   # very similar code is in PAUSE::package::filter_ppps
@@ -858,7 +859,7 @@ sub _package_governing_permission {
 }
 
 sub _index_by_files {
-  my ($self, $pmfiles, $provides) = @_;
+  my ($self, $ctx, $pmfiles, $provides) = @_;
   my $dist = $self->{DIST};
 
   my $main_package = $self->_package_governing_permission;
@@ -878,12 +879,12 @@ sub _index_by_files {
       META_CONTENT => $self->{META_CONTENT},
       MAIN_PACKAGE => $main_package,
     );
-    $fio->examine_fio;
+    $fio->examine_fio($ctx);
   }
 }
 
 sub _index_by_meta {
-  my ($self, $pmfiles, $provides) = @_;
+  my ($self, $ctx, $pmfiles, $provides) = @_;
   my $dist = $self->{DIST};
 
   my $main_package = $self->_package_governing_permission;
@@ -929,12 +930,12 @@ sub _index_by_meta {
       META_CONTENT => $self->{META_CONTENT},
       MAIN_PACKAGE => $main_package,
     );
-    $pio->examine_pkg;
+    $pio->examine_pkg($ctx);
   }
 }
 
 sub examine_pms {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   return if $self->{HAS_BLIB};
   return if $self->{HAS_MULTIPLE_ROOT};
   return if $self->{HAS_WORLD_WRITABLE};
@@ -945,10 +946,10 @@ sub examine_pms {
 
   my $dist = $self->{DIST};
 
-  my $pmfiles = $self->filter_pms;
+  my $pmfiles = $self->filter_pms($ctx);
   my ($meta, $provides, $indexing_method);
 
-  if (my $version_from_meta_ok = $self->version_from_meta_ok) {
+  if (my $version_from_meta_ok = $self->version_from_meta_ok($ctx)) {
     $meta = $self->{META_CONTENT};
     $provides = $meta->{provides};
     if ($provides && "HASH" eq ref $provides) {
@@ -961,7 +962,7 @@ sub examine_pms {
   }
 
   if ($indexing_method) {
-    $self->$indexing_method($pmfiles, $provides);
+    $self->$indexing_method($ctx, $pmfiles, $provides);
   } else {
     $self->alert("Couldn't determine an indexing method!");
   }
@@ -982,7 +983,7 @@ sub chown_unsafe {
 }
 
 sub read_dist {
-  my $self = shift;
+  my ($self, $ctx) = @_;
 
   my @manifind;
   my $ok = eval { @manifind = sort keys %{ExtUtils::Manifest::manifind()}; 1 };
@@ -1008,7 +1009,7 @@ sub read_dist {
 }
 
 sub extract_readme_and_meta {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my($suffix) = $self->{SUFFIX};
   return unless $suffix;
   my $dist = $self->{DIST};
@@ -1130,7 +1131,7 @@ sub write_updated_meta6_json {
 }
 
 sub version_from_meta_ok {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
   my $c = $self->{META_CONTENT};
 
@@ -1194,7 +1195,7 @@ sub lock {
 }
 
 sub set_indexed {
-  my($self) = @_;
+  my ($self, $ctx) = @_;
   my $dist = $self->{DIST};
   my $dbh = $self->connect;
   my $rows_affected = $dbh->do(
