@@ -106,7 +106,7 @@ sub filter_ppps {
 # package PAUSE::pmfile;
 sub examine_fio {
     # fio: file object
-    my $self = shift;
+    my ($self, $ctx) = @_;
 
     my $dist = $self->{DIO}{DIST};
     my $dbh = $self->connect;
@@ -117,7 +117,7 @@ sub examine_fio {
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
 
-    unless ($self->version_from_meta_ok) {
+    unless ($self->version_from_meta_ok($ctx)) {
         my $version;
         unless (eval { $version = $self->parse_version; 1 }) {
           my $error = $@;
@@ -148,7 +148,7 @@ sub examine_fio {
         }
     }
 
-    my($ppp) = $self->packages_per_pmfile;
+    my($ppp) = $self->packages_per_pmfile($ctx);
     my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
 
     $Logger->log([ "will examine packages: %s", \@keys_ppp ]);
@@ -174,7 +174,7 @@ sub examine_fio {
                       MAIN_PACKAGE => $self->{MAIN_PACKAGE},
                   );
 
-        $pio->examine_pkg;
+        $pio->examine_pkg($ctx);
 
     }                       # end foreach package
 
@@ -184,14 +184,14 @@ sub examine_fio {
 
 # package PAUSE::pmfile
 sub version_from_meta_ok {
-    my($self) = @_;
+    my ($self, $ctx) = @_;
     return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
-    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_meta_ok;
+    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_meta_ok($ctx);
 }
 
 # package PAUSE::pmfile;
 sub packages_per_pmfile {
-    my $self = shift;
+    my ($self, $ctx) = @_;
 
     my $ppp = {};
     my $pmfile = $self->{PMFILE};
@@ -290,7 +290,7 @@ sub packages_per_pmfile {
             $ppp->{$pkg}{infile} = $pmfile;
             if (PAUSE->basename_matches_package($pmfile,$pkg)) {
                 $ppp->{$pkg}{basename_matches_package} = $pmfile;
-                if ($self->version_from_meta_ok) {
+                if ($self->version_from_meta_ok($ctx)) {
                     my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
                         if (defined $provides->{$pkg}{version}) {

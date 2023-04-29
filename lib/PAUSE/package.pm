@@ -88,7 +88,7 @@ sub give_regdowner_perms {
   # ensure that new packages are given, at a minimum, the same permission as
   # those given to the main package of the distribution being uploaded.
   # -- rjbs, 2018-04-19
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my $package = $self->{PACKAGE};
   my $main_package = $self->{MAIN_PACKAGE};
 
@@ -117,7 +117,7 @@ sub give_regdowner_perms {
 
 # package PAUSE::package;
 sub perm_check {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my $dist = $self->{DIST};
   my $package = $self->{PACKAGE};
   my $main_package = $self->{MAIN_PACKAGE};
@@ -172,7 +172,8 @@ Current registered primary maintainer is $owner.
 Hint: you can always find the legitimate maintainer(s) on PAUSE under
 "View Permissions".};
 
-          $self->index_status($package,
+          $self->index_status($ctx,
+                              $package,
                               $pp->{version},
                               $pp->{infile},
                               PAUSE::mldistwatch::Constants::EMISSPERM,
@@ -235,7 +236,7 @@ sub mlroot {
 
 sub _pkg_name_insane {
     # XXX should be tested
-    my $self = shift;
+    my ($self, $ctx) = @_;
 
     my $package = $self->{PACKAGE};
     return $package !~ /^\w[\w\:\']*\w?\z/
@@ -247,7 +248,7 @@ sub _pkg_name_insane {
 
 # package PAUSE::package;
 sub examine_pkg {
-  my $self = shift;
+  my ($self, $ctx) = @_;
 
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
@@ -257,7 +258,7 @@ sub examine_pkg {
 
   # should they be cought earlier? Maybe.
   # but as an ultimate sanity check suggested by Richard Soderberg
-  if ($self->_pkg_name_insane) {
+  if ($self->_pkg_name_insane($ctx)) {
       $Logger->log("package[$package] name seems illegal");
       delete $self->{FIO};    # circular reference
       return;
@@ -265,8 +266,8 @@ sub examine_pkg {
 
   # Query all users with perms for this package
 
-  unless ($self->perm_check){ # (P2.0&P3.0)
-      delete $self->{FIO};    # circular reference
+  unless ($self->perm_check($ctx)) { # (P2.0&P3.0)
+      delete $self->{FIO};           # circular reference
       return;
   }
 
@@ -279,6 +280,7 @@ sub examine_pkg {
       if (lc $module eq lc $package && $module ne $package) {
         # warn "/// $self->{PMFILE} vs. $module vs. $package\n";
         $self->add_indexing_warning(
+          $ctx,
           "Capitalization of package ($package) does not match filename!",
         );
       }
@@ -290,7 +292,8 @@ sub examine_pkg {
   if ($pp->{version} && $pp->{version} =~ /^\{.*\}$/) { # JSON parser error
       my $err = JSON::jsonToObj($pp->{version});
       if ($err->{openerr}) {
-          $self->index_status($package,
+          $self->index_status($ctx,
+                              $package,
                               "undef",
                               $pp->{infile},
                               PAUSE::mldistwatch::Constants::EOPENFILE,
@@ -299,7 +302,8 @@ sub examine_pkg {
         read the file. It issued the following error: C< $err->{openerr} >},
                               );
       } else {
-          $self->index_status($package,
+          $self->index_status($ctx,
+                              $package,
                               "undef",
                               $pp->{infile},
                               PAUSE::mldistwatch::Constants::EPARSEVERSION,
@@ -333,16 +337,17 @@ sub examine_pkg {
       }
   }
 
-  $self->checkin;
+  $self->checkin($ctx);
   delete $self->{FIO};    # circular reference
 }
 
 sub _version_ok {
-  my($self, $pp, $package, $dist) = @_;
+  my ($self, $ctx, $pp, $package, $dist) = @_;
   if (length $pp->{version} > 16) {
     my $errno = PAUSE::mldistwatch::Constants::ELONGVERSION;
     my $error = PAUSE::mldistwatch::Constants::heading($errno);
-    $self->index_status($package,
+    $self->index_status($ctx,
+                        $package,
                         $pp->{version},
                         $pp->{infile},
                         $errno,
@@ -362,9 +367,7 @@ dist[$dist]
 # package PAUSE::package;
 sub update_package {
   # we come here only for packages that have opack and package
-
-  my $self = shift;
-  my $row = shift;
+  my ($self, $ctx, $row) = @_;
 
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
@@ -460,7 +463,8 @@ sub update_package {
           }
       } else {
           if (CPAN::Version->vgt($pp->{version},$oldversion)) {
-              $self->index_status($package,
+              $self->index_status($ctx,
+                                  $package,
                                   $pp->{version},
                                   $pp->{infile},
                                   PAUSE::mldistwatch::Constants::EDUALOLDER,
@@ -473,7 +477,8 @@ Maybe harmless, maybe needs resolving.},
 
                               );
           } else {
-              $self->index_status($package,
+              $self->index_status($ctx,
+                                  $package,
                                   $pp->{version},
                                   $pp->{infile},
                                   PAUSE::mldistwatch::Constants::EDUALYOUNGER,
@@ -486,7 +491,8 @@ $oldversion, so not indexing seems okay.},
           }
       }
   } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
-      $self->index_status($package,
+      $self->index_status($ctx,
+                          $package,
                           $pp->{version},
                           $pmfile,
                           PAUSE::mldistwatch::Constants::EBADVERSION,
@@ -507,7 +513,8 @@ $oldversion, so not indexing seems okay.},
   } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
       # lower VERSION number here
       if ($odist ne $dist) {
-          $self->index_status($package,
+          $self->index_status($ctx,
+                              $package,
                               $pp->{version},
                               $pmfile,
                               PAUSE::mldistwatch::Constants::EVERFALLING,
@@ -554,7 +561,7 @@ pmfile[$pmfile]
               ]);
               $ok++;
           } else {
-              $self->index_status(
+              $self->index_status($ctx,
                                   $package,
                                   $pp->{version},
                                   $pp->{infile},
@@ -584,7 +591,7 @@ also has a zero version number and the distro has a more recent modification tim
                   old     => { dist => $odist, mtime => $odistmtime },
                 },
               ]);
-              $self->index_status(
+              $self->index_status($ctx,
                                   $package,
                                   $pp->{version},
                                   $pp->{infile},
@@ -632,19 +639,20 @@ has the same version number and the distro has a more recent modification time.}
               [ @$pkg_recs ],
           ]);
 
-          $self->index_status
-              ($package,
-               "undef",
-               $pp->{infile},
-               PAUSE::mldistwatch::Constants::EDBCONFLICT,
-               qq{Indexing failed because of conflicting records for $package.
+          $self->index_status(
+              $ctx,
+              $package,
+              "undef",
+              $pp->{infile},
+              PAUSE::mldistwatch::Constants::EDBCONFLICT,
+              qq{Indexing failed because of conflicting records for $package.
 Please report the case to the PAUSE admins at modules\@perl.org.},
-              );
+          );
           $ok = 0;
       }
   }
 
-  return unless $self->_version_ok($pp, $package, $dist);
+  return unless $self->_version_ok($ctx, $pp, $package, $dist);
 
 
   if ($ok) {
@@ -681,24 +689,26 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
                              };
 
       if ($rows_affected) { # expecting only "1" can happen
-          $self->index_status
-              ($package,
-               $pp->{version},
-               $pp->{infile},
-               PAUSE::mldistwatch::Constants::OK,
-               "indexed",
-              );
+          $self->index_status(
+              $ctx,
+              $package,
+              $pp->{version},
+              $pp->{infile},
+              PAUSE::mldistwatch::Constants::OK,
+              "indexed",
+          );
       } else {
           my $dbherrstr = $dbh->errstr;
-          $self->index_status
-              ($package,
-               "undef",
-               $pp->{infile},
-               PAUSE::mldistwatch::Constants::EDBERR,
-               qq{The PAUSE indexer could not store the indexing
+          $self->index_status(
+            $ctx,
+            $package,
+            "undef",
+            $pp->{infile},
+            PAUSE::mldistwatch::Constants::EDBERR,
+            qq{The PAUSE indexer could not store the indexing
 result in the DB due the following error: C< $dbherrstr >.
 Please report the case to the PAUSE admins at modules\@perl.org.},
-              );
+          );
       }
 
   }
@@ -707,36 +717,38 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
 # package PAUSE::package;
 sub index_status {
-  my($self) = shift;
+  my ($self, $ctx, @rest) = @_;
   my $dio;
+
   if (my $fio = $self->{FIO}) {
       $dio = $fio->{DIO};
   } else {
       $dio = $self->{DIO};
   }
-  $dio->index_status(@_);
+
+  $dio->index_status($ctx, @rest);
 }
 
 sub get_index_status_status {
-  my ($self) = @_;
+  my ($self, $ctx) = @_;
 
   return $self->dist->{INDEX_STATUS}{ $self->{PACKAGE} }{status};
 }
 
 sub add_indexing_warning {
-  my($self) = shift;
+  my ($self, $ctx, @rest) = @_;
   my $dio;
   if (my $fio = $self->{FIO}) {
       $dio = $fio->{DIO};
   } else {
       $dio = $self->{DIO};
   }
-  $dio->add_indexing_warning($self->{PACKAGE}, $_[0]);
+  $dio->add_indexing_warning($ctx, $self->{PACKAGE}, @rest);
 }
 
 # package PAUSE::package;
 sub insert_into_package {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   my $dist = $self->{DIST};
@@ -760,7 +772,7 @@ sub insert_into_package {
     }
   ]);
 
-  return unless $self->_version_ok($pp, $package, $dist);
+  return unless $self->_version_ok($ctx, $pp, $package, $dist);
   $dbh->do($query,
             undef,
             $package,
@@ -772,7 +784,8 @@ sub insert_into_package {
             $self->dist->{TIME},
             $distname,
           );
-  $self->index_status($package,
+  $self->index_status($ctx,
+                      $package,
                       $pp->{version},
                       $pp->{infile},
                       PAUSE::mldistwatch::Constants::OK,
@@ -783,7 +796,7 @@ sub insert_into_package {
 # package PAUSE::package;
 # returns always the return value of print, so basically always 1
 sub checkin_into_primeur {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   my $dist = $self->{DIST};
@@ -832,7 +845,7 @@ sub checkin_into_primeur {
 
 # package PAUSE::package;
 sub checkin {
-  my $self = shift;
+  my ($self, $ctx) = @_;
   my $dbh = $self->connect;
   my $package = $self->{PACKAGE};
   my $dist = $self->{DIST};
@@ -840,7 +853,7 @@ sub checkin {
   my $pmfile = $self->{PMFILE};
 
   # Copy permissions from main module to subsidiary modules.
-  $self->give_regdowner_perms;
+  $self->give_regdowner_perms($ctx);
 
   $self->dist->{CHECKINS}{ lc $package }{$package} = $self->{PMFILE};
 
@@ -856,15 +869,15 @@ sub checkin {
 
   if ($row) {
       # We know this package from some time ago
-      $self->update_package($row);
+      $self->update_package($ctx, $row);
   } else {
       # we hear for the first time about this package
-      $self->insert_into_package;
+      $self->insert_into_package($ctx);
   }
 
-  my $status = $self->get_index_status_status;
+  my $status = $self->get_index_status_status($ctx);
   if (! $status or $status == PAUSE::mldistwatch::Constants::OK) {
-      $self->checkin_into_primeur; # called in void context!
+      $self->checkin_into_primeur($ctx); # called in void context!
   }
 
 }

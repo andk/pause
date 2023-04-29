@@ -39,6 +39,7 @@ use PAUSE::dist ();
 use PAUSE::pmfile ();
 use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
+use PAUSE::Indexer::Context;
 use PAUSE::MailAddress ();
 use PAUSE::PermsManager ();
 use Process::Status ();
@@ -334,7 +335,7 @@ sub _newcountokay {
 }
 
 sub _do_the_database_work {
-  my ($self, $dio) = @_;
+  my ($self, $ctx, $dio) = @_;
 
   my $ok = eval {
     # This is here for test purposes.  It lets us force the db work to die,
@@ -368,7 +369,7 @@ sub _do_the_database_work {
     }
 
     # ...or else Perl 5...
-    $dio->examine_pms;      # will switch user
+    $dio->examine_pms($ctx);      # will switch user
 
     my $main_pkg = $dio->_package_governing_permission;
 
@@ -434,6 +435,8 @@ sub maybe_index_dist {
                                DIST   => $dist,
                               );
 
+    my $ctx = PAUSE::Indexer::Context->new;
+
     local $Logger = $Logger->proxy({ proxy_prefix => "$dist: " });
 
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
@@ -469,13 +472,13 @@ sub maybe_index_dist {
     }
 
     for my $method (qw( examine_dist read_dist extract_readme_and_meta )) {
-      $dio->$method;
+      $dio->$method($ctx);
       if ($dio->skip) {
           delete $self->{ALLlasttime}{$dist};
           delete $self->{ALLfound}{$dist};
 
           if ($dio->{REASON_TO_SKIP}) {
-              $dio->mail_summary;
+              $dio->mail_summary($ctx);
           }
           return;
       }
@@ -489,16 +492,16 @@ sub maybe_index_dist {
     if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
         # META.json / META.yml declares it's not stable; do not index!
         $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
-        $dio->mail_summary;
+        $dio->mail_summary($ctx);
         return;
     }
 
-    $dio->check_blib;
-    $dio->check_multiple_root;
-    $dio->check_world_writable;
+    $dio->check_blib($ctx);
+    $dio->check_multiple_root($ctx);
+    $dio->check_world_writable($ctx);
 
     for my $attempt (1 .. 3) {
-      my $db_ok = $self->_do_the_database_work($dio);
+      my $db_ok = $self->_do_the_database_work($ctx, $dio);
       last if $db_ok;
       $self->disconnect;
       if ($attempt == 3) {
@@ -508,11 +511,11 @@ sub maybe_index_dist {
       }
     }
 
-    $dio->mail_summary unless $dio->perl_major_version == 6;
+    $dio->mail_summary($ctx) unless $dio->perl_major_version == 6;
     $self->sleep;
-    $dio->set_indexed;
+    $dio->set_indexed($ctx);
 
-    my @alerts = $dio->all_alerts;
+    my @alerts = $dio->all_alerts($ctx);
     return unless @alerts;
     return @alerts;
 }
