@@ -13,7 +13,7 @@ in many Perl community sites.</p>
 <%= text_field "pause99_request_id_fullname", size => 32 %>
 </p>
 <div style='font-size:0.75em'>
-Note: PAUSE has been developed in a time when it was more common than today that people have names consisting of at least a first name and a second name, like <i>Ben Cartwright</i> or <i>Tony Nelson</i>, you get the idea. This field is considered to be filled with both names, separated by a space. This trivial expectation was then coded into the server side sanity check of this form and it turned out to be a super efficient spam protection because bots often did not try to enter a space in the middle of the field. It was about the year 2003 when people started to complain that they had tried <i>Peter</i> and it did not work. Poor Peter, please remember you <b>do</b> have a second name.
+Note: You can enter fairly free-form text here but it must consist of at least two space-separated words. This is a spam protection measure we discovered accidentally. Back when PAUSE was developed in the nineties, people would generally fill out a field asking for a full name with a first name and a second name, like <i>Ben Cartwright</i> or <i>Tony Nelson</i>. When this trivial expectation was coded into the server as a sanity check, it turned out to block many spam bots because they often did not try to enter a space in the middle of the field. It was only around 2003 that people started complaining that they had tried <i>Peter</i> and it did not work. Apologies for insisting, Peter – but feel free to make something up to satisfy the requirement.
 </div>
 </div>
 
