@@ -961,11 +961,33 @@ sub chown_unsafe {
   $self->{CHOWN_UNSAFE_DONE}++;
 }
 
+sub has_consistent_prefix {
+  my ($self, $files) = @_;
+  my ($prefix) = split m{/}, $files->[0];
+
+  unless (-d $prefix) {
+    $Logger->log([ 'top level entry %s is not a directory', $prefix ]);
+    return undef;
+  }
+
+  for my $file (@$files) {
+    my ($file_prefix) = split m{/}, $file;
+
+    next if $file_prefix eq $prefix;
+
+    $Logger->log([ 'inconsistent file prefix between %s and %s', $prefix, $file ]);
+    return undef;
+  }
+
+  return 1;
+}
+
 sub read_dist {
   my $self = shift;
 
   my @manifind;
   my $ok = eval { @manifind = sort keys %{ExtUtils::Manifest::manifind()}; 1 };
+
   $self->{MANIFOUND} = \@manifind;
   unless ($ok) {
     my $error = $@;
@@ -973,8 +995,14 @@ sub read_dist {
     return;
   }
 
+  unless ($self->has_consistent_prefix(\@manifind)) {
+    $self->{SKIP} = 1;
+    $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::ETARBOMB;
+    return;
+  }
+
   my $manifound = @manifind;
-  my $dist = $self->{DIST};
+
   unless (@manifind) {
     $Logger->log("!? no files in dist");
     return;
