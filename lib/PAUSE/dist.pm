@@ -556,11 +556,11 @@ sub mail_summary {
         # magic words, see also report02() around line 573, same wording there,
         # exception prompted by JOESUF/libapreq2-2.12.tar.gz
         $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
-        push @m, sprintf("     module : %s\n",  $p);
+        push @m, sprintf("     package: %s\n",  $p);
 
-        if (my @warnings = $self->indexing_warnings_for_package($ctx, $p)) {
+        if (my @warnings = $ctx->warnings_for_package($p)) {
           push @m, map {;
-                 sprintf("     WARNING: %s\n", $_) } @warnings;
+                 sprintf("     WARNING: %s\n", $_->{text}) } @warnings;
         }
 
         push @m, sprintf("     version: %s\n", $inxst->{$p}{version});
@@ -653,13 +653,6 @@ sub index_status {
   };
 }
 
-sub add_indexing_warning {
-  my ($self, $ctx, $pack, $warning) = @_;
-
-  push @{ $self->{INDEX_WARNINGS}{$pack} }, $warning;
-  return;
-}
-
 sub indexing_warnings_for_package {
   my ($self, $ctx, $pack) = @_;
   return @{ $self->{INDEX_WARNINGS}{$pack} // [] };
@@ -694,7 +687,7 @@ sub check_blib {
       }
       last DIRDOWN unless $success; # no directory to step down anymore
       if (++$endless > 10) {
-        $self->alert("ENDLESS LOOP detected!");
+        $ctx->alert("ENDLESS LOOP detected!");
         last DIRDOWN;
       }
       next DIRDOWN;
