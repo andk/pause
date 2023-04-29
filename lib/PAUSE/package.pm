@@ -279,9 +279,9 @@ sub examine_pkg {
 
       if (lc $module eq lc $package && $module ne $package) {
         # warn "/// $self->{PMFILE} vs. $module vs. $package\n";
-        $self->add_indexing_warning(
-          $ctx,
-          "Capitalization of package ($package) does not match filename!",
+        $ctx->add_package_warning(
+          $self,
+          "Capitalization of package does not match filename!",
         );
       }
     }
@@ -733,17 +733,6 @@ sub get_index_status_status {
   my ($self, $ctx) = @_;
 
   return $self->dist->{INDEX_STATUS}{ $self->{PACKAGE} }{status};
-}
-
-sub add_indexing_warning {
-  my ($self, $ctx, @rest) = @_;
-  my $dio;
-  if (my $fio = $self->{FIO}) {
-      $dio = $fio->{DIO};
-  } else {
-      $dio = $self->{DIO};
-  }
-  $dio->add_indexing_warning($ctx, $self->{PACKAGE}, @rest);
 }
 
 # package PAUSE::package;

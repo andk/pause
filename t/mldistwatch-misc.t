@@ -187,14 +187,14 @@ subtest "warn when pkg and module match only case insensitively" => sub {
           sub {
             like(
               $_[0]{email}->get_body,
-              qr/Capitalization of package \(Fewer\)/,
+              qr/package: Fewer\s+WARNING: Capitalization of package/,
               "warning about Fewer v. fewer",
             );
           },
           sub {
             like(
               $_[0]{email}->get_body,
-              qr/Capitalization of package \(More\)/,
+              qr/package: More\s+WARNING: Capitalization of package/,
               "warning about More v. more",
             );
           },
