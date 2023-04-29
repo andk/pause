@@ -1083,6 +1083,30 @@ sub extract_readme_and_meta {
   }
 }
 
+sub check_indexability {
+    my ($self, $ctx) = @_;
+    if ($self->{META_CONTENT}{distribution_type}
+        && $self->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
+        return;
+    }
+
+    if (($self->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
+        # META.json / META.yml declares it's not stable; do not index!
+        $self->{SKIP} = 1;
+        $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
+        return;
+    }
+
+    if (my @bad_names = $self->malformed_provides_names) {
+        # "provides" is the "I know what I'm doing better than the indexer"
+        # control.  When it's wrong, just abort the whole dist.
+        $Logger->log([ "META provides has malformed package names: %s", \@bad_names ]);
+        $self->{SKIP} = 1;
+        $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBADPROVIDES;
+        return;
+    }
+}
+
 sub write_updated_meta6_json {
   my($self, $metafile, $MLROOT, $dist, $sans) = @_;
 
