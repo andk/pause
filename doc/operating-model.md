@@ -338,7 +338,7 @@ This makes the situation clearer to everyone.
 At some point after that we may change PAUSE so that
 when giving up a first-come permission,
 you're informed who else has permissions,
-and given the option of transferring first-come to one of them. 
+and given the option of transferring first-come to one of them.
 
 
 ### 3.2. Admin indexing permission
@@ -559,7 +559,7 @@ or have them downgraded.
 
 If the current maintainer(s) for a package *are* responsive,
 but you don't like what they're doing with it,
-the PAUSE admins will not consider requests for a permissions transfer/upgrade. 
+the PAUSE admins will not consider requests for a permissions transfer/upgrade.
 
 > For example:
 a group of users of a module don't like the direction the first-come,
@@ -823,14 +823,14 @@ You can find modules marked for no permissions transfer with this URL:
 
 This means "Perl 5 Porters",
 the group that maintains and develops Perl 5.
-The P5P user belongs to the current Pumpking
-(the title given to the current leader of the P5P group),
+The P5P user belongs to the current Perl Steering Council,
+(the executive arm of the Perl development team),
 and has indexing permission on all core modules.
 
 See §4.8 below,
 on what happens when a CPAN module is proposed to become a core module
 (be included with Perl itself).
- 
+
 
 ### 4.6. When a CPAN author passes away
 
@@ -893,14 +893,14 @@ then were proposed for promotion to the core.
 These days that's much less likely to happen, but if it should:
 
 * Read the section "[A Social Contract about Artistic Control](https://perldoc.perl.org/perlpolicy.html#A-Social-Contract-about-Artistic-Control)" in [perlpolicy](https://perldoc.perl.org/perlpolicy.html).
-* If the Pumpking agrees with the proposal,
+* If the Perl Steering Council (PSC) agrees with the proposal,
   it is the first-come's decision on whether the module should become dual-life.
 * If the first-come says "no",
   and the license allows it,
-  the Pumpking can always fork the module to a new namespace and
+  the PSC can always fork the module to a new namespace and
   release a new distribution to CPAN,
   and promote that to dual-life.
-  The Pumpking and first-come may decide on this course of action together,
+  The PSC and first-come may decide on this course of action together,
   for example where the first-come wants the freedom to
   make backwards incompatible changes.
 * If a module becomes dual-life,
@@ -908,7 +908,7 @@ These days that's much less likely to happen, but if it should:
   (in which case the original author will get the indexing admin permission
   (once that's implemented), or co-maint),
   or P5P may be given co-maint
-  (the special P5P PAUSE id is controlled by the Pumpking,
+  (the special P5P PAUSE id is controlled by the PSC,
   and is described in §4.5.5 above).
 * If you have a dual-life module,
   P5P requests that you nominate at least another trusted maintainer
@@ -1018,7 +1018,7 @@ so have the same basic copyright laws.
   (Security and identity-related actions may be exempted as appropriate).
   In the early days of CPAN, there was a "module list",
   and to get on that list you sent email to this address.
-  The maintenance of that list evolved into the PAUSE admins of today. 
+  The maintenance of that list evolved into the PAUSE admins of today.
 * Admins should not transfer package indexing permissions to themselves
   without prior notification of other admins.
   Where possible, ask another admin to make the transfer.
@@ -1032,7 +1032,7 @@ so have the same basic copyright laws.
   and should always be respectful of other members of the Perl community,
   whether acting as a PAUSE admin or not.
 
-### 6.3. Contacting PAUSE administrators 
+### 6.3. Contacting PAUSE administrators
 
 There are two mailing lists for the PAUSE admins:
 
