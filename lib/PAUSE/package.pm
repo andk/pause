@@ -270,9 +270,6 @@ sub examine_pkg {
       return;
   }
 
-  # Copy permissions from main module to subsidiary modules.
-  $self->give_regdowner_perms;
-
   # Check that package name matches case of file name
   {
     my (undef, $module) = split m{/lib/}, $self->{PMFILE}, 2;
@@ -841,6 +838,9 @@ sub checkin {
   my $dist = $self->{DIST};
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
+
+  # Copy permissions from main module to subsidiary modules.
+  $self->give_regdowner_perms;
 
   $self->dist->{CHECKINS}{ lc $package }{$package} = $self->{PMFILE};
 
