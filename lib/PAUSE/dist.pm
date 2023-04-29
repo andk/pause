@@ -1058,6 +1058,21 @@ sub extract_readme_and_meta {
   }
 }
 
+sub check_indexability {
+    my ($self, $ctx) = @_;
+    if ($self->{META_CONTENT}{distribution_type}
+        && $self->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
+        return;
+    }
+
+    if (($self->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
+        # META.json / META.yml declares it's not stable; do not index!
+        $self->{SKIP} = 1;
+        $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
+        return;
+    }
+}
+
 sub write_updated_meta6_json {
   my($self, $metafile, $MLROOT, $dist, $sans) = @_;
 
