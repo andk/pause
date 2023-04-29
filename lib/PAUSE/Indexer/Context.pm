@@ -39,5 +39,24 @@ sub warnings_for_package {
          map  {; @$_ } values $self->_package_warnings->%*;
 }
 
+has alerts => (
+  is      => 'bare',
+  reader  => '_alerts',
+  default => sub {  []  },
+);
+
+sub alert {
+  my ($self, $alert) = @_;
+  $alert =~ s/\v+\z//;
+
+  push $self->_alerts->@*, $alert;
+  return;
+}
+
+sub all_alerts {
+  my ($self) = @_;
+  return $self->_alerts->@*;
+}
+
 no Moo;
 1;
