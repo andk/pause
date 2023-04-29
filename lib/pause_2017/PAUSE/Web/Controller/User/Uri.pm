@@ -224,12 +224,7 @@ try again or report errors to <a href="mailto:}),
                 255 characters.");
       }
 
-    ALLOW_OVERWRITE: if (
-          $filename =~ /(readme|\.html|\.txt|\.[xy]ml|\.json|\.[pr]df|\.pod)(\.gz|\.bz2)?$/i
-          ||
-          $uriid =~ m!^C/CN/CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!
-         ) {
-        # Overwriting allowed
+    ALLOW_OVERWRITE: if (PAUSE::may_overwrite_file($filename)) {
         $dbh->do("DELETE FROM uris WHERE uriid = ?", undef, $uriid);
       }
 

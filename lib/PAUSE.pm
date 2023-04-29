@@ -548,6 +548,30 @@ sub isa_regular_perl {
   return scalar $filename =~ $ISA_REGULAR_PERL;
 }
 
+sub may_overwrite_file {
+  my ($filename) = @_;
+
+  my $is_archive = $filename =~ s/\.(gz|bz2)$//i;
+
+  return 1 if $filename =~ /readme$/i;
+
+  return 1 if $filename =~ /\.
+    ( html
+    | txt
+    | mkdn
+    | md
+    | xml
+    | yml
+    | json
+    | pdf
+    | rdf
+    | pod
+    )
+  $/ix;
+
+  return;
+}
+
 package PAUSE::DBError;
 
 sub new {
