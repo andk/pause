@@ -419,6 +419,10 @@ sub update_package {
     },
   ]);
 
+  # We don't think it's either a CPAN distribution or a perl upload.  What even
+  # are we doing?  Just give up. -- rjbs, 2023-04-30
+  return unless $distorperlok;
+
   # Until 2002-08-01 we always had
   # if >ver                                                 OK
   # elsif <ver
@@ -442,46 +446,13 @@ sub update_package {
   # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-07/msg01579.html
   # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-08/msg00062.html
 
-  if (! $distorperlok) {
-  } elsif ($isa_regular_perl) {
-      if ($older_isa_regular_perl) {
-          if (CPAN::Version->vgt($pp->{version},$oldversion)) {
-              $ok++;
-          } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
-          } elsif (CPAN::Version->vcmp($pp->{version},$oldversion)==0
-                    &&
-                    $tdistmtime >= $odistmtime) {
-              $ok++;
-          }
-      } else {
-          if (CPAN::Version->vgt($pp->{version},$oldversion)) {
-              $self->index_status($ctx,
-                                  $package,
-                                  $pp->{version},
-                                  $pp->{infile},
-                                  PAUSE::mldistwatch::Constants::EDUALOLDER,
-
-                                  qq{Not indexed because package $opack
-in file $ofile seems to have a dual life in $odist. Although the other
-package is at version [$oldversion], the indexer lets the other dist
-continue to be the reference version, shadowing the one in the core.
-Maybe harmless, maybe needs resolving.},
-
-                              );
-          } else {
-              $self->index_status($ctx,
-                                  $package,
-                                  $pp->{version},
-                                  $pp->{infile},
-                                  PAUSE::mldistwatch::Constants::EDUALYOUNGER,
-
-                                  qq{Not indexed because package $opack
-in file $ofile has a dual life in $odist. The other version is at
-$oldversion, so not indexing seems okay.},
-
-                              );
-          }
-      }
+  if ($isa_regular_perl) {
+      $ok = $self->__do_regular_perl_update($ctx, $row, {
+          oldversion  => $oldversion,
+          tdistmtime  => $tdistmtime,
+          odistmtime  => $odistmtime,
+          opack       => $opack,
+      });
   } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
       $self->index_status($ctx,
                           $package,
@@ -562,9 +533,8 @@ pmfile[$pmfile]
 also has a zero version number and the distro has a more recent modification time.}
                                   );
           }
-      } elsif (CPAN::Version
-                ->vcmp($pp->{version},
-                      $oldversion)==0) {    # equal version here
+      } elsif (CPAN::Version->vcmp($pp->{version}, $oldversion)==0) {
+          # equal version here
           # XXX needs better logging message -- dagolden, 2011-08-13
           if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
               $Logger->log([
@@ -599,8 +569,8 @@ has the same version number and the distro has a more recent modification time.}
       }
   }
 
-
-  if ($ok) {              # sanity check
+  # sanity check
+  if ($ok) {
 
       if ($self->{FIO}{DIO}{VERSION_FROM_META_OK}) {
           # nothing to argue at the moment, e.g. lib_pm.PL
@@ -705,6 +675,66 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
   }
 
+}
+
+sub __do_regular_perl_update {
+    my ($self, $ctx, $old_row, $arg) = @_;
+
+    my ($opack, $oldversion, $odist, $ofilemtime, $ofile) = @$old_row{
+      qw( package version dist filemtime file )
+    };
+
+    my $older_isa_regular_perl = $arg->{older_isa_regular_perl};
+
+    my $odistmtime  = $arg->{odistmtime};
+    my $tdistmtime  = $arg->{tdistmtime};
+
+    my $pp      = $self->{PP};
+    my $package = $self->{PACKAGE};
+
+    my $ok = 0;
+
+    if ($older_isa_regular_perl) {
+        if (CPAN::Version->vgt($pp->{version},$oldversion)) {
+            $ok++;
+        } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
+        } elsif (CPAN::Version->vcmp($pp->{version},$oldversion)==0
+                  &&
+                  $tdistmtime >= $odistmtime
+        ) {
+            $ok++;
+        }
+    } else {
+        if (CPAN::Version->vgt($pp->{version},$oldversion)) {
+            $self->index_status($ctx,
+                                $package,
+                                $pp->{version},
+                                $pp->{infile},
+                                PAUSE::mldistwatch::Constants::EDUALOLDER,
+
+                                qq{Not indexed because package $opack
+in file $ofile seems to have a dual life in $odist. Although the other
+package is at version [$oldversion], the indexer lets the other dist
+continue to be the reference version, shadowing the one in the core.
+Maybe harmless, maybe needs resolving.},
+
+                            );
+        } else {
+            $self->index_status($ctx,
+                                $package,
+                                $pp->{version},
+                                $pp->{infile},
+                                PAUSE::mldistwatch::Constants::EDUALYOUNGER,
+
+                                qq{Not indexed because package $opack
+in file $ofile has a dual life in $odist. The other version is at
+$oldversion, so not indexing seems okay.},
+
+                            );
+        }
+    }
+
+    return $ok;
 }
 
 # package PAUSE::package;
