@@ -25,9 +25,6 @@ use 5.10.1;
 use lib 't/lib';
 use lib 't/privatelib';    # Stub PrivatePAUSE
 
-use Email::Sender::Transport::Test;
-$ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
-
 use DBI;
 use File::Spec;
 use PAUSE;

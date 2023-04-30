@@ -547,11 +547,11 @@ sub mail_summary {
           "UNKNOWN (status=$status)";
           push @m, sprintf "Status: %s\n%s\n\n", $heading, "="x(length($heading)+8);
         }
-        my $tf13 = Text::Format->new(
-          bodyIndent => 13,
-          firstIndent => 13,
+        my $tf14 = Text::Format->new(
+          bodyIndent  => 14,
+          firstIndent => 14,
         );
-        my $verb_status = $tf13->format($inxst->{$p}{verb_status});
+        my $verb_status = $tf14->format($inxst->{$p}{verb_status});
         $verb_status =~ s/^\s+//; # otherwise this line is too long
         # magic words, see also report02() around line 573, same wording there,
         # exception prompted by JOESUF/libapreq2-2.12.tar.gz
