@@ -472,31 +472,29 @@ sub maybe_index_dist {
         }
     }
 
-    for my $method (qw(
-      examine_dist
-      read_dist
-      extract_readme_and_meta
-      check_indexability
-      check_blib
-      check_multiple_root
-      check_world_writable
-    )) {
-        my $ok    = eval { $dio->$method($ctx); 1; };
+    my $examine_dist_ok = eval {
+        $dio->examine_dist($ctx);
+        $dio->read_dist($ctx);
+        $dio->extract_readme_and_meta($ctx);
+        $dio->check_indexability($ctx);
+        $dio->check_blib($ctx);
+        $dio->check_multiple_root($ctx);
+        $dio->check_world_writable($ctx);
+        1;
+    };
+
+    unless ($examine_dist_ok) {
         my $abort = $@;
-        if (!$ok) {
-            if (! $abort->isa('PAUSE::Indexer::Abort')) {
-                die $abort; # Rethrow unexpected exception
-            }
+        die $abort unless $abort->isa('PAUSE::Indexer::Abort');
 
-            delete $self->{ALLlasttime}{$dist};
-            delete $self->{ALLfound}{$dist};
+        delete $self->{ALLlasttime}{$dist};
+        delete $self->{ALLfound}{$dist};
 
-            if ($abort->public) {
-                $dio->mail_summary($ctx);
-            }
-
-            return;
+        if ($abort->public) {
+            $dio->mail_summary($ctx);
         }
+
+        return;
     }
 
     for my $attempt (1 .. 3) {
