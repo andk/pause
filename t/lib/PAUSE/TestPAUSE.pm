@@ -82,13 +82,13 @@ has tmpdir => (
 has email_sender_transport => (
   is      => 'rw',
   isa     => 'Str',
-  default => 'Test',
+  default => sub { $ENV{EMAIL_SENDER_TRANSPORT} // 'Test' },
 );
 
 has email_sender_transport_args => (
   is      => 'ro',
   isa     => 'HashRef[Str]',
-  default => sub { {} },
+  predicate => 'has_email_sender_transport_args',
 );
 
 sub deploy_schemas_at {
@@ -320,7 +320,9 @@ sub test_reindex {
     local $ENV{EMAIL_SENDER_TRANSPORT_transport_class} = $transport
       if $wrap_transport;
 
-    my %args = %{ $self->email_sender_transport_args };
+    my %args = $self->has_email_sender_transport_args
+             ? %{ $self->email_sender_transport_args }
+             : ();
 
     %args = map {;
       "EMAIL_SENDER_TRANSPORT_transport_arg_$_" => $args{$_}
