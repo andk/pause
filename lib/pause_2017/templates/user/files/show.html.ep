@@ -17,7 +17,11 @@
   <tbody class="list">
 %   for my $file (sort keys %$files) {
     <tr>
+%   if ($files->{$file}{indexed}) {
+      <td class="file indexed"><%= $file %> [indexed]</td>
+%   } else {
       <td class="file"><%= $file %></td>
+%   }
       <td class="size"><%= $files->{$file}{stat} %></td>
       <td class="modified"><%= $files->{$file}{blurb} %></td>
     </tr>

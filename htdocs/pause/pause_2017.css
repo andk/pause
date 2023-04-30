@@ -165,6 +165,11 @@ div.info {
   background-color: #cce5ff;
   border-color: #b8daff;
 }
+div.warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
 div.error {
   color: #721c24;
   background-color: #f8d7da;
@@ -175,4 +180,7 @@ div.messagebox {
   margin-bottom: 1rem;
   border: 1px solid transparent;
   border-radius: 0.25rem;
+}
+td.indexed {
+  font-weight: bold
 }
