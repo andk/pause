@@ -6,9 +6,15 @@
 <h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>
 
 % if (%$files) {
+% if ($pause->{deleting_indexed_files}) {
+<div class="messagebox warning">
+<p>You are deleting one or more files that appear in the CPAN index.</p>
+</div>
+% } else {
 <div class="messagebox info">
 <p>If you delete files marked with <b>[indexed]</b>, the CPAN index will be affected.</p>
 </div>
+% }
 <div id="files">
 <input type="submit" name="SUBMIT_pause99_delete_files_delete" value="Delete"><input type="submit" name="SUBMIT_pause99_delete_files_undelete" value="Undelete"><input class="search" placeholder="Filter">
 <table class="table compact">

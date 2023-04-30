@@ -176,6 +176,7 @@ sub delete {
         $c->scheduled($whendele{$f}) :
             HTTP::Date::time2str((stat _)[9]);
     $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f} };
+    $pause->{deleting_indexed_files} = 1 if $deletes{$f} && $indexed->{$f};
   }
   $pause->{files} = \%files;
 }
