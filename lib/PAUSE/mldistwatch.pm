@@ -367,14 +367,14 @@ sub _do_the_database_work {
     my $main_pkg = $dio->_package_governing_permission;
 
     if ($self->permissions->userid_has_permissions_on_package($dio->{USERID}, $main_pkg)) {
+      $dio->normalize_package_casing;
+
       $dbh->commit;
     } else {
       $dio->alert("Uploading user has no permissions on package $main_pkg");
       $dio->{NO_DISTNAME_PERMISSION} = 1;
       $dbh->rollback;
     }
-
-    $dio->normalize_package_casing;
 
     return 1;
   };
