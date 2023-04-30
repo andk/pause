@@ -169,9 +169,7 @@ sub examine_fio {
         push @packages, $pio;
     }
 
-    for my $pio (@packages) {
-      $pio->examine_pkg($ctx);
-    }
+    $self->{DIO}->index_packages($ctx, \@packages);
 
     delete $self->{DIO};    # circular reference
 }
