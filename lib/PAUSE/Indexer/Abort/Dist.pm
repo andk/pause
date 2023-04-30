@@ -1,4 +1,4 @@
-package PAUSE::Indexer::Abort;
+package PAUSE::Indexer::Abort::Dist;
 use v5.12.0;
 use Moo;
 
