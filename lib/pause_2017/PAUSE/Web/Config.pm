@@ -235,7 +235,7 @@ our %Actions = (
   },
   remove_primary => {
     x_mojo_to => "user-perms#remove_primary",
-    verb => "Give up Primary Permissions per module",
+    verb => "Put Up My Module(s) For Adoption per module",
     priv => "user",
     cat => "User/04Permissions/14",
     desc => "Give up primary maintainership status (abandoning it without transfering it to someone else).",
@@ -323,7 +323,7 @@ our %Actions = (
   },
   remove_dist_primary => {
     x_mojo_to => "user-distperms#remove_dist_primary",
-    verb => "Give up Primary Permissions",
+    verb => "Put Up My Distribution(s) For Adoption",
     priv => "user",
     cat => "User/04Permissions/03",
     desc => "Give up distribution's primary maintainership status (abandoning it without transfering it to someone else).",

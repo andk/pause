@@ -50,7 +50,7 @@ please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.
 
 <p class="notice">If you want to give up all the modules in a distribution, visit
 <a href="<%= my_url->query(ACTION => 'remove_dist_primary') %>">
-Give up Primary Permissions per distribution</a> page.</p>
+<%= $c->app->pause->config->action('remove_dist_primary')->{verb} %></a> page.</p>
 
 <p>Select one or more namespaces:</p>
 <div id="packages">
