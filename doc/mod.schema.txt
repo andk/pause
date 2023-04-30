@@ -218,7 +218,7 @@ CREATE TABLE p6provides (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE packages (
-  package varchar(128) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+  package varchar(128) NOT NULL DEFAULT '',
   version varchar(16) NOT NULL DEFAULT '',
   dist varchar(128) NOT NULL DEFAULT '',
   distname varchar(128) NOT NULL DEFAULT '',
@@ -240,7 +240,7 @@ CREATE TABLE packages (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE perms (
   c int(10) unsigned NOT NULL AUTO_INCREMENT,
-  package char(245) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+  package char(245) NOT NULL DEFAULT '',
   userid char(10) NOT NULL DEFAULT '',
   PRIMARY KEY (c),
   UNIQUE KEY pack_user (package,userid),
@@ -256,7 +256,7 @@ CREATE TABLE perms (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE primeur (
-  package char(245) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+  package char(245) NOT NULL DEFAULT '',
   userid char(10) NOT NULL DEFAULT '',
   PRIMARY KEY (package)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
