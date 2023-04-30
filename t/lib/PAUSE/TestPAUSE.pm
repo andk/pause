@@ -13,6 +13,7 @@ use File::pushd;
 use File::Temp ();
 use File::Which;
 use Path::Class;
+use Path::Tiny;
 
 # This one, we don't expect to be used.  In a weird world, we'd mark it fatal
 # or something so we could say "nothing should log outside of test code."
@@ -100,9 +101,22 @@ sub deploy_schemas_at {
   );
 
   while ( my ($db,$sql) = each %schemas ) {
+    my $raw = path($sql)->slurp_raw;
+
+    if ($db eq 'mod') {
+      # Ughhhh. sqlite columns are case sensitive and we need them to not
+      # be, so we have to do this chicanery to add 'collate nocase' to the
+      # columun definitions for 'package'.
+      my $fixup = $raw =~ s/\b(package\s+(?:var)?char\(\d+\)\s+NOT\s+NULL\s+DEFAULT\s+''\s*),\s*$/$1 COLLATE NOCASE,/gm;
+
+      unless ($fixup == 3) {
+        warn "\n\n!!! We failed to fix up the three package definitions (only fixed $fixup)?!!!\n\n";
+      }
+    }
+
     DBIx::RunSQL->create(
       dsn => "dbi:SQLite:dbname=$dir/$db.sqlite",
-      sql => $sql,
+      sql => \$raw,
     );
   }
 }
