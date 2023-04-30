@@ -40,6 +40,7 @@ use PAUSE::pmfile ();
 use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
 use PAUSE::Indexer::Context;
+use PAUSE::Indexer::Errors;
 use PAUSE::MailAddress ();
 use PAUSE::PermsManager ();
 use Process::Status ();
@@ -379,7 +380,7 @@ sub _do_the_database_work {
       $dbh->commit;
     } else {
       $ctx->alert("Uploading user has no permissions on package $main_pkg");
-      $dio->{NO_DISTNAME_PERMISSION} = 1;
+      $ctx->add_dist_error(ERROR('no_distname_permission'));
       $dbh->rollback;
     }
 
@@ -480,16 +481,22 @@ sub maybe_index_dist {
       check_multiple_root
       check_world_writable
     )) {
-      $dio->$method($ctx);
-      if ($dio->skip) {
-          delete $self->{ALLlasttime}{$dist};
-          delete $self->{ALLfound}{$dist};
+        my $ok    = eval { $dio->$method($ctx); 1; };
+        my $abort = $@;
+        if (!$ok) {
+            if (! $abort->isa('PAUSE::Indexer::Abort')) {
+                die $abort; # Rethrow unexpected exception
+            }
 
-          if ($dio->{REASON_TO_SKIP}) {
-              $dio->mail_summary($ctx);
-          }
-          return;
-      }
+            delete $self->{ALLlasttime}{$dist};
+            delete $self->{ALLfound}{$dist};
+
+            if ($abort->public) {
+                $dio->mail_summary($ctx);
+            }
+
+            return;
+        }
     }
 
     for my $attempt (1 .. 3) {
@@ -499,7 +506,7 @@ sub maybe_index_dist {
       if ($attempt == 3) {
         $Logger->log_debug("tried $attempt times to do db work, but all failed");
         $ctx->alert("database errors while indexing");
-        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
+        $ctx->add_dist_error(ERROR('xact_fail'));
       }
     }
 

@@ -547,7 +547,7 @@ subtest "do not index dists without META file" => sub {
   my $nometa = sub {
     like(
       $_[0]{email}->object->body_str,
-      qr/\QDistribution included neither META.json nor META.yml/,
+      qr/\Qno META.yml or META.json found/,
       "email contains ENOMETAFILE string",
     );
   };

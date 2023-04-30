@@ -9,6 +9,7 @@ use List::MoreUtils ();
 use PAUSE ();
 use Parse::CPAN::Meta;
 use PAUSE::mldistwatch::Constants;
+use PAUSE::Indexer::Errors;
 use JSON::XS ();
 
 use PAUSE::Logger '$Logger';
@@ -217,8 +218,6 @@ sub untar {
 
 sub perl_major_version { shift->{PERL_MAJOR_VERSION} }
 
-sub skip { shift->{SKIP} }
-
 # Commented out this function just like $ISA_BLEAD_PERL
 ##sub isa_blead_perl {
 ##  my($self,$dist) = @_;
@@ -253,6 +252,7 @@ sub _examine_regular_perl {
     $Logger->log("perl distro ($dist) with an unusual suffix!");
     $ctx->alert("perl distro ($dist) with an unusual suffix!");
   }
+
   unless ($skip) {
     $skip = 1 unless $self->untar($ctx);
   }
@@ -276,35 +276,36 @@ sub examine_dist {
 
   if (PAUSE::isa_regular_perl($dist)) {
     ($suffix, $skip) = $self->_examine_regular_perl($ctx);
+
     $self->{SUFFIX} = $suffix;
-    $self->{SKIP}   = $skip;
+
+    if ($skip) {
+      $ctx->abort_indexing("won't process regular perl upload");
+    }
+
     return;
   }
 
   if ($self->isa_dev_version) {
-    $Logger->log("dist is a developer release");
     $self->{SUFFIX} = "N/A";
-    $self->{SKIP}   = 1;
-    return;
+    $ctx->abort_indexing("dist is a developer release");
   }
 
   if ($dist =~ m|/perl-\d+|) {
-    $Logger->log("dist is an unofficial perl-like release");
     $self->{SUFFIX} = "N/A";
-    $self->{SKIP}   = 1;
-    return;
+    $ctx->abort_indexing("dist is an unofficial perl-like release");
   }
 
   if ($dist =~ $SUFFQR) {
-    $suffix = $1;
-    $skip = 1 unless $self->untar($ctx);
+    $self->{SUFFIX} = $1;
+    unless ($self->untar($ctx)) {
+      $ctx->abort_indexing("can't untar archive");
+    }
   } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
-    $Logger->log("dist is a single-.pm-file upload");
-    $suffix = "N/A";
-    $skip   = 1;
-    $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBAREPMFILE;
+    $self->{SUFFIX} = "N/A";
+    $ctx->abort_indexing(ERROR('single_pm'));
   } elsif ($dist =~ /\.zip$/) {
-    $suffix = "zip";
+    $self->{SUFFIX} = "zip";
     my $unzipbin = $self->hub->{UNZIPBIN};
     my $system = "$unzipbin $MLROOT/$dist > /dev/null 2>&1";
     unless (system($system)==0) {
@@ -317,12 +318,10 @@ sub examine_dist {
       # system("$unzipbin -t $MLROOT/$dist");
     }
   } else {
-    $Logger->log("file does not appear to be a CPAN distribution");
-    $skip = 1;
+    $ctx->abort_indexing("file does not appear to be a CPAN distribution");
   }
 
-  $self->{SUFFIX} = $suffix;
-  $self->{SKIP}   = $skip;
+  return;
 }
 
 sub connect {
@@ -338,6 +337,84 @@ sub disconnect {
 sub mlroot {
   my($self) = @_;
   $self->hub->mlroot;
+}
+
+sub _update_mail_content_when_things_were_indexed {
+    my ($self, $ctx, $inxst, $m_ref, $status_ref) = @_;
+
+    my $Lstatus = 0;
+    my $intro_written;
+    for my $p (sort {
+        $inxst->{$b}{status} <=> $inxst->{$a}{status}
+          or
+        $a cmp $b
+      } keys %$inxst) {
+      my $status = $inxst->{$p}{status};
+      unless (defined $$status_ref) {
+        if ($status) {
+          if ($status > PAUSE::mldistwatch::Constants::OK) {
+            $$status_ref =
+            PAUSE::mldistwatch::Constants::heading($status)
+            || "UNKNOWN (status=$status)";
+          } else {
+            $$status_ref = "OK";
+          }
+        } else {
+          $$status_ref = "Unknown";
+        }
+        push @$m_ref, "Status of this distro: $$status_ref\n";
+        push @$m_ref, "="x(length($$status_ref)+23), "\n\n";
+      }
+      unless ($intro_written++) {
+        push @$m_ref, qq{\nThe following packages (grouped by }.
+        qq{status) have been found in the distro:\n\n};
+      }
+      if ($status != $Lstatus) {
+        my $heading =
+        PAUSE::mldistwatch::Constants::heading($status) ||
+        "UNKNOWN (status=$status)";
+        push @$m_ref, sprintf "Status: %s\n%s\n\n", $heading, "="x(length($heading)+8);
+      }
+      my $tf14 = Text::Format->new(
+        bodyIndent => 14,
+        firstIndent => 14,
+      );
+      my $verb_status = $tf14->format($inxst->{$p}{verb_status});
+      $verb_status =~ s/^\s+//; # otherwise this line is too long
+      # magic words, see also report02() around line 573, same wording there,
+      # exception prompted by JOESUF/libapreq2-2.12.tar.gz
+      $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
+      push @$m_ref, sprintf("     package: %s\n",  $p);
+
+      if (my @warnings = $ctx->warnings_for_package($p)) {
+        push @$m_ref, map {;
+               sprintf("     WARNING: %s\n", $_->{text}) } @warnings;
+      }
+
+      push @$m_ref, sprintf("     version: %s\n", $inxst->{$p}{version});
+      push @$m_ref, sprintf("     in file: %s\n", $inxst->{$p}{infile});
+      push @$m_ref, sprintf("     status : %s\n",  $verb_status);
+
+      $Lstatus = $status;
+    }
+}
+
+sub _update_mail_content_when_nothing_was_indexed {
+    my ($self, $ctx, $inxst, $m_ref, $status_ref) = @_;
+
+    if ($self->version_from_meta_ok($ctx)) {
+      push @$m_ref,  qq{Nothing in this distro has been \n}
+                  .  qq{indexed, because according to META.yml this\n}
+                  .  qq{package does not provide any modules.\n\n};
+
+      $$status_ref = "Empty_provides";
+    } else {
+      push @$m_ref,  qq{No or no indexable package statements could be found\n}
+                  .  qq{in the distro (maybe a script or documentation\n}
+                  .  qq{distribution or a developer release?)\n\n};
+
+      $$status_ref = "Empty_no_pm";
+    }
 }
 
 sub mail_summary {
@@ -396,214 +473,71 @@ sub mail_summary {
 
   my $status_over_all;
 
-  if (my $err = $self->{REASON_TO_SKIP}) {
-    push @m, $tf->format( PAUSE::mldistwatch::Constants::heading($err) ),
-             qq{\n\n};
+  my @dist_errors = $ctx->dist_errors;
+
+  for my $error (@dist_errors) {
+    my $header = $error->{header};
+    my $body   = $error->{body};
+    $body = $body->($self) if ref $body;
+
+    push @m, "## $header\n\n";
+    push @m, $tf->format($body), qq{\n\n};
+
     $status_over_all = "Failed";
   }
 
-  # NO_DISTNAME_PERMISSION must not hide other problem messages, so
-  # we fix up any "OK" status records to reflect the permission
-  # problem and let the rest of the report run as usual
-  if ($self->{NO_DISTNAME_PERMISSION}) {
-    my $pkg = $self->_package_governing_permission;
-    push @m, $tf->format(qq[This distribution name will only be indexed
-      when uploaded by users with permission for the package $pkg.
-      Either someone else has ownership over that package name, or
-      this is a brand new distribution and that package name was neither
-      listed in the 'provides' field in the META file nor found
-      inside the distribution's modules.  Therefore, no modules
-      will be indexed.]);
-    push @m, qq{\nFurther details on the indexing attempt follow.\n\n};
-    $status_over_all = "Failed";
-
+  if (($status_over_all//'Ok') ne 'Failed') {
     my $inxst = $self->{INDEX_STATUS};
     if ($inxst && ref $inxst && %$inxst) {
-      unless ($inxst->{$pkg}) {
-        # Perhaps they forgot a pm file matching the dist name
-        my($inxpkg_eg) = sort keys %$inxst;
-        $inxpkg_eg =~ s/::/-/g;
-        $inxpkg_eg =~ s/$/-.../;
-        push @m, $tf->format(qq{\n\nYou appear to be missing a .pm file
-          containing a package matching the dist name ($pkg). Adding this
-          may solve your issue. Or maybe it is the other way round and a
-          different distribution name could be chosen to reflect an
-          actually included package name (eg. $inxpkg_eg).\n});
-    }
+      $self->_update_mail_content_when_things_were_indexed(
+        $ctx,
+        $inxst,
+        \@m,
+        \$status_over_all,
+      );
 
-      for my $p ( keys %$inxst ) {
-          next unless
-            $inxst->{$p}{status} == PAUSE::mldistwatch::Constants::OK;
-          $inxst->{$p}{status} = PAUSE::mldistwatch::Constants::EDISTNAMEPERM;
-          $inxst->{$p}{verb_status} =
-            "Not indexed; $author not authorized for this distribution name";
-      }
-    }
-    else {
-        # some other problem prevented any modules from having status
-        # recorded, we don't have to do anything
-    }
-  }
-
-  if ($self->{HAS_MULTIPLE_ROOT}) {
-
-    push @m, $tf->format(qq[The distribution does not unpack
-      into a single directory and is therefore not being
-      indexed. Hint: try 'make dist' or 'Build dist'. (The
-        directory entries found were: @{$self->{HAS_MULTIPLE_ROOT}})]);
-
-    push @m, qq{\n\n};
-
-    $status_over_all = "Failed";
-
-  } elsif ($self->{HAS_WORLD_WRITABLE}) {
-
-    push @m, $tf->format(qq[The distribution contains the
-      following world writable directories or files and is
-      therefore considered a security breach and as such not
-      being indexed: @{$self->{HAS_WORLD_WRITABLE}} ]);
-
-    push @m, qq{\n\n};
-
-    if ($self->{HAS_WORLD_WRITABLE_FIXEDFILE}) {
-
-      push @m, $tf->format(qq[For your convenience PAUSE has
-        tried to write a new tarball with all the
-        world-writable bits removed. The file is put on
-        the CPAN as
-        '$self->{HAS_WORLD_WRITABLE_FIXEDFILE}' along with
-        your upload and will be indexed automatically
-        unless there are other errors that prevent that.
-        Please watch for a separate indexing report.]);
-
-      push @m, qq{\n\n};
-
-    } else {
-
-      my $err = join "\n", @{$self->{HAS_WORLD_WRITABLE_FIXINGERRORS}||[]};
-      $ctx->alert("Fixing a world-writable tarball failed: $err");
-
-    }
-
-    $status_over_all = "Failed";
-
-  } elsif ($self->{HAS_BLIB}) {
-
-    push @m, $tf->format(qq{The distribution contains a blib/
-      directory and is therefore not being indexed. Hint:
-      try 'make dist'.});
-
-    push @m, qq{\n\n};
-
-    $status_over_all = "Failed";
-
-  } else {
-    my $inxst = $self->{INDEX_STATUS};
-    if ($inxst && ref $inxst && %$inxst) {
-      my $Lstatus = 0;
-      my $intro_written;
-      for my $p (sort {
-          $inxst->{$b}{status} <=> $inxst->{$a}{status}
-            or
-          $a cmp $b
-        } keys %$inxst) {
-        my $status = $inxst->{$p}{status};
-        unless (defined $status_over_all) {
-          if ($status) {
-            if ($status > PAUSE::mldistwatch::Constants::OK) {
-              $status_over_all =
-              PAUSE::mldistwatch::Constants::heading($status)
-              || "UNKNOWN (status=$status)";
-            } else {
-              $status_over_all = "OK";
-            }
-          } else {
-            $status_over_all = "Unknown";
-          }
-          push @m, "Status of this distro: $status_over_all\n";
-          push @m, "="x(length($status_over_all)+23), "\n\n";
-        }
-        unless ($intro_written++) {
-          push @m, qq{\nThe following packages (grouped by }.
-          qq{status) have been found in the distro:\n\n};
-        }
-        if ($status != $Lstatus) {
-          my $heading =
-          PAUSE::mldistwatch::Constants::heading($status) ||
-          "UNKNOWN (status=$status)";
-          push @m, sprintf "Status: %s\n%s\n\n", $heading, "="x(length($heading)+8);
-        }
-        my $tf14 = Text::Format->new(
-          bodyIndent  => 14,
-          firstIndent => 14,
-        );
-        my $verb_status = $tf14->format($inxst->{$p}{verb_status});
-        $verb_status =~ s/^\s+//; # otherwise this line is too long
-        # magic words, see also report02() around line 573, same wording there,
-        # exception prompted by JOESUF/libapreq2-2.12.tar.gz
-        $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
-        push @m, sprintf("     package: %s\n",  $p);
-
-        if (my @warnings = $ctx->warnings_for_package($p)) {
-          push @m, map {;
-                 sprintf("     WARNING: %s\n", $_->{text}) } @warnings;
-        }
-
-        push @m, sprintf("     version: %s\n", $inxst->{$p}{version});
-        push @m, sprintf("     in file: %s\n", $inxst->{$p}{infile});
-        push @m, sprintf("     status : %s\n",  $verb_status);
-
-        $Lstatus = $status;
-      }
     } else {
       $Logger->log([ "index status: %s", $inxst ]);
 
-      if ($pmfiles > 0 || $self->{REASON_TO_SKIP}) {
-        if ($self->{REASON_TO_SKIP} == PAUSE::mldistwatch::Constants::E_DB_XACTFAIL) {
-          push @m,  qq{This distribution was not indexed due to database\n}
-                 .  qq{errors.  You can request another indexing attempt be\n}
-                 .  qq{made by logging into https://pause.perl.org/\n\n};
+      # No files have status, no dist-wide errors.  Nothing to report!
+      return unless $pmfiles || $ctx->dist_errors;
 
-          $status_over_all = "Failed";
-        } elsif ($self->{REASON_TO_SKIP} == PAUSE::mldistwatch::Constants::ENOMETAFILE) {
-          push @m,  qq{This distribution was not indexed because it did not\n}
-                 .  qq{contain a META.yml or META.json file.\n\n};
-
-          $status_over_all = "Failed";
-        } elsif ($self->version_from_meta_ok($ctx)) {
-
-          push @m,  qq{Nothing in this distro has been \n}
-                 .  qq{indexed, because according to META.yml this\n}
-                 .  qq{package does not provide any modules.\n\n};
-
-          $status_over_all = "Empty_provides";
-
-        } else {
-
-          push @m,  qq{No or no indexable package statements could be found\n}
-                 .  qq{in the distro (maybe a script or documentation\n}
-                 .  qq{distribution or a developer release?)\n\n};
-
-          $status_over_all = "Empty_no_pm";
-
-        }
-      } else {
-        # no need to write a report at all
-        return;
-      }
-
+      $self->_update_mail_content_when_nothing_was_indexed(
+        $ctx,
+        $inxst,
+        \@m,
+        \$status_over_all,
+      );
     }
   }
+
   push @m, qq{__END__\n};
-  my $pma = PAUSE::MailAddress->new_from_userid($author);
-  if ($PAUSE::Config->{TESTHOST} || $self->hub->{OPT}{testhost}) {
-    if ($self->hub->{PICK}) {
-      local $"="";
-      warn "Unsent Report [@m]";
+
+  $self->_send_email(\@m, $status_over_all);
+  return;
+}
+
+sub _send_email {
+    my ($self, $lines, $status_over_all) = @_;
+
+    if ($PAUSE::Config->{TESTHOST} || $self->hub->{OPT}{testhost}) {
+      if ($self->hub->{PICK}) {
+        local $"="";
+        warn "Unsent Report [@$lines]";
+      }
+
+      return;
     }
-  } else {
+
+    my $author = $self->{USERID};
+    my $distro = $self->{DIST};
+
+    my $substrdistro = substr $distro, 5;
+
+    my $pma = PAUSE::MailAddress->new_from_userid($author);
     my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
     my $failed = "";
+
     if ($status_over_all ne "OK") {
       $failed = "Failed: ";
     }
@@ -619,13 +553,12 @@ sub mail_summary {
           content_type => 'text/plain',
           encoding     => 'quoted-printable',
         },
-        body_str => join( ($, // q{}) , @m),
+        body_str => join(q{}, @$lines),
     );
 
     sendmail($email);
 
     $Logger->log("sent indexer report email");
-  }
 }
 
 sub index_status {
@@ -656,7 +589,7 @@ sub check_blib {
   my ($self, $ctx) = @_;
   if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}) {
     $self->{HAS_BLIB}++;
-    return;
+    $ctx->abort_indexing(ERROR('blib'));
   }
   # sometimes they package their stuff deep inside a hierarchy
   my @found = @{$self->{MANIFOUND}};
@@ -681,6 +614,7 @@ sub check_blib {
     # more than one entry in this directory means final check
     if (grep m|^blib/|, @found) {
       $self->{HAS_BLIB}++;
+      $ctx->abort_indexing(ERROR('blib'));
     }
     last DIRDOWN;
   }
@@ -691,8 +625,8 @@ sub check_multiple_root {
   my %seen;
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
   if (@top > 1) {
-    $Logger->log([ "archive has multiple roots: %s", [ sort @top ] ]);
     $self->{HAS_MULTIPLE_ROOT} = \@top;
+    $ctx->abort_indexing(ERROR('multiroot'));
   } else {
     $self->{DISTROOT} = $top[0];
   }
@@ -710,43 +644,12 @@ sub check_world_writable {
     $Ldirs = $dirs;
   }
   my @ww = grep {my @stat = stat $_; $stat[2] & 2} @dirs, @files;
-  if (@ww) {
-    # XXX todo: set a variable if we could successfully build the
-    # new tarball and make it visible for debugging and later
-    # visible for the user
 
-    # we are now in temp dir and in front of us is
-    # $self->{DISTROOT}, e.g. 'Tk-Wizard-2.142' (the directory, not necessarily the significant part of the distro name)
-    my @wwfixingerrors;
-    for my $wwf (@ww) {
-      my @stat = stat $wwf;
-      unless (chmod $stat[2] &~ 0022, $wwf) {
-        push @wwfixingerrors, "error during 'chmod $stat[2] &~ 0022, $wwf': $!";
-      }
-    }
-    my $fixedfile = "$self->{DISTROOT}-withoutworldwriteables.tar.gz";
-    my $todir = File::Basename::dirname($self->{DIST}); # M/MA/MAKAROW
-    my $to_abs = $self->hub->{MLROOT} . "/$todir/$fixedfile";
-    if (! length $self->{DISTROOT}) {
-      push @wwfixingerrors, "Alert: \$self->{DISTROOT} is empty, cannot fix";
-    } elsif ($self->{DIST} =~ /-withoutworldwriteables/) {
-      push @wwfixingerrors, "Sanity check failed: incoming file '$self->{DIST}' already has '-withoutworldwriteables' in the name";
-    } elsif (-e $to_abs) {
-      push @wwfixingerrors, "File '$to_abs' already exists, won't overwrite";
-    } elsif (0 != system (tar => "czf",
-        $to_abs,
-        $self->{DISTROOT}
-      )) {
-      push @wwfixingerrors, "error during 'tar ...': $!";
-    }
-    $Logger->log([ "archive has world writable files: %s", [ sort @ww ] ]);
-    $self->{HAS_WORLD_WRITABLE} = \@ww;
-    if (@wwfixingerrors) {
-      $self->{HAS_WORLD_WRITABLE_FIXINGERRORS} = \@wwfixingerrors;
-    } else {
-      $self->{HAS_WORLD_WRITABLE_FIXEDFILE} = $fixedfile;
-    }
-  }
+  return unless @ww;
+
+  $Logger->log([ "archive has world writable files: %s", [ sort @ww ] ]);
+  $self->{HAS_WORLD_WRITABLE} = \@ww;
+  $ctx->abort_indexing(ERROR('worldwritable'));
 }
 
 sub filter_pms {
@@ -900,9 +803,6 @@ sub _index_by_meta {
 
 sub examine_pms {
   my ($self, $ctx) = @_;
-  return if $self->{HAS_BLIB};
-  return if $self->{HAS_MULTIPLE_ROOT};
-  return if $self->{HAS_WORLD_WRITABLE};
 
   # XXX not yet reached, we need to re-examine what happens without SKIP.
   # Currently SKIP shadows the event of could_not_untar
@@ -1020,9 +920,7 @@ sub extract_readme_and_meta {
 
   unless ($json || $yaml) {
     $self->{METAFILE} = "No META.yml or META.json found";
-    $self->{SKIP}     = 1;
-    $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::ENOMETAFILE;
-    $Logger->log("no META.yml or META.json found");
+    $ctx->abort_indexing(ERROR('no_meta'));
     return;
   }
 
@@ -1065,10 +963,14 @@ sub check_indexability {
         return;
     }
 
+    $Logger->log([
+      "release status: %s",
+      $self->{META_CONTENT}{release_status},
+    ]);
+
     if (($self->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
         # META.json / META.yml declares it's not stable; do not index!
-        $self->{SKIP} = 1;
-        $self->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
+        $ctx->abort_indexing(ERROR('unstable_release'));
         return;
     }
 }
