@@ -427,7 +427,9 @@ sub mail_summary {
     "The following report has been written by the PAUSE namespace indexer.\n",
     "Please contact modules\@perl.org if there are any open questions.\n";
 
-  if ($self->has_indexing_warnings($ctx)) {
+  if ($ctx->warnings_for_all_packages) {
+    # If there were any warnings, put in a note to the reader that they should
+    # look for them.
     push @m,
       "\nWARNING:  Some irregularities were found while indexing your\n",
         "          distribution.  See below for more details.\n";
@@ -570,19 +572,6 @@ sub index_status {
     status => $status,
     verb_status => $verb_status,
   };
-}
-
-sub indexing_warnings_for_package {
-  my ($self, $ctx, $pack) = @_;
-  return @{ $self->{INDEX_WARNINGS}{$pack} // [] };
-}
-
-sub has_indexing_warnings {
-  my ($self, $ctx) = @_;
-  my $i;
-  my $warnings = $self->{INDEX_WARNINGS};
-
-  @$_ && return 1 for values %$warnings;
 }
 
 sub check_blib {
@@ -1279,12 +1268,6 @@ Accessor method. True if perl distro from non-pumpking or a dev release.
 =head3 mail_summary
 
 =head3 index_status
-
-=head3 add_indexing_warning
-
-=head3 indexing_warnings_for_package
-
-=head3 has_indexing_warnings
 
 =head3 _package_governing_permission
 
