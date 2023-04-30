@@ -569,112 +569,110 @@ has the same version number and the distro has a more recent modification time.}
       }
   }
 
-  # sanity check
-  if ($ok) {
+  # If we're not okay yet, we're not going to become okay going forward.
+  return unless $ok;
 
-      if ($self->{FIO}{DIO}{VERSION_FROM_META_OK}) {
-          # nothing to argue at the moment, e.g. lib_pm.PL
-      } elsif (
-                ! $pp->{basename_matches_package}
-                &&
-                PAUSE->basename_matches_package($ofile,$package)
-              ) {
+  if ($self->{FIO}{DIO}{VERSION_FROM_META_OK}) {
+      # nothing to argue at the moment, e.g. lib_pm.PL
+  } elsif (
+      ! $pp->{basename_matches_package}
+      &&
+      PAUSE->basename_matches_package($ofile,$package)
+  ) {
+      $Logger->log([
+        "warning: basename does not match package, but it used to: %s", {
+          package => $package,
+          old_file => $ofile,
+          new_file => $pp->{infile},
+        }
+      ]);
 
-          $Logger->log([
-            "warning: basename does not match package, but it used to: %s", {
-              package => $package,
-              old_file => $ofile,
-              new_file => $pp->{infile},
-            }
-          ]);
-
-          $ok = 0;
-      }
+      return;
   }
 
-  if ($ok) {
-      my $query = qq{SELECT package, version, dist from  packages WHERE lc_package = ?};
-      my($pkg_recs) = $dbh->selectall_arrayref($query,{ Slice => {} }, lc $package);
-      if (@$pkg_recs > 1) {
-          $Logger->log([
-              "conflicting records exist in packages table, won't index: %s",
-              [ @$pkg_recs ],
-          ]);
+  my ($pkg_recs) = $dbh->selectall_arrayref(
+      qq{
+          SELECT package, version, dist
+          FROM packages
+          WHERE lc_package = ?
+      },
+      { Slice => {} },
+      lc $package,
+  );
 
-          $self->index_status(
-              $ctx,
-              $package,
-              "undef",
-              $pp->{infile},
-              PAUSE::mldistwatch::Constants::EDBCONFLICT,
-              qq{Indexing failed because of conflicting records for $package.
+  if (@$pkg_recs > 1) {
+      $Logger->log([
+          "conflicting records exist in packages table, won't index: %s",
+          [ @$pkg_recs ],
+      ]);
+
+      $self->index_status(
+          $ctx,
+          $package,
+          "undef",
+          $pp->{infile},
+          PAUSE::mldistwatch::Constants::EDBCONFLICT,
+          qq{Indexing failed because of conflicting records for $package.
 Please report the case to the PAUSE admins at modules\@perl.org.},
-          );
-          $ok = 0;
-      }
+      );
+
+      return; # XXX Obsolete when the index_status above becomes an
+              # ->abort_indexing_package!
   }
 
   return unless $self->_version_ok($ctx, $pp, $package, $dist);
 
 
-  if ($ok) {
-      my $query = qq{
-        UPDATE  packages
-        SET     package = ?, lc_package = ?, version = ?, dist = ?, file = ?,
-                filemtime = ?, pause_reg = ?
-        WHERE lc_package = ?
-      };
+  $Logger->log([
+    "updating packages: %s", {
+      package  => $package,
+      version  => $pp->{version},
+      dist     => $dist,
+      infile   => $pp->{infile},
+      filetime => $pp->{filemtime},
+      disttime => $self->dist->{TIME},
+    },
+  ]);
 
-      $Logger->log([
-        "updating packages: %s", {
-          package  => $package,
-          version  => $pp->{version},
-          dist     => $dist,
-          infile   => $pp->{infile},
-          filetime => $pp->{filemtime},
-          disttime => $self->dist->{TIME},
-        },
-      ]);
+  my $rows_affected = eval {
+      $dbh->do(
+          q{
+            UPDATE  packages
+            SET     package = ?, version = ?, dist = ?, file = ?,
+                    filemtime = ?, pause_reg = ?
+            WHERE lc_package = ?
+          },
+          undef,
+          $package, $pp->{version}, $dist, $pp->{infile},
+          $pp->{filemtime}, $self->dist->{TIME},
+          lc $package,
+      );
+  };
 
-      my $rows_affected = eval { $dbh->do
-                                     ($query,
-                                      undef,
-                                      $package,
-                                      lc $package,
-                                      $pp->{version},
-                                      $dist,
-                                      $pp->{infile},
-                                      $pp->{filemtime},
-                                      $self->dist->{TIME},
-                                      lc $package,
-                                     );
-                             };
-
-      if ($rows_affected) { # expecting only "1" can happen
-          $self->index_status(
-              $ctx,
-              $package,
-              $pp->{version},
-              $pp->{infile},
-              PAUSE::mldistwatch::Constants::OK,
-              "indexed",
-          );
-      } else {
-          my $dbherrstr = $dbh->errstr;
-          $self->index_status(
-            $ctx,
-            $package,
-            "undef",
-            $pp->{infile},
-            PAUSE::mldistwatch::Constants::EDBERR,
-            qq{The PAUSE indexer could not store the indexing
+  unless ($rows_affected) {
+      my $dbherrstr = $dbh->errstr;
+      $self->index_status(
+        $ctx,
+        $package,
+        "undef",
+        $pp->{infile},
+        PAUSE::mldistwatch::Constants::EDBERR,
+        qq{The PAUSE indexer could not store the indexing
 result in the DB due the following error: C< $dbherrstr >.
 Please report the case to the PAUSE admins at modules\@perl.org.},
-          );
-      }
+      );
 
+      return; # XXX this return obsolete when ->abort_indexing_package is here
   }
 
+  $self->index_status(
+      $ctx,
+      $package,
+      $pp->{version},
+      $pp->{infile},
+      PAUSE::mldistwatch::Constants::OK,
+      "indexed",
+  );
 }
 
 sub __do_regular_perl_update {
