@@ -139,25 +139,7 @@ subtest "require permission on main module" => sub {
           sub {
             like(
               $_[0]->{email}->as_string,
-              qr/for\s+the\s+package\s+XFR/,
-              "email looks right",
-            );
-          },
-          sub {
-            like(
-              $_[0]->{email}->as_string,
-              qr/You\s+appear.*\.pm\s+file.*dist\s+name\s+\(XFR\)/s,
-              "email looks right",
-            );
-          },
-          sub {
-            like(
-              $_[0]->{email}->as_string,
-                qr/
-                  \s+the\s+other\s+way\s+round
-                  .+
-                  XForm-Rollout-\.\.\.
-                  /xs,
+              qr/package\s+would\s+be\s+called\s+XFR/,
               "email looks right",
             );
           },
