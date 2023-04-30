@@ -228,6 +228,7 @@ CREATE TABLE packages (
   `comment` varchar(255) NOT NULL DEFAULT '',
   `status` enum('index','noindex') NOT NULL DEFAULT 'index',
   PRIMARY KEY (package),
+  KEY dist (dist),
   KEY distname (distname)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
