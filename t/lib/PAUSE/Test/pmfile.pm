@@ -22,7 +22,7 @@ use Test::MockObject;
 use Test::MockObject::Extends;
 use PAUSE::mldistwatch;
 use Mock::Dist;
-use Module::Faker::Dist;
+use Module::Faker::Dist 0.025; # for "layout" in package
 use Path::Class ();
 use Data::Dumper;
 use YAML::XS;
