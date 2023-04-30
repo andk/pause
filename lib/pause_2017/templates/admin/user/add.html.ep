@@ -55,13 +55,13 @@ homepage:&#160;<%= $row->{homepage} %><br>
 %         if ($row->{introduced}) {
 %           my $time = $row->{introduced};
 %           $time =~ s/\s/\&#160;/g;
-introduced&#160;on:&#160;<%= $time %><br>
+introduced&#160;on:&#160;<%== $time %><br>
 %         }
 
 %         if ($row->{changed}) {
 %           my $time = $row->{changed};
 %           $time =~ s/\s/\&#160;/g;
-changed&#160;on:&#160;<%= $time %>&#160;by&#160;<%= $row->{changedby} %><br>
+changed&#160;on:&#160;<%== $time %>&#160;by&#160;<%= $row->{changedby} %><br>
 %         } else {
 changed&#160;by&#160;<%= $row->{changedby} %><br>
 %         }
