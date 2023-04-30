@@ -139,7 +139,7 @@ subtest "require permission on main module" => sub {
           sub {
             like(
               $_[0]->{email}->as_string,
-              qr/package\s+would\s+be\s+called\s+XFR/,
+              qr/adding\s+a\s+package\s+called\s+XFR/i,
               "email looks right",
             );
           },
