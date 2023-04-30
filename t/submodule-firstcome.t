@@ -30,10 +30,10 @@ my @existing_permissions = map {
 
 # ... and therefore, we should only index Acme::Playpen::*
 my $expected_package_list = [
-    { package => 'Acme::Playpen',            version => '0.20' },
-    { package => 'Acme::Playpen::Utilities', version => 'undef' },
-    { package => 'Acme::Playpen::_common',   version => 'undef' },
     { package => 'Acme::odometer',           version => '0.20' },
+    { package => 'Acme::Playpen',            version => '0.20' },
+    { package => 'Acme::Playpen::_common',   version => 'undef' },
+    { package => 'Acme::Playpen::Utilities', version => 'undef' },
     ### { package => 'Acme::STUDY::PERL',        version => '2.00' }, ### WRONG
 ];
 
