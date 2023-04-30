@@ -18,6 +18,19 @@ sub public_error {
   };
 }
 
+public_error bad_provides => {
+  header  => 'META provides includes a malformed package name',
+  body    => sub {
+    my ($dist) = @_;
+    my $names = join q{, }, @{ $dist->{MALFORMED_PROVIDES} || [] };
+    return <<~"EOF"
+      The "provides" entry in your META file names packages that aren't valid
+      package names: $names.  When "provides" can't be trusted, none of it is,
+      so nothing in this distribution will be indexed.
+      EOF
+  },
+};
+
 public_error blib => {
   header  => 'archive contains a "blib" directory',
   body    => <<~'EOF'
