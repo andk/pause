@@ -33,14 +33,14 @@ sub add_package_warning {
 sub warnings_for_all_packages {
   my ($self) = @_;
 
-  return map {; @$_ } values $self->_package_warnings->%*;
+  return map {; @$_ } values %{ $self->_package_warnings };
 }
 
 sub warnings_for_package {
   my ($self, $package_name) = @_;
 
   return grep {; $_->{package} eq $package_name }
-         map  {; @$_ } values $self->_package_warnings->%*;
+         map  {; @$_ } values %{ $self->_package_warnings };
 }
 
 has alerts => (
@@ -53,13 +53,13 @@ sub alert {
   my ($self, $alert) = @_;
   $alert =~ s/\v+\z//;
 
-  push $self->_alerts->@*, $alert;
+  push @{ $self->_alerts }, $alert;
   return;
 }
 
 sub all_alerts {
   my ($self) = @_;
-  return $self->_alerts->@*;
+  return @{ $self->_alerts };
 }
 
 has dist_errors => (
@@ -74,14 +74,14 @@ sub add_dist_error {
   $error = ref $error ? $error : { ident => $error, message => $error };
 
   $Logger->log("adding dist error: " . ($error->{ident} // $error->{message}));
-  push $self->_dist_errors->@*, $error;
+  push @{ $self->_dist_errors }, $error;
 
   return $error;
 }
 
 sub dist_errors {
   my ($self) = @_;
-  return $self->_dist_errors->@*;
+  return @{ $self->_dist_errors };
 }
 
 sub abort_indexing {
