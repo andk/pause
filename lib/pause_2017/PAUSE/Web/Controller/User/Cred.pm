@@ -69,6 +69,19 @@ sub edit {
         }
       }
     }
+  } else {
+    for my $field (@allmeta) {
+      unless ($meta{$field}){
+        warn "Someone tried strange field[$field], ignored";
+        next;
+      }
+      if ( $field eq "ustatus" ) {
+        if ( $u->{"ustatus"} eq "active" ) {
+          next;
+        }
+      }
+      $req->param("pause99_edit_cred_$field" => $u->{$field});
+    }
   }
 
   if ($consistentsubmit) {
@@ -202,19 +215,6 @@ sub edit {
       my $dbh = $mgr->authen_connect();
       $dbh->do($sql,undef,$u->{userid});
     }
-  }
-
-  for my $field (@allmeta) {
-    unless ($meta{$field}){
-      warn "Someone tried strange field[$field], ignored";
-      next;
-    }
-    if ( $field eq "ustatus" ) {
-      if ( $u->{"ustatus"} eq "active" ) {
-        next;
-      }
-    }
-    $req->param("pause99_edit_cred_$field" => $u->{$field});
   }
 }
 
