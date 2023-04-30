@@ -791,9 +791,20 @@ sub _index_by_meta {
     push @packages, $pio;
   }
 
-  for my $pio (@packages) {
-    $pio->examine_pkg($ctx);
-  }
+  $self->index_packages($ctx, \@packages);
+}
+
+sub index_packages {
+    my ($self, $ctx, $packages) = @_;
+
+    PACKAGE: for my $pkg (@$packages) {
+        unless (eval { $pkg->examine_pkg($ctx); 1 }) {
+            my $abort = $@;
+            die $abort unless $abort->isa('PAUSE::Indexer::Abort::Package');
+
+            next PACKAGE;
+        }
+    }
 }
 
 sub examine_pms {
