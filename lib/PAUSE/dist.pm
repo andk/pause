@@ -278,27 +278,27 @@ sub examine_dist {
     ($suffix, $skip) = $self->_examine_regular_perl($ctx);
 
     $self->{SUFFIX} = $suffix;
-    $ctx->abort_indexing("won't process regular perl upload");
+    $ctx->abort_indexing_dist("won't process regular perl upload");
   }
 
   if ($self->isa_dev_version) {
     $self->{SUFFIX} = "N/A";
-    $ctx->abort_indexing("dist is a developer release");
+    $ctx->abort_indexing_dist("dist is a developer release");
   }
 
   if ($dist =~ m|/perl-\d+|) {
     $self->{SUFFIX} = "N/A";
-    $ctx->abort_indexing("dist is an unofficial perl-like release");
+    $ctx->abort_indexing_dist("dist is an unofficial perl-like release");
   }
 
   if ($dist =~ $SUFFQR) {
     $self->{SUFFIX} = $1;
     unless ($self->untar($ctx)) {
-      $ctx->abort_indexing("can't untar archive");
+      $ctx->abort_indexing_dist("can't untar archive");
     }
   } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
     $self->{SUFFIX} = "N/A";
-    $ctx->abort_indexing(ERROR('single_pm'));
+    $ctx->abort_indexing_dist(ERROR('single_pm'));
   } elsif ($dist =~ /\.zip$/) {
     $self->{SUFFIX} = "zip";
     my $unzipbin = $self->hub->{UNZIPBIN};
@@ -313,7 +313,7 @@ sub examine_dist {
       # system("$unzipbin -t $MLROOT/$dist");
     }
   } else {
-    $ctx->abort_indexing("file does not appear to be a CPAN distribution");
+    $ctx->abort_indexing_dist("file does not appear to be a CPAN distribution");
   }
 
   return;
@@ -573,7 +573,7 @@ sub check_blib {
   my ($self, $ctx) = @_;
   if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}) {
     $self->{HAS_BLIB}++;
-    $ctx->abort_indexing(ERROR('blib'));
+    $ctx->abort_indexing_dist(ERROR('blib'));
   }
   # sometimes they package their stuff deep inside a hierarchy
   my @found = @{$self->{MANIFOUND}};
@@ -598,7 +598,7 @@ sub check_blib {
     # more than one entry in this directory means final check
     if (grep m|^blib/|, @found) {
       $self->{HAS_BLIB}++;
-      $ctx->abort_indexing(ERROR('blib'));
+      $ctx->abort_indexing_dist(ERROR('blib'));
     }
     last DIRDOWN;
   }
@@ -610,7 +610,7 @@ sub check_multiple_root {
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
   if (@top > 1) {
     $self->{HAS_MULTIPLE_ROOT} = \@top;
-    $ctx->abort_indexing(ERROR('multiroot'));
+    $ctx->abort_indexing_dist(ERROR('multiroot'));
   } else {
     $self->{DISTROOT} = $top[0];
   }
@@ -633,7 +633,7 @@ sub check_world_writable {
 
   $Logger->log([ "archive has world writable files: %s", [ sort @ww ] ]);
   $self->{HAS_WORLD_WRITABLE} = \@ww;
-  $ctx->abort_indexing(ERROR('worldwritable'));
+  $ctx->abort_indexing_dist(ERROR('worldwritable'));
 }
 
 sub filter_pms {
@@ -904,7 +904,7 @@ sub extract_readme_and_meta {
 
   unless ($json || $yaml) {
     $self->{METAFILE} = "No META.yml or META.json found";
-    $ctx->abort_indexing(ERROR('no_meta'));
+    $ctx->abort_indexing_dist(ERROR('no_meta'));
     return;
   }
 
@@ -954,7 +954,7 @@ sub check_indexability {
 
     if (($self->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
         # META.json / META.yml declares it's not stable; do not index!
-        $ctx->abort_indexing(ERROR('unstable_release'));
+        $ctx->abort_indexing_dist(ERROR('unstable_release'));
         return;
     }
 }

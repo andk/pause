@@ -2,7 +2,8 @@ package PAUSE::Indexer::Context;
 use v5.12.0;
 use Moo;
 
-use PAUSE::Indexer::Abort;
+use PAUSE::Indexer::Abort::Dist;
+use PAUSE::Indexer::Abort::Package;
 use PAUSE::Indexer::Errors;
 use PAUSE::Logger '$Logger';
 
@@ -84,12 +85,12 @@ sub dist_errors {
   return @{ $self->_dist_errors };
 }
 
-sub abort_indexing {
+sub abort_indexing_dist {
   my ($self, $error) = @_;
 
   $error = $self->add_dist_error($error);
 
-  die PAUSE::Indexer::Abort->new({
+  die PAUSE::Indexer::Abort::Dist->new({
     message => $error->{message},
     public  => $error->{public},
   });
