@@ -489,7 +489,7 @@ sub maybe_index_dist {
 
     unless ($examine_dist_ok) {
         my $abort = $@;
-        die $abort unless $abort->isa('PAUSE::Indexer::Abort');
+        die $abort unless $abort->isa('PAUSE::Indexer::Abort::Dist');
 
         delete $self->{ALLlasttime}{$dist};
         delete $self->{ALLfound}{$dist};
