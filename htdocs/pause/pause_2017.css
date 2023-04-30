@@ -176,3 +176,6 @@ div.messagebox {
   border: 1px solid transparent;
   border-radius: 0.25rem;
 }
+td.indexed {
+  font-weight: bold
+}

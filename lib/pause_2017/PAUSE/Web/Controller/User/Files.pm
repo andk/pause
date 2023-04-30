@@ -41,6 +41,8 @@ sub show {
   }
   $sth->finish if ref $sth;
 
+  my $indexed = $c->indexed($dbh, $u->{userid});
+
   foreach my $f (keys %files) {
     unless (stat $f) {
       warn "ALERT: Could not stat f[$f]: $!";
@@ -49,7 +51,7 @@ sub show {
     my $blurb = $deletes{$f} ?
         $c->scheduled($whendele{$f}) :
             HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = {stat => -s _, blurb => $blurb};
+    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f} };
   }
   $pause->{files} = \%files;
 }
@@ -163,6 +165,8 @@ sub delete {
   }
   $sth->finish if ref $sth;
 
+  my $indexed = $c->indexed($dbh, $u->{userid});
+
   foreach my $f (keys %files) {
     unless (stat $f) {
       warn "ALERT: Could not stat f[$f]: $!";
@@ -171,7 +175,7 @@ sub delete {
     my $blurb = $deletes{$f} ?
         $c->scheduled($whendele{$f}) :
             HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = {stat => -s _, blurb => $blurb};
+    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f} };
   }
   $pause->{files} = \%files;
 }
@@ -186,6 +190,28 @@ sub scheduled {
   $return .= HTTP::Date::time2str($expires);
   $return .= "\)";
   $return;
+}
+
+sub indexed {
+  my ($c, $dbh, $userid) = @_;
+
+  my %indexed;
+  my $sth;
+  if ($sth = $dbh->prepare(qq{SELECT distinct(packages.dist) AS dist FROM packages JOIN uris ON packages.dist = uris.uriid WHERE packages.status = ? AND uris.userid = ?})
+    and
+    $sth->execute('index', $userid)
+    and
+    $sth->rows
+  ) {
+    require CPAN::DistnameInfo;
+    my $dist;
+    while(($dist) = $sth->fetchrow_array) {
+      my $file = CPAN::DistnameInfo->new($dist)->filename or next;
+      $indexed{$file} = 1;
+    }
+  }
+  $sth->finish if ref $sth;
+  return \%indexed;
 }
 
 1;
