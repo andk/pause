@@ -40,7 +40,7 @@ sub warnings_for_package {
   my ($self, $package_name) = @_;
 
   return grep {; $_->{package} eq $package_name }
-         map  {; @$_ } values %{ $self->_package_warnings };
+         $self->warnings_for_all_packages;
 }
 
 has alerts => (
