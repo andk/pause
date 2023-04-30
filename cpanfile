@@ -38,7 +38,7 @@ requires 'Net::SSLeay', '1.49';
 requires 'Parse::CPAN::Packages';
 requires 'Parse::CPAN::Perms';
 requires 'Path::Class';
-requires 'Path::Tiny';
+requires 'Path::Tiny', '0.070'; # for copy
 requires 'Plack::Request';
 requires 'Plack::App::Directory::Apaxy';
 requires 'Plack::Middleware::ReverseProxy';
