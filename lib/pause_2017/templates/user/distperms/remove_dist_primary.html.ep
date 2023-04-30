@@ -54,7 +54,7 @@ please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.
 <p class="notice">If you need finer control (eg. to give up only a small part of
 a distribution for whatever reasons), visit
 <a href="<%= my_url->query(ACTION => 'remove_primary') %>">
-Give up Primary Permissions per module</a> page.</p>
+<%= $c->app->pause->config->action('remove_primary')->{verb} %></a> page.</p>
 
 <p>Select one or more distributions:</p>
 <div id="dists">
