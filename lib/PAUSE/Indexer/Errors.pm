@@ -46,10 +46,13 @@ public_error no_distname_permission => {
     my $pkg = $dist->_package_governing_permission;
 
     return <<"EOF"
-You appear to be missing a .pm file containing a package matching the dist
-name.  For this distribution, that package would be called $pkg.  Adding this
-may solve your issue. Or maybe it is the other way round and a different
-distribution name could be chosen, matching a package you are shipping.
+This distribution name will only be indexed when uploaded by users with
+permission for the package $pkg.  Either someone else has ownership over that
+package name, or this is a brand new distribution and that package name was
+neither listed in the 'provides' field in the META file nor found inside the
+distribution's modules.  Therefore, no modules will be indexed.  Adding a
+package called $pkg may solve your issue, or instead you may wish to change the
+name of your distribution.
 EOF
   },
 };
