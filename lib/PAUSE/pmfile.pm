@@ -47,52 +47,48 @@ sub mlroot {
 
 # package PAUSE::pmfile;
 sub filter_ppps {
-    my($self,@ppps) = @_;
+    my($self, @package_names) = @_;
     my @res;
 
-    # very similar code is in PAUSE::dist::filter_pms
-  MANI: for my $ppp ( @ppps ) {
-        if ($self->{META_CONTENT}){
-            my $no_index = $self->{META_CONTENT}{no_index}
-                            || $self->{META_CONTENT}{private}; # backward compat
-            if (ref($no_index) eq 'HASH') {
-                my %map = (
-                            package => qr{\z},
-                            namespace => qr{::},
-                          );
-                for my $k (qw(package namespace)) {
-                    next unless my $v = $no_index->{$k};
-                    my $rest = $map{$k};
-                    if (ref $v eq "ARRAY") {
-                        for my $ve (@$v) {
-                            $ve =~ s|::$||;
-                            if ($ppp =~ /^$ve$rest/){
-                                $Logger->log("no_index rule on $k $ve; skipping $ppp");
-                                next MANI;
-                            } else {
-                                $Logger->log_debug("no_index rule on $k $ve; NOT skipping $ppp");
-                            }
-                        }
-                    } else {
-                        $v =~ s|::$||;
-                        if ($ppp =~ /^$v$rest/){
-                            $Logger->log("no_index rule on $k $v; skipping $ppp");
-                            next MANI;
-                        } else {
-                            $Logger->log_debug("no_index rule on $k $v; NOT skipping $ppp");
-                        }
-                    }
-                }
-            } else {
-                $Logger->log_debug("no no_index or private in META_CONTENT");
-            }
-        } else {
-            # $Logger->log("no META_CONTENT"); # too noisy
-        }
-        push @res, $ppp;
+    # the name "private" is there for backwards compatibility
+    my $no_index = $self->{META_CONTENT} &&
+        ($self->{META_CONTENT}{no_index} || $self->{META_CONTENT}{private});
+
+    unless ($no_index && ref $no_index eq 'HASH') {
+        # There's no no_index directive, or it's bogus.  We'll keep every
+        # package!
+        return @package_names;
     }
 
-    @res;
+    # very similar code is in PAUSE::dist::filter_pms
+    PACKAGE: for my $pkg ( @package_names ) {
+        my %map = (
+          package   => qr{\z},
+          namespace => qr{::},
+        );
+
+        TYPE: for my $type (qw(package namespace)) {
+            next TYPE unless my $rules = $no_index->{$type};
+
+            my $rest = $map{$type};
+            $rules = [$rules] unless ref $rules;
+
+            for my $rule (@$rules) {
+                $rule =~ s|::$||;
+
+                if ($pkg =~ /^\Q$rule\E$rest/) {
+                    $Logger->log("no_index rule on $type $rule; skipping $pkg");
+                    next PACKAGE;
+                } else {
+                    $Logger->log_debug("no_index rule on $type $rule; NOT skipping $pkg");
+                }
+            }
+
+            push @res, $pkg;
+        }
+    }
+
+    return @res;
 }
 
 # package PAUSE::pmfile;
