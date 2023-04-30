@@ -740,8 +740,9 @@ sub _index_by_meta {
 
   my $main_package = $self->_package_governing_permission;
 
-  my @packages =  map {[ $_ => $provides->{$_ }]} sort keys %$provides;
-  PACKAGE: for (@packages) {
+  my @packages;
+  my @package_names =  map {[ $_ => $provides->{$_ }]} sort keys %$provides;
+  PACKAGE: for (@package_names) {
     my ( $k, $v ) = @$_;
 
     unless (ref $v and length $v->{file}) {
@@ -781,6 +782,11 @@ sub _index_by_meta {
       META_CONTENT => $self->{META_CONTENT},
       MAIN_PACKAGE => $main_package,
     );
+
+    push @packages, $pio;
+  }
+
+  for my $pio (@packages) {
     $pio->examine_pkg($ctx);
   }
 }

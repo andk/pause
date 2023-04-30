@@ -136,38 +136,44 @@ sub examine_fio {
         }
     }
 
-    my($ppp) = $self->packages_per_pmfile($ctx);
-    my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
+    my ($ppp) = $self->packages_per_pmfile($ctx);
+    my @package_names = $self->filter_ppps(sort keys %$ppp);
 
-    $Logger->log([ "will examine packages: %s", \@keys_ppp ]);
+    unless (@package_names) {
+        $Logger->log("no files left after filtering");
+        return;
+    }
+
+    $Logger->log([ "will examine packages: %s", \@package_names ]);
 
     #
     # Immediately after each package (pmfile) examined contact
     # the database
     #
 
-    my ($package);
-  DBPACK: foreach $package (@keys_ppp) {
-
+    my @packages;
+    for my $package_name (@package_names) {
         # What do we need? dio, fio, pmfile, time, dist, dbh, alert?
         my $pio = PAUSE::package->new(
-                      PACKAGE => $package,
-                      DIST => $dist,
-                      PP => $ppp->{$package}, # hash containing
-                                              # version
-                      PMFILE => $pmfile,
-                      FIO => $self,
-                      USERID => $self->{USERID},
-                      META_CONTENT => $self->{META_CONTENT},
-                      MAIN_PACKAGE => $self->{MAIN_PACKAGE},
-                  );
+            PACKAGE => $package_name,
+            DIST => $dist,
+            PP => $ppp->{$package_name},  # hash containing
+                                          # version
+            PMFILE => $pmfile,
+            FIO => $self,
+            USERID => $self->{USERID},
+            META_CONTENT => $self->{META_CONTENT},
+            MAIN_PACKAGE => $self->{MAIN_PACKAGE},
+        );
 
-        $pio->examine_pkg($ctx);
+        push @packages, $pio;
+    }
 
-    }                       # end foreach package
+    for my $pio (@packages) {
+      $pio->examine_pkg($ctx);
+    }
 
     delete $self->{DIO};    # circular reference
-
 }
 
 # package PAUSE::pmfile
