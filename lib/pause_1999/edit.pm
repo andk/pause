@@ -896,7 +896,7 @@ sub edit_cred {
                         "\n"
                        );
 	}
-        if ($field eq "email") {
+        if ($field eq "secretemail") {
           $mb = sprintf $mailsprintf1, $field, "CENSORED", "\n";
         }
         push @mailblurb, $mb;

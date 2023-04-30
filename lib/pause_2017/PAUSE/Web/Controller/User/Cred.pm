@@ -162,7 +162,7 @@ sub edit {
         } else {
           $mb = {field => $field, value => $s};
         }
-        if ($field eq "email") {
+        if ($field eq "secretemail") {
           $mb = {field => $field, value => "CENSORED"};
         }
         push @mailblurb, $mb;
