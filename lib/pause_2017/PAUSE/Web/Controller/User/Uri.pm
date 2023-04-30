@@ -184,8 +184,13 @@ try again or report errors to <a href="mailto:}),
                           $PAUSE::Config->{ADMIN},
                           Mojo::ByteStream->new(qq{">the administrator</a></p>})]);
     } else {
-      my $filename;
-      ($filename = $uri) =~ s,.*/,, ;
+      require LWP::UserAgent;
+      my $ua = LWP::UserAgent->new;
+      $ua->timeout($PAUSE::Config->{TIMEOUT}) if $PAUSE::Config->{TIMEOUT};
+      my $res = $ua->head($uri);
+      my $filename = $res && $res->is_success ? $res->filename : undef;
+      $filename ||= $uri; # as a last resort
+      $filename =~ s,.*/,, ;
       $filename =~ s/[^A-Za-z0-9_\-\.\@\+]//g; # only ASCII-\w and - . @ + allowed
 
       if ($filename eq "CHECKSUMS") {
