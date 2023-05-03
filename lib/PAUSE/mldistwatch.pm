@@ -380,7 +380,7 @@ sub _do_the_database_work {
       $dbh->commit;
     } else {
       $ctx->alert("Uploading user has no permissions on package $main_pkg");
-      $ctx->add_dist_error(ERROR('no_distname_permission'));
+      $ctx->add_dist_error(DISTERROR('no_distname_permission'));
       $dbh->rollback;
     }
 
@@ -504,7 +504,7 @@ sub maybe_index_dist {
       if ($attempt == 3) {
         $Logger->log_debug("tried $attempt times to do db work, but all failed");
         $ctx->alert("database errors while indexing");
-        $ctx->add_dist_error(ERROR('xact_fail'));
+        $ctx->add_dist_error(DISTERROR('xact_fail'));
       }
     }
 
