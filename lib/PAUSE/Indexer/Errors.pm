@@ -10,6 +10,16 @@ use Sub::Exporter -setup => {
 sub dist_error;
 sub pkg_error;
 
+sub _assert_args_present {
+  my ($ident, $hash, $names_demanded) = @_;
+
+  for my $name (@$names_demanded) {
+    next if exists $hash->{$name};
+
+    Carp::confess("no $name given in PKGERROR($ident)")
+  }
+}
+
 dist_error bad_provides => {
   header  => 'META provides includes a malformed package name',
   body    => sub {
@@ -118,16 +128,23 @@ pkg_error bad_package_name => {
 };
 
 pkg_error db_conflict => {
-  # TODO bring back $package
   header  => "Not indexed because of conflicting record in index",
-  body    => <<~"EOF"
-    Indexing failed because of conflicting records for \$package.  Please
-    report the case to the PAUSE admins at modules\@perl.org.
-    EOF
+  body    => sub {
+    my ($arg) = @_;
+
+    _assert_args_present(db_conflict => $arg, [ qw(package_name) ]);
+
+    return <<~"EOF"
+      Indexing failed because of conflicting records for $arg->{package_name}.
+      Please report the case to the PAUSE admins at modules\@perl.org.
+      EOF
+  },
 };
 
 pkg_error db_error => {
-  # TODO bring back db error string?  seems weird -- rjbs, 2023-05-01
+  # Before PKGERROR existed, this would include the database error.  This felt
+  # like a bad idea to rjbs when he refactored, so he removed it.  Easy to
+  # re-add, if we want to, though!  -- rjbs, 2023-05-03
   header  => 'Not indexed because of database error',
   body    => <<~'EOF',
     The PAUSE indexer could not store the indexing result in the PAUSE
@@ -137,30 +154,49 @@ pkg_error db_error => {
 };
 
 pkg_error dual_newer => {
-  # TODO bring back parameters
   header  => 'Not indexed because of an newer dual-life module',
-  body    => <<~'EOF',
-    Not indexed because package $opack in file $ofile has a dual life in
-    $odist. The other version is at $oldversion, so not indexing seems okay.
-    EOF
+  body    => sub {
+    my ($old) = @_;
+
+    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+
+    return <<~"EOF";
+      Not indexed because package $old->{pack} in file $old->{file} has a dual
+      life in $old->{dist}.  The other version is at $old->{version}, so not
+      indexing seems okay.
+      EOF
+  },
 };
 
 pkg_error dual_older => {
-  # TODO bring back parameters
   header  => 'Not indexed because of an older dual-life module',
-  body    => <<~'EOF',
-    Not indexed because package $opack in file $ofile seems to have a dual
-    life in $odist. Although the other package is at version [$oldversion],
-    the indexer lets the other dist continue to be the reference version,
-    shadowing the one in the core.  Maybe harmless, maybe needs resolving.
-    EOF
+  body    => sub {
+    my ($old) = @_;
+
+    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+
+    return <<~"EOF";
+      Not indexed because package $old->{pack} in file $old->{file} seems to
+      have a dual life in $old->{dist}. Although the other package is at
+      version [$old->{version}], the indexer lets the other dist continue to
+      be the reference version, shadowing the one in the core.  Maybe
+      harmless, maybe needs resolving.
+      EOF
+  }
 };
 
 pkg_error mtime_fell => {
-  # TODO bring back ofile/odist in body
   header  => 'Release seems outdated',
-  body    => q{Not indexed because $ofile in $odist also has a zero version
-               number and the distro has a more recent modification time.},
+  body    => sub {
+    my ($old) = @_;
+
+    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+
+    return <<~"EOF";
+      Not indexed because $old->{file} in $old->{dist} also has a zero version
+      number and the distro has a more recent modification time.
+      EOF
+  }
 };
 
 pkg_error no_permission => {
@@ -173,17 +209,33 @@ pkg_error no_permission => {
 };
 
 pkg_error version_fell => {
-  # TODO bring back "file in $dist", make the q{...} a qq{...}
   header => "Not indexed because of decreasing version number",
-  body   => q{Not indexed because $ofile in $odist has a higher version number
-              ($oldversion)},
+  body   => sub {
+    my ($old) = @_;
+
+    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+
+    return <<~"EOF";
+      Not indexed because $old->{file} in $old->{dist} has a higher version
+      number ($old->{version})
+      EOF
+  }
 };
 
 pkg_error version_invalid => {
-  # TODO put back $version itself?  It's already in the report.
-  # -- rjbs, 2023-05-01
   header  => 'Not indexed because version is not a valid "lax version" string.',
-  body    => undef,
+  body   => sub {
+    my ($arg) = @_;
+
+    _assert_args_present(db_conflict => $arg, [ qw(version) ]);
+
+    return <<~"EOF";
+      The version present in the file, "$arg->{version}", is not a valid lax
+      version string.  You can read more in "perldoc version".  This
+      restriction would be enforced at compile time if you put your version
+      string within your package declaration.
+      EOF
+  }
 };
 
 pkg_error version_openerr => {
@@ -239,11 +291,19 @@ sub DISTERROR {
 }
 
 sub PKGERROR {
-  my ($ident) = @_;
+  my ($ident, $arg) = @_;
 
-  my $error = $PKG_ERROR{$ident};
-  unless ($error) {
+  my $template = { $PKG_ERROR{$ident}->%* };
+
+  unless ($template) {
     Carp::confess("requested unknown package error: $ident");
+  }
+
+  my $error = { %$template };
+
+  if (ref $error->{body}) {
+    my $body = $error->{body}->($arg);
+    $error->{body} = $body;
   }
 
   return $error;
@@ -251,6 +311,7 @@ sub PKGERROR {
 
 sub dist_error {
   my ($name, $arg) = @_;
+
   $DIST_ERROR{$name} = {
     ident   => $name,
     public  => 1,
@@ -260,6 +321,7 @@ sub dist_error {
 
 sub pkg_error {
   my ($name, $arg) = @_;
+
   $PKG_ERROR{$name} = {
     ident   => $name,
     public  => 1,
