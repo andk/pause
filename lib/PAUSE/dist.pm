@@ -398,16 +398,20 @@ sub _update_mail_content_when_things_were_indexed {
 sub _update_mail_content_when_nothing_was_indexed {
     my ($self, $ctx, $m_ref, $status_ref) = @_;
 
+    my $tf = Text::Format->new(firstIndent=>0);
+
     if ($self->version_from_meta_ok($ctx)) {
-      push @$m_ref,  qq{Nothing in this distro has been \n}
-                  .  qq{indexed, because according to META.yml this\n}
-                  .  qq{package does not provide any modules.\n\n};
+      push @$m_ref, $tf->format(<<'EOF') . "\n";
+Nothing in this distro has been indexed, because according to META.yml this
+package does not provide any modules.
+EOF
 
       $$status_ref = "Empty_provides";
     } else {
-      push @$m_ref,  qq{No or no indexable package statements could be found\n}
-                  .  qq{in the distro (maybe a script or documentation\n}
-                  .  qq{distribution or a developer release?)\n\n};
+      push @$m_ref, $tf->format(<<'EOF') . "\n";
+No or no indexable package statements could be found in the distro (maybe a
+script or documentation distribution or a developer release?)
+EOF
 
       $$status_ref = "Empty_no_pm";
     }
