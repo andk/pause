@@ -502,16 +502,13 @@ pmfile[$pmfile]
       }
   } else {
 
-      # 2004-01-04: Stas Bekman asked to change logic here. Up
-      # to rev 478 we did not index files with a version of 0
-      # and with a falling timestamp. These strange timestamps
-      # typically happen for developers who work on more than
-      # one computer. Files that are not changed between
-      # releases keep two different timestamps from some
-      # arbitrary checkout in the past. Stas correctly suggests,
-      # we should check these cases for distmtime, not filemtime.
-
-      # so after rev. 478 we deprecate the EMTIMEFALLING constant
+      # 2004-01-04: Stas Bekman asked to change logic here. Up to rev 478 we
+      # did not index files with a version of 0 and with a falling timestamp.
+      # These strange timestamps typically happen for developers who work on
+      # more than one computer. Files that are not changed between releases
+      # keep two different timestamps from some arbitrary checkout in the past.
+      # Stas correctly suggests, we should check these cases for distmtime, not
+      # filemtime.
 
       if ($pp->{version} eq "undef"||$pp->{version} == 0) { # no version here,
           if ($tdistmtime >= $odistmtime) { # but younger or same-age dist
