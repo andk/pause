@@ -6,6 +6,7 @@ use vars qw($AUTOLOAD);
 use PAUSE::Logger '$Logger';
 
 use PAUSE::mldistwatch::Constants;
+use PAUSE::Indexer::Errors;
 use CPAN::DistnameInfo;
 
 =comment
@@ -108,7 +109,7 @@ sub give_regdowner_perms {
 # on Foo is the same as having it on foo
 
 # package PAUSE::package;
-sub perm_check {
+sub assert_permissions_okay {
   my ($self, $ctx) = @_;
   my $dist = $self->{DIST};
   my $package = $self->{PACKAGE};
@@ -159,18 +160,7 @@ sub perm_check {
                     // "unknown";
 
           my $error   = "not owner";
-          my $message = qq{Not indexed because permission missing.
-Current registered primary maintainer is $owner.
-Hint: you can always find the legitimate maintainer(s) on PAUSE under
-"View Permissions".};
 
-          $self->index_status($ctx,
-                              $package,
-                              $pp->{version},
-                              $pp->{infile},
-                              PAUSE::mldistwatch::Constants::EMISSPERM,
-                              $message,
-                              );
           $ctx->alert(qq{$error:
 package[$package]
 version[$pp->{version}]
@@ -180,7 +170,8 @@ userid[$userid]
 owners[@owners]
 owner[$owner]
 });
-          return;         # early return
+
+          $ctx->abort_indexing_package($self, PKGERROR('no_permission'));
       }
 
   } else {
@@ -251,17 +242,12 @@ sub examine_pkg {
   # should they be cought earlier? Maybe.
   # but as an ultimate sanity check suggested by Richard Soderberg
   if ($self->_pkg_name_insane($ctx)) {
-      $Logger->log("package[$package] name seems illegal");
-      delete $self->{FIO};    # circular reference
-      return;
+      $ctx->abort_indexing_package($self, "invalid package name");
   }
 
   # Query all users with perms for this package
 
-  unless ($self->perm_check($ctx)) { # (P2.0&P3.0)
-      delete $self->{FIO};           # circular reference
-      return;
-  }
+  $self->assert_permissions_okay($ctx);
 
   # Check that package name matches case of file name
   {
@@ -284,48 +270,19 @@ sub examine_pkg {
   if ($pp->{version} && $pp->{version} =~ /^\{.*\}$/) { # JSON parser error
       my $err = JSON::jsonToObj($pp->{version});
       if ($err->{openerr}) {
-          $self->index_status($ctx,
-                              $package,
-                              "undef",
-                              $pp->{infile},
-                              PAUSE::mldistwatch::Constants::EOPENFILE,
-
-                              qq{The PAUSE indexer was not able to
-        read the file. It issued the following error: C< $err->{openerr} >},
-                              );
-      } else {
-          $self->index_status($ctx,
-                              $package,
-                              "undef",
-                              $pp->{infile},
-                              PAUSE::mldistwatch::Constants::EPARSEVERSION,
-
-                              qq{The PAUSE indexer was not able to
-        parse the following line in that file: C< $err->{line} >
-
-        Note: the indexer is running in a Safe compartement and cannot
-        provide the full functionality of perl in the VERSION line. It
-        is trying hard, but sometime it fails. As a workaround, please
-        consider writing a META.yml that contains a 'provides'
-        attribute or contact the CPAN admins to investigate (yet
-        another) workaround against "Safe" limitations.)},
-
-                              );
+          # TODO: get $err->{openerr} back in here, I guess?
+          $ctx->abort_indexing_package($self, PKGERROR('version_openerr'));
       }
-      delete $self->{FIO};    # circular reference
-      return;
+
+      # TODO: get $err->{line} back in here, I guess?
+      $ctx->abort_indexing_package($self, PKGERROR('version_parse'));
   }
 
   # Sanity checks
-
-  for (
-        $package,
-        $pp->{version},
-        $dist
-      ) {
-      if (!defined || /^\s*$/ || /\s/){  # for whatever reason I come here
-          delete $self->{FIO};    # circular reference
-          return;            # don't screw up 02packages
+  for ($package, $pp->{version}, $dist) {
+      if (!defined || /^\s*$/ || /\s/) {
+          # If we got here, what on earth happened?
+          $ctx->abort_indexing_package($self, PKGERROR('wtf'));
       }
   }
 
@@ -333,27 +290,19 @@ sub examine_pkg {
   delete $self->{FIO};    # circular reference
 }
 
-sub _version_ok {
-  my ($self, $ctx, $pp, $package, $dist) = @_;
-  if (length $pp->{version} > 16) {
-    my $errno = PAUSE::mldistwatch::Constants::ELONGVERSION;
-    my $error = PAUSE::mldistwatch::Constants::heading($errno);
-    $self->index_status($ctx,
-                        $package,
-                        $pp->{version},
-                        $pp->{infile},
-                        $errno,
-                        $error,
-                        );
-    $ctx->alert(qq{$error:
-package[$package]
-version[$pp->{version}]
-file[$pp->{infile}]
-dist[$dist]
+sub assert_version_ok {
+    my ($self, $ctx) = @_;
+
+    return if length $self->{PP}{version} <= 16;
+
+    $ctx->alert(qq{version string was too long:
+package[$self->{PACKAGE}]
+version[$self->{PP}{version}]
+file[$self->{PP}{infile}]
+dist[$self->{DIST}]
 });
-    return;
-  }
-  return 1;
+
+    $ctx->abort_indexing_package($self, PKGERROR('version_too_long'));
 }
 
 # package PAUSE::package;
@@ -367,7 +316,6 @@ sub update_package {
   my $pp = $self->{PP};
   my $pmfile = $self->{PMFILE};
   my $fio = $self->{FIO};
-
 
   my($opack,$oldversion,$odist,$ofilemtime,$ofile) = @$row{
     qw( package version dist filemtime file )
@@ -454,13 +402,7 @@ sub update_package {
           opack       => $opack,
       });
   } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
-      $self->index_status($ctx,
-                          $package,
-                          $pp->{version},
-                          $pmfile,
-                          PAUSE::mldistwatch::Constants::EBADVERSION,
-                          qq{Not indexed because VERSION [$pp->{version}] is not a valid "lax version" string.},
-      );
+      $ctx->abort_indexing_package($self, PKGERROR('version_invalid'));
   } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
       # higher VERSION here
       $Logger->log([
@@ -476,15 +418,6 @@ sub update_package {
   } elsif (CPAN::Version->vgt($oldversion,$pp->{version})) {
       # lower VERSION number here
       if ($odist ne $dist) {
-          $self->index_status($ctx,
-                              $package,
-                              $pp->{version},
-                              $pmfile,
-                              PAUSE::mldistwatch::Constants::EVERFALLING,
-                              qq{Not indexed because $ofile in $odist
-has a higher version number ($oldversion)},
-                              );
-
           delete $self->dist->{CHECKINS}{ lc $package }{ $package };
 
           $ctx->alert(qq{decreasing VERSION number [$pp->{version}]
@@ -493,6 +426,8 @@ dist[$dist]
 oldversion[$oldversion]
 pmfile[$pmfile]
 }); # });
+
+          $ctx->abort_indexing_package($self, PKGERROR('version_fell'));
       } elsif ($older_isa_regular_perl) {
           $ok++;          # new on 2002-08-01
       } else {
@@ -521,14 +456,7 @@ pmfile[$pmfile]
               ]);
               $ok++;
           } else {
-              $self->index_status($ctx,
-                                  $package,
-                                  $pp->{version},
-                                  $pp->{infile},
-                                  PAUSE::mldistwatch::Constants::EOLDRELEASE,
-                                  qq{Not indexed because $ofile in $odist
-also has a zero version number and the distro has a more recent modification time.}
-                                  );
+              $ctx->abort_indexing_package($self, PKGERROR('mtime_fell'));
           }
       } elsif (CPAN::Version->vcmp($pp->{version}, $oldversion)==0) {
           # equal version here
@@ -550,14 +478,7 @@ also has a zero version number and the distro has a more recent modification tim
                   old     => { dist => $odist, mtime => $odistmtime },
                 },
               ]);
-              $self->index_status($ctx,
-                                  $package,
-                                  $pp->{version},
-                                  $pp->{infile},
-                                  PAUSE::mldistwatch::Constants::EOLDRELEASE,
-                                  qq{Not indexed because $ofile in $odist
-has the same version number and the distro has a more recent modification time.}
-                                  );
+              $ctx->abort_indexing_package($self, PKGERROR('mtime_fell'));
           }
       } else {
           $Logger->log(
@@ -603,22 +524,10 @@ has the same version number and the distro has a more recent modification time.}
           [ @$pkg_recs ],
       ]);
 
-      $self->index_status(
-          $ctx,
-          $package,
-          "undef",
-          $pp->{infile},
-          PAUSE::mldistwatch::Constants::EDBCONFLICT,
-          qq{Indexing failed because of conflicting records for $package.
-Please report the case to the PAUSE admins at modules\@perl.org.},
-      );
-
-      return; # XXX Obsolete when the index_status above becomes an
-              # ->abort_indexing_package!
+      $ctx->abort_indexing_package($self, PKGERROR('db_conflict'));
   }
 
-  return unless $self->_version_ok($ctx, $pp, $package, $dist);
-
+  $self->assert_version_ok($ctx);
 
   $Logger->log([
     "updating packages: %s", {
@@ -648,28 +557,10 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
 
   unless ($rows_affected) {
       my $dbherrstr = $dbh->errstr;
-      $self->index_status(
-        $ctx,
-        $package,
-        "undef",
-        $pp->{infile},
-        PAUSE::mldistwatch::Constants::EDBERR,
-        qq{The PAUSE indexer could not store the indexing
-result in the DB due the following error: C< $dbherrstr >.
-Please report the case to the PAUSE admins at modules\@perl.org.},
-      );
-
-      return; # XXX this return obsolete when ->abort_indexing_package is here
+      $ctx->abort_indexing_package($self, PKGERROR('db_error'));
   }
 
-  $self->index_status(
-      $ctx,
-      $package,
-      $pp->{version},
-      $pp->{infile},
-      PAUSE::mldistwatch::Constants::OK,
-      "indexed",
-  );
+  $ctx->record_package_indexing($self);
 }
 
 sub __do_regular_perl_update {
@@ -701,55 +592,13 @@ sub __do_regular_perl_update {
         }
     } else {
         if (CPAN::Version->vgt($pp->{version},$oldversion)) {
-            $self->index_status($ctx,
-                                $package,
-                                $pp->{version},
-                                $pp->{infile},
-                                PAUSE::mldistwatch::Constants::EDUALOLDER,
-
-                                qq{Not indexed because package $opack
-in file $ofile seems to have a dual life in $odist. Although the other
-package is at version [$oldversion], the indexer lets the other dist
-continue to be the reference version, shadowing the one in the core.
-Maybe harmless, maybe needs resolving.},
-
-                            );
+            $ctx->abort_indexing_package($self, PKGERROR('dual_older'));
         } else {
-            $self->index_status($ctx,
-                                $package,
-                                $pp->{version},
-                                $pp->{infile},
-                                PAUSE::mldistwatch::Constants::EDUALYOUNGER,
-
-                                qq{Not indexed because package $opack
-in file $ofile has a dual life in $odist. The other version is at
-$oldversion, so not indexing seems okay.},
-
-                            );
+            $ctx->abort_indexing_package($self, PKGERROR('dual_newer'));
         }
     }
 
     return $ok;
-}
-
-# package PAUSE::package;
-sub index_status {
-  my ($self, $ctx, @rest) = @_;
-  my $dio;
-
-  if (my $fio = $self->{FIO}) {
-      $dio = $fio->{DIO};
-  } else {
-      $dio = $self->{DIO};
-  }
-
-  $dio->index_status($ctx, @rest);
-}
-
-sub get_index_status_status {
-  my ($self, $ctx) = @_;
-
-  return $self->dist->{INDEX_STATUS}{ $self->{PACKAGE} }{status};
 }
 
 # package PAUSE::package;
@@ -778,7 +627,7 @@ sub insert_into_package {
     }
   ]);
 
-  return unless $self->_version_ok($ctx, $pp, $package, $dist);
+  $self->assert_version_ok($ctx);
   $dbh->do($query,
             undef,
             $package,
@@ -790,13 +639,8 @@ sub insert_into_package {
             $self->dist->{TIME},
             $distname,
           );
-  $self->index_status($ctx,
-                      $package,
-                      $pp->{version},
-                      $pp->{infile},
-                      PAUSE::mldistwatch::Constants::OK,
-                      "indexed",
-                      );
+
+  $ctx->record_package_indexing($self);
 }
 
 # package PAUSE::package;
@@ -881,11 +725,12 @@ sub checkin {
       $self->insert_into_package($ctx);
   }
 
-  my $status = $self->get_index_status_status($ctx);
-  if (! $status or $status == PAUSE::mldistwatch::Constants::OK) {
+  # my $status = $self->get_index_status_status($ctx);
+  # if (! $status or $status == PAUSE::mldistwatch::Constants::OK) {
       $self->checkin_into_primeur($ctx); # called in void context!
-  }
+  # }
 
+  return;
 }
 
 1;
