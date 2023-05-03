@@ -345,10 +345,12 @@ sub _update_mail_content_when_things_were_indexed {
     my $Lstatus = 0;
     my $intro_written;
 
-    my $all_succeeded = @$statuses == grep {; $_->{is_success} } @$statuses;
+    my $successes = grep {; $_->{is_success} } @$statuses;
 
     unless (defined $$status_ref) {
-      $$status_ref = $all_succeeded ? "OK" : "Failed";
+      $$status_ref  = $successes == @$statuses  ? "OK"
+                    : $successes                ? "partially successful"
+                    :                             "Failed";
 
       push @$m_ref, "Status of this distro: $$status_ref\n";
       push @$m_ref, "="x(length($$status_ref)+23), "\n\n";
