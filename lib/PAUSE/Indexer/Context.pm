@@ -46,16 +46,6 @@ has package_status => (
 sub _set_package_error {
   my ($self, $package_obj, $status) = @_;
 
-  # XXX remove this block when ->index_status is dead
-  $package_obj->{FIO}{DIO}->index_status(
-    $self,
-    $package_obj->{PACKAGE},
-    $package_obj->{PP}{version},
-    $package_obj->{PP}{infile},
-    2, # OK
-    $status->{header},
-  );
-
   $self->_package_status->{ $package_obj->{PACKAGE} } = {
     is_success  => 0,
     filename    => $package_obj->{PP}{infile},
@@ -75,16 +65,6 @@ sub _set_package_error {
 
 sub record_package_indexing {
   my ($self, $package_obj) = @_;
-
-  # XXX remove this block when ->index_status is dead
-  $package_obj->{FIO}{DIO}->index_status(
-    $self,
-    $package_obj->{PACKAGE},
-    $package_obj->{PP}{version},
-    $package_obj->{PP}{infile},
-    1, # OK
-    "it worked",
-  );
 
   $self->_package_status->{ $package_obj->{PACKAGE} } = {
     is_success  => 1,
