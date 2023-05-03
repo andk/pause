@@ -321,15 +321,15 @@ sub update_package {
     qw( package version dist filemtime file )
   };
 
-  $Logger->log([
-    "updating old package data: %s", {
-      package => $opack,
-      version => $oldversion,
-      dist    => $odist,
-      mtime   => $ofilemtime,
-      file    => $ofile,
-    }
-  ]);
+  my $old = {
+    package => $opack,
+    version => $oldversion,
+    dist    => $odist,
+    mtime   => $ofilemtime,
+    file    => $ofile,
+  };
+
+  $Logger->log([ "updating old package data: %s", $old ]);
 
   my $MLROOT = $self->mlroot;
   my $odistmtime = (stat "$MLROOT/$odist")[9];
@@ -402,7 +402,9 @@ sub update_package {
           opack       => $opack,
       });
   } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
-      $ctx->abort_indexing_package($self, PKGERROR('version_invalid'));
+      $ctx->abort_indexing_package($self, PKGERROR('version_invalid', {
+        version => $pp->{version}
+      }));
   } elsif (CPAN::Version->vgt($pp->{version},$oldversion)) {
       # higher VERSION here
       $Logger->log([
@@ -427,7 +429,7 @@ oldversion[$oldversion]
 pmfile[$pmfile]
 }); # });
 
-          $ctx->abort_indexing_package($self, PKGERROR('version_fell'));
+          $ctx->abort_indexing_package($self, PKGERROR('version_fell', $old));
       } elsif ($older_isa_regular_perl) {
           $ok++;          # new on 2002-08-01
       } else {
@@ -456,7 +458,7 @@ pmfile[$pmfile]
               ]);
               $ok++;
           } else {
-              $ctx->abort_indexing_package($self, PKGERROR('mtime_fell'));
+              $ctx->abort_indexing_package($self, PKGERROR('mtime_fell', $old));
           }
       } elsif (CPAN::Version->vcmp($pp->{version}, $oldversion)==0) {
           # equal version here
@@ -478,7 +480,7 @@ pmfile[$pmfile]
                   old     => { dist => $odist, mtime => $odistmtime },
                 },
               ]);
-              $ctx->abort_indexing_package($self, PKGERROR('mtime_fell'));
+              $ctx->abort_indexing_package($self, PKGERROR('mtime_fell', $old));
           }
       } else {
           $Logger->log(
@@ -570,6 +572,14 @@ sub __do_regular_perl_update {
       qw( package version dist filemtime file )
     };
 
+    my $old = {
+      package => $opack,
+      version => $oldversion,
+      dist    => $odist,
+      mtime   => $ofilemtime,
+      file    => $ofile,
+    };
+
     my $older_isa_regular_perl = $arg->{older_isa_regular_perl};
 
     my $odistmtime  = $arg->{odistmtime};
@@ -592,9 +602,9 @@ sub __do_regular_perl_update {
         }
     } else {
         if (CPAN::Version->vgt($pp->{version},$oldversion)) {
-            $ctx->abort_indexing_package($self, PKGERROR('dual_older'));
+            $ctx->abort_indexing_package($self, PKGERROR('dual_older', $old));
         } else {
-            $ctx->abort_indexing_package($self, PKGERROR('dual_newer'));
+            $ctx->abort_indexing_package($self, PKGERROR('dual_newer', $old));
         }
     }
 
