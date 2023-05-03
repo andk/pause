@@ -236,7 +236,7 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
           sub {
             like(
               $_[0]->{email}->as_string,
-              qr/has\s+a\s+higher\s+version/,
+              qr/decreasing\s+version\s+number/,
               "email looks right",
             );
           }
