@@ -28,7 +28,99 @@ sub add_package_warning {
     text    => $warning,
   };
 
+  $Logger->log([
+    "adding package warning to %s: %s",
+    $package_obj->{PACKAGE},
+    $list->[-1],
+  ]);
+
   return;
+}
+
+has package_status => (
+  is => 'bare',
+  reader  => '_package_status',
+  default => sub {  {}  },
+);
+
+sub _set_package_error {
+  my ($self, $package_obj, $status) = @_;
+
+  # XXX remove this block when ->index_status is dead
+  $package_obj->{FIO}{DIO}->index_status(
+    $self,
+    $package_obj->{PACKAGE},
+    $package_obj->{PP}{version},
+    $package_obj->{PP}{infile},
+    2, # OK
+    $status->{header},
+  );
+
+  $self->_package_status->{ $package_obj->{PACKAGE} } = {
+    is_success  => 0,
+    filename    => $package_obj->{PP}{infile},
+    version     => $package_obj->{PP}{version},
+    header      => $status->{header},
+    body        => $status->{body},
+    package     => $package_obj->{PACKAGE},
+  };
+
+  $Logger->log([
+    "set error status for %s",
+    $package_obj->{PACKAGE},
+  ]);
+
+  return;
+}
+
+sub record_package_indexing {
+  my ($self, $package_obj) = @_;
+
+  # XXX remove this block when ->index_status is dead
+  $package_obj->{FIO}{DIO}->index_status(
+    $self,
+    $package_obj->{PACKAGE},
+    $package_obj->{PP}{version},
+    $package_obj->{PP}{infile},
+    1, # OK
+    "it worked",
+  );
+
+  $self->_package_status->{ $package_obj->{PACKAGE} } = {
+    is_success  => 1,
+    filename    => $package_obj->{PP}{infile},
+    version     => $package_obj->{PP}{version},
+    header      => "Indexed successfully",
+    body        => "The package was indexed successfully.",
+    package     => $package_obj->{PACKAGE},
+  };
+
+  $Logger->log([
+    "set OK status for %s",
+    $package_obj->{PACKAGE},
+  ]);
+
+  return;
+}
+
+sub package_statuses {
+  my ($self) = @_;
+
+  my %stash = %{ $self->_package_status };
+  return @stash{ sort keys %stash };
+}
+
+sub abort_indexing_package {
+  my ($self, $package_obj, $error) = @_;
+
+  $Logger->log("abort indexing $package_obj->{PACKAGE}");
+
+  $self->_set_package_error($package_obj, $error);
+
+  die PAUSE::Indexer::Abort::Package->new({
+    message => $error->{header},
+    public  => 1,
+  });
 }
 
 sub warnings_for_all_packages {

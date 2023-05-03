@@ -298,7 +298,7 @@ sub examine_dist {
     }
   } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
     $self->{SUFFIX} = "N/A";
-    $ctx->abort_indexing_dist(ERROR('single_pm'));
+    $ctx->abort_indexing_dist(DISTERROR('single_pm'));
   } elsif ($dist =~ /\.zip$/) {
     $self->{SUFFIX} = "zip";
     my $unzipbin = $self->hub->{UNZIPBIN};
@@ -573,7 +573,7 @@ sub check_blib {
   my ($self, $ctx) = @_;
   if (grep m|^[^/]+/blib/|, @{$self->{MANIFOUND}}) {
     $self->{HAS_BLIB}++;
-    $ctx->abort_indexing_dist(ERROR('blib'));
+    $ctx->abort_indexing_dist(DISTERROR('blib'));
   }
   # sometimes they package their stuff deep inside a hierarchy
   my @found = @{$self->{MANIFOUND}};
@@ -598,7 +598,7 @@ sub check_blib {
     # more than one entry in this directory means final check
     if (grep m|^blib/|, @found) {
       $self->{HAS_BLIB}++;
-      $ctx->abort_indexing_dist(ERROR('blib'));
+      $ctx->abort_indexing_dist(DISTERROR('blib'));
     }
     last DIRDOWN;
   }
@@ -610,7 +610,7 @@ sub check_multiple_root {
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
   if (@top > 1) {
     $self->{HAS_MULTIPLE_ROOT} = \@top;
-    $ctx->abort_indexing_dist(ERROR('multiroot'));
+    $ctx->abort_indexing_dist(DISTERROR('multiroot'));
   } else {
     $self->{DISTROOT} = $top[0];
   }
@@ -633,7 +633,7 @@ sub check_world_writable {
 
   $Logger->log([ "archive has world writable files: %s", [ sort @ww ] ]);
   $self->{HAS_WORLD_WRITABLE} = \@ww;
-  $ctx->abort_indexing_dist(ERROR('worldwritable'));
+  $ctx->abort_indexing_dist(DISTERROR('worldwritable'));
 }
 
 sub filter_pms {
@@ -921,7 +921,7 @@ sub extract_readme_and_meta {
 
   unless ($json || $yaml) {
     $self->{METAFILE} = "No META.yml or META.json found";
-    $ctx->abort_indexing_dist(ERROR('no_meta'));
+    $ctx->abort_indexing_dist(DISTERROR('no_meta'));
     return;
   }
 
@@ -971,7 +971,7 @@ sub check_indexability {
 
     if (($self->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
         # META.json / META.yml declares it's not stable; do not index!
-        $ctx->abort_indexing_dist(ERROR('unstable_release'));
+        $ctx->abort_indexing_dist(DISTERROR('unstable_release'));
         return;
     }
 }
