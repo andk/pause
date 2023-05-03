@@ -9,7 +9,7 @@ use Test::Deep ();
 
 my $null = sub {};
 
-my @NULL = qw(verbose connect disconnect mlroot);
+my @NULL = qw(verbose connect disconnect mlroot index_packages);
 
 my %ALWAYS = (
   version_from_meta_ok => 1,
