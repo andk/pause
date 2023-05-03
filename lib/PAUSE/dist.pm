@@ -340,67 +340,61 @@ sub mlroot {
 }
 
 sub _update_mail_content_when_things_were_indexed {
-    my ($self, $ctx, $inxst, $m_ref, $status_ref) = @_;
+    my ($self, $ctx, $statuses, $m_ref, $status_ref) = @_;
 
     my $Lstatus = 0;
     my $intro_written;
-    for my $p (sort {
-        $inxst->{$b}{status} <=> $inxst->{$a}{status}
-          or
-        $a cmp $b
-      } keys %$inxst) {
-      my $status = $inxst->{$p}{status};
-      unless (defined $$status_ref) {
-        if ($status) {
-          if ($status > PAUSE::mldistwatch::Constants::OK) {
-            $$status_ref =
-            PAUSE::mldistwatch::Constants::heading($status)
-            || "UNKNOWN (status=$status)";
-          } else {
-            $$status_ref = "OK";
-          }
-        } else {
-          $$status_ref = "Unknown";
-        }
-        push @$m_ref, "Status of this distro: $$status_ref\n";
-        push @$m_ref, "="x(length($$status_ref)+23), "\n\n";
-      }
-      unless ($intro_written++) {
-        push @$m_ref, qq{\nThe following packages (grouped by }.
-        qq{status) have been found in the distro:\n\n};
-      }
-      if ($status != $Lstatus) {
-        my $heading =
-        PAUSE::mldistwatch::Constants::heading($status) ||
-        "UNKNOWN (status=$status)";
-        push @$m_ref, sprintf "Status: %s\n%s\n\n", $heading, "="x(length($heading)+8);
-      }
-      my $tf14 = Text::Format->new(
-        bodyIndent => 14,
-        firstIndent => 14,
-      );
-      my $verb_status = $tf14->format($inxst->{$p}{verb_status});
-      $verb_status =~ s/^\s+//; # otherwise this line is too long
-      # magic words, see also report02() around line 573, same wording there,
-      # exception prompted by JOESUF/libapreq2-2.12.tar.gz
-      $inxst->{$p}{infile} ||= "missing in META.yml, tolerated by PAUSE indexer";
-      push @$m_ref, sprintf("     package: %s\n",  $p);
 
-      if (my @warnings = $ctx->warnings_for_package($p)) {
+    my $all_succeeded = @$statuses == grep {; $_->{is_success} } @$statuses;
+
+    unless (defined $$status_ref) {
+      $$status_ref = $all_succeeded ? "OK" : "Failed";
+
+      push @$m_ref, "Status of this distro: $$status_ref\n";
+      push @$m_ref, "="x(length($$status_ref)+23), "\n\n";
+    }
+
+    push @$m_ref, qq{\nThe following packages have been found in the distro:\n\n};
+
+    my $tf14 = Text::Format->new(
+      bodyIndent  => 14,
+      firstIndent => 14,
+    );
+
+    my $last_header = q{};
+
+    for my $status (
+      # First failures, grouped, then success, by description.
+      sort { $b->{is_success} <=> $a->{is_success}
+          || $a->{header} cmp $b->{header} } @$statuses
+    ) {
+      my $header = $status->{header};
+
+      unless ($header eq $last_header) {
+        push @$m_ref, "## $header\n\n";
+        $last_header = $header;
+      }
+
+      push @$m_ref, sprintf("     package: %s\n",  $status->{package});
+
+      if (my @warnings = $ctx->warnings_for_package($status->{package})) {
         push @$m_ref, map {;
                sprintf("     WARNING: %s\n", $_->{text}) } @warnings;
       }
 
-      push @$m_ref, sprintf("     version: %s\n", $inxst->{$p}{version});
-      push @$m_ref, sprintf("     in file: %s\n", $inxst->{$p}{infile});
-      push @$m_ref, sprintf("     status : %s\n",  $verb_status);
+      my $body = $tf14->format($status->{body});
+      $body =~ s/\A\s+//; # The first line is indented by the leading text!
 
-      $Lstatus = $status;
+      my $file = $status->{filename} // "missing in META, tolerated by PAUSE indexer";
+
+      push @$m_ref, sprintf("     version: %s\n", $status->{version});
+      push @$m_ref, sprintf("     in file: %s\n", $file);
+      push @$m_ref, sprintf("     status : %s\n", $body);
     }
 }
 
 sub _update_mail_content_when_nothing_was_indexed {
-    my ($self, $ctx, $inxst, $m_ref, $status_ref) = @_;
+    my ($self, $ctx, $m_ref, $status_ref) = @_;
 
     if ($self->version_from_meta_ok($ctx)) {
       push @$m_ref,  qq{Nothing in this distro has been \n}
@@ -489,24 +483,22 @@ sub mail_summary {
   }
 
   if (($status_over_all//'Ok') ne 'Failed') {
-    my $inxst = $self->{INDEX_STATUS};
-    if ($inxst && ref $inxst && %$inxst) {
+    my @statuses = $ctx->package_statuses;
+
+    if (@statuses) {
       $self->_update_mail_content_when_things_were_indexed(
         $ctx,
-        $inxst,
+        \@statuses,
         \@m,
         \$status_over_all,
       );
-
     } else {
-      $Logger->log([ "index status: %s", $inxst ]);
 
       # No files have status, no dist-wide errors.  Nothing to report!
       return unless $pmfiles || $ctx->dist_errors;
 
       $self->_update_mail_content_when_nothing_was_indexed(
         $ctx,
-        $inxst,
         \@m,
         \$status_over_all,
       );
@@ -561,17 +553,6 @@ sub _send_email {
     sendmail($email);
 
     $Logger->log("sent indexer report email");
-}
-
-sub index_status {
-  my ($self, $ctx, $pack, $version, $infile, $status, $verb_status) = @_;
-
-  $self->{INDEX_STATUS}{$pack} = {
-    version => $version,
-    infile => $infile,
-    status => $status,
-    verb_status => $verb_status,
-  };
 }
 
 sub check_blib {
@@ -1283,8 +1264,6 @@ Accessor method. True if perl distro from non-pumpking or a dev release.
 =head3 mlroot
 
 =head3 mail_summary
-
-=head3 index_status
 
 =head3 _package_governing_permission
 
