@@ -1,0 +1,40 @@
+name: "perl test suite"
+on: [ push, pull_request ]
+
+jobs:
+  the-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: perldocker/perl-tester:5.16
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Install cpanminus
+        run: |
+          curl https://cpanmin.us/ > /tmp/cpanm
+          chmod u+x /tmp/cpanm
+      - name: Makefile.PL
+        run: |
+          perl Makefile.PL && make
+      - name: Install prereqs
+        # This could probably be made more efficient by looking at what it's
+        # installing via cpanm that could, instead, be installed from apt.  I
+        # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
+        run: |
+          cpanm --installdeps .
+      - name: Install yath
+        run: cpanm --notest Test2::Harness
+      - name: Install testing libraries
+        run: cpanm --notest Test2::Harness::Renderer::JUnit
+      - name: Run the tests
+        run: |
+          JUNIT_TEST_FILE="/tmp/test-output.xml" ALLOW_PASSING_TODOS=1 yath test --renderer=Formatter --renderer=JUnit -D
+      - name: Publish test report
+        uses: mikepenz/action-junit-report@v3
+        if: always() # always run even if the previous step fails
+        with:
+          check_name: JUnit Report (${{ matrix.perl-version }})
+          report_paths: /tmp/test-output.xml
+
