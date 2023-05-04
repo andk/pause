@@ -18,7 +18,10 @@ jobs:
       - name: Makefile.PL
         run: |
           perl Makefile.PL && make
-      - name: Install prereqs
+      - name: Install prereqs (apt)
+        run: |
+          apt install -y rsync
+      - name: Install prereqs (cpan)
         # This could probably be made more efficient by looking at what it's
         # installing via cpanm that could, instead, be installed from apt.  I
         # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
