@@ -246,9 +246,6 @@ my $GIT_CONFIG = <<'END_GIT_CONFIG';
 [user]
   email = pause.git@example.com
   name  = "PAUSE Daemon Git User"
-
-[init]
-  defaultBranch = main
 END_GIT_CONFIG
 
 sub _build_pause_config_overrides {
@@ -271,7 +268,7 @@ sub _build_pause_config_overrides {
 
   {
     my $chdir_guard = pushd($git_dir);
-    system(qw(git init --initial-branch main)) and die "error running git init";
+    system(qw(git init)) and die "error running git init";
 
     my $git_config = File::Spec->catdir($git_dir, '.git/config');
     open my $config_fh, '>', $git_config
