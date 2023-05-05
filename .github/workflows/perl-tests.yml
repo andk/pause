@@ -42,6 +42,6 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always() # always run even if the previous step fails
         with:
-          check_name: JUnit Report (${{ matrix.perl-version }})
+          check_name: JUnit Report
           report_paths: /tmp/test-output.xml
 
