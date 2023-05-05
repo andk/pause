@@ -29,8 +29,7 @@ jobs:
         # This could probably be made more efficient by looking at what it's
         # installing via cpanm that could, instead, be installed from apt.  I
         # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
-        run: |
-          cpanm --installdeps .
+        run: cpanm --notest --installdeps .
       - name: Install yath
         run: cpanm --notest Test2::Harness
       - name: Install testing libraries
