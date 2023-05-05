@@ -11,10 +11,6 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
-      - name: Install cpanminus
-        run: |
-          curl https://cpanmin.us/ > /tmp/cpanm
-          chmod u+x /tmp/cpanm
       - name: Makefile.PL
         run: |
           perl Makefile.PL && make
@@ -28,6 +24,9 @@ jobs:
           apt update
           apt install -y rsync
       - name: Install prereqs (cpanm, pinned versions)
+        # PAUSE is run (for now?) on v5.16, and the latest versions from the
+        # CPAN don't install on v5.16, so we install these version that do.
+        # -- rjbs, 2023-05-05
         run: |
           cpanm Log::Dispatchouli@2.023
           cpanm Mojolicious@8.73
@@ -36,11 +35,13 @@ jobs:
         # installing via cpanm that could, instead, be installed from apt.  I
         # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
         run: cpanm --notest --installdeps .
-      - name: Install yath
-        run: cpanm --notest Test2::Harness
-      - name: Install testing libraries
-        run: cpanm --notest Test2::Harness::Renderer::JUnit
+      - name: Install yath and JUnit renderer
+        run: cpanm --notest Test2::Harness Test2::Harness::Renderer::JUnit
       - name: Run the tests
+        # We disable Test::Perl::Critic because of a bug in
+        # Test2::Harness::Renderer::JUnit.  See:
+        # https://github.com/cpanel/Test2-Harness-Renderer-JUnit/issues/16
+        # -- rjbs, 2023-05-05
         run: |
           NO_PERL_CRITIC=1 JUNIT_TEST_FILE="/tmp/test-output.xml" ALLOW_PASSING_TODOS=1 yath test --renderer=Formatter --renderer=JUnit -D
       - name: Publish test report
