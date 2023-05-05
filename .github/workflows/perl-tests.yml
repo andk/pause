@@ -20,7 +20,8 @@ jobs:
           perl Makefile.PL && make
       - name: Install prereqs (apt)
         run: |
-          apt install -y rsync
+          apt update
+          apt install -y rsync default-mysql-server
       - name: Install prereqs (cpanm, pinned versions)
         run: |
           cpanm Log::Dispatchouli@2.023
