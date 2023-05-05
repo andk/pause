@@ -19,9 +19,14 @@ jobs:
         run: |
           perl Makefile.PL && make
       - name: Install prereqs (apt)
+        # If we install "default-mysql-server", the web tests will run, which
+        # is good, but they will run forever when we get to
+        # t/pause_2017/action/change_passwd.t not responding to SIGTERM or
+        # SIGKILL.  I seem to recall something about signals being weird on
+        # Actions, but not how... -- rjbs, 2023-05-05
         run: |
           apt update
-          apt install -y rsync default-mysql-server
+          apt install -y rsync
       - name: Install prereqs (cpanm, pinned versions)
         run: |
           cpanm Log::Dispatchouli@2.023
