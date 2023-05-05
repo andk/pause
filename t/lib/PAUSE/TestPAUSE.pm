@@ -242,6 +242,15 @@ has pause_config_overrides => (
   builder  => '_build_pause_config_overrides',
 );
 
+my $GIT_CONFIG = <<'END_GIT_CONFIG';
+[user]
+  email = pause.git@example.com
+  name  = "PAUSE Daemon Git User"
+
+[init]
+  defaultBranch = main
+END_GIT_CONFIG
+
 sub _build_pause_config_overrides {
   my ($self) = @_;
 
@@ -262,7 +271,15 @@ sub _build_pause_config_overrides {
 
   {
     my $chdir_guard = pushd($git_dir);
-    system(qw(git init)) and die "error running git init";
+    system(qw(git init --initial-branch main)) and die "error running git init";
+
+    my $git_config = File::Spec->catdir($git_dir, '.git/config');
+    open my $config_fh, '>', $git_config
+      or die "can't create git config at $git_config: $!";
+
+    print {$config_fh} $GIT_CONFIG;
+    close $config_fh
+      or die "can't write git config at $git_config: $!";
   }
 
   my $dsnbase = "DBI:SQLite:dbname=$db_root";
