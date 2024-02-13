@@ -19,6 +19,7 @@ WriteMakefile(
         Class::Singleton
         Compress::Zlib
         Crypt::Eksblowfish::Bcrypt
+        Crypt::URandom
         Cwd
         DB_File
         DBD::mysql
