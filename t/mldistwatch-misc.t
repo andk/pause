@@ -228,14 +228,14 @@ subtest "warn when pkg and module match only case insensitively" => sub {
           sub {
             like(
               $_[0]{email}->get_body,
-              qr/Capitalization of package \(Fewer\)/,
+              qr/package: Fewer\s+WARNING: Capitalization of package/,
               "warning about Fewer v. fewer",
             );
           },
           sub {
             like(
               $_[0]{email}->get_body,
-              qr/Capitalization of package \(More\)/,
+              qr/package: More\s+WARNING: Capitalization of package/,
               "warning about More v. more",
             );
           },
@@ -370,7 +370,7 @@ subtest "check overlong versions" => sub {
   my $etoolong = sub {
     like(
       $_[0]{email}->object->body_str,
-      qr/Version string exceeds maximum allowed length/,
+      qr/version string was too long/,
       "email contains ELONGVERSION string",
     );
   };
@@ -533,7 +533,7 @@ subtest "do not index dists without META file" => sub {
   my $nometa = sub {
     like(
       $_[0]{email}->object->body_str,
-      qr/\QDistribution included neither META.json nor META.yml/,
+      qr/\Qno META.yml or META.json found/,
       "email contains ENOMETAFILE string",
     );
   };

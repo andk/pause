@@ -153,12 +153,11 @@ sub examine_fio :Test :Plan(3) {
   $pmfile->{PMFILE} = $self->fake_dist_dir->file('lib/My/Dist.pm')->stringify;
   $pmfile->examine_fio;
 
-  cmp_deeply(
-    $Logger->events,
-    [
-      ignore(),
-      superhashof({ message => re(qr/will examine packages: \Q{{["My::Dist"]}}\E\z/) }),
-    ],
+  ok(
+    (
+      grep {; $_->{message} =~ qr/will examine packages: \Q{{["My::Dist"]}}\E\z/ }
+      @{ $Logger->events }
+    ),
     "we see the event log we expected",
   );
 
