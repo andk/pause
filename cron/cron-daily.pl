@@ -642,7 +642,7 @@ sub mailrc {
       };
       warn $@ if $@;
     }
-    $r[1] =~ s/"/'/g;
+    $r[1] =~ s/["<>]//g;
     push @list, sprintf qq{alias %-10s "%s <%s>"\n}, @r[ 0 .. 2 ];
   }
   $stu = $Dbh->prepare(
