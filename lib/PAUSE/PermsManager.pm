@@ -20,7 +20,7 @@ has dbh_callback => (
 sub get_package_first_come_any_case {
   my ($self, $pkg) = @_;
   my $dbh = $self->dbh_callback->();
-  my $query = "SELECT package, userid FROM primeur where LOWER(package) = LOWER(?)";
+  my $query = "SELECT package, userid FROM primeur where package = ?";
   my $owner = $dbh->selectrow_arrayref($query, undef, $pkg);
   return $owner->[1] if $owner;
   return "";
@@ -42,11 +42,11 @@ sub get_package_maintainers_list_any_case {
   my $sql = qq{
     SELECT package, userid
       FROM   primeur
-      WHERE  LOWER(package) = LOWER(?)
+      WHERE  package = ?
       UNION
     SELECT package, userid
       FROM   perms
-      WHERE  LOWER(package) = LOWER(?)
+      WHERE  package = ?
   };
   my @args = ($package) x 2;
   return $dbh->selectall_arrayref($sql, undef, @args);
@@ -66,7 +66,7 @@ sub plan_package_permission_copy {
         q{
         SELECT userid
         FROM   perms
-        WHERE  LOWER(package) = LOWER(?)
+        WHERE  package = ?
         },
         { Slice => {} },
         $src,
@@ -176,7 +176,7 @@ sub userid_has_permissions_on_package {
   my ($has_perms) = $dbh->selectrow_array(
     qq{
       SELECT COUNT(*) FROM perms
-      WHERE userid = ? AND LOWER(package) = LOWER(?)
+      WHERE userid = ? AND package = ?
     },
     undef,
     $userid, $package,
@@ -185,7 +185,7 @@ sub userid_has_permissions_on_package {
   my ($has_primary) = $dbh->selectrow_array(
     qq{
       SELECT COUNT(*) FROM primeur
-      WHERE userid = ? AND LOWER(package) = LOWER(?)
+      WHERE userid = ? AND package = ?
     },
     undef,
     $userid, $package,
@@ -204,14 +204,14 @@ sub canonicalize_module_casing {
             primeur.userid,
             1 AS is_primary
             FROM primeur
-            WHERE LOWER(primeur.package) = LOWER(?)
+            WHERE primeur.package = ?
         UNION
         SELECT
             perms.userid,
             0 AS is_primary
             FROM perms
-            WHERE lower(perms.package) = LOWER(?)
-                AND perms.userid NOT IN (SELECT userid FROM primeur WHERE lower(package) = LOWER(?))
+            WHERE perms.package = ?
+                AND perms.userid NOT IN (SELECT userid FROM primeur WHERE package = ?)
         ;
     },
     { Slice => {} },
@@ -219,13 +219,13 @@ sub canonicalize_module_casing {
   );
 
   $dbh->do(
-    qq{DELETE FROM perms   WHERE LOWER(package) = LOWER(?)},
+    qq{DELETE FROM perms WHERE package = ?},
     undef,
     $package,
   );
 
   $dbh->do(
-    qq{DELETE FROM primeur WHERE LOWER(package) = LOWER(?)},
+    qq{DELETE FROM primeur WHERE package = ?},
     undef,
     $package,
   );
@@ -248,10 +248,10 @@ sub canonicalize_module_casing {
 
   $dbh->do(
     qq{
-      UPDATE packages SET package = ? WHERE LOWER(package) = LOWER(?);
+      UPDATE packages SET package = ? WHERE package = ?;
     },
     undef,
-    ($package) x 2,
+    $package, $package,
   );
 
   return;

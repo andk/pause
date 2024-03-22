@@ -77,7 +77,7 @@ sub package_list_ok {
 
   my $p = $self->packages_data;
 
-  my @packages = sort { $a->package cmp $b->package } $p->packages;
+  my @packages = sort { lc $a->package cmp lc $b->package } $p->packages;
 
   cmp_deeply(
     \@packages,
