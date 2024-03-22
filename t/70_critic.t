@@ -3,6 +3,10 @@ use warnings;
 use File::Spec;
 use Test::More;
 
+if ($ENV{NO_PERL_CRITIC}) {
+    plan( skip_all => '$NO_PERL_CRITIC set, skipping');
+}
+
 eval { require Test::Perl::Critic; };
 
 if ( $@ ) {
@@ -13,8 +17,6 @@ if ( $@ ) {
 my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
 all_critic_ok();
-
-
 
 # Local Variables:
 # mode: cperl

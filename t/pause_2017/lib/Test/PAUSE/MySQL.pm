@@ -1,6 +1,13 @@
 package Test::PAUSE::MySQL;
 
+use Test::Builder ();
 use Test::Requires qw(Test::mysqld);
+
+BEGIN {
+  unless (-e '/usr/local/mysql/bin/mysql') {
+    Test::Builder->new->skip_all("no mysql found, needed for this test")
+  }
+}
 
 use Moose;
 use Test::mysqld;
