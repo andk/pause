@@ -2,22 +2,14 @@ use strict;
 use warnings;
 package PAUSE::Crypt;
 
+use Crypt::URandom 'urandom';
 use Crypt::Eksblowfish::Bcrypt qw( bcrypt en_base64 );
 
 sub hash_password {
   my ($pw) = @_;
 
   $pw = substr $pw, 0, 72;
-  my $hash = bcrypt($pw, '$2$12$' . en_base64( _randchar(16) ));
-}
-
-my(@saltset) = (qw(. /), 0..9, "A".."Z", "a".."z");
-
-sub _randchar ($) {
-  my($count) = @_;
-  my $str = "";
-  $str .= $saltset[int(rand(64))] while $count--;
-  $str;
+  my $hash = bcrypt($pw, '$2a$12$' . en_base64( urandom(16) ));
 }
 
 sub password_verify {
@@ -36,7 +28,7 @@ sub password_verify {
 sub maybe_upgrade_stored_hash {
   my ($arg) = @_;
 
-  return if length $arg->{old_hash} > 13; # already bcrypt
+  return if $arg->{old_hash} =~ /^\$2a\$/; # already bcrypt
 
   my $new_hash = hash_password($arg->{password});
 
