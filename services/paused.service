@@ -1,0 +1,25 @@
+[Unit]
+Description=PAUSE service
+Documentation=https://github.com/andk/PAUSE/
+
+# Wait for the network to be up
+After=network-online.target
+
+# Require the network service to be present, and at least started at the same time as this service
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+User=pause
+Group=pause
+WorkingDirectory=/home/pause/pause
+
+# Should not daemonize
+ExecStart=/home/pause/.plenv/shims/perl /home/pause/pause/bin/paused --pidfile /home/pause/pid/paused.pid
+
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
