@@ -1,0 +1,4 @@
+#!/bin/bash
+rsync -vaP pause.perl.org::pausedata/moddump.current.bz2 .
+bzcat moddump.current.bz2 | perl -ple 's/^CHANGE MASTER.*//' | \
+  sudo mysql -p mod
