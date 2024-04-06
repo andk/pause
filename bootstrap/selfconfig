@@ -67,6 +67,7 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $Config->{RUNDATA}                  = "/tmp/pause_1999";
 
   $Config->{CHECKSUMS_SIGNING_PROGRAM} = "does-not-exist";
+  $Config->{FTPPUB} = '/home/pause/pub/PAUSE/';
   $Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
   $Config->{MLROOT} = '/home/pause/pub/PAUSE/authors/id/';
   $Config->{ML_CHOWN_USER}  = 'unsafe';
