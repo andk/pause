@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/home/pause/.plenv/shims/perl
 
 =pod
 
@@ -15,6 +15,7 @@ After extended-insert:
 =cut
 
 use strict;
+use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";

@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/home/pause/.plenv/shims/perl
 
 # use 5.010;
 use strict;

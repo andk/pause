@@ -11,4 +11,4 @@ else
   exit 1
 fi
 
-perl /usr/bin/mirror -C$MIRRDIR/$MIRRCNF $MIRRDIR/mymirror.config
+/home/pause/.plenv/shims/perl /usr/bin/mirror -C$MIRRDIR/$MIRRCNF $MIRRDIR/mymirror.config

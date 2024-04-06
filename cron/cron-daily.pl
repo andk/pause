@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/home/pause/.plenv/shims/perl
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -16,6 +16,7 @@ use IO::File       ();
 use Email::Sender::Simple ();
 
 use strict;
+use warnings;
 use vars qw( $last_str $last_time $SUBJECT @listing $Dbh);
 
 #
