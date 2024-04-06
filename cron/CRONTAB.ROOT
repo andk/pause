@@ -26,7 +26,6 @@ PAUSE_ROOT=/home/pause/pub/PAUSE
 
 12 06,14,22 * * *     pause  perl $PAUSE_REPO/cron/update-checksums.pl
 29 * * * *            pause  perl $PAUSE_REPO/cron/cleanup-incoming.pl
-*/3 * * * *           pause  perl $PAUSE_REPO/cron/cleanup-apachecores.pl
 59 * * * *            pause  perl $PAUSE_REPO/cron/cron-daily.pl
 37 05 * * *           pause  perl $PAUSE_REPO/cron/gmls-lR.pl
 47 07,13,19,01 * * *  pause  perl $PAUSE_REPO/cron/mysql-dump.pl
