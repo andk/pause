@@ -43,6 +43,7 @@ for my $path (qw(
   /home/pause/pub/PAUSE/authors/id
   /home/pause/pub/PAUSE/modules
   /home/pause/pub/PAUSE/PAUSE-git
+  /home/pause/run
   /tmp/pause_1999
 )) {
   path($path)->mkdir;
