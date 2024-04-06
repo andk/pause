@@ -29,6 +29,8 @@ $TIME[4]++;
 $TIME[5] += 1900;
 my $TIME = sprintf "%02d" x 5, @TIME[ 5, 4, 3, 2, 1 ];
 
+my $TMPFILE = "/tmp/00whois.new";
+
 my $zcat = $PAUSE::Config->{ZCAT_PATH};
 die "no executable zcat" unless -x $zcat;
 my $gzip = $PAUSE::Config->{GZIP_PATH};
@@ -395,7 +397,7 @@ sub whois {
     scalar(gmtime),
     $0,
   );
-  open FH, ">00whois.new" or return "Error: Can't open 00whois.new: $!";
+  open FH, ">", $TMPFILE or return "Error: Can't open $TMPFILE: $!";
   if ($] > 5.007) {
     require Encode;
     binmode FH, ":utf8";
@@ -575,10 +577,10 @@ sub whois {
         </dl></body></html>
     ];
   close FH;
-  if (compare '00whois.new', "$PAUSE::Config->{MLROOT}/../00whois.html") {
-    report qq[copy 00whois.new $PAUSE::Config->{MLROOT}/../00whois.html\n\n];
+  if (compare $TMPFILE, "$PAUSE::Config->{MLROOT}/../00whois.html") {
+    report qq[copy $TMPFILE $PAUSE::Config->{MLROOT}/../00whois.html\n\n];
     my $whois_file = "$PAUSE::Config->{MLROOT}/../00whois.html";
-    xcopy '00whois.new', $whois_file;
+    xcopy $TMPFILE, $whois_file;
     PAUSE::newfile_hook($whois_file);
 
     my $xml_file = "$PAUSE::Config->{MLROOT}/../00whois.xml";
