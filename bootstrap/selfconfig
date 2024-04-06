@@ -1,70 +1,86 @@
-#!/usr/bin/bash
-set -e
+#!/usr/bin/perl
+use v5.36.0;
 
-cd ~pause
+use Carp qw(croak);
+use Getopt::Long::Descriptive;
+use Path::Tiny;
+
+chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
 
 # install plenv so we can manage a local perl version
-git clone https://github.com/tokuhirom/plenv.git ~/.plenv
+run_cmd(qw(
+  git clone https://github.com/tokuhirom/plenv.git /home/pause/.plenv
+));
 
-echo 'export PATH="$HOME/.plenv/bin:$PATH"' >> ~/.bash_profile
-echo 'eval "$(plenv init -)"' >> ~/.bash_profile
-source ~/.bash_profile
+path("/home/pause/.bash_profile")->append(<<~'END');
+  export PATH="$HOME/.plenv/bin:$PATH"
+  eval "$(plenv init -)"
+  END
 
 # install perl-build so we can build a new perl
-git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
+run_cmd(qw(
+  git clone https://github.com/tokuhirom/Perl-Build.git
+    /home/pause/.plenv/plugins/perl-build/
+));
 
-plenv install 5.36.0 -j 8
-plenv global 5.36.0
+run_cmd(qw( /home/pause/.plenv/bin/plenv install 5.36.0 -j 8 ));
+run_cmd(qw( /home/pause/.plenv/bin/plenv global  5.36.0 ));
 
 # install cpanm for perl dep management
-plenv install-cpanm
+run_cmd(qw( /home/pause/.plenv/bin/plenv install-cpanm ));
 
 # We need to pin these for now
-cpanm -n Mojolicious@8.72
-cpanm -n DBD::mysql@4.052
+run_cmd(qw( /home/pause/.plenv/shims/cpanm -n Mojolicious@8.72 ));
+run_cmd(qw( /home/pause/.plenv/shims/cpanm -n DBD::mysql@4.052 ));
 
-cd ~pause/pause
-cpanm -n --installdeps .
+run_cmd(qw( /home/pause/.plenv/shims/cpanm -n --installdeps . ));
 
 # Set up pause config
-mkdir -p ~pause/pause-private/lib
+for my $path (qw(
+  /home/pause/log
+  /home/pause/pause-private/lib
+  /home/pause/pid
+  /home/pause/pub/PAUSE/authors/id
+  /home/pause/pub/PAUSE/modules
+  /home/pause/pub/PAUSE/PAUSE-git
+  /tmp/pause_1999
+)) {
+  path($path)->mkdir;
+}
 
-cat << 'CONF' > ~pause/pause-private/lib/PrivatePAUSE.pm
-use strict;
-package PAUSE;
+run_cmd(qw(git init));
+run_cmd(qw(git config --global user.email pause@pause.perl.org));
+run_cmd(qw(git config --global user.name), 'PAUSE Daemon');
 
-$ENV{EMAIL_SENDER_TRANSPORT} = 'DevNull';
+path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
+  use strict;
+  package PAUSE;
 
-our $Config;
-$Config->{AUTHEN_DATA_SOURCE_USER}  = "pause";
-$Config->{AUTHEN_DATA_SOURCE_PW}    = "pausepassword";
-$Config->{MOD_DATA_SOURCE_USER}     = "pause";
-$Config->{MOD_DATA_SOURCE_PW}       = "pausepassword";
-$Config->{MAIL_MAILER}              = ["testfile"];
-$Config->{RUNDATA}                  = "/tmp/pause_1999";
+  $ENV{EMAIL_SENDER_TRANSPORT} = 'DevNull';
 
-$Config->{CHECKSUMS_SIGNING_PROGRAM} = "does-not-exist";
-$Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
-$Config->{MLROOT} = '/home/pause/pub/PAUSE/authors/id/';
-$Config->{ML_CHOWN_USER}  = 'unsafe';
-$Config->{ML_CHOWN_GROUP} = 'unsafe';
-$Config->{ML_MIN_FILES} = 1;
-$Config->{ML_MIN_INDEX_LINES} = 0;
-$Config->{PAUSE_LOG} = "/home/pause/log/paused.log";
-$Config->{PAUSE_LOG_DIR} = "/home/pause/log/";
-$Config->{PID_DIR} = "/home/pause/pid/";
-$Config->{TMP} = "/tmp/";
-CONF
+  our $Config;
+  $Config->{AUTHEN_DATA_SOURCE_USER}  = "pause";
+  $Config->{AUTHEN_DATA_SOURCE_PW}    = "pausepassword";
+  $Config->{MOD_DATA_SOURCE_USER}     = "pause";
+  $Config->{MOD_DATA_SOURCE_PW}       = "pausepassword";
+  $Config->{MAIL_MAILER}              = ["testfile"];
+  $Config->{RUNDATA}                  = "/tmp/pause_1999";
 
-mkdir ~pause/log
-mkdir ~pause/pid
-mkdir -p ~pause/pub/PAUSE/authors/id
-mkdir -p ~pause/pub/PAUSE/modules
-mkdir -p ~pause/pub/PAUSE/PAUSE-git
+  $Config->{CHECKSUMS_SIGNING_PROGRAM} = "does-not-exist";
+  $Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
+  $Config->{MLROOT} = '/home/pause/pub/PAUSE/authors/id/';
+  $Config->{ML_CHOWN_USER}  = 'unsafe';
+  $Config->{ML_CHOWN_GROUP} = 'unsafe';
+  $Config->{ML_MIN_FILES} = 1;
+  $Config->{ML_MIN_INDEX_LINES} = 0;
+  $Config->{PAUSE_LOG} = "/home/pause/log/paused.log";
+  $Config->{PAUSE_LOG_DIR} = "/home/pause/log/";
+  $Config->{PID_DIR} = "/home/pause/pid/";
+  $Config->{TMP} = "/tmp/";
+  END
 
-cd ~pause/pub/PAUSE/PAUSE-git
-git init
-git config --global user.email "pause@pause.perl.org"
-git config --global user.name "PAUSE Daemon"
+sub run_cmd (@args) {
+  system {$args[0]} @args;
 
-mkdir -p /tmp/pause_1999
+  croak "failed to run $args[0]" if $?;
+}
