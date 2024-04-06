@@ -13,7 +13,7 @@ PAUSE_ROOT=/home/pause/pub/PAUSE
 ## …and we will write this to /etc/cron.d/SOMETHING
 
 # ???
-* * * * *             pause  $PAUSE_REPO/cron/recentfile-aggregate.sh
+* * * * *             pause  $PAUSE_REPO/cron/recentfile-aggregate
 
 # some kind of PAUSE heartbeat/health check system?
 * * * * *             pause  date -u +"\%s \%a \%b \%e \%T \%Z \%Y" > /tmp/02STAMP && mv /tmp/02STAMP $PAUSE_ROOT/authors/02STAMP && perl -I $PAUSE_REPO/lib -e 'use PAUSE; PAUSE::newfile_hook(shift)' $PAUSE_ROOT/authors/02STAMP
