@@ -37,5 +37,3 @@ PAUSE_ROOT=/home/pause/pub/PAUSE
 18 * * * *            pause  perl $PAUSE_REPO/cron/cron-p6daily.pl
 46 0,6,12,18 * * *    pause  perl -I $PAUSE_REPO/lib $PAUSE_REPO/bin/indexscripts.pl > $PAUSE_REPO/bin/indexscripts.pl.out 2>&1
 7 2   * * 0           pause  perl -I $PAUSE_ROOT/lib $PAUSE_ROOT/bin/indexscripts.pl -f
-4,11,19,26,34,42,49,56 * * * * pause  zsh $PAUSE_ROOT/cron/assert-paused-running.zsh
-
