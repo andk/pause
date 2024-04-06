@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/home/pause/.plenv/shims/perl
 # Build the scripts index for PAUSE
 # Original author:  KSTAR
 # Last modified:  $Date: 2003/12/13 05:52:51 $
