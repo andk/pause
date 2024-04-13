@@ -128,6 +128,7 @@ CREATE TABLE mods (
 --
 CREATE TABLE packages (
   package varchar(128) NOT NULL DEFAULT '',
+  lc_package varchar(128) NOT NULL DEFAULT '',
   version varchar(16) NOT NULL DEFAULT '',
   dist varchar(128) NOT NULL DEFAULT '',
   distname varchar(128) NOT NULL DEFAULT '',
@@ -140,6 +141,7 @@ CREATE TABLE packages (
 );
 
 CREATE INDEX distname ON packages (distname);
+CREATE INDEX lc_package ON packages (lc_package);
 
 --
 -- Table: perms
@@ -147,10 +149,12 @@ CREATE INDEX distname ON packages (distname);
 CREATE TABLE perms (
   c INTEGER PRIMARY KEY NOT NULL,
   package char(245) NOT NULL DEFAULT '',
+  lc_package char(245) NOT NULL DEFAULT '',
   userid char(10) NOT NULL DEFAULT ''
 );
 
 CREATE INDEX package ON perms (package);
+CREATE INDEX lc_package02 ON perms (lc_package);
 
 CREATE INDEX userid02 ON perms (userid);
 
@@ -161,9 +165,12 @@ CREATE UNIQUE INDEX pack_user ON perms (package, userid);
 --
 CREATE TABLE primeur (
   package char(245) NOT NULL DEFAULT '',
+  lc_package char(245) NOT NULL DEFAULT '',
   userid char(10) NOT NULL DEFAULT '',
   PRIMARY KEY (package)
 );
+
+CREATE INDEX lc_package03 ON primeur (lc_package);
 
 --
 -- Table: uris
