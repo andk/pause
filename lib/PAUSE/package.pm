@@ -627,8 +627,8 @@ has the same version number and the distro has a more recent modification time.}
   }
 
   if ($ok) {
-      my $query = qq{SELECT package, version, dist from  packages WHERE LOWER(package) = LOWER(?)};
-      my($pkg_recs) = $dbh->selectall_arrayref($query,{ Slice => {} },$package);
+      my $query = qq{SELECT package, version, dist from  packages WHERE lc_package = ?};
+      my($pkg_recs) = $dbh->selectall_arrayref($query,{ Slice => {} }, lc $package);
       if (@$pkg_recs > 1) {
           $Logger->log([
               "conflicting records exist in packages table, won't index: %s",
@@ -653,9 +653,9 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
   if ($ok) {
       my $query = qq{
         UPDATE  packages
-        SET     package = ?, version = ?, dist = ?, file = ?,
+        SET     package = ?, lc_package = ?, version = ?, dist = ?, file = ?,
                 filemtime = ?, pause_reg = ?
-        WHERE LOWER(package) = LOWER(?)
+        WHERE lc_package = ?
       };
 
       $Logger->log([
@@ -673,12 +673,13 @@ Please report the case to the PAUSE admins at modules\@perl.org.},
                                      ($query,
                                       undef,
                                       $package,
+                                      lc $package,
                                       $pp->{version},
                                       $dist,
                                       $pp->{infile},
                                       $pp->{filemtime},
                                       $self->dist->{TIME},
-                                      $package,
+                                      lc $package,
                                      );
                              };
 
@@ -846,10 +847,10 @@ sub checkin {
     qq{
       SELECT package, version, dist, filemtime, file
       FROM packages
-      WHERE LOWER(package) = LOWER(?)
+      WHERE lc_package = ?
     },
     undef,
-    $package
+    lc $package
   );
 
   if ($row) {

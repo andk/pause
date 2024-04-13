@@ -334,7 +334,7 @@ sub owner_of_module {
                    FROM mods where modid = ?},
                  primeur => qq{SELECT package,
                           userid
-                   FROM primeur where LOWER(package) = LOWER(?)},
+                   FROM primeur where lc_package = LOWER(?)},
                 );
     for my $table (qw(mods primeur)) {
         my $owner = $dbh->selectrow_arrayref($query{$table}, undef, $m);
