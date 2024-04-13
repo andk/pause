@@ -84,8 +84,8 @@ sub plan_package_permission_copy {
       # we disable errors so that the insert emulates an upsert
       local ( $dbh->{RaiseError} ) = 0;
       local ( $dbh->{PrintError} ) = 0;
-      my $query = "INSERT INTO perms (package, userid) VALUES (?,?)";
-      my $ret   = $dbh->do( $query, {}, $dst, $mods_userid );
+      my $query = "INSERT INTO perms (package, lc_package, userid) VALUES (?,?,?)";
+      my $ret   = $dbh->do( $query, {}, $dst, lc $dst, $mods_userid );
       my $err   = "";
       $err = $dbh->errstr unless defined $ret;
       $ret ||= "";
@@ -116,7 +116,7 @@ sub plan_set_first_come {
     # we disable errors so that the insert emulates an upsert
     local ( $dbh->{RaiseError} ) = 0;
     local ( $dbh->{PrintError} ) = 0;
-    my $ret = $dbh->do("INSERT INTO primeur (package, userid) VALUES (?,?)", undef, $package, $userid);
+    my $ret = $dbh->do("INSERT INTO primeur (package, lc_package, userid) VALUES (?,?,?)", undef, $package, lc $package, $userid);
     my $err = $@;
     $ret //= "";
 
@@ -146,7 +146,7 @@ sub plan_set_comaint {
     # we disable errors so that the insert emulates an upsert
     local ( $dbh->{RaiseError} ) = 0;
     local ( $dbh->{PrintError} ) = 0;
-    my $ret = $dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", undef, $package, $userid);
+    my $ret = $dbh->do("INSERT INTO perms (package, lc_package, userid) VALUES (?,?,?)", undef, $package, lc $package, $userid);
     my $err = $@;
     $ret //= "";
 
@@ -233,16 +233,16 @@ sub canonicalize_module_casing {
 
   for my $user (@$users) {
     $dbh->do(
-      "INSERT INTO perms (package, userid) VALUES (?, ?)",
+      "INSERT INTO perms (package, lc_package, userid) VALUES (?, ?, ?)",
       undef,
-      $package, $user->{userid},
+      $package, $lc_package, $user->{userid},
     );
 
     if ($user->{is_primary}) {
       $dbh->do(
-        "INSERT INTO primeur (package, userid) VALUES (?, ?)",
+        "INSERT INTO primeur (package, lc_package, userid) VALUES (?, ?, ?)",
         undef,
-        $package, $user->{userid},
+        $package, $lc_package, $user->{userid},
       );
     }
   }

@@ -22,7 +22,7 @@ my $corpus = 'corpus/mld/submodule-comaint/authors';
 
 # However, Jenkins::Hack2 belongs to ATRION...
 my @existing_permissions = map {
-    "INSERT INTO $_ (package, userid) VALUES ('Jenkins::Hack2','ATRION')"
+    "INSERT INTO $_ (package, lc_package, userid) VALUES ('Jenkins::Hack2','jenkins::hack2','ATRION')"
 } qw/primeur perms/;
 
 # ... and therefore, we should only index Jenkins::Hack and
@@ -67,8 +67,8 @@ $result->email_ok(
 );
 
 # now lets add OOP as comaint on that and check we can upload it okay.
-$dbh->do("INSERT INTO perms (package, userid) VALUES (?,?)", {},
-        'Jenkins::Hack2','OOOPPP')
+$dbh->do("INSERT INTO perms (package, lc_package, userid) VALUES (?,?,?)", {},
+        'Jenkins::Hack2','jenkins::hack2','OOOPPP')
     or die "couldn't insert!";
 $corpus = 'corpus/mld/submodule-comaint2/authors';
 note("Indexing the corpus at [$corpus] now OOOPPP has comaint");

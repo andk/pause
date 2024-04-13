@@ -131,8 +131,8 @@ sub add_to_primeur
     my $db      = DBI->connect( "dbi:SQLite:dbname=$db_file", undef, undef)
                   or die "can't connect to db at $db_file: $DBI::errstr";
 
-    $db->do("INSERT INTO primeur (userid, package) VALUES (?, ?);",
-            undef, $author, $package)
+    $db->do("INSERT INTO primeur (userid, package, lc_package) VALUES (?, ?, ?);",
+            undef, $author, $package, lc $package)
         or die "couldn't add to primeur for $author/$package: $DBI::errstr\n";
 
 }

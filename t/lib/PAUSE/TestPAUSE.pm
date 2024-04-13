@@ -139,11 +139,11 @@ sub add_first_come {
 
   $dbh->do(
     q{
-      INSERT INTO primeur (userid, package) VALUES (?, ?);
-      INSERT INTO perms   (userid, package) VALUES (?, ?);
+      INSERT INTO primeur (userid, package, lc_package) VALUES (?, ?, ?);
+      INSERT INTO perms   (userid, package, lc_package) VALUES (?, ?, ?);
     },
     undef,
-    (uc $userid, $package) x 2,
+    (uc $userid, $package, lc $package) x 2,
   );
 }
 
@@ -160,11 +160,12 @@ sub add_comaint {
 
   $dbh->do(
     q{
-      INSERT INTO perms (userid, package) VALUES (?, ?);
+      INSERT INTO perms (userid, package, lc_package) VALUES (?, ?, ?);
     },
     undef,
     uc $userid,
     $package,
+    lc $package,
   );
 }
 
