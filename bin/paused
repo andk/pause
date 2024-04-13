@@ -209,6 +209,11 @@ sub loop () { # we're NOT called as a method
 
   # we have a continue block, so be careful with the scope
   my($hash, $hash_orig);
+  require Parallel::Runner;
+  my $runner = Parallel::Runner->new($PAUSE::Config->{MAX_MLDISTWATCH_PROCESSES} || 4);
+  $runner->exit_callback(sub {
+    mypause_daemon_inspector->logge("Debug: Reaped child[$$]");
+  });
  URIRECORD: while ( $hash  = $sth->fetchrow_hashref ) {
     $self->{URIRECORD} = $hash;
     if ($] > 5.007) {
@@ -322,23 +327,15 @@ skip        =not yet verified
 	$self->logge("Info: Verified $hash->{uriid}");
         my $run_mldistwatch_from_paused = 1; # since Checksums 0.050 atomicity good enough?
         if ($run_mldistwatch_from_paused) {
-          $SIG{CHLD} = \&main::reaper;
-          my $pid = fork;
-          if (defined $pid) {
-            if ($pid) {
-              $self->logge("Info: Started mldistwatch for lpath[$lpath] with pid[$pid]");
-            } else {
-              # child
-              exec $^X,
-                  "$PAUSE::Config->{CRONPATH}/mldistwatch",
-                      '--pick',
-                          $lpath,
-                              '--logfile',
-                                  '/var/log/mldistwatch.log';
-            }
-          } else {
-            $self->logge("Alert: could not fork for mldistwatch: $!");
-          }
+            $runner->run(sub {
+                mypause_daemon_inspector->logge("Info: Started mldistwatch for lpath[$lpath] with pid[$$]");
+                system $^X,
+                    "$PAUSE::Config->{CRONPATH}/mldistwatch",
+                        '--pick',
+                            $lpath,
+                                '--logfile',
+                                    '/var/log/mldistwatch.log';
+            });
         }
 	next URIRECORD;
       } else {
@@ -363,6 +360,7 @@ skip        =not yet verified
     main::restart() if $mypause_daemon_inspector::Signal;
   }
 
+  $runner->finish;
   # disconnect, we want to sleep
   $sth->finish;
   $sth2->finish;

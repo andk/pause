@@ -36,6 +36,7 @@ requires 'MojoX::Log::Dispatch::Simple';
 requires 'Mojolicious';
 requires 'Mojolicious::Plugin::WithCSRFProtection';
 requires 'Net::SSLeay', '1.49';
+requires 'Parallel::Runner';
 requires 'Parse::CPAN::Packages';
 requires 'Parse::CPAN::Perms';
 requires 'Path::Class';
