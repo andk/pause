@@ -748,8 +748,8 @@ sub insert_into_package {
   my $distname = CPAN::DistnameInfo->new($dist)->dist;
   my $query = qq{
     INSERT INTO packages
-      (package, version, dist, file, filemtime, pause_reg, distname)
-    VALUES (?,?,?,?,?,?,?)
+      (package, lc_package, version, dist, file, filemtime, pause_reg, distname)
+    VALUES (?,?,?,?,?,?,?,?)
   };
 
   $Logger->log([
@@ -767,6 +767,7 @@ sub insert_into_package {
   $dbh->do($query,
             undef,
             $package,
+            lc $package,
             $pp->{version},
             $dist,
             $pp->{infile},

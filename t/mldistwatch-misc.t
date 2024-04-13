@@ -120,13 +120,13 @@ subtest "cannot steal a library when primeur+perms exist" => refused_index_test(
 
 subtest "cannot steal a library when only primeur exists" => refused_index_test(sub {
   my ($pause, $dbh) = @_;
-  $dbh->do("INSERT INTO primeur (package, userid) VALUES ('Bug::Gold','ATRION')")
+  $dbh->do("INSERT INTO primeur (package, lc_package, userid) VALUES ('Bug::Gold','bug::gold','ATRION')")
     or die "couldn't insert!";
 });
 
 subtest "cannot steal a library when only perms exist" => refused_index_test(sub {
   my ($pause, $dbh) = @_;
-  $dbh->do("INSERT INTO perms (package, userid) VALUES ('Bug::Gold','ATRION')")
+  $dbh->do("INSERT INTO perms (package, lc_package, userid) VALUES ('Bug::Gold','bug::gold','ATRION')")
     or die "couldn't insert!";
 });
 
@@ -144,7 +144,7 @@ subtest "cannot steal a library via copy-main-perms mechanism" => refused_index_
   ],
   before      => sub {
     my ($pause, $dbh) = @_;
-    $dbh->do("INSERT INTO perms (package, userid) VALUES ('Jenkins::Hack2','ATRION')")
+    $dbh->do("INSERT INTO perms (package, lc_package, userid) VALUES ('Jenkins::Hack2','jenkins::hack2','ATRION')")
       or die "couldn't insert!";
   },
 });
@@ -458,8 +458,8 @@ subtest "sort of case-conflicted packages is stable" => sub {
   my $result = $pause->test_reindex;
   my $dbh = $result->connect_mod_db;
 
-  $dbh->do("INSERT INTO packages ('package','version','dist','status','file') VALUES ('Bug::Gold','1.001','O/OP/OPRIME/Bug-Gold-1.001.tar.gz','index','notexists')");
-  $dbh->do("INSERT INTO packages ('package','version','dist','status','file') VALUES ('Bug::gold','0.001','O/OP/OPRIME/Bug-gold-0.001.tar.gz','index','notexists')");
+  $dbh->do("INSERT INTO packages ('package','lc_package','version','dist','status','file') VALUES ('Bug::Gold','bug::gold','1.001','O/OP/OPRIME/Bug-Gold-1.001.tar.gz','index','notexists')");
+  $dbh->do("INSERT INTO packages ('package','lc_package','version','dist','status','file') VALUES ('Bug::gold','bug::gold','0.001','O/OP/OPRIME/Bug-gold-0.001.tar.gz','index','notexists')");
 
   my $now  = time - 86400;
   my $then = time - 86400*30;

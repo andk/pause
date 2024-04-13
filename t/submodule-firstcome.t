@@ -22,7 +22,7 @@ my $corpus = 'corpus/mld/submodule-firstcome/authors';
 
 # However, Acme::Study::Perl belongs to ANDK.
 my @existing_permissions = map {
-    "INSERT INTO $_ (package, userid) VALUES ('Acme::Study::Perl','ANDK')"
+    "INSERT INTO $_ (package, lc_package, userid) VALUES ('Acme::Study::Perl','acme::study::perl','ANDK')"
 } qw/primeur perms/;
 
 # ... and therefore, we should only index Acme::Playpen::*

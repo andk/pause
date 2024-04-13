@@ -375,15 +375,15 @@ sub _share_makeco {
                  )
                 unless $sth1->rows;
         local($db->{RaiseError}) = 0;
-        my $sth = $db->prepare("INSERT INTO perms (package,userid)
-                            VALUES (?,?)");
+        my $sth = $db->prepare("INSERT INTO perms (package,lc_package,userid)
+                            VALUES (?,?,?)");
 
         my @results;
         for my $selmod (@selmods) {
           die PAUSE::Web::Exception
               ->new(ERROR => "You do not seem to be maintainer of $selmod")
                   unless exists $all_mods->{$selmod};
-          my $ret = $sth->execute($selmod,$other_user);
+          my $ret = $sth->execute($selmod,lc $selmod,$other_user);
           my $err = "";
           $err = $db->errstr unless defined $ret;
           $ret ||= "";
