@@ -53,9 +53,9 @@ for my $path (qw(
 chdir("/home/pause/pub/PAUSE/PAUSE-git")
   || die "couldn't chdir to PAUSE-git: $!";
 
-run_cmd(qw(git init));
 run_cmd(qw(git config --global user.email pause@pause.perl.org));
 run_cmd(qw(git config --global user.name), 'PAUSE Daemon');
+run_cmd(qw(git init --initial-branch master ));
 
 path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   use strict;
