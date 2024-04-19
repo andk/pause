@@ -50,6 +50,9 @@ for my $path (qw(
   path($path)->mkdir;
 }
 
+chdir("/home/pause/pub/PAUSE/PAUSE-git")
+  || die "couldn't chdir to PAUSE-git: $!";
+
 run_cmd(qw(git init));
 run_cmd(qw(git config --global user.email pause@pause.perl.org));
 run_cmd(qw(git config --global user.name), 'PAUSE Daemon');
