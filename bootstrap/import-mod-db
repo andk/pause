@@ -1,4 +1,11 @@
 #!/bin/bash
 rsync -vaP pause.perl.org::pausedata/moddump.current.bz2 .
-bzcat moddump.current.bz2 | perl -ple 's/^CHANGE MASTER.*//' | \
-  sudo mysql -p mod
+bunzip2 moddump.current.bz2
+
+echo 'SET GLOBAL innodb_flush_log_at_trx_commit=2' | mysql
+
+pv moddump.current | \
+  perl -ple 's/^CHANGE MASTER.*//' | \
+  sudo mysql mod
+
+echo 'SET GLOBAL innodb_flush_log_at_trx_commit=1' | mysql
