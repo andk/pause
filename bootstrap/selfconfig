@@ -23,7 +23,7 @@ run_cmd(qw(
     /home/pause/.plenv/plugins/perl-build/
 ));
 
-run_cmd(qw( /home/pause/.plenv/bin/plenv install 5.36.0 -j 16 ));
+run_cmd(qw( /home/pause/.plenv/bin/plenv install 5.36.0 -j 16 --noman ));
 run_cmd(qw( /home/pause/.plenv/bin/plenv global  5.36.0 ));
 
 # install cpanm for perl dep management
