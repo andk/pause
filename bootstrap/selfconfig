@@ -5,35 +5,49 @@ use Carp qw(croak);
 use Getopt::Long::Descriptive;
 use Path::Tiny;
 
+if (-e '/tmp/plenv-tarball.tar.bz2') {
+  chdir("/home/pause") or die "can't chdir to ~pause: $!";
+
+  # Somebody helpfully gave us a plenv directory to start from!  Let's use it.
+  run_cmd(qw(tar jxvf /tmp/plenv-tarball.tar.bz2));
+
+  path("/home/pause/.bash_profile")->append(<<~'END');
+    export PATH="$HOME/.plenv/bin:$PATH"
+    eval "$(plenv init -)"
+    END
+} else {
+  chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
+
+  # install plenv so we can manage a local perl version
+  run_cmd(qw(
+    git clone https://github.com/tokuhirom/plenv.git /home/pause/.plenv
+  ));
+
+  path("/home/pause/.bash_profile")->append(<<~'END');
+    export PATH="$HOME/.plenv/bin:$PATH"
+    eval "$(plenv init -)"
+    END
+
+  # install perl-build so we can build a new perl
+  run_cmd(qw(
+    git clone https://github.com/tokuhirom/Perl-Build.git
+      /home/pause/.plenv/plugins/perl-build/
+  ));
+
+  run_cmd(qw( /home/pause/.plenv/bin/plenv install 5.36.0 -j 16 --noman ));
+  run_cmd(qw( /home/pause/.plenv/bin/plenv global  5.36.0 ));
+
+  # install cpanm for perl dep management
+  run_cmd(qw( /home/pause/.plenv/bin/plenv install-cpanm ));
+
+  # We need to pin these for now
+  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n Mojolicious@8.72 ));
+  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n DBD::mysql@4.052 ));
+
+  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n --installdeps . ));
+}
+
 chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
-
-# install plenv so we can manage a local perl version
-run_cmd(qw(
-  git clone https://github.com/tokuhirom/plenv.git /home/pause/.plenv
-));
-
-path("/home/pause/.bash_profile")->append(<<~'END');
-  export PATH="$HOME/.plenv/bin:$PATH"
-  eval "$(plenv init -)"
-  END
-
-# install perl-build so we can build a new perl
-run_cmd(qw(
-  git clone https://github.com/tokuhirom/Perl-Build.git
-    /home/pause/.plenv/plugins/perl-build/
-));
-
-run_cmd(qw( /home/pause/.plenv/bin/plenv install 5.36.0 -j 16 --noman ));
-run_cmd(qw( /home/pause/.plenv/bin/plenv global  5.36.0 ));
-
-# install cpanm for perl dep management
-run_cmd(qw( /home/pause/.plenv/bin/plenv install-cpanm ));
-
-# We need to pin these for now
-run_cmd(qw( /home/pause/.plenv/shims/cpanm -n Mojolicious@8.72 ));
-run_cmd(qw( /home/pause/.plenv/shims/cpanm -n DBD::mysql@4.052 ));
-
-run_cmd(qw( /home/pause/.plenv/shims/cpanm -n --installdeps . ));
 
 # Set up pause config
 for my $path (qw(
