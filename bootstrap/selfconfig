@@ -73,7 +73,7 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
 
   $Config->{FTPPUB} = '/home/pause/pub/PAUSE/';
   $Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
-  $Config->{INCOMING_LOC} = '/home/pause/incoming'
+  $Config->{INCOMING_LOC} = '/home/pause/incoming';
   $Config->{MLROOT} = '/home/pause/pub/PAUSE/authors/id/';
   $Config->{ML_CHOWN_USER}  = 'unsafe';
   $Config->{ML_CHOWN_GROUP} = 'unsafe';
