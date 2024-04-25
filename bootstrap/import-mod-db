@@ -2,6 +2,10 @@
 rsync -vaP pause.perl.org::pausedata/moddump.current.bz2 .
 bunzip2 moddump.current.bz2
 
+systemctl stop paused
+
+sudo -u pause rsync --progress -av pause.perl.org::PAUSE/ /home/pause/pub/PAUSE/
+
 echo 'SET GLOBAL innodb_flush_log_at_trx_commit=2' | mysql
 
 pv moddump.current | \
@@ -9,3 +13,5 @@ pv moddump.current | \
   sudo mysql mod
 
 echo 'SET GLOBAL innodb_flush_log_at_trx_commit=1' | mysql
+
+systemctl start paused
