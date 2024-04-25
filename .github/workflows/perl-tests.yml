@@ -22,7 +22,7 @@ jobs:
         # Actions, but not how... -- rjbs, 2023-05-05
         run: |
           apt update
-          apt install -y rsync
+          apt install -y rsync default-mysql-server
       - name: Install prereqs (cpanm, pinned versions)
         # PAUSE is run (for now?) on v5.16, and the latest versions from the
         # CPAN don't install on v5.16, so we install these version that do.
