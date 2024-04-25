@@ -2,9 +2,10 @@ package Test::PAUSE::MySQL;
 
 use Test::Builder ();
 use Test::Requires qw(Test::mysqld);
+use Test::Requires qw(File::Which);
 
 BEGIN {
-  unless (-e '/usr/local/mysql/bin/mysql') {
+  unless (File::Which::which 'mysql') {
     Test::Builder->new->skip_all("no mysql found, needed for this test")
   }
 }
