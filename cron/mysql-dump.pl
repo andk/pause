@@ -27,6 +27,14 @@ my $BZIP = $PAUSE::Config->{BZIP2_PATH};
 die "where is BZIP" unless -x $BZIP;
 use File::Path ();
 use File::Basename ();
+use Getopt::Long qw(GetOptions);
+
+my $extended_insert = 0;
+my $override_backupdir;
+GetOptions(
+  "extended-insert=i" => \$extended_insert,
+  "override-backupdir=s" => \$override_backupdir
+) or die("Error in command line arguments\n");
 
 my $Struct = [
               {backupdir => "$PAUSE::Config->{FTPPUB}/PAUSE-data",
@@ -42,7 +50,7 @@ my $Struct = [
               },
 ];
 for my $struct (@$Struct) {
-  my $backup_dir = $struct->{backupdir};
+  my $backup_dir = $override_backupdir || $struct->{backupdir};
   File::Path::mkpath $backup_dir;
   my($dbi,$dbengine,$db) = split /:/, $PAUSE::Config->{$struct->{cfg_dsn}};
   die "Script would not work for $dbengine" unless $dbengine =~ /mysql/i;
@@ -55,7 +63,7 @@ for my $struct (@$Struct) {
   if ($struct->{master}) {
     $master_data = " --master-data";
   }
-  system "mysqldump$master_data --lock-tables --add-drop-table --user='$user' --password='$password' '--extended-insert=0' '$db' > $backup_dir/.${db}dump.current";
+  system "mysqldump$master_data --lock-tables --add-drop-table --user='$user' --password='$password' '--extended-insert=$extended_insert' '$db' > $backup_dir/.${db}dump.current";
   rename "$backup_dir/.${db}dump.current", "$backup_dir/${db}dump.current";
   unlink "$backup_dir/${db}dump.current.bz2";
   system "$BZIP -9 --keep --small $backup_dir/${db}dump.current";
