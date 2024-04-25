@@ -59,6 +59,7 @@ for my $path (qw(
   /home/pause/pub/PAUSE/modules
   /home/pause/pub/PAUSE/PAUSE-git
   /home/pause/run
+  /home/pause/tmp
   /tmp/pause_1999
 )) {
   path($path)->mkdir;
@@ -101,7 +102,7 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $Config->{PAUSE_LOG_DIR} = "/home/pause/log/";
   $Config->{PAUSE_PUBLIC_DATA} = '/home/pause/pub/PAUSE/PAUSE-data';
   $Config->{PID_DIR} = "/home/pause/pid/";
-  $Config->{TMP} = "/tmp/";
+  $Config->{TMP} = "/home/pause/tmp/";
   END
 
 sub run_cmd (@args) {
