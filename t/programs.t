@@ -1,4 +1,4 @@
-#!perl -- -*- mode: cperl -*-
+#!perl
 
 use Test::More;
 use File::Spec;
