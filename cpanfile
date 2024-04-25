@@ -7,7 +7,7 @@ requires 'Class::Singleton';
 requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'DB_File';
 requires 'DBI';
-requires 'DBD::mysql';
+requires 'DBD::mysql', '== 4.050';
 requires 'DBD::SQLite';
 requires 'Digest::SHA1';
 requires 'Email::Address';
