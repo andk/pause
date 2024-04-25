@@ -82,10 +82,7 @@ run_cmd(qw(git init --initial-branch master ));
 # 6BA1716EFB099DB2. -- rjbs, 2024-04-25
 run_cmd(qw( gpg --import --armor /home/pause/pause/bootstrap/test-key.txt ));
 
-my $authuser_pw = $opt->authuser_pw;
-my $moduser_pw  = $opt->moduser_pw;
-
-path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
+my $config_file_contents = <<~'END';
   use strict;
   package PAUSE;
 
@@ -95,10 +92,10 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $Config->{AUTHEN_BACKUP_DIR}        = "/home/pause/db-backup";
 
   $Config->{AUTHEN_DATA_SOURCE_USER}  = "authuser";
-  $Config->{AUTHEN_DATA_SOURCE_PW}    = "\Q$authuser_pw";
+  $Config->{AUTHEN_DATA_SOURCE_PW}    = "%%AUTHUSER_PW%%";
 
   $Config->{MOD_DATA_SOURCE_USER}     = "moduser";
-  $Config->{MOD_DATA_SOURCE_PW}       = "\Q$moduser_pw";
+  $Config->{MOD_DATA_SOURCE_PW}       = "%%MODUSER_PW%%";
 
   $Config->{MAIL_MAILER}              = ["testfile"];
   $Config->{RUNDATA}                  = "/tmp/pause_1999";
@@ -121,6 +118,10 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $Config->{PID_DIR} = "/home/pause/pid/";
   $Config->{TMP} = "/home/pause/tmp/";
   END
+
+$config_file_contents =~ s/%%AUTHUSER_PW%%/$opt->authuser_pw/e;
+$config_file_contents =~ s/%%MODUSER_PW%%/$opt->moduser_pw/e;
+path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew($config_file_contents);
 
 sub run_cmd (@args) {
   system {$args[0]} @args;
