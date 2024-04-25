@@ -72,6 +72,10 @@ run_cmd(qw(git config --global user.email pause@pause.perl.org));
 run_cmd(qw(git config --global user.name), 'PAUSE Daemon');
 run_cmd(qw(git init --initial-branch master ));
 
+# This imports a test key, which nobody should trust, and which has key id
+# 6BA1716EFB099DB2. -- rjbs, 2024-04-25
+run_cmd(qw( gpg --import --armor /home/pause/pause/bootstrap/test-key.txt ));
+
 path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   use strict;
   package PAUSE;
@@ -87,8 +91,9 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $Config->{MAIL_MAILER}              = ["testfile"];
   $Config->{RUNDATA}                  = "/tmp/pause_1999";
 
-  $Config->{CHECKSUMS_SIGNING_PROGRAM} = "does-not-exist";
-  $Config->{CHECKSUMS_SIGNING_ARGS}    = "...";
+  $Config->{CHECKSUMS_SIGNING_PROGRAM} = "gpg";
+  $Config->{CHECKSUMS_SIGNING_ARGS}    = '--homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ';
+  $Config->{CHECKSUMS_SIGNING_KEY}     = '6BA1716EFB099DB2';
 
   $Config->{FTPPUB} = '/home/pause/pub/PAUSE/';
   $Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
