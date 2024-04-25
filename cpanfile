@@ -5,6 +5,7 @@ requires 'CPAN::DistnameInfo';
 requires 'CPAN::Indexer::Mirror';
 requires 'Class::Singleton';
 requires 'Crypt::Eksblowfish::Bcrypt';
+requires 'Crypt::URandom';
 requires 'DB_File';
 requires 'DBI';
 requires 'DBD::mysql', '== 4.050';
