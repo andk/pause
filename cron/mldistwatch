@@ -75,6 +75,11 @@ Setting testhost prevents sending mail; automatically sets skip-locking too.
 
 =cut
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'mldistwatch',
+  facility  => 'daemon',
+} };
+
 use strict;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
