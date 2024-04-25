@@ -99,6 +99,7 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $Config->{ML_MIN_INDEX_LINES} = 0;
   $Config->{PAUSE_LOG} = "/home/pause/log/paused.log";
   $Config->{PAUSE_LOG_DIR} = "/home/pause/log/";
+  $Config->{PAUSE_PUBLIC_DATA} = '/home/pause/pub/PAUSE/PAUSE-data';
   $Config->{PID_DIR} = "/home/pause/pid/";
   $Config->{TMP} = "/tmp/";
   END
