@@ -15,7 +15,7 @@ sub default_logger_class { 'PAUSE::Logger::_Logger' }
 
 sub default_logger_args {
   return {
-    ident     => "PAUSE",
+    ident     => "PAUSE-unidentified",
 
     # to turn on syslogging...
     facility  => 'daemon', # where "daemon" is whatever syslog facility you want
