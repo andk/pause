@@ -204,9 +204,14 @@ sub packages_per_pmfile {
     local $/ = "\n";
     my $inpod = 0;
 
+    my $checked_bom;
   PLINE: while (<$fh>) {
         chomp;
         my($pline) = $_;
+        unless ($checked_bom) {
+            $pline =~ s/\A(?:\x00\x00\xfe\xff|\xff\xfe\x00\x00|\xfe\xff|\xff\xfe|\xef\xbb\xbf)//;
+            $checked_bom = 1;
+        }
         $inpod = $pline =~ /^=(?!cut)/ ? 1 :
             $pline =~ /^=cut/ ? 0 : $inpod;
         next if $inpod;
