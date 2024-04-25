@@ -88,6 +88,10 @@ use PAUSE::mldistwatch ();
 use Getopt::Long ();
 use Pod::Usage;
 
+if (-f "/etc/PAUSE.CLOSED" && ! $ENV{PAUSE_INDEX_DURING_CLOSURE}) {
+  die "PAUSE is closed. You can set PAUSE_INDEX_DURING_CLOSURE to index anyway.\n";
+}
+
 MAIN: {
     umask 0002;
     $|=1;
