@@ -29,7 +29,6 @@ PAUSE_ROOT=/home/pause/pub/PAUSE
 59 * * * *            pause  $PAUSE_REPO/cron/cron-daily.pl
 37 05 * * *           pause  $PAUSE_REPO/cron/gmls-lR.pl
 47 07,13,19,01 * * *  pause  $PAUSE_REPO/cron/mysql-dump.pl
-19 * * * *            pause  $PAUSE_REPO/cron/make-mirror-yaml.pl
 21 */6 * * *          pause  $PAUSE_REPO/cron/rm_stale_links
 23 07,13,19,01 * * *  pause  $PAUSE_REPO/cron/run_mirrors.sh
 22 * * * *            pause  $PAUSE_REPO/cron/sync-04pause.pl
