@@ -205,6 +205,7 @@ sub packages_per_pmfile {
     my $inpod = 0;
 
     my $checked_bom;
+    my $package_or_class = 'package';
   PLINE: while (<$fh>) {
         chomp;
         my($pline) = $_;
@@ -225,6 +226,30 @@ sub packages_per_pmfile {
             last PLINE;
         }
 
+=pod
+        # hide in the pod block until 'class' is added to a version bundle
+        if ($pline =~ /^[\s\{;]*use\s(+v?5\.[0-9]+)/) {
+            my $version = $1;
+            my $version_bundle_for_class = version->parse("v5.xx.xx");
+            if (eval { version->parse($version) >= $version_bundle_for_class) {
+                $package_or_class = 'package|class|role';
+            }
+            next PLINE;
+        }
+=cut
+
+        # use feature 'class'; enabels class (and role, though not implemented yet)
+        if ($pline =~ /^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        if ($pline =~ /^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        # Object::Pad is special-cased; let's ignore other modules that are too old or less known
+        if ($pline =~ /^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+            $package_or_class = 'package|class|role';
+        }
+
         my $pkg;
         my $strict_version;
 
@@ -232,8 +257,7 @@ sub packages_per_pmfile {
             $pline =~ m{
                       ^
                       [\s\{;]*
-                      package
-                      \s+
+                      \b(?:$package_or_class)\s+
                       ([\w\:\']+)
                       \s*
                       (?: $ | [\}\;] | \{ | \s+($version::STRICT) )
