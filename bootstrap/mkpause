@@ -1,0 +1,295 @@
+#!/usr/bin/env perl
+use v5.36.0;
+
+use lib 'lib';
+
+use Dobby::Client;
+use Future::AsyncAwait;
+use Getopt::Long::Descriptive;
+use IO::Async::Loop;
+use Log::Dispatchouli;
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'username|u=s',   "your username; defaults to $ENV{USER}",
+                      { default => $ENV{USER} // die 'no USER env var!' } ],
+
+  # For serious business, we like c-16. -- rjbs, 2024-04-19
+  [ 'size=s',         "slug for Digital Ocean droplet", { default => 'g-4vcpu-16gb' } ],
+  [ 'box-ident|i=s',  "identifying part of box name; defaults to --username" ],
+  [],
+  [ 'plenv-file|P=s', "a tar.bz2 file to use for plenv (it's a shortcut)" ],
+  [],
+  [ 'certbot-staging|C', 'use the staging version of certbot' ],
+
+  [],
+  [ 'mode', 'hidden' => {
+      default => 'create',
+      one_of  => [
+        [ 'create',   'create the box if it does not exist' ],
+        [ 'destroy',  'destroy the box if it does exist' ],
+      ],
+    }
+  ],
+);
+
+my $Logger = Log::Dispatchouli->new({
+  facility  => undef,
+  ident     => 'unpause-boxo',
+  log_pid   => 0,
+  to_stdout => 1,
+});
+
+if ($opt->plenv_file) {
+  die "plenv file does not exist" unless -e $opt->plenv_file;
+  die "plenv file can't be read"  unless -r $opt->plenv_file;
+
+  die "plenv file should be a .tar.bz2 file"
+    unless $opt->plenv_file =~ /\.tar\.bz2\z/;
+}
+
+my $loop = IO::Async::Loop->new;
+
+my $TOKEN = $ENV{DO_TOKEN} // die "no token, no milk\n";
+
+my $dobby = Dobby::Client->new(
+  bearer_token => $TOKEN,
+);
+
+$loop->add($dobby);
+
+my $domain     = "fastmail.dev";
+my $username   = $opt->username;
+my $boxname    = ($opt->box_ident // $username) . ".unpause";
+my $project_id = q{62113225-81be-4538-8408-f42f54f6c93f}; # PAUSE 2024
+
+my $todo = __PACKAGE__->can("do_" . $opt->mode);
+
+# This "can't happen". -- rjbs, 2024-03-23
+die "WTF: unknown mode of operation request" unless $todo;
+
+await $todo->();
+
+#---( cut here )---
+
+my sub ip_addr_for ($droplet) {
+  my ($ip_addr) = map { $_->{ip_address} } grep { $_->{type} eq 'public'}
+                     $droplet->{networks}{v4}->@*;
+
+  return $ip_addr;
+}
+
+async sub do_create {
+  {
+    my @droplets = await $dobby->get_droplets_with_tag('unpause');
+    my ($droplet) = grep {; $_->{name} eq $boxname } @droplets;
+
+    if ($droplet) {
+      my ($net) = grep {;
+        $_->{type} eq 'public'
+      } $droplet->{networks}{v4}->@*;
+
+      my $extra = $net ? " at root\@$net->{ip_address}" : "";
+
+      die "box already exists$extra\n";
+    }
+  }
+
+  my @key_ids;
+  {
+    my %want_key = map {; $_ => 1 } qw( matthew rjbs );
+    my $keys = await $dobby->json_get_pages_of("/account/keys", 'ssh_keys');
+
+    my (@keys) = grep {; $want_key{$_->{name}} } @$keys;
+
+    unless (@keys) {
+      die "can't find ssh keys to use!\n";
+    }
+
+    @key_ids = map {; $_->{id} } @keys;
+  }
+
+  my $image  = 'debian-12-x64';
+  my $region = 'nyc3';
+  my $size   = $opt->size;
+
+  my %droplet_create_args = (
+    name     => $boxname,
+    image    => $image,
+    region   => $region,
+    size     => $size,
+    ssh_keys => \@key_ids,
+    tags     => [ 'unpause' ],
+  );
+
+  $Logger->log([ "Creating droplet: %s", \%droplet_create_args ]);
+
+  my $droplet = await $dobby->create_droplet(\%droplet_create_args);
+
+  unless ($droplet) {
+    die "There was an error creating the box. Try again.\n";
+  }
+
+  # At this point, the box exists, but isn't quite up.  The above result, for
+  # example, has no networks entry.  We need to re-get it.
+  $Logger->log([ "Created droplet %i, now waiting for network...", $droplet->{id} ]);
+
+  # We delay this because a completed droplet sometimes does not show up in GET
+  # /droplets immediately, which causes annoying problems.  Waiting is a
+  # silly fix, but seems to work, and it's not like box creation is
+  # lightning-fast anyway.
+  await $loop->delay_future(after => 5);
+
+  {
+    my $payload = await $dobby->json_get("/droplets/$droplet->{id}");
+    $droplet = $payload->{droplet};
+  }
+
+  unless ($droplet) {
+    die "Box was created, but now I can't find it! Check the DigitalOcean console and maybe try again.\n";
+  }
+
+  my $ip_addr = ip_addr_for($droplet);
+
+  $Logger->log([ "Droplet is now up on %s...", $ip_addr ]);
+
+  await $dobby->add_droplet_to_project($droplet->{id}, $project_id);
+
+  $Logger->log("updating DNS names for $boxname");
+
+  await $dobby->point_domain_record_at_ip(
+    $domain,
+    "$boxname",
+    $ip_addr,
+  );
+
+  $Logger->log("Waiting for ssh to become available...");
+
+  my $ssh_up = await wait_for_port($ip_addr, 22);
+
+  unless ($ssh_up) {
+    $Logger->log("The droplet was created, but ssh didn't come up.  Your turn!");
+    exit 1;
+  }
+
+  $Logger->log("ssh is now available to $boxname.$domain ($ip_addr)");
+
+  if ($opt->plenv_file) {
+    $Logger->log("Copying plenv install tarball to destination...");
+
+    system(
+      qw(
+        scp
+          -o UserKnownHostsFile=/dev/null
+          -o UpdateHostKeys=no
+          -o StrictHostKeyChecking=no
+      ),
+      $opt->plenv_file,
+
+      "root\@$ip_addr:/tmp/plenv-tarball.tar.bz2",
+    );
+  }
+
+
+  $Logger->log("Now turning the box into a PAUSE server...");
+
+  system(
+    qw(
+      scp
+        -o UserKnownHostsFile=/dev/null
+        -o UpdateHostKeys=no
+        -o StrictHostKeyChecking=no
+
+        selfconfig-root
+    ),
+    "root\@$ip_addr:",
+  );
+
+  system(
+    qw(
+      ssh
+        -o UserKnownHostsFile=/dev/null
+        -o UpdateHostKeys=no
+        -o StrictHostKeyChecking=no
+
+        -l root
+    ),
+    $ip_addr,
+    qw( perl selfconfig-root ),
+      '--host', "$boxname.$domain",
+      '--user', $username,
+      '--pass', $username, # XXX: Do something better later.
+      ($opt->certbot_staging ? '--certbot-staging' : ()),
+  );
+
+  $Logger->log(<<~EOF);
+
+    Done! If all went well, pause should be at:
+
+      ssh root\@$ip_addr
+      ssh root\@$boxname.$domain
+
+      https://$boxname.$domain
+    EOF
+}
+
+async sub do_destroy {
+  my $droplet;
+  {
+    my @droplets = await $dobby->get_droplets_with_tag('unpause');
+    ($droplet) = grep {; $_->{name} eq $boxname } @droplets;
+  }
+
+  unless ($droplet) {
+    die "The box $boxname does not exist, and so cannot be destroyed.\n";
+  }
+
+  my $ip_addr = ip_addr_for($droplet);
+
+  await $dobby->remove_domain_records_for_ip($domain, $ip_addr);
+
+  $Logger->log([ "Destroying droplet: %s (%s)", $droplet->{id}, $droplet->{name} ]);
+
+  await $dobby->destroy_droplet($droplet->{id});
+
+  $Logger->log([ "Destroyed droplet: %s", $droplet->{id} ]);
+}
+
+async sub wait_for_port ($ip_addr, $port) {
+  my $max_tries = 20;
+  TRY: for my $try (1..$max_tries) {
+    my $socket;
+    eval {
+      $socket = await $loop->connect(addr => {
+        family   => 'inet',
+        socktype => 'stream',
+        port     => 22,
+        ip       => $ip_addr,
+      });
+    };
+
+    if ($socket) {
+      # We didn't need the connection, just to know it worked!
+      return 1;
+    }
+
+    my $error = $@;
+    if ($error !~ /Connection refused/) {
+      $Logger->log([
+        "weird error connecting to %s:22: %s",
+        $ip_addr,
+        $error,
+      ]);
+    }
+
+    $Logger->log([
+      "ssh on %s is not up, maybe wait and try again; %s tries remain",
+      $ip_addr,
+      $max_tries - $try,
+    ]);
+
+    await $loop->delay_future(after => 1);
+  }
+
+  return;
+}
