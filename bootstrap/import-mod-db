@@ -1,6 +1,13 @@
 #!/bin/bash
+if [ $UID != "0" ]; then
+  echo "import-mod-db is meant to be run as root" >&2
+  exit 1;
+fi
+
 rsync -vaP pause.perl.org::pausedata/moddump.current.bz2 .
 bunzip2 moddump.current.bz2
+
+touch /etc/PAUSE.CLOSED
 
 systemctl stop paused
 
@@ -15,3 +22,5 @@ pv moddump.current | \
 echo 'SET GLOBAL innodb_flush_log_at_trx_commit=1' | mysql
 
 systemctl start paused
+
+rm /etc/PAUSE.CLOSED
