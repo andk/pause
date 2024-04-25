@@ -5,6 +5,12 @@ use Carp qw(croak);
 use Getopt::Long::Descriptive;
 use Path::Tiny;
 
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'authuser-pw=s', "password for auth user",  { required => 1 } ],
+  [ 'moduser-pw=s',  "password for mod user",   { required => 1 } ],
+);
+
 if (-e '/tmp/plenv-tarball.tar.bz2') {
   chdir("/home/pause") or die "can't chdir to ~pause: $!";
 
@@ -76,6 +82,9 @@ run_cmd(qw(git init --initial-branch master ));
 # 6BA1716EFB099DB2. -- rjbs, 2024-04-25
 run_cmd(qw( gpg --import --armor /home/pause/pause/bootstrap/test-key.txt ));
 
+my $authuser_pw = $opt->authuser_pw;
+my $moduser_pw  = $opt->moduser_pw;
+
 path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   use strict;
   package PAUSE;
@@ -84,10 +93,13 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
 
   our $Config;
   $Config->{AUTHEN_BACKUP_DIR}        = "/home/pause/db-backup";
-  $Config->{AUTHEN_DATA_SOURCE_USER}  = "pause";
-  $Config->{AUTHEN_DATA_SOURCE_PW}    = "pausepassword";
-  $Config->{MOD_DATA_SOURCE_USER}     = "pause";
-  $Config->{MOD_DATA_SOURCE_PW}       = "pausepassword";
+
+  $Config->{AUTHEN_DATA_SOURCE_USER}  = "authuser";
+  $Config->{AUTHEN_DATA_SOURCE_PW}    = "\Q$authuser_pw";
+
+  $Config->{MOD_DATA_SOURCE_USER}     = "moduser";
+  $Config->{MOD_DATA_SOURCE_PW}       = "\Q$moduser_pw";
+
   $Config->{MAIL_MAILER}              = ["testfile"];
   $Config->{RUNDATA}                  = "/tmp/pause_1999";
 
