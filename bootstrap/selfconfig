@@ -78,6 +78,7 @@ path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew(<<~'END');
   $ENV{EMAIL_SENDER_TRANSPORT} = 'DevNull';
 
   our $Config;
+  $Config->{AUTHEN_BACKUP_DIR}        = "/home/pause/db-backup";
   $Config->{AUTHEN_DATA_SOURCE_USER}  = "pause";
   $Config->{AUTHEN_DATA_SOURCE_PW}    = "pausepassword";
   $Config->{MOD_DATA_SOURCE_USER}     = "pause";
