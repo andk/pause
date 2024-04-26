@@ -516,6 +516,39 @@ EOT
   });
 };
 
+subtest "we should ignore the BOM at the start of a file" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  my $BOM = "\x00\x00\xfe\xff";
+  $pause->upload_author_fake(DANKOGAI => 'Lingua-JA-Numbers-0.05.tar.gz', {
+    append => [
+      {
+        file => "lib/Lingua/JA/Numbers.pm",
+        content => $BOM . <<'EOT',
+package Lingua::JA::Numbers;
+
+use 5.008001;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = sprintf "%d.%02d", q$Revision: 0.5 $ =~ /(\d+)/g;
+1;
+EOT
+      }
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'Lingua::JA::Numbers', version => '0.05'  },
+  ]);
+
+  $result->perm_list_ok({
+    'Lingua::JA::Numbers' => { f => 'DANKOGAI' },
+  });
+};
+
 subtest "do not index dists without META file" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->upload_author_fake(PERSON => 'Not-Very-Meta-1.234.tar.gz', {
