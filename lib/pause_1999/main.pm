@@ -399,7 +399,7 @@ sub is_ssl {
     $uri ||= $self->myurl;
     if ($uri->scheme eq "https") {
         $is_ssl = 1;
-    } elsif (Sys::Hostname::hostname() =~ /pause2/) {
+    } elsif ($PAUSE::Config->{TRUST_IS_SSL_HEADER}) {
         my $header = $self->{REQ}->header("X-pause-is-SSL") || 0;
         $is_ssl = !!$header;
     }

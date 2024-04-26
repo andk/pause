@@ -27,7 +27,7 @@ sub _is_ssl {
   my $pause = $c->stash(".pause");
   if ($c->req->url->to_abs->scheme eq "https") {
     $pause->{is_ssl} = 1;
-  } elsif (Sys::Hostname::hostname() =~ /pause2/) {
+  } elsif ($PAUSE::Config->{TRUST_IS_SSL_HEADER}) {
     my $header = $c->req->headers->header("X-pause-is-SSL") || 0;
     $pause->{is_ssl} = !!$header;
   }
