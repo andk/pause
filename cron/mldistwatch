@@ -75,14 +75,15 @@ Setting testhost prevents sending mail; automatically sets skip-locking too.
 
 =cut
 
+use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 use PAUSE::Logger '$Logger' => { init => {
   ident     => 'mldistwatch',
   facility  => 'daemon',
 } };
 
-use strict;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use PAUSE::mldistwatch ();
 
 use Getopt::Long ();
