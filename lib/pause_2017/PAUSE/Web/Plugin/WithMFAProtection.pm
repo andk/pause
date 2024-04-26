@@ -80,6 +80,13 @@ sub register {
         }
     );
 
+    $routes->add_shortcut(
+        with_csrf_and_mfa_protection => sub {
+            my ($route) = @_;
+            return $route->requires( with_csrf_protection => 1, with_mfa_protection => 1 );
+        }
+    );
+
     return;
 }
 

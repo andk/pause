@@ -81,8 +81,9 @@ sub startup {
       my $action = $app->pause->config->action($name);
       for my $method (qw/get post/) {
         my $route = $private->$method("/$name");
-        $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
-        $route->with_mfa_protection  if $method eq "post" and $action->{x_mfa_protection};
+        $route->with_csrf_protection         if $method eq "post" and $action->{x_csrf_protection};
+        $route->with_mfa_protection          if $method eq "post" and $action->{x_mfa_protection};
+        $route->with_csrf_and_mfa_protection if $method eq "post" and $action->{x_csrf_and_mfa_protection};
         $route->to($action->{x_mojo_to});
       }
     }

@@ -428,8 +428,7 @@ our %Actions = (
     cat => "User/06Account/02",
     desc => "Change your password any time you want.",
     method => 'POST',
-    x_csrf_protection => 1,
-    x_mfa_protection => 1,
+    x_csrf_and_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       ABRA => {form_type => "hidden_field"},
@@ -445,8 +444,7 @@ our %Actions = (
     cat => "User/06Account/01",
     desc => "Edit your user name, your email addresses (both public and secret one), change the URL of your homepage.",
     method => 'POST',
-    x_csrf_protection => 1,
-    x_mfa_protection => 1,
+    x_csrf_and_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       pause99_edit_cred_fullname => {form_type => "text_field"},
