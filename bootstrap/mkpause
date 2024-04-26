@@ -18,7 +18,7 @@ my ($opt, $usage) = describe_options(
   [ 'size=s',         "slug for Digital Ocean droplet", { default => 'g-4vcpu-16gb' } ],
   [ 'box-ident|i=s',  "identifying part of box name; defaults to --username" ],
   [],
-  [ 'plenv-file|P=s', "a tar.bz2 file to use for plenv (it's a shortcut)" ],
+  [ 'plenv-url|P=s', "URL to a tar.bz2 file to use for plenv (it's a shortcut)" ],
   [],
   [ 'certbot-staging|C', 'use the staging version of certbot' ],
   [ 'enable-mail|m',  "set up postfix config for outbound mail" ],
@@ -58,14 +58,6 @@ my $Logger = Log::Dispatchouli->new({
   log_pid   => 0,
   to_stdout => 1,
 });
-
-if ($opt->plenv_file) {
-  die "plenv file does not exist" unless -e $opt->plenv_file;
-  die "plenv file can't be read"  unless -r $opt->plenv_file;
-
-  die "plenv file should be a .tar.bz2 file"
-    unless $opt->plenv_file =~ /\.tar\.bz2\z/;
-}
 
 my $loop = IO::Async::Loop->new;
 
@@ -195,23 +187,6 @@ async sub do_create {
 
   sleep 1;
 
-  if ($opt->plenv_file) {
-    $Logger->log("Copying plenv install tarball to destination...");
-
-    system(
-      qw(
-        scp
-          -o UserKnownHostsFile=/dev/null
-          -o UpdateHostKeys=no
-          -o StrictHostKeyChecking=no
-      ),
-      $opt->plenv_file,
-
-      "root\@$ip_addr:/tmp/plenv-tarball.tar.bz2",
-    );
-  }
-
-
   $Logger->log("Now turning the box into a PAUSE server...");
 
   system(
@@ -248,6 +223,8 @@ async sub do_create {
       '--pass', $username, # XXX: Do something better later.
       ($opt->certbot_staging ? '--certbot-staging' : ()),
       ($opt->enable_mail ? ('--enable-mail', %mailopts) : ()),
+
+      ($opt->plenv_url ? ('--plenv-url' => $opt->plenv_url) : ()),
   );
 
   $Logger->log(<<~EOF);

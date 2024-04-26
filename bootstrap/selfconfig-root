@@ -74,7 +74,10 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   [ "user=s", "username for PAUSE admin to create",       { required => 1 } ],
   [ "pass=s", "password for PAUSE admin to create",       { required => 1 } ],
   [],
+  [ 'plenv-url=s', "curl-able URL to a tar.bz2 archive of a .plenv" ],
+  [],
   [ 'certbot-staging|C', 'use the staging version of certbot' ],
+  [],
   [ "enable-mail|m", "enable working postfix config",         ],
   [ 'relay-host=s',   "relay host for smtp" ],
   [ 'relay-port=s',   "relay port for smtp" ],
@@ -103,6 +106,10 @@ my $admin_pass = $opt->pass;
 # The --comment is here to suppress prompting for name, confirmation, etc.
 run_cmd(qw(adduser pause  --disabled-password --comment), 'PAUSE User');
 run_cmd(qw(adduser unsafe --disabled-password --comment), 'PAUSE Unsafe');
+
+if ($opt->plenv_url) {
+  run_cmd('curl', $opt->plenv_url, '--output', '/tmp/plenv-tarball.tar.bz2');
+}
 
 run_cmd(qw(
   sudo -u pause git clone -b unpause https://git@github.com/rjbs/pause/ /home/pause/pause
