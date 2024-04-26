@@ -77,7 +77,7 @@ sub _build_mod_db {
 
 has 'plack_app' => (
     is => 'ro',
-    default => sub { Plack::Util::load_psgi "$AppRoot/app.psgi" },
+    default => sub { Plack::Util::load_psgi "$AppRoot/app_1999.psgi" },
 );
 
 has 'plack_test' => (
