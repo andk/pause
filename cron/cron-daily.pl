@@ -755,13 +755,16 @@ sub pumpkings {
   my $repfile = "$PAUSE::Config->{MLROOT}/../08pumpkings.txt.gz";
   my $list    = "";
   my $olist   = "";
-  local ($/) = undef;
-  if (open F, "$zcat $repfile|") {
-    if ($] > 5.007) {
-      binmode F, ":utf8";
+
+  if (-e $repfile) {
+    local ($/) = undef;
+    if (open F, "$zcat $repfile|") {
+      if ($] > 5.007) {
+        binmode F, ":utf8";
+      }
+      $olist = <F>;
+      close F;
     }
-    $olist = <F>;
-    close F;
   }
 
   my @pumpkings;
