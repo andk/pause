@@ -165,7 +165,6 @@ sub rewrite_indexes {
     $self->rewrite01();
     $self->rewrite03();
     $self->rewrite06();
-    $self->rewrite07();
     $Logger->log("finished rewriting indexes");
 
     $self->git->commit({ m => "indexer run at $^T, pid $$" })
@@ -1327,26 +1326,6 @@ Date:        %s
         rename "$repfile.gz.new", "$repfile.gz" or
             $Logger->log("couldn't rename to $repfile.gz: $!");
         PAUSE::newfile_hook("$repfile.gz");
-    }
-}
-
-sub rewrite07 {
-    my($self) = @_;
-    my $fromdir = $PAUSE::Config->{FTP_RUN} or $Logger->log("FTP_RUN not defined");
-    $fromdir .= "/mirroryaml";
-    -d $fromdir or $Logger->log("FTP_RUN directory [$fromdir] does not exist");
-    my $mlroot = $self->mlroot or $Logger->log("MLROOT not defined");
-    my $todir = "$mlroot/../../modules";
-    -d $todir or $Logger->log("mirror list target directory [$todir] does not exist");
-    for my $exte (qw(json yml)) {
-        my $f = "$fromdir/mirror.$exte";
-        my $t = "$todir/07mirror.$exte";
-        next unless -e $f;
-        rename $f, $t or $Logger->log([
-          "couldn't rename: %s",
-          { old => $f, new => $t, err => "$!" },
-        ]);
-        PAUSE::newfile_hook($t);
     }
 }
 

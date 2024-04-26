@@ -68,10 +68,6 @@ push @INC, $pauselib;
 
 $PAUSE::Config ||=
     {
-     # previously also used for ftp password; still used in Error as
-     # contact address and as address to send internal notifications
-     # to:
-     FTP_RUN => qq{/home/ftp/run},
      ABRA_EXPIRATION => 86400/4,
      ADMIN => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neilb@neilb.org},
      ADMINS => [qq(modules\@perl.org)],
