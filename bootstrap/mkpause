@@ -274,23 +274,48 @@ async sub do_destroy {
 async sub wait_for_port ($ip_addr, $port) {
   my $max_tries = 20;
   TRY: for my $try (1..$max_tries) {
-    my $socket;
-    eval {
+    my $done = eval {
+      my $socket;
+
       $socket = await $loop->connect(addr => {
         family   => 'inet',
         socktype => 'stream',
         port     => 22,
         ip       => $ip_addr,
       });
+
+      if ($socket) {
+        $Logger->log("We connected... let's see if we get a banner...");
+
+        $socket->blocking(1);
+
+        local $SIG{ALRM} = sub { die "timed out\n" };
+        alarm 5;
+
+        my $banner;
+        $socket->recv($banner, 1024);
+
+        alarm 0;
+
+        if ($banner && $banner =~ /^SSH/) {
+          $Logger->log("Yup!");
+
+          return 1;
+        }
+
+        $Logger->log("Nope, not yet.");
+
+        return 0;
+      }
     };
 
-    if ($socket) {
-      # We didn't need the connection, just to know it worked!
-      return 1;
-    }
+    alarm 0;
+
+    return 1 if $done;
 
     my $error = $@;
-    if ($error !~ /Connection refused/) {
+
+    if ($error && $error !~ /(Connection refused|timed out)/) {
       $Logger->log([
         "weird error connecting to %s:22: %s",
         $ip_addr,
