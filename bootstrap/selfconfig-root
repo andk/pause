@@ -328,16 +328,22 @@ run_cmd(
 Path::Tiny::path("/home/pause/pause/cron/CRONTAB.ROOT")->copy("/etc/cron.d/pause");
 
 if ($opt->enable_mail) {
-  system(
-    q{echo "postfix postfix/main_mailer_type string 'Internet with smarthost'" | debconf-set-selections}
-  );
+  my $relayhost = $opt->relay_host;
+  my $relayport = $opt->relay_port;
 
+  system(
+    q{echo postfix postfix/main_mailer_type select "Internet with smarthost" | debconf-set-selections}
+  );
   croak "failed to update debconf for main_mailer_type" if $?;
 
   system(
-    qq{echo "postfix postfix/mailname string '$hostname'" | debconf-set-selections}
+    qq{echo postfix postfix/mailname string $hostname | debconf-set-selections}
   );
+  croak "failed to update debconf for mailname" if $?;
 
+  system(
+    qq{echo postfix postfix/relayhost string \\[$relayhost\\]:$relayport | debconf-set-selections}
+  );
   croak "failed to update debconf for mailname" if $?;
 
   run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y postfix));
@@ -349,9 +355,6 @@ if ($opt->enable_mail) {
     or warn "!!! Failed to replace daemon_directory !!!\n\n";
   $maincf =~ s{inet_interfaces = all}{inet_interfaces = localhost}
     or warn "!!! Failed to replace inet_interfaces !!!\n\n";
-
-  my $relayhost = $opt->relay_host;
-  my $relayport = $opt->relay_port;
 
   $maincf .= <<~EOF;
     relayhost = [$relayhost]:$relayport
