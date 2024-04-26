@@ -92,7 +92,6 @@ $PAUSE::Config ||=
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP_OPTIONS => '--best --rsyncable',
      GZIP_PATH => (List::Util::first { -x $_ } ("/bin/gzip", "/usr/bin/gzip" )),
-     HOME => '/home/puppet/',
      CRONPATH => '/home/puppet/pause/cron',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
      INCOMING => 'ftp://localhost/incoming/',
