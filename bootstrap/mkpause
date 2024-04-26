@@ -21,6 +21,11 @@ my ($opt, $usage) = describe_options(
   [ 'plenv-file|P=s', "a tar.bz2 file to use for plenv (it's a shortcut)" ],
   [],
   [ 'certbot-staging|C', 'use the staging version of certbot' ],
+  [ 'enable-mail|m',  "set up postfix config for outbound mail" ],
+  [ 'relay-host=s',   "relay host for smtp" ],
+  [ 'relay-port=s',   "relay port for smtp" ],
+  [ 'relay-username=s', "relay sasl username for smtp" ],
+  [ 'relay-password=s', "relay sasl password for smtp" ],
 
   [],
   [ 'mode', 'hidden' => {
@@ -32,6 +37,20 @@ my ($opt, $usage) = describe_options(
     }
   ],
 );
+
+my @mopts = qw(relay_host relay_port relay_username relay_password);
+
+if ($opt->enable_mail) {
+  my @m;
+
+  for my $setting (@mopts) {
+    push @m, $setting unless $opt->$setting;
+  }
+
+  $_ =~ s/_/-/g for @m;
+
+  die "--enable-mail requires @m\n" if @m;
+}
 
 my $Logger = Log::Dispatchouli->new({
   facility  => undef,
@@ -174,6 +193,8 @@ async sub do_create {
 
   $Logger->log("ssh is now available to $boxname.$domain ($ip_addr)");
 
+  sleep 1;
+
   if ($opt->plenv_file) {
     $Logger->log("Copying plenv install tarball to destination...");
 
@@ -205,6 +226,12 @@ async sub do_create {
     "root\@$ip_addr:",
   );
 
+  my %mailopts;
+
+  if ($opt->enable_mail) {
+    $mailopts{"--" . ($_ =~ s/_/-/gr)} = $opt->$_ for @mopts;
+  }
+
   system(
     qw(
       ssh
@@ -220,6 +247,7 @@ async sub do_create {
       '--user', $username,
       '--pass', $username, # XXX: Do something better later.
       ($opt->certbot_staging ? '--certbot-staging' : ()),
+      ($opt->enable_mail ? ('--enable-mail', %mailopts) : ()),
   );
 
   $Logger->log(<<~EOF);
