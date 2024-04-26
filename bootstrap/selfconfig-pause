@@ -59,9 +59,11 @@ if (-e '/tmp/plenv-tarball.tar.bz2') {
   # install cpanm for perl dep management
   run_cmd(qw( /home/pause/.plenv/bin/plenv install-cpanm ));
 
-  # We need to pin these for now
-  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n Mojolicious@8.72 ));
-  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n DBD::mysql@4.052 ));
+  # Pin DBD::mysql to 4.050. Newer doesn't work for some reason
+  # last I knew (mariadb problems?). And 4.052 breaks reconnecting
+  # after calls to disconnect, so we can't use that. 4.050 is what
+  # is in pause2 right now, so this should be fine.
+  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n DBD::mysql@4.050 ));
 
   run_cmd(qw( /home/pause/.plenv/shims/cpanm -n --installdeps . ));
 }
