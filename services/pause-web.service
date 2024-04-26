@@ -16,7 +16,7 @@ Group=pause
 WorkingDirectory=/home/pause/pause
 
 # Should not daemonize
-ExecStart=/home/pause/.plenv/shims/plackup --port 5000
+ExecStart=/home/pause/.plenv/shims/plackup --port 5000 app_2017.psgi
 
 Restart=on-failure
 RestartSec=30
