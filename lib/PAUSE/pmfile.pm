@@ -238,7 +238,7 @@ sub packages_per_pmfile {
         }
 =cut
 
-        # use feature 'class'; enabels class (and role, though not implemented yet)
+        # use feature 'class'; enables class (and role, though not implemented yet)
         if ($pline =~ /^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
             $package_or_class = 'package|class';
         }
@@ -376,7 +376,7 @@ sub packages_per_pmfile {
             }
 =cut
 
-            # use feature 'class'; enabels class (and role, though not implemented yet)
+            # use feature 'class'; enables class (and role, though not implemented yet)
             if (/^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
                 $package_or_class = 'package|class';
             }
