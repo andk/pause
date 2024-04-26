@@ -50,6 +50,7 @@ unless (
 
 # read_errorlog();
 for_authors();
+pumpkings();
 watch_files();
 delete_scheduled_files();
 send_the_mail();
@@ -729,6 +730,57 @@ sub authors {
     $author->[1] ||= sprintf q{%s@cpan.org}, lc($author->[0]);
 
     $list .= (join qq{\t}, @$author) . "\n";
+  }
+
+  if ($list ne $olist) {
+    if (open F, "| $gzip -9c > $repfile") {
+      if ($] > 5.007) {
+        binmode F, ":utf8";
+      }
+      print F $list;
+      close F or return "ERROR: error closing $repfile: $!";;
+    } else {
+      return ("ERROR: Couldn't open $repfile to write: $!");
+    }
+  } else {
+    # print "Endlich keine neue Version geschrieben\n";
+  }
+  PAUSE::newfile_hook($repfile);
+  return;
+}
+
+sub pumpkings {
+  # Rewriting 08pumpkings.txt
+
+  my $repfile = "$PAUSE::Config->{MLROOT}/../08pumpkings.txt.gz";
+  my $list    = "";
+  my $olist   = "";
+  local ($/) = undef;
+  if (open F, "$zcat $repfile|") {
+    if ($] > 5.007) {
+      binmode F, ":utf8";
+    }
+    $olist = <F>;
+    close F;
+  }
+
+  my @pumpkings;
+  my $authen_dbh = DBI->connect(
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
+    $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
+    { RaiseError => 1 }
+  ) or report "Connect to database not possible: $DBI::errstr\n";
+
+  my $sth = $authen_dbh->prepare("SELECT user FROM grouptable WHERE ugroup='pumpking' order by user");
+  $sth->execute;
+  while (my @row = $sth->fetchrow_array) {
+    push @pumpkings, $row[0];
+  }
+  $sth->finish;
+
+  for my $pumpking (@pumpkings) {
+    $list .= $pumpking . "\n";
   }
 
   if ($list ne $olist) {
