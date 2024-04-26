@@ -9,16 +9,16 @@ p { padding: 0.5em; margin: 0; }
 
 h1.logo { font-size:1em; margin: 0; padding: 0 }
 div.menu {
-  padding-right: 0.2em;
+  padding-right: 0.5em;
 }
 div.menu p {
   margin: 0;
-  padding: 0 0 0.1em 0;
+  padding: 0.2em 0.3em 0.2em 0.3em;
 }
-div.menu p.menuheading { padding-top: 0.5em; }
+div.menu p.menuheading { padding-top: 0.5em; padding-bottom: 0.3em; }
 nav {
   border-right: 0.3em #f00 solid;
-  margin-right: 0.3em;
+  margin-right: 1em;
 }
 
 .actionresponse {
@@ -184,3 +184,8 @@ div.messagebox {
 td.indexed {
   font-weight: bold
 }
+.row {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+h1.logo img { margin-right: 0.5em; }
