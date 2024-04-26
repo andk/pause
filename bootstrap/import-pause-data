@@ -40,7 +40,7 @@ bunzip2 authen_pausedump.current.bz2
 
 pv authen_pause.current | \
   perl -ple 's/^CHANGE MASTER.*//' | \
-  sudo mysql authen
+  sudo mysql authen_pause
 
 echo 'SET GLOBAL innodb_flush_log_at_trx_commit=1' | mysql
 
