@@ -121,6 +121,7 @@ $PAUSE::Config ||=
                                  # 2006-05-xx 7-9 minutes observed
      SLEEP => 75,
      TIMEOUT => 60*60,
+     TRUST_IS_SSL_HEADER => 1,
      TMP => '/home/ftp/tmp/',
      UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
