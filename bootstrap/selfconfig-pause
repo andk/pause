@@ -104,6 +104,8 @@ my $config_file_contents = <<~'END';
   $Config->{CHECKSUMS_SIGNING_ARGS}    = '--homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ';
   $Config->{CHECKSUMS_SIGNING_KEY}     = '6BA1716EFB099DB2';
 
+  $Config->{CRONPATH} = '/home/pause/pause/cron/';
+
   $Config->{FTPPUB} = '/home/pause/pub/PAUSE/';
   $Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
   $Config->{INCOMING_LOC} = '/home/pause/incoming';
