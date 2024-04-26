@@ -135,10 +135,15 @@ if ($opt->plenv_url) {
 require Path::Tiny;
 
 # Partitioning!
+for my $dir (qw(
+  /data/mysql/mysql
+  /data/pause/pub
+  /data/pause/incoming
+  /data/pause/tmp
+)) {
+  Path::Tiny::path($dir)->mkdir;
+}
 
-run_cmd(qw(mkdir -p /data/mysql /data/pause/pub));
-run_cmd(qw(mkdir -p /data/mysql /data/pause/incoming));
-run_cmd(qw(mkdir -p /data/mysql /data/pause/tmp));
 if (-e "/usr/sbin/lvcreate" && $opt->volume_group) {
   my $vg = $opt->volume_group;
   run_cmd(qw(lvcreate -L4G),  qq($vg), qw(-n mysql));
@@ -153,8 +158,10 @@ EOF
   run_cmd(qw(mount /data/mysql));
   run_cmd(qw(mount /data/pause));
 }
-run_cmd(qw(ln -s /data/mysql /var/lib/mysql));
-run_cmd(qw(ln -s /data/pause /home/ftp));
+
+run_cmd(qw(mkdir /data/pause/ftp));
+run_cmd(qw(ln -s /data/mysql/mysql /var/lib/mysql));
+run_cmd(qw(ln -s /data/pause/ftp /home/ftp));
 
 # Mariadb has to be installed _after_ partitioning.
 run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
