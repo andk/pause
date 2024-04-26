@@ -30,6 +30,8 @@ if (-e $file) {
 
 my ($opt, $usage) = describe_options(
   '%c %o',
+  [ 'list|l',         "list boxes that are running then quit" ],
+
   [ 'username|u=s', "your username; defaults to $ENV{USER}",
     { default => $default{username} // $ENV{USER} // die 'no USER env var!' } ],
 
@@ -63,18 +65,11 @@ my ($opt, $usage) = describe_options(
   ],
 );
 
-my @mopts = qw(relay_host relay_port relay_username relay_password);
+my sub ip_addr_for ($droplet) {
+  my ($ip_addr) = map { $_->{ip_address} } grep { $_->{type} eq 'public'}
+                     $droplet->{networks}{v4}->@*;
 
-if ($opt->enable_mail) {
-  my @m;
-
-  for my $setting (@mopts) {
-    push @m, $setting unless $opt->$setting;
-  }
-
-  $_ =~ s/_/-/g for @m;
-
-  die "--enable-mail requires @m\n" if @m;
+  return $ip_addr;
 }
 
 my $Logger = Log::Dispatchouli->new({
@@ -94,6 +89,38 @@ my $dobby = Dobby::Client->new(
 
 $loop->add($dobby);
 
+if ($opt->list) {
+  my @droplets = $dobby->get_droplets_with_tag('unpause')->get;
+
+  if (@droplets) {
+    $Logger->log("Droplets:");
+
+    my %drops = map {; $_->{name} => ip_addr_for($_) } @droplets;
+
+    for my $k (sort keys %drops) {
+      $Logger->log(["  %-20s %s", $k, $drops{$k}]);
+    }
+  } else {
+    $Logger->log("No unpause droplets found");
+  }
+
+  exit;
+}
+
+my @mopts = qw(relay_host relay_port relay_username relay_password);
+
+if ($opt->enable_mail) {
+  my @m;
+
+  for my $setting (@mopts) {
+    push @m, $setting unless $opt->$setting;
+  }
+
+  $_ =~ s/_/-/g for @m;
+
+  die "--enable-mail requires @m\n" if @m;
+}
+
 my $domain     = "fastmail.dev";
 my $username   = $opt->username;
 my $boxname    = ($opt->box_ident // $username) . ".unpause";
@@ -107,24 +134,15 @@ await $todo->();
 
 #---( cut here )---
 
-my sub ip_addr_for ($droplet) {
-  my ($ip_addr) = map { $_->{ip_address} } grep { $_->{type} eq 'public'}
-                     $droplet->{networks}{v4}->@*;
-
-  return $ip_addr;
-}
-
 async sub do_create {
   {
     my @droplets = await $dobby->get_droplets_with_tag('unpause');
     my ($droplet) = grep {; $_->{name} eq $boxname } @droplets;
 
     if ($droplet) {
-      my ($net) = grep {;
-        $_->{type} eq 'public'
-      } $droplet->{networks}{v4}->@*;
+      my $ip = ip_addr_for($droplet);
 
-      my $extra = $net ? " at root\@$net->{ip_address}" : "";
+      my $extra = $ip ? " at root\@$ip" : "";
 
       die "box already exists$extra\n";
     }
