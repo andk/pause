@@ -10,6 +10,7 @@ use Email::MIME;
 use Data::Dumper;
 use PAUSE::Web::Config;
 use PAUSE::Web::Exception;
+use Auth::GoogleAuth;
 
 our $VERSION = "1072";
 
@@ -38,6 +39,17 @@ sub version {
     $version = $v if $v > $version;
   }
   $version;
+}
+
+sub authenticator_for {
+  my ($self, $user) = @_;
+  my $cpan_alias = lc($user->{userid}) . '@cpan.org';
+  my $secret32   = $user->{mfa_secret32};
+  return Auth::GoogleAuth->new({
+    secret32 => $secret32,
+    issuer   => $PAUSE::Config->{MFA_ISSUER} || 'PAUSE',
+    key_id   => $cpan_alias,
+  });
 }
 
 sub hostname {
