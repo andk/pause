@@ -56,7 +56,6 @@ my @required_debs = qw(
  libgetopt-long-descriptive-perl
  libpath-tiny-perl
  libssl-dev
- mariadb-server
  nginx
  python3-certbot-nginx
  unzip
@@ -80,6 +79,7 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   [ 'relay-port=s',   "relay port for smtp" ],
   [ 'relay-username=s', "relay sasl username for smtp" ],
   [ 'relay-password=s', "relay sasl password for smtp" ],
+  [ 'volume-group=s', "volume group for data" ],
 );
 
 my @mopts = qw(relay_host relay_port relay_username relay_password);
@@ -103,6 +103,33 @@ my $admin_pass = $opt->pass;
 # The --comment is here to suppress prompting for name, confirmation, etc.
 run_cmd(qw(adduser pause  --disabled-password --comment), 'PAUSE User');
 run_cmd(qw(adduser unsafe --disabled-password --comment), 'PAUSE Unsafe');
+
+
+require Path::Tiny;
+
+# Partitioning!
+
+run_cmd(qw(mkdir -p /data/mysql /data/pause));
+if (-e "/usr/sbin/lvcreate" && $opt->volume_group;) {
+  my $vg = $opt->volume_group;
+  run_cmd(qw(lvcreate -L4G $vg -n mysql))
+  run_cmd(qw(lvcreate -L50G $vg -n pause))
+  Path::Tiny::path("/etc/fstab")->append(<<~EOF);
+/dev/$vg/mysql            /data/mysql ext4 defaults 0 2
+/dev/$vg/pause            /data/pause ext4 defaults 0 2
+EOF
+  run_cmd(qw(systemctl daemon-reload));
+  run_cmd(qw(mkfs.ext4 -j /dev/$vg/mysql));
+  run_cmd(qw(mkfs.ext4 -j /dev/$vg/pause));
+  run_cmd(qw(mount /data/mysql));
+  run_cmd(qw(mount /data/pause));
+}
+run_cmd(qw(mkdir /data/pause/ftp));
+run_cmd(qw(ln -s /data/mysql /var/lib/mysql));
+run_cmd(qw(ln -s /data/pause/ftp /home/ftp));
+
+# Mariadb has to be installed _after_ partitioning.
+run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y), qw(mariadb-server));
 
 run_cmd(qw(
   sudo -u pause git clone -b unpause https://git@github.com/rjbs/pause/ /home/pause/pause
@@ -203,7 +230,6 @@ server {
 }
 END
 
-require Path::Tiny;
 Path::Tiny::path("/etc/nginx/sites-available/$hostname")->spew($nginx_config);
 
 unlink('/etc/nginx/sites-enabled/default');
