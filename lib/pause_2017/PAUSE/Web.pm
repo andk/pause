@@ -33,6 +33,7 @@ sub startup {
 
   # Load plugins to modify path/set stash values/provide helper methods
   $app->plugin("WithCSRFProtection");
+  $app->plugin("PAUSE::Web::Plugin::WithMFAProtection");
   $app->plugin("PAUSE::Web::Plugin::ConfigPerRequest");
   $app->plugin("PAUSE::Web::Plugin::IsPauseClosed");
   $app->plugin("PAUSE::Web::Plugin::GetActiveUserRecord");
@@ -81,6 +82,7 @@ sub startup {
       for my $method (qw/get post/) {
         my $route = $private->$method("/$name");
         $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
+        $route->with_mfa_protection  if $method eq "post" and $action->{x_mfa_protection};
         $route->to($action->{x_mojo_to});
       }
     }
