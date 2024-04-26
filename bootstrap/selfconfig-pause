@@ -121,6 +121,7 @@ my $config_file_contents = <<~'END';
 
   $Config->{FTPPUB} = '/home/pause/pub/PAUSE/';
   $Config->{GITROOT} = '/home/pause/pub/PAUSE/PAUSE-git';
+  $Config->{HTTP_ERRORLOG} = '/var/log/nginx/error.log';
   $Config->{INCOMING_LOC} = '/home/pause/incoming';
   $Config->{MLROOT} = '/home/pause/pub/PAUSE/authors/id/';
   $Config->{ML_CHOWN_USER}  = 'unsafe';
