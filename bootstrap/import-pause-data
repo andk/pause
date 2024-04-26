@@ -38,7 +38,7 @@ pv moddump.current | \
 
 bunzip2 authen_pausedump.current.bz2
 
-pv authen_pause.current | \
+pv authen_pausedump.current | \
   perl -ple 's/^CHANGE MASTER.*//' | \
   sudo mysql authen_pause
 
