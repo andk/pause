@@ -78,6 +78,7 @@ for my $path (qw(
   /home/pause/pub/PAUSE/modules
   /home/pause/pub/PAUSE/PAUSE-git
   /home/pause/run
+  /home/pause/testmail
   /home/pause/tmp
   /tmp/pause_1999
 )) {
@@ -110,7 +111,8 @@ my $config_file_contents = <<~'END';
   use strict;
   package PAUSE;
 
-  $ENV{EMAIL_SENDER_TRANSPORT} = 'DevNull';
+  $ENV{EMAIL_SENDER_TRANSPORT} = 'Maildir';
+  $ENV{EMAIL_SENDER_TRANSPORT_dir} = '/home/pause/testmail';
 
   our $Config;
   $Config->{AUTHEN_BACKUP_DIR}        = "/home/pause/db-backup";
