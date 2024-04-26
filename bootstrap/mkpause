@@ -19,19 +19,33 @@ use Future::AsyncAwait;
 use Getopt::Long::Descriptive;
 use IO::Async::Loop;
 use Log::Dispatchouli;
+use YAML::XS qw(LoadFile);
+
+my %default;
+my $file = $ENV{PAUSE_MKPAUSE_CONFIG} // ".mkpause";
+if (-e $file) {
+  my ($config) = LoadFile($file);
+  %default = %$config;
+}
 
 my ($opt, $usage) = describe_options(
   '%c %o',
-  [ 'username|u=s',   "your username; defaults to $ENV{USER}",
-                      { default => $ENV{USER} // die 'no USER env var!' } ],
+  [ 'username|u=s', "your username; defaults to $ENV{USER}",
+    { default => $default{username} // $ENV{USER} // die 'no USER env var!' } ],
 
   # For serious business, we like c-16. -- rjbs, 2024-04-19
-  [ 'size=s',         "slug for Digital Ocean droplet", { default => 'g-4vcpu-16gb' } ],
+  [ 'size=s',         "slug for DigitalOcean droplet",
+    { default => $default{size} // 'g-4vcpu-16gb' } ],
+  [ 'project_id=s',   "if given, a DigitalOcean project id to add the VM to",
+    { default => $default{'project-id'} } ],
+
   [ 'box-ident|i=s',  "identifying part of box name; defaults to --username" ],
   [],
-  [ 'plenv-url|P=s', "URL to a tar.bz2 file to use for plenv (it's a shortcut)" ],
+  [ 'plenv-url|P=s', "URL to a tar.bz2 file to use for plenv (it's a shortcut)",
+      { default => $default{'plenv-url'} } ],
   [],
-  [ 'certbot-staging|C', 'use the staging version of certbot' ],
+  [ 'certbot-staging|C!', 'use the staging version of certbot',
+      { default => $default{'certbot-staging'} } ],
   [ 'enable-mail|m',  "set up postfix config for outbound mail" ],
   [ 'relay-host=s',   "relay host for smtp" ],
   [ 'relay-port=s',   "relay port for smtp" ],
@@ -72,7 +86,7 @@ my $Logger = Log::Dispatchouli->new({
 
 my $loop = IO::Async::Loop->new;
 
-my $TOKEN = $ENV{DO_TOKEN} // die "no token, no milk\n";
+my $TOKEN = $ENV{DO_TOKEN} // $default{'api-token'} // die "no DigitalOcean API token\n";
 
 my $dobby = Dobby::Client->new(
   bearer_token => $TOKEN,
@@ -83,7 +97,6 @@ $loop->add($dobby);
 my $domain     = "fastmail.dev";
 my $username   = $opt->username;
 my $boxname    = ($opt->box_ident // $username) . ".unpause";
-my $project_id = q{62113225-81be-4538-8408-f42f54f6c93f}; # PAUSE 2024
 
 my $todo = __PACKAGE__->can("do_" . $opt->mode);
 
@@ -175,7 +188,9 @@ async sub do_create {
 
   $Logger->log([ "Droplet is now up on %s...", $ip_addr ]);
 
-  await $dobby->add_droplet_to_project($droplet->{id}, $project_id);
+  if ($opt->project_id) {
+    await $dobby->add_droplet_to_project($droplet->{id}, $opt->project_id);
+  }
 
   $Logger->log("updating DNS names for $boxname");
 
