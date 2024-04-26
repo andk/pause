@@ -47,6 +47,7 @@ requires 'Plack::Middleware::ReverseProxy';
 requires 'Plack::Middleware::ServerStatus::Tiny';
 requires 'Process::Status';
 requires 'Set::Crontab';
+requires 'Starman';
 requires 'String::Random';
 requires 'Text::Format';
 requires 'Text::Markdown::Hoedown';
