@@ -1,4 +1,17 @@
 #!/usr/bin/perl
+
+# Normally, you won't run this program by hand.  Instead, it's run indirectly
+# by mkpause, which is run by a human.  mkpause will create a new VM, copy
+# selfconfig-root to it, and remotely run that program as root.
+# selfconfig-root, in turn, will create a low-privilege user (pause) and run
+# *this* program on the VM.
+#
+# This program's job is to install the Perl environment needed for PAUSE
+# and then to configure PAUSE for operation on this VM.
+#
+# For higher-level and more detailed view, check out the README in this
+# directory.
+
 use v5.36.0;
 
 use Carp qw(croak);

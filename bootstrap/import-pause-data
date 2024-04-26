@@ -1,4 +1,12 @@
 #!/bin/bash
+
+# This program is meant to be run on a just-installed bootstrapped PAUSE host.
+# It expects that you've gotten MySQL dumps from ../cron/mysql-dump.pl,
+# preferably using --extended-insert, and put them in the current working
+# directory.  It will stop indexing, import all the files from PAUSE, and then
+# also all the database content.  Then it starts things back up.  This can be
+# used for testing operations on "real" data, but is also a useful step in
+# transitioning to a new PAUSE install in production.
 if [ $UID != "0" ]; then
   echo "import-mod-db is meant to be run as root" >&2
   exit 1;

@@ -1,4 +1,15 @@
 #!/usr/bin/env perl
+
+# If you're building a test PAUSE to test this automation, this is the place to
+# start.  This program requires a DigitalOcean API token, which is used to
+# create a VM.  This program then copies `selfconfig-root` to that VM and runs
+# it.  `selfconfig-root` will install packages, create users, and configure
+# services.  One of the created users is `pause`, which will be used to run the
+# `selfconfig-pause` program found in this directory.
+#
+# For higher-level and more detailed view, check out the README in this
+# directory.
+
 use v5.36.0;
 
 use lib 'lib';

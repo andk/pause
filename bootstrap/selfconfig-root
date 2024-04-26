@@ -1,4 +1,18 @@
 #!/usr/bin/perl
+
+# Normally, you won't run this program by hand.  Instead, it's run by mkpause,
+# which is run by a human.  mkpause will create a new VM, copy this program to
+# it, and then remotely execute this program as root.
+#
+# This program's job is to set up the remote machine to become a PAUSE.  It
+# installs the needed packages, creates needed unix accounts, sets up and
+# starts services, and also runs the selfconfig-pause program.
+# selfconfig-pause is found right next to this selfconfig-root in the PAUSE
+# repository, and runs as the pause user.
+#
+# For higher-level and more detailed view, check out the README in this
+# directory.
+
 use v5.36.0;
 use warnings;
 
