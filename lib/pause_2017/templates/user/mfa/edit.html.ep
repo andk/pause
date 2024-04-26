@@ -1,0 +1,59 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $cpan_alias = lc($pause->{HiddenUser}{userid}) . '@cpan.org';
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (flash('mfa_enabled')) {
+<div class="messagebox info">
+<p><b>Multifactor Authentication is enabled.</b></p>
+<p>Recovery codes:</p>
+<code>
+<ul>
+% for my $code (@{ flash('recovery_codes') }) {
+<li><%= $code %>
+% }
+</ul>
+</code>
+<p>Please write down these codes, as they will not show again.</p>
+</div>
+% } elsif (flash('mfa_disabled')) {
+<div class="messagebox info">
+<p>Multifactor Authentication is disabled.</p>
+</div>
+% }
+
+<h3><% if (!$pause->{HiddenUser}{mfa}) { %>Enable<% } else { %>Disable<% } %> Multifactor Authentication for <%= $pause->{HiddenUser}{userid} %>
+% if (exists $pause->{UserGroups}{admin}) {
+ (lastvisit <%= $pause->{HiddenUser}{lastvisit} || "before 2005-12-02" %>)
+% }
+</h3>
+
+% if (my $error = $pause->{error}) {
+<div class="messagebox error">
+<b>ERROR</b>:
+%   if ($error->{invalid_code}) {
+Verification Code is invalid.
+%   }
+</div>
+<hr>
+% }
+% if (!$pause->{HiddenUser}{mfa}) {
+<div>
+<p>Submit 6-digit code to enable Multifactor Authentication.</p>
+<img src="<%= $pause->{mfa_qrcode} %>">
+</div>
+% } else {
+<p>Submit 6-digit code to disable Multifactor Authentication.</p>
+<%= hidden_field "pause99_mfa_reset" => 1 %>
+% }
+
+<div>
+<p>CODE: <%= text_field "pause99_mfa_code" => '',
+    size => 10,
+    maxlength => 10,
+%>
+<input type="submit" name="pause99_mfa_sub" value="Submit"></p>
+</div>
+
+%= csrf_field
