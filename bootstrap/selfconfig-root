@@ -76,9 +76,17 @@ my @required_debs = qw(
  unzip
  zlib1g-dev
  libsasl2-modules
+ ufw
 );
 
 run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y), @required_debs);
+
+# Some packages we just don't want.
+my @unwanted_debs = qw(
+  firewalld
+);
+
+run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 remove -y), @unwanted_debs);
 
 require Getopt::Long::Descriptive;
 
@@ -230,6 +238,13 @@ Path::Tiny::path("/etc/nginx/sites-available/$hostname")->spew($nginx_config);
 unlink('/etc/nginx/sites-enabled/default');
 symlink("/etc/nginx/sites-available/$hostname", "/etc/nginx/sites-enabled/$hostname")
   or die "can't symlink nginx conf: $!";
+
+# Firewall config
+run_cmd(qw(ufw allow http));
+run_cmd(qw(ufw allow https));
+run_cmd(qw(ufw allow rsync));
+run_cmd(qw(ufw allow ssh));
+run_cmd(qw(ufw --force enable));
 
 # Install ssl cert
 run_cmd(
