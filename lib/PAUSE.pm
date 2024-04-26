@@ -33,7 +33,6 @@ if ($USE_RECENTFILE_HOOKS) {
     die "Did not find Recentfile library!";
   }
 }
-our $IS_PAUSE_US = Sys::Hostname::hostname =~ /pause2/ ? 1 : 0;
 
 use v5.12.0;
 use vars qw(@ISA @EXPORT_OK $VERSION $Config $Id);
@@ -81,9 +80,7 @@ $PAUSE::Config ||=
      AUTHEN_PASSWORD_FLD => "password",
      AUTHEN_USER_FLD => "user",
      AUTHEN_USER_TABLE => "usertable",
-     AUTHEN_BACKUP_DIR => $IS_PAUSE_US
-     ? '/home/puppet/pause-var/backup'
-     : '/home/k/PAUSE/111_sensitive/backup',
+     AUTHEN_BACKUP_DIR => '/home/puppet/pause-var/backup',
      BZCAT_PATH => (List::Util::first { -x $_ } ("/bin/bzcat", "/usr/bin/bzcat" )),
      BZIP2_PATH => (List::Util::first { -x $_ } ("/bin/bzip2", "/usr/bin/bzip2" )),
      CPAN_TESTERS => qq(cpan-uploads\@perl.org), # cpan-uploads is a mailing list, BINGOS relies on it
@@ -95,26 +92,26 @@ $PAUSE::Config ||=
      GONERS_NOTIFY => qq{gbarr\@search.cpan.org},
      GZIP_OPTIONS => '--best --rsyncable',
      GZIP_PATH => (List::Util::first { -x $_ } ("/bin/gzip", "/usr/bin/gzip" )),
-     HOME => $IS_PAUSE_US ? '/home/puppet/' : '/home/k/',
-     CRONPATH => $IS_PAUSE_US ? '/home/puppet/pause/cron' : '/home/k/pause/cron',
+     HOME => '/home/puppet/',
+     CRONPATH => '/home/puppet/pause/cron',
      HTTP_ERRORLOG => '/usr/local/apache/logs/error_log', # harmless use in cron-daily
-     INCOMING => $IS_PAUSE_US ? 'ftp://localhost/incoming/' : 'ftp://pause.perl.org/incoming/',
+     INCOMING => 'ftp://localhost/incoming/',
      INCOMING_LOC => '/home/ftp/incoming/',
      MAIL_MAILER => ["sendmail"],
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
      MIRRORED_BY_URL => "ftp://ftp.funet.fi/pub/languages/perl/CPAN/MIRRORED.BY",
      MLROOT => '/home/ftp/pub/PAUSE/authors/id/', # originally module list root
-     ML_CHOWN_USER  => $IS_PAUSE_US ? qq{pause-unsafe} : qq{UNSAFE},
-     ML_CHOWN_GROUP => $IS_PAUSE_US ? qq{pause-unsafe} : qq{UNSAFE},
+     ML_CHOWN_USER  => qq{pause-unsafe},
+     ML_CHOWN_GROUP => qq{pause-unsafe},
      ML_MIN_INDEX_LINES => 1_000, # 02packages must be this long
      ML_MIN_FILES => 20_000, # must be this many files to run mldistwatch
      MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
      NO_SUCCESS_BREAK => 900,
      P5P => 'release-announce@perl.org',
      PID_DIR => "/var/run/",
-     PAUSE_LOG => $IS_PAUSE_US ? "/var/log/paused.log" : "/home/k/PAUSE/log/paused.log",
-     PAUSE_LOG_DIR => $IS_PAUSE_US ? "/var/log" : "/home/k/PAUSE/log/",
+     PAUSE_LOG => "/var/log/paused.log",
+     PAUSE_LOG_DIR => "/var/log",
      PAUSE_PUBLIC_DATA => '/home/ftp/pub/PAUSE/PAUSE-data',
      PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
      PUB_MODULE_URL => 'http://www.cpan.org/authors/id/',
@@ -216,14 +213,10 @@ Hint: I like to use date to determine a timestamp in the future
 =cut
 
 sub downtimeinfo {
-  return $IS_PAUSE_US ? +{
-                          downtime => 1357374600,
-                          willlast => 5400,
-                         }
-      : +{
-          downtime => 1357374600,
-          willlast => 5400,
-         };
+  return +{
+    downtime => 1357374600,
+    willlast => 5400,
+  };
 }
 
 sub filehash {
