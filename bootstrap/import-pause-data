@@ -26,7 +26,7 @@ touch /etc/PAUSE.CLOSED
 
 systemctl stop paused
 
-sudo -u pause rsync --progress -av pause.perl.org::PAUSE/ /home/pause/pub/PAUSE/
+sudo -u pause rsync --progress -av pause.perl.org::PAUSE/ /data/pause/pub/PAUSE/
 
 echo 'SET GLOBAL innodb_flush_log_at_trx_commit=2' | mysql
 
