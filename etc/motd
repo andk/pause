@@ -1,0 +1,16 @@
+
+welcome     oooooooooo   o    ooooo  oooo oooooooo8 ooooooooooo
+     to      888    888 888    888    88 888         888    88
+             888oooo88 8  88   888    88  888oooooo  888ooo8
+             888      8oooo88  888    88         888 888    oo
+            o888o   o88o  o888o 888oo88  o88oooo888 o888ooo8888
+
+    You're probably here to check whether things are working, or to deploy
+    and update to PAUSE.  For more information on doing this stuff, check the
+    docs: https://github.com/andk/pause/tree/master/doc
+
+    They're not thorough yet, but they will get better.
+
+    To act as the pause user, remember to run: sudo -u pause -i
+
+
