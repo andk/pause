@@ -21,7 +21,6 @@ PAUSE_ROOT=/data/pause/pub/PAUSE
 37 05 * * *           pause  $PAUSE_REPO/cron/gmls-lR.pl
 47 07,13,19,01 * * *  pause  $PAUSE_REPO/cron/mysql-dump.pl
 21 */6 * * *          pause  $PAUSE_REPO/cron/rm_stale_links
-23 07,13,19,01 * * *  pause  $PAUSE_REPO/cron/run_mirrors.sh
 22 * * * *            pause  $PAUSE_REPO/cron/sync-04pause.pl
 10 09,15,21,03 * * *  pause  cd $PAUSE_ROOT/PAUSE-git && (git gc && git push -u origin master) >> /home/pause/log/git-gc-push.out
 18 * * * *            pause  $PAUSE_REPO/cron/cron-p6daily.pl
