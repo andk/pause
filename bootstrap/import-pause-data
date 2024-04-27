@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# This program is meant to be run on a just-installed bootstrapped PAUSE host.
+# It expects that you've gotten MySQL dumps from ../cron/mysql-dump.pl,
+# preferably using --extended-insert, and put them in the current working
+# directory.  It will stop indexing, import all the files from PAUSE, and then
+# also all the database content.  Then it starts things back up.  This can be
+# used for testing operations on "real" data, but is also a useful step in
+# transitioning to a new PAUSE install in production.
+if [ $UID != "0" ]; then
+  echo "import-mod-db is meant to be run as root" >&2
+  exit 1;
+fi
+
+if [ ! -e "moddump.current.bz2" -o ! -e "authen_pausedump.current.bz2" ]; then
+  # The code used to do this:
+  #   rsync -vaP pause.perl.org::pausedata/moddump.current.bz2 .
+  #
+  # ...but this only gets the moddump, and really we are going to need authen
+  # also.
+  echo "both moddump.current.bz2 and authen_pausedump.current.bz2 must be in cwd" >&2
+  exit 1;
+fi
+
+touch /etc/PAUSE.CLOSED
+
+systemctl stop paused
+
+sudo -u pause rsync --progress -av pause.perl.org::PAUSE/ /data/pause/pub/PAUSE/
+
+echo 'SET GLOBAL innodb_flush_log_at_trx_commit=2' | mysql
+
+bunzip2 moddump.current.bz2
+
+pv moddump.current | \
+  perl -ple 's/^CHANGE MASTER.*//' | \
+  sudo mysql mod
+
+bunzip2 authen_pausedump.current.bz2
+
+pv authen_pausedump.current | \
+  perl -ple 's/^CHANGE MASTER.*//' | \
+  sudo mysql authen_pause
+
+echo 'SET GLOBAL innodb_flush_log_at_trx_commit=1' | mysql
+
+systemctl start paused
+
+rm /etc/PAUSE.CLOSED

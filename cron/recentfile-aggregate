@@ -1,0 +1,25 @@
+#!/home/pause/.plenv/shims/perl
+use v5.36.0;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use PAUSE;
+use Path::Tiny;
+
+my $PAUSE_ROOT = $PAUSE::Config->{FTPPUB};
+
+die "FTPPUB directory ($PAUSE_ROOT) isn't there!\n"
+  unless -d $PAUSE_ROOT;
+
+my $root = path($PAUSE_ROOT);
+
+system(
+  '/home/pause/.plenv/shims/rrr-aggregate',
+  $root->child('authors/RECENT-1h.yaml'),
+);
+
+system(
+  '/home/pause/.plenv/shims/rrr-aggregate',
+  $root->child('modules/RECENT-1h.yaml'),
+);

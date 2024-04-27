@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+
+# Normally, you won't run this program by hand.  Instead, it's run indirectly
+# by mkpause, which is run by a human.  mkpause will create a new VM, copy
+# selfconfig-root to it, and remotely run that program as root.
+# selfconfig-root, in turn, will create a low-privilege user (pause) and run
+# *this* program on the VM.
+#
+# This program's job is to install the Perl environment needed for PAUSE
+# and then to configure PAUSE for operation on this VM.
+#
+# For higher-level and more detailed view, check out the README in this
+# directory.
+
+use v5.36.0;
+
+use Carp qw(croak);
+use Getopt::Long::Descriptive;
+use Path::Tiny;
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'authuser-pw=s', "password for auth user",  { required => 1 } ],
+  [ 'moduser-pw=s',  "password for mod user",   { required => 1 } ],
+);
+
+if (-e '/tmp/plenv-tarball.tar.bz2') {
+  chdir("/home/pause") or die "can't chdir to ~pause: $!";
+
+  # Somebody helpfully gave us a plenv directory to start from!  Let's use it.
+  run_cmd(qw(tar jxvf /tmp/plenv-tarball.tar.bz2));
+
+  path("/home/pause/.bash_profile")->append(<<~'END');
+    export PATH="$HOME/.plenv/bin:$PATH"
+    eval "$(plenv init -)"
+    END
+} else {
+  chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
+
+  # install plenv so we can manage a local perl version
+  run_cmd(qw(
+    git clone https://github.com/tokuhirom/plenv.git /home/pause/.plenv
+  ));
+
+  path("/home/pause/.bash_profile")->append(<<~'END');
+    export PATH="$HOME/.plenv/bin:$PATH"
+    eval "$(plenv init -)"
+    END
+
+  # install perl-build so we can build a new perl
+  run_cmd(qw(
+    git clone https://github.com/tokuhirom/Perl-Build.git
+      /home/pause/.plenv/plugins/perl-build/
+  ));
+
+  run_cmd(qw( /home/pause/.plenv/bin/plenv install 5.36.0 -j 16 --noman ));
+  run_cmd(qw( /home/pause/.plenv/bin/plenv global  5.36.0 ));
+
+  # install cpanm for perl dep management
+  run_cmd(qw( /home/pause/.plenv/bin/plenv install-cpanm ));
+
+  # Pin DBD::mysql to 4.050. Newer doesn't work for some reason
+  # last I knew (mariadb problems?). And 4.052 breaks reconnecting
+  # after calls to disconnect, so we can't use that. 4.050 is what
+  # is in pause2 right now, so this should be fine.
+  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n DBD::mysql@4.050 ));
+
+  run_cmd(qw( /home/pause/.plenv/shims/cpanm -n --installdeps . ));
+}
+
+chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
+
+for my $dir (qw(
+  /data/pause/ftp
+  /data/pause/pub
+  /data/pause/incoming
+  /data/pause/tmp
+)) {
+  Path::Tiny::path($dir)->mkdir;
+}
+
+# Set up pause config
+for my $path (qw(
+  /data/pause/pub/PAUSE/authors/id
+  /data/pause/pub/PAUSE/modules
+  /data/pause/pub/PAUSE/PAUSE-git
+
+  /home/pause/log
+  /home/pause/pause-private/lib
+  /home/pause/pid
+  /home/pause/run
+  /home/pause/testmail
+  /tmp/pause_1999
+)) {
+  path($path)->mkdir;
+}
+
+chdir("/data/pause/pub/PAUSE/PAUSE-git")
+  || die "couldn't chdir to PAUSE-git: $!";
+
+run_cmd(qw(git config --global user.email pause@pause.perl.org));
+run_cmd(qw(git config --global user.name), 'PAUSE Daemon');
+run_cmd(qw(git init --initial-branch master ));
+
+{
+  # This imports a test key, which nobody should trust, and which has key id
+  # 6BA1716EFB099DB2. -- rjbs, 2024-04-25
+  path("/home/pause/pause-private/gnupg-pause-batch-signing-home")
+    ->mkdir
+    ->chmod(0700);
+
+  run_cmd(qw(
+    gpg
+      --homedir /home/pause/pause-private/gnupg-pause-batch-signing-home
+      --import
+      --armor /home/pause/pause/bootstrap/test-key.txt
+  ));
+}
+
+my $config_file_contents = <<~'END';
+  use strict;
+  package PAUSE;
+
+  $ENV{EMAIL_SENDER_TRANSPORT} = 'Maildir';
+  $ENV{EMAIL_SENDER_TRANSPORT_dir} = '/home/pause/testmail';
+
+  our $Config;
+  $Config->{AUTHEN_BACKUP_DIR}        = "/home/pause/db-backup";
+
+  $Config->{AUTHEN_DATA_SOURCE_USER}  = "authuser";
+  $Config->{AUTHEN_DATA_SOURCE_PW}    = "%%AUTHUSER_PW%%";
+
+  $Config->{MOD_DATA_SOURCE_USER}     = "moduser";
+  $Config->{MOD_DATA_SOURCE_PW}       = "%%MODUSER_PW%%";
+
+  $Config->{MAIL_MAILER}              = ["testfile"];
+  $Config->{RUNDATA}                  = "/tmp/pause_1999";
+
+  $Config->{CHECKSUMS_SIGNING_PROGRAM} = "gpg";
+  $Config->{CHECKSUMS_SIGNING_ARGS}    = '--homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ';
+  $Config->{CHECKSUMS_SIGNING_KEY}     = '6BA1716EFB099DB2';
+
+  $Config->{CRONPATH} = '/home/pause/pause/cron/';
+
+  $Config->{FTPPUB} = '/data/pause/pub/PAUSE/';
+  $Config->{GITROOT} = '/data/pause/pub/PAUSE/PAUSE-git';
+  $Config->{HTTP_ERRORLOG} = '/var/log/nginx/error.log';
+  $Config->{INCOMING} = "file://data/pause/incoming/";
+  $Config->{INCOMING_LOC} = '/data/pause/incoming';
+  $Config->{MLROOT} = '/data/pause/pub/PAUSE/authors/id/';
+  $Config->{ML_CHOWN_USER}  = 'unsafe';
+  $Config->{ML_CHOWN_GROUP} = 'unsafe';
+  $Config->{ML_MIN_FILES} = 1;
+  $Config->{ML_MIN_INDEX_LINES} = 0;
+  $Config->{PAUSE_LOG} = "/home/pause/log/paused.log";
+  $Config->{PAUSE_LOG_DIR} = "/home/pause/log/";
+  $Config->{PAUSE_PUBLIC_DATA} = '/data/pause/pub/PAUSE/PAUSE-data';
+  $Config->{PID_DIR} = "/home/pause/pid/";
+  $Config->{TMP} = "/data/pause/tmp/";
+  END
+
+$config_file_contents =~ s/%%AUTHUSER_PW%%/$opt->authuser_pw/e;
+$config_file_contents =~ s/%%MODUSER_PW%%/$opt->moduser_pw/e;
+path("/home/pause/pause-private/lib/PrivatePAUSE.pm")->spew($config_file_contents);
+
+sub run_cmd (@args) {
+  system {$args[0]} @args;
+
+  croak "failed to run $args[0]" if $?;
+}

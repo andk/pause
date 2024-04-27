@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/home/pause/.plenv/shims/perl
 
 =comment
 
@@ -18,6 +18,7 @@ use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 use File::Compare qw(compare);
 use strict;
+use warnings;
 
 chdir $PAUSE::Config->{FTPPUB} or die "Could not chdir to $PAUSE::Config->{FTPPUB}: $!";
 mkdir "indexes", 0755 unless -d "indexes";

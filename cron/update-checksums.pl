@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/home/pause/.plenv/shims/perl
 
 # use 5.010;
 use strict;
@@ -60,7 +60,7 @@ use Getopt::Long;
 use Hash::Util qw(lock_keys);
 use Pod::Usage;
 
-my $lockfile = "/var/run/PAUSE-update-checksums.LCK";
+my $lockfile = "/home/pause/run/PAUSE-update-checksums.LCK";
 use Fcntl qw( :flock :seek O_RDONLY O_RDWR O_CREAT );
 my $lfh;
 unless (open $lfh, "+<", $lockfile) {

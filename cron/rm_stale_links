@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w -- -*- mode: cperl -*-
+#!/home/pause/.plenv/shims/perl
 
 =pod
 
@@ -18,16 +18,29 @@ use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
 use strict;
+use warnings;
 
 use File::Find;
 use File::Spec;
 chdir "$PAUSE::Config->{MLROOT}../..";
+
+my %KEEP_FOREVER = (
+  # No matter what, do not delete these paths!  For an example of why this is
+  # interesting, imagine a freshly installed PAUSE that has no files uploaded
+  # yet.  Without protecting authors/id, it could be deleted.  Later, something
+  # will try to upload authors/id/X/XY/XYZZY/Foo-1.23.tar.gz, but it can't,
+  # because authors/id has been removed.  Possibly it should be willing to
+  # create the full tree, but right now, it can't.  So, we will avoid deleting
+  # it instead.
+  'authors/id' => 1,
+);
 
 find(
      {
       bydepth => 1,
       wanted => sub {
         return if /^\.\.?$/;
+        return if $KEEP_FOREVER{ $File::Find::name };
         my($dev,$ino,$mode,$nlink,$uid,$gid) = lstat($_);
         if (-l $_ && ! -e $_){
           warn "unlinking stale $File::Find::name\n";

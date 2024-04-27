@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/home/pause/.plenv/shims/perl
 
 =pod
 
@@ -15,6 +15,7 @@ After extended-insert:
 =cut
 
 use strict;
+use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -41,7 +42,6 @@ my $Struct = [
                cfg_dsn => "MOD_DATA_SOURCE_NAME",
                cfg_user => "MOD_DATA_SOURCE_USER",
                cfg_pw => "MOD_DATA_SOURCE_PW",
-               master => 1,
               },
               {backupdir => $PAUSE::Config->{AUTHEN_BACKUP_DIR},
                cfg_dsn => "AUTHEN_DATA_SOURCE_NAME",

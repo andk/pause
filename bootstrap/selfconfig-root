@@ -1,0 +1,425 @@
+#!/usr/bin/perl
+
+# Normally, you won't run this program by hand.  Instead, it's run by mkpause,
+# which is run by a human.  mkpause will create a new VM, copy this program to
+# it, and then remotely execute this program as root.
+#
+# This program's job is to set up the remote machine to become a PAUSE.  It
+# installs the needed packages, creates needed unix accounts, sets up and
+# starts services, and also runs the selfconfig-pause program.
+# selfconfig-pause is found right next to this selfconfig-root in the PAUSE
+# repository, and runs as the pause user.
+#
+# For higher-level and more detailed view, check out the README in this
+# directory.
+
+use v5.36.0;
+use warnings;
+
+use Carp qw(croak);
+
+# If we don't have a term debconf gets angry
+$ENV{TERM} //= 'xterm';
+
+# On DigitalOcean, the journal won't be journaling at startup.  Why?  Well, I
+# want to swear and say "because systemd!" but there seems to be an interesting
+# reason, related to the machine id being baked into the image and then not
+# matching that on the new cloud instance.  I don't quite follow it.
+#
+# References:
+# * https://unix.stackexchange.com/a/538881
+# * https://serverfault.com/a/1058260
+#
+# Since we won't (??) be using DO for this in real work, I'm not trying to
+# really fix it, I just want it logging before we start doing work.  This will
+# do the trick:
+run_cmd(qw( systemctl restart systemd-journald.service ));
+
+# Don't run apt-get update if apt is already busy. We need to wait or we'll
+# fail to update. Also wait for /var/lib/dpkg/lock-frontend
+for my $try (1..30) {
+  system(
+    "fuser /var/lib/apt/lists/lock >/dev/null 2>/dev/null"
+  );
+
+  my $exit = $? >> 8;
+  last if $exit;
+
+  warn "apt running, waiting 1s, try $try/30\n";
+
+  sleep 1;
+}
+
+run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 update));
+
+# Install system deps:
+#
+# Note that rjbs has been somewhat obnoxiously clever, below.  Here, we install
+# libpath-tiny-perl.  That's Path::Tiny.  Later in this very program, we will
+# load and use this module.  What a yutz. -- rjbs, 2024-03-23
+#
+# Same goes for libgetopt-long-descriptive-perl.  Yutz and proud.
+# -- rjbs, 2024-04-05
+my @required_debs = qw(
+ build-essential
+ certbot
+ git
+ libdb-dev
+ libexpat1-dev
+ libgetopt-long-descriptive-perl
+ libpath-tiny-perl
+ libssl-dev
+ nginx
+ python3-certbot-nginx
+ unzip
+ zlib1g-dev
+ libsasl2-modules
+ ufw
+);
+
+run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y), @required_debs);
+
+# Some packages we just don't want.
+my @unwanted_debs = qw(
+  firewalld
+);
+
+run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 remove -y), @unwanted_debs);
+
+require Getopt::Long::Descriptive;
+
+my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
+  '%c %o',
+  [ "host=s", "the hostname being used for this install", { required => 1 } ],
+  [ "user=s", "username for PAUSE admin to create",       { required => 1 } ],
+  [ "pass=s", "password for PAUSE admin to create",       { required => 1 } ],
+  [],
+  [ 'plenv-url=s', "curl-able URL to a tar.bz2 archive of a .plenv" ],
+  [],
+  [ 'certbot-staging|C', 'use the staging version of certbot' ],
+  [],
+  [ "enable-mail|m", "enable working postfix config",         ],
+  [ 'relay-host=s',   "relay host for smtp" ],
+  [ 'relay-port=s',   "relay port for smtp" ],
+  [ 'relay-username=s', "relay sasl username for smtp" ],
+  [ 'relay-password=s', "relay sasl password for smtp" ],
+  [ 'volume-group=s', "volume group for data" ],
+);
+
+my @mopts = qw(relay_host relay_port relay_username relay_password);
+
+if ($opt->enable_mail) {
+  my @m;
+
+  for my $setting (@mopts) {
+    push @m, $setting unless $opt->$setting;
+  }
+
+  $_ =~ s/_/-/g for @m;
+
+  die "--enable-mail requires @m\n" if @m;
+}
+
+my $hostname   = $opt->host;
+my $admin_user = uc $opt->user;
+my $admin_pass = $opt->pass;
+
+# The --comment is here to suppress prompting for name, confirmation, etc.
+run_cmd(qw(adduser pause  --disabled-password --comment), 'PAUSE User');
+run_cmd(qw(adduser unsafe --disabled-password --comment), 'PAUSE Unsafe');
+
+if ($opt->plenv_url) {
+  run_cmd('curl', $opt->plenv_url, '--output', '/tmp/plenv-tarball.tar.bz2');
+}
+
+require Path::Tiny;
+
+Path::Tiny::path("/data/mysql")->mkdir;
+
+Path::Tiny::path("/data/pause")->mkdir;
+run_cmd("chown", "pause:", "/data/pause");
+
+if (-e "/usr/sbin/lvcreate" && $opt->volume_group) {
+  my $vg = $opt->volume_group;
+  run_cmd(qw(lvcreate -L4G),  qq($vg), qw(-n mysql));
+  run_cmd(qw(lvcreate -L50G), qq($vg), qw(-n pause));
+  Path::Tiny::path("/etc/fstab")->append(<<~EOF);
+/dev/$vg/mysql            /data/mysql ext4 defaults 0 2
+/dev/$vg/pause            /data/pause ext4 defaults 0 2
+EOF
+  run_cmd(qw(systemctl daemon-reload));
+  run_cmd(qw(mkfs.ext4 -j), qq(/dev/$vg/mysql));
+  run_cmd(qw(mkfs.ext4 -j), qq(/dev/$vg/pause));
+  run_cmd(qw(mount /data/mysql));
+  run_cmd(qw(mount /data/pause));
+
+  # We have to chown *again* after mounting.  We don't *only* chown here
+  # because we only enter this branch when --volume-group was passed!
+  run_cmd("chown", "pause:", "/data/pause");
+}
+
+# Partitioning!
+Path::Tiny::path("/data/mysql/mysql")->mkdir;
+
+run_cmd(qw(ln -s /data/mysql/mysql /var/lib/mysql));
+
+# Mariadb has to be installed _after_ partitioning.
+run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
+        qw(
+            mariadb-server
+            default-libmysqlclient-dev
+        ));
+
+run_cmd(qw(
+  sudo -u pause git clone -b unpause https://git@github.com/rjbs/pause/ /home/pause/pause
+));
+
+# set up mysql databases and our pause user
+run_cmd(qw(mysqladmin CREATE mod));
+run_sh('mysql mod < ~pause/pause/doc/mod.schema.txt');
+
+run_cmd(qw(mysqladmin CREATE authen_pause));
+run_sh('mysql -u root authen_pause < ~pause/pause/doc/authen_pause.schema.txt');
+
+run_cmd(qw(mysql mod -e), "INSERT INTO users (userid) VALUES ('$admin_user')");
+
+my $crypted_pass = crypt $admin_pass, chr(rand(26)+97) . chr(rand(26)+97);
+
+run_cmd(
+  qw(mysql authen_pause -e),
+  "INSERT INTO usertable (user, password) VALUES ('$admin_user', '$crypted_pass')",
+);
+
+run_cmd(
+  qw(mysql authen_pause -e),
+  "INSERT INTO grouptable (user, ugroup) VALUES ('$admin_user', 'admin')",
+);
+
+my %db_password_for = (
+  authuser  => undef,
+  moduser   => undef,
+);
+
+{
+  my sub rand_pw {
+    # Generates strings kinda like this one: b9l12-r5y9s-uc609-zey9q-61vjd
+    my @chars = (0..9, 'a' .. 'z');
+    my $pw = join q{-},
+      map {; join q{}, map {; $chars[ rand @chars ] } (1..5) }
+      (1..5);
+
+    return $pw;
+  }
+
+  for my $user (sort keys %db_password_for) {
+    $db_password_for{$user} = rand_pw();
+
+    run_cmd(
+      qw(mysql -e),
+      qq{CREATE USER $user IDENTIFIED BY '$db_password_for{$user}'},
+    );
+  }
+}
+
+run_cmd(
+  qw(mysql -e),
+  q{GRANT DELETE, INDEX, INSERT, SELECT, UPDATE, LOCK TABLES ON `mod`.* TO 'moduser'@'%';},
+);
+
+run_cmd(
+  qw(mysql -e),
+  q{GRANT DELETE, INDEX, INSERT, SELECT, UPDATE, LOCK TABLES ON `authen_pause`.* TO 'authuser'@'%';},
+);
+
+run_cmd(
+  qw(mysql -e),
+  q{GRANT BINLOG MONITOR, RELOAD ON *.* TO 'moduser'@'%';},
+);
+
+run_cmd(
+  qw(mysql -e),
+  q{GRANT BINLOG MONITOR, RELOAD ON *.* TO 'authuser'@'%';},
+);
+
+my $nginx_config = <<~"END";
+# Set up nginx conf
+upstream pause {
+    server 127.0.0.1:5000;
+}
+
+server {
+  listen 80 default_server;
+
+  location / {
+     proxy_pass http://pause;
+     proxy_set_header X-Forwarded-Host \$host;
+     proxy_set_header X-Forwarded-Server \$host;
+     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+     proxy_set_header X-Forwarded-Proto \$scheme;
+
+     proxy_pass_request_headers on;
+     proxy_no_cache \$cookie_nocache  \$arg_nocache\$arg_comment;
+     proxy_no_cache \$http_pragma     \$http_authorization;
+     proxy_cache_bypass \$cookie_nocache \$arg_nocache \$arg_comment;
+     proxy_cache_bypass \$http_pragma \$http_authorization;
+     proxy_pass_header Authorization;
+  }
+
+  server_name $hostname;
+}
+END
+
+Path::Tiny::path("/etc/nginx/sites-available/$hostname")->spew($nginx_config);
+
+unlink('/etc/nginx/sites-enabled/default');
+symlink("/etc/nginx/sites-available/$hostname", "/etc/nginx/sites-enabled/$hostname")
+  or die "can't symlink nginx conf: $!";
+
+# Firewall config
+run_cmd(qw(ufw allow http));
+run_cmd(qw(ufw allow https));
+run_cmd(qw(ufw allow rsync));
+run_cmd(qw(ufw allow ssh));
+run_cmd(qw(ufw --force enable));
+
+# Install ssl cert
+run_cmd(
+  qw(sudo certbot --nginx -d),
+  $hostname,
+  qw(--agree-tos -n --email pause@pause.perl.org),
+
+  # This will use the staging server, which can be used to make lots more
+  # certificates that usual, but they aren't trusted.
+  ($opt->certbot_staging
+    ? ( qw( --server https://acme-staging-v02.api.letsencrypt.org/directory ) )
+    : ()),
+);
+
+Path::Tiny::path("/etc/rsyncd.conf")->spew(<<~'END');
+  # cat rsyncd.conf
+  max connections = 12
+  log file = /var/log/rsyncd
+  pid file = /var/run/PAUSE-rsyncd.pid
+  transfer logging = true
+  use chroot = true
+  timeout = 600
+
+  [PAUSE]
+  path = /data/pause/pub/PAUSE
+
+  [authors]
+  path = /data/pause/pub/PAUSE/authors
+
+  [modules]
+  path = /data/pause/pub/PAUSE/modules
+
+  [scripts]
+  path = /data/pause/pub/PAUSE/scripts/new
+
+  [pausedata]
+  path = /data/pause/pub/PAUSE/PAUSE-data
+
+  [pausecode]
+  path = /data/pause/pub/PAUSE/PAUSE-code
+
+  [pausegit]
+  path = /data/pause/pub/PAUSE/PAUSE-git
+  END
+
+run_cmd(
+  qw( sudo -u pause ),
+  "/home/pause/pause/bootstrap/selfconfig-pause",
+  "--authuser-pw", $db_password_for{authuser},
+  "--moduser-pw",  $db_password_for{moduser},
+);
+
+# XXX: I would like to not have or need this! -- rjbs, 2024-04-27
+run_cmd(qw(ln -s /data/pause /home/ftp));
+
+Path::Tiny::path("/home/pause/pause/cron/CRONTAB.ROOT")->copy("/etc/cron.d/pause");
+
+if ($opt->enable_mail) {
+  my $relayhost = $opt->relay_host;
+  my $relayport = $opt->relay_port;
+
+  system(
+    q{echo postfix postfix/main_mailer_type select "Internet with smarthost" | debconf-set-selections}
+  );
+  croak "failed to update debconf for main_mailer_type" if $?;
+
+  system(
+    qq{echo postfix postfix/mailname string $hostname | debconf-set-selections}
+  );
+  croak "failed to update debconf for mailname" if $?;
+
+  system(
+    qq{echo postfix postfix/relayhost string \\[$relayhost\\]:$relayport | debconf-set-selections}
+  );
+  croak "failed to update debconf for mailname" if $?;
+
+  run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y postfix));
+
+  my $cf = Path::Tiny::path("/home/pause/pause/etc/puppet/modules/pause/files/etc/postfix/main.cf-pause-us");
+
+  my $maincf = $cf->slurp_raw;
+  $maincf =~ s{daemon_directory = /usr/libexec/postfix}{daemon_directory = /usr/lib/postfix/sbin}
+    or warn "!!! Failed to replace daemon_directory !!!\n\n";
+  $maincf =~ s{inet_interfaces = all}{inet_interfaces = localhost}
+    or warn "!!! Failed to replace inet_interfaces !!!\n\n";
+
+  $maincf .= <<~EOF;
+    relayhost = [$relayhost]:$relayport
+
+    smtp_sasl_auth_enable = yes
+    smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+    smtp_sasl_security_options =
+    smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+    smtp_use_tls = yes
+    smtp_tls_wrappermode = yes
+    smtp_tls_security_level = encrypt
+    EOF
+
+  Path::Tiny::path("/etc/postfix/main.cf")->spew_raw($maincf);
+
+  my ($user, $pass) = ($opt->relay_username, $opt->relay_password);
+
+  Path::Tiny::path("/etc/postfix/sasl_passwd")->spew_raw(<<~EOF);
+    [$relayhost]:$relayport $user:$pass
+    EOF
+
+  run_cmd(qw(chmod 600 /etc/postfix/sasl_passwd));
+  run_cmd(qw(postmap /etc/postfix/sasl_passwd));
+
+  run_cmd(qw( postfix stop ));
+  run_cmd(qw( postfix start ));
+}
+
+for my $service (qw( paused pause-web )) {
+  Path::Tiny::path("/home/pause/pause/services/$service.service")
+    ->copy("/etc/systemd/system/$service.service");
+
+  run_cmd(qw( systemctl enable ), $service );
+  run_cmd(qw( systemctl start  ), $service );
+  run_cmd(qw( systemctl status ), $service );
+}
+
+for my $service (qw( rsync )) {
+  run_cmd(qw( systemctl enable ), $service );
+  run_cmd(qw( systemctl start  ), $service );
+  run_cmd(qw( systemctl status ), $service );
+}
+
+## SUBROUTINES GO DOWN BELOW
+## THAT'S WHY THEY'RE CALLED SUBROUTINES
+
+sub run_cmd (@args) {
+  system {$args[0]} @args;
+
+  croak "failed to run $args[0]" if $?;
+}
+
+sub run_sh ($str) {
+  system $str;
+
+  croak "failed to run shell command" if $?;
+}
