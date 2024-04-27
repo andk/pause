@@ -334,7 +334,7 @@ run_cmd(
 );
 
 # XXX: I would like to not have or need this! -- rjbs, 2024-04-27
-run_cmd(qw(ln -s /data/pause/ftp /home/ftp));
+run_cmd(qw(ln -s /data/pause /home/ftp));
 
 Path::Tiny::path("/home/pause/pause/cron/CRONTAB.ROOT")->copy("/etc/cron.d/pause");
 
