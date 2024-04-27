@@ -38,6 +38,8 @@ my ($opt, $usage) = describe_options(
     { default => $default{size} // 'g-4vcpu-16gb' } ],
   [ 'project_id=s',   "if given, a DigitalOcean project id to add the VM to",
     { default => $default{'project-id'} } ],
+  [ 'domain=s',       "the DigitalOcean-managed domain for this box's name",
+    { default => $default{domain} } ],
 
   [ 'box-ident|i=s',  "identifying part of box name; defaults to --username" ],
   [],
@@ -120,7 +122,11 @@ if ($opt->enable_mail) {
   die "--enable-mail requires @m\n" if @m;
 }
 
-my $domain     = "fastmail.dev";
+unless ($opt->domain) {
+  die "No --domain passed, and no domain specified in config.\n";
+}
+
+my $domain     = $opt->domain;
 my $username   = $opt->username;
 my $boxname    = ($opt->box_ident // $username) . ".unpause";
 
