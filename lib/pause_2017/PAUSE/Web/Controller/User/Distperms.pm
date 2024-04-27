@@ -20,8 +20,8 @@ sub peek {
     my $query = qq{SELECT packages.distname,
                           GROUP_CONCAT(DISTINCT primeur.userid ORDER BY primeur.userid),
                           GROUP_CONCAT(DISTINCT perms.userid ORDER BY perms.userid)
-                   FROM packages LEFT JOIN primeur ON primeur.package=packages.package
-                                 LEFT JOIN perms ON perms.package=packages.package AND primeur.userid <> perms.userid
+                   FROM packages LEFT JOIN primeur ON primeur.lc_package=packages.lc_package
+                                 LEFT JOIN perms ON perms.lc_package=packages.lc_package AND primeur.userid <> perms.userid
                 };
 
     my $db = $mgr->connect;
@@ -127,7 +127,7 @@ sub move_dist_primary {
                   unless exists $all_dists->{$seldist};
           my $mods = $db->selectcol_arrayref(
             q{SELECT primeur.package
-              FROM primeur JOIN packages ON primeur.package = packages.package
+              FROM primeur JOIN packages ON primeur.lc_package = packages.lc_package
               WHERE packages.distname=? AND primeur.userid=?},
             undef, $seldist, $u->{userid});
           for my $selmod (@$mods) {
@@ -204,7 +204,7 @@ sub remove_dist_primary {
                   unless exists $all_dists->{$seldist};
           my $mods = $db->selectcol_arrayref(
             q{SELECT primeur.package
-              FROM primeur JOIN packages ON primeur.package = packages.package
+              FROM primeur JOIN packages ON primeur.lc_package = packages.lc_package
               WHERE packages.distname=? AND primeur.userid=?},
             undef, $seldist, $u->{userid});
           for my $selmod (@$mods) {
@@ -286,7 +286,7 @@ sub make_dist_comaint {
                   unless exists $all_dists->{$seldist};
           my $mods = $db->selectcol_arrayref(
             q{SELECT primeur.package
-              FROM primeur JOIN packages ON primeur.package = packages.package
+              FROM primeur JOIN packages ON primeur.lc_package = packages.lc_package
               WHERE packages.distname=? AND primeur.userid=?},
             undef, $seldist, $u->{userid});
           for my $selmod (@$mods) {
@@ -369,7 +369,7 @@ sub remove_dist_comaint {
           }
           my $mods = $db->selectcol_arrayref(
             q{SELECT primeur.package
-              FROM primeur JOIN packages ON primeur.package = packages.package
+              FROM primeur JOIN packages ON primeur.lc_package = packages.lc_package
               WHERE packages.distname=? AND primeur.userid=?},
             undef, $seldist, $u->{userid});
           for my $selmod (@$mods) {
@@ -434,7 +434,7 @@ sub giveup_dist_comaint {
                   unless exists $all_dists->{$seldist};
           my $mods = $db->selectcol_arrayref(
             q{SELECT perms.package
-              FROM perms JOIN packages ON perms.package = packages.package
+              FROM perms JOIN packages ON perms.lc_package = packages.lc_package
               WHERE packages.distname=? AND perms.userid=?},
             undef, $seldist, $u->{userid});
           for my $selmod (@$mods) {
@@ -489,12 +489,12 @@ sub all_pdists {
 #       LEFT JOIN primeur AS p3 ON p2.package = p3.package GROUP BY packages.distname});
   my $sth2 = $db->prepare(
     qq{SELECT packages.distname
-       FROM packages JOIN primeur ON primeur.userid = ? AND primeur.package=packages.package});
+       FROM packages JOIN primeur ON primeur.userid = ? AND primeur.lc_package=packages.lc_package});
   $sth2->execute($u->{userid});
   while (my($distname) = $mgr->fetchrow($sth2, "fetchrow_array")) {
     next if $distname eq '';
     my $owners = $db->selectcol_arrayref(
-      qq{SELECT DISTINCT(userid) FROM primeur JOIN packages ON packages.distname = ? AND primeur.package = packages.package},
+      qq{SELECT DISTINCT(userid) FROM primeur JOIN packages ON packages.distname = ? AND primeur.lc_package = packages.lc_package},
       undef, $distname);
     $all_dists{$distname} = join ',', @$owners;
   }
@@ -509,8 +509,8 @@ sub all_cdists {
   my(%all_dists);
   my $sth2 = $db->prepare(qq{SELECT packages.distname, GROUP_CONCAT(DISTINCT primeur.userid ORDER BY primeur.userid)
                              FROM packages
-                                 JOIN perms ON perms.userid = ? AND perms.package = packages.package
-                                 LEFT JOIN primeur ON packages.package = primeur.package
+                                 JOIN perms ON perms.userid = ? AND perms.lc_package = packages.lc_package
+                                 LEFT JOIN primeur ON packages.lc_package = primeur.lc_package
                              GROUP BY packages.distname});
   $sth2->execute($u->{userid});
   while (my($id, $owner) = $mgr->fetchrow($sth2, "fetchrow_array")) {
@@ -539,7 +539,7 @@ sub all_comaints {
   my $db = $mgr->connect;
   my $or = join " OR\n", map { "packages.distname='$_'" } keys %$all_dists;
   my $sth2 = $db->prepare(qq{SELECT packages.distname, userid, perms.package
-                             FROM perms LEFT JOIN packages ON perms.package = packages.package
+                             FROM perms LEFT JOIN packages ON perms.lc_package = packages.lc_package
                              WHERE userid <> '$u->{userid}' AND ( $or )
                              });
   $sth2->execute;
