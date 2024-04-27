@@ -1,18 +1,9 @@
-# MAILTO=andreas.koenig.5c1c1wmb@franz.ak.mind.de
+MAILTO=andreas.koenig.5c1c1wmb@franz.ak.mind.de
 
 PATH=/home/pause/.plenv/shims:/usr/bin:/home/pause/pause/cron
 PAUSE_REPO=/home/pause/pause
 PAUSE_ROOT=/data/pause/pub/PAUSE
 
-## STUFF RJBS DID TO PUT THIS INTO UNPAUSE:
-## * replace a bunch of paths:
-##   * /opt/perl/current/bin with /usr/bin/perl
-##   * put "perl" in front of things to use plenv perl instead of system perl
-##   * put the pause repo's cron directory in path *and use it*
-##
-## …and we will write this to /etc/cron.d/SOMETHING
-
-# ???
 * * * * *             pause  $PAUSE_REPO/cron/recentfile-aggregate
 
 # some kind of PAUSE heartbeat/health check system?
@@ -30,7 +21,6 @@ PAUSE_ROOT=/data/pause/pub/PAUSE
 37 05 * * *           pause  $PAUSE_REPO/cron/gmls-lR.pl
 47 07,13,19,01 * * *  pause  $PAUSE_REPO/cron/mysql-dump.pl
 21 */6 * * *          pause  $PAUSE_REPO/cron/rm_stale_links
-23 07,13,19,01 * * *  pause  $PAUSE_REPO/cron/run_mirrors.sh
 22 * * * *            pause  $PAUSE_REPO/cron/sync-04pause.pl
 10 09,15,21,03 * * *  pause  cd $PAUSE_ROOT/PAUSE-git && (git gc && git push -u origin master) >> /home/pause/log/git-gc-push.out
 18 * * * *            pause  $PAUSE_REPO/cron/cron-p6daily.pl
