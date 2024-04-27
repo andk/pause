@@ -190,7 +190,11 @@ run_sh('mysql mod < ~pause/pause/doc/mod.schema.txt');
 run_cmd(qw(mysqladmin CREATE authen_pause));
 run_sh('mysql -u root authen_pause < ~pause/pause/doc/authen_pause.schema.txt');
 
-run_cmd(qw(mysql mod -e), "INSERT INTO users (userid) VALUES ('$admin_user')");
+my $admin_email = "$admin_user\@example.com";
+run_cmd(
+  qw(mysql mod -e),
+  "INSERT INTO users (userid, email) VALUES ('$admin_user', '$admin_email')",
+);
 
 my $crypted_pass = crypt $admin_pass, chr(rand(26)+97) . chr(rand(26)+97);
 
