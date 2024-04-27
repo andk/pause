@@ -318,6 +318,18 @@ run_cmd(qw(ln -s /data/pause /home/ftp));
 
 Path::Tiny::path("/home/pause/pause/cron/CRONTAB.ROOT")->copy("/etc/cron.d/pause");
 
+{
+  # We want to see the MOTD when logging in, but we don't want the "Debian has no
+  # warranty" text, which is a distraction. -- rjbs, 2024-04-27
+  Path::Tiny::path("/etc/ssh/sshd_config.d/pause-motd")->spew("PrintMotd yes\n");
+  Path::Tiny::path("/etc/motd")->spew("");
+
+  Path::Tiny::path("/etc/update-motd.d/00-pause")->spew(<<~'END')->chmod('a+x');
+  #!/bin/sh
+  cat /home/pause/pause/etc/motd
+  END
+}
+
 if ($opt->enable_mail) {
   my $relayhost = $opt->relay_host;
   my $relayport = $opt->relay_port;
