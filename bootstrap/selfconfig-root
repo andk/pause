@@ -152,6 +152,10 @@ EOF
   run_cmd(qw(mkfs.ext4 -j), qq(/dev/$vg/pause));
   run_cmd(qw(mount /data/mysql));
   run_cmd(qw(mount /data/pause));
+
+  # We have to chown *again* after mounting.  We don't *only* chown here
+  # because we only enter this branch when --volume-group was passed!
+  run_cmd("chown", "pause:", "/data/pause");
 }
 
 # Partitioning!
