@@ -71,7 +71,6 @@ if (-e '/tmp/plenv-tarball.tar.bz2') {
 chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
 
 for my $dir (qw(
-  /data/pause
   /data/pause/ftp
   /data/pause/pub
   /data/pause/incoming
