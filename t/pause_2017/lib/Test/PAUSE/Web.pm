@@ -434,6 +434,7 @@ sub reset_module_fixture {
             my $userdir = _userdir($dist->{owner});
             $self->mod_db->insert("packages", {
                 package => $package,
+                lc_package => lc $package,
                 version => '0.01',
                 dist => "$userdir/$dist->{name}-0.01.tar.gz",
                 distname => $dist->{name},
@@ -443,6 +444,7 @@ sub reset_module_fixture {
             });
             $self->mod_db->insert("primeur", {
                 package => $package,
+                lc_package => lc $package,
                 userid => $dist->{owner},
             });
         }
@@ -452,6 +454,7 @@ sub reset_module_fixture {
                 for my $package (@$packages) {
                     $self->mod_db->insert("perms", {
                         package => $package,
+                        lc_package => lc $package,
                         userid => $id,
                     });
                 }
@@ -459,6 +462,7 @@ sub reset_module_fixture {
                 for my $package (@{$dist->{packages}}) {
                     $self->mod_db->insert("perms", {
                         package => $package,
+                        lc_package => lc $package,
                         userid => $comaint,
                     });
                 }
