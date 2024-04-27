@@ -435,7 +435,7 @@ sub newfile_hook {
     $rf = File::Rsync::Mirror::Recentfile->new
         (
          @common_args,
-         localroot => "/home/ftp/pub/PAUSE/authors/",
+         localroot => "/data/pause/pub/PAUSE/authors/",
          aggregator => [qw(6h 1d 1W 1M 1Q 1Y Z)],
         );
   };
@@ -447,7 +447,7 @@ sub newfile_hook {
   $rf = File::Rsync::Mirror::Recentfile->new
       (
        @common_args,
-       localroot => "/home/ftp/pub/PAUSE/modules/",
+       localroot => "/data/pause/pub/PAUSE/modules/",
        aggregator => [qw(1d 1W Z)],
       );
   $rf->update($f,"new");
@@ -461,7 +461,7 @@ sub delfile_hook {
     $rf = File::Rsync::Mirror::Recentfile->new
         (
          @common_args,
-         localroot => "/home/ftp/pub/PAUSE/authors/",
+         localroot => "/data/pause/pub/PAUSE/authors/",
          aggregator => [qw(6h 1d 1W 1M 1Q 1Y Z)],
         );
   };
@@ -473,7 +473,7 @@ sub delfile_hook {
   $rf = File::Rsync::Mirror::Recentfile->new
       (
        @common_args,
-       localroot => "/home/ftp/pub/PAUSE/modules/",
+       localroot => "/data/pause/pub/PAUSE/modules/",
        aggregator => [qw(1d 1W Z)],
       );
   $rf->update($f,"delete");
