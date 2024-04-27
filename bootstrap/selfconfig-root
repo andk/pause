@@ -135,13 +135,16 @@ if ($opt->plenv_url) {
 require Path::Tiny;
 
 # Partitioning!
+Path::Tiny::path("/data/mysql/mysql")->mkdir;
 for my $dir (qw(
-  /data/mysql/mysql
+  /data/pause
+  /data/pause/ftp
   /data/pause/pub
   /data/pause/incoming
   /data/pause/tmp
 )) {
   Path::Tiny::path($dir)->mkdir;
+  run_cmd('chown', 'pause:', $dir);
 }
 
 if (-e "/usr/sbin/lvcreate" && $opt->volume_group) {
@@ -159,7 +162,6 @@ EOF
   run_cmd(qw(mount /data/pause));
 }
 
-run_cmd(qw(mkdir /data/pause/ftp));
 run_cmd(qw(ln -s /data/mysql/mysql /var/lib/mysql));
 run_cmd(qw(ln -s /data/pause/ftp /home/ftp));
 
