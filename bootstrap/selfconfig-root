@@ -305,25 +305,25 @@ Path::Tiny::path("/etc/rsyncd.conf")->spew(<<~'END');
   timeout = 600
 
   [PAUSE]
-  path = /home/pause/pub/PAUSE
+  path = /data/pause/pub/PAUSE
 
   [authors]
-  path = /home/pause/pub/PAUSE/authors
+  path = /data/pause/pub/PAUSE/authors
 
   [modules]
-  path = /home/pause/pub/PAUSE/modules
+  path = /data/pause/pub/PAUSE/modules
 
   [scripts]
-  path = /home/pause/pub/PAUSE/scripts/new
+  path = /data/pause/pub/PAUSE/scripts/new
 
   [pausedata]
-  path = /home/pause/pub/PAUSE/PAUSE-data
+  path = /data/pause/pub/PAUSE/PAUSE-data
 
   [pausecode]
-  path = /home/pause/pub/PAUSE/PAUSE-code
+  path = /data/pause/pub/PAUSE/PAUSE-code
 
   [pausegit]
-  path = /home/pause/pub/PAUSE/PAUSE-git
+  path = /data/pause/pub/PAUSE/PAUSE-git
   END
 
 run_cmd(
