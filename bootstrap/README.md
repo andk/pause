@@ -4,8 +4,14 @@ This directory is a collection of programs to make it easy to stand up a
 complete PAUSE instance, either for testing or for preparing a new PAUSE
 instance to be used in production.
 
-For testing, the simplest thing might be for you to use `mkpause` which has
-roughly this usage.
+## Using DigitalOcean (optional)
+
+For testing, the simplest thing might be for you to use `mkpause`.  That
+program will use the DigitalOcean API to create a Droplet (a virtual machine)
+and configure it to have a working PAUSE install.  If you want to use your own
+machine or virtual machine, you can skip down to the next sectoin.
+
+`mkpause` has roughly this usage:
 
 ```
 --username STR (or -u)     your username; defaults to $ENV{USER}
@@ -20,18 +26,39 @@ roughly this usage.
 --destroy                  destroy the box if it does exist
 ```
 
+Also, you can create a YAML config file called `.mkpause`.  You have to run
+`mkpause` from the `bootstrap` directory, and that's where the config file must
+live.  The config file might look like:
+
+```
+certbot-staging: 1
+
+project-id: 83f85b40-049d-11ef-ba73-98c76c1f70db # DigitalOcean Project Id
+api-token: dop_v1_big_long_secret_api_key
+domain: your-domain-in-digital-ocean
+
+plenv-url: https://dot-plenv.nyc3.digitaloceanspaces.com/dot-plenv.tar.bz2
+```
+
 In general, you don't need to provide any options.  If your local computer's
 unix account is `hans` then you'll get a box named `hans.unpause.your-domain`,
 where `your-domain` is the DigitalOcean domain you've set aside for this work.
-That means you need a DigitalOcean account and an API key set in the `DO_TOKEN`
-environment variable.
 
 `mkpause` will create a VM and then copy the `selfconfig-root` program to the
-VM.  It will run `selfconfig-root` as the root user.  That program will install
-a bunch of apt packages, configure the firewall, create non-root users, and
-then run the program `selfconfig-pause` as the new `pause` user.  When that's
-done, cronjobs and systemd services will be installed and running, and you'll
-be able to log into the web interface.
+VM.  It will run `selfconfig-root` as the root user.  When that happens, you've
+left the realm of what `mkpause` does (apart from its `--list` and `--destroy`
+switches).  So, on to the next section:
+
+## selfconfig
+
+If you've got a fresh Debian system (Bookworm, at time of writing), you can use
+the selfconfig system to build a new PAUSE.  Start by copying `selfconfig-root`
+to that Debian box.  Run it as root and watch the magic.
+
+`selfconfig-root` program will install a bunch of apt packages, configure the
+firewall, create non-root users, and then run the program `selfconfig-pause` as
+the new `pause` user.  When that's done, cronjobs and systemd services will be
+installed and running, and you'll be able to log into the web interface.
 
 **Admin user**:  The bootstrap program will also create an admin account in
 PAUSE for you, with the username and password both set to the value of
@@ -53,4 +80,3 @@ this takes around ten minutes.  It's useful to save a copy of the
 that archive, as a `tar.bz2` file, somewhere on the web, and then provide the
 URL to it as the `--plenv-url` option.  As of 2024-04-26, a workable archive
 can be found at https://dot-plenv.nyc3.digitaloceanspaces.com/dot-plenv.tar.bz2
-
