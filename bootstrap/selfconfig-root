@@ -320,7 +320,7 @@ run_cmd(
 # XXX: I would like to not have or need this! -- rjbs, 2024-04-27
 run_cmd(qw(ln -s /data/pause /home/ftp));
 
-Path::Tiny::path("/home/pause/pause/cron/CRONTAB.ROOT")->copy("/etc/cron.d/pause");
+run_cmd(qw(ln -s /home/pause/pause/cron/CRONTAB.ROOT /etc/cron.d/pause");
 
 {
   # We want to see the MOTD when logging in, but we don't want the "Debian has no
