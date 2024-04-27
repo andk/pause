@@ -304,36 +304,7 @@ run_cmd(
     : ()),
 );
 
-Path::Tiny::path("/etc/rsyncd.conf")->spew(<<~'END');
-  # cat rsyncd.conf
-  max connections = 12
-  log file = /var/log/rsyncd
-  pid file = /var/run/PAUSE-rsyncd.pid
-  transfer logging = true
-  use chroot = true
-  timeout = 600
-
-  [PAUSE]
-  path = /data/pause/pub/PAUSE
-
-  [authors]
-  path = /data/pause/pub/PAUSE/authors
-
-  [modules]
-  path = /data/pause/pub/PAUSE/modules
-
-  [scripts]
-  path = /data/pause/pub/PAUSE/scripts/new
-
-  [pausedata]
-  path = /data/pause/pub/PAUSE/PAUSE-data
-
-  [pausecode]
-  path = /data/pause/pub/PAUSE/PAUSE-code
-
-  [pausegit]
-  path = /data/pause/pub/PAUSE/PAUSE-git
-  END
+Path::Tiny::path("/home/pause/pause/etc/rsyncd.conf")->copy("/etc/rsyncd.conf");
 
 run_cmd(
   qw( sudo -u pause ),
