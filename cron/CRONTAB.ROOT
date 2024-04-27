@@ -2,7 +2,7 @@
 
 PATH=/home/pause/.plenv/shims:/usr/bin:/home/pause/pause/cron
 PAUSE_REPO=/home/pause/pause
-PAUSE_ROOT=/home/pause/pub/PAUSE
+PAUSE_ROOT=/data/pause/pub/PAUSE
 
 ## STUFF RJBS DID TO PUT THIS INTO UNPAUSE:
 ## * replace a bunch of paths:
