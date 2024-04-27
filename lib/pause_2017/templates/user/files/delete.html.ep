@@ -29,7 +29,7 @@
   <tbody class="list">
 % for my $file (sort keys %$files) {
     <tr>
-      <td class="checkbox"><%= check_box "pause99_delete_files_FILE" => $file %></td>
+      <td class="checkbox"><%= check_box "pause99_delete_files_FILE" => $file, 'data-dist' => $files->{$file}{dist} %></td>
 %   if ($files->{$file}{indexed}) {
       <td class="file indexed"><%= $file %> [indexed]</td>
 %   } else {
