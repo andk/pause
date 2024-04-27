@@ -1,18 +1,9 @@
-# MAILTO=andreas.koenig.5c1c1wmb@franz.ak.mind.de
+MAILTO=andreas.koenig.5c1c1wmb@franz.ak.mind.de
 
 PATH=/home/pause/.plenv/shims:/usr/bin:/home/pause/pause/cron
 PAUSE_REPO=/home/pause/pause
 PAUSE_ROOT=/data/pause/pub/PAUSE
 
-## STUFF RJBS DID TO PUT THIS INTO UNPAUSE:
-## * replace a bunch of paths:
-##   * /opt/perl/current/bin with /usr/bin/perl
-##   * put "perl" in front of things to use plenv perl instead of system perl
-##   * put the pause repo's cron directory in path *and use it*
-##
-## …and we will write this to /etc/cron.d/SOMETHING
-
-# ???
 * * * * *             pause  $PAUSE_REPO/cron/recentfile-aggregate
 
 # some kind of PAUSE heartbeat/health check system?
