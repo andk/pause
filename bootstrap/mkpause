@@ -43,6 +43,8 @@ my ($opt, $usage) = describe_options(
   [],
   [ 'plenv-url|P=s', "URL to a tar.bz2 file to use for plenv (it's a shortcut)",
       { default => $default{'plenv-url'} } ],
+  [ 'repo-user=s',    "which GitHub user's pause.git to clone", { default => 'andk' } ],
+  [ 'repo-branch=s',  "which branch to clone for the repo",     { default => 'master' } ],
   [],
   [ 'certbot-staging|C!', 'use the staging version of certbot',
       { default => $default{'certbot-staging'} } ],
@@ -264,6 +266,10 @@ async sub do_create {
       '--host', "$boxname.$domain",
       '--user', $username,
       '--pass', $username, # XXX: Do something better later.
+
+      '--repo-user',   $opt->repo_user,
+      '--repo-branch', $opt->repo_branch,
+
       ($opt->certbot_staging ? '--certbot-staging' : ()),
       ($opt->enable_mail ? ('--enable-mail', %mailopts) : ()),
 

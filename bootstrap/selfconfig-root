@@ -94,7 +94,9 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   [ "user=s", "username for PAUSE admin to create",       { required => 1 } ],
   [ "pass=s", "password for PAUSE admin to create",       { required => 1 } ],
   [],
-  [ 'plenv-url=s', "curl-able URL to a tar.bz2 archive of a .plenv" ],
+  [ 'plenv-url=s',    "curl-able URL to a tar.bz2 archive of a .plenv" ],
+  [ 'repo-user=s',    "which GitHub user's pause.git to clone", { default => 'andk' } ],
+  [ 'repo-branch=s',  "which branch to clone for the repo",     { default => 'master' } ],
   [],
   [ 'certbot-staging|C', 'use the staging version of certbot' ],
   [],
@@ -170,9 +172,16 @@ run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
             default-libmysqlclient-dev
         ));
 
-run_cmd(qw(
-  sudo -u pause git clone -b unpause https://git@github.com/rjbs/pause/ /home/pause/pause
-));
+{
+  my $user = $opt->repo_user;
+
+  run_cmd(
+    qw( sudo -u pause git clone ),
+    '-b', $opt->repo_branch,
+    "https://git\@github.com/$user/pause/",
+    "/home/pause/pause",
+  );
+}
 
 # set up mysql databases and our pause user
 run_cmd(qw(mysqladmin CREATE mod));
