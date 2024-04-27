@@ -1,0 +1,13 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+Record update in the PAUSE users database:
+
+The ustatus of <%= $pause->{user} %> has changed from <%= $pause->{ustatus} %> to <%= $pause->{new_ustatus} %>.
+
+Data entered by <%= $pause->{User}{fullname} %>.
+
+Thanks,
+--
+The PAUSE Team

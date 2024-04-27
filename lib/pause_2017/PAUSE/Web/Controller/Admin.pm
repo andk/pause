@@ -167,6 +167,50 @@ sub edit_ml {
   }
 }
 
+sub change_user_status {
+  my $c = shift;
+  my $pause = $c->stash(".pause");
+  my $mgr = $c->app->pause;
+  my $req = $c->req;
+  my $u = $c->active_user_record;
+
+  my %valid_status = map {$_ => 1} qw(active nologin);
+
+  my $user        = $req->param("pause99_change_user_status_user");
+  my $new_ustatus = $req->param("pause99_change_user_status_new_ustatus");
+  if ($user) {
+    $pause->{user} = uc $user;
+    my $dbh = $mgr->connect;
+    my $sql = qq{SELECT ustatus FROM users WHERE userid = ?};
+    my $row = $dbh->selectrow_arrayref($sql, undef, uc $user);
+    if ($row) {
+      $pause->{ustatus} = $row->[0];
+    } else {
+      $pause->{user_not_found} = 1;
+      return;
+    }
+
+    if ($new_ustatus && $valid_status{$new_ustatus} && $new_ustatus ne $pause->{ustatus}) {
+      my $sql = qq{UPDATE users SET ustatus = ?, changed = ?, changedby = ? WHERE userid = ?};
+      my $sth = $dbh->prepare($sql);
+      my $ret = $sth->execute($new_ustatus, time, $u->{userid}, uc $user);
+      $sth->finish;
+      if ($ret) {
+        $pause->{changed} = 1;
+        $pause->{new_ustatus} = $new_ustatus;
+        my $mailblurb = $c->render_to_string("email/admin/change_user_status", format => "email");
+        my @to = ($u->{secretemail}||$u->{email}, $mgr->config->mailto_admins);
+        warn "sending to[@to]";
+        warn "mailblurb[$mailblurb]";
+        my $header = {
+                      Subject => "User status update for $user"
+                     };
+        $mgr->send_mail_multi(\@to, $header, $mailblurb);
+      }
+    }
+  }
+}
+
 sub select_user {
   my $c = shift;
   my $pause = $c->stash(".pause");
