@@ -70,24 +70,33 @@ if (-e '/tmp/plenv-tarball.tar.bz2') {
 
 chdir("/home/pause/pause") or die "can't chdir to ~pause/pause: $!";
 
+for my $dir (qw(
+  /data/pause
+  /data/pause/ftp
+  /data/pause/pub
+  /data/pause/incoming
+  /data/pause/tmp
+)) {
+  Path::Tiny::path($dir)->mkdir;
+}
+
 # Set up pause config
 for my $path (qw(
-  /home/pause/incoming
+  /data/pause/pub/PAUSE/authors/id
+  /data/pause/pub/PAUSE/modules
+  /data/pause/pub/PAUSE/PAUSE-git
+
   /home/pause/log
   /home/pause/pause-private/lib
   /home/pause/pid
-  /home/pause/pub/PAUSE/authors/id
-  /home/pause/pub/PAUSE/modules
-  /home/pause/pub/PAUSE/PAUSE-git
   /home/pause/run
   /home/pause/testmail
-  /home/pause/tmp
   /tmp/pause_1999
 )) {
   path($path)->mkdir;
 }
 
-chdir("/home/pause/pub/PAUSE/PAUSE-git")
+chdir("/data/pause/pub/PAUSE/PAUSE-git")
   || die "couldn't chdir to PAUSE-git: $!";
 
 run_cmd(qw(git config --global user.email pause@pause.perl.org));
@@ -137,8 +146,8 @@ my $config_file_contents = <<~'END';
   $Config->{FTPPUB} = '/data/pause/pub/PAUSE/';
   $Config->{GITROOT} = '/data/pause/pub/PAUSE/PAUSE-git';
   $Config->{HTTP_ERRORLOG} = '/var/log/nginx/error.log';
-  $Config->{INCOMING} = "file://home/pause/incoming/";
-  $Config->{INCOMING_LOC} = '/home/pause/incoming';
+  $Config->{INCOMING} = "file://data/pause/incoming/";
+  $Config->{INCOMING_LOC} = '/data/pause/incoming';
   $Config->{MLROOT} = '/data/pause/pub/PAUSE/authors/id/';
   $Config->{ML_CHOWN_USER}  = 'unsafe';
   $Config->{ML_CHOWN_GROUP} = 'unsafe';

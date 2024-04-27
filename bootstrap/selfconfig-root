@@ -134,18 +134,10 @@ if ($opt->plenv_url) {
 
 require Path::Tiny;
 
-# Partitioning!
-Path::Tiny::path("/data/mysql/mysql")->mkdir;
-for my $dir (qw(
-  /data/pause
-  /data/pause/ftp
-  /data/pause/pub
-  /data/pause/incoming
-  /data/pause/tmp
-)) {
-  Path::Tiny::path($dir)->mkdir;
-  run_cmd('chown', 'pause:', $dir);
-}
+Path::Tiny::path("/data/mysql")->mkdir;
+
+Path::Tiny::path("/data/pause")->mkdir;
+run_cmd("chown", "pause:", "/data/pause");
 
 if (-e "/usr/sbin/lvcreate" && $opt->volume_group) {
   my $vg = $opt->volume_group;
@@ -162,8 +154,10 @@ EOF
   run_cmd(qw(mount /data/pause));
 }
 
+# Partitioning!
+Path::Tiny::path("/data/mysql/mysql")->mkdir;
+
 run_cmd(qw(ln -s /data/mysql/mysql /var/lib/mysql));
-run_cmd(qw(ln -s /data/pause/ftp /home/ftp));
 
 # Mariadb has to be installed _after_ partitioning.
 run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
@@ -334,6 +328,9 @@ run_cmd(
   "--authuser-pw", $db_password_for{authuser},
   "--moduser-pw",  $db_password_for{moduser},
 );
+
+# XXX: I would like to not have or need this! -- rjbs, 2024-04-27
+run_cmd(qw(ln -s /data/pause/ftp /home/ftp));
 
 Path::Tiny::path("/home/pause/pause/cron/CRONTAB.ROOT")->copy("/etc/cron.d/pause");
 
