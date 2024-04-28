@@ -49,7 +49,7 @@ doing that, you'll need to carry out the following steps:
     --export-secret-key --armor --homedir ...` and pipe it into a file.
     Transfer the file to the new host, in the same location, and use `gpg
     --import -homedir ...` to import it to the keyring.  Delete the file.
-6.  (more steps to be filled in, 2024-04-28)
+6.  [Additional steps for productionization](install-prod.md).
 7.  Review the `PrivatePAUSE.pm` file on the old PAUSE host for any settings
     that may have been missed.
 
