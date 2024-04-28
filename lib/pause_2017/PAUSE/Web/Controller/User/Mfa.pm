@@ -26,15 +26,18 @@ sub edit {
   if (uc $req->method eq 'POST' and $req->param("pause99_mfa_sub")) {
     my $code = $req->param("pause99_mfa_code");
     $req->param("pause99_mfa_code", undef);
-    if ($code =~ /\A[0-9]{6}\z/ && !$auth->verify($code)) {
-        $pause->{error}{invalid_code} = 1;
-        return;
+    my $verified;
+    if ($code =~ /\A[0-9]{6}\z/ && $auth->verify($code)) {
+        $verified = 1;
     } elsif ($code =~ /\A[a-z0-9]{5}\-[a-z0-9]{5}\z/ && $u->{mfa_recovery_codes} && $req->param("pause99_mfa_reset")) {
         my @recovery_codes = split / /, $u->{mfa_recovery_codes} // '';
-        if (!grep { PAUSE::Crypt::password_verify($code, $_) } @recovery_codes) {
-            $pause->{error}{invalid_code} = 1;
-            return;
+        if (grep { PAUSE::Crypt::password_verify($code, $_) } @recovery_codes) {
+            $verified = 1;
         }
+    }
+    unless ($verified) {
+        $pause->{error}{invalid_code} = 1;
+        return;
     }
     my ($mfa, $secret32, $recovery_codes);
     if ($req->param("pause99_mfa_reset")) {
