@@ -13,12 +13,19 @@ gmtime instead of localtime.
 
 =cut
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use PAUSE ();
-use File::Compare qw(compare);
 use strict;
 use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use PAUSE ();
+use File::Compare qw(compare);
+
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-gmls-lR',
+  facility  => 'daemon',
+} };
 
 chdir $PAUSE::Config->{FTPPUB} or die "Could not chdir to $PAUSE::Config->{FTPPUB}: $!";
 mkdir "indexes", 0755 unless -d "indexes";

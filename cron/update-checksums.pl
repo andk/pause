@@ -1,16 +1,10 @@
 #!/home/pause/.plenv/shims/perl
-
-# use 5.010;
 use strict;
 use warnings;
 
 =head1 NAME
 
-
-
-=head1 SYNOPSIS
-
-
+update-checksums.pl
 
 =head1 OPTIONS
 
@@ -44,10 +38,7 @@ start at this directory
 
 =head1 DESCRIPTION
 
-
-
 =cut
-
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -59,6 +50,11 @@ use File::Temp;
 use Getopt::Long;
 use Hash::Util qw(lock_keys);
 use Pod::Usage;
+
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-update-checksums',
+  facility  => 'daemon',
+} };
 
 my $lockfile = "/home/pause/run/PAUSE-update-checksums.LCK";
 use Fcntl qw( :flock :seek O_RDONLY O_RDWR O_CREAT );

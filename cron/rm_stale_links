@@ -17,6 +17,11 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-rm-stale-links',
+  facility  => 'daemon',
+} };
+
 use strict;
 use warnings;
 

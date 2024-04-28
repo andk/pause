@@ -20,6 +20,12 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
+
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-mysql-dump',
+  facility  => 'daemon',
+} };
+
 my @m=gmtime;
 $m[5]+=1900;
 $m[4]++;

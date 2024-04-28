@@ -4,6 +4,11 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-sync-04pause',
+  facility  => 'daemon',
+} };
+
 $ENV{LANG} = "C";
 my $target = "$PAUSE::Config->{FTPPUB}/modules/";
 open my $fh, "-|", "rsync -av $FindBin::Bin/../htdocs/0*.html $target" or die "Could not fork: $!";

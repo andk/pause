@@ -1,8 +1,15 @@
 #!/home/pause/.plenv/shims/perl
+use strict;
+use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
+
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-cron-daily',
+  facility  => 'daemon',
+} };
 
 use File::Basename ();
 use DBI;
@@ -15,8 +22,6 @@ use IO::File       ();
 
 use Email::Sender::Simple ();
 
-use strict;
-use warnings;
 use vars qw( $last_str $last_time $SUBJECT @listing $Dbh);
 
 #
