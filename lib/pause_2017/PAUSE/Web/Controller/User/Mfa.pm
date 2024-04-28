@@ -41,14 +41,12 @@ sub edit {
         $pause->{error}{invalid_code} = 1;
         return;
     }
-    my ($mfa, $secret32, $recovery_codes);
+    my ($secret32, $recovery_codes);
     if ($req->param("pause99_mfa_reset")) {
-        $mfa = 0;
         $secret32 = undef;
         $recovery_codes = undef;
         $c->flash(mfa_disabled => 1);
     } else {
-        $mfa = 1;
         $secret32 = $auth->secret32;
         $c->flash(mfa_enabled => 1);
         my @codes = _generate_recovery_codes();
@@ -57,8 +55,8 @@ sub edit {
     }
     my $dbh = $mgr->authen_connect;
     my $tbl = $PAUSE::Config->{AUTHEN_USER_TABLE};
-    my $sql = "UPDATE $tbl SET mfa = ?, mfa_secret32 = ?, mfa_recovery_codes = ?, changed = ?, changedby = ? WHERE user = ?";
-    if ($dbh->do($sql, undef, $mfa, $secret32, $recovery_codes, time, $pause->{User}{userid}, $u->{userid})) {
+    my $sql = "UPDATE $tbl SET mfa_secret32 = ?, mfa_recovery_codes = ?, changed = ?, changedby = ? WHERE user = ?";
+    if ($dbh->do($sql, undef, $secret32, $recovery_codes, time, $pause->{User}{userid}, $u->{userid})) {
       my $mailblurb = $c->render_to_string("email/user/mfa/edit", format => "email");
       my $header = {Subject => "User update for $u->{userid}"};
       my @to = $u->{secretemail};

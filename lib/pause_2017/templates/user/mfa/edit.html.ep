@@ -22,7 +22,7 @@
 </div>
 % }
 
-<h3><% if (!$pause->{HiddenUser}{mfa}) { %>Enable<% } else { %>Disable<% } %> Multifactor Authentication for <%= $pause->{HiddenUser}{userid} %>
+<h3><% if (!$pause->{HiddenUser}{mfa_secret32}) { %>Enable<% } else { %>Disable<% } %> Multifactor Authentication for <%= $pause->{HiddenUser}{userid} %>
 % if (exists $pause->{UserGroups}{admin}) {
  (lastvisit <%= $pause->{HiddenUser}{lastvisit} || "before 2005-12-02" %>)
 % }
@@ -37,7 +37,7 @@ Verification Code is invalid.
 </div>
 <hr>
 % }
-% if (!$pause->{HiddenUser}{mfa}) {
+% if (!$pause->{HiddenUser}{mfa_secret32}) {
 <div>
 <p>Submit 6-digit code to enable Multifactor Authentication.</p>
 <img src="<%= $pause->{mfa_qrcode} %>">

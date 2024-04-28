@@ -16,7 +16,7 @@ sub register {
             my $u = $c->active_user_record;
 
             # XXX: The active user record does not have mfa when an admin user is pretending someone else.
-            return 1 unless $u->{mfa};
+            return 1 unless $u->{mfa_secret32};
 
             my $otp = $c->req->body_params->param('otp');
             if (defined $otp and $otp ne '') {
