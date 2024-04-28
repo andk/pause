@@ -428,6 +428,8 @@ for my $service (qw( rsync )) {
   run_cmd(qw( systemctl status ), $service );
 }
 
+run_cmd(qw( systemctl restart systemd-journald.service ));
+
 ## SUBROUTINES GO DOWN BELOW
 ## THAT'S WHY THEY'RE CALLED SUBROUTINES
 
