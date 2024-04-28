@@ -130,6 +130,8 @@ exit;
 
 package mypause_send_mail;
 
+use PAUSE::Logger '$Logger';
+
 our %hp_inside;
 
 sub send {
@@ -160,6 +162,7 @@ sub send {
 package mypause_daemon_inspector;
 
 use List::Util qw(max);
+use PAUSE::Logger '$Logger';
 
 # package mypause_daemon_inspector
 sub loop () { # we're NOT called as a method
