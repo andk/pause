@@ -43,12 +43,12 @@ sub version {
 
 sub authenticator_for {
   my ($self, $user) = @_;
-  my $cpan_alias = lc($user->{userid}) . '@cpan.org';
-  my $secret32   = $user->{mfa_secret32};
+  my $userid   = lc($user->{userid});
+  my $secret32 = $user->{mfa_secret32};
   return Auth::GoogleAuth->new({
     secret32 => $secret32,
     issuer   => $PAUSE::Config->{MFA_ISSUER} || 'PAUSE',
-    key_id   => $cpan_alias,
+    key_id   => $userid,
   });
 }
 
