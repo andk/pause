@@ -136,6 +136,8 @@ my $config_file_contents = <<~'END';
 
   $Config->{ML_MIN_FILES} = 1;
   $Config->{ML_MIN_INDEX_LINES} = 0;
+
+  1;
   END
 
 $config_file_contents =~ s/%%AUTHUSER_PW%%/$opt->authuser_pw/e;
