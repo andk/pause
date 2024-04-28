@@ -1,2 +1,0 @@
-09:49  rm -rf .svn apache-* bin cron doc etc htdocs lib log/.svn mirror privatelib/.svn rc
-09:49  svn co http://localhost:5459/svn/pause/trunk .

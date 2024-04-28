@@ -1,3 +1,0 @@
-Creating a dump of the schema:
-
-make doc/mod.schema.txt doc/authen_pause.schema.txt
