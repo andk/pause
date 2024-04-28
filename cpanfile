@@ -86,7 +86,6 @@ on test => sub {
     requires 'Test::MockObject';
     requires 'Test::WWW::Mechanize::PSGI';
     requires 'Test::mysqld';
-    requires 'WWW::Mechanize::Boilerplate';
     requires 'YAML::Syck';
     requires 'YAML::XS';
     requires 'namespace::autoclean';
