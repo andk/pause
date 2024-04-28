@@ -172,6 +172,29 @@ run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
             default-libmysqlclient-dev
         ));
 
+# Configure Mariadb a bit
+Path::Tiny::path("/etc/mysql/conf.d/mysql.cnf")->append(<<~EOF);
+
+  # PAUSE specific config
+  [client]
+  # Compat with old pause setup for command line client. Previous
+  # mysql version had latin1 by default so insert utf8 data into latin1
+  # column and pulling them back out just ... worked. Weird right? Without
+  # this, we cannot insert utf8 data to fullname column, and existing
+  # utf8 data in that column comes out mojibaked in the mysql command line
+  default-character-set = latin1
+  
+  [mysqld]
+  # Compat with old pause setup for DBI connections, etc...
+  # This lets pause-web and others work correctly with utf8 data in the
+  # fullname column. Otherwise fullnames would be mojibaked and updating/
+  # inserting utf8 data was not possible.
+  init_connect='set NAMES latin1'
+  
+  EOF
+
+run_cmd(qw(/etc/init.d/mariadb restart));
+
 {
   my $user = $opt->repo_user;
 
@@ -404,6 +427,8 @@ for my $service (qw( rsync )) {
   run_cmd(qw( systemctl start  ), $service );
   run_cmd(qw( systemctl status ), $service );
 }
+
+run_cmd(qw( systemctl restart systemd-journald.service ));
 
 ## SUBROUTINES GO DOWN BELOW
 ## THAT'S WHY THEY'RE CALLED SUBROUTINES
