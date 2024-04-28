@@ -5,6 +5,8 @@ use Auth::GoogleAuth;
 use PAUSE::Crypt;
 use Crypt::URandom qw(urandom);
 use Convert::Base32 qw(encode_base32);
+use Imager::QRCode qw(plot_qrcode);
+use URI;
 
 sub edit {
   my $c = shift;
@@ -14,7 +16,7 @@ sub edit {
   my $u = $c->active_user_record;
 
   my $auth = $c->app->pause->authenticator_for($u);
-  $pause->{mfa_qrcode} = $auth->qr_code;
+  $pause->{mfa_qrcode} = _generate_qrcode($auth);
   if (!$u->{mfa_secret32}) {
     my $dbh = $mgr->authen_connect;
     my $tbl = $PAUSE::Config->{AUTHEN_USER_TABLE};
@@ -78,6 +80,18 @@ sub _generate_recovery_codes {
         push @codes, $code;
     }
     @codes;
+}
+
+# using $auth->qr_code directly is handy but insecure
+sub _generate_qrcode {
+    my $auth = shift;
+    my $otpauth = $auth->qr_code(undef, undef, undef, 1);
+    my $img = plot_qrcode($otpauth, { casesensitive => 1 });
+    $img->write(data => \my $qr_png, type => 'png') or die "Failed to write image: " . $img->errstr;
+    my $data = URI->new("data:");
+    $data->data($qr_png);
+    $data->media_type('image/png');
+    $data;
 }
 
 1;
