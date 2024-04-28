@@ -178,8 +178,8 @@ sub authenticate {
       $dbh->disconnect;
       return HTTP_OK;
     } else {
-      warn sprintf "crypt_pw[%s]user[%s]uri[%s]auth_required[%d]",
-          $crypt_pw, $user_record->{user}, $req->path, HTTP_UNAUTHORIZED;
+      warn sprintf "failed login: user[%s]uri[%s]auth_required[%d]",
+          $user_record->{user}, $req->path, HTTP_UNAUTHORIZED;
     }
   }
 
