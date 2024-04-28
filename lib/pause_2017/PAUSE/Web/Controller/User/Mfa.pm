@@ -86,7 +86,7 @@ sub _generate_recovery_codes {
 sub _generate_qrcode {
     my $auth = shift;
     my $otpauth = $auth->qr_code(undef, undef, undef, 1);
-    my $img = plot_qrcode($otpauth, { casesensitive => 1 });
+    my $img = plot_qrcode($otpauth, { casesensitive => 1, size => 4, margin => 4, version => 1, level => 'M' });
     $img->write(data => \my $qr_png, type => 'png') or die "Failed to write image: " . $img->errstr;
     my $data = URI->new("data:");
     $data->data($qr_png);
