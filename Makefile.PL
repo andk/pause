@@ -15,7 +15,6 @@ WriteMakefile(
         CPAN::Checksums
         CPAN::DistnameInfo
         CPAN::Indexer::Mirror
-        Class::MOP::Class
         Class::Singleton
         Compress::Zlib
         Crypt::Eksblowfish::Bcrypt
@@ -94,7 +93,6 @@ WriteMakefile(
         URI::URL
         Unicode::Collate
         Unicode::String
-        WWW::Mechanize::Boilerplate
         XML::LibXML
         XML::Parser
         XML::SAX::Base
