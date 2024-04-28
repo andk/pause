@@ -18,7 +18,7 @@ use PAUSE::Logger '$Logger' => { init => {
   facility  => 'daemon',
   to_file   => 1,
   log_path  => '/', # because log_file will be absolute
-  log_file  => $PAUSE::Config->{PAUSE_LOG},
+  log_file  => $ENV{PAUSE_PAUSED_LOG_FILE} // $PAUSE::Config->{PAUSE_LOG},
 } };
 
 use DBI ();
