@@ -58,6 +58,12 @@ our $MAINTAIN_SYMLINKTREE = 1;
 use Fcntl qw(:flock);
 # this class shows that it was born as spaghetticode
 
+# This can/should be replaced by making things like "reasons to skip indexing a
+# dist" into an enumerated type.  Until that happens, though, this one needs to
+# be easy to refer to, because it's compared against (search for the var name
+# below). -- rjbs, 2024-04-28
+my $OLD_UNCHANGED_FILE = "file mtime has not changed";
+
 sub new {
     my $class = shift;
     my $opt = shift;
@@ -410,7 +416,7 @@ sub reason_to_skip_dist {
     }
 
     unless ($dio->mtime_ok($self->{ALLlasttime}{$dist})){
-        return "mtime not okay";
+        return $OLD_UNCHANGED_FILE;
     }
 
     unless ($dio->lock) {
@@ -431,7 +437,11 @@ sub maybe_index_dist {
     local $Logger = $Logger->proxy({ proxy_prefix => "$dist: " });
 
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
-        $Logger->log("skipping: $skip_reason");
+        # We don't log on $OLD_UNCHANGED_FILE because it's extremely common and
+        # leads to noise in the logs. -- rjbs, 2024-04-28
+        my $log_method = $skip_reason eq $OLD_UNCHANGED_FILE ? 'log_debug' : 'log';
+        $Logger->$log_method("skipping: $skip_reason");
+
         delete $self->{ALLlasttime}{$dist};
         delete $self->{ALLfound}{$dist};
         return;
