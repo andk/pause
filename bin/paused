@@ -13,6 +13,14 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'paused',
+  facility  => 'daemon',
+  to_file   => 1,
+  log_path  => '/', # because log_file will be absolute
+  log_file  => $PAUSE::Config->{PAUSE_LOG},
+} };
+
 use DBI ();
 use Fcntl qw(:flock);
 use File::Basename ();
@@ -36,7 +44,8 @@ use URI::URL ();
 use CPAN::DistnameInfo;
 
 use strict;
-use vars qw(%Opt);
+
+my %Opt;
 
 GetOptions
     (
@@ -901,18 +910,14 @@ sub _rewrite_tarball {
 # often called as a class method!
 # package mypause_daemon_inspector
 sub logge {
-  my($self,$arg) = @_;
-  my $v = max $VERSION, $PAUSE::VERSION;
-  my $stamp = $self->timestamp() . " \$\$$$ v$v: ";
+  my ($self, $string) = @_;
+
   my @caller = caller;
   shift @caller;
   $caller[0] =~ s|.*/||;
   my $from = join ":", @caller;
-  # open the log file
-  my $logfile = $PAUSE::Config->{PAUSE_LOG};
-  open my $LOG, ">>", $logfile or die "open $logfile: $!";
-  print $LOG $stamp, $arg, " ($from)\n";
-  close $LOG;
+
+  $Logger->log([ "%s: %s", $from, $string ]);
 }
 
 # package mypause_daemon_inspector
