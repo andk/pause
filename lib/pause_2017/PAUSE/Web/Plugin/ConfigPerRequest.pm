@@ -79,7 +79,7 @@ sub _retrieve_user {
       $sth7->execute($user);
       my $error;
       if ($sth7->rows > 0) {
-        $error = "User '$user' set to nologin. Many users with an insecure password have got their password reset recently because of an incident on perlmonks.org. Please talk to modules\@perl.org to find out how to proceed";
+        $error = "User '$user' set to nologin. Many users with an insecure password have got their password reset recently. Please talk to modules\@perl.org to find out how to proceed";
       } else {
         $error = "User '$user' not known";
       }
