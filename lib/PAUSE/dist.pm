@@ -3,6 +3,8 @@ use warnings;
 package PAUSE::dist;
 use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
+use Email::Address::XS;
+use Email::MIME::Header::AddressList;
 use File::Copy ();
 use List::MoreUtils ();
 use PAUSE ();
@@ -559,7 +561,7 @@ sub _send_email {
     my $email = Email::MIME->create(
         header_str => [
             To      => $pma->email_header_object,
-            Cc      => PAUSE::Email->admin_email_header_object,
+            Cc      => PAUSE::Email->report_email_header_object,
             Subject => $failed."PAUSE indexer report $substrdistro",
             From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
         ],
