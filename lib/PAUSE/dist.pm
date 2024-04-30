@@ -616,7 +616,6 @@ sub mail_summary {
       warn "Unsent Report [@m]";
     }
   } else {
-    my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
     my $failed = "";
     if ($status_over_all ne "OK") {
       $failed = "Failed: ";
@@ -624,7 +623,8 @@ sub mail_summary {
 
     my $email = Email::MIME->create(
         header_str => [
-            To      => $to,
+            To      => $pma->email_header_object,
+            Cc      => PAUSE::Email->admin_email_header_object,
             Subject => $failed."PAUSE indexer report $substrdistro",
             From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
         ],
