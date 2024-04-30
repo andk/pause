@@ -1,6 +1,9 @@
-package PAUSE::MailAddress;
-use PAUSE ();
 use strict;
+use warnings;
+
+package PAUSE::MailAddress;
+use Email::Address::XS;
+use PAUSE ();
 
 # use fields qw(address is_secret)
 
@@ -10,45 +13,50 @@ sub new {
 }
 
 sub new_from_userid {
-  my($class,$userid) = @_;
-  my $dbh = DBI->connect(
-                   $PAUSE::Config->{AUTHEN_DATA_SOURCE_NAME},
-                   $PAUSE::Config->{AUTHEN_DATA_SOURCE_USER},
-                   $PAUSE::Config->{AUTHEN_DATA_SOURCE_PW},
-                   { RaiseError => 1 }
-                  )
-          or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
-  my $sth = $dbh->prepare("SELECT secretemail
-                             FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
-                             WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
-  $sth->execute($userid);
+  my($class, $userid) = @_;
+
+  my $authen_dbh = PAUSE::dbh('authen');
+  my ($secretemail) = $authen_dbh->selectrow_array(
+    "SELECT secretemail
+    FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
+    WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?",
+    undef,
+    $userid,
+  );
+
   my $me = {};
-  my $addr;
-  if ($sth->rows > 0) {
-    ($addr) = $sth->fetchrow_array;
-  }
-  if ($addr) {
-    $me->{address} = $addr;
+
+  if ($secretemail) {
+    $me->{address} = $secretemail;
     $me->{is_secret} = 1;
-  } else {
-    my $dbh = DBI->connect(
-                    $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
-                    $PAUSE::Config->{MOD_DATA_SOURCE_USER},
-                    $PAUSE::Config->{MOD_DATA_SOURCE_PW},
-                    { RaiseError => 1 }
-                    )
-            or Carp::croak(qq{Can't DBI->connect(): $DBI::errstr});
-    $sth = $dbh->prepare("SELECT email FROM users WHERE userid=?");
-    $sth->execute($userid);
-    if ($sth->rows >= 0){
-      ($me->{address}) = $sth->fetchrow_array;
-    }
-    $me->{address} ||= "$userid\@cpan.org";
   }
+
+  my $mod_dbh = PAUSE::dbh('mod');
+  my ($email, $fullname) = $mod_dbh->selectrow_array(
+    "SELECT email, fullname FROM users WHERE userid=?",
+    undef,
+    $userid,
+  );
+
+  $fullname = Encode::decode('UTF-8', $fullname) if length $fullname;
+
+  # The users.email column is NOT NULL, DEFAULT '', so we use || instead of //.
+  #
+  # Also, defaulting to USER@cpan.org is not going to age well, but for now,
+  # I'm sticking to the existing behavior. -- rjbs, 2024-04-30
+  $me->{address} ||= $email || "$userid\@cpan.org";
+
+  $me->{email_object} = Email::Address::XS->new($fullname, $me->{address});
+
   bless $me, $class;
 }
 
 sub address { shift->{address} }
 sub is_secret { shift->{is_secret} }
+
+sub email_header_object {
+  my ($self) = @_;
+  PAUSE::Email->email_header_object_for_addresses($self->{email_object});
+}
 
 1;
