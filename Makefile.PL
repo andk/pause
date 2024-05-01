@@ -27,7 +27,6 @@ WriteMakefile(
         DBIx::RunSQL
         Devel::Peek
         Dumpvalue
-        Email::Address
         Email::Address::XS
         Email::MIME
         Email::Sender::Simple

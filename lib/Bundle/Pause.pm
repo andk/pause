@@ -34,7 +34,6 @@ DBD::mysql
 DBI
 DBIx::RunSQL
 DB_File::Lock
-Email::Address
 Email::Address::XS
 Email::MIME
 Email::Sender::Simple
