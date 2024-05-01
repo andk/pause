@@ -2,7 +2,6 @@ package PAUSE::Web::Controller::Public::RequestId;
 
 use Mojo::Base "Mojolicious::Controller";
 use PAUSE::Web::Util::Encode;
-use Email::Address;
 
 sub request {
   my $c = shift;
@@ -60,8 +59,9 @@ sub request {
       push @errors, "You must supply a name\n";
     }
     if( $email ) {
-      my $addr_spec = $Email::Address::addr_spec;
-      push @errors, "Your email address doesn't look like valid email address.\n" unless $email =~ /\A$addr_spec\z/;
+      unless (PAUSE::Email->is_valid_email($email)) {
+        push @errors, "Your email address doesn't look like valid email address.\n";
+      }
     } else {
       push @errors, "You must supply an email address\n";
     }
