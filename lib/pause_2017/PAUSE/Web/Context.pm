@@ -91,7 +91,7 @@ sub database_alert {
     my $server = $self->hostname;
     my $header = {
                   From => "database_alert",
-                  To => $PAUSE::Config->{ADMIN},
+                  To   => PAUSE::Email->report_email_header_object,
                   Subject => "PAUSE Database Alert $server",
                  };
     $self->send_mail($header, $mess);
