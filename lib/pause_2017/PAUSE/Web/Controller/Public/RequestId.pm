@@ -54,7 +54,7 @@ sub request {
     my @errors = ();
     if ( $fullname ) {
       unless ($fullname =~ /[ ]/) {
-        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to @{$PAUSE::Config->{ADMINS}}.";
+        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to $PAUSE::Config->{CONTACT_ADDRESS}.";
       }
     } else {
       push @errors, "You must supply a name\n";
@@ -246,8 +246,10 @@ sub _directly_add_user {
         my ( $subject, $blurb ) =
           $c->send_welcome_email( [$email], $userid, $email, $fullname, $homepage,
             $fullname );
-        $c->send_welcome_email( $PAUSE::Config->{ADMINS},
-            $userid, "CENSORED", $fullname, $homepage, $fullname );
+        $c->send_welcome_email(
+            [ $PAUSE::Config->{CONTACT_ADDRESS} ],
+            $userid, "CENSORED", $fullname, $homepage, $fullname
+        );
 
         $pause->{subject_for_user_addition} = $subject;
         $pause->{blurb_for_user_addition} = $blurb;

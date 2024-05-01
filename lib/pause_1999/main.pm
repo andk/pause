@@ -438,7 +438,7 @@ sub send_mail {
 
   my @hdebug = %$header; $self->{REQ}->logger({level => 'error', message => sprintf("hdebug[%s]", join "|", @hdebug) });
   $header->{From}                        ||= $self->{OurEmailFrom};
-  $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
+  $header->{"Reply-To"}                  ||= $PAUSE::Config->{CONTACT_ADDRESS};
 
   if ($] > 5.007) {
     require Encode;

@@ -2458,7 +2458,7 @@ The PAUSE Team
     # both users and mailing lists run this code
 
     warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
-    my(@to) = @{$PAUSE::Config->{ADMINS}};
+    my(@to) = $PAUSE::Config->{CONTACT_ADDRESS};
     push @m, qq{ Sending separate mails to:
 }, join(" AND ", @to, $email), qq{
 <pre>
@@ -2870,7 +2870,7 @@ sub request_id {
     my @errors = ();
     if ( $fullname ) {
       unless ($fullname =~ /[ ]/) {
-        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to @{$PAUSE::Config->{ADMINS}}.";
+        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to $PAUSE::Config->{CONTACT_ADDRESS}.";
       }
     } else {
       push @errors, "You must supply a name\n";
@@ -3613,7 +3613,7 @@ sub edit_mod {
                 $u->{userid}. Please note, only modules that are
                 already registered in the module list can be edited
                 here. If you believe, this is a bug, please contact
-                @{$PAUSE::Config->{ADMINS}}.</p> };
+                $PAUSE::Config->{CONTACT_ADDRESS}.</p> };
 
     return @m;
   }
@@ -5747,7 +5747,7 @@ sub peek_perms {
             <p>The
             contents of the tables presented on this page are mostly
             generated automatically, so please report any errors you
-            observe to @{$PAUSE::Config->{ADMINS}} so that the tables
+            observe to $PAUSE::Config->{CONTACT_ADDRESS} so that the tables
             can be corrected.--Thank you!</p><p>};
 
 

@@ -167,9 +167,11 @@ sub send_mail_multi {
 sub send_mail {
   my ($self, $header, $blurb) = @_;
 
-  my @hdebug = %$header; $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
-  $header->{From}                        ||= qq{"Perl Authors Upload Server" <$PAUSE::Config->{UPLOAD}>};
-  $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
+  my @hdebug = %$header;
+  $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
+
+  $header->{From} ||= qq{"Perl Authors Upload Server" <$PAUSE::Config->{UPLOAD}>};
+  $header->{"Reply-To"} ||= $PAUSE::Config->{CONTACT_ADDRESS};
 
   my $email = Email::MIME->create(
     header_str => [%$header],

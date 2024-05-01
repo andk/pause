@@ -28,7 +28,7 @@ View permission per distribution</a> page.</p>
 <p>The
 contents of the tables presented on this page are mostly
 generated automatically, so please report any errors you
-observe to <%= "@{$PAUSE::Config->{ADMINS}}" %> so that the tables
+observe to <%= "$PAUSE::Config->{CONTACT_ADDRESS}" %> so that the tables
 can be corrected.--Thank you!</p><p>
 
 <%= select_field 'pause99_peek_perms_by' => [

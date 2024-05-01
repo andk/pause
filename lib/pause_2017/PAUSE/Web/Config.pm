@@ -651,6 +651,6 @@ our $Valid_Userid = qr/^[A-Z]{3,9}$/;
 
 sub valid_userid { $Valid_Userid }
 
-sub mailto_admins { join(",", @{$PAUSE::Config->{ADMINS}}) }
+sub mailto_admins { $PAUSE::Config->{CONTACT_ADDRESS} }
 
 1;
