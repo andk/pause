@@ -40,7 +40,7 @@ require PAUSE::Web::Config;
 $PAUSE::Config->{DOCUMENT_ROOT} = "$AppRoot/htdocs";
 $PAUSE::Config->{PID_DIR} = $TestRoot;
 $PAUSE::Config->{ADMIN} = $TestEmail;
-$PAUSE::Config->{ADMINS} = [$TestEmail];
+$PAUSE::Config->{CONTACT_ADDRESS} = $TestEmail;
 $PAUSE::Config->{CPAN_TESTERS} = $TestEmail;
 $PAUSE::Config->{TO_CPAN_TESTERS} = $TestEmail;
 $PAUSE::Config->{REPLY_TO_CPAN_TESTERS} = $TestEmail;

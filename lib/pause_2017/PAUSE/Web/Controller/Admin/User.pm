@@ -274,11 +274,14 @@ sub add_user_doit {
       # send emails to user and modules@perl.org; latter must censor the
       # user's email address
       my ($subject, $blurb) = $c->send_welcome_email( [$email], $userid, $email, $fullname, $homepage, $entered_by );
-      $c->send_welcome_email( $PAUSE::Config->{ADMINS}, $userid, "CENSORED", $fullname, $homepage, $entered_by );
+      $c->send_welcome_email(
+        [ $PAUSE::Config->{CONTACT_ADDRESS} ],
+        $userid, "CENSORED", $fullname, $homepage, $entered_by
+      );
 
       $pause->{subject} = $subject;
       $pause->{blurb}   = $blurb;
-      $pause->{send_to} = join(" AND ", @{$PAUSE::Config->{ADMINS}}, $email);
+      $pause->{send_to} = join(" AND ", $PAUSE::Config->{CONTACT_ADDRESS}, $email);
     }
 
     warn "Info: clearing all fields";
