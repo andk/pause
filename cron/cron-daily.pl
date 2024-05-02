@@ -715,6 +715,7 @@ sub authors {
       require Encode;
       for (@$author) {
         defined && /\P{ASCII}/ && Encode::_utf8_on($_);
+        $_ //= ""; # some fields are undef, make them empty instead.
       }
 
       # Surely no one has tabs in his or her email or full name, but let's
