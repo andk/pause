@@ -137,7 +137,7 @@ sub send {
 
   my %from  = exists $header->{From}
             ? ()
-            : (From => "PAUSE <$PAUSE::Config->{UPLOAD}>");
+            : (From => PAUSE::Email->noreply_email_header_object);
 
   my $email = Email::MIME->create(
     attributes => {
