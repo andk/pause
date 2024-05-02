@@ -628,7 +628,7 @@ sub mail_summary {
             To      => $pma->email_header_object,
             Cc      => PAUSE::Email->report_email_header_object,
             Subject => $failed."PAUSE indexer report $substrdistro",
-            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+            From    => PAUSE::Email->noreply_email_header_object,
         ],
         attributes => {
           charset      => 'utf-8',

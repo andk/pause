@@ -20,6 +20,14 @@ sub report_email_header_object ($class) {
   return $class->email_header_object_for_addresses(@objects);
 }
 
+sub noreply_email_header_object ($class) {
+  require PAUSE;
+
+  return $class->email_header_object_for_addresses(
+    Email::Address::XS->new("Perl Authors Upload Server", $PAUSE::Config->{UPLOAD})
+  );
+}
+
 sub is_valid_email ($class, $string) {
   my $parse = Email::Address::XS->parse_bare_address($string);
 

@@ -170,7 +170,7 @@ sub send_mail {
   my @hdebug = %$header;
   $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
 
-  $header->{From} ||= qq{"Perl Authors Upload Server" <$PAUSE::Config->{UPLOAD}>};
+  $header->{From} ||= PAUSE::Email->noreply_email_header_object;
   $header->{"Reply-To"} ||= $PAUSE::Config->{CONTACT_ADDRESS};
 
   my $email = Email::MIME->create(

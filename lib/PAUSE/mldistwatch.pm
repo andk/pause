@@ -593,7 +593,7 @@ sub handle_alerts {
         header_str => [
             To      => PAUSE::Email->report_email_header_object,
             Subject => "PAUSE upload indexing error",
-            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+            From    => PAUSE::Email->noreply_email_header_object,
         ],
         attributes => {
             charset      => 'utf-8',
