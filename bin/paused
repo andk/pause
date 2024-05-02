@@ -132,8 +132,6 @@ package mypause_send_mail;
 
 use PAUSE::Logger '$Logger';
 
-our %hp_inside;
-
 sub send {
   my($self,$header,$blurb) = @_;
 
