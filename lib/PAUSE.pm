@@ -121,7 +121,7 @@ $PAUSE::Config ||=
      UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
      CHECKSUMS_SIGNING_PROGRAM => 'gpg',
-     CHECKSUMS_SIGNING_ARGS => '--homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ',
+     CHECKSUMS_SIGNING_ARGS => '-q --homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ',
      CHECKSUMS_SIGNING_KEY => '6BA1716EFB099DB2',
      MIN_MTIME_CHECKSUMS => 1300000000, # invent a threshold for oldest mtime
      HAVE_PERLBAL => 1,
