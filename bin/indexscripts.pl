@@ -28,16 +28,13 @@
 #   Value:  The contents of the SCRIPTNAME POD section, _or_ the basename
 #           of .tarpath, _or_ the basename of the uri.
 
-
-my $VERSION = substr q$Revision: 1.33 $, 10;
-my $Id = q$Id: indexscripts.pl,v 1.33 2003/12/13 05:52:51 kstar Exp $;
-
 my $MAINTAINER =
     '<A HREF="mailto:kstar@cpan.org">Kurt Starsinic</A>';
 
 use strict;
-use lib '/home/k/PAUSE/lib';
-
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use Getopt::Std;
 use vars qw($opt_v);    # Verbose
@@ -84,6 +81,10 @@ use Data::Dumper;
 use DBI;
 use Compress::Zlib;
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'indexscripts',
+  facility  => 'daemon',
+} };
 
 my $SCRIPT_TMP  = "/home/kstar/etc/tmp";            # Scratchpad
 my $SCRIPT_ROOT = defined($opt_D) ? $opt_D : $$PAUSE::Config{FTPPUB};

@@ -4,6 +4,11 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-cron-p6daily',
+  facility  => 'daemon',
+} };
+
 use File::Basename ();
 use DBI;
 use Email::MIME;

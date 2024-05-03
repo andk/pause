@@ -1,10 +1,14 @@
 #!/home/pause/.plenv/shims/perl
-
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use PAUSE ();
 use DBI;
 use File::Spec;
+
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-cleanup-incoming',
+  facility  => 'daemon',
+} };
 
 my $incdir = File::Spec->canonpath($PAUSE::Config->{INCOMING_LOC});
 

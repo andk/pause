@@ -7,6 +7,11 @@ use lib "$FindBin::Bin/../lib";
 use PAUSE;
 use Path::Tiny;
 
+use PAUSE::Logger '$Logger' => { init => {
+  ident     => 'pause-recentfile-aggregate',
+  facility  => 'daemon',
+} };
+
 my $PAUSE_ROOT = $PAUSE::Config->{FTPPUB};
 
 die "FTPPUB directory ($PAUSE_ROOT) isn't there!\n"
