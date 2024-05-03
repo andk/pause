@@ -67,9 +67,7 @@ unless (open $lfh, "+<", $lockfile) {
     open $lfh, ">>", $lockfile or die "Could not open lockfile: $!";
     open $lfh, "+<", $lockfile or die "Could not open lockfile: $!";
 }
-if (flock $lfh, LOCK_EX|LOCK_NB) {
-    warn "Info: Got the lock, continuing";
-} else {
+if (not flock $lfh, LOCK_EX|LOCK_NB) {
     die "lockfile '$lockfile' locked by a different process; cannot continue";
 }
 
