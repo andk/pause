@@ -32,7 +32,7 @@ sub noreply_email_header_object ($class) {
   require PAUSE;
 
   return $class->email_header_object_for_addresses(
-    Email::Address::XS->new("Perl Authors Upload Server", $PAUSE::Config->{UPLOAD})
+    Email::Address::XS->new("Perl Authors Upload Server", $PAUSE::Config->{NOREPLY_ADDRESS})
   );
 }
 

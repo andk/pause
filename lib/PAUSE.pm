@@ -104,6 +104,7 @@ $PAUSE::Config ||=
      ML_MIN_FILES => 20_000, # must be this many files to run mldistwatch
      MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
      NO_SUCCESS_BREAK => 900,
+     NOREPLY_ADDRESS => 'upload@pause.perl.org',
      P5P => 'release-announce@perl.org',
      PID_DIR => "/home/pause/pid/",
      PAUSE_LOG => "/home/pause/log/paused.log",
@@ -119,7 +120,6 @@ $PAUSE::Config ||=
      TIMEOUT => 60*60,
      TRUST_IS_SSL_HEADER => 1,
      TMP => '/data/pause/tmp/',
-     UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
      CHECKSUMS_SIGNING_PROGRAM => 'gpg',
      CHECKSUMS_SIGNING_ARGS => '-q --homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ',

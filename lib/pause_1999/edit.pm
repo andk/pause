@@ -1654,7 +1654,7 @@ filename[%s]. </p>
 
   # via FTP GET
 
-  warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+  warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
   push @m, qq{<tr><td bgcolor="#ffe0ff">If you want me <b>to fetch a
       file</b> from an URL, enter the full URL here.<br />};
 
@@ -2457,12 +2457,12 @@ The PAUSE Team
 
     # both users and mailing lists run this code
 
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
     my(@to) = $PAUSE::Config->{CONTACT_ADDRESS};
     push @m, qq{ Sending separate mails to:
 }, join(" AND ", @to, $email), qq{
 <pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject\n};
 
     my($blurb) = join "", @blurb;
@@ -3065,7 +3065,7 @@ MAIL
                    }{<a href=\"$1\">$1</a>}xg;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
     push @m, qq{<pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject
 
 $blurbcopy
@@ -4394,9 +4394,9 @@ The PAUSE Team
     my($blurb) = join "", @blurb;
     require HTML::Entities;
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
     push @m, qq{<pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject
 
 $blurbcopy
@@ -4967,9 +4967,9 @@ Peek at the current permissions:
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
     $blurbcopy =~ s|(https?://[^\s\"]+)|<a href="$1">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
-    # warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    # warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
     push @m, qq{<pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject
 
 $blurbcopy
@@ -5951,7 +5951,7 @@ decision.</li>
     again. As it is done by a cron job, it may take up to an hour
     until the indexer actually executes the command. If this doesn't
     repair the index, please <a
-    href="mailto:$PAUSE::Config->{UPLOAD}">email me</a>. };
+    href="mailto:$PAUSE::Config->{NOREPLY_ADDRESS}">email me</a>. };
 
   require Cwd;
   my $cwd = Cwd::cwd();

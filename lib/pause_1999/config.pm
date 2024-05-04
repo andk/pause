@@ -394,7 +394,7 @@ share_perms
 
   }
 
-  $self->{OurEmailFrom} = "\"Perl Authors Upload Server\" <$PAUSE::Config->{UPLOAD}>";
+  $self->{OurEmailFrom} = "\"Perl Authors Upload Server\" <$PAUSE::Config->{NOREPLY_ADDRESS}>";
   # warn "Debug: OurEmailFrom=UPLOAD[$self->{OurEmailFrom}]";
   my(@time) = gmtime; # sec,min,hour,day,month,year
   my $quartal = int($time[4]/3) + 1; # 1..4

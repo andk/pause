@@ -87,7 +87,7 @@ changed&#160;by&#160;<%= $row->{changedby} %><br>
 
 Sending separate mails to: <%= $pause->{send_to} %>
 <pre>
-From: <%= $PAUSE::Config->{UPLOAD} %>
+From: <%= $PAUSE::Config->{NOREPLY_ADDRESS} %>
 Subject: <%= $pause->{subject} %>
 
 <%= $pause->{blurb} %>
