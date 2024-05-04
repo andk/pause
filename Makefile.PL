@@ -78,7 +78,6 @@ WriteMakefile(
         String::Random
         Test::Class
         Test::Deep
-        Test::FITesque::Fixture
         Test::MockObject
         Test::mysqld
         Test::Requires
