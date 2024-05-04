@@ -190,6 +190,7 @@ sub edit {
           if ($nu->{userid} && $nu->{userid} eq $pause->{User}{userid}) {
             $pause->{User} = $nu;
           }
+
           # Send separate emails to user and public places because
           # CC leaks secretemail to others
           my @to;
@@ -197,13 +198,14 @@ sub edit {
           for my $lu ($u, $nu) {
             for my $att (qw(secretemail email)) {
               if ($lu->{$att}){
-                $umailset{qq{<$lu->{$att}>}} = 1;
+                $umailset{ $lu->{$att} } = 1;
                 last;
               }
             }
           }
-          push @to, join ", ", keys %umailset;
-          push @to, $mgr->config->mailto_admins if $mailto_admins;
+          push @to, sort keys %umailset;
+          push @to, PAUSE::Email->report_email_header_object if $mailto_admins;
+
           my $header = {Subject => "User update for $u->{userid}"};
           $mgr->send_mail_multi(\@to,$header, $mailblurb);
         } else {

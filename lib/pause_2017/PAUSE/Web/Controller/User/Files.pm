@@ -121,23 +121,8 @@ sub delete {
     $pause->{blurb} = $blurb;
     $blurb = $c->render_to_string("email/user/delete_files", format => "email");
 
-    my %umailset;
-    my $name = $u->{asciiname} || $u->{fullname} || "";
-    my $Uname = $pause->{User}{asciiname} || $pause->{User}{fullname} || "";
-    if ($u->{secretemail}) {
-      $umailset{qq{"$name" <$u->{secretemail}>}} = 1;
-    } elsif ($u->{email}) {
-      $umailset{qq{"$name" <$u->{email}>}} = 1;
-    }
-    if ($u->{userid} ne $pause->{User}{userid}) {
-      if ($pause->{User}{secretemail}) {
-        $umailset{qq{"$Uname" <$pause->{User}{secretemail}>}} = 1;
-      }elsif ($pause->{User}{email}) {
-        $umailset{qq{"$Uname" <$pause->{User}{email}>}} = 1;
-      }
-    }
-    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
-    my @to = keys %umailset;
+    my @to = $mgr->prepare_sendto($u, $pause->{User}, 1);
+
     my $header = {
                   Subject => "Files of $u->{userid} scheduled for deletion"
                  };

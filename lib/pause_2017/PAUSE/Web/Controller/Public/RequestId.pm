@@ -141,9 +141,10 @@ sub request {
       }
     }
 
-    my @to = $mgr->config->mailto_admins;
+    my @to = PAUSE::Email->report_email_header_object;
     push @to, $email;
-    $pause->{send_to} = "@to";
+    $pause->{send_to} = "$email"; # I don't understand what this is for XXX -- rjbs, 2024-05-03
+
     my $time = time;
     if ($rationale) {
       # wrap it
