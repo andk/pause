@@ -38,6 +38,6 @@ for my $dirent (readdir DIR) {
   my $size = -s $absdirent;
 
   unlink $absdirent or die "Could not unlink $absdirent: $!";
-  warn "unlinked $absdirent ($size)\n";
+  $Logger->log("unlinked $absdirent ($size)");
 }
 closedir DIR;
