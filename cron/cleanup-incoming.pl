@@ -36,14 +36,7 @@ for my $dirent (readdir DIR) {
       next if $sth->rows > 0;
   }
   my $size = -s $absdirent;
-  if (0 && $dirent =~ /^(\d+)\.(\d+)$/) { # these come often, but I could not decipher
-    open my $fh, $absdirent or die "Could not open $absdirent: $!";
-    local $/;
-    my $str = <$fh>;
-    substr($str,100*1024) = "" if length($str)> 100*1024;
-    require Data::Dumper;
-    warn sprintf "content[%s]\n", Data::Dumper::Dumper($str);
-  }
+
   unlink $absdirent or die "Could not unlink $absdirent: $!";
   warn "unlinked $absdirent ($size)\n";
 }
