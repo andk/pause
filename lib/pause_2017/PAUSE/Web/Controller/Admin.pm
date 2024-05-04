@@ -156,7 +156,7 @@ sub edit_ml {
     if ($saw_a_change) {
       $pause->{changed} = 1;
       my $mailblurb = $c->render_to_string("email/admin/edit_ml", format => "email");
-      my @to = ($u->{secretemail}||$u->{email}, $mgr->config->mailto_admins);
+      my @to = ($u->{secretemail}||$u->{email}, PAUSE::Email->report_email_header_object);
       warn "sending to[@to]";
       warn "mailblurb[$mailblurb]";
       my $header = {
@@ -199,7 +199,7 @@ sub change_user_status {
         $pause->{changed} = 1;
         $pause->{new_ustatus} = $new_ustatus;
         my $mailblurb = $c->render_to_string("email/admin/change_user_status", format => "email");
-        my @to = ($u->{secretemail}||$u->{email}, $mgr->config->mailto_admins);
+        my @to = ($u->{secretemail}||$u->{email}, PAUSE::Email->report_email_header_object);
         warn "sending to[@to]";
         warn "mailblurb[$mailblurb]";
         my $header = {
