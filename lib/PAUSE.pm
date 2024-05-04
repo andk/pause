@@ -70,7 +70,6 @@ push @INC, $pauselib;
 $PAUSE::Config ||=
     {
      ABRA_EXPIRATION => 86400/4,
-     ADMIN => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neilb@neilb.org},
      ANON_FTP_PASS => qq{k\@pause.perl.org},
      AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
      AUTHEN_PASSWORD_FLD => "password",
@@ -93,6 +92,7 @@ $PAUSE::Config ||=
      HTTP_ERRORLOG => '/var/log/nginx/error.log', # harmless use in cron-daily
      INCOMING => 'file://data/pause/incoming/',
      INCOMING_LOC => '/data/pause/incoming',
+     INTERNAL_REPORT_ADDRESS => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neilb@neilb.org},
      MAIL_MAILER => ["sendmail"],
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',

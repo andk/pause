@@ -308,7 +308,7 @@ skip        =not yet verified
 
 
       mypause_send_mail->send({
-                               To => $PAUSE::Config->{ADMIN},
+                               To => $PAUSE::Config->{INTERNAL_REPORT_ADDRESS},
                                Subject => "Mirror request from $package"
                               },
                               $blurb
@@ -400,7 +400,7 @@ sub woe {
     my @To;
     my $pma = PAUSE::MailAddress->new_from_userid($userid);
     my $to  = $pma->address;
-    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
+    push @To, $PAUSE::Config->{INTERNAL_REPORT_ADDRESS}, qq{"$asciiname" <$to>};
 
     my $blurb = "The URL $hash->{uri},
 requested for upload as $hash->{uriid} has problems
@@ -471,7 +471,7 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
     my @To;
     my $pma = PAUSE::MailAddress->new_from_userid($userid);
     my $address  = $pma->address;
-    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
+    push @To, $PAUSE::Config->{INTERNAL_REPORT_ADDRESS}, qq{"$asciiname" <$address>};
 
     my $blurb;
     if ($self->{ErrNotGzip}) {
@@ -775,7 +775,7 @@ sub verify_gzip_tar {
         if ($child_stat != 0) {
             $err =~ s/\n/ /g;
             $self->logge("Debug: child_stat[$child_stat]err[$err]");
-            my @To = $PAUSE::Config->{ADMIN};
+            my @To = $PAUSE::Config->{INTERNAL_REPORT_ADDRESS};
 
             my $blurb = "For the resource [$uri]
  the command [$testinggzip -t $tpath]

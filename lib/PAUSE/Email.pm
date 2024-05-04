@@ -11,7 +11,7 @@ sub email_header_object_for_addresses ($class, @addresses) {
 sub report_email_header_object ($class) {
   require PAUSE;
 
-  my @addrs = split /\s*,\s*/, $PAUSE::Config->{ADMIN};
+  my @addrs = split /\s*,\s*/, $PAUSE::Config->{INTERNAL_REPORT_ADDRESS};
 
   die "No PAUSE config entry for ADMIN!?" unless @addrs;
 

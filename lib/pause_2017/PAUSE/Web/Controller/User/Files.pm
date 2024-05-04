@@ -136,7 +136,7 @@ sub delete {
         $umailset{qq{"$Uname" <$pause->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my @to = keys %umailset;
     my $header = {
                   Subject => "Files of $u->{userid} scheduled for deletion"

@@ -284,7 +284,7 @@ sub database_alert {
     my $server = $self->myurl->can("host") ? $self->myurl->host : $self->myurl->hostname;
     my $header = {
                   From => "database_alert",
-                  To => $PAUSE::Config->{ADMIN},
+                  To => $PAUSE::Config->{INTERNAL_REPORT_ADDRESS},
                   Subject => "PAUSE Database Alert $server",
                  };
     $self->send_mail($header,$mess);

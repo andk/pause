@@ -500,7 +500,7 @@ sub active_user_record {
       die PAUSE::HeavyCGI::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help him identifying what's going on. Thanks!");
     }
     my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
     require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({hiddenuser_h1 => $hiddenuser_h1}); # XXX
@@ -598,7 +598,7 @@ sub active_user_record {
       die PAUSE::HeavyCGI::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help them identify what's going on. Thanks!")
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help them identify what's going on. Thanks!")
               unless $sth1->rows;
 
       $mgr->{User} = $mgr->fetchrow($sth1, "fetchrow_hashref");
@@ -1394,7 +1394,7 @@ sub add_uri {
   die PAUSE::HeavyCGI::Exception
       ->new(ERROR =>
             "Unidentified error happened, please write to the PAUSE admins
- at $PAUSE::Config->{ADMIN} and help them identifying what's going on. Thanks!")
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help them identifying what's going on. Thanks!")
           unless $u->{userid};
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
   my $can_multipart = $mgr->can_multipart;
@@ -1701,7 +1701,7 @@ into $her directory. The request used the following parameters:});
     $mailblurb .= $self->wrappar($success);
     $mailblurb .= "\n\nThanks for your contribution,\n-- \nThe PAUSE Team\n";
 #    my $header = {
-#		  To => qq{$PAUSE::Config->{ADMIN}, $u->{email}, $mgr->{User}{email}},
+#		  To => qq{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}, $u->{email}, $mgr->{User}{email}},
 #		  Subject => qq{Notification from PAUSE},
 #		 };
     my %umailset;
@@ -1719,7 +1719,7 @@ into $her directory. The request used the following parameters:});
 	$umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my @to = keys %umailset;
     my $header = {
                   Subject => "Notification from PAUSE",
@@ -1755,7 +1755,7 @@ Sorry, <b>$uri</b> could not be recognized as an uri (},
 			 qq{\)<p>Please
 try again or report errors to <a
 href="mailto:},
-			  $PAUSE::Config->{ADMIN},
+			  $PAUSE::Config->{INTERNAL_REPORT_ADDRESS},
 			  qq{">the administrator</a></p>}]);
     } else {
       my $filename;
@@ -2126,7 +2126,7 @@ glory is collected on http://history.perl.org/backpan/});
         $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my @to = keys %umailset;
     my $header = {
                   Subject => "Files of $u->{userid} scheduled for deletion"
@@ -2383,7 +2383,7 @@ Description: };
         my $otpwblurb = qq{
 
 (This mail has been generated automatically by the Perl Authors Upload
-Server on behalf of the admin $PAUSE::Config->{ADMIN})
+Server on behalf of the admin $PAUSE::Config->{INTERNAL_REPORT_ADDRESS})
 
 As already described in a separate message, you\'re a registered Perl
 Author with the userid $userid. For the sake of approval I have
@@ -2402,14 +2402,14 @@ possible, otherwise your password can be intercepted by third parties.
 
 Thanks & Regards,
 --
-$PAUSE::Config->{ADMIN}
+$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}
 };
 
         my $header = {
                       Subject => $subject,
                      };
         warn "header[$header]otpwblurb[$otpwblurb]";
-        $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
+        $mgr->send_mail_multi([$email,$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}],
                               $header,
                               $otpwblurb);
 
@@ -6063,7 +6063,7 @@ Estimated time of job completion: %s
         $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my $header = {
                   Subject => "Scheduled for reindexing $u->{userid}"
                  };
@@ -7223,7 +7223,7 @@ packages have their recorded version set to 'undef'.
         $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my $header = {
                   Subject => "Version reset for $u->{userid}"
                  };
