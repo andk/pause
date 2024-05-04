@@ -33,6 +33,7 @@ $TmpDir->child('log')->child('paused.log')->touch();
 
 $INC{"PrivatePAUSE.pm"} = 1;
 $ENV{EMAIL_SENDER_TRANSPORT} = "Test";
+$ENV{PLACK_ENV} = 'github';
 
 require PAUSE;
 require PAUSE::Web::Config;

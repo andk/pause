@@ -1,0 +1,3 @@
+dispatchers = null
+
+null.class = Log::Dispatch::Null
