@@ -415,7 +415,7 @@ sub whois {
 <body>
   <h3>People, <a href="#mailinglists">Mailinglists</a> And
   <a href="#mlarchives">Mailinglist Archives</a> </h3>
-<i>generated on $now UTC by $PAUSE::Config->{ADMIN}</i>
+<i>generated on $now UTC by $PAUSE::Config->{INTERNAL_REPORT_ADDRESS}</i>
 <pre xml:space="preserve">
 };
 

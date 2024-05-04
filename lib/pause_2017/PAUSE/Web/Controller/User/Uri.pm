@@ -17,7 +17,7 @@ sub add {
   die PAUSE::Web::Exception
       ->new(ERROR =>
             "Unidentified error happened, please write to the PAUSE admins
- at $PAUSE::Config->{ADMIN} and help them identifying what's going on. Thanks!")
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help them identifying what's going on. Thanks!")
           unless $u->{userid};
 
   my($tryupload) = 1; # everyone supports multipart now
@@ -181,7 +181,7 @@ Sorry, <b>$uri</b> could not be recognized as an uri (}),
                           $@,
                          Mojo::ByteStream->new(qq{\)Please
 try again or report errors to <a href="mailto:}),
-                          $PAUSE::Config->{ADMIN},
+                          $PAUSE::Config->{INTERNAL_REPORT_ADDRESS},
                           Mojo::ByteStream->new(qq{">the administrator</a></p>})]);
     } else {
       require LWP::UserAgent;

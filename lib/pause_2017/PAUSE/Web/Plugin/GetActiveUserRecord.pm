@@ -64,7 +64,7 @@ sub _get {
                           $sth1->rows,
                           $sth1->rows,
                          ));
-      die PAUSE::Web::Exception->new(ERROR => "Unidentified error happened, please write to the PAUSE admin at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
+      die PAUSE::Web::Exception->new(ERROR => "Unidentified error happened, please write to the PAUSE admin at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help him identifying what's going on. Thanks!");
     }
     my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
 
@@ -157,7 +157,7 @@ sub _get {
       die PAUSE::Web::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help them identify what's going on. Thanks!")
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help them identify what's going on. Thanks!")
               unless $sth1->rows;
 
       $pause->{User} = $mgr->fetchrow($sth1, "fetchrow_hashref");

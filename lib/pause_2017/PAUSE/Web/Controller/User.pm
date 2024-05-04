@@ -204,7 +204,7 @@ sub reindex {
     $pause->{blurb} = $blurb;
     $pause->{eta} = $eta;
 
-    my @to = $mgr->prepare_sendto($u, $pause->{User}, $PAUSE::Config->{ADMIN});
+    my @to = $mgr->prepare_sendto($u, $pause->{User}, $PAUSE::Config->{INTERNAL_REPORT_ADDRESS});
     my $mailbody = $c->render_to_string("email/user/reindex", format => "email");
     my $header = {
                   Subject => "Scheduled for reindexing $u->{userid}"
@@ -274,7 +274,7 @@ sub reset_version {
   if ($blurb) {
     $pause->{blurb} = $blurb;
 
-    my @to = $mgr->prepare_sendto($u, $pause->{User}, $PAUSE::Config->{ADMIN});
+    my @to = $mgr->prepare_sendto($u, $pause->{User}, $PAUSE::Config->{INTERNAL_REPORT_ADDRESS});
     my $mailbody = $c->render_to_string("email/user/reset_version", format => "email");
     my $header = {
                   Subject => "Version reset for $u->{userid}"
