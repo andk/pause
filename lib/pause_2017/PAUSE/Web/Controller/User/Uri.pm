@@ -136,7 +136,7 @@ sub add {
 
   # via FTP GET
 
-  warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+  warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
 
   # END OF UPLOAD OPTIONS
 }
