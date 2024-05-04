@@ -88,8 +88,10 @@ use PAUSE ();
 
 $Opt{debug} ||= 0;
 if ($Opt{debug}) {
-  warn "Debugging on. CPAN::Checksums::VERSION[$CPAN::Checksums::VERSION]";
+  $Logger->set_debug(1);
+  $Logger->log("Debugging on. CPAN::Checksums::VERSION[$CPAN::Checksums::VERSION]");
 }
+
 my $root = $PAUSE::Config->{MLROOT};
 $Opt{startdir} //= $root;
 our $TESTDIR;
@@ -159,7 +161,7 @@ find(sub {
        }
        my $ret = eval { CPAN::Checksums::updatedir($ffname, $root); };
        if ($@) {
-         warn "error[$@] in checksums file[$ffname]: must unlink";
+         $Logger->log("error[$@] in checksums file[$ffname]: must unlink");
          unlink "$ffname/CHECKSUMS";
        }
        if ($Opt{debug}) {
@@ -175,7 +177,14 @@ find(sub {
            ) or die $!;
          $yaml->{stop} = time;
          my $tooktime = sprintf "%.6f", $yaml->{stop} - $yaml->{start};
-         warn "debugdir[$debugdir]ret[$ret]tooktime[$tooktime]cnt[$cnt]\n";
+
+         $Logger->log_event('checksum-debugging-file' => [
+           debugdir => $debugdir,
+           ret      => $ret,
+           tooktime => $tooktime,
+           cnt      => $cnt,
+         ]);
+
          $yaml->{tooktime} = $tooktime;
          YAML::Syck::DumpFile(File::Spec->catfile($debugdir,
                                                   "YAML"), $yaml);
