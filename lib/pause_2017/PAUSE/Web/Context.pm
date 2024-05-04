@@ -171,7 +171,7 @@ sub send_mail {
   $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
 
   $header->{From} ||= PAUSE::Email->noreply_email_header_object;
-  $header->{"Reply-To"} ||= $PAUSE::Config->{CONTACT_ADDRESS};
+  $header->{"Reply-To"} ||= PAUSE::Email->contact_email_header_object;
 
   my $email = Email::MIME->create(
     header_str => [%$header],
