@@ -30,15 +30,15 @@ sub ignoredist {
   my $self = shift;
   my $dist = $self->{DIST};
   if ($dist =~ m|/\.|) {
-    $Logger->log("Warning: illegal filename");
-    return 1;
+    return PAUSE::mldistwatch::Constants::IGFILENAME;
   }
 
-  return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
+  return PAUSE::mldistwatch::Constants::IGMETADATA
+    if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
 
   # Stupid to have code that needs to be maintained in two places,
   # here and in edit.pm:
-  return "weird CNANDOR case"
+  return PAUSE::mldistwatch::Constants::IGCNANDOR
     if $dist =~ m!CNANDOR/(?:mp_(?:app|debug|doc|lib|source|tool)|VISEICat(?:\.idx)?|VISEData)!;
 
   return;

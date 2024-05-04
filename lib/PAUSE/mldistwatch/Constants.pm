@@ -49,6 +49,14 @@ sub heading ($) {
   $heading->{$status};
 }
 
+# constants used for ignoredist
+use constant IGFILENAME => 'illegal filename';
+use constant IGMETADATA => 'metadata';
+use constant IGCNANDOR => 'weird CNANDOR case';
+use constant IGGONER => "it's a goner";
+use constant IGNOLOCK => 'could not obtain a lock';
+use constant IGUNCHANGED => 'file mtime has not changed';
+
 1;
 
 
