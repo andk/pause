@@ -41,39 +41,40 @@ my %KEEP_FOREVER = (
 );
 
 find(
-     {
-      bydepth => 1,
-      wanted => sub {
-        return if /^\.\.?$/;
-        return if $KEEP_FOREVER{ $File::Find::name };
-        my($dev,$ino,$mode,$nlink,$uid,$gid) = lstat($_);
-        if (-l $_ && ! -e $_){
-          $Logger->log("unlinking stale $File::Find::name");
-          unlink $_;
-          # PAUSE::delfile_hook(File::Spec->rel2abs($_)); # do we track symlinks?
+  {
+    bydepth => 1,
+    wanted => sub {
+      return if /^\.\.?$/;
+      return if $KEEP_FOREVER{ $File::Find::name };
+      my($dev,$ino,$mode,$nlink,$uid,$gid) = lstat($_);
+      if (-l $_ && ! -e $_){
+        $Logger->log("unlinking stale $File::Find::name");
+        unlink $_;
+        # PAUSE::delfile_hook(File::Spec->rel2abs($_)); # do we track symlinks?
+      }
+      if ($_ eq "CHECKSUMS") {
+        opendir DIR, ".";
+        my @readdir = readdir DIR;
+        closedir DIR;
+        if (@readdir == 3) {
+          $Logger->log("unlinking orphaned $File::Find::name");
+          unlink $_ or die "Could not unlink $_: $!";
+          PAUSE::delfile_hook(File::Spec->rel2abs($_)); # definitely needed
         }
-        if ($_ eq "CHECKSUMS") {
-          opendir DIR, ".";
-          my @readdir = readdir DIR;
-          closedir DIR;
-          if (@readdir == 3) {
-            $Logger->log("unlinking orphaned $File::Find::name");
-            unlink $_ or die "Could not unlink $_: $!";
-            PAUSE::delfile_hook(File::Spec->rel2abs($_)); # definitely needed
-          }
+      }
+      return if -l $_;
+      ($dev,$ino,$mode,$nlink,$uid,$gid) = stat($_);
+      if (-d _ and $nlink == 2) { # directory without subdir
+        opendir DIR, $_;
+        my @readdir = readdir DIR;
+        closedir DIR;
+        if (@readdir == 2) {
+          $Logger->log("rmdirring empty $File::Find::name");
+          rmdir $_ or die "Could not rmdir $_: $!";
+          # PAUSE::delfile_hook(File::Spec->rel2abs($_)); # we do not track directories
         }
-        return if -l $_;
-        ($dev,$ino,$mode,$nlink,$uid,$gid) = stat($_);
-        if (-d _ and $nlink == 2) { # directory without subdir
-          opendir DIR, $_;
-          my @readdir = readdir DIR;
-          closedir DIR;
-          if (@readdir == 2) {
-            $Logger->log("rmdirring empty $File::Find::name");
-            rmdir $_ or die "Could not rmdir $_: $!";
-            # PAUSE::delfile_hook(File::Spec->rel2abs($_)); # we do not track directories
-          }
-        }
-      },
-     },
-     "authors", "modules");
+      }
+    },
+  },
+  "authors", "modules"
+);
