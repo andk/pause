@@ -80,7 +80,7 @@ sub read_errorlog {
     close LOG;
     report "\nErrorlog contains $errorlines lines today\n";
   } else {
-    warn "error opening $PAUSE::Config->{HTTP_ERRORLOG}: $!";
+    $Logger->log("error opening $PAUSE::Config->{HTTP_ERRORLOG}: $!");
   }
 }
 
@@ -241,7 +241,8 @@ sub watch_files {
           quoteHighBit => 1,
         );
         my $v = $d->stringify($File::Find::name);
-        warn sprintf qq{Found a bad directory v[%s], rmtree-ing}, $v;
+
+        $Logger->log([ qq{Found a bad directory v[%s], rmtree-ing}, $v ]);
         require File::Path;
         File::Path::rmtree($File::Find::name);
       }
@@ -649,7 +650,10 @@ sub mailrc {
         require Text::Unidecode;
         $r[1] = Text::Unidecode::unidecode($r[1]);
       };
-      warn $@ if $@;
+
+      if ($@) {
+        $Logger->log([ "error unidecoding: %s", "$@" ]);
+      }
     }
     $r[1] =~ s/["<>]//g;
     push @list, sprintf qq{alias %-10s "%s <%s>"\n}, @r[ 0 .. 2 ];
