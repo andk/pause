@@ -102,7 +102,6 @@ sub new {
                       OPT => $opt,
                       PIDFH => $fh,
                      }, $class;
-    $self->{VERBOSE} = -t STDOUT ? 2 : 1;
     if ($opt->{pick}) {
         for my $pick (@{$opt->{pick}}) {
             $pick =~ s|^.*authors/id/|| if $pick =~ m|authors/id/./../|;
