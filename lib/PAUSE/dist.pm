@@ -34,7 +34,7 @@ sub ignoredist {
     return 1;
   }
 
-  return 1 if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
+  return "non-dist file" if $dist =~ /(\.readme|\.sig|\.meta|CHECKSUMS)$/;
 
   # Stupid to have code that needs to be maintained in two places,
   # here and in edit.pm:
