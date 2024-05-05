@@ -5,20 +5,11 @@ use Test::PAUSE::Web;
 use utf8;
 
 my $default = {
-    pause99_tail_logfile_1 => 5000,
+    pause99_tail_logfile_1 => 500,
     pause99_tail_logfile_sub => 1,
 };
 
 Test::PAUSE::Web->setup;
-
-{
-    open my $fh, '>', $PAUSE::Config->{PAUSE_LOG};
-    say $fh <<LOG;
-pause log
-pause log
-pause log
-LOG
-}
 
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
