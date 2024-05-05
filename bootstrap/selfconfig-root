@@ -68,13 +68,13 @@ my @required_debs = qw(
  libexpat1-dev
  libgetopt-long-descriptive-perl
  libpath-tiny-perl
+ libsasl2-modules
  libssl-dev
  nginx
  python3-certbot-nginx
+ ufw
  unzip
  zlib1g-dev
- libsasl2-modules
- ufw
 );
 
 run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y), @required_debs);
