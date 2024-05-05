@@ -302,9 +302,7 @@ sub tail_logfile {
 
   my $tail = $req->param("pause99_tail_logfile_1") || 5000;
   my $file = $PAUSE::Config->{PAUSE_LOG};
-  if ($PAUSE::Config->{TESTHOST}) {
-    $file = "/usr/local/apache/logs/error_log"; # for testing
-  }
+
   open my $fh, "<", $file or die "Could not open $file: $!";
   seek $fh, -$tail, 2;
   local($/);
