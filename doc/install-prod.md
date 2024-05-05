@@ -66,6 +66,17 @@ Install node exporter.
 apt -y install prometheus-node-exporter
 ```
 
+### General
+
+You probably want to enable some non-default collectors.  In
+`/etc/default/prometheus-node-exporter`:
+
+```
+ARGS="--collector.systemd"
+```
+
+### nginx
+
 Consider
 [nginx-prometheus-exporter](https://github.com/nginxinc/nginx-prometheus-exporter).
 
