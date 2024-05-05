@@ -437,9 +437,11 @@ sub maybe_index_dist {
     local $Logger = $Logger->proxy({ proxy_prefix => "$dist: " });
 
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
-        # We don't log on $OLD_UNCHANGED_FILE because it's extremely common and
-        # leads to noise in the logs. -- rjbs, 2024-04-28
-        my $log_method = $skip_reason eq $OLD_UNCHANGED_FILE ? 'log_debug' : 'log';
+        # We don't log on a few things that are extremely common and lead to
+        # noise in the logs. -- rjbs, 2024-04-28
+        my $log_method = $skip_reason eq $OLD_UNCHANGED_FILE ? 'log_debug'
+                       : $skip_reason eq "non-dist file"     ? 'log_debug'
+                       :                                       'log';
         $Logger->$log_method("skipping: $skip_reason");
 
         delete $self->{ALLlasttime}{$dist};
