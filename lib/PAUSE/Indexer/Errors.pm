@@ -2,6 +2,8 @@ package PAUSE::Indexer::Errors;
 use v5.12.0;
 use warnings;
 
+use Carp ();
+
 use Sub::Exporter -setup => {
   exports => [ qw( DISTERROR PKGERROR ) ],
   groups  => { default => [ qw( DISTERROR PKGERROR ) ] },
