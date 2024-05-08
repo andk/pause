@@ -400,6 +400,7 @@ sub update_package {
           tdistmtime  => $tdistmtime,
           odistmtime  => $odistmtime,
           opack       => $opack,
+          older_isa_regular_perl => $older_isa_regular_perl,
       });
   } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
       $ctx->abort_indexing_package($self, PKGERROR('version_invalid', {
