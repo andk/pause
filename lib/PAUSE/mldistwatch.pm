@@ -355,14 +355,14 @@ sub _do_the_database_work {
     if ($dio->perl_major_version == 6) {
       if ($dio->p6_dist_meta_ok) {
         if (my $err = $dio->p6_index_dist($ctx)) {
-          $ctx->alert($err);
+          $ctx->add_alert($err);
           $dbh->rollback;
         } else {
           $dbh->commit;
         }
       }
       else {
-        $ctx->alert("Meta information of Perl 6 dist is invalid");
+        $ctx->add_alert("Meta information of Perl 6 dist is invalid");
         $dbh->rollback;
       }
 
@@ -379,7 +379,7 @@ sub _do_the_database_work {
 
       $dbh->commit;
     } else {
-      $ctx->alert("Uploading user has no permissions on package $main_pkg");
+      $ctx->add_alert("Uploading user has no permissions on package $main_pkg");
       $ctx->add_dist_error(DISTERROR('no_distname_permission'));
       $dbh->rollback;
     }
@@ -503,7 +503,7 @@ sub maybe_index_dist {
       $self->disconnect;
       if ($attempt == 3) {
         $Logger->log_debug("tried $attempt times to do db work, but all failed");
-        $ctx->alert("database errors while indexing");
+        $ctx->add_alert("database errors while indexing");
         $ctx->add_dist_error(DISTERROR('xact_fail'));
       }
     }

@@ -161,7 +161,7 @@ sub assert_permissions_okay {
 
           my $error   = "not owner";
 
-          $ctx->alert(qq{$error:
+          $ctx->add_alert(qq{$error:
 package[$package]
 version[$pp->{version}]
 file[$pp->{infile}]
@@ -295,7 +295,7 @@ sub assert_version_ok {
 
     return if length $self->{PP}{version} <= 16;
 
-    $ctx->alert(qq{version string was too long:
+    $ctx->add_alert(qq{version string was too long:
 package[$self->{PACKAGE}]
 version[$self->{PP}{version}]
 file[$self->{PP}{infile}]
@@ -423,7 +423,7 @@ sub update_package {
       if ($odist ne $dist) {
           delete $self->dist->{CHECKINS}{ lc $package }{ $package };
 
-          $ctx->alert(qq{decreasing VERSION number [$pp->{version}]
+          $ctx->add_alert(qq{decreasing VERSION number [$pp->{version}]
 in package[$package]
 dist[$dist]
 oldversion[$oldversion]
@@ -435,7 +435,7 @@ pmfile[$pmfile]
           $ok++;          # new on 2002-08-01
       } else {
           # we get a different result now than we got in a previous run
-          $ctx->alert("Taking back previous version calculation. odist[$odist]oversion[$oldversion]dist[$dist]version[$pp->{version}].");
+          $ctx->add_alert("Taking back previous version calculation. odist[$odist]oversion[$oldversion]dist[$dist]version[$pp->{version}].");
           $ok++;
       }
   } else {

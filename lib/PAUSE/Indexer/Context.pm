@@ -122,7 +122,7 @@ has alerts => (
   default => sub {  []  },
 );
 
-sub alert {
+sub add_alert {
   my ($self, $alert) = @_;
   $alert =~ s/\v+\z//;
 
@@ -152,7 +152,7 @@ sub add_dist_error {
   return $error;
 }
 
-sub dist_errors {
+sub all_dist_errors {
   my ($self) = @_;
   return @{ $self->_dist_errors };
 }
