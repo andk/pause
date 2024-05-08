@@ -175,7 +175,7 @@ sub untar {
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
       $Logger->log("*** ALERT: updir detected!");
-      $ctx->alert("updir detected!");
+      $ctx->add_alert("updir detected!");
       $self->{COULD_NOT_UNTAR}++;
       return;
     }
@@ -186,7 +186,7 @@ sub untar {
   $self->{PERL_MAJOR_VERSION} = 5 unless defined $self->{PERL_MAJOR_VERSION};
   unless (close TARTEST) {
     $Logger->log("could not untar $dist!");
-    $ctx->alert("could not untar!");
+    $ctx->add_alert("could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return;
   }
@@ -253,7 +253,7 @@ sub _examine_regular_perl {
     $suffix = $1;
   } else {
     $Logger->log("perl distro ($dist) with an unusual suffix!");
-    $ctx->alert("perl distro ($dist) with an unusual suffix!");
+    $ctx->add_alert("perl distro ($dist) with an unusual suffix!");
   }
 
   unless ($skip) {
@@ -478,7 +478,7 @@ sub mail_summary {
 
   my $status_over_all;
 
-  my @dist_errors = $ctx->dist_errors;
+  my @dist_errors = $ctx->all_dist_errors;
 
   for my $error (@dist_errors) {
     my $header = $error->{header};
@@ -504,7 +504,7 @@ sub mail_summary {
     } else {
 
       # No files have status, no dist-wide errors.  Nothing to report!
-      return unless $pmfiles || $ctx->dist_errors;
+      return unless $pmfiles || $ctx->all_dist_errors;
 
       $self->_update_mail_content_when_nothing_was_indexed(
         $ctx,
@@ -594,7 +594,7 @@ sub check_blib {
       }
       last DIRDOWN unless $success; # no directory to step down anymore
       if (++$endless > 10) {
-        $ctx->alert("ENDLESS LOOP detected!");
+        $ctx->add_alert("ENDLESS LOOP detected!");
         last DIRDOWN;
       }
       next DIRDOWN;
@@ -721,7 +721,7 @@ sub _index_by_files {
 
   for my $pmfile (@$pmfiles) {
     if ($pmfile =~ m|/blib/|) {
-      $ctx->alert("blib directory detected ($pmfile)");
+      $ctx->add_alert("blib directory detected ($pmfile)");
       next;
     }
 
@@ -833,7 +833,7 @@ sub examine_pms {
   if ($indexing_method) {
     $self->$indexing_method($ctx, $pmfiles, $provides);
   } else {
-    $ctx->alert("Couldn't determine an indexing method!");
+    $ctx->add_alert("Couldn't determine an indexing method!");
   }
 }
 
@@ -1189,7 +1189,7 @@ sub p6_index_dist {
   }
   unless (close TARTEST) {
     $Logger->log("could not untar!");
-    $ctx->alert("Could not untar!");
+    $ctx->add_alert("Could not untar!");
     $self->{COULD_NOT_UNTAR}++;
     return "ERROR: Could not untar $dist!";
   }
