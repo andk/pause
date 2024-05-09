@@ -1,4 +1,4 @@
-name: "perl test suite"
+name: "PAUSE test suite"
 on:
   push:
   pull_request:
