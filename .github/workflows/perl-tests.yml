@@ -1,5 +1,12 @@
 name: "perl test suite"
-on: [ push, pull_request ]
+on:
+  push:
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    - reopened
+    - labeled
 
 jobs:
   the-tests:
@@ -36,7 +43,15 @@ jobs:
         # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
         run: cpanm --notest --installdeps .
       - name: Run the tests
+        if: "!(contains(github.event.pull_request.labels.*.name, 'want-coverage'))"
         run: prove -lr -j4 t
+      - name: Run tests (with coverage)
+        if: contains(github.event.pull_request.labels.*.name, 'want-coverage')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cpanm -n Devel::Cover::Report::Coveralls
+          cover -test -report Coveralls
 #      - name: Install yath and JUnit renderer
 #        run: cpanm --notest Test2::Harness Test2::Harness::Renderer::JUnit
 #      - name: Run the tests
@@ -52,4 +67,3 @@ jobs:
 #        with:
 #          check_name: JUnit Report
 #          report_paths: /tmp/test-output.xml
-
