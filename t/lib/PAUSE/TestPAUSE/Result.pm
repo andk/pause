@@ -192,4 +192,26 @@ sub assert_index_not_updated ($self, $desc = "02packages was not changed") {
   ok(!$self->updated_02packages, $desc);
 }
 
+has log_events => (
+  isa => 'ArrayRef',
+  required => 1,
+  traits   => [ 'Array' ],
+  handles  => { log_events => 'elements' },
+);
+
+sub logged_event_like ($self, $qr, $desc = "found matching log line") {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  ok(
+    (grep {; $_->{message} =~ $qr } $self->log_events),
+    $desc,
+  );
+}
+
+sub diag_log_messages ($self) {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  diag($_->{message}) for $self->log_events;
+}
+
 1;
