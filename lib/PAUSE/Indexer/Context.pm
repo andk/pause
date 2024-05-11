@@ -56,8 +56,9 @@ sub _set_package_error {
   };
 
   $Logger->log([
-    "set error status for %s",
+    "set error status for %s to %s",
     $package_obj->{PACKAGE},
+    $status,
   ]);
 
   return;
