@@ -532,6 +532,40 @@ subtest "do not index dists without META file" => sub {
   );
 };
 
+subtest "do not index dists without trial versions" => sub {
+  for my $test (
+    { desc => "low line in version", munger => sub { $_[0] =~ s/22/2_2/r } },
+    { desc => "TRIAL in version",    munger => sub { $_[0] =~ s/22/22-TRIAL/r } },
+  ) {
+    subtest $test->{desc} => sub {
+      my $pause = PAUSE::TestPAUSE->init_new;
+
+      # Module::Faker will give us a bit of grief for uploading a file called
+      # 1.2_2 because it wants to set META release status to stable, and the
+      # low line is in conflict with that.  Rather than muck about making this
+      # permissible, I'm going to write out the archive, then rename it before
+      # indexing.
+      my $old_name = $pause->upload_author_fake(PERSON => 'Just-Testing-1.22.tar.gz');
+      my $new_name = $test->{munger}->($old_name);
+
+      rename($old_name, $new_name) or die "can't rename $old_name: $!";
+
+      my $result = $pause->test_reindex;
+
+      $pause->file_not_updated_ok(
+        $result->tmpdir
+               ->file(qw(cpan modules 02packages.details.txt.gz)),
+        "there were no things to update",
+      );
+
+      $result->logged_event_like(
+        qr{\Qdist is a developer release},
+        "we do not index trial-like filenames",
+      );
+    };
+  }
+};
+
 done_testing;
 
 # Local Variables:
