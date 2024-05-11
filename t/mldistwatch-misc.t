@@ -566,6 +566,42 @@ subtest "do not index dists without trial versions" => sub {
   }
 };
 
+subtest "updates to existing packages " => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  subtest "first version" => sub {
+    $pause->upload_author_fake(MTRON => 'Eye-Meeter-1.234.tar.gz');
+
+    my $result = $pause->test_reindex;
+
+    $pause->file_updated_ok(
+      $result->tmpdir
+             ->file(qw(cpan modules 02packages.details.txt.gz)),
+      "index updated",
+    );
+
+    $result->package_list_ok([
+      { package => 'Eye::Meeter', version => '1.234'  },
+    ]);
+  };
+
+  subtest "second version" => sub {
+    $pause->upload_author_fake(MTRON => 'Eye-Meeter-1.235.tar.gz');
+
+    my $result = $pause->test_reindex;
+
+    $pause->file_updated_ok(
+      $result->tmpdir
+             ->file(qw(cpan modules 02packages.details.txt.gz)),
+      "index updated",
+    );
+
+    $result->package_list_ok([
+      { package => 'Eye::Meeter', version => '1.235'  },
+    ]);
+  };
+};
+
 done_testing;
 
 # Local Variables:
