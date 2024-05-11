@@ -339,6 +339,35 @@ subtest "check overlong versions" => sub {
   );
 };
 
+subtest "version is not a lax version string" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(MONSTER => 'Hex-Version-1.234.tar.gz', {
+    append => [
+      {
+        file => "lib/Hex/Version/NoJoke.pm",
+        content => <<'EOT',
+use strict;
+use warnings;
+package Hex::Version::NoJoke;
+our $VERSION = '0x1p-1';
+1;
+EOT
+      }
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'Hex::Version', version => '1.234'  },
+  ]);
+
+  $result->logged_event_like(
+    qr/error with version/,
+    "0x1p-1 is a bad version",
+  );
+};
+
 subtest "case-changing imports" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
