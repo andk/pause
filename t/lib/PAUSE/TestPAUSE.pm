@@ -269,7 +269,7 @@ sub _build_pause_config_overrides {
 
   {
     my $chdir_guard = pushd($git_dir);
-    system(qw(git init --initial-branch master)) and die "error running git init";
+    system(qw(git init --quiet --initial-branch master)) and die "error running git init";
 
     my $git_config = File::Spec->catdir($git_dir, '.git/config');
     open my $config_fh, '>', $git_config
