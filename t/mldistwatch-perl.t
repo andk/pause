@@ -228,4 +228,53 @@ subtest "perl uploads do not unseat dual-life modules" => sub {
   };
 };
 
+subtest "non-perl can replace perl versions" => sub {
+  # The "separate then in-core" rule which says that the core won't shadow a
+  # separate upload only goes in one direction.  If a library is first found in
+  # core, and then later uploaded outside, the newly uploaded package may
+  # become indexed in that new dist.
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my $initial_result = $pause->test_reindex;
+  my $dbh = $initial_result->connect_authen_db;
+
+  die "couldn't make OPRIME a pumpking"
+    unless $dbh->do("INSERT INTO grouptable (user, ugroup) VALUES ('OPRIME', 'pumpking')");
+
+  my $perl_dist  = 'O/OP/OPRIME/perl-5.56.55.tar.gz';
+  my $other_dist = 'O/OP/OPRIME/Little-Buddy-3.000.tar.gz';
+
+  subtest "upload the in-core version of a dual-life dist" => sub {
+    $pause->upload_author_fake(OPRIME => {
+      name      => 'perl',
+      version   => '5.56.55',
+      packages  => [
+        'Little::Buddy' => { version => '2.000' },
+        'Perl::Core'    => { version => '1.002' },
+      ],
+    });
+
+    my $result = $pause->test_reindex;
+
+    $result->package_list_ok(
+      [
+        { package => 'Little::Buddy', version => '2.000' },
+        { package => 'Perl::Core',    version => '1.002' },
+      ],
+    );
+  };
+
+  subtest "upload the standalone version of a dual-life dist" => sub {
+    $pause->upload_author_fake(OPRIME => "Little-Buddy-3.000.tar.gz");
+    my $result = $pause->test_reindex;
+
+    $result->package_list_ok(
+      [
+        { package => 'Little::Buddy', version => '3.000' },
+        { package => 'Perl::Core',    version => '1.002' },
+      ],
+    );
+  };
+};
+
 done_testing;
