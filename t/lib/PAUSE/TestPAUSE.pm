@@ -387,8 +387,11 @@ sub file_updated_ok {
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
+  my $tmpdir = $self->tmpdir . "";
+  my $prettyname = $filename =~ s/\Q$tmpdir/\${TEST}/r;
+
   unless (-e $filename) {
-    return Test::More::fail("$desc$filename not updated");
+    return Test::More::fail("$desc$prettyname not updated");
   }
 
   my ($dev, $ino) = stat $filename;
@@ -397,12 +400,12 @@ sub file_updated_ok {
 
   unless (defined $old) {
     $self->_file_index->{$filename} = "$dev,$ino";
-    return Test::More::pass("$desc$filename updated (created)");
+    return Test::More::pass("$desc$prettyname updated (created)");
   }
 
   my $ok = Test::More::ok(
     $old ne "$dev,$ino",
-    "$desc$filename updated",
+    "$desc$prettyname updated",
   );
 
   $self->_file_index->{$filename} = "$dev,$ino";
@@ -417,21 +420,24 @@ sub file_not_updated_ok {
 
   my $old = $self->_file_index->{ $filename };
 
+  my $tmpdir = $self->tmpdir . "";
+  my $prettyname = $filename =~ s/\Q$tmpdir/\${TEST}/r;
+
   unless (-e $filename) {
-    return Test::More::fail("$desc$filename deleted") if $old;
-    return Test::More::pass("$desc$filename not created (thus not updated)");
+    return Test::More::fail("$desc$prettyname deleted") if $old;
+    return Test::More::pass("$desc$prettyname not created (thus not updated)");
   }
 
   my ($dev, $ino) = stat $filename;
 
   unless (defined $old) {
     $self->_file_index->{$filename} = "$dev,$ino";
-    return Test::More::fail("$desc$filename updated (created)");
+    return Test::More::fail("$desc$prettyname updated (created)");
   }
 
   my $ok = Test::More::ok(
     $old eq "$dev,$ino",
-    "$desc$filename not updated",
+    "$desc$prettyname not updated",
   );
 
   return $ok;
