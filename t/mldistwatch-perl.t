@@ -58,6 +58,35 @@ subtest "should index single-life dev vers. modules in perl dist" => sub {
   ok($packages->package("POSIX"), "we index POSIX in a dev version");
 };
 
+subtest "reject perl by unauthorized user" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my $initial_result = $pause->test_reindex;
+  my $dbh = $initial_result->connect_authen_db;
+
+  $pause->upload_author_fake(OPRIME => {
+    name      => 'perl',
+    version   => '5.56.55',
+    packages  => [ 'Perl::Core' ],
+    packages  => [
+      'Perl::Core' => { version => '1.002' },
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  $result->logged_event_like(
+    qr{\Qperl dist O/OP/OPRIME/perl-5.56.55.tar.gz from untrusted user OPRIME},
+    "rejected because user it not trusted to upload perl",
+  );
+};
+
 subtest "indexing a new perl" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
@@ -82,6 +111,31 @@ subtest "indexing a new perl" => sub {
     [
       { package => 'Perl::Core',      version => '1.002' },
     ],
+  );
+};
+
+subtest "indexing a new perl, but file is not a proper tar.gz" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my $initial_result = $pause->test_reindex;
+  my $dbh = $initial_result->connect_authen_db;
+
+  die "couldn't make OPRIME a pumpking"
+    unless $dbh->do("INSERT INTO grouptable (user, ugroup) VALUES ('OPRIME', 'pumpking')");
+
+  $pause->upload_author_garbage(OPRIME => "perl-5.56.55.tar.gz");
+
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  $result->logged_event_like(
+    qr{\Qcould not untar O/OP/OPRIME/perl-5.56.55.tar.gz},
+    "you can't index what you can't extract",
   );
 };
 
