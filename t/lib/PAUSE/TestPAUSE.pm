@@ -14,6 +14,7 @@ use File::pushd;
 use File::Temp ();
 use File::Which;
 use Path::Class;
+use Process::Status;
 
 # This one, we don't expect to be used.  In a weird world, we'd mark it fatal
 # or something so we could say "nothing should log outside of test code."
@@ -234,6 +235,28 @@ sub upload_author_file {
   fcopy($file, $author_dir);
 
   return File::Spec->catfile($author_dir, $file);
+}
+
+sub upload_author_garbage {
+  my ($self, $author, $file) = @_;
+
+  $author = uc $author;
+  my $cpan_root  = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $author_dir = File::Spec->catdir(
+    $cpan_root,
+    qw(authors id),
+    (substr $author, 0, 1),
+    (substr $author, 0, 2),
+    $author,
+  );
+
+  make_path( $author_dir );
+  my $target = File::Spec->catfile($author_dir, $file);
+  system('dd', 'if=/dev/random', "of=$target", "count=20", "status=none"); # write 20k
+
+  Process::Status->assert_ok("dd from /dev/random to $target");
+
+  return $target;
 }
 
 has pause_config_overrides => (
