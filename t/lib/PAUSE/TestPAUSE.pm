@@ -373,6 +373,8 @@ sub test_reindex {
 
     die "stray mail in test mail trap before reindex" if @stray_mail;
 
+    my $existing_log_events = $self->logger->events->@*;
+
     if ($arg->{pick}) {
       my $dbh = PAUSE::dbh();
       $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
@@ -396,11 +398,16 @@ sub test_reindex {
 
     $arg->{after}->($self->tmpdir) if $arg->{after};
 
-    my $new_package_state = filestate($package_file);
+    # The first $existing_log_events were already there.  We only care about
+    # ones added during the indexer run.
+    my @log_events = $self->logger->events->@*;
+    splice @log_events, 0, $existing_log_events;
 
     my @deliveries = Email::Sender::Simple->default_transport->deliveries;
 
     Email::Sender::Simple->default_transport->clear_deliveries;
+
+    my $new_package_state = filestate($package_file);
 
     return PAUSE::TestPAUSE::Result->new({
       tmpdir => $self->tmpdir,
@@ -408,6 +415,7 @@ sub test_reindex {
       authen_db_file   => File::Spec->catfile($self->db_root, 'authen.sqlite'),
       mod_db_file      => File::Spec->catfile($self->db_root, 'mod.sqlite'),
       deliveries       => \@deliveries,
+      log_events       => \@log_events,
       updated_02packages => $old_package_state ne $new_package_state,
     });
   });
