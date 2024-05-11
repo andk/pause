@@ -11,7 +11,7 @@ use PAUSE::TestPAUSE;
 
 use Test::More;
 
-subtest "perl-\\d should not get indexed" => sub {
+subtest "perl-\\d should not get indexed (not really perl)" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
   $pause->upload_author_fake(PLUGH => 'Soft-Ware-2');
@@ -31,6 +31,11 @@ subtest "perl-\\d should not get indexed" => sub {
   );
 
   # TODO: send a report saying 'no perl-X allowed'
+
+  $result->logged_event_like(
+    qr{dist is an unofficial perl-like release},
+    "perl-6.tar.gz is not a really perl-like file",
+  );
 };
 
 subtest "should index single-life dev vers. modules in perl dist" => sub {
