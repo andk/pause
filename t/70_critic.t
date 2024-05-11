@@ -16,7 +16,7 @@ if ( $@ ) {
 
 my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
-all_critic_ok();
+all_critic_ok(qw( bin cron lib t ));
 
 # Local Variables:
 # mode: cperl

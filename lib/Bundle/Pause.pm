@@ -61,7 +61,6 @@ Set::Crontab
 String::Random
 Sub::Uplevel
 Test::Exception
-Test::FITesque::Fixture
 Text::Unidecode
 Time::Duration
 Time::HiRes

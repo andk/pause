@@ -83,7 +83,6 @@ on test => sub {
     requires 'Path::Tiny';
     requires 'SQL::Maker';
     requires 'Test::Class::Load';
-    requires 'Test::FITesque';
     requires 'Test::MockObject';
     requires 'Test::WWW::Mechanize::PSGI';
     requires 'Test::mysqld';
