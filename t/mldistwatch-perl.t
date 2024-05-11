@@ -53,4 +53,31 @@ subtest "should index single-life dev vers. modules in perl dist" => sub {
   ok($packages->package("POSIX"), "we index POSIX in a dev version");
 };
 
+subtest "indexing a new perl" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my $initial_result = $pause->test_reindex;
+  my $dbh = $initial_result->connect_authen_db;
+
+  die "couldn't make OPRIME a pumpking"
+    unless $dbh->do("INSERT INTO grouptable (user, ugroup) VALUES ('OPRIME', 'pumpking')");
+
+  $pause->upload_author_fake(OPRIME => {
+    name      => 'perl',
+    version   => '5.56.55',
+    packages  => [ 'Perl::Core' ],
+    packages  => [
+      'Perl::Core' => { version => '1.002' },
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok(
+    [
+      { package => 'Perl::Core',      version => '1.002' },
+    ],
+  );
+};
+
 done_testing;
