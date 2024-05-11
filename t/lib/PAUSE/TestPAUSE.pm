@@ -2,6 +2,7 @@ package PAUSE::TestPAUSE;
 use Moose;
 use MooseX::StrictConstructor;
 
+use v5.36.0;
 use autodie;
 
 use DBI;
@@ -355,12 +356,24 @@ sub test_reindex {
         for @{ $arg->{pick} };
     }
 
+    my sub filestate ($file) {
+      return ';;' unless -e $file;
+      my @stat = stat $file;
+      return join q{;}, @stat[0,1,7]; # dev, ino, size
+    }
+
+    my $package_file = $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz));
+
+    my $old_package_state = filestate($package_file);
+
     PAUSE::mldistwatch->new({
       sleep => 0,
       ($arg->{pick} ? (pick => $arg->{pick}) : ()),
     })->reindex;
 
     $arg->{after}->($self->tmpdir) if $arg->{after};
+
+    my $new_package_state = filestate($package_file);
 
     my @deliveries = Email::Sender::Simple->default_transport->deliveries;
 
@@ -372,6 +385,7 @@ sub test_reindex {
       authen_db_file   => File::Spec->catfile($self->db_root, 'authen.sqlite'),
       mod_db_file      => File::Spec->catfile($self->db_root, 'mod.sqlite'),
       deliveries       => \@deliveries,
+      updated_02packages => $old_package_state ne $new_package_state,
     });
   });
 }

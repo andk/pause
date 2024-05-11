@@ -57,10 +57,7 @@ subtest "retry indexing on db failure, only three times" => sub {
 
   is($x, 3, "we tried three times, and no more");
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
+  $result->assert_index_not_updated;
 
   $result->email_ok(
     [
