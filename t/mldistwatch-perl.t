@@ -87,7 +87,7 @@ subtest "reject perl by unauthorized user" => sub {
   );
 };
 
-subtest "indexing a new perl" => sub {
+subtest "indexing a new perl and then another one" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
   my $initial_result = $pause->test_reindex;
@@ -96,22 +96,67 @@ subtest "indexing a new perl" => sub {
   die "couldn't make OPRIME a pumpking"
     unless $dbh->do("INSERT INTO grouptable (user, ugroup) VALUES ('OPRIME', 'pumpking')");
 
-  $pause->upload_author_fake(OPRIME => {
-    name      => 'perl',
-    version   => '5.56.55',
-    packages  => [ 'Perl::Core' ],
-    packages  => [
-      'Perl::Core' => { version => '1.002' },
-    ],
-  });
+  subtest "first version of perl" => sub {
+    $pause->upload_author_fake(OPRIME => {
+      name      => 'perl',
+      version   => '5.56.55',
+      packages  => [
+        'Perl::Core'    => { version => '1.002' },
+        'Little::Buddy' => { version => '2.003' },
+      ],
+    });
 
-  my $result = $pause->test_reindex;
+    my $result = $pause->test_reindex;
 
-  $result->package_list_ok(
-    [
-      { package => 'Perl::Core',      version => '1.002' },
-    ],
-  );
+    $result->package_list_ok(
+      [
+        { package => 'Little::Buddy', version => '2.003' },
+        { package => 'Perl::Core',    version => '1.002' },
+      ],
+    );
+  };
+
+  subtest "re-upload that same version again" => sub {
+    $pause->upload_author_fake(OPRIME => {
+      name      => 'perl',
+      version   => '5.56.55',
+      packages  => [
+        'Perl::Core'    => { version => '1.002' },
+        'Little::Buddy' => { version => '2.003' },
+      ],
+    });
+
+    my $result = $pause->test_reindex;
+
+    $result->package_list_ok(
+      [
+        { package => 'Little::Buddy', version => '2.003' },
+        { package => 'Perl::Core',    version => '1.002' },
+      ],
+    );
+  };
+
+  subtest "actual next version of perl" => sub {
+    $pause->upload_author_fake(OPRIME => {
+      name      => 'perl',
+      version   => '5.56.56',
+      packages  => [
+        'Little::Buddy' => { version => '2.345' },
+        'Newly::Added'  => { version => '3.000' },
+        'Perl::Core'    => { version => '1.002' },
+      ],
+    });
+
+    my $result = $pause->test_reindex;
+
+    $result->package_list_ok(
+      [
+        { package => 'Little::Buddy', version => '2.345' },
+        { package => 'Newly::Added',  version => '3.000' },
+        { package => 'Perl::Core',    version => '1.002' },
+      ],
+    );
+  };
 };
 
 subtest "indexing a new perl, but file is not a proper tar.gz" => sub {
