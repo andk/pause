@@ -17,10 +17,7 @@ subtest "do not index bare .pm but report rejection" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
+  $result->assert_index_not_updated;
 
   $result->email_ok(
     [
@@ -41,6 +38,8 @@ subtest "perl-\\d should not get indexed" => sub {
   });
 
   my $result = $pause->test_reindex;
+
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -66,6 +65,7 @@ subtest "should index single-life dev vers. modules in perl dist" => sub {
   $pause->upload_author_file('OPRIME', 'perl-5.20.2.tar.gz');
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   my $packages = $result->packages_data;
   ok($packages->package("POSIX"), "we index POSIX in a dev version");
@@ -156,6 +156,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
 
   {
     my $result = $pause->test_reindex;
+    $result->assert_index_updated;
 
     $result->email_ok([
       { subject => 'PAUSE indexer report OPRIME/Pie-Eater-1.23.tar.gz' },
@@ -175,6 +176,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
   );
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Pie::Eater',      version => '1.23'  },
@@ -213,6 +215,7 @@ subtest "warn when pkg and module match only case insensitively" => sub {
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -259,6 +262,7 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -291,12 +295,7 @@ subtest "check various forms of version" => sub {
   });
 
   my $result = $pause->test_reindex;
-
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  $result->assert_index_updated;
 
   # VVVVVV          - just fine!  index it
   # VVVVVV::Bogus   - utterly busted, give up
@@ -339,6 +338,7 @@ EOT
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Globby::Version',           version => '1.234'  },
@@ -360,12 +360,7 @@ subtest "check overlong versions" => sub {
   });
 
   my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "there were no things to update",
-  );
+  $result->assert_index_not_updated;
 
   my $etoolong = sub {
     like(
@@ -406,6 +401,7 @@ subtest "case-changing imports" => sub {
       });
 
       my $result = $pause->test_reindex;
+      $result->assert_index_updated;
 
       $result->package_list_ok([
         { package => 'Foo::Bar',      version => '0.001'  },
@@ -426,6 +422,7 @@ subtest "case-changing imports" => sub {
       });
 
       my $result = $pause->test_reindex;
+      $result->assert_index_updated;
 
       $result->package_list_ok([
         { package => 'foo::bar',      version => '0.002'  },
@@ -444,6 +441,8 @@ subtest "check perl6 distribution indexing" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/perl6/authors');
   my $result = $pause->test_reindex;
+
+  $result->assert_index_not_updated("p5 index not updated on p6 upload");
 
   $result->p6dists_ok(
     [
@@ -504,6 +503,7 @@ EOT
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Version::Cmp',           version => '1.234'  },
@@ -539,6 +539,7 @@ EOT
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Lingua::JA::Numbers', version => '0.05'  },
@@ -556,12 +557,7 @@ subtest "do not index dists without META file" => sub {
   });
 
   my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "there were no things to update",
-  );
+  $result->assert_index_not_updated;
 
   my $nometa = sub {
     like(

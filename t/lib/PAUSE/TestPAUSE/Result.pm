@@ -2,6 +2,8 @@ package PAUSE::TestPAUSE::Result;
 use Moose;
 use MooseX::StrictConstructor;
 
+use v5.36.0;
+
 use DBI;
 use Parse::CPAN::Packages;
 use Test::Deep qw(cmp_deeply superhashof methods);
@@ -112,7 +114,7 @@ sub perm_list_ok {
                  ->file(qw(06perms.txt.gz));
 
   our $GZIP = $PAUSE::Config->{GZIP_PATH};
-  open my $fh, "$GZIP --stdout --uncompress $index_06|"
+  open my $fh, "-|", "$GZIP --stdout --uncompress $index_06"
     or die "can't open $index_06 for reading with gip: $!";
 
   my (@header, @data);
@@ -129,6 +131,8 @@ sub perm_list_ok {
       @{$permissions{$m}{$p}} = sort {$a cmp $b } (@{$permissions{$m}{$p}}, $u);
     }
   }
+
+  close($fh) or die "error reading $index_06: $!";
 
   is_deeply(\%permissions, $want, "permissions look correct in 06perms")
     or diag explain(\%permissions);
@@ -170,6 +174,22 @@ sub email_ok {
       $_->($delivery);
     }
   }
+}
+
+has updated_02packages => (
+  is  => 'ro',
+  isa => 'Bool',
+  required => 1,
+);
+
+sub assert_index_updated ($self, $desc = "02packages was changed") {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  ok($self->updated_02packages, $desc);
+}
+
+sub assert_index_not_updated ($self, $desc = "02packages was not changed") {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  ok(!$self->updated_02packages, $desc);
 }
 
 1;
