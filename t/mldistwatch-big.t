@@ -17,17 +17,7 @@ subtest "first indexing" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
-
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 03modlist.data.gz)),
-    "our indexer indexed",
-  );
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -97,11 +87,7 @@ for my $uploader (qw(FCOME CMAINT)) {
     {
       my $result = $pause->test_reindex;
 
-      $pause->file_updated_ok(
-        $result->tmpdir
-               ->file(qw(cpan modules 02packages.details.txt.gz)),
-        "our indexer indexed",
-      );
+      $result->assert_index_updated;
 
       $result->package_list_ok(
         [
@@ -222,11 +208,7 @@ subtest "case mismatch, authorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
