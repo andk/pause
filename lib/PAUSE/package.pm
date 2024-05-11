@@ -736,10 +736,7 @@ sub checkin {
       $self->insert_into_package($ctx);
   }
 
-  # my $status = $self->get_index_status_status($ctx);
-  # if (! $status or $status == PAUSE::mldistwatch::Constants::OK) {
-      $self->checkin_into_primeur($ctx); # called in void context!
-  # }
+  $self->checkin_into_primeur($ctx); # called in void context!
 
   return;
 }
