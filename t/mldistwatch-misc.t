@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
-use 5.10.1;
+use v5.36.0;
 use lib 't/lib';
 use lib 't/privatelib'; # Stub PrivatePAUSE
 
 use File::Spec;
 use PAUSE;
 use PAUSE::TestPAUSE;
+use Process::Status;
 
 use Test::More;
 
@@ -629,6 +630,55 @@ subtest "updates to existing packages " => sub {
       { package => 'Eye::Meeter', version => '1.235'  },
     ]);
   };
+};
+
+subtest "the notorious version zero" => sub {
+  # When we've got two dists both of which provide version 0 (or version
+  # undef), we pick the winner by mtime.  I hate this, but I will write a test
+  # so that I can someday more confidently forbid anything like this.  Good
+  # grief. -- rjbs, 2024-05-11
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my sub touch_file ($filename, $i) {
+    my $secs = sprintf '%02i', $i;
+    system("touch", '-m', '-d', "2020-01-02T03:04:${secs}Z", $filename);
+    Process::Status->assert_ok("touching $filename");
+  }
+
+  # First, a zero version package.
+  # Then, again, but file mtime is older.  We keep the package on file.
+  # Then, again, but file mtime is newer.  We switch to the new package.
+  my @tests = (
+    { desc => "first upload",  offset => 10, dist_v => '1.0', want => '1.0' },
+    { desc => "second upload", offset =>  5, dist_v => '1.1', want => '1.0' },
+    { desc => "third upload",  offset => 15, dist_v => '1.2', want => '1.2' },
+  );
+
+  for my $test (@tests) {
+    subtest $test->{desc} => sub {
+      my $file = $pause->upload_author_fake(CIPHER => {
+        name      => 'Zero',
+        version   => $test->{dist_v},
+        packages  => [
+          'Zero' => { version => '0.000' },
+        ],
+      });
+
+      touch_file($file, $test->{offset});
+
+      my $result = $pause->test_reindex;
+
+      $result->package_list_ok([
+        { package => 'Zero', version => '0.000'  },
+      ]);
+
+      my $p = $result->packages_data;
+
+      my $dist = $p->latest_distribution("Zero");
+      is($dist->prefix, "C/CI/CIPHER/Zero-$test->{want}.tar.gz", "right dist indexed");
+      is($dist->version, $test->{want}, "with the right version");
+    };
+  }
 };
 
 done_testing;
