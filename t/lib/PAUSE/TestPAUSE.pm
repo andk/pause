@@ -313,9 +313,8 @@ sub with_our_config {
   $code->($self);
 }
 
-sub test_reindex {
-  my ($self, $arg) = @_;
-  $arg //= {};
+sub _take_pause_action {
+  my ($self, $action) = @_;
 
   $self->with_our_config(sub {
     my $self = shift;
@@ -349,18 +348,7 @@ sub test_reindex {
 
     die "stray mail in test mail trap before reindex" if @stray_mail;
 
-    if ($arg->{pick}) {
-      my $dbh = PAUSE::dbh();
-      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
-        for @{ $arg->{pick} };
-    }
-
-    PAUSE::mldistwatch->new({
-      sleep => 0,
-      ($arg->{pick} ? (pick => $arg->{pick}) : ()),
-    })->reindex;
-
-    $arg->{after}->($self->tmpdir) if $arg->{after};
+    $action->();
 
     my @deliveries = Email::Sender::Simple->default_transport->deliveries;
 
@@ -374,6 +362,34 @@ sub test_reindex {
       deliveries       => \@deliveries,
     });
   });
+}
+
+sub rewrite_indexes {
+  my ($self) = @_;
+  my $action = sub {
+    PAUSE::mldistwatch->new({ sleep => 0 })->rewrite_indexes;
+  };
+
+  return $self->_take_pause_action($action);
+}
+
+sub test_reindex {
+  my ($self, $arg) = @_;
+  $arg //= {};
+  my $action = sub {
+    if ($arg->{pick}) {
+      my $dbh = PAUSE::dbh();
+      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
+        for @{ $arg->{pick} };
+    }
+
+    PAUSE::mldistwatch->new({
+      sleep => 0,
+      ($arg->{pick} ? (pick => $arg->{pick}) : ()),
+    })->reindex;
+  };
+
+  return $self->_take_pause_action($action);
 }
 
 has _file_index => (
