@@ -582,11 +582,7 @@ subtest "do not index dists without trial versions" => sub {
 
       my $result = $pause->test_reindex;
 
-      $pause->file_not_updated_ok(
-        $result->tmpdir
-               ->file(qw(cpan modules 02packages.details.txt.gz)),
-        "there were no things to update",
-      );
+      $result->assert_index_not_updated;
 
       $result->logged_event_like(
         qr{\Qdist is a developer release},
@@ -604,11 +600,7 @@ subtest "updates to existing packages " => sub {
 
     my $result = $pause->test_reindex;
 
-    $pause->file_updated_ok(
-      $result->tmpdir
-             ->file(qw(cpan modules 02packages.details.txt.gz)),
-      "index updated",
-    );
+    $result->assert_index_updated;
 
     $result->package_list_ok([
       { package => 'Eye::Meeter', version => '1.234'  },
@@ -620,11 +612,7 @@ subtest "updates to existing packages " => sub {
 
     my $result = $pause->test_reindex;
 
-    $pause->file_updated_ok(
-      $result->tmpdir
-             ->file(qw(cpan modules 02packages.details.txt.gz)),
-      "index updated",
-    );
+    $result->assert_index_updated;
 
     $result->package_list_ok([
       { package => 'Eye::Meeter', version => '1.235'  },

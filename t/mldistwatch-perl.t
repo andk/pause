@@ -75,11 +75,7 @@ subtest "reject perl by unauthorized user" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "there were no things to update",
-  );
+  $result->assert_index_not_updated;
 
   $result->logged_event_like(
     qr{\Qperl dist O/OP/OPRIME/perl-5.56.55.tar.gz from untrusted user OPRIME},
@@ -172,11 +168,7 @@ subtest "indexing a new perl, but file is not a proper tar.gz" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "there were no things to update",
-  );
+  $result->assert_index_not_updated;
 
   $result->logged_event_like(
     qr{\Qcould not untar O/OP/OPRIME/perl-5.56.55.tar.gz},
