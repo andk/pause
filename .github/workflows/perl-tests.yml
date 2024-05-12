@@ -1,5 +1,21 @@
-name: "perl test suite"
-on: [ push, pull_request ]
+name: "PAUSE test suite"
+on:
+  push:
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    - reopened
+    - labeled
+
+#
+# * To trigger a coverage run, add the `want-coverage` label, and
+# cover will be used instead of prove.  Results will be posted to
+# https://coveralls.io/github/andk/pause
+#
+# * To flush the GitHub Actions Cache:
+# https://github.com/andk/pause/actions/caches
+#
 
 jobs:
   the-tests:
@@ -15,28 +31,35 @@ jobs:
         run: |
           perl Makefile.PL && make
       - name: Install prereqs (apt)
-        # If we install "default-mysql-server", the web tests will run, which
-        # is good, but they will run forever when we get to
-        # t/pause_2017/action/change_passwd.t not responding to SIGTERM or
-        # SIGKILL.  I seem to recall something about signals being weird on
-        # Actions, but not how... -- rjbs, 2023-05-05
         run: |
           apt update
-          apt install -y rsync default-mysql-server
-      - name: Install prereqs (cpanm, pinned versions)
-        # PAUSE is run (for now?) on v5.16, and the latest versions from the
-        # CPAN don't install on v5.16, so we install these version that do.
-        # -- rjbs, 2023-05-05
+          apt install -y rsync mariadb-server
+      - name: Get Perl Version
+        id: get-perl-version
         run: |
-          cpanm Log::Dispatchouli@2.023
-          cpanm Mojolicious@8.73
+          echo version="$(perl -le 'print $]')" >> $GITHUB_OUTPUT
+        shell: bash
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/perl5/site_perl
+          key: ${{ runner.os }}-${{ steps.get-perl-version.outputs.version }}-${{ hashFiles('Makefile.PL') }}
       - name: Install prereqs (cpan)
         # This could probably be made more efficient by looking at what it's
         # installing via cpanm that could, instead, be installed from apt.  I
         # may do that later, but for now, it's fine! -- rjbs, 2023-01-07
         run: cpanm --notest --installdeps .
       - name: Run the tests
+        if: "!(contains(github.event.pull_request.labels.*.name, 'want-coverage'))"
         run: prove -lr -j4 t
+      - name: Run tests (with coverage)
+        if: contains(github.event.pull_request.labels.*.name, 'want-coverage')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cpanm -n Devel::Cover::Report::Coveralls
+          cover -test -report Coveralls | tee -a $GITHUB_STEP_SUMMARY
 #      - name: Install yath and JUnit renderer
 #        run: cpanm --notest Test2::Harness Test2::Harness::Renderer::JUnit
 #      - name: Run the tests
@@ -52,4 +75,3 @@ jobs:
 #        with:
 #          check_name: JUnit Report
 #          report_paths: /tmp/test-output.xml
-
