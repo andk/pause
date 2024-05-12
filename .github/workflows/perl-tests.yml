@@ -8,15 +8,6 @@ on:
     - reopened
     - labeled
 
-#
-# * To trigger a coverage run, add the `want-coverage` label, and
-# cover will be used instead of prove.  Results will be posted to
-# https://coveralls.io/github/andk/pause
-#
-# * To flush the GitHub Actions Cache:
-# https://github.com/andk/pause/actions/caches
-#
-
 jobs:
   the-tests:
     runs-on: ubuntu-latest
