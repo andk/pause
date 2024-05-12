@@ -569,9 +569,28 @@ sub parse_version {
 sub normalize_version {
     my($self,$v) = @_;
     $v = "undef" unless defined $v;
+
+    # What on earth is this hunk about?  Well, if the user has written
+    #
+    #   $VERSION = 0.000001
+    #
+    # ...instead of...
+    #
+    #   $VERSION = '0.000001'
+    #
+    # ...then when we eval the version value, we get a number.  That's bad,
+    # because we'll lose fidelity.  Sometimes this only means that 1.100
+    # becomes 1.1, but the worse case is when a version like 0.000001 becomes
+    # 1e-6, which then can't be turned into a version object with version->new.
+    #
+    # If the stringified version appears to be scientific notation, format it
+    # back into expanded form and make a version of that.
     my $dv = Dumpvalue->new;
-    my $sdv = $dv->stringify($v,1); # second argument prevents ticks
-    $Logger->log("result of normalize_version: $sdv");
+    my $sdv = $dv->stringify($v, 1); # second argument prevents ticks
+    if ($sdv =~ /\A[0-9](?:\.[0-9]+)?e([-+])?[0-9]+\z/a) {
+        my $adj = $1 eq '-' ? 'small' : 'large';
+        die "very large or small numeric version; you must use a string in your source\n";
+    }
 
     return $v if $v eq "undef";
     return $v if $v =~ /^\{.*\}$/; # JSON object
