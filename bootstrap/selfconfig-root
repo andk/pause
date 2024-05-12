@@ -169,7 +169,7 @@ run_cmd(qw(ln -s /data/mysql/mysql /var/lib/mysql));
 run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
         qw(
             mariadb-server
-            libmariadb-dev-compat
+            default-libmysqlclient-dev
         ));
 
 # Configure Mariadb a bit

@@ -24,7 +24,7 @@ jobs:
       - name: Install prereqs (apt)
         run: |
           apt update
-          apt install -y rsync mariadb-server
+          apt install -y rsync default-mysql-server
       - name: Get Perl Version
         id: get-perl-version
         run: |
