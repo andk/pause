@@ -30,6 +30,13 @@ jobs:
         run: |
           apt update
           apt install -y rsync default-mysql-server
+      - name: Install prereqs (cpanm, pinned versions)
+        # PAUSE is run (for now?) on v5.16, and the latest versions from the
+        # CPAN don't install on v5.16, so we install these version that do.
+        # -- rjbs, 2023-05-05
+        run: |
+          cpanm Log::Dispatchouli@2.023
+          cpanm Mojolicious@8.73
       - name: Install prereqs (cpan)
         # This could probably be made more efficient by looking at what it's
         # installing via cpanm that could, instead, be installed from apt.  I
