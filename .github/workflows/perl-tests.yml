@@ -21,7 +21,7 @@ jobs:
   the-tests:
     runs-on: ubuntu-latest
     container:
-      image: perldocker/perl-tester:5.36-bookworm
+      image: perldocker/perl-tester:5.36-slim-bookworm
     strategy:
       fail-fast: false
     steps:
