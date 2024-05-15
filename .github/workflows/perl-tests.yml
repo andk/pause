@@ -33,7 +33,7 @@ jobs:
       - name: Install prereqs (apt)
         run: |
           apt update
-          apt install -y \
+          apt-get install -y \
             gnupg \
             libdb-dev \
             libexpat-dev \
