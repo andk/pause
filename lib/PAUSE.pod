@@ -4,6 +4,9 @@ PAUSE - Perl Authors Upload Server
 
 =head1 SYNOPSIS
 
+IMPORTANT: THIS DOCUMENT IS OVER 10 YEARS OUT OF DATE.  MORE RECENT
+DOCUMENTATION IS AVAILABLE IN the doc DIRECTORY.
+
 This module is the code that runs L<http://pause.cpan.org/>, a server dedicated
 to collect the work of perl authors worldwide.  It provides personal directories
 and enables their owners to upload their work into that directory themselves.
@@ -80,12 +83,6 @@ cfengine, but in a way that the master and the client must run on
 localhost because we often take files directly from the repo.
 
 Debian is gone, centos6 replaces it.
-
-[ MISSING documentation:
-
-  /etc/cron.jobs/indexscripts.pl -> ../../home/kstar/cron/indexscripts.pl
-
-]
 
 =head2 Cronjob table for PAUSE
 

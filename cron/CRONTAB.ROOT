@@ -24,5 +24,3 @@ PAUSE_ROOT=/data/pause/pub/PAUSE
 22 * * * *            pause  $PAUSE_REPO/cron/sync-04pause.pl
 10 09,15,21,03 * * *  pause  cd $PAUSE_ROOT/PAUSE-git && (git gc -q && git push -q -u origin master)
 18 * * * *            pause  $PAUSE_REPO/cron/cron-p6daily.pl
-46 0,6,12,18 * * *    pause  perl -I $PAUSE_REPO/lib $PAUSE_REPO/bin/indexscripts.pl > $PAUSE_REPO/bin/indexscripts.pl.out 2>&1
-7 2   * * 0           pause  perl -I $PAUSE_REPO/lib $PAUSE_REPO/bin/indexscripts.pl -f
