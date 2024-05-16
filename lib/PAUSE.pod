@@ -42,23 +42,6 @@ One *.pm file in a distro.
 
 One package statement within a L<PAUSE::pmfile>.
 
-=head2 Overview of contents of the PAUSE distribution
-
-    apache-conf/       Apache Configuration
-    apache-perl/       Legacy from the very first pause
-    bin/               scripts, mainly paused, the pause daemon
-    cron/              cronjobs
-    doc/               doc
-    htdocs/            symlinked to Apache's document root
-    lib/               PAUSE.pm and such
-    mirror/            mirror configuration, symlinked to /usr/local/mirror
-
-The two core scripts are F<bin/paused> and F<cron/mldistwatch>. Both would
-need to be broken down into reusable and maintainable code.
-
-PAUSE.pm was originally the pure configuration file, but now also
-contains some frequently used routines.
-
 =head2 Excluded files
 
 The following file has been excluded from the repository for obvious
@@ -73,37 +56,10 @@ Other sensitive files, like the SSL key of the server, password files
 need to be maintained separately from the repository. See below the
 section about user management.
 
-=head2 File system layout
-
-(last time updated: 2012-01-03)
-
-If you have an older installation of PAUSE you probably want to know:
-/home/k is gone, cfengine is gone; puppet is supposed to replace
-cfengine, but in a way that the master and the client must run on
-localhost because we often take files directly from the repo.
-
-Debian is gone, centos6 replaces it.
-
 =head2 Cronjob table for PAUSE
 
 The repository has a file CRONTAB.ROOT which is usually quite in sync
 with the real pause.
-
-=head2 External programs needed to run PAUSE
-
-  apache with mod_perl and Apache-SSL
-  perl
-  mirror (the good old one)
-  mon
-  proftpd (update 2013: ftp is not any more supported)
-  mysqld
-  rsync (runs as daemon)
-  gpg
-  unzip
-  zsh
-
-At the time of this writing (2012-01-03), all perl scripts were
-running under 5.16.2.
 
 =head2 Database schema
 
@@ -113,25 +69,6 @@ of PAUSE's two databases.
 A dump of the mod database is produced every few hours and available
 for download in the rsync area (pause.perl.org::pausedata). A dump of
 the authen_pause database is -- of course -- not available.
-
-=head2 User management
-
-This section is about the fun of making mysql safe based on UNIX user
-and group permissions. This is dangerous stuff. Be careful here and
-follow the advice in the mysql manual about how to secure mysql in
-general. E.g. C<--skip-networking> and root user password are a must,
-etc.
-
-PAUSE is running processes as user root, apache, and
-pause-unsafe. The user "puppet" in the group "puppet" owns the working
-copy of the repository and all the sensitive files. There are no
-members in the group puppet. The SSL data for the webservers and the
-passwords for accessing the DB are only readable by root who starts
-the webservers and runs the cronjobs.
-
-This setup must ensure that the user apuse-unsafe cannot read the
-database account informations. The root password to mysql is not
-needed by any script, so can be stored offline.
 
 =head2 Other security considerations
 
@@ -145,18 +82,6 @@ fall out of sync and inconsistencies can be tracked easily. It opens
 us the possibility to maintain a I<backpan>, a backup of all relevant
 files of all times. Any attempt to upload malicious code can thus be
 tracked much better.
-
-=head2 Missing pieces
-
-As always, there are things we didn't bother to integrate into the
-repository because they are so basic stuff for any UNIX machine:
-
-  logrotate
-  xntpd/ntpd
-  sendmail/postfix
-
-and probably more. If you discover pieces that are important but
-missing in the repository or documentation, please let us know.
 
 =head1 AUTHOR
 
