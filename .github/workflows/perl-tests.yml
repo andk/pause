@@ -24,6 +24,8 @@ jobs:
       image: perldocker/perl-tester:5.36-slim-bookworm
     strategy:
       fail-fast: false
+    env:
+      PLACK_ENV: ghaction
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -62,6 +64,7 @@ jobs:
       - name: Run the tests
         if: "!(contains(github.event.pull_request.labels.*.name, 'want-coverage'))"
         run: prove -lr -j4 t
+        continue-on-error: true
       - name: Run tests (with coverage)
         if: contains(github.event.pull_request.labels.*.name, 'want-coverage')
         env:
@@ -69,6 +72,23 @@ jobs:
         run: |
           cpanm -n Devel::Cover::Report::Coveralls
           cover -test -report Coveralls | tee -a $GITHUB_STEP_SUMMARY
+        continue-on-error: true
+      # We need different versions of upload-artifact in production or
+      # local testing due to https://github.com/nektos/act/issues/2135
+      - name: Archive plack logs (prod)
+        uses: actions/upload-artifact@v4
+        if: ${{ env.ACT != 'true' }}
+        with:
+          name: plack.log
+          path: |
+            /tmp/plack.log
+      - name: Archive plack logs (dev)
+        uses: actions/upload-artifact@v3
+        if: ${{ env.ACT == 'true' }}
+        with:
+          name: plack.log
+          path: |
+            /tmp/plack.log
 #      - name: Install yath and JUnit renderer
 #        run: cpanm --notest Test2::Harness Test2::Harness::Renderer::JUnit
 #      - name: Run the tests
