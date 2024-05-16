@@ -380,7 +380,7 @@ if ($opt->enable_mail) {
 
   run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y postfix));
 
-  my $cf = Path::Tiny::path("/home/pause/pause/etc/puppet/modules/pause/files/etc/postfix/main.cf-pause-us");
+  my $cf = Path::Tiny::path("/home/pause/pause/etc/postfix/main.cf-pause-us");
 
   my $maincf = $cf->slurp_raw;
   $maincf =~ s{daemon_directory = /usr/libexec/postfix}{daemon_directory = /usr/lib/postfix/sbin}
