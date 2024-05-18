@@ -19,25 +19,25 @@ sub _wrap {
   }
 
   my $res = eval { $next->(); };
-  if ($@) {
-    if (UNIVERSAL::isa($@, "PAUSE::Web::Exception")) {
-      if ($@->{ERROR}) {
-        $@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR} eq 'ARRAY';
-        push @{$pause->{ERROR}}, @{$@->{ERROR}};
+  if (my $e = $@) {
+    if (UNIVERSAL::isa($e, "PAUSE::Web::Exception")) {
+      if ($e->{ERROR}) {
+        $e->{ERROR} = [ $e->{ERROR} ] unless ref $e->{ERROR} eq 'ARRAY';
+        push @{$pause->{ERROR}}, @{$e->{ERROR}};
         require Data::Dumper;
         my $message = "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$pause->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump;
         $c->app->pause->log({level => 'debug', message => $message});
-        $c->res->code($@->{HTTP_STATUS}) if $@->{HTTP_STATUS};
+        $c->res->code($e->{HTTP_STATUS}) if $e->{HTTP_STATUS};
         $c->render('layouts/layout') unless $c->stash('Action');
-      } elsif ($@->{HTTP_STATUS}) {
+      } elsif ($e->{HTTP_STATUS}) {
         $c->res->headers->content_type('text/plain');
-        $c->res->body(status_message($@->{HTTP_STATUS}));
-        $c->rendered($@->{HTTP_STATUS});
+        $c->res->body(status_message($e->{HTTP_STATUS}));
+        $c->rendered($e->{HTTP_STATUS});
         return;
       }
     } else {
       # this is NOT a known error type, we need to handle it anon
-      my $error = "$@";
+      my $error = "$e";
       if ($pause->{ERRORS_TO_BROWSER}) {
         push @{$pause->{ERROR}}, " ", $error;
       } else {
