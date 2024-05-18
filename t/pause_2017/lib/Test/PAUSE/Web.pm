@@ -300,6 +300,17 @@ sub text_unlike {
   $self;
 }
 
+sub dom_not_found {
+  my ($self, $selector) = @_;
+  my $at = $self->dom->at($selector);
+  if ($at) {
+    fail "'$selector' is found";
+  } else {
+    pass "'$selector' is not found";
+  }
+  $self;
+}
+
 sub title_is_ok {
   my ($self, $url) = @_;
   return if $self->dom->at('p.error_message'); # ignore if error

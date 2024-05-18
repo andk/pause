@@ -537,11 +537,25 @@ our %Actions = (
     cat => "01usr/01look",
     desc => "Admins can look where email should go",
   },
+  change_user_status => {
+    x_mojo_to => "admin#change_user_status",
+    verb => "Change user status",
+    priv => "admin",
+    cat => "01usr/03",
+    desc => "Admins can change the ustatus of a user",
+    x_csrf_protection => 1,
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      pause99_change_user_status_user => {form_type => "text_field"},
+      pause99_change_user_status_new_ustatus => {form_type => "select_field"},
+      pause99_change_user_status_sub => {form_type => "submit_button"},
+    },
+  },
   select_user => {
     x_mojo_to => "admin#select_user",
     verb => "Select User/Action",
     priv => "admin",
-    cat => "01usr/03",
+    cat => "01usr/04",
     desc => "Admins can access PAUSE as-if they were somebody else. Here they select a user/action pair.",
     method => 'POST',
     x_form => {
