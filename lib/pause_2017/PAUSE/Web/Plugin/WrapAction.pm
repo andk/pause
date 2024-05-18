@@ -25,7 +25,8 @@ sub _wrap {
         $@->{ERROR} = [ $@->{ERROR} ] unless ref $@->{ERROR} eq 'ARRAY';
         push @{$pause->{ERROR}}, @{$@->{ERROR}};
         require Data::Dumper;
-        print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$pause->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump; # XXX
+        my $message = "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$pause->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->Dump;
+        $c->app->pause->log({level => 'debug', message => $message});
         $c->res->code($@->{HTTP_STATUS}) if $@->{HTTP_STATUS};
         $c->render('layouts/layout') unless $c->stash('Action');
       } elsif ($@->{HTTP_STATUS}) {
