@@ -1,6 +1,5 @@
 Things I hope to have done at PTS and afterwards:
 
-- Finish porting pause_1999::fixup (see below)
 - Write more tests, especially using latin-1 (and Asian/Emoji) characters
 - Replace "require ..." with "use ..." to preload
 - Move lib/pause_2017/t/ directory into t/ when tests are ready for travis.ci

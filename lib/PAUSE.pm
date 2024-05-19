@@ -294,7 +294,6 @@ sub user2dir {
   $result;
 }
 
-# available as pause_1999::main::file_to_user method
 sub dir2user {
   my($uriid) = @_;
   $uriid =~ s|^/?authors/id||;
