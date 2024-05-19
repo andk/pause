@@ -16,7 +16,7 @@ sub to_app {
   };
 }
 
-# pause_1999::index::handler
+
 sub dispatch {
   my ($self, $req) = @_;
 

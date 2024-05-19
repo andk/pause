@@ -25,7 +25,7 @@ sub _fix {
   $c->stash(".pause")->{Action} = $action;
 }
 
-# pause_1999::fixup::handler
+
 
 =comment
 
