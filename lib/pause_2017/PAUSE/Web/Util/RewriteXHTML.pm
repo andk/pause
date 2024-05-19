@@ -21,7 +21,7 @@ sub rewrite {
   join "", @out;
 }
 
-# pause_1999::saxfilter01
+
 
 package PAUSE::Web::Util::RewriteXHTML::Filter;
 

@@ -25,7 +25,7 @@ sub init {
   Log::Dispatch::Config->configure("$root/etc/plack_log.conf.".($ENV{PLACK_ENV} // "development"));
 }
 
-# pause_1999::main::version
+
 sub version {
   my $self = shift;
   return $self->{VERSION} if defined $self->{VERSION};

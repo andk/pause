@@ -7,7 +7,7 @@ sub register {
   $app->helper(active_user_record => \&_get);
 }
 
-# pause_1999::edit::active_user_record
+
 sub _get {
   my ($c, $hidden_user, $opt) = @_;
   $opt ||= {};

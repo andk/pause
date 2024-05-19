@@ -42,7 +42,7 @@ sub _need_form_data {
   $pause->{need_form_data};
 }
 
-# pause_1999::authen_user::header
+
 sub _retrieve_user {
   my $c = shift;
   my $pause = $c->stash(".pause");
@@ -137,7 +137,7 @@ sub _retrieve_user {
   }
 }
 
-# pause_1999::edit::parameters
+
 sub _set_allowed_actions {
   my $c = shift;
   my $pause = $c->stash(".pause");

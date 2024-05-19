@@ -49,7 +49,7 @@ sub unauthorized {
   ];
 }
 
-# pause_1999::authen_user::handler
+
 sub authenticate {
   my ($self, $env) = @_;
 

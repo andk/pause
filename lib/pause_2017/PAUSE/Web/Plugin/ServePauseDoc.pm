@@ -9,7 +9,7 @@ sub register {
   $app->helper(serve_pause_doc => \&_serve_pause_doc);
 }
 
-# pause_1999::edit::show_document
+
 sub _serve_pause_doc {
   my ($c, $name, $rewrite) = @_;
 
