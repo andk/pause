@@ -1,12 +1,6 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<p>Query the <code>perms</code> table by author or by
-module. Select the option and fill in a module name or
-user ID as appropriate. The answer is all modules that an
-user ID is registered for or all user IDs registered for a
-module, as appropriate.</p>
-
 <p>Registration comes in one of two types: type
 <b>first-come</b> is the automatic registration on a
 first-come-first-serve basis that happens on the initial
