@@ -110,7 +110,7 @@ $PAUSE::Config ||=
      PAUSE_PUBLIC_DATA => '/data/pause/pub/PAUSE/PAUSE-data',
      PML => 'ftp://pause.perl.org/pub/PAUSE/authors/id/',
      PUB_MODULE_URL => 'http://www.cpan.org/authors/id/',
-     RUNDATA => "/tmp/pause_1999",
+     RUNDATA => "/tmp/pause.rundata",
      RUNTIME_MLDISTWATCH => 600, # 720 was the longest of on 2003-08-10,
                                  # 2004-12-xx we frequently see >20 minutes
                                  # 2006-05-xx 7-9 minutes observed

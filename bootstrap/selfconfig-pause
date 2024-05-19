@@ -90,7 +90,7 @@ for my $path (qw(
   /home/pause/pid
   /home/pause/run
   /home/pause/testmail
-  /tmp/pause_1999
+  /tmp/pause.rundata
 )) {
   path($path)->mkdir;
 }
