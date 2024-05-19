@@ -3,6 +3,8 @@ use warnings;
 package PAUSE::dist;
 use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
+use Email::Address::XS;
+use Email::MIME::Header::AddressList;
 use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
 use List::MoreUtils ();
@@ -616,7 +618,6 @@ sub mail_summary {
       warn "Unsent Report [@m]";
     }
   } else {
-    my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
     my $failed = "";
     if ($status_over_all ne "OK") {
       $failed = "Failed: ";
@@ -624,9 +625,10 @@ sub mail_summary {
 
     my $email = Email::MIME->create(
         header_str => [
-            To      => $to,
+            To      => $pma->email_header_object,
+            Cc      => PAUSE::Email->report_email_header_object,
             Subject => $failed."PAUSE indexer report $substrdistro",
-            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+            From    => PAUSE::Email->noreply_email_header_object,
         ],
         attributes => {
           charset      => 'utf-8',

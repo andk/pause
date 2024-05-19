@@ -500,7 +500,7 @@ sub active_user_record {
       die PAUSE::HeavyCGI::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help him identifying what's going on. Thanks!");
     }
     my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
     require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({hiddenuser_h1 => $hiddenuser_h1}); # XXX
@@ -598,7 +598,7 @@ sub active_user_record {
       die PAUSE::HeavyCGI::Exception
           ->new(ERROR =>
                 "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help them identify what's going on. Thanks!")
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help them identify what's going on. Thanks!")
               unless $sth1->rows;
 
       $mgr->{User} = $mgr->fetchrow($sth1, "fetchrow_hashref");
@@ -1394,7 +1394,7 @@ sub add_uri {
   die PAUSE::HeavyCGI::Exception
       ->new(ERROR =>
             "Unidentified error happened, please write to the PAUSE admins
- at $PAUSE::Config->{ADMIN} and help them identifying what's going on. Thanks!")
+ at $PAUSE::Config->{INTERNAL_REPORT_ADDRESS} and help them identifying what's going on. Thanks!")
           unless $u->{userid};
   push @m, qq{<input type="hidden" name="HIDDENNAME" value="$u->{userid}" />};
   my $can_multipart = $mgr->can_multipart;
@@ -1654,7 +1654,7 @@ filename[%s]. </p>
 
   # via FTP GET
 
-  warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+  warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
   push @m, qq{<tr><td bgcolor="#ffe0ff">If you want me <b>to fetch a
       file</b> from an URL, enter the full URL here.<br />};
 
@@ -1701,7 +1701,7 @@ into $her directory. The request used the following parameters:});
     $mailblurb .= $self->wrappar($success);
     $mailblurb .= "\n\nThanks for your contribution,\n-- \nThe PAUSE Team\n";
 #    my $header = {
-#		  To => qq{$PAUSE::Config->{ADMIN}, $u->{email}, $mgr->{User}{email}},
+#		  To => qq{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}, $u->{email}, $mgr->{User}{email}},
 #		  Subject => qq{Notification from PAUSE},
 #		 };
     my %umailset;
@@ -1719,7 +1719,7 @@ into $her directory. The request used the following parameters:});
 	$umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my @to = keys %umailset;
     my $header = {
                   Subject => "Notification from PAUSE",
@@ -1755,7 +1755,7 @@ Sorry, <b>$uri</b> could not be recognized as an uri (},
 			 qq{\)<p>Please
 try again or report errors to <a
 href="mailto:},
-			  $PAUSE::Config->{ADMIN},
+			  $PAUSE::Config->{INTERNAL_REPORT_ADDRESS},
 			  qq{">the administrator</a></p>}]);
     } else {
       my $filename;
@@ -2126,7 +2126,7 @@ glory is collected on http://history.perl.org/backpan/});
         $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my @to = keys %umailset;
     my $header = {
                   Subject => "Files of $u->{userid} scheduled for deletion"
@@ -2383,7 +2383,7 @@ Description: };
         my $otpwblurb = qq{
 
 (This mail has been generated automatically by the Perl Authors Upload
-Server on behalf of the admin $PAUSE::Config->{ADMIN})
+Server on behalf of the admin $PAUSE::Config->{INTERNAL_REPORT_ADDRESS})
 
 As already described in a separate message, you\'re a registered Perl
 Author with the userid $userid. For the sake of approval I have
@@ -2402,14 +2402,14 @@ possible, otherwise your password can be intercepted by third parties.
 
 Thanks & Regards,
 --
-$PAUSE::Config->{ADMIN}
+$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}
 };
 
         my $header = {
                       Subject => $subject,
                      };
         warn "header[$header]otpwblurb[$otpwblurb]";
-        $mgr->send_mail_multi([$email,$PAUSE::Config->{ADMIN}],
+        $mgr->send_mail_multi([$email,$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}],
                               $header,
                               $otpwblurb);
 
@@ -2457,12 +2457,12 @@ The PAUSE Team
 
     # both users and mailing lists run this code
 
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
-    my(@to) = @{$PAUSE::Config->{ADMINS}};
+    warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
+    my(@to) = $PAUSE::Config->{CONTACT_ADDRESS};
     push @m, qq{ Sending separate mails to:
 }, join(" AND ", @to, $email), qq{
 <pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject\n};
 
     my($blurb) = join "", @blurb;
@@ -2870,7 +2870,7 @@ sub request_id {
     my @errors = ();
     if ( $fullname ) {
       unless ($fullname =~ /[ ]/) {
-        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to @{$PAUSE::Config->{ADMINS}}.";
+        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to $PAUSE::Config->{CONTACT_ADDRESS}.";
       }
     } else {
       push @errors, "You must supply a name\n";
@@ -3065,7 +3065,7 @@ MAIL
                    }{<a href=\"$1\">$1</a>}xg;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
     push @m, qq{<pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject
 
 $blurbcopy
@@ -3613,7 +3613,7 @@ sub edit_mod {
                 $u->{userid}. Please note, only modules that are
                 already registered in the module list can be edited
                 here. If you believe, this is a bug, please contact
-                @{$PAUSE::Config->{ADMINS}}.</p> };
+                $PAUSE::Config->{CONTACT_ADDRESS}.</p> };
 
     return @m;
   }
@@ -4394,9 +4394,9 @@ The PAUSE Team
     my($blurb) = join "", @blurb;
     require HTML::Entities;
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
-    warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
     push @m, qq{<pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject
 
 $blurbcopy
@@ -4967,9 +4967,9 @@ Peek at the current permissions:
     my($blurbcopy) = HTML::Entities::encode($blurb,"<>&");
     $blurbcopy =~ s|(https?://[^\s\"]+)|<a href="$1">$1</a>|g;
     $blurbcopy =~ s|(>http.*?)U|$1\n    U|gs; # break the long URL
-    # warn "DEBUG: UPLOAD[$PAUSE::Config->{UPLOAD}]";
+    # warn "DEBUG: UPLOAD[$PAUSE::Config->{NOREPLY_ADDRESS}]";
     push @m, qq{<pre>
-From: $PAUSE::Config->{UPLOAD}
+From: $PAUSE::Config->{NOREPLY_ADDRESS}
 Subject: $subject
 
 $blurbcopy
@@ -5747,7 +5747,7 @@ sub peek_perms {
             <p>The
             contents of the tables presented on this page are mostly
             generated automatically, so please report any errors you
-            observe to @{$PAUSE::Config->{ADMINS}} so that the tables
+            observe to $PAUSE::Config->{CONTACT_ADDRESS} so that the tables
             can be corrected.--Thank you!</p><p>};
 
 
@@ -5951,7 +5951,7 @@ decision.</li>
     again. As it is done by a cron job, it may take up to an hour
     until the indexer actually executes the command. If this doesn't
     repair the index, please <a
-    href="mailto:$PAUSE::Config->{UPLOAD}">email me</a>. };
+    href="mailto:$PAUSE::Config->{NOREPLY_ADDRESS}">email me</a>. };
 
   require Cwd;
   my $cwd = Cwd::cwd();
@@ -6063,7 +6063,7 @@ Estimated time of job completion: %s
         $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my $header = {
                   Subject => "Scheduled for reindexing $u->{userid}"
                  };
@@ -7223,7 +7223,7 @@ packages have their recorded version set to 'undef'.
         $umailset{qq{"$Uname" <$mgr->{User}{email}>}} = 1;
       }
     }
-    $umailset{$PAUSE::Config->{ADMIN}} = 1;
+    $umailset{$PAUSE::Config->{INTERNAL_REPORT_ADDRESS}} = 1;
     my $header = {
                   Subject => "Version reset for $u->{userid}"
                  };

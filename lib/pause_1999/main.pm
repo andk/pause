@@ -284,7 +284,7 @@ sub database_alert {
     my $server = $self->myurl->can("host") ? $self->myurl->host : $self->myurl->hostname;
     my $header = {
                   From => "database_alert",
-                  To => $PAUSE::Config->{ADMIN},
+                  To => $PAUSE::Config->{INTERNAL_REPORT_ADDRESS},
                   Subject => "PAUSE Database Alert $server",
                  };
     $self->send_mail($header,$mess);
@@ -438,7 +438,7 @@ sub send_mail {
 
   my @hdebug = %$header; $self->{REQ}->logger({level => 'error', message => sprintf("hdebug[%s]", join "|", @hdebug) });
   $header->{From}                        ||= $self->{OurEmailFrom};
-  $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
+  $header->{"Reply-To"}                  ||= $PAUSE::Config->{CONTACT_ADDRESS};
 
   if ($] > 5.007) {
     require Encode;

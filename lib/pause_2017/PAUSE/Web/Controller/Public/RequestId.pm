@@ -2,7 +2,6 @@ package PAUSE::Web::Controller::Public::RequestId;
 
 use Mojo::Base "Mojolicious::Controller";
 use PAUSE::Web::Util::Encode;
-use Email::Address;
 
 sub request {
   my $c = shift;
@@ -54,14 +53,15 @@ sub request {
     my @errors = ();
     if ( $fullname ) {
       unless ($fullname =~ /[ ]/) {
-        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to @{$PAUSE::Config->{ADMINS}}.";
+        push @errors, "Name does not look like a full civil name. Please accept our apologies if you believe we're wrong. In this case please write to $PAUSE::Config->{CONTACT_ADDRESS}.";
       }
     } else {
       push @errors, "You must supply a name\n";
     }
     if( $email ) {
-      my $addr_spec = $Email::Address::addr_spec;
-      push @errors, "Your email address doesn't look like valid email address.\n" unless $email =~ /\A$addr_spec\z/;
+      unless (PAUSE::Email->is_valid_email($email)) {
+        push @errors, "Your email address doesn't look like valid email address.\n";
+      }
     } else {
       push @errors, "You must supply an email address\n";
     }
@@ -141,9 +141,10 @@ sub request {
       }
     }
 
-    my @to = $mgr->config->mailto_admins;
+    my @to = PAUSE::Email->report_email_header_object;
     push @to, $email;
-    $pause->{send_to} = "@to";
+    $pause->{send_to} = "$email"; # I don't understand what this is for XXX -- rjbs, 2024-05-03
+
     my $time = time;
     if ($rationale) {
       # wrap it
@@ -246,8 +247,10 @@ sub _directly_add_user {
         my ( $subject, $blurb ) =
           $c->send_welcome_email( [$email], $userid, $email, $fullname, $homepage,
             $fullname );
-        $c->send_welcome_email( $PAUSE::Config->{ADMINS},
-            $userid, "CENSORED", $fullname, $homepage, $fullname );
+        $c->send_welcome_email(
+            [ $PAUSE::Config->{CONTACT_ADDRESS} ],
+            $userid, "CENSORED", $fullname, $homepage, $fullname
+        );
 
         $pause->{subject_for_user_addition} = $subject;
         $pause->{blurb_for_user_addition} = $blurb;

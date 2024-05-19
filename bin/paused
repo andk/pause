@@ -132,14 +132,12 @@ package mypause_send_mail;
 
 use PAUSE::Logger '$Logger';
 
-our %hp_inside;
-
 sub send {
-  my($self,$header,$blurb) = @_;
+  my ($self,$header,$blurb) = @_;
 
   my %from  = exists $header->{From}
             ? ()
-            : (From => "PAUSE <$PAUSE::Config->{UPLOAD}>");
+            : (From => PAUSE::Email->noreply_email_header_object);
 
   my $email = Email::MIME->create(
     attributes => {
@@ -310,7 +308,7 @@ skip        =not yet verified
 
 
       mypause_send_mail->send({
-                               To => $PAUSE::Config->{ADMIN},
+                               To => PAUSE::Email->report_email_header_object,
                                Subject => "Mirror request from $package"
                               },
                               $blurb
@@ -399,10 +397,8 @@ sub woe {
     # fullname just to reuse sth2
     $asciiname ||= $fullname;
     $asciiname =~ s/[^\0-\177]/?/g;
-    my @To;
+
     my $pma = PAUSE::MailAddress->new_from_userid($userid);
-    my $to  = $pma->address;
-    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
 
     my $blurb = "The URL $hash->{uri},
 requested for upload as $hash->{uriid} has problems
@@ -414,13 +410,17 @@ new trial.
 Virtually Yours,
 $Id\n";
 
-    for my $to (@To) {
-      mypause_send_mail->send({
-                               To => join(",",$to),
-                               Subject => "Upload problem $hash->{uriid}"
-                              },
-                              $blurb
-                             );
+    for my $to (
+      $pma->email_header_object,
+      PAUSE::Email->report_email_header_object,
+    ) {
+      mypause_send_mail->send(
+        {
+          To => $to,
+          Subject => "Upload problem $hash->{uriid}"
+        },
+        $blurb
+      );
     }
 
   } elsif ($hash->{nosuccesscount} == $PAUSE::Config->{MAXRETRIES}) {
@@ -470,10 +470,8 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
     my($fullname, $asciiname) = $sth2->fetchrow_array;
     $asciiname ||= $fullname;
     $asciiname =~ s/[^\0-\177]/?/g;
-    my @To;
+
     my $pma = PAUSE::MailAddress->new_from_userid($userid);
-    my $address  = $pma->address;
-    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
 
     my $blurb;
     if ($self->{ErrNotGzip}) {
@@ -497,13 +495,17 @@ Virtually Yours,
 $Id\n";
     }
 
-    for my $to (@To) {
-      mypause_send_mail->send({
-                               To => join(",",$to),
-                               Subject => "Upload problem $hash->{uriid}"
-                              },
-                              $blurb
-                             );
+    for my $to (
+      $pma->email_header_object,
+      PAUSE::Email->report_email_header_object,
+    ) {
+      mypause_send_mail->send(
+        {
+          To => $to,
+          Subject => "Upload problem $hash->{uriid}"
+        },
+        $blurb
+      );
     }
 
     # don't writeback, it would defeat removing it.
@@ -534,14 +536,6 @@ sub welcome_file {
   $asciiname ||= $fullname;
   $asciiname =~ s/[^\0-\177]/?/g;
   my $dbh = $self->{DBH};
-  my $pma = PAUSE::MailAddress->new_from_userid($userid);
-  my $address  = $pma->address;
-  my @To = qq{"$asciiname" <$address>};
-  unless ($PAUSE::Config->{TESTHOST}) {
-      push @To, $PAUSE::Config->{TO_CPAN_TESTERS};
-      push @To, $PAUSE::Config->{'P5P'} if
-          $hash->{'mailto_p5p'}==1;
-  }
 
   my $blurb = "The URL";
   $blurb = "The uploaded file" if $hash->{uri} !~ m,/,;
@@ -587,14 +581,24 @@ CPAN Testers will start reporting results in an hour or so:
                  "Thanks,\n-- \n$Id"
                 );
 
+  my $pma = PAUSE::MailAddress->new_from_userid($userid);
+  my @To = $pma->email_header_object;
+
+  unless ($PAUSE::Config->{TESTHOST}) {
+    push @To, PAUSE::Email->email_header_object_for_addresses(
+      Email::Address::XS->new('CPAN Testers', $PAUSE::Config->{TO_CPAN_TESTERS}),
+    );
+  }
+
   for my $to (@To) {
-    mypause_send_mail->send({
-                             To => join(",",$to),
-                             Subject => "CPAN Upload: $hash->{uriid}",
-                             "Reply-To" => $PAUSE::Config->{REPLY_TO_CPAN_TESTERS},
-                            },
-                            $blurb
-                           );
+    mypause_send_mail->send(
+      {
+        To => $to,
+        Subject => "CPAN Upload: $hash->{uriid}",
+        "Reply-To" => $PAUSE::Config->{REPLY_TO_CPAN_TESTERS},
+      },
+      $blurb
+    );
   }
   $self->logge("Info: Sent 'has entered' email about uriid[$hash->{uriid}]");
   sleep 10;
@@ -777,7 +781,6 @@ sub verify_gzip_tar {
         if ($child_stat != 0) {
             $err =~ s/\n/ /g;
             $self->logge("Debug: child_stat[$child_stat]err[$err]");
-            my @To = $PAUSE::Config->{ADMIN};
 
             my $blurb = "For the resource [$uri]
  the command [$testinggzip -t $tpath]
@@ -787,15 +790,14 @@ sub verify_gzip_tar {
  The command [ls -l $tpath]
  gives [$ls]\n\n";
 
-            for my $to (@To) {
-                mypause_send_mail->send
-                    ({
-                      To      => $to,
-                      Subject => "Upload problem $uri"
-                     },
-                     $blurb
-                    );
-            }
+            mypause_send_mail->send(
+              {
+                To      => PAUSE::Email->report_email_header_object,
+                Subject => "Upload problem $uri"
+              },
+              $blurb
+            );
+
             if ($err =~ /not in gzip format/) {
                 $self->{URIRECORD}{nosuccesscount} = $PAUSE::Config->{MAXRETRIES} - 1;
                 $self->{ErrNotGzip}++;

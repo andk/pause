@@ -283,10 +283,13 @@ sub _build_pause_config_overrides {
   my $dsnbase = "DBI:SQLite:dbname=$db_root";
 
   my $overrides = {
+    ADMIN_LIST  => q{admin-list@example.com},
     AUTHEN_DATA_SOURCE_NAME   => "$dsnbase/authen.sqlite",
     CHECKSUMS_SIGNING_PROGRAM => "\0",
+    CONTACT_ADDRESS           => q{admin-list@example.com},
     GITROOT                   => $git_dir,
     GZIP_OPTIONS              => '',
+    INTERNAL_REPORT_ADDRESS   => q{pause-admin@example.com},
     MLROOT                    => File::Spec->catdir($ml_root),
     ML_CHOWN_GROUP     => +(getgrgid($)))[0],
     ML_CHOWN_USER      => +(getpwuid($>))[0],

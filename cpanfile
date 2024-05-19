@@ -11,7 +11,7 @@ requires 'DBI';
 requires 'DBD::mysql', '== 4.050';
 requires 'DBD::SQLite';
 requires 'Digest::SHA1';
-requires 'Email::Address';
+requires 'Email::Address::XS';
 requires 'Email::MIME';
 requires 'Email::Sender::Simple';
 requires 'EV';

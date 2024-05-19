@@ -591,9 +591,9 @@ sub handle_alerts {
 
     my $email = Email::MIME->create(
         header_str => [
-            To      => $PAUSE::Config->{ADMIN},
+            To      => PAUSE::Email->report_email_header_object,
             Subject => "PAUSE upload indexing error",
-            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+            From    => PAUSE::Email->noreply_email_header_object,
         ],
         attributes => {
             charset      => 'utf-8',

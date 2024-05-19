@@ -1,7 +1,6 @@
 package PAUSE::Web::Controller::User::Cred;
 
 use Mojo::Base "Mojolicious::Controller";
-use Email::Address;
 use PAUSE::Web::Util::Encode;
 use Text::Unidecode;
 
@@ -27,7 +26,15 @@ sub edit {
     my $wantemail = $req->param("pause99_edit_cred_email");
     my $wantsecretemail = $req->param("pause99_edit_cred_secretemail");
     my $wantalias = $req->param("pause99_edit_cred_cpan_mail_alias");
-    my $addr_spec = $Email::Address::addr_spec;
+
+    # I don't know why this is like this.  I'm just reworking earlier code.
+    # -- rjbs, 2024-05-03
+    my $is_not_emaily = sub {
+      my ($inside) = $_[0] =~ /^\s*(.+)\s*$/;
+
+      ! PAUSE::Email->is_valid_email($inside);
+    };
+
     if ($wantemail=~/^\s*$/ && $wantsecretemail=~/^\s*$/) {
       $pause->{error}{no_email} = 1;
     } elsif ($wantalias eq "publ" && $wantemail=~/^\s*$/) {
@@ -38,9 +45,9 @@ sub edit {
       $pause->{error}{no_secret_email} = 1;
     } elsif ($wantalias eq "secr" && $wantsecretemail=~/\Q$cpan_alias\E/i) {
       $pause->{error}{secret_is_cpan_alias} = 1;
-    } elsif (defined $wantsecretemail && $wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
+    } elsif (defined $wantsecretemail && $wantsecretemail!~/^\s*$/ && $is_not_emaily->($wantsecretemail)) {
       $pause->{error}{invalid_secret} = 1;
-    } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/ && $wantemail ne 'CENSORED') {
+    } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $is_not_emaily->($wantemail) && $wantemail ne 'CENSORED') {
       $pause->{error}{invalid_public} = 1;
     } else {
       $consistentsubmit = 1;
@@ -183,6 +190,7 @@ sub edit {
           if ($nu->{userid} && $nu->{userid} eq $pause->{User}{userid}) {
             $pause->{User} = $nu;
           }
+
           # Send separate emails to user and public places because
           # CC leaks secretemail to others
           my @to;
@@ -190,13 +198,14 @@ sub edit {
           for my $lu ($u, $nu) {
             for my $att (qw(secretemail email)) {
               if ($lu->{$att}){
-                $umailset{qq{<$lu->{$att}>}} = 1;
+                $umailset{ $lu->{$att} } = 1;
                 last;
               }
             }
           }
-          push @to, join ", ", keys %umailset;
-          push @to, $mgr->config->mailto_admins if $mailto_admins;
+          push @to, sort keys %umailset;
+          push @to, PAUSE::Email->report_email_header_object if $mailto_admins;
+
           my $header = {Subject => "User update for $u->{userid}"};
           $mgr->send_mail_multi(\@to,$header, $mailblurb);
         } else {

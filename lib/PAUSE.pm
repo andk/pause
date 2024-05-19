@@ -23,6 +23,7 @@ use File::Spec ();
 use IO::File ();
 use List::Util ();
 use Digest::SHA ();
+use PAUSE::Email;
 use Sys::Hostname ();
 use Time::Piece;
 use YAML::Syck;
@@ -69,8 +70,6 @@ push @INC, $pauselib;
 $PAUSE::Config ||=
     {
      ABRA_EXPIRATION => 86400/4,
-     ADMIN => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neilb@neilb.org},
-     ADMINS => [qq(modules\@perl.org)],
      ANON_FTP_PASS => qq{k\@pause.perl.org},
      AUTHEN_DATA_SOURCE_NAME => "DBI:mysql:authen_pause",
      AUTHEN_PASSWORD_FLD => "password",
@@ -79,6 +78,7 @@ $PAUSE::Config ||=
      AUTHEN_BACKUP_DIR => '/home/pause/db-backup',
      BZCAT_PATH => (List::Util::first { -x $_ } ("/bin/bzcat", "/usr/bin/bzcat" )),
      BZIP2_PATH => (List::Util::first { -x $_ } ("/bin/bzip2", "/usr/bin/bzip2" )),
+     CONTACT_ADDRESS => q(modules@perl.org),
      CPAN_TESTERS => qq(cpan-uploads\@perl.org), # cpan-uploads is a mailing list, BINGOS relies on it
      TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
      REPLY_TO_CPAN_TESTERS => qq(cpan-uploads\@perl.org),
@@ -92,6 +92,7 @@ $PAUSE::Config ||=
      HTTP_ERRORLOG => '/var/log/nginx/error.log', # harmless use in cron-daily
      INCOMING => 'file://data/pause/incoming/',
      INCOMING_LOC => '/data/pause/incoming',
+     INTERNAL_REPORT_ADDRESS => q{andreas.koenig.gmwojprw+pause@franz.ak.mind.de, neilb@neilb.org},
      MAIL_MAILER => ["sendmail"],
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
@@ -103,6 +104,7 @@ $PAUSE::Config ||=
      ML_MIN_FILES => 20_000, # must be this many files to run mldistwatch
      MOD_DATA_SOURCE_NAME => "dbi:mysql:mod",
      NO_SUCCESS_BREAK => 900,
+     NOREPLY_ADDRESS => 'upload@pause.perl.org',
      P5P => 'release-announce@perl.org',
      PID_DIR => "/home/pause/pid/",
      PAUSE_LOG => "/home/pause/log/paused.log",
@@ -118,7 +120,6 @@ $PAUSE::Config ||=
      TIMEOUT => 60*60,
      TRUST_IS_SSL_HEADER => 1,
      TMP => '/data/pause/tmp/',
-     UPLOAD => 'upload@pause.perl.org',
      # sign the auto-generated CHECKSUM files with:
      CHECKSUMS_SIGNING_PROGRAM => 'gpg',
      CHECKSUMS_SIGNING_ARGS => '-q --homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ',

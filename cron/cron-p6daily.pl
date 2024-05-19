@@ -71,8 +71,8 @@ sub send_the_mail {
     },
     header_str => [
       Subject => $SUBJECT,
-      To      => $PAUSE::Config->{ADMIN},
-      From    => "cron daemon cron-p6daily.pl <upload\@pause.perl.org>",
+      To      => PAUSE::Email->report_email_header_object,
+      From    => PAUSE::Email->report_email_header_object,
     ],
     body_str => join(q{}, @blurb),
   );

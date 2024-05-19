@@ -356,7 +356,7 @@ share_perms
 	    CHARSET         => $pause_1999::main::DO_UTF8 ? "utf-8" : "iso-8859-1",
 	    EXECUTION_PLAN => $Exeplan,
 	    MailMailerConstructorArgs => $PAUSE::Config->{MAIL_MAILER},
-	    MailtoAdmins => join(",",@{$PAUSE::Config->{ADMINS}}),
+	    MailtoAdmins => $PAUSE::Config->{CONTACT_ADDRESS},
 	    ModDsn       => $PAUSE::Config->{MOD_DATA_SOURCE_NAME},
 	    ModDsnPasswd => $PAUSE::Config->{MOD_DATA_SOURCE_PW},
 	    ModDsnUser   => $PAUSE::Config->{MOD_DATA_SOURCE_USER},
@@ -394,7 +394,7 @@ share_perms
 
   }
 
-  $self->{OurEmailFrom} = "\"Perl Authors Upload Server\" <$PAUSE::Config->{UPLOAD}>";
+  $self->{OurEmailFrom} = "\"Perl Authors Upload Server\" <$PAUSE::Config->{NOREPLY_ADDRESS}>";
   # warn "Debug: OurEmailFrom=UPLOAD[$self->{OurEmailFrom}]";
   my(@time) = gmtime; # sec,min,hour,day,month,year
   my $quartal = int($time[4]/3) + 1; # 1..4

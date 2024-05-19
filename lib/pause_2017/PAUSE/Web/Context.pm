@@ -91,7 +91,7 @@ sub database_alert {
     my $server = $self->hostname;
     my $header = {
                   From => "database_alert",
-                  To => $PAUSE::Config->{ADMIN},
+                  To   => PAUSE::Email->report_email_header_object,
                   Subject => "PAUSE Database Alert $server",
                  };
     $self->send_mail($header, $mess);
@@ -132,26 +132,39 @@ sub fetchrow {
 ### Mailer
 
 sub prepare_sendto {
-  my ($self, $active_user, $pause_user, @admin) = @_;
+  my ($self, $active_user, $pause_user, $include_admin) = @_;
 
+  # %umailset is just used to uniq mail targets.  Keys are email addresses we
+  # will send to.  The values are the names.  If we end up seeing two entries
+  # for one address, it will only be emailed once.  This is acceptable.
+  # -- rjbs, 2024-05-03
   my %umailset;
-  my $name = $active_user->{asciiname} || $active_user->{fullname} || "";
-  my $Uname = $pause_user->{asciiname} || $pause_user->{fullname} || "";
+  my $name = $active_user->{fullname} || $active_user->{asciiname} || "";
+  my $Uname = $pause_user->{fullname} || $pause_user->{asciiname}  || "";
   if ($active_user->{secretemail}) {
-    $umailset{qq{"$name" <$active_user->{secretemail}>}} = 1;
+    $umailset{ $active_user->{secretemail} } = $name;
   } elsif ($active_user->{email}) {
-    $umailset{qq{"$name" <$active_user->{email}>}} = 1;
+    $umailset{ $active_user->{email} } = $name;
   }
   if ($active_user->{userid} ne $pause_user->{userid}) {
     if ($pause_user->{secretemail}) {
-      $umailset{qq{"$Uname" <$pause_user->{secretemail}>}} = 1;
-    }elsif ($pause_user->{email}) {
-      $umailset{qq{"$Uname" <$pause_user->{email}>}} = 1;
+      $umailset{ $pause_user->{secretemail} } = $Uname;
+    } elsif ($pause_user->{email}) {
+      $umailset{ $pause_user->{email} } = $Uname;
     }
   }
-  my @to = keys %umailset;
-  push @to, @admin if @admin;
-  @to;
+
+  my @to;
+  for my $addr (sort keys %umailset) {
+    my $addr = Email::Address::XS->new($umailset{$addr}, $addr);
+    push @to, PAUSE::Email->email_header_object_for_addresses($addr);
+  }
+
+  if ($include_admin) {
+    push @to, PAUSE::Email->report_email_header_object;
+  }
+
+  return @to;
 }
 
 sub send_mail_multi {
@@ -167,9 +180,11 @@ sub send_mail_multi {
 sub send_mail {
   my ($self, $header, $blurb) = @_;
 
-  my @hdebug = %$header; $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
-  $header->{From}                        ||= qq{"Perl Authors Upload Server" <$PAUSE::Config->{UPLOAD}>};
-  $header->{"Reply-To"}                  ||= join ", ", @{$PAUSE::Config->{ADMINS}};
+  my @hdebug = %$header;
+  $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
+
+  $header->{From} ||= PAUSE::Email->noreply_email_header_object;
+  $header->{"Reply-To"} ||= PAUSE::Email->contact_email_header_object;
 
   my $email = Email::MIME->create(
     header_str => [%$header],
