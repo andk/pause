@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
-use 5.10.1;
+use v5.36.0;
 use lib 't/lib';
 use lib 't/privatelib'; # Stub PrivatePAUSE
 
 use File::Spec;
 use PAUSE;
 use PAUSE::TestPAUSE;
+use Process::Status;
 
 use Test::More;
 
@@ -17,58 +18,13 @@ subtest "do not index bare .pm but report rejection" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_not_updated_ok(
-    $result->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
-    "did not reindex",
-  );
+  $result->assert_index_not_updated;
 
   $result->email_ok(
     [
       { subject => 'Failed: PAUSE indexer report OPRIME/Matrix.pm.gz' },
     ],
   );
-};
-
-subtest "perl-\\d should not get indexed" => sub {
-  my $pause = PAUSE::TestPAUSE->init_new;
-
-  $pause->upload_author_fake(PLUGH => 'Soft-Ware-2');
-
-  $pause->upload_author_fake(PLUGH => {
-    name      => 'perl',
-    version   => 6,
-    packages  => [ 'perl::rocks' ],
-  });
-
-  my $result = $pause->test_reindex;
-
-  $result->package_list_ok(
-    [
-      { package => 'Soft::Ware',      version => '2' },
-    ],
-  );
-
-  # TODO: send a report saying 'no perl-X allowed'
-};
-
-subtest "should index single-life dev vers. modules in perl dist" => sub {
-  plan skip_all => "this test only run when perl-5.20.2.tar.gz found"
-    unless -e 'perl-5.20.2.tar.gz';
-
-  my $pause = PAUSE::TestPAUSE->init_new;
-
-  my $initial_result = $pause->test_reindex;
-
-  my $dbh = $initial_result->connect_authen_db;
-  die "couldn't make OPRIME a pumpking"
-    unless $dbh->do("INSERT INTO grouptable (user, ugroup) VALUES ('OPRIME', 'pumpking')");
-
-  $pause->upload_author_file('OPRIME', 'perl-5.20.2.tar.gz');
-
-  my $result = $pause->test_reindex;
-
-  my $packages = $result->packages_data;
-  ok($packages->package("POSIX"), "we index POSIX in a dev version");
 };
 
 sub refused_index_test {
@@ -156,6 +112,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
 
   {
     my $result = $pause->test_reindex;
+    $result->assert_index_updated;
 
     $result->email_ok([
       { subject => 'PAUSE indexer report OPRIME/Pie-Eater-1.23.tar.gz' },
@@ -175,6 +132,7 @@ subtest "do not index if meta has release_status <> stable" => sub {
   );
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Pie::Eater',      version => '1.23'  },
@@ -213,6 +171,7 @@ subtest "warn when pkg and module match only case insensitively" => sub {
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -259,6 +218,7 @@ subtest "(package NAME VERSION BLOCK) and (package NAME BLOCK)" => sub {
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -291,12 +251,7 @@ subtest "check various forms of version" => sub {
   });
 
   my $result = $pause->test_reindex;
-
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  $result->assert_index_updated;
 
   # VVVVVV          - just fine!  index it
   # VVVVVV::Bogus   - utterly busted, give up
@@ -339,6 +294,7 @@ EOT
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Globby::Version',           version => '1.234'  },
@@ -360,12 +316,7 @@ subtest "check overlong versions" => sub {
   });
 
   my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "there were no things to update",
-  );
+  $result->assert_index_not_updated;
 
   my $etoolong = sub {
     like(
@@ -389,6 +340,35 @@ subtest "check overlong versions" => sub {
   );
 };
 
+subtest "version is not a lax version string" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(MONSTER => 'Hex-Version-1.234.tar.gz', {
+    append => [
+      {
+        file => "lib/Hex/Version/NoJoke.pm",
+        content => <<'EOT',
+use strict;
+use warnings;
+package Hex::Version::NoJoke;
+our $VERSION = '0x1p-1';
+1;
+EOT
+      }
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'Hex::Version', version => '1.234'  },
+  ]);
+
+  $result->logged_event_like(
+    qr/error with version/,
+    "0x1p-1 is a bad version",
+  );
+};
+
 subtest "case-changing imports" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
@@ -406,6 +386,7 @@ subtest "case-changing imports" => sub {
       });
 
       my $result = $pause->test_reindex;
+      $result->assert_index_updated;
 
       $result->package_list_ok([
         { package => 'Foo::Bar',      version => '0.001'  },
@@ -426,6 +407,7 @@ subtest "case-changing imports" => sub {
       });
 
       my $result = $pause->test_reindex;
+      $result->assert_index_updated;
 
       $result->package_list_ok([
         { package => 'foo::bar',      version => '0.002'  },
@@ -444,6 +426,8 @@ subtest "check perl6 distribution indexing" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/perl6/authors');
   my $result = $pause->test_reindex;
+
+  $result->assert_index_not_updated("p5 index not updated on p6 upload");
 
   $result->p6dists_ok(
     [
@@ -504,6 +488,7 @@ EOT
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Version::Cmp',           version => '1.234'  },
@@ -539,6 +524,7 @@ EOT
   });
 
   my $result = $pause->test_reindex;
+  $result->assert_index_updated;
 
   $result->package_list_ok([
     { package => 'Lingua::JA::Numbers', version => '0.05'  },
@@ -556,12 +542,7 @@ subtest "do not index dists without META file" => sub {
   });
 
   my $result = $pause->test_reindex;
-
-  $pause->file_not_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "there were no things to update",
-  );
+  $result->assert_index_not_updated;
 
   my $nometa = sub {
     like(
@@ -579,6 +560,116 @@ subtest "do not index dists without META file" => sub {
       },
     ],
   );
+};
+
+subtest "do not index dists without trial versions" => sub {
+  for my $test (
+    { desc => "low line in version", munger => sub { $_[0] =~ s/22/2_2/r } },
+    { desc => "TRIAL in version",    munger => sub { $_[0] =~ s/22/22-TRIAL/r } },
+  ) {
+    subtest $test->{desc} => sub {
+      my $pause = PAUSE::TestPAUSE->init_new;
+
+      # Module::Faker will give us a bit of grief for uploading a file called
+      # 1.2_2 because it wants to set META release status to stable, and the
+      # low line is in conflict with that.  Rather than muck about making this
+      # permissible, I'm going to write out the archive, then rename it before
+      # indexing.
+      my $old_name = $pause->upload_author_fake(PERSON => 'Just-Testing-1.22.tar.gz');
+      my $new_name = $test->{munger}->($old_name);
+
+      die "test munger turned old name into old name!"
+        if $old_name eq $new_name;
+
+      rename($old_name, $new_name) or die "can't rename $old_name: $!";
+
+      my $result = $pause->test_reindex;
+
+      $result->assert_index_not_updated;
+
+      $result->logged_event_like(
+        qr{\Qdist is a developer release},
+        "we do not index trial-like filenames",
+      );
+    };
+  }
+};
+
+subtest "updates to existing packages " => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  subtest "first version" => sub {
+    $pause->upload_author_fake(MTRON => 'Eye-Meeter-1.234.tar.gz');
+
+    my $result = $pause->test_reindex;
+
+    $result->assert_index_updated;
+
+    $result->package_list_ok([
+      { package => 'Eye::Meeter', version => '1.234'  },
+    ]);
+  };
+
+  subtest "second version" => sub {
+    $pause->upload_author_fake(MTRON => 'Eye-Meeter-1.235.tar.gz');
+
+    my $result = $pause->test_reindex;
+
+    $result->assert_index_updated;
+
+    $result->package_list_ok([
+      { package => 'Eye::Meeter', version => '1.235'  },
+    ]);
+  };
+};
+
+subtest "the notorious version zero" => sub {
+  # When we've got two dists both of which provide version 0 (or version
+  # undef), we pick the winner by mtime.  I hate this, but I will write a test
+  # so that I can someday more confidently forbid anything like this.  Good
+  # grief. -- rjbs, 2024-05-11
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my sub touch_file ($filename, $i) {
+    state $base = 1715832000; # May 16, 2024, Philly time
+    my $time = $base + $i;
+    utime $time, $time, $filename || die "Couldn't touch $filename: $!\n";
+  }
+
+  # First, a zero version package.
+  # Then, again, but file mtime is older.  We keep the package on file.
+  # Then, again, but file mtime is newer.  We switch to the new package.
+  my @tests = (
+    { desc => "first upload",  offset => 10, dist_v => '1.0', want => '1.0' },
+    { desc => "second upload", offset =>  5, dist_v => '1.1', want => '1.0' },
+    { desc => "third upload",  offset => 15, dist_v => '1.2', want => '1.2' },
+  );
+
+  for my $test (@tests) {
+    subtest $test->{desc} => sub {
+      my $file = $pause->upload_author_fake(CIPHER => {
+        name      => 'Zero',
+        version   => $test->{dist_v},
+        packages  => [
+          'Zero' => { version => '0.000' },
+        ],
+      });
+
+      touch_file($file, $test->{offset});
+
+      my $result = $pause->test_reindex;
+
+      $result->package_list_ok([
+        { package => 'Zero', version => '0.000'  },
+      ]);
+
+      my $p = $result->packages_data;
+
+      my $dist = $p->latest_distribution("Zero");
+      is($dist->prefix, "C/CI/CIPHER/Zero-$test->{want}.tar.gz", "right dist indexed");
+      is($dist->version, $test->{want}, "with the right version");
+    };
+  }
 };
 
 done_testing;
