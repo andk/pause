@@ -2,6 +2,7 @@ package PAUSE::TestPAUSE;
 use Moose;
 use MooseX::StrictConstructor;
 
+use v5.36.0;
 use autodie;
 
 use DBI;
@@ -13,6 +14,7 @@ use File::pushd;
 use File::Temp ();
 use File::Which;
 use Path::Class;
+use Process::Status;
 
 # This one, we don't expect to be used.  In a weird world, we'd mark it fatal
 # or something so we could say "nothing should log outside of test code."
@@ -235,6 +237,28 @@ sub upload_author_file {
   return File::Spec->catfile($author_dir, $file);
 }
 
+sub upload_author_garbage {
+  my ($self, $author, $file) = @_;
+
+  $author = uc $author;
+  my $cpan_root  = File::Spec->catdir($self->tmpdir, 'cpan');
+  my $author_dir = File::Spec->catdir(
+    $cpan_root,
+    qw(authors id),
+    (substr $author, 0, 1),
+    (substr $author, 0, 2),
+    $author,
+  );
+
+  make_path( $author_dir );
+  my $target = File::Spec->catfile($author_dir, $file);
+  system('dd', 'if=/dev/random', "of=$target", "count=20", "status=none"); # write 20k
+
+  Process::Status->assert_ok("dd from /dev/random to $target");
+
+  return $target;
+}
+
 has pause_config_overrides => (
   is  => 'ro',
   isa => 'HashRef',
@@ -349,11 +373,23 @@ sub test_reindex {
 
     die "stray mail in test mail trap before reindex" if @stray_mail;
 
+    my $existing_log_events = $self->logger->events->@*;
+
     if ($arg->{pick}) {
       my $dbh = PAUSE::dbh();
       $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
         for @{ $arg->{pick} };
     }
+
+    my sub filestate ($file) {
+      return ';;' unless -e $file;
+      my @stat = stat $file;
+      return join q{;}, @stat[0,1,7]; # dev, ino, size
+    }
+
+    my $package_file = $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz));
+
+    my $old_package_state = filestate($package_file);
 
     PAUSE::mldistwatch->new({
       sleep => 0,
@@ -362,9 +398,16 @@ sub test_reindex {
 
     $arg->{after}->($self->tmpdir) if $arg->{after};
 
+    # The first $existing_log_events were already there.  We only care about
+    # once added during the indexer run.
+    my @log_events = $self->logger->events->@*;
+    splice @log_events, 0, $existing_log_events;
+
     my @deliveries = Email::Sender::Simple->default_transport->deliveries;
 
     Email::Sender::Simple->default_transport->clear_deliveries;
+
+    my $new_package_state = filestate($package_file);
 
     return PAUSE::TestPAUSE::Result->new({
       tmpdir => $self->tmpdir,
@@ -372,75 +415,10 @@ sub test_reindex {
       authen_db_file   => File::Spec->catfile($self->db_root, 'authen.sqlite'),
       mod_db_file      => File::Spec->catfile($self->db_root, 'mod.sqlite'),
       deliveries       => \@deliveries,
+      log_events       => \@log_events,
+      updated_02packages => $old_package_state ne $new_package_state,
     });
   });
-}
-
-has _file_index => (
-  is      => 'ro',
-  default => sub {  {}  },
-);
-
-sub file_updated_ok {
-  my ($self, $filename, $desc) = @_;
-  $desc = defined $desc ? "$desc: " : q{};
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  my $tmpdir = $self->tmpdir . "";
-  my $prettyname = $filename =~ s/\Q$tmpdir/\${TEST}/r;
-
-  unless (-e $filename) {
-    return Test::More::fail("$desc$prettyname not updated");
-  }
-
-  my ($dev, $ino) = stat $filename;
-
-  my $old = $self->_file_index->{ $filename };
-
-  unless (defined $old) {
-    $self->_file_index->{$filename} = "$dev,$ino";
-    return Test::More::pass("$desc$prettyname updated (created)");
-  }
-
-  my $ok = Test::More::ok(
-    $old ne "$dev,$ino",
-    "$desc$prettyname updated",
-  );
-
-  $self->_file_index->{$filename} = "$dev,$ino";
-  return $ok;
-}
-
-sub file_not_updated_ok {
-  my ($self, $filename, $desc) = @_;
-  $desc = defined $desc ? "$desc: " : q{};
-
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-  my $old = $self->_file_index->{ $filename };
-
-  my $tmpdir = $self->tmpdir . "";
-  my $prettyname = $filename =~ s/\Q$tmpdir/\${TEST}/r;
-
-  unless (-e $filename) {
-    return Test::More::fail("$desc$prettyname deleted") if $old;
-    return Test::More::pass("$desc$prettyname not created (thus not updated)");
-  }
-
-  my ($dev, $ino) = stat $filename;
-
-  unless (defined $old) {
-    $self->_file_index->{$filename} = "$dev,$ino";
-    return Test::More::fail("$desc$prettyname updated (created)");
-  }
-
-  my $ok = Test::More::ok(
-    $old eq "$dev,$ino",
-    "$desc$prettyname not updated",
-  );
-
-  return $ok;
 }
 
 sub run_shell {

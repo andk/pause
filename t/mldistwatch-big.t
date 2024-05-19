@@ -11,23 +11,36 @@ use PAUSE::TestPAUSE;
 
 use Test::More;
 
+subtest "the simplest thing that could possibly work" => sub {
+  for my $ext (qw( tar.gz zip )) {
+    my $pause = PAUSE::TestPAUSE->init_new;
+    $pause->upload_author_fake(AIDEN => "Shoe-Keeper-1.23.$ext");
+
+    my $result = $pause->test_reindex;
+
+    $result->diag_log_messages;
+
+    $result->assert_index_updated;
+
+    $result->package_list_ok(
+      [ { package => 'Shoe::Keeper',   version => '1.23' } ],
+    );
+
+    $result->perm_list_ok({ 'Shoe::Keeper' => { f => 'AIDEN' } });
+
+    $result->email_ok(
+      [ { subject => "PAUSE indexer report AIDEN/Shoe-Keeper-1.23.$ext" } ],
+    );
+  }
+};
+
 subtest "first indexing" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->import_author_root('corpus/mld/001/authors');
 
   my $result = $pause->test_reindex;
 
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
-
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 03modlist.data.gz)),
-    "our indexer indexed",
-  );
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
@@ -97,11 +110,7 @@ for my $uploader (qw(FCOME CMAINT)) {
     {
       my $result = $pause->test_reindex;
 
-      $pause->file_updated_ok(
-        $result->tmpdir
-               ->file(qw(cpan modules 02packages.details.txt.gz)),
-        "our indexer indexed",
-      );
+      $result->assert_index_updated;
 
       $result->package_list_ok(
         [
@@ -222,11 +231,7 @@ subtest "case mismatch, authorized for original" => sub {
 
   my $result = $pause->test_reindex;
 
-  $pause->file_updated_ok(
-    $result->tmpdir
-           ->file(qw(cpan modules 02packages.details.txt.gz)),
-    "our indexer indexed",
-  );
+  $result->assert_index_updated;
 
   $result->package_list_ok(
     [
