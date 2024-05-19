@@ -578,6 +578,9 @@ subtest "do not index dists without trial versions" => sub {
       my $old_name = $pause->upload_author_fake(PERSON => 'Just-Testing-1.22.tar.gz');
       my $new_name = $test->{munger}->($old_name);
 
+      die "test munger turned old name into old name!"
+        if $old_name eq $new_name;
+
       rename($old_name, $new_name) or die "can't rename $old_name: $!";
 
       my $result = $pause->test_reindex;
