@@ -631,9 +631,9 @@ subtest "the notorious version zero" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
 
   my sub touch_file ($filename, $i) {
-    my $secs = sprintf '%02i', $i;
-    system("touch", '-m', '-d', "2020-01-02T03:04:${secs}Z", $filename);
-    Process::Status->assert_ok("touching $filename");
+    state $base = 1715832000; # May 16, 2024, Philly time
+    my $time = $base + $i;
+    utime $time, $time, $filename || die "Couldn't touch $filename: $!\n";
   }
 
   # First, a zero version package.
