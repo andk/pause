@@ -34,7 +34,7 @@ subtest 'get: user with subdirs' => sub {
         my $user_home = $PAUSE::Config->{MLROOT}."/".PAUSE::user2dir($user);
         my $subdir = path("$user_home/test");
         $subdir->make_path;
-        $subdir->child("stuff.txt")->spurt("Foo");
+        $subdir->child("stuff.txt")->spew("Foo");
 
         my $t = Test::PAUSE::Web->new(user => $user);
         $t->get_ok("$path?ACTION=add_uri");
@@ -103,7 +103,7 @@ subtest 'post: under a Perl6 subdir' => sub {
         my $user_home = $PAUSE::Config->{MLROOT}."/".PAUSE::user2dir($user);
         my $subdir = path("$user_home/Perl6");
         $subdir->make_path;
-        $subdir->child("stuff.txt")->spurt("Foo");
+        $subdir->child("stuff.txt")->spew("Foo");
 
         my $file = $PAUSE::Config->{INCOMING_LOC}."/".$form{pause99_add_uri_httpupload}[1];
         ok !-f $file, "file to upload does not exist";
