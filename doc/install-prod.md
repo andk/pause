@@ -66,6 +66,17 @@ Install node exporter.
 apt -y install prometheus-node-exporter
 ```
 
+### General
+
+You probably want to enable some non-default collectors.  In
+`/etc/default/prometheus-node-exporter`:
+
+```
+ARGS="--collector.systemd"
+```
+
+### nginx
+
 Consider
 [nginx-prometheus-exporter](https://github.com/nginxinc/nginx-prometheus-exporter).
 
@@ -95,12 +106,28 @@ server {
 
 ## Additional Configuration
 
+### Fail2ban
+
 Default fail2ban bantime is very short. Make it longer:
 
 ```
 fail2ban-client start sshd
 fail2ban-client set sshd bantime 86400
 ```
+
+Make sure that fail2ban is reading logs.  Run `fail2ban-client status
+sshd`.  If it's not failing any IPs, that's a sign it's not working.
+The default backend of `auto` normally works, but may get confused if
+`/var/log/auth.log` exists.  If deleting `/var/log/auth.log` doesn't
+work, or you want to force it to always read the journal... in
+`/etc/fail2ban/jail.conf`:
+
+```
+[DEFAULT]
+backend = systemd
+```
+
+### Package upgrades
 
 Automatic security upgrades are a good idea, and probably outweigh
 the risks.
