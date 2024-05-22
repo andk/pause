@@ -163,7 +163,9 @@ sub request {
                          userid => $userid,
                          rationale => $rationale,
                         };
-    require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$session->{APPLY}],[qw(APPLY)])->Indent(1)->Useqq(1)->Dump; # XXX
+    require Data::Dumper;
+    my $message = "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$session->{APPLY}],[qw(APPLY)])->Indent(1)->Useqq(1)->Dump;
+    $c->app->pause->log({level => 'debug', message => $message });
     if (lc($fullname) eq lc($userid)) {
       die PAUSE::Web::Exception->new(ERROR => "fullname looks like spam");
     }

@@ -283,8 +283,9 @@ sub _share_remopr {
   if (0) {
     # here I discovered that Apache::Request has case-insensitive keys
     my %p = map { $_, [ $req->every_param($_)] } @{$req->param->names};
-    require Data::Dumper; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%p],[qw()])->Indent(1)->Useqq(1)->Dump; # XXX
-
+    require Data::Dumper;
+    my $message = "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([\%p],[qw()])->Indent(1)->Useqq(1)->Dump;
+    $c->app->pause->log({level => 'debug', message => $message});
   }
 
   if (

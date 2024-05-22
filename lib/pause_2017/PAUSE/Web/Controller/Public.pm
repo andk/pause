@@ -80,8 +80,9 @@ sub mailpw {
     # we have.
     unless ($email = $rec->{secretemail}) {
       my $u = $c->active_user_record($param,{hidden_user_ok => 1});
-      require YAML::Syck; print STDERR "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({u=>$u}); # XXX
-
+      require YAML::Syck;
+      my $message = "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . YAML::Syck::Dump({u=>$u});
+      $mgr->log({level => 'debug', message => $message});
       $email = $u->{email};
     }
     if ($email) {
