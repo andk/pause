@@ -16,6 +16,7 @@ use File::Basename ();
 use Compress::Zlib ();
 use Cwd ();
 use DBI ();
+use Email::Sender::Simple ();
 use Exporter;
 use Fcntl qw(:flock);
 my $HAVE_RECENTFILE = eval {require File::Rsync::Mirror::Recentfile; 1;};
@@ -557,6 +558,12 @@ sub may_overwrite_file {
   $/ix;
 
   return;
+}
+
+sub sendmail {
+  my ($self, $email) = @_;
+
+  Email::Sender::Simple->send($email);
 }
 
 package PAUSE::DBError {

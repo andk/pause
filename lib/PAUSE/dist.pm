@@ -3,7 +3,6 @@ use warnings;
 package PAUSE::dist;
 use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
-use Email::Sender::Simple qw(sendmail);
 use File::Copy ();
 use List::MoreUtils ();
 use PAUSE ();
@@ -568,7 +567,7 @@ sub _send_email {
         body_str => join(q{}, @$lines),
     );
 
-    sendmail($email);
+    PAUSE->sendmail($email);
 
     $Logger->log("sent indexer report email");
 }

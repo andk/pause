@@ -16,7 +16,6 @@ use DirHandle ();
 use Dumpvalue ();
 use DynaLoader ();
 use Email::MIME;
-use Email::Sender::Simple qw(sendmail);
 use Exporter ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
@@ -601,7 +600,7 @@ sub handle_alerts {
         body_str => $body_str,
     );
 
-    sendmail($email);
+    PAUSE->sendmail($email);
 
     return;
 }
