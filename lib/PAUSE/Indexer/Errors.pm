@@ -163,9 +163,9 @@ pkg_error dual_newer => {
     _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
 
     return <<~"EOF";
-      Not indexed because package $old->{pack} in file $old->{file} has a dual
-      life in $old->{dist}.  The other version is at $old->{version}, so not
-      indexing seems okay.
+      Not indexed because package $old->{package} in file $old->{file} has a
+      dual life in $old->{dist}.  The other version is at $old->{version}, so
+      not indexing seems okay.
       EOF
   },
 };
@@ -178,8 +178,8 @@ pkg_error dual_older => {
     _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
 
     return <<~"EOF";
-      Not indexed because package $old->{pack} in file $old->{file} seems to
-      have a dual life in $old->{dist}. Although the other package is at
+      Not indexed because package $old->{package} in file $old->{file} seems
+      to have a dual life in $old->{dist}. Although the other package is at
       version [$old->{version}], the indexer lets the other dist continue to
       be the reference version, shadowing the one in the core.  Maybe
       harmless, maybe needs resolving.
