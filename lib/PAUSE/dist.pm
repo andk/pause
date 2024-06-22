@@ -480,10 +480,22 @@ sub mail_summary {
   for my $error (@dist_errors) {
     my $header = $error->{header};
     my $body   = $error->{body};
-    $body = $body->($self) if ref $body;
 
-    push @m, "## $header\n\n";
-    push @m, $tf->format($body), qq{\n\n};
+    if ($error->{public}) {
+      $body = $body->($self) if ref $body;
+
+      unless ($body) {
+        $Logger->log([
+          "encountered dist error with no body: %s",
+          $error->{header},
+        ]);
+
+        $body = "No further information about this error is available.";
+      }
+
+      push @m, "## $header\n\n";
+      push @m, $tf->format($body), qq{\n\n};
+    }
 
     $status_over_all = "Failed";
   }
