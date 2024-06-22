@@ -708,7 +708,7 @@ subtest "indexer ran, but nothing indexed" => sub {
           sub {
             like(
               $_[0]{email}->object->body_str,
-              qr/this package does not provide any modules/,
+              qr/this distribution does not provide any packages/,
               "email has the expected content",
             );
           },

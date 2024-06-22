@@ -401,8 +401,8 @@ sub _update_mail_content_when_nothing_was_indexed {
 
     if ($self->version_from_meta_ok($ctx)) {
       push @$m_ref, $tf->format(<<'EOF') . "\n";
-Nothing in this distro has been indexed, because according to META.yml this
-package does not provide any modules.
+Nothing in this distribution has been indexed, because according to META.yml
+this distribution does not provide any packages.
 EOF
 
       $$status_ref = "Empty_provides";
