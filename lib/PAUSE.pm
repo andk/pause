@@ -559,16 +559,16 @@ sub may_overwrite_file {
   return;
 }
 
-package PAUSE::DBError;
+package PAUSE::DBError {
+  sub new {
+      my ($class, $msg) = @_;
+      return bless \$msg, $class;
+  }
 
-sub new {
-    my ($class, $msg) = @_;
-    return bless \$msg, $class;
+  use overload (
+      '""' => sub { ${$_[0]} }
+  );
 }
-
-use overload (
-    '""' => sub { ${$_[0]} }
-);
 
 1;
 
