@@ -145,12 +145,13 @@ has dist_errors => (
 sub add_dist_error {
   my ($self, $error) = @_;
 
-  $error = ref $error ? $error : { ident => $error, message => $error };
+  $Logger->log_fatal([ "add_dist_error got bogus input: %s", $error ])
+    unless ref $error and $error->{header};
 
-  $Logger->log("adding dist error: " . ($error->{ident} // $error->{message}));
+  $Logger->log([ "adding dist error: %s", $error->{header} ]);
   push @{ $self->_dist_errors }, $error;
 
-  return $error;
+  return;
 }
 
 sub all_dist_errors {
@@ -161,10 +162,10 @@ sub all_dist_errors {
 sub abort_indexing_dist {
   my ($self, $error) = @_;
 
-  $error = $self->add_dist_error($error);
+  $self->add_dist_error($error);
 
   die PAUSE::Indexer::Abort::Dist->new({
-    message => $error->{message},
+    message => $error->{header},
     public  => $error->{public},
   });
 }
