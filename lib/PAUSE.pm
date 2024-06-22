@@ -563,6 +563,22 @@ sub may_overwrite_file {
 sub sendmail {
   my ($self, $email) = @_;
 
+  if ($ENV{PAUSE_TEST_MAIL_MBOX}) {
+    # This is here for extra testing.  If you set this to a filename, every
+    # email will be written to this mbox.  Make sure it's an *absolute* path,
+    # because the tests change directory. -- rjbs, 2024-06-22
+
+    require Email::Sender::Transport::Mbox;
+    state $mbox = Email::Sender::Transport::Mbox->new({
+      filename => $ENV{PAUSE_TEST_MAIL_MBOX},
+    });
+
+    $mbox->send_email(Email::Abstract->new($email), {
+      from => 'test-system',
+      to   => 'test-system',
+    });
+  }
+
   Email::Sender::Simple->send($email);
 }
 
