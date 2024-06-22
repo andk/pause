@@ -70,6 +70,34 @@ ExtUtils::MakeMaker can help with this.
 EOF
 };
 
+dist_error not_a_dist => {
+  header  => 'file does not appear to be a CPAN distribution',
+  body    => <<'EOF',
+The file you uploaded doesn't appear to be a CPAN distribution.  Usually that
+means you didn't upload a .tar.gz or .zip file.  At any rate, PAUSE can't index
+it.
+EOF
+};
+
+dist_error perl_unofficial => {
+  header  => 'perl-like archive rejected',
+  body    => <<'EOF',
+The archive you uploaded has a name starting with "perl-", but doesn't appear
+to be an authorized release of Perl.  Pick a different name.  If you're diong
+an authorized Perl release and you see this error, contact the PAUSE admins!
+EOF
+};
+
+dist_error perl_rejected => {
+  header  => 'perl release archive rejected',
+  body    => <<'EOF',
+The archive you uploaded looks like it's meant to be a release of Perl itself.
+It won't be indexed, either because you don't have permission to release Perl,
+or because it looks weird in some way.  If you're doing an authorized Perl
+release and you see this error, contact the PAUSE admins!
+EOF
+};
+
 dist_error single_pm => {
   header  => 'dist is a single-.pm-file upload',
   body    => <<"EOF",
@@ -79,11 +107,29 @@ no longer is.  Please use a CPAN distribution building tool.
 EOF
 };
 
+dist_error untar_failure => {
+  header => "archive couldn't be untar-ed",
+  body   => <<"EOF",
+You uploaded a tar archive, but PAUSE can't untar it to index the contents.
+This is pretty unusual!  Maybe you named a zip file "tar.gz" by accident.
+Maybe you're using a weird (and possibly broken) version of tar.  At any rate,
+PAUSE can't index this archive.
+EOF
+};
+
 dist_error unstable_release => {
   header  => 'META release_status is not stable',
   body    => <<'EOF',
 Your META file provides a release status other than "stable", so this
 distribution will not be indexed.
+EOF
+};
+
+dist_error version_dev => {
+  header  => 'release has trial-release version',
+  body    => <<'EOF',
+The uploaded filename contains an underscore ("_") or the string "-TRIAL",
+indicating that it shouldn't be indexed.
 EOF
 };
 

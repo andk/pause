@@ -280,7 +280,7 @@ sub examine_dist {
     $self->{SUFFIX} = $suffix;
 
     if ($skip) {
-      $ctx->abort_indexing_dist("won't process regular perl upload");
+      $ctx->abort_indexing_dist(DISTERROR('perl_rejected'));
     }
 
     return;
@@ -288,18 +288,18 @@ sub examine_dist {
 
   if ($self->isa_dev_version) {
     $self->{SUFFIX} = "N/A";
-    $ctx->abort_indexing_dist("dist is a developer release");
+    $ctx->abort_indexing_dist(DISTERROR('version_dev'));
   }
 
   if ($dist =~ m|/perl-\d+|) {
     $self->{SUFFIX} = "N/A";
-    $ctx->abort_indexing_dist("dist is an unofficial perl-like release");
+    $ctx->abort_indexing_dist(DISTERROR('perl_unofficial'));
   }
 
   if ($dist =~ $SUFFQR) {
     $self->{SUFFIX} = $1;
     unless ($self->untar($ctx)) {
-      $ctx->abort_indexing_dist("can't untar archive");
+      $ctx->abort_indexing_dist(DISTERROR('untar_failure'));
     }
   } elsif ($dist =~ /\.pm\.(?:Z|gz|bz2)$/) {
     $self->{SUFFIX} = "N/A";
@@ -318,7 +318,7 @@ sub examine_dist {
       # system("$unzipbin -t $MLROOT/$dist");
     }
   } else {
-    $ctx->abort_indexing_dist("file does not appear to be a CPAN distribution");
+    $ctx->abort_indexing_dist(DISTERROR('not_a_dist'));
   }
 
   return;

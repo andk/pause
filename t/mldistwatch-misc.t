@@ -562,7 +562,7 @@ subtest "do not index dists without META file" => sub {
   );
 };
 
-subtest "do not index dists without trial versions" => sub {
+subtest "do not index dists with trial versions" => sub {
   for my $test (
     { desc => "low line in version", munger => sub { $_[0] =~ s/22/2_2/r } },
     { desc => "TRIAL in version",    munger => sub { $_[0] =~ s/22/22-TRIAL/r } },
@@ -588,7 +588,7 @@ subtest "do not index dists without trial versions" => sub {
       $result->assert_index_not_updated;
 
       $result->logged_event_like(
-        qr{\Qdist is a developer release},
+        qr{\Qtrial-release version},
         "we do not index trial-like filenames",
       );
     };
