@@ -672,6 +672,52 @@ subtest "the notorious version zero" => sub {
   }
 };
 
+subtest "indexer ran, but nothing indexed" => sub {
+  # This is to test the weird _update_mail_content_when_nothing_was_indexed
+  # case in PAUSE::dist.
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  {
+    # If we want to upload an Empty-Dist-2.0 with no packages, we need the
+    # uploader to have permissions on Empty::Dist, so we will first upload
+    # Empty-Dist-1.0 with the expected package.
+    $pause->upload_author_fake(CBROWN => 'Empty-Dist-1.0.tar.gz');
+
+    my $result = $pause->test_reindex;
+  }
+
+  my $file = $pause->upload_author_fake(CBROWN => {
+    name      => 'Empty-Dist',
+    version   => '2.0',
+    meta_munger => sub {
+      my ($meta) = @_;
+      $meta->{provides} = {};
+      return $meta;
+    }
+  });
+
+  my $result = $pause->test_reindex;
+
+  # Nothing in this distro has been indexed, because according to META.yml
+  # this package does not provide any modules.
+  $result->email_ok(
+    [
+      {
+        subject  => 'Failed: PAUSE indexer report CBROWN/Empty-Dist-2.0.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->object->body_str,
+              qr/this package does not provide any modules/,
+              "email has the expected content",
+            );
+          },
+        ],
+      },
+    ],
+  );
+};
+
 done_testing;
 
 # Local Variables:
