@@ -139,25 +139,7 @@ subtest "require permission on main module" => sub {
           sub {
             like(
               $_[0]->{email}->as_string,
-              qr/for\s+the\s+package\s+XFR/,
-              "email looks right",
-            );
-          },
-          sub {
-            like(
-              $_[0]->{email}->as_string,
-              qr/You\s+appear.*\.pm\s+file.*dist\s+name\s+\(XFR\)/s,
-              "email looks right",
-            );
-          },
-          sub {
-            like(
-              $_[0]->{email}->as_string,
-                qr/
-                  \s+the\s+other\s+way\s+round
-                  .+
-                  XForm-Rollout-\.\.\.
-                  /xs,
+              qr/adding\s+a\s+package\s+called\s+XFR/i,
               "email looks right",
             );
           },
@@ -254,7 +236,7 @@ subtest "case mismatch, authorized for original, desc. version" => sub {
           sub {
             like(
               $_[0]->{email}->as_string,
-              qr/has\s+a\s+higher\s+version/,
+              qr/decreasing\s+version\s+number/,
               "email looks right",
             );
           }
