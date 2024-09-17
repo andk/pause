@@ -12,6 +12,7 @@ sub add {
   my $req = $c->req;
 
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
+  $PAUSE::Config->{INCOMING_TMP} =~ s|/$||;
 
   my $u = $c->active_user_record;
   die PAUSE::Web::Exception
@@ -26,11 +27,20 @@ sub add {
 
   if ($req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
       || $req->param("SUBMIT_pause99_add_uri_httpupload")) {
-    my $upl = $req->upload('pause99_add_uri_httpupload');
-    unless ($upl->size) {
-      warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
-      $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
-      $req->param("SUBMIT_pause99_add_uri_httpupload","");
+    if (my $stashed = $req->param("pause99_add_uri_httpupload_stashed")) {
+      my $stashed_file = "$PAUSE::Config->{INCOMING_TMP}/$stashed";
+      if (!-e $stashed_file) {
+        warn "Warning: maybe their files are already gone, not doing HTTPUPLOAD";
+        $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
+        $req->param("SUBMIT_pause99_add_uri_httpupload","");
+      }
+    } else {
+      my $upl = $req->upload('pause99_add_uri_httpupload');
+      unless ($upl->size) {
+        warn "Warning: maybe they hit RETURN, no upload size, not doing HTTPUPLOAD";
+        $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD","");
+        $req->param("SUBMIT_pause99_add_uri_httpupload","");
+      }
     }
   }
   if (!   $req->param("SUBMIT_pause99_add_uri_HTTPUPLOAD")
@@ -54,7 +64,25 @@ sub add {
      ) {
     { # $pause->{UseModuleSet} eq "ApReq"
       my $upl;
-      if (
+      if (my $filename = $req->param("pause99_add_uri_httpupload_stashed")) {
+          my $stashed_file = "$PAUSE::Config->{INCOMING_TMP}/$filename";
+          my $to = "$PAUSE::Config->{INCOMING_LOC}/$filename";
+          rename $stashed_file => $to or die PAUSE::Web::Exception
+                ->new(ERROR => "Couldn't copy file '$filename' to '$to': $!");
+          $pause->{successfully_copied_to} = $to;
+          warn "h1[File successfully copied to '$to']filename[$filename]";
+          if ($req->param("pause99_add_uri_httpupload_renamed_from")) {
+            require Dumpvalue;
+            my $dv = Dumpvalue->new;
+            $req->param("pause99_add_uri_httpupload",$filename);
+            $pause->{upload_is_renamed} = {
+              from => $dv->stringify($req->param("pause99_add_uri_httpupload_renamed_from")),
+              to => $dv->stringify($filename),
+            };
+          }
+          $uri = $filename;
+      }
+      elsif (
           $upl = $req->upload("pause99_add_uri_httpupload") or # from 990806
           $upl = $req->upload("HTTPUPLOAD")
          ) {

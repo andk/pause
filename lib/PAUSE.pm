@@ -92,6 +92,7 @@ $PAUSE::Config ||=
      HTTP_ERRORLOG => '/var/log/nginx/error.log', # harmless use in cron-daily
      INCOMING => 'file://data/pause/incoming/',
      INCOMING_LOC => '/data/pause/incoming',
+     INCOMING_TMP => '/data/pause/tmp/',
      MAIL_MAILER => ["sendmail"],
      MAXRETRIES => 16,
      MIRRORCONFIG => '/usr/local/mirror/mymirror.config',
