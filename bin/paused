@@ -905,7 +905,7 @@ sub _rewrite_tarball {
     {
         my $wd = File::pushd::pushd( $testdir );
         my @children = Path::Tiny::path(".")->children;
-        $rc = 0 == system tar => $taropt, "-cf", $path, @children or die "Could not tar c";
+        $rc = 0 == system tar => $taropt, "-cf", $path, '--', @children or die "Could not tar c";
     }
     return $rc;
 }
