@@ -875,10 +875,13 @@ sub _rewrite_tarball {
     open my $fh, "-|", tar => "-C", $testdir, $taropt, "-xvvf", $path or die "could not fork";
     my(@ww); #world-writable
     my(@dnx); #directories-not-xessable
-    while (<$fh>) {
+  TARX: while (<$fh>) {
         chomp;
         my($stat,@rest) = split " ", $_;
         my($dir,$ur,$uw,$ux,$gr,$gw,$gx,$or,$ow,$ox) = $stat =~ /^(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)/;
+        if ($dir && $dir eq "l") {
+            next TARX: # avert chmod on any symlink
+        }
         if ($ow && $ow eq "w") {
             push @ww, $rest[-1];
         }
