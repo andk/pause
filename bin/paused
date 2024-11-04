@@ -880,7 +880,7 @@ sub _rewrite_tarball {
         my($stat,@rest) = split " ", $_;
         my($dir,$ur,$uw,$ux,$gr,$gw,$gx,$or,$ow,$ox) = $stat =~ /^(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)/;
         if ($dir && $dir eq "l") {
-            next TARX: # avert chmod on any symlink
+            next TARX; # avert chmod on any symlink
         }
         if ($ow && $ow eq "w") {
             push @ww, $rest[-1];
