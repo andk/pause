@@ -280,6 +280,8 @@ sub packages_per_pmfile {
             next PLINE unless $pkg =~ /^[A-Za-z]/;
             next PLINE unless $pkg =~ /\w$/;
             next PLINE if $pkg eq "main";
+            next PLINE if $pkg =~ /^Local::/; # Local::*
+            next PLINE if $pkg eq "Local"; # Local
             # Perl::Critic::Policy::TestingAndDebugging::ProhibitShebangWarningsArg
             # database for modid in mods, package in packages, package in perms
             # alter table mods modify modid varchar(128) binary NOT NULL default '';
