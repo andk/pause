@@ -77,7 +77,7 @@ my @required_debs = qw(
  zlib1g-dev
 );
 
-run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y), @required_debs);
+run_cmd(qw(apt-get --no-install-recommends -o DPkg::Lock::Timeout=60 install -y), @required_debs);
 
 # Some packages we just don't want.
 my @unwanted_debs = qw(
@@ -98,8 +98,10 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   [ 'repo-user=s',    "which GitHub user's pause.git to clone", { default => 'andk' } ],
   [ 'repo-branch=s',  "which branch to clone for the repo",     { default => 'master' } ],
   [],
-  [ 'certbot-staging|C', 'use the staging version of certbot' ],
+  [ 'certbot-staging|C', 'use the staging version of certbot'.  { implies => { 'enable-certbot' => 1}}],
+  [ 'enable-certbot=i', 'enable certbot', {default => 1}],
   [],
+  [ 'enable-ufw=i', 'enable ufw', {default => 1}],
   [ "enable-mail|m", "enable working postfix config",         ],
   [ 'relay-host=s',   "relay host for smtp" ],
   [ 'relay-port=s',   "relay port for smtp" ],
@@ -127,9 +129,10 @@ my $admin_user = uc $opt->user;
 my $admin_pass = $opt->pass;
 
 # The --comment is here to suppress prompting for name, confirmation, etc.
-run_cmd(qw(adduser pause  --disabled-password --comment), 'PAUSE User');
-run_cmd(qw(adduser unsafe --disabled-password --comment), 'PAUSE Unsafe');
-
+run_cmd(qw(adduser pause  --disabled-password --comment), 'PAUSE User')
+  unless getpwnam('pause');
+run_cmd(qw(adduser unsafe --disabled-password --comment), 'PAUSE Unsafe')
+  unless getpwnam('unsafe');
 if ($opt->plenv_url) {
   run_cmd('curl', $opt->plenv_url, '--output', '/tmp/plenv-tarball.tar.bz2');
 }
@@ -140,6 +143,7 @@ Path::Tiny::path("/data/mysql")->mkdir;
 
 Path::Tiny::path("/data/pause")->mkdir;
 run_cmd("chown", "pause:", "/data/pause");
+run_cmd("chown", "-R", "pause:", "/home/pause");
 
 if (-e "/usr/sbin/lvcreate" && $opt->volume_group) {
   my $vg = $opt->volume_group;
@@ -166,7 +170,7 @@ Path::Tiny::path("/data/mysql/mysql")->mkdir;
 run_cmd(qw(ln -s /data/mysql/mysql /var/lib/mysql));
 
 # Mariadb has to be installed _after_ partitioning.
-run_cmd(qw(apt-get -o DPkg::Lock::Timeout=60 install -y),
+run_cmd(qw(apt-get --no-install-recommends -o DPkg::Lock::Timeout=60 install -y),
         qw(
             mariadb-server
             libmariadb-dev-compat
@@ -195,7 +199,7 @@ Path::Tiny::path("/etc/mysql/conf.d/mysql.cnf")->append(<<~EOF);
 
 run_cmd(qw(/etc/init.d/mariadb restart));
 
-{
+if (! -e "/home/pause/pause") {
   my $user = $opt->repo_user;
 
   run_cmd(
@@ -314,24 +318,28 @@ symlink("/etc/nginx/sites-available/$hostname", "/etc/nginx/sites-enabled/$hostn
   or die "can't symlink nginx conf: $!";
 
 # Firewall config
-run_cmd(qw(ufw allow http));
-run_cmd(qw(ufw allow https));
-run_cmd(qw(ufw allow rsync));
-run_cmd(qw(ufw allow ssh));
-run_cmd(qw(ufw --force enable));
+if ($opt->enable_ufw) {
+  run_cmd(qw(ufw allow http));
+  run_cmd(qw(ufw allow https));
+  run_cmd(qw(ufw allow rsync));
+  run_cmd(qw(ufw allow ssh));
+  run_cmd(qw(ufw --force enable));
+}
 
 # Install ssl cert
-run_cmd(
-  qw(sudo certbot --nginx -d),
-  $hostname,
-  qw(--agree-tos -n --email pause@pause.perl.org),
+if ($opt->enable_certbot) {
+  run_cmd(
+    qw(sudo certbot --nginx -d),
+    $hostname,
+    qw(--agree-tos -n --email pause@pause.perl.org),
 
-  # This will use the staging server, which can be used to make lots more
-  # certificates that usual, but they aren't trusted.
-  ($opt->certbot_staging
-    ? ( qw( --server https://acme-staging-v02.api.letsencrypt.org/directory ) )
-    : ()),
-);
+    # This will use the staging server, which can be used to make lots more
+    # certificates that usual, but they aren't trusted.
+    ($opt->certbot_staging
+     ? ( qw( --server https://acme-staging-v02.api.letsencrypt.org/directory ) )
+     : ()),
+  );
+}
 
 Path::Tiny::path("/home/pause/pause/etc/rsyncd.conf")->copy("/etc/rsyncd.conf");
 
