@@ -835,16 +835,29 @@ on what happens when a CPAN module is proposed to become a core module
 ### 4.6. When a CPAN author passes away
 
 When a CPAN author passes away,
-the PAUSE admins will make the following changes:
+the PAUSE admins will run the following process:
 
-* The name of the account has "(PAUSE Custodial Account)" appended.
-* All co-maint and admin indexing permissions of that account are dropped.
-* All first-come indexing permissions are transferred to ADOPTME.
-  In the future,
-  we would like to automatically inform any people with co-maint
-  and admin indexing permissions on the same package, to
-  (a) let them know, and
-  (b) give them a chance to apply for the first-come.
+1. First confirm the news. Do not progress any further unless certain.
+2. Append "(PAUSE Custodial Account)" to their name in their PAUSE account.
+3. Set their public email address to cpanorg-custodial@perl.org.
+4. Configure their account so that their cpan.org email address forwards to their public email address.
+5. Clear their secret email address, if set.
+6. If their website address is set to a personal web site, and it's still up, leave it unchanged. Otherwise blank it out.
+7. Drop their pumpkin bit, if they had one (currently you have to ask Andreas to do this).
+8. Lock their account (currently you have to ask Andreas to do this).
+9. Resolve the indexing permissions, as described below.
+
+The following process is followed to resolve their indexing permissions:
+
+* Review all of their indexing permissions, looking at each distribution where they had an indexing permission, so you can see who has first-come, and how many co-maints there are. Where appropriate, look at the release history for distributions.
+* If any of the modules are dual-life (i.e. bundled with Perl), then consider emailing perl5-porters, or at least the PSC. Typically the special user `P5P` will have first-come and the deceased author will have had co-maint. Drop the co-maint.
+* If any of the packages have co-maint given to `NOXFER`, then the permissions must be left unchanged, unless it's a dual-life module.
+* If they had first-come and there are one or more co-maints, email the co-maints to see if anyone would like first-come.
+* If they had co-maint, drop the co-maint and email the first-come and any other co-maints to let them know.
+* If they had first-come, transfer it to the special user `ADOPTME` (see 4.5.1 above). Look at the distributions position on the CPAN River and consider emailing appropriate authors who have distributions dependent on the distribution in question, to see if they'd like to adopt.
+* After transferring first-come indexing permissions to other authors or `ADOPTME`, check whether a co-maint needs dropping.
+* Check for any indexing permissions on packages which aren't indexed, and resolve those too.
+* Consider writing a blog post about the distributions which are now available for adoption.
 
 
 ### 4.7. Treading on another author's toes (namespaces or permissions)
