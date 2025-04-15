@@ -288,23 +288,9 @@ you getting the admin indexing permission.
 
 #### 3.1.2. Dropping your first-come indexing permission
 
-At the moment,
-if you have first-come indexing permission on a package,
-PAUSE will let you give up the first-come
-without transferring it to someone else.
-This means the package ends up with
-no-one holding a first-come indexing permission on the package.
-
-If there are no other permissions on the package
-(i.e. no admin or co-maint),
-anyone can then upload a release of that package,
-and they will be granted first-come.
-
-If you drop first-come on a package,
-and one or more other authors have an indexing permission on that package,
-then the next person to release the package
-**will not** be granted first-come by PAUSE,
-regardless of whether they currently have an indexing permission.
+Giving up your first-come indexing permission
+will result in first-come being transferred to the special user **`ADOPTME`**
+(described in §4.5.1 below) and will make you a co-maint.
 
 Where a package does not have a first-come but has other permissions,
 any of the people with other permissions on the package (co-maint or admin),
@@ -326,20 +312,6 @@ and not first-come.
 Think carefully before giving up first-come permissions,
 especially if (a) other people have admin or co-maint permissions,
 and/or (b) other modules on CPAN rely on the package.
-
-In the near future,
-we plan to modify PAUSE so that
-"giving up your first-come indexing permission"
-will result in first-come being transferred to the special user **`ADOPTME`**
-(described in §4.5.1 below),
-if other people have admin or co-maint permissions.
-This makes the situation clearer to everyone.
-
-At some point after that we may change PAUSE so that
-when giving up a first-come permission,
-you're informed who else has permissions,
-and given the option of transferring first-come to one of them.
-
 
 ### 3.2. Admin indexing permission
 
