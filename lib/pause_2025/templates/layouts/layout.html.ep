@@ -12,7 +12,7 @@
 <title><%= $title %><%= $action %></title>
 <link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg">
 <link rel="stylesheet" type="text/css" href="/pause/min.css">
-<link rel="stylesheet" type="text/css" href="/pause/pause_2017.css">
+<link rel="stylesheet" type="text/css" href="/pause/pause_2025.css">
 </head>
 <body>
 

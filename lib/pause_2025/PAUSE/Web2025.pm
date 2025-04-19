@@ -26,7 +26,7 @@ sub startup {
   $app->secrets([sha1_hex($$.time)]);
 
   # Fix template path for now
-  unshift @{$app->renderer->paths}, $app->home->rel_file("lib/pause_2017/templates");
+  unshift @{$app->renderer->paths}, $app->home->rel_file("lib/pause_2025/templates");
 
   # Fix static path
   unshift @{$app->static->paths}, $app->home->rel_file("htdocs");
