@@ -1,0 +1,43 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $files = $pause->{files} || {};
+
+<h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>
+% if (%$files) {
+<div id="files">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="sort asc" data-sort="file">File</th>
+      <th class="sort" data-sort="size">Size</th>
+      <th class="sort" data-sort="modified">Modified</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+%   for my $file (sort keys %$files) {
+    <tr>
+%   if ($files->{$file}{indexed}) {
+      <td class="file indexed"><%= $file %> [indexed]</td>
+%   } else {
+      <td class="file"><%= $file %></td>
+%   }
+      <td class="size"><%= $files->{$file}{stat} %></td>
+      <td class="modified"><%= $files->{$file}{blurb} %></td>
+    </tr>
+%   }
+  </tbody>
+</table>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('files', {
+  valueNames: ['file', 'size', 'modified']
+});
+% end
+% end
+
+% } else {
+No files found in authors/id/<%= $pause->{userhome} %>
+% }

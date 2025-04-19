@@ -1,0 +1,80 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_share_perms_remocos")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{not_exists}) {
+<li class="error">Cannot handle tuple <i><%= $_->{mod} %></i>. If you believe, this is a bug, please complain.</li>
+%       } elsif ($_->{error}) {
+<li class="error">Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>: <%= $_->{error} %></li>
+%       } else {
+<li class="result">Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %>.</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more packages. Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+<h3>Remove co-maintainer status</h3>
+<p>The scrolling
+list shows you, which packages are associated with other
+maintainers besides yourself. Every line denotes a tuple
+of a namespace and a userid. Select those that you want to
+remove and press <i>Remove</i></p>
+
+<p class="notice">If you want to remove comaintainers from all the modules
+in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'remove_dist_comaint') %>">
+Remove Comaintainers per distribution</a> page.</p>
+
+<div id="packages">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="package">Package</th>
+      <th class="sort" data-sort="dist">Indexed Distribution</th>
+      <th class="sort" data-sort="userid">UserID</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{mods}}) {
+    % my ($package, $userid) = split /\s*\-\-\s*/, $_;
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_share_perms_remocos_tuples" => $_ %></td>
+      <td class="package"><%= $package %></td>
+      <td class="dist"><%= $pause->{dist_for_package}{$package} // '' %></td>
+      <td class="userid"><%= $userid %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<p>
+<input type="submit" name="SUBMIT_pause99_share_perms_remocos"
+ value="Remove"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('packages', {
+  valueNames: ['pacakge', 'dist', 'userid']
+});
+% end
+% end
+
+% } else {
+<p>There are no co-maintainers registered to any of <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>'s modules.</p>
+% }

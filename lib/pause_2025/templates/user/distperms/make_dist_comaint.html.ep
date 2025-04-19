@@ -1,0 +1,92 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_make_dist_comaint")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li class="error">Error trying to add <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>): <%= $_->{error} %></li>
+%       } elsif ($_->{duplicated}) {
+<li class="warning"><%= $_->{user} %> was already a co-maintainer of <%= $_->{mod} %> (<%= $_->{dist} %>): skipping</li>
+%       } else {
+<li class="result">Added <%= $_->{user} %> to co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>).</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more distributions and enter a userid.
+ Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{dists} || []}) {
+
+<h3>Select a co-maintainer</h3>
+<p>Please select one or
+more distributions for which you want to select a
+co-maintainer, enter the CPAN userid of the co-maintainer
+into the text field and press <i>Make Co-Maintainer</i></p>
+
+<p class="notice">If you are open to someone else asking for your first-come
+permissions, but you wish to decide on any such request, you
+can give a co-maint to a special user called
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_2_handoff">HANDOFF</a>.</p>
+
+<p class="notice">You can also grant co-maint to 
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_3_needhelp">NEEDHELP</a>
+if you would like additional volunteers to help you work on a particular module.</p>
+
+<p class="notice">If you need finer control (eg. to add comaintainers for only
+a small part of a distribution just to allow them to handle RT tickets
+while prohibiting them to upload the distribution), visit
+<a href="<%= my_url->query(ACTION => 'make_comaint') %>">
+Add Comaintainers per module</a> page.</p>
+
+<p>Select one or more distributions:</p>
+<div id="dists">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort" data-sort="dist">Distribution</th>
+      <th class="sort" data-sort="owners">Owners</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{dists}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_make_dist_comaint_d" => $_->[0] %></td>
+      <td class="dist"><%= $_->[0] %><% if (($_->[1] // '') =~ /,/) { %> (incomplete ownership)<% } %></td>
+      <td class="owners"><%= $_->[1] %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<p>Select a userid:<br>
+<%= text_field "pause99_make_dist_comaint_a", size => 15, maxlength => 9 %>
+
+</p><p>
+<input type="submit" name="SUBMIT_pause99_make_dist_comaint"
+ value="Make Co-Maintainer"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('dists', {
+  valueNames: ['dist','owners']
+});
+% end
+% end
+
+% } else {
+<p>Sorry, there are no distributions registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
+% }

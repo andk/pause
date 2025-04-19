@@ -1,0 +1,58 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $files = $pause->{files} || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+<p>Indexing normally happens only once, shortly after the upload takes place. Sometimes it is necessary to reindex a file. The reason is typically one of the following:</p>
+<ul>
+
+<li>A file that contained a current version of a module got deleted, now an older file should be considered current.</li>
+
+<li>The <code>perms</code> table got altered, now a file should be visited again to overrule the previous indexing decision.</li>
+
+<li>At the time of uploading PAUSE had a bug and made a wrong indexing decision.</li>
+
+</ul>
+
+<p>With this form you can tell the indexer to index selected files again. As it is done by a cron job, it may take up to an hour until the indexer actually executes the command. If this doesn't repair the index, please <a href="mailto:<%= $PAUSE::Config->{UPLOAD} %>">email me</a>.</p>
+
+% if (%$files) {
+%   if ($pause->{mailbody}) {
+<hr><pre><%= $pause->{mailbody} %></pre><hr>
+%   }
+
+<h3>Files in directory authors/id/<%= $pause->{userhome} %></h3>
+
+<div id="files">
+<input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="checkbox"></th>
+      <th class="sort" data-sort="file">File</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+% for my $file (sort keys %$files) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_reindex_FILE" => $file %></td>
+      <td class="file"><%= $file %></td>
+    </tr>
+% }
+  </tbody>
+</table>
+<p><input type="submit" name="SUBMIT_pause99_reindex_delete" value="Reindex"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('files', {
+  valueNames: ['file']
+});
+% end
+% end
+
+% } else {
+No files found in authors/id/<%= $pause->{userhome} %>
+% }

@@ -1,0 +1,35 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<p>Query a combination of <code>usertable</code> table and user for public or private emails according to the preferences</p>
+
+<div id="emails">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="sort asc" data-sort="userid">id</th>
+      <th class="sort" data-sort="email"><i>id</i>@cpan.org gets forwarded to</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+% for (@{$pause->{list} || []}) {
+    <tr>
+      <td class="userid"><%= $_->{id} %></td>
+      <td class="email"><%= $_->{mail} %></td>
+    </tr>
+% }
+  </tbody>
+</table>
+
+<p><a href="<%= my_url->query(ACTION => "email_for_admin", OF => "YAML") %>" style="text-decoration: none;"><span class="orange_button">YAML</span>
+</a></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('emails', {
+  valueNames: ['userid', 'email']
+});
+% end
+% end

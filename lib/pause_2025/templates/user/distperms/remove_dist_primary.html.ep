@@ -1,0 +1,96 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_remove_dist_primary")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li class="error">Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %> (<%= $_->{dist} %>): <%= $_->{error} %></li>
+%       } else {
+<li class="result">Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %> (<%= $_->{dist} %>).</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more distributions. Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{dists} || []}) {
+
+<h3>Give up maintainership status</h3>
+<p>Please select one or more distributions for which you
+want to give up primary maintainership status and press
+<i>Give Up Maintainership Status</i>. Note: you keep co-maintainer
+status after this move. If you want to get rid of that too,
+please visit <a href="<%= my_url->query(ACTION => "remove_dist_comaint") %>">Give up
+co-maintainership status</a> next.</p>
+
+<p class="notice">Giving up primary permissions now means that the permissions are
+transferred to a special user called
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_1_adoptme">ADOPTME</a>.
+</p>
+
+<p class="notice">You can only give up what you actually own.
+If multiple owners are listed, those owners keep their primary
+maintainership for their part of the distribution. In this case,
+you are strongly advised to
+<a href="<%= my_url->query(ACTION => "move_dist_primary") %>">transfer your primary permissions</a>
+to one of the other owners.</p>
+
+<p class="notice">
+If you have are unsure about what to do, or have any questions,
+please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.org</a>.
+</p>
+
+<p class="notice">If you need finer control (eg. to give up only a small part of
+a distribution for whatever reasons), visit
+<a href="<%= my_url->query(ACTION => 'remove_primary') %>">
+<%= $c->app->pause->config->action('remove_primary')->{verb} %></a> page.</p>
+
+<p>Select one or more distributions:</p>
+<div id="dists">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort" data-sort="dist">Distribution</th>
+      <th class="sort" data-sort="owners">Owners</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{dists}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_remove_dist_primary_d" => $_->[0] %></td>
+      <td class="dist"><%= $_->[0] %><% if ($_->[1] =~ /,/) { %> (incomplete ownership)<% } %></td>
+      <td class="owners"><%= $_->[1] %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+
+<p><input type="submit" name="SUBMIT_pause99_remove_dist_primary"
+ value="Give Up Maintainership Status"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('dists', {
+  valueNames: ['dist', 'owners']
+});
+% end
+% end
+
+% } else {
+<p>Sorry, there are no distributions registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
+% }
+

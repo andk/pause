@@ -1,0 +1,100 @@
+% my $pause = stash(".pause") || {};
+% my $title = $PAUSE::Config->{TESTHOST} ? "pause\@home: " : "PAUSE: ";
+% my $action = $pause->{action} || "The CPAN back stage entrance";
+%
+% #-----------------------------------------------------------------
+%
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewpoint" content="width=device-width, initial-scale=1">
+<title><%= $title %><%= $action %></title>
+<link rel="shortcut icon" href="/pause/pause_favicon.jpg" type="image/jpeg">
+<link rel="stylesheet" type="text/css" href="/pause/min.css">
+<link rel="stylesheet" type="text/css" href="/pause/pause_2017.css">
+</head>
+<body>
+
+<header>
+<div class="row">
+  <div class="col c8">
+    <h1 class="logo"><a href="authenquery"><img src="/pause/pause2.png" border="0" alt="PAUSE Logo" width="177" height="43" align="left"></a>
+    The [Perl programming] Authors Upload Server</h1>
+  </div>
+  <div class="col c3">
+    %= include "_user_status";
+  </div>
+</div>
+</header>
+
+% if (my $downtime = $pause->{scheduled_downtime}) {
+
+<div class="row">
+  <div class="col c11">
+    <p class="motd">
+    <b>Scheduled downtime</b><br>
+    On <%= $downtime->{http_time} %> (that is in <%= $downtime->{delta} %>) PAUSE will be closed for maintainance work. The estimated downtime is <%= $downtime->{will_last} %>.
+    </p>
+  </div>
+</div>
+% } elsif ($pause->{closed}) {
+  % my $user = $c->req->env->{REMOTE_USER};
+<div class="row">
+  <div class="col c11">
+<p class="motd">Hi <%= $user %>, you see the site now <b>but it is closed for maintainance</b>.
+Please be careful not to disturb the database operation. Expect failures everywhere. Do not edit anything, it may get lost. Other users get the following text:</p>
+%= include "_closed";
+  </div>
+</div>
+% }
+
+% if ($pause->{ERROR}) {
+<div class="row">
+  <div class="col c11">
+    <h2>Error</h2>
+    <p class="error_message">
+%   for (@{$pause->{ERROR}}) {
+<%= $_ %>
+%   }
+    </p>
+    <p>Please try again, probably by using the Back button of your browser and repeating the last action you took.</p>
+  </div>
+</div>
+% } else {
+<div class="row">
+  <div class="col c2">
+    %= include "_user_menu";
+  </div>
+  <div class="col c9">
+    % my $action_conf = app->pause->config->action($pause->{Action});
+    % my $me = my_url();
+    % my $method = $action_conf->{method} // 'GET';
+    % my $enctype;
+    % if ($pause->{need_form_data}) {
+    %   $enctype = "multipart/form-data";
+    % }
+    % if ($PAUSE::Config->{TESTHOST}) {
+    %   warn "DEBUG: me[$me]enctype[$enctype]";
+    <h2>[ATTN: Form going to post to <%= $me %>]</h2>
+    % }
+    <form action="<%= $me %>" <% if ($enctype) { %>enctype="<%= $enctype %>" <% } %>method="<%= $method %>">
+    % if (!$action_conf->{method}) {
+    <input type="hidden" name="ACTION" value="<%= $pause->{Action} %>">
+    % }
+    <main>
+    % if (my $verb = $action_conf->{verb} and !$action_conf->{has_title}) {
+      <h2 class="firstheader"><%= $verb %></h2>
+    % }
+    <%== content %>
+    </main>
+    </form>
+  </div>
+</div>
+% }
+% if ($ENV{PAUSE_WEB_DEBUG} // $PAUSE::Config->{PAUSE_WEB_DEBUG}) {
+  %= include "_debug";
+% }
+%== content 'javascript'
+</body>
+</html>

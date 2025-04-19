@@ -1,0 +1,92 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_share_perms_remopr")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li class="error">Error trying to remove primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>: <%= $_->{error} %></li>
+%       } else {
+<li class="result">Removed primary maintainership of <%= $_->{user} %> from <%= $_->{mod} %>.</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more packages. Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{mods} || []}) {
+
+<h3>Give up maintainership status</h3>
+<p>Please select one or more namespaces for which you
+want to give up primary maintainership status and press
+<i>Give Up Maintainership Status</i>. Note: you keep co-maintainer
+status after this move. If you want to get rid of that too,
+please visit <a href="<%= my_url->query(ACTION => "remove_comaint") %>">Give up
+co-maintainership status</a> next.</p>
+
+<p class="notice">Giving up primary permissions now means that the permissions are
+transferred to a special user called
+<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_1_adoptme">ADOPTME</a>.</p>
+
+<p class="notice">If multiple owners are listed, those owners keep their primary
+maintainership for those modules. In this case, you are strongly advised to
+<a href="<%= my_url->query(ACTION => "move_primary") %>">transfer your primary permissions</a>
+to one of the other owners.</p>
+
+<p class="notice">
+If you have are unsure about what to do, or have any questions,
+please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.org</a>.
+</p>
+
+<p class="notice">If you want to give up all the modules in a distribution, visit
+<a href="<%= my_url->query(ACTION => 'remove_dist_primary') %>">
+<%= $c->app->pause->config->action('remove_dist_primary')->{verb} %></a> page.</p>
+
+<p>Select one or more namespaces:</p>
+<div id="packages">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort" data-sort="package">Package</th>
+      <th class="sort" data-sort="dist">Indexed Distribution</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{mods}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_share_perms_pr_m" => $_ %></td>
+      <td class="package"><%= $_ %></td>
+      <td class="dist"><%= $pause->{dist_for_package}{$_} // '' %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+
+<p><input type="submit" name="SUBMIT_pause99_share_perms_remopr"
+ value="Give Up Maintainership Status"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('packages', {
+  valueNames: ['package', 'dist']
+});
+% end
+% end
+
+% } else {
+<p>Sorry, there are no modules registered belonging to <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>.</p>
+% }
+

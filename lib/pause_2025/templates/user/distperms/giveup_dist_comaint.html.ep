@@ -1,0 +1,75 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_giveup_dist_comaint")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{error}) {
+<li class="error">Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>): <%= $_->{error} %></li>
+%       } else {
+<li class="result">Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>).</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more distributions. Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{dists} || []}) {
+<h3>Give up co-maintainer status</h3>
+<p>Please select one or
+more distributions for which you want to be removed from
+the co-maintainer table and press <i>Give Up</i></p>
+
+<p class="notice">If you need finer control (eg. to give up comaintainership
+for a removed module), visit
+<a href="<%= my_url->query(ACTION => 'giveup_comaint') %>">
+Give up Co-maintainership status per module</a> page.</p>
+
+<p>Select one or more distributions:</p>
+
+<div id="dists">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="dist">Distribution</th>
+      <th class="sort asc" data-sort="owners">Owners</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{dists}}) {
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_giveup_dist_comaint_d" => $_->[0] %></td>
+      <td class="dist"><%= $_->[0] %><% if ($_->[1] =~ /,/) { %> (incomplete ownership)<% } %></td>
+      <td class="owners"><%= $_->[1] %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<p>
+<input type="submit" name="SUBMIT_pause99_giveup_dist_comaint"
+ value="Give Up"></p>
+<div>
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('dists', {
+  valueNames: ['dist','owners']
+});
+% end
+% end
+
+% } else {
+<p>Sorry, <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %> does not seem to be co-maintainer of any distribution.</p>
+% }
