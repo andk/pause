@@ -52,7 +52,8 @@ builder {
     # Static files are serverd by us; maybe some day we want to change that
     enable 'Static',
         path => qr{(?:(?<!index)\.(js|css|gif|jpg|png|pod|html)$|^/\.well-known/)},
-        root => "$FindBin::Bin/htdocs";
+        root => "$FindBin::Bin/htdocs",
+        pass_through => 1;
 
     mount '/pub/PAUSE' => builder {
         enable '+PAUSE::Web::Middleware::Auth::Basic', context => $context;
