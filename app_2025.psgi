@@ -18,6 +18,8 @@ use PAUSE::Web::Context;
 use PAUSE::Web;
 use PAUSE::Web::App::Index;
 use PAUSE::Web::App::Disabled;
+use PAUSE::Web2025;
+use PAUSE::Web2025::Context;
 
 use BSD::Resource ();
 #BSD::Resource::setrlimit(BSD::Resource::RLIMIT_CPU(),
@@ -32,8 +34,11 @@ my $builder = eval {
 my $context = PAUSE::Web::Context->new(root => $AppRoot);
 $context->init;
 
+my $context2025 = PAUSE::Web2025::Context->new(root => $AppRoot);
+$context2025->init;
+
 my $pause_app = PAUSE::Web->new(pause => $context);
-my $index_app = PAUSE::Web::App::Index->new->to_app;
+my $pause2025_app = PAUSE::Web2025->new(pause => $context2025);
 my $disabled_app = PAUSE::Web::App::Disabled->new->to_app;
 
 builder {
@@ -64,7 +69,9 @@ builder {
         $pause_app->start('psgi');
     };
 
-    mount '/' => builder { $index_app };
+    mount '/' => builder {
+        $pause2025_app->start('psgi');
+    };
   }
 };
 
