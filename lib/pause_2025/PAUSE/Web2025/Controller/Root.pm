@@ -6,12 +6,16 @@ sub check {
   my $c = shift;
 
   if ($c->pause_is_closed) {
-    my $user = $c->req->env->{REMOTE_USER};
+    my $session = $c->session || {};
+    my $user = $session->{user};
     if ($user and $user eq "ANDK") {
     } else {
       $c->render("closed");
       return;
     }
+  }
+  if (my $action = $c->match->stack->[-1]{ACTION}) {
+    return unless $c->is_allowed_action($action);
   }
 
   return 1;

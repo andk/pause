@@ -10,6 +10,7 @@ sub register {
   my ($self, $app, $conf) = @_;
   $app->hook(before_dispatch => \&_before_dispatch);
   $app->helper(need_form_data => \&_need_form_data);
+  $app->helper(is_allowed_action => \&_is_allowed_action);
 }
 
 sub _before_dispatch {
@@ -249,8 +250,21 @@ parameter ABRA=$param, but the database doesn't know about this token.", HTTP_ST
   $pause->{allow_action} = [ sort { $a cmp $b } keys %allow_action ];
   # warn "allowaction[@{$pause->{allow_action}}]";
   # warn "allowsubmit[@allow_submit]";
+  $pause->{allow_submit} = \@allow_submit;
+}
 
-  $param = $req->param("ACTION");
+sub _is_allowed_action {
+  my $c = shift;
+  my $pause = $c->stash(".pause");
+  my $mgr = $c->app->pause;
+  my $req = $c->req;
+
+  my %allow_action = map {$_ => undef} @{ $pause->{allow_action} };
+  my @allow_submit = @{ $pause->{allow_submit} };
+
+  my $userid = $pause->{User}{userid};
+
+  my $param = shift || $req->param("ACTION");
   # warn "ACTION-param[$param]req[$req]";
   if ($param) {
     if (exists $allow_action{$param}) {
@@ -323,6 +337,7 @@ parameter ABRA=$param, but the database doesn't know about this token.", HTTP_ST
     warn "$userid tried disallowed action: $action";
     die PAUSE::Web2025::Exception->new(ERROR => "Forbidden", HTTP_STATUS => 403);
   }
+  return 1;
   # warn "action[$action]";
 }
 
