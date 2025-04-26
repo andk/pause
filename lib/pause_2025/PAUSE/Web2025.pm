@@ -51,36 +51,43 @@ sub startup {
   my $r = $app->routes->under("/")->to("root#check");
 
   # Public Menu
-  my $public = $r->under("/query");
+  my $public = $r->under("/");
   $public->any("/")->to("root#index");
   for my $group ($app->pause->config->public_groups) {
     for my $name ($app->pause->config->action_names_for($group)) {
       my $action = $app->pause->config->action($name);
       for my $method (qw/get post/) {
-        my $route = $public->$method("/$name");
+        my $route = $public->$method("/$group/$name");
         $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
-        $route->to($action->{x_mojo_to});
+        $route->to($action->{x_mojo_to}, ACTION => $name)->name($name);
       }
     }
   }
   # change_passwd is public when it is used for password recovery
   my $action = $app->pause->config->action('change_passwd');
   for my $method (qw/get post/) {
-    my $route = $public->$method("/change_passwd");
+    my $route = $public->$method("/public/change_passwd");
     $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
-    $route->to($action->{x_mojo_to});
+    $route->to($action->{x_mojo_to}, ACTION => 'change_passwd')->name('change_passwd');
+  }
+
+  # login
+  for my $method (qw/get post/) {
+    my $route = $public->$method("/login");
+    $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
+    $route->to("root#login", ACTION => 'login');
   }
 
   # Private/User Menu
-  my $private = $r->under("/authenquery")->to("root#auth");
+  my $private = $r->under("/")->to("root#auth");
   $private->any("/")->to("root#index");
   for my $group ($app->pause->config->all_groups) {
     for my $name ($app->pause->config->action_names_for($group)) {
       my $action = $app->pause->config->action($name);
       for my $method (qw/get post/) {
-        my $route = $private->$method("/$name");
+        my $route = $private->$method("/$group/$name");
         $route->with_csrf_protection if $method eq "post" and $action->{x_csrf_protection};
-        $route->to($action->{x_mojo_to});
+        $route->to($action->{x_mojo_to}, ACTION => $name)->name($name);
       }
     }
   }
