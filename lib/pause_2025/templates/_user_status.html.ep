@@ -1,5 +1,6 @@
 % my $pause = stash(".pause") || {};
-% my $remote_user = $c->req->env->{REMOTE_USER};
+% my $session = $c->session || {};
+% my $remote_user = $session->{user};
 % if ($remote_user and $remote_user ne "-") {
   % my $user = $pause->{User};
   % my $status_class = $pause->{is_ssl} ? "statusencr" : "statusunencr";

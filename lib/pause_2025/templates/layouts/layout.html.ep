@@ -1,4 +1,5 @@
 % my $pause = stash(".pause") || {};
+% my $session = $c->session || {};
 % my $title = $PAUSE::Config->{TESTHOST} ? "pause\@home: " : "PAUSE: ";
 % my $action = $pause->{action} || "The CPAN back stage entrance";
 %
@@ -39,7 +40,7 @@
   </div>
 </div>
 % } elsif ($pause->{closed}) {
-  % my $user = $c->req->env->{REMOTE_USER};
+  % my $user = $session->{user};
 <div class="row">
   <div class="col c11">
 <p class="motd">Hi <%= $user %>, you see the site now <b>but it is closed for maintainance</b>.
