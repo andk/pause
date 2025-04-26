@@ -50,8 +50,9 @@ sub _retrieve_user {
   my $c = shift;
   my $pause = $c->stash(".pause");
   my $mgr = $c->app->pause;
+  my $session = $c->session || {};
 
-  my $user = $c->req->env->{REMOTE_USER} or return;
+  my $user = $session->{user} or return;
 
   # This is a database application with nearly all users having write access
   # Write access means expiration any moment
