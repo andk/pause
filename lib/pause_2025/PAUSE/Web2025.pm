@@ -23,7 +23,7 @@ sub startup {
   $app->hook(around_dispatch => \&_log);
 
   # Set random secrets to keep mojo session secure
-  $app->secrets([sha1_hex($$.time)]);
+  $app->secrets([sha1_hex($app->pause->secret)]);
 
   # Fix template path for now
   unshift @{$app->renderer->paths}, $app->home->rel_file("lib/pause_2025/templates");

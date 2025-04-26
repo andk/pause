@@ -41,6 +41,11 @@ sub version {
   $version;
 }
 
+sub secret {
+  my $self = shift;
+  $PAUSE::Config->{WEB_SECRET} || $self->hostname;
+}
+
 sub authenticator_for {
   my ($self, $user) = @_;
   my $cpan_alias = lc($user->{userid}) . '@cpan.org';
