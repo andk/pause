@@ -16,7 +16,7 @@ setting of a new password. Here it is (please watch out for line
 wrapping errors of your mail reader and other cut and paste errors,
 this URL must not contain any spaces):
 
-    <%== my_full_url(ACTION => "change_passwd", ABRA => "$pause->{mailpw_userid}.$pause->{passwd}")->scheme("https") %>
+    <%== my_full_url(ACTION => "change_passwd")->query(ABRA => "$pause->{mailpw_userid}.$pause->{passwd}")->scheme("https") %>
 
 Please visit this URL, it should open you the door to a password
 changer that lets you set a new password for yourself. This token
