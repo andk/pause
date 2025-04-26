@@ -38,7 +38,6 @@ sub startup {
   $app->plugin("PAUSE::Web2025::Plugin::GetActiveUserRecord");
   $app->plugin("PAUSE::Web2025::Plugin::GetUserMeta");
   $app->plugin("PAUSE::Web2025::Plugin::ServePauseDoc");
-  $app->plugin("PAUSE::Web2025::Plugin::FixAction");
   $app->plugin("PAUSE::Web2025::Plugin::WrapAction");
   $app->plugin("PAUSE::Web2025::Plugin::EditUtils");
   $app->plugin("PAUSE::Web2025::Plugin::Delegate");
