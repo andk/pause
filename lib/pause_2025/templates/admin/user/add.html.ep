@@ -195,7 +195,7 @@ subscribe information if this user is a mailing list
 
 <br>
 
-<p>If this is a bad request: <a href="<%= my_url->query(
+<p>If this is a bad request: <a href="<%= my_url(
   ACTION => "manage_id_requests",
   subaction => "delete",
   USERID => $pause->{userid},

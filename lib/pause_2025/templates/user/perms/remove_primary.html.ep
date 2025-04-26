@@ -31,16 +31,16 @@
 want to give up primary maintainership status and press
 <i>Give Up Maintainership Status</i>. Note: you keep co-maintainer
 status after this move. If you want to get rid of that too,
-please visit <a href="<%= my_url->query(ACTION => "remove_comaint") %>">Give up
+please visit <a href="<%= my_url(ACTION => "remove_comaint") %>">Give up
 co-maintainership status</a> next.</p>
 
 <p class="notice">Giving up primary permissions now means that the permissions are
 transferred to a special user called
-<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_1_adoptme">ADOPTME</a>.</p>
+<a href="<%= my_url(ACTION => 'pause_operating_model') %>#4_5_1_adoptme">ADOPTME</a>.</p>
 
 <p class="notice">If multiple owners are listed, those owners keep their primary
 maintainership for those modules. In this case, you are strongly advised to
-<a href="<%= my_url->query(ACTION => "move_primary") %>">transfer your primary permissions</a>
+<a href="<%= my_url(ACTION => "move_primary") %>">transfer your primary permissions</a>
 to one of the other owners.</p>
 
 <p class="notice">
@@ -49,7 +49,7 @@ please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.
 </p>
 
 <p class="notice">If you want to give up all the modules in a distribution, visit
-<a href="<%= my_url->query(ACTION => 'remove_dist_primary') %>">
+<a href="<%= my_url(ACTION => 'remove_dist_primary') %>">
 <%= $c->app->pause->config->action('remove_dist_primary')->{verb} %></a> page.</p>
 
 <p>Select one or more namespaces:</p>

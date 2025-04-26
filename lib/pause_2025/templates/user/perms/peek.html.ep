@@ -22,7 +22,7 @@ upload a module in that namespace but also be accepted by
 the indexer. In other words, the indexer will not ignore
 uploads for that namespace by that person.</p>
 
-<p class="notice">If the list is too long, visit <a href="<%= my_url->query(ACTION => 'peek_dist_perms') %>">
+<p class="notice">If the list is too long, visit <a href="<%= my_url(ACTION => 'peek_dist_perms') %>">
 View permission per distribution</a> page.</p>
 
 <p>The
@@ -56,12 +56,12 @@ can be corrected.--Thank you!</p><p>
   <tbody class="list">
 %   for my $row (@{$pause->{rows}}) {
     <tr>
-      <td class="module"><a href="<%= my_url->query([
+      <td class="module"><a href="<%= my_url([
         pause99_peek_perms_by => "me",
         pause99_peek_perms_query => $row->[0],
         pause99_peek_perms_sub => 1,
       ]) %>"><%= $row->[0] %></a></td>
-      <td class="userid"><a href="<%= my_url->query([
+      <td class="userid"><a href="<%= my_url([
         pause99_peek_perms_by => "a",
         pause99_peek_perms_query => $row->[1],
         pause99_peek_perms_sub => 1,
@@ -72,7 +72,7 @@ can be corrected.--Thank you!</p><p>
 % }
   </tbody>
 </table>
-<p><a href="<%= my_url->query([
+<p><a href="<%= my_url([
   OF => "YAML",
   pause99_peek_perms_sub => 1,
   pause99_peek_perms_by => param("pause99_peek_perms_by"),

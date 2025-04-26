@@ -32,7 +32,7 @@ maintainership status, enter the CPAN userid of the new
 maintainer into the text field and press <i>Pass Maintainership
 Status</i>. Note: you keep co-maintainer status after this move.
 If you want to get rid of that too, please visit <a
-href="<%= my_url->query(ACTION => 'remove_dist_primary') %>">Give up
+href="<%= my_url(ACTION => 'remove_dist_primary') %>">Give up
 co-maintainership status</a> next.</p>
 
 <p class="notice">You can only transfer what you actually own.
@@ -42,7 +42,7 @@ their permissions as well.</p>
 
 <p class="notice">If you need finer control (eg. to transfer only a small part of
 a distribution you and other people own, for clarity's sake), visit
-<a href="<%= my_url->query(ACTION => 'move_primary') %>">
+<a href="<%= my_url(ACTION => 'move_primary') %>">
 Transfer Primary Permissions per module</a> page.</p>
 
 <p>Select one or more distributions:</p><p>

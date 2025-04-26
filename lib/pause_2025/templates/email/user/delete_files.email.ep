@@ -7,8 +7,8 @@ According to a request entered by <%== $pause->{User}{fullname} %> the
 following files and the symlinks pointing to them have been scheduled
 for deletion. They will expire after 72 hours and then be deleted by a
 cronjob. Until then you can undelete them via
-<%== my_full_url->path("/pause/authenquery")->query(ACTION => "delete_files")->scheme("https") %> or
-<%== my_full_url->path("/pause/authenquery")->query(ACTION => "delete_files")->scheme("http") %>
+<%== my_full_url(ACTION => "delete_files")->scheme("https") %> or
+<%== my_full_url(ACTION => "delete_files")->scheme("http") %>
 % end
 
 <%== $pause->{blurb} %>

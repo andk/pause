@@ -37,7 +37,7 @@ remove and press <i>Remove</i></p>
 <p class="notice">If you need finer control (eg. to remove comaintainers
 only for a small part of a distribution, or remove comaintainers
 for a removed module), visit
-<a href="<%= my_url->query(ACTION => 'remove_comaint') %>">
+<a href="<%= my_url(ACTION => 'remove_comaint') %>">
 Remove Comaintainers per module</a> page.</p>
 
 <div id="dists">

@@ -34,14 +34,14 @@ into the text field and press <i>Make Co-Maintainer</i></p>
 <p class="notice">If you are open to someone else asking for your first-come
 permissions, but you wish to decide on any such request, you
 can give a co-maint to a special user called
-<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_2_handoff">HANDOFF</a>.</p>
+<a href="<%= my_url(ACTION => 'pause_operating_model') %>#4_5_2_handoff">HANDOFF</a>.</p>
 
 <p class="notice">You can also grant co-maint to
-<a href="<%= my_url->query(ACTION => 'pause_operating_model') %>#4_5_3_needhelp">NEEDHELP</a>
+<a href="<%= my_url(ACTION => 'pause_operating_model') %>#4_5_3_needhelp">NEEDHELP</a>
 if you would like additional volunteers to help you work on a particular module.</p>
 
 <p class="notice">If you want to add comaintainers for all the modules in a
-distribution, visit <a href="<%= my_url->query(ACTION => 'make_dist_comaint') %>">
+distribution, visit <a href="<%= my_url(ACTION => 'make_dist_comaint') %>">
 Add Comaintainers per distribution</a> page.</p>
 
 <p>Select one or more namespaces:</p><p>

@@ -23,9 +23,9 @@ Please note that your email address is exposed in various listings and
 database dumps. You can register with both a public and a secret email
 if you want to protect yourself from SPAM. If you want to do this,
 please visit
-  <%== my_full_url->path("/pause/authenquery")->query(ACTION => "edit_cred" )->scheme("https") %>
+  <%== my_full_url(ACTION => "edit_cred" )->scheme("https") %>
 or
-  <%== my_full_url->path("/pause/authenquery")->query(ACTION => "edit_cred" )->scheme("http") %>
+  <%== my_full_url(ACTION => "edit_cred" )->scheme("http") %>
 
 If you need any further information, please visit
   $CPAN/modules/04pause.html.

@@ -29,13 +29,13 @@
         $json;
       } %></pre></td>
       <td>
-        <a href="<%= my_url->query(
+        <a href="<%= my_url(
           ACTION => (exists $ALL{$k}{session}{APPLY}{fullname} ? "add_user" : "add_mod"),
           USERID => $ALL{$k}{session}{_session_id},
           (exists $ALL{$k}{session}{APPLY}{fullname} ? "SUBMIT_pause99_add_user_sub" : "SUBMIT_pause99_add_mod_preview") => 1
         ) %>">Go To Registration</a>
         <br>
-        <a href="<%= my_url->query(
+        <a href="<%= my_url(
           ACTION => "manage_id_requests",
           subaction => "delete",
           USERID => $ALL{$k}{session}{_session_id},

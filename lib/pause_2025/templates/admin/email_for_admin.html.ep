@@ -22,7 +22,7 @@
   </tbody>
 </table>
 
-<p><a href="<%= my_url->query(ACTION => "email_for_admin", OF => "YAML") %>" style="text-decoration: none;"><span class="orange_button">YAML</span>
+<p><a href="<%= my_url(ACTION => "email_for_admin", OF => "YAML") %>" style="text-decoration: none;"><span class="orange_button">YAML</span>
 </a></p>
 </div>
 % content_for javascript => begin

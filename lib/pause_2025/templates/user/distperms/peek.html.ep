@@ -27,7 +27,7 @@ not per distribution. So you might not have enough
 permission to upload a distribution or grant permissions to
 other people if you are listed here (when you have permissions for
 only a part of the distribution). If you want more detailed
-information, visit <a href="<%= my_url->query(ACTION => 'peek_perms') %>">
+information, visit <a href="<%= my_url(ACTION => 'peek_perms') %>">
 View permission per module</a> page.</p>
 
 <p>The
@@ -61,7 +61,7 @@ can be corrected.--Thank you!</p><p>
   <tbody class="list">
 %   for my $row (@{$pause->{rows}}) {
     <tr>
-      <td class="dist"><a href="<%= my_url->query([
+      <td class="dist"><a href="<%= my_url([
         pause99_peek_dist_perms_by => "de",
         pause99_peek_dist_perms_query => $row->[0],
         pause99_peek_dist_perms_sub => 1,
@@ -69,7 +69,7 @@ can be corrected.--Thank you!</p><p>
       <td class="owner">
 %     my @owners = split /,/, $row->[1] // '';
 %     while(my $owner = shift @owners) {
-        <a href="<%= my_url->query([
+        <a href="<%= my_url([
           pause99_peek_dist_perms_by => "a",
           pause99_peek_dist_perms_query => $owner,
           pause99_peek_dist_perms_sub => 1,
@@ -79,7 +79,7 @@ can be corrected.--Thank you!</p><p>
       <td class="comaint">
 %     my @comaints = split /,/, $row->[2] // '';
 %     while(my $comaint = shift @comaints) {
-        <a href="<%= my_url->query([
+        <a href="<%= my_url([
           pause99_peek_dist_perms_by => "a",
           pause99_peek_dist_perms_query => $comaint,
           pause99_peek_dist_perms_sub => 1,
@@ -90,7 +90,7 @@ can be corrected.--Thank you!</p><p>
 % }
   </tbody>
 </table>
-<p><a href="<%= my_url->query([
+<p><a href="<%= my_url([
   OF => "YAML",
   pause99_peek_dist_perms_sub => 1,
   pause99_peek_dist_perms_by => param("pause99_peek_dist_perms_by"),

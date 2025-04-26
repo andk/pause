@@ -32,7 +32,7 @@ the co-maintainer table and press <i>Give Up</i></p>
 
 <p class="notice">If you need finer control (eg. to give up comaintainership
 for a removed module), visit
-<a href="<%= my_url->query(ACTION => 'giveup_comaint') %>">
+<a href="<%= my_url(ACTION => 'giveup_comaint') %>">
 Give up Co-maintainership status per module</a> page.</p>
 
 <p>Select one or more distributions:</p>
