@@ -11,10 +11,11 @@ sub register {
   # to generate a url
   $app->helper(my_url => sub {
     my $c = shift;
-    my $url = Mojo::URL->new($c->req->env->{REQUEST_URI});
+    my %param = ref $_[0] ? () : @_;
     my $action = $c->stash('.pause')->{Action};
-    my $requested_action = $url->query->param('ACTION') // '';
-    $url->query->param(ACTION => $action) if $action && $action ne $requested_action;
+    my $requested_action = $param{ACTION} ? delete $param{ACTION} : '';
+    my $url = $c->url_for($action && $action ne $requested_action ? $action : $requested_action);
+    $url->query(ref $_[0] ? $_[0] : %param);
     $url->query->remove('ABRA');
     $url;
   });
