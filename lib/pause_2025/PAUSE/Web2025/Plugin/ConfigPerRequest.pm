@@ -17,6 +17,8 @@ sub _before_dispatch {
 
   $c->stash(".pause" => {}) unless $c->stash(".pause");
 
+  $c->stash(".pause")->{Action} = $c->req->param('ACTION');
+
   _is_ssl($c);
   _retrieve_user($c);
   _set_allowed_actions($c);
