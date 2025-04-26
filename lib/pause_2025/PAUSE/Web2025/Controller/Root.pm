@@ -48,6 +48,12 @@ sub index {
 
 sub auth {
   my $c = shift;
+  my $session = $c->session || {};
+
+  unless ($session->{user}) {
+    $c->redirect_to('/login');
+    return;
+  }
   return 1;
 }
 
