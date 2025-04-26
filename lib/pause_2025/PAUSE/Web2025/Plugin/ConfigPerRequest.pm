@@ -97,12 +97,13 @@ sub _retrieve_user {
   $sth->finish;
 
   my $dbh2 = $mgr->authen_connect;
-  $sth = $dbh2->prepare("SELECT secretemail
+  $sth = $dbh2->prepare("SELECT *
                          FROM $PAUSE::Config->{AUTHEN_USER_TABLE}
                          WHERE $PAUSE::Config->{AUTHEN_USER_FLD}=?");
   $sth->execute($user);
-  my($secret_email) = $sth->fetchrow_array;
-  $pause->{User}{secretemail} = $secret_email;
+  my $user_record = $sth->fetchrow_hashref;
+  delete $user_record->{$PAUSE::Config->{AUTHEN_PASSWORD_FLD}};
+  $pause->{User}{secretemail}  = $user_record->{secretemail};
   $sth->finish;
 
   $sql = qq{SELECT *
@@ -134,7 +135,7 @@ sub _retrieve_user {
     $pause->{IsMailinglistRepresentative} = \%mlrepr;
   }
 
-  $pause->{UserSecrets} = $c->req->env->{"pause.user_secrets"};
+  $pause->{UserSecrets} = $user_record;
   if ( $pause->{UserSecrets}{forcechange} ) {
     $pause->{Action} = "change_passwd"; # ueberschreiben
     $c->req->param(ACTION => "change_passwd"); # faelschen
