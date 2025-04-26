@@ -58,7 +58,7 @@ there was a problem.</p>
 <p><input type="submit" name="SUBMIT_pause99_reset_version_forget" value="Forget"></p>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('packages', {
   valueNames: ['package', 'version', 'dist']

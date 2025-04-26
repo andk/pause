@@ -67,7 +67,7 @@ Remove Comaintainers per distribution</a> page.</p>
  value="Remove"></p>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('packages', {
   valueNames: ['pacakge', 'dist', 'userid']

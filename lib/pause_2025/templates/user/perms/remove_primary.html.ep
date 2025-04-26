@@ -78,7 +78,7 @@ please email the PAUSE admins at <a href="mailto:modules@cpan.org">modules@cpan.
  value="Give Up Maintainership Status"></p>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('packages', {
   valueNames: ['package', 'dist']

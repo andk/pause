@@ -47,7 +47,7 @@
 </table>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var requestList = new List('requests', {valueNames: ['type', 'userid', 'session']});
 % end

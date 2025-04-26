@@ -82,7 +82,7 @@ a distribution for whatever reasons), visit
  value="Give Up Maintainership Status"></p>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('dists', {
   valueNames: ['dist', 'owners']

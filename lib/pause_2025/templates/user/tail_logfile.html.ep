@@ -14,7 +14,7 @@
 </table>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var logList = new List('logs', {valueNames: ['log']});
 % end

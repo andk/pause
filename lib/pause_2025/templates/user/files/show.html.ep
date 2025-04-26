@@ -30,7 +30,7 @@
 </table>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('files', {
   valueNames: ['file', 'size', 'modified']

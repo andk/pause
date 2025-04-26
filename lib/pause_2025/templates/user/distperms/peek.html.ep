@@ -100,7 +100,7 @@ can be corrected.--Thank you!</p><p>
 </a></p>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('perms', {
   valueNames: ['dist', 'owner', 'comaint']

@@ -77,7 +77,7 @@ Add Comaintainers per distribution</a> page.</p>
  value="Make Co-Maintainer"></p>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('packages', {
   valueNames: ['package', 'dist']

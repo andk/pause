@@ -25,7 +25,7 @@ mailing list.</p>
 </table>
 </div>
 % content_for javascript => begin
-%= javascript "/list.min.js"
+%= javascript "/pause/list.min.js"
 %= javascript begin
 var userList = new List('users', {valueNames: ['ml', 'userid']});
 % end
