@@ -4,6 +4,20 @@ use Mojo::Base -base;
 use PAUSE;
 
 our %Actions = (
+  # ROOT
+  login => {
+    x_mojo_to => "root#login",
+    verb => "Login",
+    priv => "root",
+    method => "POST",
+    x_csrf_protection => 1,
+    x_form => {
+      pause_id => {form_type => "text_field"},
+      password => {form_type => "password_field"},
+      SUBMIT   => {form_type => "submit_button"},
+    },
+  },
+
   # PUBLIC
   request_id => {
     x_mojo_to => "public-request_id#request",
@@ -456,11 +470,32 @@ our %Actions = (
       pause99_edit_cred_sub => {form_type => "submit_button"},
     },
   },
-  pause_logout => {
-    x_mojo_to => "user#pause_logout",
-    verb => "About Logging Out",
+  mfa => {
+    x_mojo_to => "user-mfa#edit",
+    verb => "Multifactor Auth",
+    priv => "user",
+    cat => "User/06Account/03",
+    desc => "Multifactor Authentication.",
+    method => 'POST',
+    x_csrf_protection => 1,
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      pause99_mfa_code => {form_type => "text_field"},
+      pause99_mfa_reset => {form_type => "hidden_field"},
+      pause99_mfa_sub => {form_type => "submit_button"},
+    },
+  },
+  logout => {
+    x_mojo_to => "root#logout",
+    verb => "Log Out",
+    method => 'POST',
     priv => "user",
     cat => "User/06Account/04",
+    x_csrf_protection => 1,
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      pause99_logout_sub => {form_type => "submit_button"},
+    },
   },
 
   # ADMIN+mlrep+modlistmaint
