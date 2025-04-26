@@ -114,6 +114,13 @@ sub login {
 
     # delete not to be carried around
     my $crypt_pw = delete $user_record->{$attr->{pwd_field}};
+    if ($user_record->{mfa}) {
+        if (!_verify_otp($c, $user_record)) {
+            $pause->{mfa} = 1 unless $req->param('otp');
+            $c->render;
+            return;
+        }
+    }
     if ($crypt_pw) {
       if (PAUSE::Crypt::password_verify($sent_pw, $crypt_pw)) {
         PAUSE::Crypt::maybe_upgrade_stored_hash({
@@ -137,7 +144,32 @@ sub login {
     }
     $dbh->disconnect;
   }
+  delete $pause->{mfa};
   $pause->{Action} = 'login';
+}
+
+sub _verify_otp {
+    my ($c, $u) = @_;
+    my $pause = $c->stash(".pause");
+    my $otp = $c->req->param('otp') or return;
+    if ($otp =~ /\A[0-9]{6}\z/) {
+        return 1 if $c->app->pause->authenticator_for($u)->verify($otp);
+    } elsif ($otp =~ /\A[a-z0-9]{5}\-[a-z0-9]{5}\z/) { # maybe one of the recovery codes?
+        require PAUSE::Crypt;
+        my $pause = $c->stash(".pause");
+        my @recovery_codes = split / /, $u->{mfa_recovery_codes} // '';
+        for my $code (@recovery_codes) {
+            if (PAUSE::Crypt::password_verify($otp, $code)) {
+                my $new_codes = join ' ', grep { $_ ne $code } @recovery_codes;
+                my $dbh = $c->app->pause->authen_connect;
+                my $tbl = $PAUSE::Config->{AUTHEN_USER_TABLE};
+                my $sql = "UPDATE $tbl SET mfa_recovery_codes = ?, changed = ?, changedby = ? WHERE user = ?";
+                $dbh->do($sql, undef, $new_codes, time, $u->{userid}, $u->{userid})
+                    or push @{$pause->{ERROR}}, sprintf(qq{Could not enter the data into the database: <i>%s</i>.},$dbh->errstr);
+                return 1;
+            }
+        }
+    }
 }
 
 1;
