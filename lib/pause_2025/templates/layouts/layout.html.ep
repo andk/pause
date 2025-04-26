@@ -79,9 +79,6 @@ Please be careful not to disturb the database operation. Expect failures everywh
     <h2>[ATTN: Form going to post to <%= $me %>]</h2>
     % }
     <form action="<%= $me %>" <% if ($enctype) { %>enctype="<%= $enctype %>" <% } %>method="<%= $method %>">
-    % if (!$action_conf->{method}) {
-    <input type="hidden" name="ACTION" value="<%= $pause->{Action} %>">
-    % }
     <main>
     % if (my $verb = $action_conf->{verb} and !$action_conf->{has_title}) {
       <h2 class="firstheader"><%= $verb %></h2>
