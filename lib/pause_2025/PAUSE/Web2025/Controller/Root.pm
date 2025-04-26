@@ -172,4 +172,17 @@ sub _verify_otp {
     }
 }
 
+sub logout {
+  my $c = shift;
+  my $pause = $c->stash(".pause");
+  my $mgr = $c->app->pause;
+  my $req = $c->req;
+
+  if (uc $req->method eq 'POST') {
+    my $user_id = $pause->{User}{userid};
+    $c->session(expires => 1);
+    $c->redirect_to('/');
+  }
+}
+
 1;
