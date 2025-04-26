@@ -64,7 +64,7 @@ sub _get {
                           $sth1->rows,
                           $sth1->rows,
                          ));
-      die PAUSE::Web2025::Exception->new(ERROR => "Unidentified error happened, please write to the PAUSE admin at $PAUSE::Config->{ADMIN} and help him identifying what's going on. Thanks!");
+      die PAUSE::Web2025::Exception->new(NEEDS_LOGIN => 1);
     }
     my $hiddenuser_h1 = $mgr->fetchrow($sth1, "fetchrow_hashref");
 
@@ -154,11 +154,7 @@ sub _get {
       my $dbh1 = $mgr->connect;
       my $sth1 = $dbh1->prepare("SELECT * FROM users WHERE userid=?");
       $sth1->execute($pause->{User}{userid});
-      die PAUSE::Web2025::Exception
-          ->new(ERROR =>
-                "Unidentified error happened, please write to the PAUSE admin
- at $PAUSE::Config->{ADMIN} and help them identify what's going on. Thanks!")
-              unless $sth1->rows;
+      die PAUSE::Web2025::Exception->new(NEEDS_LOGIN => 1) unless $sth1->rows;
 
       $pause->{User} = $mgr->fetchrow($sth1, "fetchrow_hashref");
       $sth1->finish;

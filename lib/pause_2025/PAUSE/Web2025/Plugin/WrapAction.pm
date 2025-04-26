@@ -21,7 +21,11 @@ sub _wrap {
   my $res = eval { $next->(); };
   if (my $e = $@) {
     if (UNIVERSAL::isa($e, "PAUSE::Web2025::Exception")) {
-      if ($e->{ERROR}) {
+      if ($e->{NEEDS_LOGIN}) {
+        $c->redirect_to('/login');
+        return;
+      }
+      elsif ($e->{ERROR}) {
         $e->{ERROR} = [ $e->{ERROR} ] unless ref $e->{ERROR} eq 'ARRAY';
         push @{$pause->{ERROR}}, @{$e->{ERROR}};
         require Data::Dumper;
