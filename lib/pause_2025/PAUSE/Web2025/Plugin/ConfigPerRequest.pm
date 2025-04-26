@@ -153,6 +153,7 @@ sub _set_allowed_actions {
 
   # What is allowed here is allowed to anybody
   @allow_action{ $mgr->config->action_names_for('public') } = ();
+  $allow_action{login} = undef;
 
   @allow_submit = (
                    "request_id",
