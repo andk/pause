@@ -51,7 +51,7 @@ sub startup {
   my $r = $app->routes->under("/")->to("root#check");
 
   # Public Menu
-  my $public = $r->under("/");
+  my $public = $r->under("/")->to("root#public");
   $public->any("/")->to("root#index");
   for my $group ($app->pause->config->public_groups) {
     for my $name ($app->pause->config->action_names_for($group)) {

@@ -21,6 +21,8 @@ sub check {
   return 1;
 }
 
+sub public { return 1 }
+
 sub index {
   my $c = shift;
   my $pause = $c->stash(".pause");
