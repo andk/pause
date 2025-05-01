@@ -250,8 +250,7 @@ try again or report errors to <a href="mailto:}),
         $pause->{query_succeeded} = 1;
 
         my $usrdir = "https://$server/pub/PAUSE/authors/id/$userhome";
-        my $tailurl = "https://$server/pause/authenquery?ACTION=tail_logfile" .
-            "&pause99_tail_logfile_1=5000";
+        my $tailurl = $c->my_full_url(ACTION => 'tail_logfile')->query(pause99_tail_logfile_1 => 5000);
 
         $pause->{usrdir} = $usrdir;
         $pause->{tailurl} = $tailurl;
