@@ -21,10 +21,13 @@ sub register {
   });
   $app->helper(my_full_url => sub {
     my $c = shift;
+    my %param = ref $_[0] ? () : @_;
     my $url = $c->req->url->clone->to_abs;
     $url->query->pairs([]);
-    my $path_query = $c->my_url(@_);
-    $url->path_query($path_query);
+    my $action = $param{ACTION} ? delete $param{ACTION} : '';
+    my $path = $c->url_for($action);
+    $url->path_query($path);
+    $url->query(ref $_[0] ? $_[0] : %param);
     $url->query->remove('ABRA');
     $url;
   });
