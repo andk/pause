@@ -1,4 +1,5 @@
 requires 'Apache::Session::Counted';
+requires 'Auth::GoogleAuth', '1.05';
 requires 'BSD::Resource';
 requires 'CPAN::Checksums', '1.050';
 requires 'CPAN::DistnameInfo';
@@ -34,7 +35,7 @@ requires 'Log::Dispatchouli';
 requires 'Module::Signature';
 requires 'MojoX::Log::Dispatch::Simple';
 requires 'Mojolicious';
-requires 'Mojolicious::Plugin::WithCSRFProtection';
+requires 'Mojolicious::Plugin::WithCSRFProtection', '1.02';
 requires 'Net::SSLeay', '1.49';
 requires 'Parallel::Runner';
 requires 'Parse::CPAN::Packages';
