@@ -273,7 +273,7 @@ subtest 'get: retrieve a stored session' => sub {
         like $userid => qr/\A\d+_\w+\z/;
         $t->clear_deliveries;
 
-        $t->get_ok("/admin/add_user\?USERID=$userid");
+        $t->get_ok("/admin/add_user?USERID=$userid");
         # note $t->content;
 
         for my $key (keys %$new_user) {

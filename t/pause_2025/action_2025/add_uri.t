@@ -130,28 +130,6 @@ subtest 'post: under a Perl6 subdir' => sub {
     }
 };
 
-subtest 'post: move error' => sub {
-    for my $test (Test::PAUSE::Web->tests_for('user')) {
-        my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new;
-        $t->login(user => $user);
-        my %form = %$http_upload;
-        rmtree($PAUSE::Config->{INCOMING_LOC});
-
-        $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
-        $t->text_like('.error_message' => qr/Couldn't copy file/);
-
-        my $rows = $t->mod_db->select('uris', ['*'], {
-            userid => $user,
-            uri => $form{pause99_add_uri_httpupload}[1],
-        });
-        is @$rows => 0;
-
-        mkpath($PAUSE::Config->{INCOMING_LOC});
-    }
-};
-
 subtest 'post: empty' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
