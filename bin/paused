@@ -473,7 +473,7 @@ but I couldn't ($!). Seems as if the admin has to do something\n\n";
     my @To;
     my $pma = PAUSE::MailAddress->new_from_userid($userid);
     my $address  = $pma->address;
-    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$address>};
+    push @To, $PAUSE::Config->{ADMIN}, qq{<$address>};
 
     my $blurb;
     if ($self->{ErrNotGzip}) {
