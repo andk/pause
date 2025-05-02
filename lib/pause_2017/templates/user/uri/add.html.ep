@@ -126,7 +126,7 @@ to your homedirectory:<br>
 
 <p><%= text_field "pause99_add_uri_uri",
     size => 64,
-    maxlength => 128,
+    maxlength => 255,
 %><br>
 <input type="submit" name="SUBMIT_pause99_add_uri_uri" value=" Upload this URL "></p>
 </div>
