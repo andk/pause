@@ -23,6 +23,7 @@ requires 'HTML::Entities';
 requires 'HTTP::Date';
 requires 'HTTP::Status';
 requires 'HTTP::Tiny', '0.059';
+requires 'Imager::QRCode';
 requires 'IO::Socket::SSL', '1.56';
 requires 'IPC::Run3';
 requires 'JSON';
