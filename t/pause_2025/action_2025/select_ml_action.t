@@ -22,8 +22,9 @@ Test::PAUSE::Web->setup;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=select_ml_action");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/mlrepr/select_ml_action");
         # note $t->content;
     }
 };
@@ -31,9 +32,10 @@ subtest 'get' => sub {
 subtest 'post: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
-        $t->post_ok("$path?ACTION=add_user", $mailing_list);
+        $t->post_ok("/admin/add_user", $mailing_list);
 
         $t->mod_db->insert("list2user", {
             maillistid => "MAILLIST",
@@ -41,8 +43,8 @@ subtest 'post: basic' => sub {
         }, {ignore => 1});
 
         my %form = %$default;
-        $t->post_ok("$path?ACTION=select_ml_action", \%form);
-        # note $t->content;
+        $t->post_ok("/mlrepr/select_ml_action", \%form);
+        note $t->content;
     }
 };
 

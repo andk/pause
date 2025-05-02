@@ -23,21 +23,15 @@ subtest 'get' => sub {
 
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
-        $t->get_ok("$path?ACTION=who_admin")
+        $t->get_ok("/public/who_admin")
           ->text_like('body', qr/Registered admins:\s+BAR, FOO/);
 
-        $t->get_ok("$path?ACTION=who_admin&OF=YAML");
+        $t->get_ok("/public/who_admin?OF=YAML");
         my $list_amp = YAML::Syck::Load( $t->content );
         is_deeply( $list_amp, [qw/BAR FOO TESTADMIN/], "YAML output works" );
-
-    SKIP: {
-        skip "; is not supported anymore", 1;
-        $t->get_ok("$path?ACTION=who_admin;OF=YAML");
-        my $list_sem = YAML::Syck::Load( $t->content );
-        is_deeply( $list_sem, [qw/BAR FOO TESTADMIN/], "YAML output works" );
-        }
     }
 };
 

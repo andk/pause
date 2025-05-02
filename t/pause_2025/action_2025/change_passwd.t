@@ -16,8 +16,9 @@ Test::PAUSE::Web->setup;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=change_passwd");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/change_passwd");
         # note $t->content;
     }
 };
@@ -26,9 +27,10 @@ subtest 'get: public without ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         next if $user; # public only
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         $t->authen_dbh->do('TRUNCATE abrakadabra');
-        my $res = $t->get("$path?ACTION=change_passwd");
+        my $res = $t->get("/public/change_passwd");
         is $res->code => 403;
         # note $t->content;
     }
@@ -38,7 +40,8 @@ subtest 'get: public with ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         next if $user; # public only
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my $chuser = 'TESTUSER';
         my $chpass = 'testpassword';
@@ -49,7 +52,7 @@ subtest 'get: public with ABRA' => sub {
             expires => Time::Piece->new(time + 3600)->strftime('%Y-%m-%d %H:%M:%S'),
         });
 
-        $t->get_ok("$path?ACTION=change_passwd&ABRA=$chuser.$chpass");
+        $t->get_ok("/public/change_passwd?ABRA=$chuser.$chpass");
         # note $t->content;
 
         # No links should keep ABRA (71a745d)
@@ -63,8 +66,9 @@ subtest 'post: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
         my %form = %$default;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        my $res = $t->post("$path?ACTION=change_passwd", \%form);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        my $res = $t->post("/user/change_passwd", \%form);
         ok !$res->is_success && $res->code == 403, "Forbidden";
         like $res->content => qr/Failed CSRF check/;
         # note $t->content;
@@ -76,8 +80,9 @@ subtest 'post_with_token: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
         my %form = %$default;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->post_with_token_ok("/user/change_passwd", \%form)
           ->text_like("p.password_stored", qr/New password stored/);
         is $t->deliveries => 1, "one delivery for admin";
         # note $t->content;
@@ -91,8 +96,9 @@ subtest 'post_with_token: user with CENSORED email' => sub {
         $user = "TESTCNSRD" if $user eq "TESTUSER";
 
         my %form = %$default;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->post_with_token_ok("/user/change_passwd", \%form)
           ->text_like("p.password_stored", qr/New password stored/);
         my @deliveries = $t->deliveries;
         is @deliveries => 1, "one delivery for admin";
@@ -109,11 +115,12 @@ subtest 'post_with_token: public without ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         next if $user; # public only
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         $t->authen_dbh->do('TRUNCATE abrakadabra');
 
         my %form = %$default;
-        my $res = $t->post_with_token("$path?ACTION=change_passwd", \%form);
+        my $res = $t->post_with_token("/public/change_passwd", \%form);
         is $res->code => 403;
         # note $t->content;
     }
@@ -123,7 +130,8 @@ subtest 'post_with_token: public with ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         next if $user; # public only
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my $chuser = 'TESTUSER';
         my $chpass = 'testpassword';
@@ -135,7 +143,7 @@ subtest 'post_with_token: public with ABRA' => sub {
         });
 
         my %form = %$default;
-        $t->post_with_token_ok("$path?ACTION=change_passwd&ABRA=$chuser.$chpass", \%form);
+        $t->post_with_token_ok("/public/change_passwd?ABRA=$chuser.$chpass", \%form);
         $t->text_like("p.password_stored", qr/New password stored/);
         # note $t->content;
 
@@ -144,7 +152,7 @@ subtest 'post_with_token: public with ABRA' => sub {
         ok !grep {$_ =~ /ABRA=/} @links;
 
         # Used ABRA is gone (8234a6a)
-        my $res = $t->post_with_token("$path?ACTION=change_passwd&ABRA=$chuser.$chpass", \%form);
+        my $res = $t->post_with_token("/public/change_passwd?ABRA=$chuser.$chpass", \%form);
         ok !$res->is_success;
         is $res->code => 401;
     }
@@ -154,7 +162,8 @@ subtest 'post_with_token: public with incorrect ABRA' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
         next if $user; # public only
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my $chuser = 'TESTUSER';
         my $chpass = 'testpassword';
@@ -166,7 +175,7 @@ subtest 'post_with_token: public with incorrect ABRA' => sub {
         });
 
         my %form = %$default;
-        my $res = $t->post_with_token("$path?ACTION=change_passwd&ABRA=$chuser.wrong$chpass", \%form);
+        my $res = $t->post_with_token("/public/change_passwd?ABRA=$chuser.wrong$chpass", \%form);
         is $res->code => 401;
         # note $t->content;
     }
@@ -176,12 +185,13 @@ subtest 'post_with_token: passwords mismatch' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = (
             %$default,
             pause99_change_passwd_pw2 => "wrong_pass",
         );
-        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("/user/change_passwd", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/The two passwords didn't match./);
         ok !$t->deliveries, "no delivery for admin";
@@ -193,12 +203,13 @@ subtest 'post_with_token: only one password' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = (
             %$default,
             pause99_change_passwd_pw2 => undef,
         );
-        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("/user/change_passwd", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/You need to fill in the same password in both fields./);
         ok !$t->deliveries, "no delivery for admin";
@@ -210,13 +221,14 @@ subtest 'post_with_token: no password' => sub {
     Test::PAUSE::Web->setup;
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = (
             %$default,
             pause99_change_passwd_pw1 => undef,
             pause99_change_passwd_pw2 => undef,
         );
-        $t->post_with_token_ok("$path?ACTION=change_passwd", \%form)
+        $t->post_with_token_ok("/user/change_passwd", \%form)
           ->text_is("h2", "Error")
           ->text_like("p.error_message", qr/Please fill in the form with passwords./);
         ok !$t->deliveries, "no delivery for admin";

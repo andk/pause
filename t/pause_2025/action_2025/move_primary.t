@@ -19,8 +19,9 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
 
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=move_primary");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/move_primary");
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         if ($user eq 'TESTADMIN') {
             cmp_bag(\@modules, [qw/
@@ -42,7 +43,8 @@ subtest 'get' => sub {
 subtest 'normal case' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my @packages;
         if ($user eq 'TESTADMIN') {
@@ -59,7 +61,7 @@ subtest 'normal case' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=move_primary", \%form);
+        $t->post_ok("/user/move_primary", \%form);
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         if ($user eq 'TESTADMIN') {
@@ -86,7 +88,8 @@ subtest 'normal case' => sub {
 subtest 'unknown user' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my @packages;
         if ($user eq 'TESTADMIN') {
@@ -103,7 +106,7 @@ subtest 'unknown user' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=move_primary", \%form);
+        $t->post_ok("/user/move_primary", \%form);
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         my @errors = map {$_->all_text} $t->dom->find('.error')->each;
@@ -131,7 +134,8 @@ subtest 'unknown user' => sub {
 subtest 'unrelated modules' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %form = (
             %$default,
@@ -140,7 +144,7 @@ subtest 'unrelated modules' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=move_primary", \%form);
+        $t->post_ok("/user/move_primary", \%form);
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         my @errors = map {$_->all_text} $t->dom->find('.error')->each;

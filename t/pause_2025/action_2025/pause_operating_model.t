@@ -9,8 +9,9 @@ Test::PAUSE::Web->setup;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('public')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=pause_operating_model");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/public/pause_operating_model");
         # note $t->content;
     }
 };

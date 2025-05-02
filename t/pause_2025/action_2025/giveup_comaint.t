@@ -18,8 +18,9 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
 
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=giveup_comaint");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/giveup_comaint");
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         if ($user eq 'TESTADMIN') {
             cmp_bag(\@modules, [qw/
@@ -41,7 +42,8 @@ subtest 'get' => sub {
 subtest 'normal case (comaint)' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %form = (
             %$default,
@@ -49,7 +51,7 @@ subtest 'normal case (comaint)' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=giveup_comaint", \%form);
+        $t->post_ok("/user/giveup_comaint", \%form);
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         if ($user eq 'TESTADMIN') {
@@ -76,7 +78,8 @@ subtest 'normal case (comaint)' => sub {
 subtest 'unrelated modules' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %form = (
             %$default,
@@ -84,7 +87,7 @@ subtest 'unrelated modules' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=giveup_comaint", \%form);
+        $t->post_ok("/user/giveup_comaint", \%form);
         my @modules = map {$_->all_text} $t->dom->find('td.package')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         my @errors = map {$_->all_text} $t->dom->find('.error')->each;

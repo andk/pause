@@ -19,8 +19,9 @@ Test::PAUSE::Web->reset_module_fixture;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=peek_perms");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/peek_perms");
         # note $t->content;
     }
 };
@@ -30,13 +31,14 @@ subtest 'search by author' => sub {
         for my $test (Test::PAUSE::Web->tests_for('user')) {
             my ($path, $user) = @$test;
 
-            my $t = Test::PAUSE::Web->new(user => $user);
+            my $t = Test::PAUSE::Web->new;
+            $t->login(user => $user);
 
             my %form = (
                 %$default,
                 pause99_peek_perms_query => $user,
             );
-            $t->$method("$path?ACTION=peek_perms", \%form);
+            $t->$method("/user/peek_perms", \%form);
             my @modules = map {$_->all_text} $t->dom->find('td.module')->each;
             my @types   = map {$_->all_text} $t->dom->find('td.type')->each;
             if ($user eq 'TESTADMIN') {
@@ -61,7 +63,7 @@ subtest 'search by author' => sub {
             }
             # note $t->content;
 
-            $t->$method("$path?ACTION=peek_perms&OF=YAML", \%form);
+            $t->$method("/user/peek_perms?OF=YAML", \%form);
             my $list = YAML::Syck::Load( $t->content );
             if ($user eq 'TESTADMIN') {
                 eq_or_diff( $list => [
@@ -140,14 +142,15 @@ subtest 'search by module (exact)' => sub {
         for my $test (Test::PAUSE::Web->tests_for('user')) {
             my ($path, $user) = @$test;
 
-            my $t = Test::PAUSE::Web->new(user => $user);
+            my $t = Test::PAUSE::Web->new;
+            $t->login(user => $user);
 
             my %form = (
                 %$default,
                 pause99_peek_perms_query => 'Module::User::Foo',
                 pause99_peek_perms_by => 'me',
             );
-            $t->$method("$path?ACTION=peek_perms", \%form);
+            $t->$method("/user/peek_perms", \%form);
             my @modules = map {$_->all_text} $t->dom->find('td.module')->each;
             my @types   = map {$_->all_text} $t->dom->find('td.type')->each;
             cmp_set(\@modules, [qw/
@@ -156,7 +159,7 @@ subtest 'search by module (exact)' => sub {
             ok grep(/co-maint/, @types), 'Has co-maint';
             # note $t->content;
 
-            $t->$method("$path?ACTION=peek_perms&OF=YAML", \%form);
+            $t->$method("/user/peek_perms?OF=YAML", \%form);
             my $list = YAML::Syck::Load( $t->content );
             eq_or_diff( $list => [
                {
@@ -181,14 +184,15 @@ subtest 'search by module (sql-like)' => sub {
         for my $test (Test::PAUSE::Web->tests_for('user')) {
             my ($path, $user) = @$test;
 
-            my $t = Test::PAUSE::Web->new(user => $user);
+            my $t = Test::PAUSE::Web->new;
+            $t->login(user => $user);
 
             my %form = (
                 %$default,
                 pause99_peek_perms_query => 'Module::User::%',
                 pause99_peek_perms_by => 'ml',
             );
-            $t->$method("$path?ACTION=peek_perms", \%form);
+            $t->$method("/user/peek_perms", \%form);
             my @modules = map {$_->all_text} $t->dom->find('td.module')->each;
             my @types   = map {$_->all_text} $t->dom->find('td.type')->each;
             cmp_set(\@modules, [qw/
@@ -199,7 +203,7 @@ subtest 'search by module (sql-like)' => sub {
             ok grep(/co-maint/, @types), 'Has co-maint';
             # note $t->content;
 
-            $t->$method("$path?ACTION=peek_perms&OF=YAML", \%form);
+            $t->$method("/user/peek_perms?OF=YAML", \%form);
             my $list = YAML::Syck::Load( $t->content );
             eq_or_diff( $list => [
                {

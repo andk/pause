@@ -7,38 +7,56 @@ use HTTP::Status qw/:constants/;
 
 Test::PAUSE::Web->setup;
 
-subtest 'logout 1: redirect with Cookie' => sub {
-    for my $test (Test::PAUSE::Web->tests_for('user')) {
-        my ($path, $user) = @$test;
-        my $rand = rand 1;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path");
-        my $res = $t->get("$path?logout=1$rand");
-        is $res->code => HTTP_UNAUTHORIZED;
-    }
+subtest 'for 2017 app' => sub {
+    subtest 'logout 1: redirect with Cookie' => sub {
+        for my $test (Test::PAUSE::Web->tests_for('user')) {
+            my ($path, $user) = @$test;
+            my $rand = rand 1;
+            my $t    = Test::PAUSE::Web->new(user => $user);
+            $t->get_ok("$path");
+            my $res = $t->get("$path?logout=1$rand");
+            is $res->code => HTTP_UNAUTHORIZED;
+        }
+    };
+
+    subtest 'logout 2: redirect to Badname:Badpass@Server URL' => sub {
+        plan skip_all => "WWW::Mechanize/LWP::UserAgent currently ignores userinfo";
+        for my $test (Test::PAUSE::Web->tests_for('user')) {
+            my ($path, $user) = @$test;
+            my $rand = rand 1;
+            my $t    = Test::PAUSE::Web->new(user => $user);
+            $t->get_ok("$path");
+            my $res = $t->get("$path?logout=2$rand");
+            is $res->code => HTTP_UNAUTHORIZED;
+        }
+    };
+
+    subtest 'logout 3: Quick direct 401' => sub {
+        for my $test (Test::PAUSE::Web->tests_for('user')) {
+            my ($path, $user) = @$test;
+            my $rand = rand 1;
+            my $t    = Test::PAUSE::Web->new(user => $user);
+            $t->get_ok("$path");
+            my $res = $t->get("$path?logout=3$rand");
+            is $res->code => HTTP_UNAUTHORIZED;
+        }
+    };
 };
 
-subtest 'logout 2: redirect to Badname:Badpass@Server URL' => sub {
-    plan skip_all => "WWW::Mechanize/LWP::UserAgent currently ignores userinfo";
-    for my $test (Test::PAUSE::Web->tests_for('user')) {
-        my ($path, $user) = @$test;
-        my $rand = rand 1;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path");
-        my $res = $t->get("$path?logout=2$rand");
-        is $res->code => HTTP_UNAUTHORIZED;
-    }
-};
-
-subtest 'logout 3: Quick direct 401' => sub {
-    for my $test (Test::PAUSE::Web->tests_for('user')) {
-        my ($path, $user) = @$test;
-        my $rand = rand 1;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path");
-        my $res = $t->get("$path?logout=3$rand");
-        is $res->code => HTTP_UNAUTHORIZED;
-    }
+subtest 'for 2025 app' => sub {
+    # there's only one way to logout
+    subtest 'logout' => sub {
+        for my $test (Test::PAUSE::Web->tests_for('user')) {
+            my ($path, $user) = @$test;
+            my $rand = rand 1;
+            my $t    = Test::PAUSE::Web->new;
+            $t->login(user => $user);
+            $t->get_ok("/user/logout");
+            $t->post_with_token_ok("/user/logout", {SUBMIT => 'Logout'});
+            my $res = $t->get("/user/logout");
+            is $res->code => HTTP_FORBIDDEN;
+        }
+    };
 };
 
 done_testing;

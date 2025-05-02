@@ -22,8 +22,9 @@ Test::PAUSE::Web->setup;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=add_uri");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("user/add_uri");
         # note $t->content;
     }
 };
@@ -36,8 +37,9 @@ subtest 'get: user with subdirs' => sub {
         $subdir->make_path;
         $subdir->child("stuff.txt")->spew("Foo");
 
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=add_uri");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/add_uri");
         $t->text_is('select[name="pause99_add_uri_subdirscrl"] option[value="."]', "."); # default
         $t->text_is('select[name="pause99_add_uri_subdirscrl"] option[value="test"]', "test");
         # note $t->content;
@@ -47,13 +49,14 @@ subtest 'get: user with subdirs' => sub {
 subtest 'post: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         my $file = $PAUSE::Config->{INCOMING_LOC}."/".$form{pause99_add_uri_httpupload}[1];
         ok !-f $file, "file to upload does not exist";
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         ok -f $file, "uploaded file exists";
@@ -70,7 +73,8 @@ subtest 'post: basic' => sub {
 subtest 'post: under a new subdir' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         $form{pause99_add_uri_subdirtext} = "new_dir";
 
@@ -78,7 +82,7 @@ subtest 'post: under a new subdir' => sub {
         ok !-f $file, "file to upload does not exist";
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         ok -f $file, "uploaded file exists";
@@ -96,7 +100,8 @@ subtest 'post: under a new subdir' => sub {
 subtest 'post: under a Perl6 subdir' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         $form{pause99_add_uri_subdirscrl} = "Perl6";
 
@@ -109,7 +114,7 @@ subtest 'post: under a Perl6 subdir' => sub {
         ok !-f $file, "file to upload does not exist";
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         ok -f $file, "uploaded file exists";
@@ -125,15 +130,38 @@ subtest 'post: under a Perl6 subdir' => sub {
     }
 };
 
+subtest 'post: move error' => sub {
+    for my $test (Test::PAUSE::Web->tests_for('user')) {
+        my ($path, $user) = @$test;
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        my %form = %$http_upload;
+        rmtree($PAUSE::Config->{INCOMING_LOC});
+
+        $t->mod_dbh->do('TRUNCATE uris');
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
+        $t->text_like('.error_message' => qr/Couldn't copy file/);
+
+        my $rows = $t->mod_db->select('uris', ['*'], {
+            userid => $user,
+            uri => $form{pause99_add_uri_httpupload}[1],
+        });
+        is @$rows => 0;
+
+        mkpath($PAUSE::Config->{INCOMING_LOC});
+    }
+};
+
 subtest 'post: empty' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         $form{pause99_add_uri_httpupload} = [undef, 'index.html'];
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         my $rows = $t->mod_db->select('uris', ['*'], {
@@ -147,14 +175,15 @@ subtest 'post: empty' => sub {
 subtest 'post: renamed' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         $form{pause99_add_uri_httpupload} = ["$Test::PAUSE::Web::AppRoot/htdocs/index.html", 'html/index.html'];
         my $file = $PAUSE::Config->{INCOMING_LOC}."/index.html";
         ok !-f $file, "file to upload does not exist";
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         # renamed file exists
@@ -172,11 +201,12 @@ subtest 'post: renamed' => sub {
 subtest 'post: uri' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$uri_upload;
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         my $rows = $t->mod_db->select('uris', ['*'], {
@@ -190,12 +220,13 @@ subtest 'post: uri' => sub {
 subtest 'post: CHECKSUMS' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         $form{pause99_add_uri_httpupload} = ["$Test::PAUSE::Web::AppRoot/htdocs/index.html", "CHECKSUMS"],
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         $t->text_like('.error_message' => qr/Files with the name CHECKSUMS cannot be/);
         # note $t->content;
 
@@ -210,14 +241,15 @@ subtest 'post: CHECKSUMS' => sub {
 subtest 'post: allow overwrite' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         my $file = $PAUSE::Config->{INCOMING_LOC}."/".$form{pause99_add_uri_httpupload}[1];
         ok !-f $file, "file to upload does not exists";
 
         $t->mod_dbh->do('TRUNCATE uris');
         for (0 .. 1) {
-            $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+            $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
             # note $t->content;
 
             # uploaded file exists
@@ -236,14 +268,15 @@ subtest 'post: allow overwrite' => sub {
 subtest 'post: duplicate' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         $form{pause99_add_uri_httpupload} = ["$Test::PAUSE::Web::AppRoot/htdocs/index.html", "index.tar.gz"],
         my $file = $PAUSE::Config->{INCOMING_LOC}."/".$form{pause99_add_uri_httpupload}[1];
         ok !-f $file, "file to upload does not exist";
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         ok -f $file, "uploaded file exists";
@@ -255,7 +288,7 @@ subtest 'post: duplicate' => sub {
         });
         is @$rows => 1;
 
-        my $res = $t->post("$path?ACTION=add_uri", \%form, "Content-Type" => "form-data");
+        my $res = $t->post("/user/add_uri", \%form, "Content-Type" => "form-data");
         is $res->code => 409;
         # note $t->content;
 
@@ -273,13 +306,14 @@ subtest 'post: duplicate' => sub {
 subtest 'post: to the site top, as various CPAN uploaders do/did' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
         my %form = %$http_upload;
         my $file = $PAUSE::Config->{INCOMING_LOC}."/".$form{pause99_add_uri_httpupload}[1];
         ok !-f $file, "file to upload does not exist";
 
         $t->mod_dbh->do('TRUNCATE uris');
-        $t->post_ok("$path", \%form, "Content-Type" => "form-data");
+        $t->post_ok("/", \%form, "Content-Type" => "form-data");
         # note $t->content;
 
         ok -f $file, "uploaded file exists";

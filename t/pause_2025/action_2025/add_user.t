@@ -31,8 +31,9 @@ Test::PAUSE::Web->setup;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=add_user");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/admin/add_user");
         # note $t->content;
     }
 };
@@ -40,10 +41,11 @@ subtest 'get' => sub {
 subtest 'post: ordinary user' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", $new_user);
+        $t->post_ok("/admin/add_user", $new_user);
         # note $t->content;
 
         # new user exists
@@ -72,10 +74,11 @@ subtest 'post: ordinary user' => sub {
 subtest 'post: user with an accent in their name' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %$new_user,
             pause99_add_user_fullname => "T\xc3\xa9st Name",
         });
@@ -96,7 +99,8 @@ subtest 'post: user with an accent in their name' => sub {
 subtest 'post: soundex' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %copied_user = %$new_user;
         $copied_user{pause99_add_user_fullname} = 'new user';
@@ -104,7 +108,7 @@ subtest 'post: soundex' => sub {
         delete $copied_user{SUBMIT_pause99_add_user_Definitely};
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %copied_user,
         });
         # note $t->content;
@@ -120,7 +124,8 @@ subtest 'post: soundex' => sub {
 subtest 'post: soundex error: similar name' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %copied_user = %$new_user;
         $copied_user{pause99_add_user_fullname} = 'new nome';
@@ -128,7 +133,7 @@ subtest 'post: soundex error: similar name' => sub {
         delete $copied_user{SUBMIT_pause99_add_user_Definitely};
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %copied_user,
         });
         $t->text_like('h3', qr/Not submitting NEWUSER, maybe we have a duplicate/);
@@ -145,7 +150,8 @@ subtest 'post: soundex error: similar name' => sub {
 subtest 'post: metaphone' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %copied_user = %$new_user;
         $copied_user{pause99_add_user_fullname} = 'new user';
@@ -153,7 +159,7 @@ subtest 'post: metaphone' => sub {
         delete $copied_user{SUBMIT_pause99_add_user_Definitely};
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %copied_user,
         });
         # note $t->content;
@@ -169,7 +175,8 @@ subtest 'post: metaphone' => sub {
 subtest 'post: metaphone error: similar name' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %copied_user = %$new_user;
         $copied_user{pause99_add_user_fullname} = 'new nome';
@@ -177,7 +184,7 @@ subtest 'post: metaphone error: similar name' => sub {
         delete $copied_user{SUBMIT_pause99_add_user_Definitely};
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %copied_user,
         });
         $t->text_like('h3', qr/Not submitting NEWUSER, maybe we have a duplicate/);
@@ -194,14 +201,15 @@ subtest 'post: metaphone error: similar name' => sub {
 subtest 'post: metaphone error: completely duplicated' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %copied_user = %$new_user;
         $copied_user{SUBMIT_pause99_add_user_Metaphone} = 1;
         delete $copied_user{SUBMIT_pause99_add_user_Definitely};
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %copied_user,
         });
 
@@ -211,7 +219,7 @@ subtest 'post: metaphone error: completely duplicated' => sub {
         });
         is @$rows => 1;
 
-        $t->post_ok("$path?ACTION=add_user", {
+        $t->post_ok("/admin/add_user", {
             %copied_user,
         });
         $t->text_like('h3', qr/Not submitting NEWUSER, maybe we have a duplicate/);
@@ -222,10 +230,11 @@ subtest 'post: metaphone error: completely duplicated' => sub {
 subtest 'post: mailing list' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=add_user", $new_mailing_list);
+        $t->post_ok("/admin/add_user", $new_mailing_list);
         # note $t->content;
 
         # new mailing list exists
@@ -245,7 +254,8 @@ subtest 'post: mailing list' => sub {
 subtest 'get: retrieve a stored session' => sub {
     for my $test (Test::PAUSE::Web->tests_for('admin')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %requested_user;
         for my $key (keys %$new_user) {
@@ -257,13 +267,13 @@ subtest 'get: retrieve a stored session' => sub {
         $requested_user{SUBMIT_pause99_request_id_sub} = 1;
 
         $t->reset_fixture;
-        $t->post_ok("$path?ACTION=request_id", \%requested_user);
+        $t->post_ok("/public/request_id", \%requested_user);
         my ($email) = map {$_->body} $t->deliveries;
-        my ($userid) = $email =~ m!https://.+?/pause/authenquery.+?USERID=([^&\s]+)!;
+        my ($userid) = $email =~ m!https://.+?/admin/add_user\?USERID=([^&\s]+)!;
         like $userid => qr/\A\d+_\w+\z/;
         $t->clear_deliveries;
 
-        $t->get_ok("$path?ACTION=add_user&USERID=$userid");
+        $t->get_ok("/admin/add_user\?USERID=$userid");
         # note $t->content;
 
         for my $key (keys %$new_user) {

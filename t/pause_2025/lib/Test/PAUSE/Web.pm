@@ -26,7 +26,7 @@ our @EXPORT = @Test::More::EXPORT;
 our $FilenameToUpload = "Hash-RenameKey-0.02.tar.gz";
 our $FileToUpload = "$AppRoot/t/staging/$FilenameToUpload";
 
-push @INC, "$AppRoot/lib", "$AppRoot/lib/pause_2017", "$AppRoot/privatelib";
+push @INC, "$AppRoot/lib", "$AppRoot/lib/pause_2025", "$AppRoot/lib/pause_2017", "$AppRoot/privatelib";
 
 $TmpDir->child($_)->mkpath for qw/rundata incoming etc public log/;
 $TmpDir->child('log')->child('paused.log')->touch();
@@ -35,7 +35,7 @@ $INC{"PrivatePAUSE.pm"} = 1;
 $ENV{EMAIL_SENDER_TRANSPORT} = "Test";
 
 require PAUSE;
-require PAUSE::Web::Config;
+require PAUSE::Web2025::Config;
 
 $PAUSE::Config->{DOCUMENT_ROOT} = "$AppRoot/htdocs";
 $PAUSE::Config->{PID_DIR} = $TestRoot;
@@ -145,7 +145,7 @@ sub reset_fixture {
 sub new {
   my ($class, %args) = @_;
 
-  my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2017.psgi";
+  my $psgi = $ENV{TEST_PAUSE_WEB_PSGI} // "app_2025.psgi";
   my $app = do "$AppRoot/$psgi";
 
   $args{mech} = Test::WWW::Mechanize::PSGI->new(app => $app, cookie_jar => {});
@@ -161,8 +161,19 @@ sub new {
 
 sub set_credentials {
   my $self = shift;
+  return unless $self->{user};
   note "log in as ".$self->{user};
   $self->{mech}->credentials($self->{user}, $self->{pass});
+  $self->{mech}->{env}{REMOTE_USER} = $self->{user};
+}
+
+sub login {
+  my ($self, %args) = @_;
+  my $user = $args{user} or return;
+  my $pass = $args{pass} || 'test';
+  note "log in as $user";
+  $self->{mech}->get('/login');
+  $self->{mech}->submit_form(fields => {pause_id => $user, password => $pass});
 }
 
 sub get {
@@ -300,6 +311,17 @@ sub text_unlike {
   $self;
 }
 
+sub dom_not_found {
+  my ($self, $selector) = @_;
+  my $at = $self->dom->at($selector);
+  if ($at) {
+    fail "'$selector' is found";
+  } else {
+    pass "'$selector' is not found";
+  }
+  $self;
+}
+
 sub title_is_ok {
   my ($self, $url) = @_;
   return if $self->dom->at('p.error_message'); # ignore if error
@@ -308,7 +330,7 @@ sub title_is_ok {
   my ($action) = $url =~ /ACTION=(\w+)/;
   $action ||= $url; # in case action is passed as url
   return if $action =~ /^select_(user|ml_action)$/;
-  my $conf = PAUSE::Web::Config->action($action);
+  my $conf = PAUSE::Web2025::Config->action($action);
   return if $conf->{has_title}; # uses different title from its data source
 
   my $title = $conf->{verb};
@@ -423,6 +445,7 @@ sub reset_module_fixture {
             my $userdir = _userdir($dist->{owner});
             $self->mod_db->insert("packages", {
                 package => $package,
+                lc_package => lc $package,
                 version => '0.01',
                 dist => "$userdir/$dist->{name}-0.01.tar.gz",
                 distname => $dist->{name},
@@ -432,6 +455,7 @@ sub reset_module_fixture {
             });
             $self->mod_db->insert("primeur", {
                 package => $package,
+                lc_package => lc $package,
                 userid => $dist->{owner},
             });
         }
@@ -441,6 +465,7 @@ sub reset_module_fixture {
                 for my $package (@$packages) {
                     $self->mod_db->insert("perms", {
                         package => $package,
+                        lc_package => lc $package,
                         userid => $id,
                     });
                 }
@@ -448,6 +473,7 @@ sub reset_module_fixture {
                 for my $package (@{$dist->{packages}}) {
                     $self->mod_db->insert("perms", {
                         package => $package,
+                        lc_package => lc $package,
                         userid => $comaint,
                     });
                 }

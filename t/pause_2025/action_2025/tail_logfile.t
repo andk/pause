@@ -23,8 +23,9 @@ LOG
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("/pause/authenquery?ACTION=tail_logfile");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/tail_logfile");
         # note $t->content;
     }
 };
@@ -32,10 +33,11 @@ subtest 'get' => sub {
 subtest 'post: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %form = %$default;
-        $t->post_ok("$path?ACTION=tail_logfile", \%form);
+        $t->post_ok("/user/tail_logfile", \%form);
         # note $t->content;
     }
 };

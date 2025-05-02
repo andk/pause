@@ -19,8 +19,9 @@ Test::PAUSE::Web->setup;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=edit_uris");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/edit_uris");
         # note $t->content;
     }
 };
@@ -28,16 +29,17 @@ subtest 'get' => sub {
 subtest 'post: basic' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         $t->mod_dbh->do("TRUNCATE uris");
 
         # prepare distribution
-        $t->post_ok("$path?ACTION=add_uri", $default_for_add_uri, "Content-Type" => "form-data");
+        $t->post_ok("/user/add_uri", $default_for_add_uri, "Content-Type" => "form-data");
 
         my %form = %$default;
         $form{pause99_edit_uris_3} =~ s/TESTUSER/$user/;
-        $t->post_ok("$path?ACTION=edit_uris", \%form);
+        $t->post_ok("/user/edit_uris", \%form);
         # note $t->content;
     }
 };

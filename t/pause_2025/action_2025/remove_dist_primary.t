@@ -18,8 +18,9 @@ subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
 
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=remove_dist_primary");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/remove_dist_primary");
         my @dists = map {$_->all_text} $t->dom->find('td.dist')->each;
         if ($user eq 'TESTADMIN') {
             cmp_bag(\@dists, [qw/
@@ -39,7 +40,8 @@ subtest 'get' => sub {
 subtest 'normal case' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my @dists;
         if ($user eq 'TESTADMIN') {
@@ -55,7 +57,7 @@ subtest 'normal case' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=remove_dist_primary", \%form);
+        $t->post_ok("/user/remove_dist_primary", \%form);
         @dists = map {$_->all_text} $t->dom->find('td.dist')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         if ($user eq 'TESTADMIN') {
@@ -67,7 +69,7 @@ subtest 'normal case' => sub {
             ]);
 
             # really transferred to ADOPTME?
-            $t->get_ok("$path?ACTION=peek_dist_perms", {
+            $t->get_ok("/user/peek_dist_perms", {
                 pause99_peek_dist_perms_query => "ADOPTME",
                 pause99_peek_dist_perms_by => "a",
                 pause99_peek_dist_perms_sub => 1,
@@ -85,7 +87,7 @@ subtest 'normal case' => sub {
             ]);
 
             # really transferred to ADOPTME?
-            $t->get_ok("$path?ACTION=peek_dist_perms", {
+            $t->get_ok("/user/peek_dist_perms", {
                 pause99_peek_dist_perms_query => "ADOPTME",
                 pause99_peek_dist_perms_by => "a",
                 pause99_peek_dist_perms_sub => 1,
@@ -100,7 +102,8 @@ subtest 'normal case' => sub {
 subtest 'unrelated dists' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
 
         my %form = (
             %$default,
@@ -108,7 +111,7 @@ subtest 'unrelated dists' => sub {
         );
 
         Test::PAUSE::Web->reset_module_fixture;
-        $t->post_ok("$path?ACTION=remove_dist_primary", \%form);
+        $t->post_ok("/user/remove_dist_primary", \%form);
         my @dists = map {$_->all_text} $t->dom->find('td.dist')->each;
         my @results = map {$_->all_text} $t->dom->find('.result')->each;
         my @warnings = map {$_->all_text} $t->dom->find('.warning')->each;

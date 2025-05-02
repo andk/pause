@@ -19,8 +19,9 @@ Test::PAUSE::Web->reset_module_fixture;
 subtest 'get' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {
         my ($path, $user) = @$test;
-        my $t = Test::PAUSE::Web->new(user => $user);
-        $t->get_ok("$path?ACTION=peek_dist_perms");
+        my $t = Test::PAUSE::Web->new;
+        $t->login(user => $user);
+        $t->get_ok("/user/peek_dist_perms");
         # note $t->content;
     }
 };
@@ -30,13 +31,14 @@ subtest 'search by author' => sub {
         for my $test (Test::PAUSE::Web->tests_for('user')) {
             my ($path, $user) = @$test;
 
-            my $t = Test::PAUSE::Web->new(user => $user);
+            my $t = Test::PAUSE::Web->new;
+            $t->login(user => $user);
 
             my %form = (
                 %$default,
                 pause99_peek_dist_perms_query => $user,
             );
-            $t->$method("$path?ACTION=peek_dist_perms", \%form);
+            $t->$method("/user/peek_dist_perms", \%form);
             my @dists = map {$_->all_text} $t->dom->find('td.dist')->each;
             if ($user eq 'TESTADMIN') {
                 cmp_bag(\@dists, [qw/
@@ -55,7 +57,7 @@ subtest 'search by author' => sub {
             }
             # note $t->content;
 
-            $t->$method("$path?ACTION=peek_dist_perms&OF=YAML", \%form);
+            $t->$method("/user/peek_dist_perms?OF=YAML", \%form);
             my $list = YAML::Syck::Load( $t->content );
             if ($user eq 'TESTADMIN') {
                 eq_or_diff( $list => [
@@ -104,21 +106,22 @@ subtest 'search by dist (exact)' => sub {
         for my $test (Test::PAUSE::Web->tests_for('user')) {
             my ($path, $user) = @$test;
 
-            my $t = Test::PAUSE::Web->new(user => $user);
+            my $t = Test::PAUSE::Web->new;
+            $t->login(user => $user);
 
             my %form = (
                 %$default,
                 pause99_peek_dist_perms_query => 'Module-User',
                 pause99_peek_dist_perms_by => 'de',
             );
-            $t->$method("$path?ACTION=peek_dist_perms", \%form);
+            $t->$method("/user/peek_dist_perms", \%form);
             my @dists = map {$_->all_text} $t->dom->find('td.dist')->each;
             cmp_set(\@dists, [qw/
                 Module-User
             /]) or note explain \@dists;
             # note $t->content;
 
-            $t->$method("$path?ACTION=peek_dist_perms&OF=YAML", \%form);
+            $t->$method("/user/peek_dist_perms?OF=YAML", \%form);
             my $list = YAML::Syck::Load( $t->content );
             eq_or_diff( $list => [
                {
@@ -136,14 +139,15 @@ subtest 'search by module (sql-like)' => sub {
         for my $test (Test::PAUSE::Web->tests_for('user')) {
             my ($path, $user) = @$test;
 
-            my $t = Test::PAUSE::Web->new(user => $user);
+            my $t = Test::PAUSE::Web->new;
+            $t->login(user => $user);
 
             my %form = (
                 %$default,
                 pause99_peek_dist_perms_query => 'Module-User%',
                 pause99_peek_dist_perms_by => 'dl',
             );
-            $t->$method("$path?ACTION=peek_dist_perms", \%form);
+            $t->$method("/user/peek_dist_perms", \%form);
             my @dists = map {$_->all_text} $t->dom->find('td.dist')->each;
             cmp_set(\@dists, [qw/
                 Module-User
@@ -151,7 +155,7 @@ subtest 'search by module (sql-like)' => sub {
             /]) or note explain \@dists;
             # note $t->content;
 
-            $t->$method("$path?ACTION=peek_dist_perms&OF=YAML", \%form);
+            $t->$method("/user/peek_dist_perms?OF=YAML", \%form);
             my $list = YAML::Syck::Load( $t->content );
             eq_or_diff( $list => [
                {
