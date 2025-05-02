@@ -35,7 +35,7 @@ requires 'Log::Dispatchouli';
 requires 'Module::Signature';
 requires 'MojoX::Log::Dispatch::Simple';
 requires 'Mojolicious';
-requires 'Mojolicious::Plugin::WithCSRFProtection', '1.02';
+requires 'Mojolicious::Plugin::WithCSRFProtection'; #, '1.02';
 requires 'Net::SSLeay', '1.49';
 requires 'Parallel::Runner';
 requires 'Parse::CPAN::Packages';
