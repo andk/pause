@@ -118,7 +118,7 @@ $PAUSE::Config ||=
      TIMEOUT => 60*60,
      TRUST_IS_SSL_HEADER => 1,
      TMP => '/data/pause/tmp/',
-     UPLOAD => 'upload@pause.perl.org',
+     UPLOAD => 'modules@perl.org',
      # sign the auto-generated CHECKSUM files with:
      CHECKSUMS_SIGNING_PROGRAM => 'gpg',
      CHECKSUMS_SIGNING_ARGS => '-q --homedir /home/pause/pause-private/gnupg-pause-batch-signing-home --clearsign --default-key ',
