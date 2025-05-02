@@ -402,7 +402,7 @@ sub woe {
     my @To;
     my $pma = PAUSE::MailAddress->new_from_userid($userid);
     my $to  = $pma->address;
-    push @To, $PAUSE::Config->{ADMIN}, qq{"$asciiname" <$to>};
+    push @To, $PAUSE::Config->{ADMIN}, qq{<$to>};
 
     my $blurb = "The URL $hash->{uri},
 requested for upload as $hash->{uriid} has problems
@@ -536,7 +536,7 @@ sub welcome_file {
   my $dbh = $self->{DBH};
   my $pma = PAUSE::MailAddress->new_from_userid($userid);
   my $address  = $pma->address;
-  my @To = qq{"$asciiname" <$address>};
+  my @To = qq{<$address>};
   unless ($PAUSE::Config->{TESTHOST}) {
       push @To, $PAUSE::Config->{TO_CPAN_TESTERS};
       push @To, $PAUSE::Config->{'P5P'} if
