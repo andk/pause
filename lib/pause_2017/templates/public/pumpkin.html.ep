@@ -1,7 +1,6 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
 
-<p>Query the <code>grouptable</code> table for who is a pumpkin bit holder</p>
 <p>Registered pumpkins: <%= join ", ", @{$pause->{pumpkins} || []} %></p>
 <p><a href="<%= my_url->query(ACTION => "who_pumpkin", OF => "YAML") %>" style="text-decoration: none;">
 <span class="orange_button">YAML</span>
