@@ -538,7 +538,7 @@ sub isa_regular_perl {
 sub may_overwrite_file {
   my ($filename) = @_;
 
-  my $is_archive = $filename =~ s/\.(gz|bz2)$//i;
+  $filename =~ s/\.(gz|bz2)$//i;
 
   return 1 if $filename =~ /readme$/i;
 
