@@ -161,8 +161,10 @@ sub permissions {
 sub rewrite_indexes {
     my $self = shift;
 
-    $self->git->reset({ hard => 1 })
-      if -e dir($self->gitroot)->file(qw(.git refs heads master));
+    if ($PAUSE::Config->{GITROOT}) {
+        $self->git->reset({ hard => 1 })
+          if -e dir($self->gitroot)->file(qw(.git refs heads master));
+    }
 
     $self->rewrite02();
     my $MLROOT = $self->mlroot;
@@ -173,8 +175,10 @@ sub rewrite_indexes {
     $self->rewrite06();
     $Logger->log("finished rewriting indexes");
 
-    $self->git->commit({ m => "indexer run at $^T, pid $$" })
-        if $self->git->status->is_dirty;
+    if ($PAUSE::Config->{GITROOT}) {
+        $self->git->commit({ m => "indexer run at $^T, pid $$" })
+            if $self->git->status->is_dirty;
+    }
 }
 
 sub debug_mem {
@@ -711,21 +715,23 @@ Last-Updated: $date\n\n};
 
     $list .= join "", sort {lc $a cmp lc $b} @listing02;
     if ($list ne $olist) {
-        my $F;
-        my $gitfile = File::Spec->catfile(
-          $self->gitroot,
-          '02packages.details.txt',
-        );
-        if (open $F, ">", $gitfile) {
-            print $F $header;
-            print $F $list;
-        } else {
-            $Logger->log("couldn't open $repfile for writing 02packages: $!");
-        }
-        close $F or die "Couldn't close: $!";
-        $self->git->add({}, '02packages.details.txt');
+        if ($PAUSE::Config->{GITROOT}) {
+            my $F;
+            my $gitfile = File::Spec->catfile(
+              $self->gitroot,
+              '02packages.details.txt',
+            );
+            if (open $F, ">", $gitfile) {
+                print $F $header;
+                print $F $list;
+            } else {
+                $Logger->log("couldn't open $repfile for writing 02packages: $!");
+            }
+            close $F or die "Couldn't close: $!";
+            $self->git->add({}, '02packages.details.txt');
 
-        $self->_install($gitfile);
+            $self->_install($gitfile);
+        }
 
         PAUSE::newfile_hook($repfile);
         0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
@@ -1321,17 +1327,19 @@ Date:        %s
     if ($list eq $olist) {
         $Logger->log("06perms.txt has not changed; won't rewrite");
     } else {
-        my $F;
-        my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
-        if (open $F, ">:utf8", $gitfile) {
-            print $F $header;
-            print $F $list;
-        } else {
-            $Logger->log("couldn't open $gitfile: $!");
+        if ($PAUSE::Config->{GITROOT}) {
+            my $F;
+            my $gitfile = File::Spec->catfile($self->gitroot, '06perms.txt');
+            if (open $F, ">:utf8", $gitfile) {
+                print $F $header;
+                print $F $list;
+            } else {
+                $Logger->log("couldn't open $gitfile: $!");
+            }
+            close $F or die "Couldn't close: $!";
+            $self->git->add({}, '06perms.txt');
+            $self->_install($gitfile);
         }
-        close $F or die "Couldn't close: $!";
-        $self->git->add({}, '06perms.txt');
-        $self->_install($gitfile);
         PAUSE::newfile_hook($repfile);
         0==system "$GZIP $PAUSE::Config->{GZIP_OPTIONS} --stdout $repfile > $repfile.gz.new"
             or $Logger->log([ "couldn't gzip $repfile: %s", Process::Status->as_struct ]);
