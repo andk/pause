@@ -64,7 +64,7 @@ jobs:
       - name: Run the tests
         if: "!(contains(github.event.pull_request.labels.*.name, 'want-coverage'))"
         run: prove -lr -j4 t
-        continue-on-error: true
+#        continue-on-error: true
       - name: Run tests (with coverage)
         if: contains(github.event.pull_request.labels.*.name, 'want-coverage')
         env:
