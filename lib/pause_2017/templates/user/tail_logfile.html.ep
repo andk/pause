@@ -2,8 +2,8 @@
 % my $pause = stash(".pause") || {};
 
 <div id="logs">
-<%= select_field pause99_tail_logfile_1 => [qw/2000 5000 10000 20000 40000/]; =%>
-<input type="submit" name="pause99_tail_logfile_sub" value="Tail characters">
+<%= select_field pause99_tail_logfile_1 => [qw/500 1000 10000 20000/]; =%>
+<input type="submit" name="pause99_tail_logfile_sub" value="Tail lines">
 <input class="search" placeholder="Filter">
 <table class="table compact">
   <tbody class="list">
