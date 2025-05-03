@@ -176,11 +176,11 @@ sub delete {
     my $tmpf = $f;
     $tmpf =~ s/\.(?:readme|meta)$/.tar.gz/;
     my $info = CPAN::DistnameInfo->new($tmpf);
-    my $dist = $info->dist;
+    my $distv = $info->distvname;
     my $blurb = $deletes{$f} ?
         $c->scheduled($whendele{$f}) :
             HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f}, dist => $dist };
+    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f}, distv => $distv };
     $pause->{deleting_indexed_files} = 1 if $deletes{$f} && $indexed->{$f};
   }
   $pause->{files} = \%files;
