@@ -13,6 +13,7 @@ sub register {
     my $dump = YAML::Syck::Dump($data);
     my $edump = Encode::encode_utf8($dump);
     my $action = $c->req->param('ACTION') || 'pause';
+    $action =~ tr/a-z0-9_//cd;
     $c->res->headers->content_disposition("attachment; filename=$action.yaml");
     $c->res->headers->content_type('application/yaml');
     $c->stash(format => "text");
