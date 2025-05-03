@@ -23,7 +23,7 @@
       <td class="file"><%= $file %></td>
 %   }
       <td class="size"><%= $files->{$file}{stat} %></td>
-      <td class="modified"><%= $files->{$file}{blurb} %></td>
+      <td class="modified" data-modified="<%= $files->{$file}{modified} %>"><%= $files->{$file}{blurb} %></td>
     </tr>
 %   }
   </tbody>
@@ -33,7 +33,7 @@
 %= javascript "/list.min.js"
 %= javascript begin
 var List = new List('files', {
-  valueNames: ['file', 'size', 'modified']
+  valueNames: ['file', 'size', { name: 'modified', attr: 'data-modified' }]
 });
 % end
 % end

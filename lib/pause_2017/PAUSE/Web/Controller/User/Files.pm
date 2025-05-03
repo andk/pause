@@ -49,10 +49,11 @@ sub show {
       warn "ALERT: Could not stat f[$f]: $!";
       next;
     }
+    my $modified = (stat _)[9];
     my $blurb = $deletes{$f} ?
         $c->scheduled($whendele{$f}) :
-            HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f} };
+            HTTP::Date::time2str($modified);
+    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f}, modified => $modified };
   }
   $pause->{files} = \%files;
 }
@@ -177,10 +178,11 @@ sub delete {
     $tmpf =~ s/\.(?:readme|meta)$/.tar.gz/;
     my $info = CPAN::DistnameInfo->new($tmpf);
     my $distv = $info->distvname;
+    my $modified = (stat _)[9];
     my $blurb = $deletes{$f} ?
         $c->scheduled($whendele{$f}) :
-            HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f}, distv => $distv };
+            HTTP::Date::time2str($modified);
+    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f}, distv => $distv, modified => $modified };
     $pause->{deleting_indexed_files} = 1 if $deletes{$f} && $indexed->{$f};
   }
   $pause->{files} = \%files;
