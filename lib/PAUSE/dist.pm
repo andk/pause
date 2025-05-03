@@ -177,11 +177,12 @@ sub untar {
   local *TARTEST;
   my $tarbin = $self->hub->{TARBIN};
   my $MLROOT = $self->mlroot;
-  my $tar_opt = "tzf";
+  my $tar_opt = "-tzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
-    $tar_opt = "tjf";
+    $tar_opt = "-tjf";
   }
-  open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
+  my $ignore_unknown_keyword = '--warning=no-unknown-keyword';
+  open TARTEST, "$tarbin $ignore_unknown_keyword $tar_opt $MLROOT/$dist |";
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
       $Logger->log("*** ALERT: updir detected!");
@@ -200,12 +201,12 @@ sub untar {
     $self->{COULD_NOT_UNTAR}++;
     return;
   }
-  $tar_opt = "xzf";
+  $tar_opt = "-xzf";
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
-    $tar_opt = "xjf";
+    $tar_opt = "-xjf";
   }
 
-  my @cmd = ($tarbin, $tar_opt, "$MLROOT/$dist");
+  my @cmd = ($tarbin, $ignore_unknown_keyword, $tar_opt, "$MLROOT/$dist");
   $Logger->log([ "going to untar with: %s", \@cmd ]);
 
   unless (system(@cmd)==0) {
