@@ -29,14 +29,14 @@
   <tbody class="list">
 % for my $file (sort keys %$files) {
     <tr>
-      <td class="checkbox"><%= check_box "pause99_delete_files_FILE" => $file %></td>
+      <td class="checkbox"><%= check_box "pause99_delete_files_FILE" => $file, 'data-distv' => $files->{$file}{distv} %></td>
 %   if ($files->{$file}{indexed}) {
       <td class="file indexed"><%= $file %> [indexed]</td>
 %   } else {
       <td class="file"><%= $file %></td>
 %   }
       <td class="size"><%= $files->{$file}{stat} %></td>
-      <td class="modified"><%= $files->{$file}{blurb} %></td>
+      <td class="modified" data-modified="<%= $files->{$file}{modified} %>"><%= $files->{$file}{blurb} %></td>
     </tr>
 % }
   </tbody>
@@ -48,8 +48,19 @@
 %= javascript "/pause/list.min.js"
 %= javascript begin
 var List = new List('files', {
-  valueNames: ['file', 'size', 'modified']
+  valueNames: ['file', 'size', { name: 'modified', attr: 'data-modified' }]
 });
+
+document.querySelectorAll('input[type=checkbox]').forEach(function(e) {
+  e.addEventListener('change', function(ev) {
+    var checked = ev.currentTarget.checked;
+    var distv = ev.currentTarget.getAttribute('data-distv');
+    document.querySelectorAll('input[data-distv="'+distv+'"]').forEach(function(e) {
+      e.checked = checked;
+    });
+  })
+});
+
 % end
 % end
 

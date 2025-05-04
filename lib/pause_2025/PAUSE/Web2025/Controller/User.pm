@@ -218,7 +218,7 @@ sub reindex {
 
   foreach my $f (keys %files) {
     if (
-        $f =~ /readme$/ ||
+        $f =~ /\.(?:readme|meta)$/ ||
         $f eq "CHECKSUMS"
        ) {
       delete $files{$f};

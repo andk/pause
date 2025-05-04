@@ -83,7 +83,6 @@ subtest 'normal case' => sub {
         note $t->content;
     }
 };
-done_testing;exit;
 
 subtest 'unknown user' => sub {
     for my $test (Test::PAUSE::Web->tests_for('user')) {

@@ -56,8 +56,7 @@ you do not seem to want HTTP upload enabled, we do
 % }
 
 <p class="url_upload"><b>GET URL:</b> PAUSE fetches any http or ftp
-URL that can be handled by LWP (<b>Note: https is currently not
-supported</b>): use the text field (please specify the <i>complete
+URL that can be handled by LWP: use the text field (please specify the <i>complete
 URL</i>).</p>
 
 <blockquote><b>Please,</b> make sure your filename
@@ -127,7 +126,7 @@ to your homedirectory:<br>
 
 <p><%= text_field "pause99_add_uri_uri",
     size => 64,
-    maxlength => 128,
+    maxlength => 255,
 %><br>
 <input type="submit" name="SUBMIT_pause99_add_uri_uri" value=" Upload this URL "></p>
 </div>
