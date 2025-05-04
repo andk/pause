@@ -16,7 +16,6 @@ $ENV{MOJO_HOME} = $AppRoot;
 # preload stuff
 use PAUSE::Web::Context;
 use PAUSE::Web;
-use PAUSE::Web::App::Index;
 use PAUSE::Web::App::Disabled;
 use PAUSE::Web2025;
 use PAUSE::Web2025::Context;
