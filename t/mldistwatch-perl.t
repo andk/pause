@@ -33,7 +33,7 @@ subtest "perl-\\d should not get indexed (not really perl)" => sub {
   # TODO: send a report saying 'no perl-X allowed'
 
   $result->logged_event_like(
-    qr{dist is an unofficial perl-like release},
+    qr{perl-like archive rejected},
     "perl-6.tar.gz is not a really perl-like file",
   );
 };

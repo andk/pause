@@ -16,7 +16,6 @@ use DirHandle ();
 use Dumpvalue ();
 use DynaLoader ();
 use Email::MIME;
-use Email::Sender::Simple qw(sendmail);
 use Exporter ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
@@ -39,6 +38,8 @@ use PAUSE::dist ();
 use PAUSE::pmfile ();
 use PAUSE::package ();
 use PAUSE::mldistwatch::Constants ();
+use PAUSE::Indexer::Context;
+use PAUSE::Indexer::Errors;
 use PAUSE::MailAddress ();
 use PAUSE::PermsManager ();
 use Process::Status ();
@@ -338,7 +339,7 @@ sub _newcountokay {
 }
 
 sub _do_the_database_work {
-  my ($self, $dio) = @_;
+  my ($self, $ctx, $dio) = @_;
 
   my $ok = eval {
     # This is here for test purposes.  It lets us force the db work to die,
@@ -356,15 +357,15 @@ sub _do_the_database_work {
     # Either we're doing Perl 6...
     if ($dio->perl_major_version == 6) {
       if ($dio->p6_dist_meta_ok) {
-        if (my $err = $dio->p6_index_dist) {
-          $dio->alert($err);
+        if (my $err = $dio->p6_index_dist($ctx)) {
+          $ctx->add_alert($err);
           $dbh->rollback;
         } else {
           $dbh->commit;
         }
       }
       else {
-        $dio->alert("Meta information of Perl 6 dist is invalid");
+        $ctx->add_alert("Meta information of Perl 6 dist is invalid");
         $dbh->rollback;
       }
 
@@ -372,7 +373,7 @@ sub _do_the_database_work {
     }
 
     # ...or else Perl 5...
-    $dio->examine_pms;      # will switch user
+    $dio->examine_pms($ctx);      # will switch user
 
     my $main_pkg = $dio->_package_governing_permission;
 
@@ -381,8 +382,8 @@ sub _do_the_database_work {
 
       $dbh->commit;
     } else {
-      $dio->alert("Uploading user has no permissions on package $main_pkg");
-      $dio->{NO_DISTNAME_PERMISSION} = 1;
+      $ctx->add_alert("Uploading user has no permissions on package $main_pkg");
+      $ctx->add_dist_error(DISTERROR('no_distname_permission'));
       $dbh->rollback;
     }
 
@@ -438,6 +439,8 @@ sub maybe_index_dist {
                                DIST   => $dist,
                               );
 
+    my $ctx = PAUSE::Indexer::Context->new;
+
     local $Logger = $Logger->proxy({ proxy_prefix => "$dist: " });
 
     if (my $skip_reason = $self->reason_to_skip_dist($dio)) {
@@ -472,53 +475,47 @@ sub maybe_index_dist {
         }
     }
 
-    for my $method (qw( examine_dist read_dist extract_readme_and_meta )) {
-      $dio->$method;
-      if ($dio->skip) {
-          delete $self->{ALLlasttime}{$dist};
-          delete $self->{ALLfound}{$dist};
+    my $examine_dist_ok = eval {
+        $dio->examine_dist($ctx);
+        $dio->read_dist($ctx);
+        $dio->extract_readme_and_meta($ctx);
+        $dio->check_indexability($ctx);
+        $dio->check_blib($ctx);
+        $dio->check_multiple_root($ctx);
+        $dio->check_world_writable($ctx);
+        1;
+    };
 
-          if ($dio->{REASON_TO_SKIP}) {
-              $dio->mail_summary;
-          }
-          return;
-      }
-    }
+    unless ($examine_dist_ok) {
+        my $abort = $@;
+        die $abort unless $abort->isa('PAUSE::Indexer::Abort::Dist');
 
-    if ($dio->{META_CONTENT}{distribution_type}
-        && $dio->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
+        delete $self->{ALLlasttime}{$dist};
+        delete $self->{ALLfound}{$dist};
+
+        if ($abort->public) {
+            $dio->mail_summary($ctx);
+        }
+
         return;
     }
-
-    if (($dio->{META_CONTENT}{release_status} // 'stable') ne 'stable') {
-        # META.json / META.yml declares it's not stable; do not index!
-        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EMETAUNSTABLE;
-        $dio->mail_summary;
-        return;
-    }
-
-    $dio->check_blib;
-    $dio->check_multiple_root;
-    $dio->check_world_writable;
 
     for my $attempt (1 .. 3) {
-      my $db_ok = $self->_do_the_database_work($dio);
+      my $db_ok = $self->_do_the_database_work($ctx, $dio);
       last if $db_ok;
       $self->disconnect;
       if ($attempt == 3) {
         $Logger->log_debug("tried $attempt times to do db work, but all failed");
-        $dio->alert("database errors while indexing");
-        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::E_DB_XACTFAIL;
+        $ctx->add_alert("database errors while indexing");
+        $ctx->add_dist_error(DISTERROR('xact_fail'));
       }
     }
 
-    $dio->mail_summary unless $dio->perl_major_version == 6;
+    $dio->mail_summary($ctx) unless $dio->perl_major_version == 6;
     $self->sleep;
-    $dio->set_indexed;
+    $dio->set_indexed($ctx);
 
-    my @alerts = $dio->all_alerts;
-    return unless @alerts;
-    return @alerts;
+    return $ctx->all_alerts;
 }
 
 sub check_for_new {
@@ -607,7 +604,7 @@ sub handle_alerts {
         body_str => $body_str,
     );
 
-    sendmail($email);
+    PAUSE->sendmail($email);
 
     return;
 }
