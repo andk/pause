@@ -1,0 +1,23 @@
+% my $pause = stash(".pause") || {};
+% my $session = $c->session || {};
+% my $remote_user = $session->{user};
+% if ($remote_user and $remote_user ne "-") {
+  % my $user = $pause->{User};
+  % my $status_class = $pause->{is_ssl} ? "statusencr" : "statusunencr";
+  % my $email = $user->{secretemail} || $user->{email} || "No email???";
+  % my $hidden_user = $pause->{HiddenUser};
+  % my $hidden_user_email = $hidden_user->{secretemail} || $hidden_user->{email} || "No email???";
+  <div class="userstatus <%= $status_class %>">
+    <span class="userid"><%= $remote_user %></span> &lt;<span class="email"><%= $email %></span>&gt;<br>
+    % if ($hidden_user and $user and $hidden_user->{userid} and $user->{userid} and $hidden_user->{userid} ne $user->{userid}) {
+      acting as <span class="admin_userid"><%= $hidden_user->{userid} %></span> &lt;<span class="admin_email"><%= $hidden_user_email %></span>&gt;<br>
+    % }
+    <span class="session_type">
+    % if ($pause->{is_ssl}) {
+      encrypted session
+    % } else {
+      <b>unencrypted session</b>
+    % }
+    </span>
+  </div>
+% }

@@ -1,0 +1,2 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
