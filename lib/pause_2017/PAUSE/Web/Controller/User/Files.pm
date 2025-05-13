@@ -4,7 +4,6 @@ use Mojo::Base "Mojolicious::Controller";
 use HTTP::Date ();
 use File::pushd;
 use PAUSE ();
-use CPAN::DistnameInfo;
 
 sub show {
   my $c = shift;
@@ -173,14 +172,10 @@ sub delete {
       warn "ALERT: Could not stat f[$f]: $!";
       next;
     }
-    my $tmpf = $f;
-    $tmpf =~ s/\.(?:readme|meta)$/.tar.gz/;
-    my $info = CPAN::DistnameInfo->new($tmpf);
-    my $dist = $info->dist;
     my $blurb = $deletes{$f} ?
         $c->scheduled($whendele{$f}) :
             HTTP::Date::time2str((stat _)[9]);
-    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f}, dist => $dist };
+    $files{$f} = {stat => -s _, blurb => $blurb, indexed => $indexed->{$f} };
     $pause->{deleting_indexed_files} = 1 if $deletes{$f} && $indexed->{$f};
   }
   $pause->{files} = \%files;
