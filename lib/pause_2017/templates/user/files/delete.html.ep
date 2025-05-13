@@ -50,17 +50,6 @@
 var List = new List('files', {
   valueNames: ['file', 'size', 'modified']
 });
-
-document.querySelectorAll('input[type=checkbox]').forEach(function(e) {
-  e.addEventListener('change', function(ev) {
-    var checked = ev.currentTarget.checked;
-    var dist = ev.currentTarget.getAttribute('data-dist');
-    document.querySelectorAll('input[data-dist='+dist+']').forEach(function(e) {
-      e.checked = checked;
-    });
-  })
-});
-
 % end
 % end
 
