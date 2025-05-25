@@ -1,0 +1,43 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+<h3>Changing Password of <%= $pause->{HiddenUser}{userid} %></h3>
+% if (param("ABRA")) {
+<input type="hidden" name="ABRA" value="<%= param("ABRA") %>">
+% }
+
+% if ($pause->{password_stored}) {
+<p class="password_stored">New password stored and enabled. Be prepared that
+you will be asked for a new authentication on the next request. If
+this doesn't work out, it may be that you have to restart the
+browser.</p>
+% } else {
+%   if ( $pause->{UserSecrets}{forcechange} ) {
+
+<p>Your password in the database is tainted which
+means you have to renew it. If you believe this is wrong, please
+complain, it's always possible that you are seeing a bug.</p>
+
+%   }
+
+<p>Please fill in your new password in both textboxes.
+Only if both fields contain the same password, we will be able to
+proceed.</p>
+
+<%= password_field "pause99_change_passwd_pw1",
+    maxlength => 72,
+    size => 16,
+=%>
+
+<%= password_field "pause99_change_passwd_pw2",
+    maxlength => 72,
+    size => 16,
+=%>
+
+%= csrf_field
+<input type="submit" name="pause99_change_passwd_sub" value="Submit">
+
+% }
+
