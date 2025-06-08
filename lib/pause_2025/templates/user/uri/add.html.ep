@@ -1,0 +1,132 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+<input type="hidden" name="CAN_MULTIPART" value="1"><%# just for compatibility; will be removed eventually =%>
+
+<h3>Add a file for <%= $pause->{HiddenUser}{userid} %></h3>
+
+% if (my $to = $pause->{successfully_copied_to}) {
+<h3>File successfully copied to '<%= $to %>'</h3>
+% }
+
+% if (my $renamed = $pause->{upload_is_renamed}) {
+
+<p> Your filename has been altered as it contained characters besides
+the class [A-Za-z0-9_\\-\\.\\@\\+]. DEBUG: your filename[<%= $renamed->{from} %>] corrected
+filename[<%= $renamed->{to} %>]. </p>
+
+% }
+
+% if (! $pause->{uploaded_uri} ) {
+<div class='noactionnoresponse'></div>
+% } else {
+
+%= include "user/uri/_continued";
+
+% }
+
+<!-- Preamble: By uploading material to the
+PAUSE, you cause an eminent wide distribution mechanism, the
+CPAN, to bring your material to hundreds of mirroring ftp
+servers and other distribution channels. Thus it may not be easy
+or even possible to withdraw the material again. Please think,
+before you type, if this is what you want and agree upon. -->
+
+<p>This form enables you to enter one file at a time
+into CPAN in one of these ways:</p>
+
+% if ($pause->{tryupload}) {
+
+<p class="http_upload"><b>HTTP Upload:</b> As an
+HTTP upload: enter the filename in the lower text field.
+<b>Hint:</b> If you encounter problems processing this form,
+it may be due to the fact that your browser can't handle
+<code>multipart/form-data</code> forms that support file
+upload. In such a case, please retry to access this <a
+href="<%= my_url(ACTION => "add_uri", CAN_MULTIPART => 0) %>">file-upload-disabled form</a>.</p>
+
+% } else {
+
+<p class="http_upload"><b>HTTP Upload:</b> <i>As
+you do not seem to want HTTP upload enabled, we do
+<b>not</b> offer it. If this is not what you want, try to
+<a href="<%= my_url(ACTION => "add_uri", CAN_MULTIPART => 1) %>">explicitly enable HTTP upload</a>.</i></p>
+
+% }
+
+<p class="url_upload"><b>GET URL:</b> PAUSE fetches any http or ftp
+URL that can be handled by LWP: use the text field (please specify the <i>complete
+URL</i>).</p>
+
+<blockquote><b>Please,</b> make sure your filename
+contains a version number. For security reasons you will never
+be able to upload a file with the same name again (not even
+after deleting it). <b>Thank you.</b></blockquote>
+
+<p>There is no need to upload README files separately. The
+upload server will unwrap your files (.tar.gz or .zip files
+only) within a few hours after uploading and will put the
+topmost README file as, say, Foo-Bar-3.14.readme into your
+directory. <b>Hint:</b> if you're looking for an even more
+convenient way to upload files than this form, you can try the
+<a href="https://metacpan.org/release/CPAN-Uploader">cpan-upload</a> script.
+</p>
+
+<h3>Target Directory</h3><p> If you want to load the
+file into a directory below your CPAN directory,
+please specify the directory name here. Any number of
+subdirectory levels is allowed, they all will be
+created on the fly if they don't exist yet. Only sane
+directory names are allowed and the number of
+characters for the whole path is limited.</p><p>
+<b>NOTE</b>:  To upload a Perl6 distribution a target
+directory whose top level subdirectory is "Perl6" must
+be specified.  In addition, a Perl6 distribution must
+contain a META6.json.  Pause will only consider it a
+Perl6 dist if these two conditions are satisfied.
+</p>
+
+<div>
+<p>
+<%= text_field "pause99_add_uri_subdirtext",
+    size => 32,
+    maxlength => 128,
+%>
+
+% if (@{$pause->{subdirs} || []}) {
+<br>
+<%= select_field "pause99_add_uri_subdirscrl" => $pause->{subdirs},
+    size  => (@{$pause->{subdirs}} > 18 ? 15 : scalar @{$pause->{subdirs}}),
+%>
+% }
+</p>
+</div>
+
+<h3>Upload Material</h3>
+
+% if ($pause->{tryupload}) {
+<div class="http_upload">
+
+<p>If <b>your browser can handle
+file upload</b>, enter the filename here and I'll transfer it
+to your homedirectory:<br>
+
+<p><%= file_field "pause99_add_uri_httpupload",
+    size => 50,
+%><br>
+<input type="submit" name="SUBMIT_pause99_add_uri_httpupload"
+ value=" Upload this file from my disk "></p>
+
+</div>
+% }
+
+<div class="url_upload">
+<p>If you want me <b>to fetch a file</b> from an URL, enter the full URL here.<br>
+
+<p><%= text_field "pause99_add_uri_uri",
+    size => 64,
+    maxlength => 255,
+%><br>
+<input type="submit" name="SUBMIT_pause99_add_uri_uri" value=" Upload this URL "></p>
+</div>

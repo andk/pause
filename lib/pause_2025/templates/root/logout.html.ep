@@ -1,0 +1,7 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $mgr = $c->app->pause;
+
+<p><input type="submit" name="SUBMIT" value="Logout"></p>
+%= csrf_field
+

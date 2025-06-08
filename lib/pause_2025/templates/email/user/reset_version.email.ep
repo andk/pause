@@ -1,0 +1,12 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+According to a request by <%== $pause->{User}{fullname} %> the following
+packages have their recorded version set to 'undef'.
+
+<%== $pause->{blurb} %>
+
+Thanks,
+--
+The PAUSE Team

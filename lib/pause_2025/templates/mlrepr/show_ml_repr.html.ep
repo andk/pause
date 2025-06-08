@@ -1,0 +1,32 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<p>These are the contents of the table <b>list2user</b>.
+There's currently no way to edit the table except
+direct SQL. The table says who is representative of a
+mailing list.</p>
+
+<div id="users">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th class="sort asc" data-sort="ml">Mailing list</th>
+      <th class="sort" data-sort="userid">User-ID</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for my $rec (@{$pause->{lists} || []}) {
+    <tr>
+      <td class="ml"><%= $rec->{maillistid} %></td>
+      <td class="userid"><%= $rec->{userid} %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+</div>
+% content_for javascript => begin
+%= javascript "/pause/list.min.js"
+%= javascript begin
+var userList = new List('users', {valueNames: ['ml', 'userid']});
+% end
+% end

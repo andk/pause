@@ -1,0 +1,21 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<div id="logs">
+<%= select_field pause99_tail_logfile_1 => [qw/2000 5000 10000 20000 40000/]; =%>
+<input type="submit" name="pause99_tail_logfile_sub" value="Tail characters">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <tbody class="list">
+  % for (split /\n/, $pause->{tail}) {
+    <tr><td class="log"><%= $_ %></td></tr>
+  % }
+  </tbody>
+</table>
+</div>
+% content_for javascript => begin
+%= javascript "/pause/list.min.js"
+%= javascript begin
+var logList = new List('logs', {valueNames: ['log']});
+% end
+% end

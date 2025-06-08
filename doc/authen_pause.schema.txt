@@ -56,6 +56,9 @@ CREATE TABLE usertable (
   `changed` int(11) DEFAULT NULL,
   changedby char(10) DEFAULT NULL,
   lastvisit datetime DEFAULT NULL,
+  mfa tinyint(1) DEFAULT 0,
+  mfa_secret32 varchar(16) DEFAULT NULL,
+  mfa_recovery_codes text DEFAULT NULL,
   PRIMARY KEY (`user`),
   KEY usertable_password (`password`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;

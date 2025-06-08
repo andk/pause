@@ -1,0 +1,79 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if (param("SUBMIT_pause99_remove_dist_comaint")) {
+<div class="response">
+%   if ($pause->{error}) {
+<p class="error"><%= $pause->{error} %></p>
+%   } elsif (@{$pause->{results} || []}) {
+      <ul>
+%     for (@{$pause->{results}}) {
+%       if ($_->{not_exists}) {
+<li class="error">Cannot handle tuple <i><%= $_->{sel} %></i>. If you believe, this is a bug, please complain.</li>
+%       } elsif ($_->{error}) {
+<li class="error">Error trying to remove <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>): <%= $_->{error} %></li>
+%       } else {
+<li class="result">Removed <%= $_->{user} %> from co-maintainers of <%= $_->{mod} %> (<%= $_->{dist} %>).</li>
+%       }
+%     }
+      </ul>
+%   } else {
+<p class="warning">You need to select one or more distributions. Nothing done.</p>
+%   }
+</div>
+<hr>
+% }
+
+% if (@{$pause->{dists} || []}) {
+<h3>Remove co-maintainer status</h3>
+<p>The scrolling
+list shows you, which distributions are associated with other
+maintainers besides yourself. Every line denotes a tuple
+of a distribution and a userid. Select those that you want to
+remove and press <i>Remove</i></p>
+
+<p class="notice">If you need finer control (eg. to remove comaintainers
+only for a small part of a distribution, or remove comaintainers
+for a removed module), visit
+<a href="<%= my_url(ACTION => 'remove_comaint') %>">
+Remove Comaintainers per module</a> page.</p>
+
+<div id="dists">
+<input class="search" placeholder="Filter">
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort asc" data-sort="dist">Distribution</th>
+      <th class="sort" data-sort="userid">UserID</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+  % for (@{$pause->{dists}}) {
+    % my ($dist, $userid) = split /\s*\-\-\s*/, $_;
+    <tr>
+      <td class="checkbox"><%= check_box "pause99_remove_dist_comaint_tuples" => $_ %></td>
+      <td class="dist"><%= $dist %></td>
+      <td class="userid"><%= $userid %></td>
+    </tr>
+  % }
+  </tbody>
+</table>
+<p>
+<input type="submit" name="SUBMIT_pause99_remove_dist_comaint"
+ value="Remove"></p>
+</div>
+% content_for javascript => begin
+%= javascript "/pause/list.min.js"
+%= javascript begin
+var List = new List('dists', {
+  valueNames: ['dist', 'userid']
+});
+% end
+% end
+
+% } else {
+<p>There are no co-maintainers registered to any of <%= $pause->{HiddenUser}{userid} || $pause->{User}{userid} %>'s distributions.</p>
+% }

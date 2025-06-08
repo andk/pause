@@ -1,0 +1,3 @@
+% my $pause = stash(".pause") || {};
+% my $closed = $pause->{closed};
+<p class="motd">PAUSE is closed for maintainance for about <%= $closed->{will_last} %>. Estimated time of opening is in <%= $closed->{delta} %>.</p><p class="motd">Sorry for the inconvenience and Thanks for your patience.</p>
