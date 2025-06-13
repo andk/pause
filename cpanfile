@@ -1,4 +1,5 @@
 requires 'Apache::Session::Counted';
+requires 'Auth::GoogleAuth', '1.05';
 requires 'BSD::Resource';
 requires 'CPAN::Checksums', '1.050';
 requires 'CPAN::DistnameInfo';
@@ -22,6 +23,7 @@ requires 'HTML::Entities';
 requires 'HTTP::Date';
 requires 'HTTP::Status';
 requires 'HTTP::Tiny', '0.059';
+requires 'Imager::QRCode';
 requires 'IO::Socket::SSL', '1.56';
 requires 'IPC::Run3';
 requires 'JSON';

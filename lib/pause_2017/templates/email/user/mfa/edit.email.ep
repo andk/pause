@@ -1,0 +1,19 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+Record update in the PAUSE users database:
+
+<%== sprintf "%11s: [%s]", "userid", $pause->{HiddenUser}{userid} %>
+
+% if ($pause->{mfa_enabled}) {
+Multifactor Authentication is enabled.
+% } elsif ($pause->{mfa_disabled}) {
+Multifactor Authentication is disabled.
+% }
+
+Data were entered by <%== $pause->{User}{userid} %> (<%== $pause->{User}{fullname} %>).
+Please check if they are correct.
+
+Thanks,
+The PAUSE Team
