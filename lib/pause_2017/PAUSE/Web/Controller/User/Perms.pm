@@ -29,7 +29,7 @@ sub peek {
                           "co-maint",
                           primeur.userid
                    FROM perms LEFT JOIN users ON perms.userid=users.userid
-                              LEFT JOIN primeur ON perms.package=primeur.package
+                              LEFT JOIN primeur ON perms.lc_package=primeur.lc_package
                 },
                );
 
@@ -583,7 +583,7 @@ sub all_cmods {
   my(%all_mods);
   my $sth2 = $db->prepare(qq{SELECT perms.package, primeur.userid
                              FROM perms LEFT JOIN primeur
-                               ON perms.package = primeur.package
+                               ON perms.lc_package = primeur.lc_package
                              WHERE perms.userid=?});
   $sth2->execute($u->{userid});
   while (my($id, $owner) = $mgr->fetchrow($sth2, "fetchrow_array")) {
