@@ -27,14 +27,6 @@ sub new {
     bless { @_ }, ref($me) || $me;
 }
 
-# package PAUSE::pmfile;
-sub alert {
-    my $self = shift;
-    my $what = shift;
-    my $dio = $self->{DIO};
-    $dio->alert($what);
-}
-
 sub connect {
     my($self) = @_;
     my $dio = $self->{DIO};
@@ -55,58 +47,54 @@ sub mlroot {
 
 # package PAUSE::pmfile;
 sub filter_ppps {
-    my($self,@ppps) = @_;
+    my($self, @package_names) = @_;
     my @res;
 
-    # very similar code is in PAUSE::dist::filter_pms
-  MANI: for my $ppp ( @ppps ) {
-        if ($self->{META_CONTENT}){
-            my $no_index = $self->{META_CONTENT}{no_index}
-                            || $self->{META_CONTENT}{private}; # backward compat
-            if (ref($no_index) eq 'HASH') {
-                my %map = (
-                            package => qr{\z},
-                            namespace => qr{::},
-                          );
-                for my $k (qw(package namespace)) {
-                    next unless my $v = $no_index->{$k};
-                    my $rest = $map{$k};
-                    if (ref $v eq "ARRAY") {
-                        for my $ve (@$v) {
-                            $ve =~ s|::$||;
-                            if ($ppp =~ /^$ve$rest/){
-                                $Logger->log("no_index rule on $k $ve; skipping $ppp");
-                                next MANI;
-                            } else {
-                                $Logger->log_debug("no_index rule on $k $ve; NOT skipping $ppp");
-                            }
-                        }
-                    } else {
-                        $v =~ s|::$||;
-                        if ($ppp =~ /^$v$rest/){
-                            $Logger->log("no_index rule on $k $v; skipping $ppp");
-                            next MANI;
-                        } else {
-                            $Logger->log_debug("no_index rule on $k $v; NOT skipping $ppp");
-                        }
-                    }
-                }
-            } else {
-                $Logger->log_debug("no no_index or private in META_CONTENT");
-            }
-        } else {
-            # $Logger->log("no META_CONTENT"); # too noisy
-        }
-        push @res, $ppp;
+    # the name "private" is there for backwards compatibility
+    my $no_index = $self->{META_CONTENT} &&
+        ($self->{META_CONTENT}{no_index} || $self->{META_CONTENT}{private});
+
+    unless ($no_index && ref $no_index eq 'HASH') {
+        # There's no no_index directive, or it's bogus.  We'll keep every
+        # package!
+        return @package_names;
     }
 
-    @res;
+    # very similar code is in PAUSE::dist::filter_pms
+    PACKAGE: for my $pkg ( @package_names ) {
+        my %map = (
+          package   => qr{\z},
+          namespace => qr{::},
+        );
+
+        TYPE: for my $type (qw(package namespace)) {
+            next TYPE unless my $rules = $no_index->{$type};
+
+            my $rest = $map{$type};
+            $rules = [$rules] unless ref $rules;
+
+            for my $rule (@$rules) {
+                $rule =~ s|::$||;
+
+                if ($pkg =~ /^\Q$rule\E$rest/) {
+                    $Logger->log("no_index rule on $type $rule; skipping $pkg");
+                    next PACKAGE;
+                } else {
+                    $Logger->log_debug("no_index rule on $type $rule; NOT skipping $pkg");
+                }
+            }
+
+            push @res, $pkg;
+        }
+    }
+
+    return @res;
 }
 
 # package PAUSE::pmfile;
 sub examine_fio {
     # fio: file object
-    my $self = shift;
+    my ($self, $ctx) = @_;
 
     my $dist = $self->{DIO}{DIST};
     my $dbh = $self->connect;
@@ -117,7 +105,7 @@ sub examine_fio {
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
 
-    unless ($self->version_from_meta_ok) {
+    unless ($self->version_from_meta_ok($ctx)) {
         my $version;
         unless (eval { $version = $self->parse_version; 1 }) {
           my $error = $@;
@@ -148,50 +136,54 @@ sub examine_fio {
         }
     }
 
-    my($ppp) = $self->packages_per_pmfile;
-    my @keys_ppp = $self->filter_ppps(sort keys %$ppp);
+    my ($ppp) = $self->packages_per_pmfile($ctx);
+    my @package_names = $self->filter_ppps(sort keys %$ppp);
 
-    $Logger->log([ "will examine packages: %s", \@keys_ppp ]);
+    unless (@package_names) {
+        $Logger->log("no files left after filtering");
+        return;
+    }
+
+    $Logger->log([ "will examine packages: %s", \@package_names ]);
 
     #
     # Immediately after each package (pmfile) examined contact
     # the database
     #
 
-    my ($package);
-  DBPACK: foreach $package (@keys_ppp) {
-
+    my @packages;
+    for my $package_name (@package_names) {
         # What do we need? dio, fio, pmfile, time, dist, dbh, alert?
         my $pio = PAUSE::package->new(
-                      PACKAGE => $package,
-                      DIST => $dist,
-                      PP => $ppp->{$package}, # hash containing
-                                              # version
-                      PMFILE => $pmfile,
-                      FIO => $self,
-                      USERID => $self->{USERID},
-                      META_CONTENT => $self->{META_CONTENT},
-                      MAIN_PACKAGE => $self->{MAIN_PACKAGE},
-                  );
+            PACKAGE => $package_name,
+            DIST => $dist,
+            PP => $ppp->{$package_name},  # hash containing
+                                          # version
+            PMFILE => $pmfile,
+            FIO => $self,
+            USERID => $self->{USERID},
+            META_CONTENT => $self->{META_CONTENT},
+            MAIN_PACKAGE => $self->{MAIN_PACKAGE},
+        );
 
-        $pio->examine_pkg;
+        push @packages, $pio;
+    }
 
-    }                       # end foreach package
+    $self->{DIO}->index_packages($ctx, \@packages);
 
     delete $self->{DIO};    # circular reference
-
 }
 
 # package PAUSE::pmfile
 sub version_from_meta_ok {
-    my($self) = @_;
+    my ($self, $ctx) = @_;
     return $self->{VERSION_FROM_META_OK} if exists $self->{VERSION_FROM_META_OK};
-    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_meta_ok;
+    $self->{VERSION_FROM_META_OK} = $self->{DIO}->version_from_meta_ok($ctx);
 }
 
 # package PAUSE::pmfile;
 sub packages_per_pmfile {
-    my $self = shift;
+    my ($self, $ctx) = @_;
 
     my $ppp = {};
     my $pmfile = $self->{PMFILE};
@@ -292,7 +284,7 @@ sub packages_per_pmfile {
             $ppp->{$pkg}{infile} = $pmfile;
             if (PAUSE->basename_matches_package($pmfile,$pkg)) {
                 $ppp->{$pkg}{basename_matches_package} = $pmfile;
-                if ($self->version_from_meta_ok) {
+                if ($self->version_from_meta_ok($ctx)) {
                     my $provides = $self->{DIO}{META_CONTENT}{provides};
                     if (exists $provides->{$pkg}) {
                         if (defined $provides->{$pkg}{version}) {

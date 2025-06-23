@@ -187,14 +187,14 @@ subtest "warn when pkg and module match only case insensitively" => sub {
           sub {
             like(
               $_[0]{email}->get_body,
-              qr/Capitalization of package \(Fewer\)/,
+              qr/package: Fewer\s+WARNING: Capitalization of package/,
               "warning about Fewer v. fewer",
             );
           },
           sub {
             like(
               $_[0]{email}->get_body,
-              qr/Capitalization of package \(More\)/,
+              qr/package: More\s+WARNING: Capitalization of package/,
               "warning about More v. more",
             );
           },
@@ -321,7 +321,7 @@ subtest "check overlong versions" => sub {
   my $etoolong = sub {
     like(
       $_[0]{email}->object->body_str,
-      qr/Version string exceeds maximum allowed length/,
+      qr/version string was too long/,
       "email contains ELONGVERSION string",
     );
   };
@@ -547,7 +547,7 @@ subtest "do not index dists without META file" => sub {
   my $nometa = sub {
     like(
       $_[0]{email}->object->body_str,
-      qr/\QDistribution included neither META.json nor META.yml/,
+      qr/\Qno META.yml or META.json found/,
       "email contains ENOMETAFILE string",
     );
   };
@@ -562,7 +562,7 @@ subtest "do not index dists without META file" => sub {
   );
 };
 
-subtest "do not index dists without trial versions" => sub {
+subtest "do not index dists with trial versions" => sub {
   for my $test (
     { desc => "low line in version", munger => sub { $_[0] =~ s/22/2_2/r } },
     { desc => "TRIAL in version",    munger => sub { $_[0] =~ s/22/22-TRIAL/r } },
@@ -588,7 +588,7 @@ subtest "do not index dists without trial versions" => sub {
       $result->assert_index_not_updated;
 
       $result->logged_event_like(
-        qr{\Qdist is a developer release},
+        qr{\Qtrial-release version},
         "we do not index trial-like filenames",
       );
     };
@@ -670,6 +670,52 @@ subtest "the notorious version zero" => sub {
       is($dist->version, $test->{want}, "with the right version");
     };
   }
+};
+
+subtest "indexer ran, but nothing indexed" => sub {
+  # This is to test the weird _update_mail_content_when_nothing_was_indexed
+  # case in PAUSE::dist.
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  {
+    # If we want to upload an Empty-Dist-2.0 with no packages, we need the
+    # uploader to have permissions on Empty::Dist, so we will first upload
+    # Empty-Dist-1.0 with the expected package.
+    $pause->upload_author_fake(CBROWN => 'Empty-Dist-1.0.tar.gz');
+
+    my $result = $pause->test_reindex;
+  }
+
+  my $file = $pause->upload_author_fake(CBROWN => {
+    name      => 'Empty-Dist',
+    version   => '2.0',
+    meta_munger => sub {
+      my ($meta) = @_;
+      $meta->{provides} = {};
+      return $meta;
+    }
+  });
+
+  my $result = $pause->test_reindex;
+
+  # Nothing in this distro has been indexed, because according to META.yml
+  # this package does not provide any modules.
+  $result->email_ok(
+    [
+      {
+        subject  => 'Failed: PAUSE indexer report CBROWN/Empty-Dist-2.0.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->object->body_str,
+              qr/this distribution does not provide any packages/,
+              "email has the expected content",
+            );
+          },
+        ],
+      },
+    ],
+  );
 };
 
 done_testing;
