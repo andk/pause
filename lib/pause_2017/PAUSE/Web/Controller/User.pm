@@ -300,19 +300,18 @@ sub tail_logfile {
   my $pause = $c->stash(".pause");
   my $req = $c->req;
 
-  my $tail = $req->param("pause99_tail_logfile_1") || 5000;
-  my $file = $PAUSE::Config->{PAUSE_LOG};
-  if ($PAUSE::Config->{TESTHOST}) {
-    $file = "/usr/local/apache/logs/error_log"; # for testing
-  }
-  open my $fh, "<", $file or die "Could not open $file: $!";
-  seek $fh, -$tail, 2;
-  local($/);
-  $/ = "\n";
-  <$fh>;
-  $/ = undef;
+  my $lines = $req->param("pause99_tail_logfile_1") || 1000;
 
-  $pause->{tail} = <$fh>;
+  my @valid_options = qw(500 1000 10000 20000);
+  unless (grep {; $lines eq $_ } @valid_options) {
+    $lines = 500;
+  }
+
+  my $logs = readpipe("/usr/bin/journalctl --lines $lines --identifier paused");
+
+  $logs = qq{Error reading PAUSE daemon logs!\n} if $? != 0;
+
+  $pause->{tail} = $logs;
 }
 
 sub change_passwd {
