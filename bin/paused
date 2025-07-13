@@ -861,7 +861,7 @@ sub verify_gzip_tar {
 sub _rewrite_tarball {
     my($path) = @_;
     $path = File::Spec->rel2abs($path);
-    my $testdir = File::Temp::tempdir(
+    my $testdir = File::Temp->newdir(
                                       "paused_rewrite_XXXX",
                                       DIR => "/tmp",
                                       CLEANUP => 1,
