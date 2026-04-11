@@ -216,5 +216,6 @@ while (<DATA>) {
 #MHonArc,EHOOD,f,add
 #Module::CoreList,P5P,f,add
 #encoding::warnings,AUDREYT,f,delete
+#Tk::Contrib,HANJE,f,add
 __END__
-Tk::Contrib,HANJE,f,add
+File::Slurp::Remote,NHORNE,f,add
