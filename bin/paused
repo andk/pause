@@ -201,7 +201,7 @@ sub loop () { # we're NOT called as a method
 	      WHERE length(userid) > 1
                 AND ( dverified=''
                       OR
-                      dverified+0 > ?
+                      dverified > ?
                     ) }; #};
 
   $sth = $dbh->prepare($query);

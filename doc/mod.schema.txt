@@ -292,6 +292,7 @@ CREATE TABLE uris (
   is_perl6 tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (uriid),
   UNIQUE KEY useridbaseis_perl6 (userid,basename,is_perl6),
+  KEY dverified (dverified),
   KEY uri (uri)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
