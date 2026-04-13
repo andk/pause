@@ -276,6 +276,36 @@ subtest "check various forms of version" => sub {
   );
 };
 
+subtest "unquoted vstring version" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(RJBS => {
+    name      => 'Quod-Version',
+    version   => '8.67.53',
+    packages  => [
+      'Quod::Version'   => {
+        version => 'v8.67.53',
+        layout  => { version => 'our-literal' }
+      },
+    ]
+  });
+
+  my $result = $pause->test_reindex;
+
+  $pause->file_not_updated_ok(
+    $result->tmpdir
+           ->file(qw(cpan modules 02packages.details.txt.gz)),
+    "there were no things to update",
+  );
+
+  diag($_->{email}->as_string) for $result->deliveries;
+
+  $result->email_ok(
+    [
+      { subject => 'PAUSE indexer report Quod-Version-8.67.53.tar.gz' },
+    ],
+  );
+};
+
 subtest "version assigned to a blob as a ref" => sub {
   my $pause = PAUSE::TestPAUSE->init_new;
   $pause->upload_author_fake(LUNATIC => 'Globby-Version-1.234.tar.gz', {
