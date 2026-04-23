@@ -2,6 +2,7 @@ package PAUSE::Web::Controller::Public;
 
 use Mojo::Base "Mojolicious::Controller";
 use Time::Duration;
+use Crypt::URandom;
 
 sub mailpw {
   my $c = shift;
@@ -94,8 +95,7 @@ sub mailpw {
                         WHERE NOW() > expires};
       $authen_dbh->do($sql);
 
-      my $passwd = sprintf "%08x" x 4, rand(0xffffffff), rand(0xffffffff),
-          rand(0xffffffff), rand(0xffffffff);
+      my $passwd = unpack("H*", Crypt::URandom::urandom(16));
       # warn "pw[$passwd]";
       $pause->{passwd} = $passwd;
 

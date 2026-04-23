@@ -6,6 +6,7 @@ use HTTP::Tiny 0.059;
 use IO::Socket::SSL 1.56;
 use Net::SSLeay 1.49;
 use JSON::XS;
+use Crypt::URandom;
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -51,7 +52,7 @@ sub _set_onetime_password {
     my $pause = $c->stash('.pause');
     my $mgr = $c->app->pause;
 
-    my $onetime = sprintf "%08x", rand(0xffffffff);
+    my $onetime = unpack("H*", Crypt::URandom::urandom(4));
 
     my $sql = qq{INSERT INTO $PAUSE::Config->{AUTHEN_USER_TABLE} (
                     $PAUSE::Config->{AUTHEN_USER_FLD},
