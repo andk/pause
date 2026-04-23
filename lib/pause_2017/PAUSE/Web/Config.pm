@@ -111,6 +111,7 @@ our %Actions = (
     cat => "User/01Files/01up",
     desc => "This is the heart of the <b>Upload Server</b>, the page most heavily used on PAUSE.",
     method => 'POST',
+    x_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       CAN_MULTIPART => {form_type => "hidden_field"},
@@ -427,7 +428,7 @@ our %Actions = (
     cat => "User/06Account/02",
     desc => "Change your password any time you want.",
     method => 'POST',
-    x_csrf_protection => 1,
+    x_csrf_and_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       ABRA => {form_type => "hidden_field"},
@@ -443,7 +444,7 @@ our %Actions = (
     cat => "User/06Account/01",
     desc => "Edit your user name, your email addresses (both public and secret one), change the URL of your homepage.",
     method => 'POST',
-    x_csrf_protection => 1,
+    x_csrf_and_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       pause99_edit_cred_fullname => {form_type => "text_field"},
@@ -454,6 +455,21 @@ our %Actions = (
       pause99_edit_cred_cpan_mail_alias => {form_type => "radio_button"},
       pause99_edit_cred_ustatus => {form_type => "check_box"}, # to delete
       pause99_edit_cred_sub => {form_type => "submit_button"},
+    },
+  },
+  mfa => {
+    x_mojo_to => "user-mfa#edit",
+    verb => "Multifactor Auth",
+    priv => "user",
+    cat => "User/06Account/03",
+    desc => "Multifactor Authentication.",
+    method => 'POST',
+    x_csrf_protection => 1,
+    x_form => {
+      HIDDENNAME => {form_type => "hidden_field"},
+      pause99_mfa_code => {form_type => "text_field"},
+      pause99_mfa_reset => {form_type => "hidden_field"},
+      pause99_mfa_sub => {form_type => "submit_button"},
     },
   },
   pause_logout => {
@@ -493,6 +509,7 @@ our %Actions = (
     cat => "01usr/01add",
     desc => "Admins can add users or mailinglists.",
     method => 'POST',
+    x_mfa_protection => 1,
     x_form => {
       SUBMIT_pause99_add_user_Soundex => {form_type => "submit_button"},
       SUBMIT_pause99_add_user_Metaphone => {form_type => "submit_button"},
@@ -520,6 +537,7 @@ our %Actions = (
     cat => "01usr/02",
     desc => "Admins and mailing list representatives can change the name, address and description of a mailing list.",
     method => 'POST',
+    x_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "hidden_field"},
       pause99_edit_ml_3 => {form_type => "select_field"}, # mailing lists
@@ -558,6 +576,7 @@ our %Actions = (
     cat => "01usr/04",
     desc => "Admins can access PAUSE as-if they were somebody else. Here they select a user/action pair.",
     method => 'POST',
+    x_mfa_protection => 1,
     x_form => {
       HIDDENNAME => {form_type => "select_field"},
       ACTIONREQ => {form_type => "select_field"},
