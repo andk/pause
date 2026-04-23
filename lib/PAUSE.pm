@@ -16,6 +16,7 @@ use File::Basename ();
 use Compress::Zlib ();
 use Cwd ();
 use DBI ();
+use Email::Sender::Simple ();
 use Exporter;
 use Fcntl qw(:flock);
 my $HAVE_RECENTFILE = eval {require File::Rsync::Mirror::Recentfile; 1;};
@@ -559,16 +560,38 @@ sub may_overwrite_file {
   return;
 }
 
-package PAUSE::DBError;
+sub sendmail {
+  my ($self, $email) = @_;
 
-sub new {
-    my ($class, $msg) = @_;
-    return bless \$msg, $class;
+  if ($ENV{PAUSE_TEST_MAIL_MBOX}) {
+    # This is here for extra testing.  If you set this to a filename, every
+    # email will be written to this mbox.  Make sure it's an *absolute* path,
+    # because the tests change directory. -- rjbs, 2024-06-22
+
+    require Email::Sender::Transport::Mbox;
+    state $mbox = Email::Sender::Transport::Mbox->new({
+      filename => $ENV{PAUSE_TEST_MAIL_MBOX},
+    });
+
+    $mbox->send_email(Email::Abstract->new($email), {
+      from => 'test-system',
+      to   => 'test-system',
+    });
+  }
+
+  Email::Sender::Simple->send($email);
 }
 
-use overload (
-    '""' => sub { ${$_[0]} }
-);
+package PAUSE::DBError {
+  sub new {
+      my ($class, $msg) = @_;
+      return bless \$msg, $class;
+  }
+
+  use overload (
+      '""' => sub { ${$_[0]} }
+  );
+}
 
 1;
 
