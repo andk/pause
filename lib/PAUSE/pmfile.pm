@@ -260,7 +260,7 @@ sub packages_per_pmfile {
                       \b(?:$package_or_class)\s+
                       ([\w\:\']+)
                       \s*
-                      (?: $ | [\}\;] | \{ | \s+($version::STRICT) )
+                      (?: $ | [\}\;\:] | \{ | \s+($version::STRICT) )
                     }x) {
             $pkg = $1;
             $strict_version = $2;
@@ -390,7 +390,7 @@ sub packages_per_pmfile {
                 $package_or_class = 'package|class|role';
             }
 
-            if (my ($ver) = /^[\s\{;]*(?:$package_or_class) \s+ \S+ \s+ (\S+) \s* [;{]/x) {
+            if (my ($ver) = /^[\s\{;]*(?:$package_or_class) \s+ \S+ \s+ (\S+) \s* [:;{]/x) {
               # XXX: should handle this better if version is bogus -- rjbs,
               # 2014-03-16
               return $ver if version::is_lax($ver);
