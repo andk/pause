@@ -178,6 +178,17 @@ class Test::ClassBlock {
 EOT
         },
         {
+          file => "lib/Test/ClassBlockAttr.pm",
+          content => <<"EOT",
+use v5.37.9;
+$test->[1]
+use builtin qw( true false trim );
+ 
+class Test::ClassBlockAttr :isa(Test::ClassBlock) {
+}
+EOT
+        },
+        {
           file => "lib/Test/ClassVersion.pm",
           content => <<"EOT",
 use v5.37.9;
@@ -185,6 +196,16 @@ $test->[1]
 use builtin qw( true false trim );
  
 class Test::ClassVersion 0.01;
+EOT
+        },
+        {
+          file => "lib/Test/ClassVersionAttr.pm",
+          content => <<"EOT",
+use v5.37.9;
+$test->[1]
+use builtin qw( true false trim );
+ 
+class Test::ClassVersionAttr 0.01 :isa(Test::ClassVersion);
 EOT
         },
         {
@@ -206,6 +227,17 @@ $test->[1]
 use builtin qw( true false trim );
  
 class Test::ClassVersionBlock 0.03 {
+}
+EOT
+        },
+        {
+          file => "lib/Test/ClassVersionBlockAttr.pm",
+          content => <<"EOT",
+use v5.37.9;
+$test->[1]
+use builtin qw( true false trim );
+ 
+class Test::ClassVersionBlockAttr 0.04 :isa(Test::ClassVersionBlock) {
 }
 EOT
         },
@@ -292,33 +324,40 @@ EOT
     my $result = $pause->test_reindex;
 
     $result->package_list_ok([
-      { package => 'Test::Class',                version => 'undef'  },
-      { package => 'Test::ClassBlock',           version => 'undef'  },
-      { package => 'Test::ClassBlockOurVersion', version => '0.04'  },
-      { package => 'Test::ClassOurVersion',      version => '0.02'  },
-      { package => 'Test::ClassVersion',         version => '0.01'  },
-      { package => 'Test::ClassVersionBlock',    version => '0.03'  },
-      { package => 'Test::Role',                 version => 'undef'  },
-      { package => 'Test::RoleBlock',            version => 'undef'  },
-      { package => 'Test::RoleBlockOurVersion',  version => '0.04'  },
-      { package => 'Test::RoleOurVersion',       version => '0.02'  },
-      { package => 'Test::RoleVersion',          version => '0.01'  },
-      { package => 'Test::RoleVersionBlock',     version => '0.03'  },
+      { package => 'Test::Class',                 version => 'undef'  },
+      { package => 'Test::ClassBlock',            version => 'undef'  },
+      { package => 'Test::ClassBlockAttr',        version => 'undef'  },
+      { package => 'Test::ClassBlockOurVersion',  version => '0.04'  },
+      { package => 'Test::ClassOurVersion',       version => '0.02'  },
+      { package => 'Test::ClassVersion',          version => '0.01'  },
+      { package => 'Test::ClassVersionAttr',      version => '0.01'  },
+      { package => 'Test::ClassVersionBlock',     version => '0.03'  },
+      { package => 'Test::ClassVersionBlockAttr', version => '0.04'  },
+      { package => 'Test::Role',                  version => 'undef'  },
+      { package => 'Test::RoleBlock',             version => 'undef'  },
+      { package => 'Test::RoleBlockOurVersion',   version => '0.04'  },
+      { package => 'Test::RoleOurVersion',        version => '0.02'  },
+      { package => 'Test::RoleVersion',           version => '0.01'  },
+      { package => 'Test::RoleVersionBlock',      version => '0.03'  },
     ]);
 
     $result->perm_list_ok({
-      'Test::Class'                => { f => 'SOMEONE' },
-      'Test::ClassBlock'           => { f => 'SOMEONE' },
-      'Test::ClassVersion'         => { f => 'SOMEONE' },
-      'Test::ClassOurVersion'      => { f => 'SOMEONE' },
-      'Test::ClassVersionBlock'    => { f => 'SOMEONE' },
-      'Test::ClassBlockOurVersion' => { f => 'SOMEONE' },
-      'Test::Role'                 => { f => 'SOMEONE' },
-      'Test::RoleBlock'            => { f => 'SOMEONE' },
-      'Test::RoleVersion'          => { f => 'SOMEONE' },
-      'Test::RoleOurVersion'       => { f => 'SOMEONE' },
-      'Test::RoleVersionBlock'     => { f => 'SOMEONE' },
-      'Test::RoleBlockOurVersion'  => { f => 'SOMEONE' },
+      'Test::Class'                 => { f => 'SOMEONE' },
+      'Test::ClassBlock'            => { f => 'SOMEONE' },
+      'Test::ClassBlockAttr'        => { f => 'SOMEONE' },
+      'Test::ClassVersion'          => { f => 'SOMEONE' },
+      'Test::ClassVersionAttr'      => { f => 'SOMEONE' },
+      'Test::ClassOurVersion'       => { f => 'SOMEONE' },
+      'Test::ClassOurVersion'       => { f => 'SOMEONE' },
+      'Test::ClassVersionBlock'     => { f => 'SOMEONE' },
+      'Test::ClassVersionBlockAttr' => { f => 'SOMEONE' },
+      'Test::ClassBlockOurVersion'  => { f => 'SOMEONE' },
+      'Test::Role'                  => { f => 'SOMEONE' },
+      'Test::RoleBlock'             => { f => 'SOMEONE' },
+      'Test::RoleVersion'           => { f => 'SOMEONE' },
+      'Test::RoleOurVersion'        => { f => 'SOMEONE' },
+      'Test::RoleVersionBlock'      => { f => 'SOMEONE' },
+      'Test::RoleBlockOurVersion'   => { f => 'SOMEONE' },
     });
   };
 }
