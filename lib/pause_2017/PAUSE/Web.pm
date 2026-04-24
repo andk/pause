@@ -2,7 +2,6 @@ package PAUSE::Web;
 
 use Mojo::Base "Mojolicious";
 use MojoX::Log::Dispatch::Simple;
-use Digest::SHA1 qw/sha1_hex/;
 
 has pause => sub { Carp::confess "requires PAUSE::Web::Context" };
 
@@ -23,7 +22,7 @@ sub startup {
   $app->hook(around_dispatch => \&_log);
 
   # Set random secrets to keep mojo session secure
-  $app->secrets([sha1_hex($$.time)]);
+  $app->secrets($app->pause->secrets);
 
   # Fix template path for now
   unshift @{$app->renderer->paths}, $app->home->rel_file("lib/pause_2017/templates");
