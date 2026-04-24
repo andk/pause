@@ -1019,10 +1019,16 @@ sub extract_readme_and_meta {
     for (1..$#readme) {
       $readme = $readme[$_] if length($readme[$_]) < length($readme);
     }
-    $self->{README} = $readme;
-    File::Copy::copy $readme, "$MLROOT/$sans.readme";
-    utime((stat $readme)[8,9], "$MLROOT/$sans.readme");
-    PAUSE::newfile_hook("$MLROOT/$sans.readme");
+    if (-l $readme) {
+      my $err = "found README but it was a symlink, ignoring";
+      $self->{README} = $err;
+      $Logger->log($err);
+    } else {
+      $self->{README} = $readme;
+      File::Copy::copy $readme, "$MLROOT/$sans.readme";
+      utime((stat $readme)[8,9], "$MLROOT/$sans.readme");
+      PAUSE::newfile_hook("$MLROOT/$sans.readme");
+    }
   } else {
     $self->{README} = "No README found";
     $Logger->log("no README found");
@@ -1054,7 +1060,11 @@ sub extract_readme_and_meta {
   }
 
   for my $metafile ($json || $yaml) {
-    if (-s $metafile) {
+    if (-l $metafile) {
+      my $err = "found $metafile but it was a symlink, ignoring";
+      $self->{METAFILE} = $err;
+      $Logger->log($err);
+    } elsif (-s $metafile) {
       $self->{METAFILE} = $metafile;
       if ($self->perl_major_version == 6) {
         $self->write_updated_meta6_json($metafile, $MLROOT, $dist, $sans);
