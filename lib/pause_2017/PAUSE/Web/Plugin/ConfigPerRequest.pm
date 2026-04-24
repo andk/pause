@@ -5,6 +5,7 @@ package PAUSE::Web::Plugin::ConfigPerRequest;
 
 use Mojo::Base "Mojolicious::Plugin";
 use Sys::Hostname;
+use Mojo::Util qw(secure_compare);
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -210,11 +211,13 @@ sub _set_allowed_actions {
     my $sql = sprintf qq{DELETE FROM abrakadabra
                          WHERE NOW() > expires };
     $dbh->do($sql);
-    $sql = qq{SELECT *
+    $sql = qq{SELECT chpasswd
               FROM abrakadabra
-              WHERE user=? AND chpasswd=?};
+              WHERE user=?};
     my $sth = $dbh->prepare($sql);
-    if ( $sth->execute($user, $passwd) and $sth->rows ) {
+    $sth->execute($user);
+    my ($chpasswd) = $sth->fetchrow_array();
+    if (defined $chpasswd and secure_compare($chpasswd, $passwd)) {
       # TUT: in the keys of %allow_action we store the methods that are
       # allowed in this request. @allow_submit does something similar.
       $allow_action{"change_passwd"} = undef;
