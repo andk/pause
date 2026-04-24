@@ -8,13 +8,12 @@ use Sys::Hostname ();
 use Email::Sender::Simple;
 use Email::MIME;
 use Data::Dumper;
-use PAUSE::Web::Config;
 use PAUSE::Web::Exception;
 
 our $VERSION = "1072";
 
 has root => sub { Carp::confess "requires root" };
-has config => sub { PAUSE::Web::Config->new };
+has config => sub { require PAUSE::Web::Config; PAUSE::Web::Config->new };
 has logger => sub { Log::Dispatch::Config->instance };
 has mailer => sub { Email::Sender::Simple->new };
 
