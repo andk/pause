@@ -52,7 +52,6 @@ WriteMakefile(
         LWP::UserAgent
         LWP::Protocol::https
         Digest::SHA
-        Mail::Mailer
         Module::Faker::Dist
         Module::Signature
         Moo
