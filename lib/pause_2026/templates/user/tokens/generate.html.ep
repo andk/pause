@@ -1,0 +1,62 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $cpan_alias = lc($pause->{HiddenUser}{userid}) . '@cpan.org';
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+<h3>Generate a new token for <%= $pause->{HiddenUser}{userid} %>
+% if (exists $pause->{UserGroups}{admin}) {
+ (lastvisit <%= $pause->{HiddenUser}{lastvisit} || "before 2005-12-02" %>)
+% }
+</h3>
+
+% if (my $new_token = flash('new_token')) {
+<div>
+The generated token is <code><%= $new_token %></code>. This will never be shown again, so save it in a safe place.
+</div>
+% } else {
+
+%   if (my $error = $pause->{error}) {
+<div class="messagebox error">
+Token generation failed due to an error:
+%     if ($error->{ip_ranges_error}) {
+invalid IP ranges: <%= $error->{ip_ranges_error} %>
+%     } elsif ($error->{generation_failed}) {
+insertion failure (because of token duplication or other database error)
+%     }
+</div>
+%   }
+
+<br>
+<p>All fields are optional.</p>
+<table cellspacing="2" cellpadding="8">
+% my $alter = 0;
+<tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">Token description</h4>
+<p class="explain">
+</p>
+<%= text_field "new_token_description",
+    size => 50,
+    maxlength => 127, # caution!
+%>
+</td></tr>
+
+<tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">Token expires in</h4>
+<p class="explain">
+</p>
+<%= text_field "new_token_expires_in",
+    size => 3,
+    maxlength => 3,
+%> days (default: 180)
+</td></tr>
+
+<tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">IP Ranges</h4>
+<%= text_area "new_token_ip_ranges",
+    rows => 5,
+%>
+</td></tr>
+
+</table>
+%= csrf_field
+<input type="submit" name="new_token_sub" value="Submit">
+
+% }

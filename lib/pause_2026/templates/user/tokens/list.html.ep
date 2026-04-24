@@ -1,0 +1,46 @@
+% layout 'layout';
+% my $pause  = stash(".pause") || {};
+% my $tokens = $pause->{tokens} || [];
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+<h3>Tokens for <%= $pause->{HiddenUser}{userid} %></h3>
+
+% if (@$tokens) {
+<div id="tokens">
+<p><input type="submit" name="revoke_tokens_sub" value="Revoke"> <input class="search" placeholder="Filter"></p>
+<table class="table compact">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="sort" data-sort="token_id">Token ID</th>
+      <th class="sort" data-sort="description">Description</th>
+      <th class="sort" data-sort="expires_at">Expires at</th>
+    </tr>
+  </thead>
+  <tbody class="list">
+% for my $token (@$tokens) {
+    <tr>
+      <td class="checkbox"><%= check_box "revoke_tokens" => $token->{id} %></td>
+      <td class="token_id"><%= $token->{token_id} %></td>
+      <td class="description"><%= $token->{description} %></td>
+      <td class="expires_at"><%= $token->{expires_at} %></td>
+    </tr>
+% }
+  </tbody>
+</table>
+
+<p><input type="submit" name="revoke_tokens_sub" value="Revoke"></p>
+</div>
+%= csrf_field
+% content_for javascript => begin
+%= javascript "/list.min.js"
+%= javascript begin
+var List = new List('files', {
+  valueNames: ['token', 'description', 'expires_at']
+});
+% end
+% end
+
+% } else {
+No tokens for <%= $pause->{HiddenUser}{userid} %>
+% }
