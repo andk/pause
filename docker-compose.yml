@@ -1,0 +1,67 @@
+services:
+  pause: &pause
+    build:
+      context: ./
+      dockerfile: Containerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - ./docker-compose/PrivatePAUSE.pm:/home/pause/privatelib/PrivatePAUSE.pm
+      - ./docker-compose/tmp:/pause-run/tmp
+      - ./lib:/home/pause/lib
+      - ./bin:/home/pause/bin
+      - pause_run:/pause-run
+      - pause_data:/data
+    environment:
+      PAUSE_DEV_ROOT: /home/pause
+      PAUSE_DEV_EMAIL: pause@localhost.localdomain
+      PAUSE_DEV_DBUSER: pause
+      PAUSE_DEV_DBPASS: test
+      EMAIL_SENDER_TRANSPORT: SMTP
+      EMAIL_SENDER_TRANSPORT_host: mail
+      EMAIL_SENDER_TRANSPORT_port: 1025
+    depends_on:
+      - mysql
+      - mail
+    command: plackup -p 5000 -R /home/pause/lib/pause_2017 app_2017.psgi
+  paused:
+    <<: *pause
+    ports: []
+    command: bin/paused --pidfile /pause-run/pid/paused.pid
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - ./doc/mod.schema.txt:/docker-entrypoint-initdb.d/01_mod.schema.sql
+      - ./doc/authen_pause.schema.txt:/docker-entrypoint-initdb.d/02_authen_pause.schema.sql
+      - ./docker-compose/mysql/03_fixtures.sql:/docker-entrypoint-initdb.d/03_fixtures.sql
+      - mysql_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_USER: pause
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: pause
+    expose:
+      - 3306
+  mail:
+    image: axllent/mailpit
+    ports:
+      - 1025:1025
+      - 8025:8025
+    environment:
+      MP_MAX_MESSAGES: 100
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+  nginx:
+    image: nginx:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - pause
+    volumes:
+      - ./htdocs:/var/www/html/
+      - ./docker-compose/nginx/default.conf:/etc/nginx/conf.d/default.conf
+volumes:
+  mysql_db:
+  pause_run:
+  pause_data:
