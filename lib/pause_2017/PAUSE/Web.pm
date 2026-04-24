@@ -25,10 +25,12 @@ sub startup {
   $app->secrets($app->pause->secrets);
 
   # Fix template path for now
-  unshift @{$app->renderer->paths}, $app->home->rel_file("lib/pause_2017/templates");
+  unshift @{$app->renderer->paths}, map { $app->home->rel_file($_) } @{ $app->pause->template_paths };
 
   # Fix static path
   unshift @{$app->static->paths}, $app->home->rel_file("htdocs");
+
+  $app->routes->namespaces($app->pause->controller_namespaces);
 
   # Load plugins to modify path/set stash values/provide helper methods
   $app->plugin("WithCSRFProtection");

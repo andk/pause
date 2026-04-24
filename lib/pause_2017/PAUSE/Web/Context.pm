@@ -18,6 +18,8 @@ has root => sub { Carp::confess "requires root" };
 has config => sub { require PAUSE::Web::Config; PAUSE::Web::Config->new };
 has logger => sub { Log::Dispatch::Config->instance };
 has mailer => sub { Email::Sender::Simple->new };
+has template_paths => sub { [ "lib/pause_2017/templates" ] };
+has controller_namespaces => sub { [ "PAUSE::Web::Controller" ] };
 
 sub init {
   my $self = shift;
