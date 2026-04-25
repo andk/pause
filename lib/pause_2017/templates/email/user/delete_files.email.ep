@@ -14,7 +14,7 @@ cronjob. Until then you can undelete them via
 
 %= text_format begin
 Note: to encourage deletions, all of past CPAN
-glory is collected on http://history.perl.org/backpan/
+glory is collected on https://backpan.perl.org/
 % end
 
 The PAUSE Team
