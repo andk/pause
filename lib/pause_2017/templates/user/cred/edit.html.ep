@@ -16,14 +16,6 @@
 <b>ERROR</b>:
 %     if ($error->{no_email}) {
 Both of your email fields are left blank, this is not the way it is intended on PAUSE, PAUSE must be able to contact you. Please fill out at least one of the two email fields.
-%     } elsif ($error->{no_public_email}) {
-You chose your email alias on CPAN to point to your public email address but your public email address is left blank. Please either pick a different choice for the alias or fill in a public email address.
-%     } elsif ($error->{public_is_cpan_alias}) {
-You chose your email alias on CPAN to point to your public email address but your public email address field contains <%= $cpan_alias %>. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable public email address.
-%     } elsif ($error->{no_secret_email}) {
-You chose your email alias on CPAN to point to your secret email address but your secret email address is left blank. Please either pick a different choice for the alias or fill in a secret email address.
-%     } elsif ($error->{secret_is_cpan_alias}) {
-You chose your email alias on CPAN to point to your secret email address but your secret email address field contains <%= $cpan_alias %>. This looks like a circular reference. Please either pick a different choice for the alias or fill in a more reasonable secret email address.
 %     } elsif ($error->{invalid_secret}) {
 Your secret email address doesn't look like valid email address.
 %     } elsif ($error->{invalid_public}) {
@@ -108,25 +100,17 @@ for communicating with you.
 %>
 </td></tr>
 
-<tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">The email address <i><%= $cpan_alias %></i> should be configured to forward mail to ...</h4>
+<tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">Security Notice</h4>
 <p class="explain">
-<b>cpan.org</b> has a mail
-address for you and it's your choice if you want it to point to your
-public email address or to your secret one. Please allow a few hours
-for any change you make to this setting for propagation. BTW, let us
-reassure you that cpan.org gets the data through a secure
-channel.<br><br><b>Note:</b> you can disable redirect by clicking
-<i>neither nor</i> or by using an invalid email address in the
-according field above, but this will prevent you from recieving
-emails from services like rt.cpan.org.
+Contact information will be shared with the CPAN security team (<a href="https://security.cpan.org/">security.cpan.org</a>).
 </p>
-<%= radio_button "pause99_edit_cred_cpan_mail_alias" => "publ" %>
-my public email address<br>
-<%= radio_button "pause99_edit_cred_cpan_mail_alias" => "secr" %>
-my secret email address<br>
-<%= radio_button "pause99_edit_cred_cpan_mail_alias" => "none",
-    checked => "checked",
-%> neither nor<br>
+</td></tr>
+
+<tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">cpan.org email forwarding</h4>
+<p class="explain">
+cpan.org email forwarding has been shut down.
+See <a href="https://log.perl.org/2026/04/cpanorg-email-forwarding-has-been-shut.html">this blog post</a> for more information.
+</p>
 </td></tr>
 
 % if ($pause->{HiddenUser}{ustatus} ne "active") {

@@ -14,9 +14,9 @@ sub edit {
   $u = $c->active_user_record;
 
   # @allmeta *must* be the union of meta and secmeta
-  my @meta = qw( fullname asciiname email homepage cpan_mail_alias ustatus);
+  my @meta = qw( fullname asciiname email homepage ustatus);
   my @secmeta = qw(secretemail);
-  my @allmeta = qw( fullname asciiname email secretemail homepage cpan_mail_alias ustatus);
+  my @allmeta = qw( fullname asciiname email secretemail homepage ustatus);
 
   my $cpan_alias = lc($u->{userid}) . '@cpan.org';
 
@@ -26,18 +26,9 @@ sub edit {
   if (uc $req->method eq 'POST' and $req->param("pause99_edit_cred_sub")) {
     my $wantemail = $req->param("pause99_edit_cred_email");
     my $wantsecretemail = $req->param("pause99_edit_cred_secretemail");
-    my $wantalias = $req->param("pause99_edit_cred_cpan_mail_alias");
     my $addr_spec = $Email::Address::addr_spec;
     if ($wantemail=~/^\s*$/ && $wantsecretemail=~/^\s*$/) {
       $pause->{error}{no_email} = 1;
-    } elsif ($wantalias eq "publ" && $wantemail=~/^\s*$/) {
-      $pause->{error}{no_public_email} = 1;
-    } elsif ($wantalias eq "publ" && $wantemail=~/\Q$cpan_alias\E/i) {
-      $pause->{error}{public_is_cpan_alias} = 1;
-    } elsif ($wantalias eq "secr" && $wantsecretemail=~/^\s*$/) {
-      $pause->{error}{no_secret_email} = 1;
-    } elsif ($wantalias eq "secr" && $wantsecretemail=~/\Q$cpan_alias\E/i) {
-      $pause->{error}{secret_is_cpan_alias} = 1;
     } elsif (defined $wantsecretemail && $wantsecretemail!~/^\s*$/ && $wantsecretemail!~/^\s*$addr_spec\s*$/) {
       $pause->{error}{invalid_secret} = 1;
     } elsif (defined $wantemail && $wantemail!~/^\s*$/ && $wantemail!~/^\s*$addr_spec\s*$/ && $wantemail ne 'CENSORED') {

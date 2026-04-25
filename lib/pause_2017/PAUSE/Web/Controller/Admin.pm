@@ -14,35 +14,22 @@ sub email_for_admin {
     my $dbm = $mgr->connect;
     my $sth1 = $dbm->prepare(qq{SELECT userid, email
                                 FROM   users
-                                WHERE  isa_list = ''
-                                  AND  (
-                                        cpan_mail_alias='publ'
-                                        OR
-                                        cpan_mail_alias='secr'
-                                       )});
+                                WHERE  isa_list = ''});
     $sth1->execute;
     while (my($id,$mail) = $sth1->fetchrow_array) {
-      $ALL{$id} = $mail; # we store public email even for those who want
-                         # secret, because we never know if we will find a
-                         # secret one
+      $ALL{$id} = $mail; # store public email as baseline
     }
     $sth1->finish;
-    my $sth2 = $dbm->prepare(qq{SELECT userid
-                                FROM   users
-                                WHERE  cpan_mail_alias='secr'
-                                  AND  isa_list = ''});
+
+    my $sth2 = $dba->prepare(qq{SELECT user, secretemail
+                                FROM   usertable});
     $sth2->execute;
-    my $sth3 = $dba->prepare(qq{SELECT secretemail
-                                FROM   usertable
-                                WHERE  user=?});
-    while (my($id) = $sth2->fetchrow_array) {
-      $sth3->execute($id);
-      next unless $sth3->rows;
-      my($mail) = $sth3->fetchrow_array or next;
-      $ALL{$id} = $mail;
+    while (my($id,$mail) = $sth2->fetchrow_array) {
+      if (exists $ALL{$id} && defined $mail && $mail ne '') {
+        $ALL{$id} = $mail; # override with secret email if available
+      }
     }
     $sth2->finish;
-    $sth3->finish;
   };
   my $output_format = $req->param("OF");
   if ($output_format){

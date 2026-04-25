@@ -451,7 +451,6 @@ our %Actions = (
       pause99_edit_cred_email => {form_type => "text_field"},
       pause99_edit_cred_secretemail => {form_type => "text_field"},
       pause99_edit_cred_homepage => {form_type => "text_field"},
-      pause99_edit_cred_cpan_mail_alias => {form_type => "radio_button"},
       pause99_edit_cred_ustatus => {form_type => "check_box"}, # to delete
       pause99_edit_cred_sub => {form_type => "submit_button"},
     },

@@ -9,7 +9,7 @@
   <thead>
     <tr>
       <th class="sort asc" data-sort="userid">id</th>
-      <th class="sort" data-sort="email"><i>id</i>@cpan.org gets forwarded to</th>
+      <th class="sort" data-sort="email">Contact Email</th>
     </tr>
   </thead>
   <tbody class="list">

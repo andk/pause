@@ -23,6 +23,7 @@ Note: You can enter fairly free-form text here but it must consist of at least t
 <p>
 <%= text_field "pause99_request_id_email", size => 32 %>
 </p>
+<p><small>Note that contact information will be shared with the CPAN security team (<a href="https://security.cpan.org/">security.cpan.org</a>).</small></p>
 </div>
 
 <div class="alternate<%= $alt++ % 2 + 1 %>">
