@@ -65,7 +65,7 @@ sub refused_index_test {
 
     $result->package_list_ok($arg->{want_package_list});
 
-    my $file = $pause->tmpdir->subdir(qw(cpan modules))->file('06perms.txt');
+    my $file = $pause->tmpdir->child(qw(cpan modules 06perms.txt));
   };
 };
 
@@ -452,10 +452,10 @@ subtest "sort of case-conflicted packages is stable" => sub {
   $dbh->do("INSERT INTO distmtimes ('dist','distmtime') VALUES ('O/OP/OPRIME/Bug-Gold-1.001.tar.gz','$now')");
 
   for my $fn (qw(Bug-gold-0.001.tar.gz Bug-Gold-1.001.tar.gz)) {
-    my $dir = $pause->tmpdir->subdir( qw(cpan authors id O OP OPRIME) );
+    my $dir = $pause->tmpdir->child( qw(cpan authors id O OP OPRIME) );
     $dir->mkpath;
 
-    open my $fh, ">", $dir->file($fn) or die "Could not open: $!";
+    open my $fh, ">", $dir->child($fn) or die "Could not open: $!";
     print $fh qq<fake tarball>;
     close $fh or die "Could not close: $!";
   }

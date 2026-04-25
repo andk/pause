@@ -13,7 +13,7 @@ use File::Path qw(make_path);
 use File::pushd;
 use File::Temp ();
 use File::Which;
-use Path::Class;
+use Path::Tiny;
 use Process::Status;
 
 # This one, we don't expect to be used.  In a weird world, we'd mark it fatal
@@ -36,12 +36,12 @@ sub init_new {
   my ($class, @arg) = @_;
   my $self = $class->new(@arg);
 
-  my $authors_dir = $self->tmpdir->subdir(qw(cpan authors id));
+  my $authors_dir = $self->tmpdir->child(qw(cpan authors id));
   make_path $authors_dir->stringify;
 
-  my $modules_dir = $self->tmpdir->subdir(qw(cpan modules));
+  my $modules_dir = $self->tmpdir->child(qw(cpan modules));
   make_path $modules_dir->stringify;
-  my $index_06 = $modules_dir->file(qw(06perms.txt.gz));
+  my $index_06 = $modules_dir->child(qw(06perms.txt.gz));
 
   {
     File::Copy::copy('corpus/empty.txt.gz', $index_06->stringify)
@@ -78,7 +78,7 @@ has _tmpdir_obj => (
 has tmpdir => (
   is      => 'ro',
   lazy    => 1,
-  default => sub { dir($_[0]->_tmpdir_obj) },
+  default => sub { path($_[0]->_tmpdir_obj) },
 );
 
 has email_sender_transport => (
@@ -381,15 +381,9 @@ sub test_reindex {
         for @{ $arg->{pick} };
     }
 
-    my sub filestate ($file) {
-      return ';;' unless -e $file;
-      my @stat = stat $file;
-      return join q{;}, @stat[0,1,7]; # dev, ino, size
-    }
+    my $package_file = $self->tmpdir->child(qw(cpan modules 02packages.details.txt.gz));
 
-    my $package_file = $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz));
-
-    my $old_package_state = filestate($package_file);
+    my $old_package_state = -f $package_file ? $package_file->digest : '';
 
     PAUSE::mldistwatch->new({
       sleep => 0,
@@ -407,7 +401,7 @@ sub test_reindex {
 
     Email::Sender::Simple->default_transport->clear_deliveries;
 
-    my $new_package_state = filestate($package_file);
+    my $new_package_state = -f $package_file ? $package_file->digest : '';
 
     return PAUSE::TestPAUSE::Result->new({
       tmpdir => $self->tmpdir,

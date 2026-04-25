@@ -52,12 +52,12 @@ sub connect_mod_db {
 sub packages_data {
   my ($self) = @_;
 
-  unless (-e $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz))) {
+  unless (-e $self->tmpdir->child(qw(cpan modules 02packages.details.txt.gz))) {
     return Parse::CPAN::Packages->new("Description:");
   }
 
   return Parse::CPAN::Packages->new(
-    q{} . $self->tmpdir->file(qw(cpan modules 02packages.details.txt.gz)),
+    q{} . $self->tmpdir->child(qw(cpan modules 02packages.details.txt.gz)),
   );
 }
 
@@ -110,8 +110,7 @@ sub perm_list_ok {
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-  my $index_06 = $self->tmpdir->subdir(qw(cpan modules))
-                 ->file(qw(06perms.txt.gz));
+  my $index_06 = $self->tmpdir->child(qw(cpan modules 06perms.txt.gz));
 
   our $GZIP = $PAUSE::Config->{GZIP_PATH};
   open my $fh, "-|", "$GZIP --stdout --uncompress $index_06"

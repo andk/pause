@@ -54,8 +54,8 @@ subtest "first indexing" => sub {
 
   subtest "meagre git tests" => sub {
     ok(
-      -e $result->tmpdir->file('git/.git/refs/heads/master')
-        || -e $result->tmpdir->file('git/.git/refs/heads/main'),
+      -e $result->tmpdir->child('git/.git/refs/heads/master')
+        || -e $result->tmpdir->child('git/.git/refs/heads/main'),
       "we now have a master or main commit",
     );
   };
