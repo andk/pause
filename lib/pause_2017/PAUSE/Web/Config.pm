@@ -93,6 +93,11 @@ our %Actions = (
     cat => "02serv/05",
     desc => "A list, also available as YAML",
   },
+  who_pumpkin => {
+    x_mojo_to => "public#pumpkin",
+    priv => "public",
+    display => 0,
+  },
   who_admin => {
     x_mojo_to => "public#admin",
     verb => "List of admins",

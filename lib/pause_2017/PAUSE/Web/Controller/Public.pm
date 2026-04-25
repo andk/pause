@@ -168,6 +168,13 @@ sub privacy_policy {
   $c->serve_pause_doc("doc/privacy-policy.md")
 }
 
+sub pumpkin {
+  my $c = shift;
+  my $pause = $c->stash(".pause");
+  local $pause->{Action} = 'perl_releasers';
+  $c->redirect_to($c->my_url);
+}
+
 sub perl_releasers {
   my $c = shift;
   my $pause = $c->stash(".pause");
