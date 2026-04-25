@@ -86,9 +86,9 @@ our %Actions = (
     desc => "Your rights as a user of PAUSE",
     has_title => 1,
   },
-  who_pumpkin => {
-    x_mojo_to => "public#pumpkin",
-    verb => "List of pumpkins",
+  perl_releasers => {
+    x_mojo_to => "public#perl_releasers",
+    verb => "Approved Perl releasers",
     priv => "public",
     cat => "02serv/05",
     desc => "A list, also available as YAML",

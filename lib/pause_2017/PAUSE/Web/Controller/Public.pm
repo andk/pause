@@ -168,7 +168,7 @@ sub privacy_policy {
   $c->serve_pause_doc("doc/privacy-policy.md")
 }
 
-sub pumpkin {
+sub perl_releasers {
   my $c = shift;
   my $pause = $c->stash(".pause");
   my $mgr = $c->app->pause;
@@ -191,7 +191,7 @@ sub pumpkin {
       die "not supported OF=$output_format"
     }
   }
-  $pause->{pumpkins} = \@hres;
+  $pause->{perl_releasers} = \@hres;
 }
 
 sub admin {

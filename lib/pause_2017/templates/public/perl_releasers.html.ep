@@ -1,0 +1,7 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<p>Approved Perl releasers: <%= join ", ", @{$pause->{perl_releasers} || []} %></p>
+<p><a href="<%= my_url->query(ACTION => "perl_releasers", OF => "YAML") %>" style="text-decoration: none;">
+<span class="orange_button">YAML</span>
+</a></p>
