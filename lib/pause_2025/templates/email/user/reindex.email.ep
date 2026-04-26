@@ -1,0 +1,15 @@
+% my $pause = stash(".pause") || {};
+%
+%#------------------------------------------------------------------
+%
+According to a request entered by <%== $pause->{User}{fullname} %> the
+following files have been scheduled for reindexing.
+
+<%== $pause->{blurb} %>
+
+Estimated time of job completion: <%== $pause->{eta} %>
+
+Thanks,
+--
+The PAUSE Team
+

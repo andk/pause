@@ -1,0 +1,5 @@
+% layouts 'layout', title => "Closed for Maintenance";
+% my $pause = stash(".pause") || {};
+
+<h2>Dear visitor,</h2>
+%== $pause->{message};

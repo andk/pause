@@ -1,0 +1,24 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+% my $mgr = $c->app->pause;
+
+% if (!$pause->{mfa}) {
+<p>PAUSE ID: <%= text_field "pause_id", size => 15, maxlength => 9 =%></p>
+<p>Password: <%= password_field "password", size => 15 =%></p>
+<p><input type="submit" name="SUBMIT" value="Login"></p>
+% } else {
+<p>Authentication code</p>
+%= text_field 'otp', autocomplete => 'off';
+
+% for my $name (@{ $c->req->params->names }) {
+  % for my $value (@{ $c->req->every_param($name) }) {
+    % next if $name eq 'ACTION';
+    % next if $name eq 'otp';
+    %= hidden_field $name => $value;
+  % }
+% }
+
+%= submit_button 'verify';
+% }
+%= csrf_field
+

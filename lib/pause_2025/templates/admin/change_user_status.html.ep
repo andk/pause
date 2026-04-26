@@ -1,0 +1,19 @@
+% layout 'layout';
+% my $pause = stash(".pause") || {};
+
+<input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
+
+% if ($pause->{user_not_found}) {
+<div class="messagebox error">
+<p>User <%= $pause->{user} %> is not found.</p>
+</div>
+% } elsif ($pause->{changed}) {
+<div class="messagebox info">
+<p><%= $pause->{user} %>'s status has changed from <%= $pause->{ustatus} %> to <%= $pause->{new_ustatus} %>.</p>
+</div>
+% }
+
+%= csrf_field
+%= text_field "pause99_change_user_status_user" => $pause->{user};
+%= select_field "pause99_change_user_status_new_ustatus" => ['nologin', 'active'];
+%= submit_button "Change", name => "pause99_change_user_status_sub";

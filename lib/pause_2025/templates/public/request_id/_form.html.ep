@@ -1,0 +1,63 @@
+% my $pause = stash(".pause") || {};
+% my $alt = 0;
+
+<p>A PAUSE account is only required to distribute and manage Perl module
+distributions on CPAN. You do not need a PAUSE account to submit
+bug reports to <a href="http://rt.cpan.org/">RT</a> or participate
+in many Perl community sites.</p>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Your full name (civil name)</b></p>
+<p><small>Unicode Characters OK.</small></p>
+<p>
+<%= text_field "pause99_request_id_fullname", size => 32 %>
+</p>
+<div style='font-size:0.75em'>
+Note: You can enter fairly free-form text here but it must consist of at least two space-separated words. This is a spam protection measure we discovered accidentally. Back when PAUSE was developed in the nineties, people would generally fill out a field asking for a full name with a first name and a second name, like <i>Ben Cartwright</i> or <i>Tony Nelson</i>. When this trivial expectation was coded into the server as a sanity check, it turned out to block many spam bots because they often did not try to enter a space in the middle of the field. It was only around 2003 that people started complaining that they had tried <i>Peter</i> and it did not work. Apologies for insisting, Peter – but feel free to make something up to satisfy the requirement.
+</div>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Email</b></p>
+<p><small>required, otherwise we cannot send you the password</small></p>
+<p>
+<%= text_field "pause99_request_id_email", size => 32 %>
+</p>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Web site</b></p>
+<p><small>optional</small></p>
+<p>
+<%= text_field "pause99_request_id_homepage", size => 32 %>
+</p>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>Desired ID</b></p>
+<p><small>3-9 characters matching [A-Z], please</small></p>
+<%= text_field "pause99_request_id_userid", size => 32 %>
+</div>
+
+<div class="alternate<%= $alt++ % 2 + 1 %>">
+<p><b>A short description of why you would like a
+PAUSE ID:</b></p><p><small>required; include what you are planning to contribute; do not use HTML</small></p><p>
+
+<%= text_area "pause99_request_id_rationale", rows=>8, cols=>60 =%>
+<!-- zdjela meda -->
+</div>
+
+% if ( $PAUSE::Config->{RECAPTCHA_ENABLED} ) {
+%   if ( $PAUSE::Config->{RECAPTCHA_SITE_KEY} ) {
+<div>
+<div class="g-recaptcha" data-sitekey="<%= $PAUSE::Config->{RECAPTCHA_SITE_KEY} %>"></div>
+</div>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+%   }
+%   else {
+%     warn "request_id: RECAPTCHA_SITE_KEY not available\n";
+%   }
+% }
+<div style="visibility:hidden;">If you're a bot, then type something in here: <input name="url" size="1"></div>
+</p>
+<input type="submit" name="SUBMIT_pause99_request_id_sub" value="Request Account">
