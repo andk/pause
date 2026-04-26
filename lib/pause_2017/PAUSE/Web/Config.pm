@@ -96,6 +96,7 @@ our %Actions = (
   who_pumpkin => {
     x_mojo_to => "public#pumpkin",
     priv => "public",
+    cat => "02serv/05",
     display => 0,
   },
   who_admin => {
