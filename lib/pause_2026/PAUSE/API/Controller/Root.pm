@@ -41,6 +41,7 @@ sub check_token {
   my $c = shift;
   my $header = $c->req->headers->header('Authorization');
   die PAUSE::Web::Exception->new(ERROR => 'No authorization header') unless $header;
+  $c->req->headers->remove('Authorization'); # to prevent reuse
   $header =~ s/Bearer\s+//i or die PAUSE::Web::Exception->new(ERROR => 'No Bearer token');
 
   my ($user, $token_id, $token) = split ':', $header;
