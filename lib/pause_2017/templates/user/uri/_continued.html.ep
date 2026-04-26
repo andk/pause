@@ -23,7 +23,7 @@ of a module on several hundred mirrors. Please consider <a
 href="<%= my_url->query(ACTION => "delete_files") %>">removing</a> old versions of
 your module from PAUSE and CPAN. If you are worried that someone might
 need an old version, it can always be found on the <a
-href="http://backpan.cpan.org/authors/id/<%= $pause->{userhome} %>/">backpan</a>
+href="https://backpan.perl.org/authors/id/<%= $pause->{userhome} %>/">backpan</a>
 </p>
 
 <p><b>Debugging:</b> your submission should show up soon at <a

@@ -35,7 +35,7 @@ to fix <i>broken</i> uploads that cannot be completed, not an
 opportunity to turn the time back.
 
 <p> To re-iterate: If you change the content of this field to
-<b>http://www.slashdot.org/</b>, PAUSE will fetch the current
+<b>https://slashdot.org/</b>, PAUSE will fetch the current
 Slashdot page and will put it into
 <b><%= $pause->{selected}{uriid} %></b>. If you change it to
 <b>FooBar-3.14.tar.gz</b>, PAUSE will try to get
@@ -43,8 +43,8 @@ Slashdot page and will put it into
 finds it, it puts it into <b><%= $pause->{selected}{uriid} %></b>.</p>
 
 <p>An example: if you made a typo and requested to upload
-<b>http://badsite.org/foo</b> instead of
-<b>http://goodsite.org/foo</b>, just correct the thing in the
+<b>https://badsite.org/foo</b> instead of
+<b>https://goodsite.org/foo</b>, just correct the thing in the
 textfield below.</p>
 
 <p>Another example: If your upload was unsuccessful and you now have

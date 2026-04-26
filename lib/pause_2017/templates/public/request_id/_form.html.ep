@@ -3,7 +3,7 @@
 
 <p>A PAUSE account is only required to distribute and manage Perl module
 distributions on CPAN. You do not need a PAUSE account to submit
-bug reports to <a href="http://rt.cpan.org/">RT</a> or participate
+bug reports to <a href="https://rt.cpan.org/">RT</a> or participate
 in many Perl community sites.</p>
 
 <div class="alternate<%= $alt++ % 2 + 1 %>">
