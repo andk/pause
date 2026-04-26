@@ -55,7 +55,7 @@ sub check_token {
   my $dbh = $mgr->authen_connect or die;
   my $row = $dbh->selectrow_hashref(qq{
     SELECT user, ip_ranges, scope FROM auth_tokens WHERE user = ? and token_id = ? and token_hash = ? and revoked = 0 and expires_at > NOW()
-  }, undef, $user, $token_id, Digest::SHA::hmac_sha256_hex($token, $token_id));
+  }, undef, $user, $token_id, Digest::SHA::hmac_sha256_hex($token_id, $token));
   die PAUSE::Web::Exception->new(ERROR => 'Invalid token') unless $row;
 
   $pause->{token_info} = $row;
