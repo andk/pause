@@ -13,9 +13,10 @@ You will need:
 
 * `docker compose up`
 * Go to `http://pause.localhost:8080`
+  * It might happen that your browser redirects to `https://pause.localhost:8080`, which won't work. If this happens, adjust the protocol in the browser address bar and reload.
 * Login with userid `testuser`, password `test`
 * Play around with it!
-* Read mail sent by pause at `http://localhost:8025`
+* Read mail sent by PAUSE at `http://localhost:8025`
 * `docker compose down`
 
 The setup will persist after `docker compose down`.
@@ -87,7 +88,7 @@ The `pause` Plack app (currently `app_2017`) providing the web interface. Runs o
 
 ### paused
 
-The pause daemon handling uploads. Logs to `/pause-run/log/paused.log`.
+The PAUSE daemon handling uploads. Logs to `/pause-run/log/paused.log`.
 
 To tail the log from the host, do:
 
@@ -95,7 +96,7 @@ To tail the log from the host, do:
 
 ### mysql
 
-The mysql database server. It contains the pause schema, 3 test users, but no further data. Data will persist between restart of the service.
+The mysql database server. It contains the PAUSE schema, 3 test users, but no further data. Data will persist between restart of the service.
 
 To connect to the database from the host, do:
 

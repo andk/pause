@@ -23,7 +23,7 @@ services:
     depends_on:
       - mysql
       - mail
-    command: plackup -p 5000 -R /home/pause/lib/pause_2017 app_2017.psgi
+    command: plackup -p 5000 -R /home/pause/lib/pause_2026 app_2026.psgi
   paused:
     <<: *pause
     ports: []
