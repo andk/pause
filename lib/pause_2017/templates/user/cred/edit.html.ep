@@ -109,6 +109,12 @@ for communicating with you.
 </td></tr>
 
 <tr><td class="alternate<%= $alter++ % 2 + 1 %>"><h4 class="altering">The email address <i><%= $cpan_alias %></i> should be configured to forward mail to ...</h4>
+% if (!$PAUSE::cpan_dot_org_mail_forwarding_ok) {
+<p class="explain"><b>
+🚧 The mail forwarding service is currently not
+available. Changes here will only take effect when the service can
+be started up again. -- </b></p>
+% }
 <p class="explain">
 <b>cpan.org</b> has a mail
 address for you and it's your choice if you want it to point to your
