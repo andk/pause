@@ -39,6 +39,11 @@ sub _pause_is_closed {
 
 sub check_token {
   my $c = shift;
+  my $pause = $c->stash('.pause');
+  if (!$pause) {
+    $c->stash(".pause" => $pause = {});
+  }
+
   my $header = $c->req->headers->header('Authorization');
   die PAUSE::Web::Exception->new(ERROR => 'No authorization header') unless $header;
   $c->req->headers->remove('Authorization'); # to prevent reuse
@@ -47,10 +52,6 @@ sub check_token {
   my ($user, $token_id, $token) = split ':', $header;
   die PAUSE::Web::Exception->new(ERROR => 'Invalid token') if !$user or !$token_id or !$token;
 
-  my $pause = $c->stash('.pause');
-  if (!$pause) {
-    $c->stash(".pause" => $pause = {});
-  }
 
   my $mgr = $c->app->pause;
   my $dbh = $mgr->authen_connect or die;
