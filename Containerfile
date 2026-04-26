@@ -9,7 +9,7 @@ RUN useradd -m --shell /bin/bash pause
 WORKDIR /home/pause
 
 COPY cpanfile cpanfile
-RUN cpanm -n --installdeps .
+RUN cpm install -g
 
 COPY docker-compose/setup.sh /setup.sh
 RUN /setup.sh
@@ -24,5 +24,6 @@ COPY --chown=pause cron cron
 COPY --chown=pause bin bin
 COPY --chown=pause lib lib
 COPY --chown=pause app_2017.psgi app_2017.psgi
+COPY --chown=pause app_2026.psgi app_2026.psgi
 
-CMD ["plackup","app_2017.psgi"]
+CMD ["plackup","app_2026.psgi"]
