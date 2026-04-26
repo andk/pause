@@ -14,7 +14,7 @@ sub upload {
   my $scope = $token_info->{scope};
 
   # TODO: finer control
-  die PAUSE::Web::Exception->new(ERROR => 'Invalid scope') unless $scope eq 'upload';
+  die PAUSE::Web::Exception->new(ERROR => 'Invalid scope') unless $scope eq 'upload:distributions';
 
   $PAUSE::Config->{INCOMING_LOC} =~ s|/$||;
 
