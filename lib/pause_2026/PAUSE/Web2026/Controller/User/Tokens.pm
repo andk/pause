@@ -58,7 +58,7 @@ sub generate {
 
   if ($req->param('new_token_sub')) {
     my $token = unpack 'H*', Crypt::URandom::urandom(32);
-    my $token_id = unpack 'H*', Crypt::URandom::urandom(4);
+    my $token_id = unpack 'H*', Crypt::URandom::urandom(16);
     my $token_hash = Digest::SHA::hmac_sha256_hex($token_id, $token);
     my $description = $req->param('new_token_description');
     my $expires_in  = $req->param('new_token_expires_in') || 180;
