@@ -56,6 +56,11 @@ sub check_token {
 
   my $mgr = $c->app->pause;
   my $dbh = $mgr->authen_connect or die;
+
+  # TODO: We should add a rate-limit check, and send an email to the admins if necessary so that they can
+  # add some measures in front of the API app (fail2ban, etc), or unban a user by a DB query,
+  # or via a new web user interface that lists the relevant auth log etc.
+
   my $row = $dbh->selectrow_hashref(qq{
     SELECT user, ip_ranges, scope FROM auth_tokens WHERE user = ? and token_id = ? and token_hash = ? and revoked = 0 and expires_at > NOW()
   }, undef, $user, $token_id, Digest::SHA::hmac_sha256_hex($token_id, $token));
