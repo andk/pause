@@ -4,7 +4,7 @@ use Mojo::Base "Mojolicious::Controller";
 use HTTP::Date ();
 use File::pushd;
 use PAUSE ();
-use Crypt::PRNG;
+use Crypt::URandom;
 use Digest::SHA;
 
 sub list {
@@ -57,8 +57,8 @@ sub generate {
   my $u = $c->active_user_record;
 
   if ($req->param('new_token_sub')) {
-    my $token = Crypt::PRNG::random_bytes_hex(32);
-    my $token_id = Crypt::PRNG::random_bytes_hex(4);
+    my $token = unpack 'H*', Crypt::URandom::urandom(32);
+    my $token_id = unpack 'H*', Crypt::URandom::urandom(4);
     my $token_hash = Digest::SHA::hmac_sha256_hex($token, $token_id);
     my $description = $req->param('new_token_description');
     my $expires_in  = $req->param('new_token_expires_in') || 180;
