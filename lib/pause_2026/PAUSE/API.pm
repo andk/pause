@@ -61,6 +61,7 @@ sub _wrap {
 
   my $res = eval { $next->(); };
   if (my $e = $@) {
+    my $error;
     if (UNIVERSAL::isa($e, "PAUSE::Web::Exception")) {
       if ($e->{ERROR}) {
         $e->{ERROR} = [ $e->{ERROR} ] unless ref $e->{ERROR} eq 'ARRAY';
@@ -70,17 +71,26 @@ sub _wrap {
 Dump;
         $c->app->pause->log({level => 'error', message => $message});
         $c->res->code($e->{HTTP_STATUS} // HTTP_BAD_REQUEST);
-        return $c->render(json => { error => $pause->{ERROR} })
+
+        $error = $pause->{ERROR};
       } elsif ($e->{HTTP_STATUS}) {
-        return $c->render(json => {error => status_message($e->{HTTP_STATUS})});
+        $error = status_message($e->{HTTP_STATUS});
       }
     } else {
       # this is NOT a known error type, we need to handle it anon
-      my $error = "$e";
-      $c->app->pause->log({level => 'error', message => $error });
+      $c->app->pause->log({level => 'error', message => "$e" });
       $c->res->code(HTTP_INTERNAL_SERVER_ERROR);
-      return $c->render(json => {error => 'Internal server error'});
+      $error = 'Internal server error';
     }
+
+    my $bearer = $pause->{bearer};
+    my $dbh = $c->app->pause->authen_connect;
+    $dbh->do(qq{
+        INSERT INTO auth_log (user, token_id, ip, error)
+        VALUES (?, ?, ?, ?)}, undef,
+        $bearer->{user}, $bearer->{token_id}, $c->tx->remote_address, ref $error ? encode_json($error) : $error
+    );
+    return $c->render(json => {error => $error});
   }
   return $res;
 }
