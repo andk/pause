@@ -50,8 +50,9 @@ sub check_token {
   $header =~ s/Bearer\s+//i or die PAUSE::Web::Exception->new(ERROR => 'No Bearer token');
 
   my ($user, $token_id, $token) = split ':', $header;
-  die PAUSE::Web::Exception->new(ERROR => 'Invalid token') if !$user or !$token_id or !$token;
+  $pause->{bearer} = {user => $user, token_id => $token_id};
 
+  die PAUSE::Web::Exception->new(ERROR => 'Invalid token') if !$user or !$token_id or !$token;
 
   my $mgr = $c->app->pause;
   my $dbh = $mgr->authen_connect or die;
