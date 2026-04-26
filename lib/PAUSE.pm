@@ -27,6 +27,9 @@ use Sys::Hostname ();
 use Time::Piece;
 use YAML::Syck;
 
+# cf. https://github.com/andk/pause/issues/584
+our $cpan_dot_org_mail_forwarding_ok = 0;
+
 our $USE_RECENTFILE_HOOKS = Sys::Hostname::hostname =~ /pause/;
 if ($USE_RECENTFILE_HOOKS) {
   unless ($HAVE_RECENTFILE) {
