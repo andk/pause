@@ -1,6 +1,5 @@
 % layout 'layout';
 % my $pause = stash(".pause") || {};
-% my $cpan_alias = lc($pause->{HiddenUser}{userid}) . '@cpan.org';
 
 <input type="hidden" name="HIDDENNAME" value="<%= $pause->{HiddenUser}{userid} %>">
 
