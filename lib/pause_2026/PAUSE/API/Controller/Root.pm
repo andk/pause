@@ -129,6 +129,19 @@ sub _retrieve_user {
   my($secret_email) = $sth->fetchrow_array;
   $pause->{User}{secretemail} = $secret_email;
   $sth->finish;
+
+  my $ip = $c->tx->remote_address;
+
+  my $bearer = $pause->{bearer};
+  my $dbh = $c->app->pause->authen_connect;
+  $dbh->do(qq{
+      INSERT INTO auth_log (user, token_id, ip)
+      VALUES (?, ?, ?, ?)}, undef,
+      $bearer->{user}, $bearer->{token_id}, $ip
+  );
+  $mgr->log({level => 'info', message => "Token authentication for '$user' succeeded, using '$bearer->{token_id}' [$ip]"});
+
+  return 1;
 }
 
 1;
