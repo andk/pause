@@ -68,7 +68,7 @@ sub _wrap {
         require Data::Dumper;
         my $message = "Line " . __LINE__ . ", File: " . __FILE__ . "\n" . Data::Dumper->new([$pause->{ERROR}],[qw(error)])->Indent(1)->Useqq(1)->
 Dump;
-        $c->app->pause->log({level => 'debug', message => $message});
+        $c->app->pause->log({level => 'error', message => $message});
         $c->res->code($e->{HTTP_STATUS} // HTTP_BAD_REQUEST);
         return $c->render(json => { error => $pause->{ERROR} })
       } elsif ($e->{HTTP_STATUS}) {
