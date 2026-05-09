@@ -51,7 +51,7 @@ switches).  So, on to the next section:
 
 ## selfconfig
 
-If you've got a fresh Debian system (Bookworm, at time of writing), you can use
+If you've got a fresh Debian system (Trixie, at time of writing), you can use
 the selfconfig system to build a new PAUSE.  Start by copying `selfconfig-root`
 to that Debian box.  Run it as root and watch the magic.
 

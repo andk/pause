@@ -169,7 +169,7 @@ async sub do_create {
     @key_ids = map {; $_->{id} } @keys;
   }
 
-  my $image  = 'debian-12-x64';
+  my $image  = 'debian-13-x64';
   my $region = 'nyc3';
   my $size   = $opt->size;
 

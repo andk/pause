@@ -17,7 +17,7 @@ Other places with docs:
 These instructions describe how to set up a private, or local, PAUSE
 server for development and testing.
 
-1. Provision a Debian host, preferably running Debian 12 (Bookworm)
+1. Provision a Debian host, preferably running Debian 13 (Trixie)
 2. Copy the `bootstrap/selfconfig-root` program to that host and run it
 3. You're done!
 
