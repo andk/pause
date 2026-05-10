@@ -1,0 +1,24 @@
+# This workflow will fail if the branch contains a merge commit or if
+# it isn't based on master.
+#
+# Caveat: It runs at push time, so if master moves after the branch is
+# push, this will still pass.  A merge queue is likely needed to solve
+# this.
+# https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue
+# Another workaround is that mergers could re-run just this workflow.
+name: Enforce Rebasing
+
+on: [push]
+
+jobs:
+  rebase_job:
+    runs-on: ubuntu-latest
+    name: Enforce rebasing
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Is Rebased on master?
+      uses: rspier/enforce-rebase@master
