@@ -988,7 +988,7 @@ sub check_indexability {
     my ($self, $ctx) = @_;
     if ($self->{META_CONTENT}{distribution_type}
         && $self->{META_CONTENT}{distribution_type} =~ m/^(script)$/) {
-        return;
+        $ctx->abort_indexing_dist(DISTERROR('script_dist'));
     }
 
     $Logger->log([
