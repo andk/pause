@@ -249,7 +249,7 @@ sub examine_pkg {
   # should they be cought earlier? Maybe.
   # but as an ultimate sanity check suggested by Richard Soderberg
   if ($self->_pkg_name_insane($ctx)) {
-      $ctx->abort_indexing_package($self, "invalid package name");
+      $ctx->abort_indexing_package($self, PKGERROR('bad_package_name'));
   }
 
   # Query all users with perms for this package
