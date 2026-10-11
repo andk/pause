@@ -8,6 +8,7 @@ use File::Copy ();
 use List::MoreUtils ();
 use PAUSE ();
 use Parse::CPAN::Meta;
+use PAUSE::package ();
 use PAUSE::mldistwatch::Constants;
 use JSON::XS ();
 
@@ -675,6 +676,15 @@ sub has_indexing_warnings {
   my $warnings = $self->{INDEX_WARNINGS};
 
   @$_ && return 1 for values %$warnings;
+}
+
+sub malformed_provides_names {
+  my ($self) = @_;
+
+  my $provides = $self->{META_CONTENT}{provides};
+  return unless $provides && ref $provides eq 'HASH';
+
+  return grep {; PAUSE::package->name_is_insane($_) } sort keys %$provides;
 }
 
 sub check_blib {

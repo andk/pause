@@ -497,6 +497,15 @@ sub maybe_index_dist {
         return;
     }
 
+    if (my @bad_names = $dio->malformed_provides_names) {
+        # "provides" is the "I know what I'm doing better than the indexer"
+        # control.  When it's wrong, just abort the whole dist.
+        $Logger->log([ "META provides has malformed package names: %s", \@bad_names ]);
+        $dio->{REASON_TO_SKIP} = PAUSE::mldistwatch::Constants::EBADPROVIDES;
+        $dio->mail_summary;
+        return;
+    }
+
     $dio->check_blib;
     $dio->check_multiple_root;
     $dio->check_world_writable;

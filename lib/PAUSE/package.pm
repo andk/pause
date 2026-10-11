@@ -237,7 +237,14 @@ sub _pkg_name_insane {
     # XXX should be tested
     my $self = shift;
 
-    my $package = $self->{PACKAGE};
+    return PAUSE::package->name_is_insane($self->{PACKAGE});
+}
+
+# This is a class method, so that we can check the names in a dist's META
+# "provides" before making any package objects.
+sub name_is_insane {
+    my ($class, $package) = @_;
+
     return $package !~ /^\w[\w\:\']*\w?\z/
         || $package !~ /\w\z/
         || $package =~ /:/ && $package !~ /::/
