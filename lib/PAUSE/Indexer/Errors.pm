@@ -150,6 +150,9 @@ dist_error unstable_release => {
 };
 
 dist_error version_dev => {
+  # Trial releases are deliberately unindexed, so we don't send the uploader a
+  # failure report about them. -- claude, 2026-10-11
+  public  => 0,
   header  => 'release has trial-release version',
   body    => <<~'EOF',
     The uploaded filename contains an underscore ("_") or the string "-TRIAL",
