@@ -83,9 +83,9 @@ sub filter_ppps {
                     $Logger->log_debug("no_index rule on $type $rule; NOT skipping $pkg");
                 }
             }
-
-            push @res, $pkg;
         }
+
+        push @res, $pkg;
     }
 
     return @res;
