@@ -403,10 +403,8 @@ sub update_package {
 
   if ($isa_regular_perl) {
       $ok = $self->__do_regular_perl_update($ctx, $row, {
-          oldversion  => $oldversion,
           tdistmtime  => $tdistmtime,
           odistmtime  => $odistmtime,
-          opack       => $opack,
           older_isa_regular_perl => $older_isa_regular_perl,
       });
   } elsif (defined $pp->{version} && ! version::is_lax($pp->{version})) {
