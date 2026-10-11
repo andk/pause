@@ -44,6 +44,7 @@ use PAUSE::MailAddress ();
 use PAUSE::PermsManager ();
 use Process::Status ();
 use Safe;
+use Scalar::Util ();
 use Text::Format;
 
 $Data::Dumper::Indent = 1;
@@ -488,7 +489,8 @@ sub maybe_index_dist {
 
     unless ($examine_dist_ok) {
         my $abort = $@;
-        die $abort unless $abort->isa('PAUSE::Indexer::Abort::Dist');
+        die $abort
+          unless Scalar::Util::blessed($abort) && $abort->isa('PAUSE::Indexer::Abort::Dist');
 
         delete $self->{ALLlasttime}{$dist};
         delete $self->{ALLfound}{$dist};

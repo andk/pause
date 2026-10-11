@@ -11,6 +11,7 @@ use PAUSE::package ();
 use PAUSE::mldistwatch::Constants;
 use PAUSE::Indexer::Errors;
 use JSON::XS ();
+use Scalar::Util ();
 
 use PAUSE::Logger '$Logger';
 
@@ -810,7 +811,8 @@ sub index_packages {
     PACKAGE: for my $pkg (@$packages) {
         unless (eval { $pkg->examine_pkg($ctx); 1 }) {
             my $abort = $@;
-            die $abort unless $abort->isa('PAUSE::Indexer::Abort::Package');
+            die $abort
+              unless Scalar::Util::blessed($abort) && $abort->isa('PAUSE::Indexer::Abort::Package');
 
             next PACKAGE;
         }
