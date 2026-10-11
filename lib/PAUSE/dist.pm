@@ -586,6 +586,9 @@ sub mail_summary {
                  .  qq{contain a META.yml or META.json file.\n\n};
 
           $status_over_all = "Failed";
+        } elsif ($self->{REASON_TO_SKIP}) {
+          # The reason we skipped this dist is already at the top of the
+          # report.  Don't tack on a guess.
         } elsif ($self->version_from_meta_ok) {
 
           push @m,  qq{Nothing in this distro has been \n}
