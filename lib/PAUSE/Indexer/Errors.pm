@@ -112,6 +112,16 @@ dist_error perl_rejected => {
     EOF
 };
 
+dist_error script_dist => {
+  header  => 'META distribution_type is "script"',
+  body    => <<~'EOF',
+    Your META file says that this distribution's distribution_type is
+    "script", meaning that it's a program to run rather than a library, so
+    PAUSE will not index its packages.  The distribution_type field is
+    deprecated, so you can probably just remove it.
+    EOF
+};
+
 dist_error single_pm => {
   header  => 'dist is a single-.pm-file upload',
   body    => <<~"EOF",
