@@ -661,6 +661,7 @@ sub rewrite02 {
         -f "$repfile.gz" and
         open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
        ) {
+        local $_;
         while (<$fh>) {
             next if 1../^$/;
             $olist .= $_;
@@ -757,6 +758,7 @@ sub rewrite01 {
     local $/;
     if (-e $repfile) {
         if (open my $fh, $repfile) {
+            local $_;
             while (<$fh>) {
                 $olist .= $_;
             }
@@ -1203,6 +1205,7 @@ sub rewrite03 {
               require Encode;
               binmode $fh, ":utf8";
           }
+          local $_;
           while (<$fh>) {
               next if 1../^\s*$/;
               $olist .= $_;
@@ -1278,6 +1281,7 @@ sub rewrite06 {
         if (
             open my $fh, "$GZIP --stdout --uncompress $repfile.gz|"
            ) {
+            local $_;
             while (<$fh>) {
                 next if 1../^\s*$/;
                 $olist .= $_;

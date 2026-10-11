@@ -206,6 +206,7 @@ sub packages_per_pmfile {
 
     my $checked_bom;
     my $package_or_class = 'package';
+    local $_;
   PLINE: while (<$fh>) {
         chomp;
         my($pline) = $_;
@@ -360,6 +361,7 @@ sub packages_per_pmfile {
         open(FH,$parsefile) or die "Could not open '$parsefile': $!";
         my $inpod = 0;
         my $package_or_class = 'package';
+        local $_;
         while (<FH>) {
             $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
             next if $inpod || /^\s*#/;

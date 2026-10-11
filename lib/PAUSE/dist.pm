@@ -183,6 +183,7 @@ sub untar {
   }
   my $ignore_unknown_keyword = '--warning=no-unknown-keyword';
   open TARTEST, "$tarbin $ignore_unknown_keyword $tar_opt $MLROOT/$dist |";
+  local $_;
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
       $Logger->log("*** ALERT: updir detected!");
@@ -1262,6 +1263,7 @@ sub p6_index_dist {
     $tar_opt = "tjf";
   }
   open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
+  local $_;
   while (<TARTEST>) {
     if (m:^bin/([^/]+)$:) {
       @args = ($1, $dist);
