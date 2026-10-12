@@ -42,7 +42,7 @@ distribution_type_ok(
 
 distribution_type_ok(
   script => [],
-  [],
+  [ 'Failed: PAUSE indexer report PERSON/Foo-Bar-1.000.tar.gz' ],
 );
 
 done_testing;
