@@ -3,7 +3,7 @@ use warnings;
 package PAUSE::Logger;
 use parent 'Log::Dispatchouli::Global';
 
-use Log::Dispatchouli 2.002;
+use Log::Dispatchouli 3.010;
 use Time::HiRes ();
 
 sub logger_globref {
