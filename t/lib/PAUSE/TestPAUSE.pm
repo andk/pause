@@ -207,6 +207,21 @@ sub upload_author_fake {
     };
   }
 
+  # Real dists almost always have a no_index entry, because ExtUtils::MakeMaker
+  # writes one by default, so we do too, unless the test asks for something
+  # else.  Pass no_index => undef to get no no_index at all.
+  $fake = { %$fake };
+  my $no_index = exists $fake->{no_index}
+               ? delete $fake->{no_index}
+               : { directory => [ qw(t inc) ] };
+
+  if ($no_index) {
+    $fake->{more_metadata} = {
+      %{ $fake->{more_metadata} // {} },
+      no_index => $no_index,
+    };
+  }
+
   my $dist = Module::Faker::Dist->from_struct($fake);
 
   my $cpan_root   = File::Spec->catdir($self->tmpdir, 'cpan');

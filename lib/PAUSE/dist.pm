@@ -8,6 +8,7 @@ use File::Copy ();
 use List::MoreUtils ();
 use PAUSE ();
 use Parse::CPAN::Meta;
+use PAUSE::package ();
 use PAUSE::mldistwatch::Constants;
 use JSON::XS ();
 
@@ -183,6 +184,7 @@ sub untar {
   }
   my $ignore_unknown_keyword = '--warning=no-unknown-keyword';
   open TARTEST, "$tarbin $ignore_unknown_keyword $tar_opt $MLROOT/$dist |";
+  local $_;
   while (<TARTEST>) {
     if (m:^\.\./: || m:/\.\./: ) {
       $Logger->log("*** ALERT: updir detected!");
@@ -585,6 +587,9 @@ sub mail_summary {
                  .  qq{contain a META.yml or META.json file.\n\n};
 
           $status_over_all = "Failed";
+        } elsif ($self->{REASON_TO_SKIP}) {
+          # The reason we skipped this dist is already at the top of the
+          # report.  Don't tack on a guess.
         } elsif ($self->version_from_meta_ok) {
 
           push @m,  qq{Nothing in this distro has been \n}
@@ -671,6 +676,15 @@ sub has_indexing_warnings {
   my $warnings = $self->{INDEX_WARNINGS};
 
   @$_ && return 1 for values %$warnings;
+}
+
+sub malformed_provides_names {
+  my ($self) = @_;
+
+  my $provides = $self->{META_CONTENT}{provides};
+  return unless $provides && ref $provides eq 'HASH';
+
+  return grep {; PAUSE::package->name_is_insane($_) } sort keys %$provides;
 }
 
 sub check_blib {
@@ -1262,6 +1276,7 @@ sub p6_index_dist {
     $tar_opt = "tjf";
   }
   open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
+  local $_;
   while (<TARTEST>) {
     if (m:^bin/([^/]+)$:) {
       @args = ($1, $dist);

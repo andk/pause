@@ -150,6 +150,13 @@ subtest "do not index if meta has release_status <> stable" => sub {
               qr/META release_status is not stable/,
               "skip report includes expected text",
             );
+          },
+          sub {
+            unlike(
+              $_[0]{email}->get_body,
+              qr/no indexable package statements|does not provide any modules/,
+              "skip report doesn't also claim there was nothing to index",
+            );
           }
         ],
       },
