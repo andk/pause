@@ -28,7 +28,7 @@ jobs:
       PLACK_ENV: ghaction
     steps:
       - name: Check out repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Makefile.PL
         run: |
           perl Makefile.PL && make
@@ -51,7 +51,7 @@ jobs:
           echo version="$(perl -le 'print $]')" >> $GITHUB_OUTPUT
         shell: bash
       - name: Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             /usr/local/lib/perl5/site_perl
@@ -74,7 +74,7 @@ jobs:
           cover -test -report Coveralls | tee -a $GITHUB_STEP_SUMMARY
         continue-on-error: true
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: plack.log
           path: |
