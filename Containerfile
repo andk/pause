@@ -1,4 +1,4 @@
-FROM perl:5.42-bookworm
+FROM perl:5.42-trixie
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
