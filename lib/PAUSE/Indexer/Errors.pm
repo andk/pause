@@ -220,7 +220,7 @@ pkg_error dual_newer => {
   body    => sub {
     my ($old) = @_;
 
-    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+    _assert_args_present(dual_newer => $old, [ qw(package file dist version) ]);
 
     return <<~"EOF";
       Not indexed because package $old->{package} in file $old->{file} has a
@@ -235,7 +235,7 @@ pkg_error dual_older => {
   body    => sub {
     my ($old) = @_;
 
-    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+    _assert_args_present(dual_older => $old, [ qw(package file dist version) ]);
 
     return <<~"EOF";
       Not indexed because package $old->{package} in file $old->{file} seems
@@ -252,7 +252,7 @@ pkg_error mtime_fell => {
   body    => sub {
     my ($old) = @_;
 
-    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+    _assert_args_present(mtime_fell => $old, [ qw(package file dist version) ]);
 
     return <<~"EOF";
       Not indexed because $old->{file} in $old->{dist} also has a zero version
@@ -275,7 +275,7 @@ pkg_error version_fell => {
   body   => sub {
     my ($old) = @_;
 
-    _assert_args_present(db_conflict => $old, [ qw(package file dist version) ]);
+    _assert_args_present(version_fell => $old, [ qw(package file dist version) ]);
 
     return <<~"EOF";
       Not indexed because $old->{file} in $old->{dist} has a higher version
@@ -289,7 +289,7 @@ pkg_error version_invalid => {
   body   => sub {
     my ($arg) = @_;
 
-    _assert_args_present(db_conflict => $arg, [ qw(version) ]);
+    _assert_args_present(version_invalid => $arg, [ qw(version) ]);
 
     return <<~"EOF";
       The version present in the file, "$arg->{version}", is not a valid lax
