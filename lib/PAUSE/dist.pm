@@ -1194,7 +1194,16 @@ sub p6_index_dist {
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
     $tar_opt = "tjf";
   }
-  open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
+
+  # A Perl 6 dist can be a zip file, but this listing was only ever done with
+  # tar, which fails on a zip and so aborted indexing the whole dist.  "unzip
+  # -Z1" prints one entry name per line, like "tar tf".
+  my $unzipbin = $self->hub->{UNZIPBIN};
+  my $list_cmd = $dist =~ /\.zip$/
+               ? "$unzipbin -Z1 $MLROOT/$dist"
+               : "$tarbin $tar_opt $MLROOT/$dist";
+
+  open TARTEST, "$list_cmd |";
   local $_;
   while (<TARTEST>) {
     if (m:^bin/([^/]+)$:) {
