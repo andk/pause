@@ -328,6 +328,11 @@ sub examine_dist {
       # XXX Temporarily disabled -- rjbs, 2019-04-27
       # system("$unzipbin -t $MLROOT/$dist");
     }
+
+    # untar decides whether this is a Perl 6 dist while listing the archive,
+    # but nothing did that for zip files, so perl_major_version was undef
+    # for them
+    $self->{PERL_MAJOR_VERSION} = (grep { -f } glob('*/META6.json')) ? 6 : 5;
   } else {
     $ctx->abort_indexing_dist(DISTERROR('not_a_dist'));
   }
