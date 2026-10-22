@@ -1159,7 +1159,7 @@ sub p6_index_dist {
   my @args = ($c->{name}, $userid, $c->{version}, $dist, PAUSE->_now_string);
   my $ret  = $dbh->do($p6dists, undef, @args);
   pop @args; # we do not use the "now string" in the sprintf below
-  push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+  push @args, ($ret || ''), (defined $ret ? '' : $dbh->errstr);
   $Logger->log([
     "inserted into p6dists: %s", {
       name    => $args[0],
@@ -1179,7 +1179,7 @@ sub p6_index_dist {
   for my $namespace (keys %{$c->{provides} // {}}) {
     @args = ($namespace, $dist);
     $ret  = $dbh->do($p6provides, undef, @args);
-    push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+    push @args, ($ret || ''), (defined $ret ? '' : $dbh->errstr);
     $Logger->log([
       "inserted into p6provides: %s", {
         name    => $args[0],
@@ -1214,7 +1214,7 @@ sub p6_index_dist {
     if (m:^bin/([^/]+)$:) {
       @args = ($1, $dist);
       $ret  = $dbh->do($p6binaries, undef, @args);
-      push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+      push @args, ($ret || ''), (defined $ret ? '' : $dbh->errstr);
       $Logger->log([
         "inserted into p6binaries: %s", {
           name    => $args[0],
