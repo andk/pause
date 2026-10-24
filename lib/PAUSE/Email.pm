@@ -39,9 +39,6 @@ sub noreply_email_header_object ($class) {
 sub is_valid_email ($class, $string) {
   my $parse = Email::Address::XS->parse_bare_address($string);
 
-  # None at all!  That's not a valid email.
-  return unless $parse;
-
   # This could mean >1 address in $string, or various forms of "not a useful
   # email" like "no domain".
   return unless $parse->is_valid;
