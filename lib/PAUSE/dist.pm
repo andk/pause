@@ -3,8 +3,6 @@ use warnings;
 package PAUSE::dist;
 use vars qw(%CHECKSUMDONE $AUTOLOAD);
 
-use Email::Address::XS;
-use Email::MIME::Header::AddressList;
 use File::Copy ();
 use List::MoreUtils ();
 use PAUSE ();
