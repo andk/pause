@@ -31,7 +31,11 @@ sub skipped_upload_reports_ok ($new_basename, $want_subjects) {
 
 skipped_upload_reports_ok('Just-Testing-1.2_2.tar.gz',     []);
 skipped_upload_reports_ok('Just-Testing-1.22-TRIAL.tar.gz', []);
-skipped_upload_reports_ok('Just-Testing-1.22.txt',         []);
-skipped_upload_reports_ok('perl-5.99.0.tar.gz',            []);
+skipped_upload_reports_ok('Just-Testing-1.22.txt', [
+  'Failed: PAUSE indexer report PERSON/Just-Testing-1.22.txt',
+]);
+skipped_upload_reports_ok('perl-5.99.0.tar.gz', [
+  'Failed: PAUSE indexer report PERSON/perl-5.99.0.tar.gz',
+]);
 
 done_testing;
