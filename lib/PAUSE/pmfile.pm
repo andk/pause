@@ -3,6 +3,7 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
+use Scalar::Util ();
 
 use PAUSE::Logger '$Logger';
 
@@ -548,7 +549,8 @@ sub parse_version {
                 }
             }
             if (defined $v) {
-                $v = $v->numify if ref($v) eq 'version';
+                $v = version->new($v) if Scalar::Util::isvstring($v);
+                $v = $v->numify if ref($v) && ref($v) eq 'version';
             } else {
                 $v = "";
             }

@@ -264,7 +264,7 @@ subtest "check various forms of version" => sub {
   # VVVVVV::Bogus   - utterly busted, give up
   # VVVVVV::Dev     - has an underscore!  do not index
   # VVVVVV::Lax     - just fine!  index it
-  # VVVVVV::VString - version.pm can't handle what we pull out of it
+  # VVVVVV::VString - unquoted v-string; numified like a quoted one would be
 
   $result->package_list_ok(
     [
@@ -272,13 +272,49 @@ subtest "check various forms of version" => sub {
       # { package => 'VVVVVV::Bogus',   version => '6.666june6' },
       # { package => 'VVVVVV::Dev',     version => '6.66_6'     },
       { package => 'VVVVVV::Lax',     version => '6.006006'  },
-      # { package => 'VVVVVV::VString', version => 'v6.6.6'    },
+      { package => 'VVVVVV::VString', version => '6.006006' },
     ],
   );
 
   $result->email_ok(
     [
       { subject => 'PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
+    ],
+  );
+};
+
+subtest "unquoted vstring version" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(RJBS => {
+    name      => 'Quod-Version',
+    version   => '8.67.53',
+    packages  => [
+      'Quod::Version'   => {
+        version => 'v8.67.53',
+        layout  => { version => 'our-literal' }
+      },
+    ]
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->assert_index_updated;
+
+  $result->package_list_ok(
+    [
+      { package => 'Quod::Version', version => '8.067053' },
+    ],
+  );
+
+  $result->perm_list_ok(
+    {
+      'Quod::Version' => { f => 'RJBS' },
+    }
+  );
+
+  $result->email_ok(
+    [
+      { subject => 'PAUSE indexer report RJBS/Quod-Version-8.67.53.tar.gz' },
     ],
   );
 };
