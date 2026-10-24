@@ -195,7 +195,15 @@ sub untar {
     $tar_opt = "-xjf";
   }
 
-  my @cmd = ($tarbin, $ignore_unknown_keyword, $tar_opt, "$MLROOT/$dist");
+  # We extract right into the work directory, so an archive entry for "./" is
+  # an entry for the work directory itself, and tar would apply that entry's
+  # mode and ownership to it.  A "./" entry with mode 0644 left the indexer
+  # unable to chdir back into its work directory, killing the whole run.
+  # --no-overwrite-dir keeps the metadata of directories that already exist.
+  my @cmd = (
+    $tarbin, $ignore_unknown_keyword, '--no-overwrite-dir',
+    $tar_opt, "$MLROOT/$dist",
+  );
   $Logger->log([ "going to untar with: %s", \@cmd ]);
 
   unless (system(@cmd)==0) {
