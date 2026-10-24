@@ -13,7 +13,7 @@ sub report_email_header_object ($class) {
 
   my @addrs = split /\s*,\s*/, $PAUSE::Config->{INTERNAL_REPORT_ADDRESS};
 
-  die "No PAUSE config entry for ADMIN!?" unless @addrs;
+  die "No PAUSE config entry for INTERNAL_REPORT_ADDRESS!?" unless @addrs;
 
   my @objects = map {; Email::Address::XS->new(undef, $_) } @addrs;
 
