@@ -478,10 +478,10 @@ sub maybe_index_dist {
     my $examine_dist_ok = eval {
         $dio->examine_dist($ctx);
         $dio->read_dist($ctx);
+        $dio->check_multiple_root($ctx);
         $dio->extract_readme_and_meta($ctx);
         $dio->check_indexability($ctx);
         $dio->check_blib($ctx);
-        $dio->check_multiple_root($ctx);
         $dio->check_world_writable($ctx);
         1;
     };
@@ -1489,9 +1489,9 @@ to check its validity for indexing:
   $dio->examine_dist; # checks for perl, developer, version, etc. and untars
   $dio->skip # must return false
   $dio->read_dist;
+  $dio->check_multiple_root;
   $dio->extract_readme_and_meta;
   $dio->check_blib;
-  $dio->check_multiple_root;
   $dio->check_world_writable;
   $dio->examine_pms;
 

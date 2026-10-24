@@ -42,10 +42,31 @@ sub archive_layout_ok ($desc, $arg) {
 
     my $result = $pause->test_reindex;
 
-    $result->package_list_ok([ map {; { package => $_ } } $arg->{indexed}->@* ]);
+    if (my $want = $arg->{indexed}) {
+      $result->package_list_ok([ map {; { package => $_ } } @$want ]);
+
+      $result->email_ok([
+        { subject => 'PAUSE indexer report PERSON/Archive-Layout-1.0.tar.gz' },
+      ]);
+
+      return;
+    }
+
+    $result->assert_index_not_updated;
 
     $result->email_ok([
-      { subject => 'PAUSE indexer report PERSON/Archive-Layout-1.0.tar.gz' },
+      {
+        subject   => 'Failed: PAUSE indexer report PERSON/Archive-Layout-1.0.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->object->body_str,
+              qr/does not unpack into a single\s+directory/,
+              "report says the archive needs one top-level directory",
+            );
+          },
+        ],
+      },
     ]);
   };
 }
@@ -73,6 +94,18 @@ archive_layout_ok("archive with ./ entry whose mode lacks x bits", {
   rename    => sub ($path) { "./$path" },
   dot_entry => 0644,
   indexed   => [ 'Archive::Layout' ],
+});
+
+# A tarbomb that still has its META file at the top level used to be reported
+# as having no META file at all, because we look for META inside the expected
+# top-level directory.  It should be told what's really wrong.
+archive_layout_ok("tarbomb: dist contents at the top level", {
+  rename => sub ($path) { $path =~ s{\AArchive-Layout-1\.0/}{}r },
+});
+
+archive_layout_ok("tarbomb: dist contents at the top level, under ./", {
+  rename    => sub ($path) { $path =~ s{\AArchive-Layout-1\.0/}{./}r },
+  dot_entry => 0755,
 });
 
 done_testing;
