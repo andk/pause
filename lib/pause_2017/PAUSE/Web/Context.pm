@@ -174,7 +174,8 @@ sub prepare_sendto {
 
 sub send_mail_multi {
   my ($self, $to, $header, $mailblurb) = @_;
-  warn "sending to[@$to]";
+  warn sprintf "sending to[%s]",
+    join " ", map {; PAUSE::Email->header_value_as_string($_) } @$to;
   warn "mailblurb[$mailblurb]";
   for my $to2 (@$to) {
     $header->{To} = $to2;
@@ -185,7 +186,7 @@ sub send_mail_multi {
 sub send_mail {
   my ($self, $header, $blurb) = @_;
 
-  my @hdebug = %$header;
+  my @hdebug = map {; PAUSE::Email->header_value_as_string($_) } %$header;
   $self->log({level => "info", message => sprintf("hdebug[%s]", join "|", @hdebug) });
 
   $header->{From} ||= PAUSE::Email->noreply_email_header_object;

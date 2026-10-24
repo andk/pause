@@ -36,6 +36,13 @@ sub noreply_email_header_object ($class) {
   );
 }
 
+# Header values are now sometimes Email::MIME::Header::AddressList objects,
+# which do not stringify.  This gives back something fit for a log line.
+sub header_value_as_string ($class, $value) {
+  return $value unless ref $value;
+  return $value->as_string;
+}
+
 sub is_valid_email ($class, $string) {
   my $parse = Email::Address::XS->parse_bare_address($string);
 
