@@ -7,7 +7,9 @@ use Encode;
 use Sys::Hostname ();
 use Email::Sender::Simple;
 use Email::MIME;
+use Email::Address::XS;
 use Data::Dumper;
+use PAUSE::Email;
 use PAUSE::Web::Exception;
 use Crypt::URandom;
 

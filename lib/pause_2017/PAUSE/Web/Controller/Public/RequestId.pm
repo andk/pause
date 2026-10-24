@@ -1,6 +1,7 @@
 package PAUSE::Web::Controller::Public::RequestId;
 
 use Mojo::Base "Mojolicious::Controller";
+use PAUSE::Email;
 use PAUSE::Web::Util::Encode;
 
 sub request {

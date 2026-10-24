@@ -1,6 +1,7 @@
 package PAUSE::Web::Plugin::UserRegistration;
 
 use Mojo::Base "Mojolicious::Plugin";
+use PAUSE::Email;
 use PAUSE::Crypt;
 use HTTP::Tiny 0.059;
 use IO::Socket::SSL 1.56;

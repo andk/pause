@@ -1,6 +1,7 @@
 package PAUSE::Web::Controller::Admin;
 
 use Mojo::Base "Mojolicious::Controller";
+use PAUSE::Email;
 
 sub email_for_admin {
   my $c = shift;

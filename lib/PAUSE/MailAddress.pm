@@ -3,7 +3,9 @@ use warnings;
 
 package PAUSE::MailAddress;
 use Email::Address::XS;
+use Encode ();
 use PAUSE ();
+use PAUSE::Email;
 
 # use fields qw(address is_secret)
 

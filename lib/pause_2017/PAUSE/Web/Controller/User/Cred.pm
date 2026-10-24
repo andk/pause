@@ -1,6 +1,7 @@
 package PAUSE::Web::Controller::User::Cred;
 
 use Mojo::Base "Mojolicious::Controller";
+use PAUSE::Email;
 use PAUSE::Web::Util::Encode;
 use Text::Unidecode;
 
