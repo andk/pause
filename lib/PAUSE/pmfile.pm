@@ -528,8 +528,7 @@ sub parse_version {
             $comp->share("*version::new");
             $comp->share("*version::numify");
             $comp->share_from('main', ['*version::',
-                                        '*Exporter::',
-                                        '*DynaLoader::']);
+                                        '*Exporter::']);
             $comp->share_from('version', ['&qv']);
             $comp->permit(":base_math");
             # $comp->permit("require"); # no strict!
