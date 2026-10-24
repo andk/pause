@@ -758,9 +758,9 @@ subtest "quotes in username" => sub {
   is($to_addresses[0]->phrase,  q{R★S"'<xmp>},         "To name is right");
 
   my @cc_addresses = $cc->addresses;
-  is(@cc_addresses, 1, "there is one To address");
+  is(@cc_addresses, 1, "there is one Cc address");
   is($cc_addresses[0]->address, q{pause-admin@example.com}, "Cc address is right");
-  is($cc_addresses[0]->phrase,  undef,                      "To name is right");
+  is($cc_addresses[0]->phrase,  undef,                      "Cc name is right");
 };
 
 done_testing;
