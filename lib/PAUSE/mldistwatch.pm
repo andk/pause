@@ -16,6 +16,7 @@ use DirHandle ();
 use Dumpvalue ();
 use DynaLoader ();
 use Email::MIME;
+use Encode ();
 use Exporter ();
 use ExtUtils::MakeMaker ();
 use ExtUtils::Manifest;
