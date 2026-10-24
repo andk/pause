@@ -44,12 +44,12 @@ dist_error blib => {
 };
 
 dist_error multiroot => {
-  header  => 'archive has multiple roots',
+  header  => 'archive does not unpack into a single directory',
   body    => sub {
     my ($dist) = @_;
     return <<~"EOF"
       The distribution does not unpack into a single directory and is therefore
-      not being indexed. Hint: try 'make dist' or 'Build dist'. (The directory
+      not being indexed. Hint: try 'make dist' or 'Build dist'. (The top-level
       entries found were: @{$dist->{HAS_MULTIPLE_ROOT}})
     EOF
   },

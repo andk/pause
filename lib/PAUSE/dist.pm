@@ -632,7 +632,10 @@ sub check_multiple_root {
   my ($self, $ctx) = @_;
   my %seen;
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
-  if (@top > 1) {
+
+  # A single top-level entry has to be a directory.  An archive holding just
+  # Foo.pm is no better than one holding Foo.pm and Bar.pm.
+  if (@top > 1 || (@top == 1 && ! -d $top[0])) {
     $self->{HAS_MULTIPLE_ROOT} = \@top;
     $ctx->abort_indexing_dist(DISTERROR('multiroot'));
   } else {

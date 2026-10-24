@@ -108,4 +108,10 @@ archive_layout_ok("tarbomb: dist contents at the top level, under ./", {
   dot_entry => 0755,
 });
 
+archive_layout_ok("tarbomb: a single file at the top level", {
+  rename => sub ($path) {
+    $path =~ m{/lib/Archive/Layout\.pm\z} ? 'Layout.pm' : undef
+  },
+});
+
 done_testing;
