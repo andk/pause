@@ -348,13 +348,12 @@ sub packages_per_pmfile {
     sub parse_version_safely {
         my($parsefile) = @_;
         my $result;
-        local *FH;
         local $/ = "\n";
-        open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+        open(my $fh,"<",$parsefile) or die "Could not open '$parsefile': $!";
         my $inpod = 0;
         my $package_or_class = 'package';
         local $_;
-        while (<FH>) {
+        while (<$fh>) {
             $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
             next if $inpod || /^\s*#/;
             last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
@@ -428,12 +427,11 @@ sub _module_version {
     (my $pkg = $leaf) =~ s/\.pm//;
     my ($module, $version, $in_pkg, %version);
 
-    local *FH;
     local $_;
-    open(FH,$leaf) or return;
+    open(my $fh,"<",$leaf) or return;
     my $inpod;
 
-    while(<FH>) {
+    while(<$fh>) {
         $inpod = $1 ne 'cut' if /^=(\w+)/;
         next if $inpod or /^\s*#/;
 
@@ -468,7 +466,7 @@ sub _module_version {
             last;
         }
     }
-    close(FH);
+    close($fh);
     return $module ? ($module, $version) : ();
 }
 
