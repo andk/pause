@@ -422,54 +422,6 @@ sub packages_per_pmfile {
     }
 }
 
-sub _module_version {
-    my $leaf = shift;
-    (my $pkg = $leaf) =~ s/\.pm//;
-    my ($module, $version, $in_pkg, %version);
-
-    local $_;
-    open(my $fh,"<",$leaf) or return;
-    my $inpod;
-
-    while(<$fh>) {
-        $inpod = $1 ne 'cut' if /^=(\w+)/;
-        next if $inpod or /^\s*#/;
-
-        if(/^\s*package\s+(([\w]+(?:'|::))*([\w]+))/) {
-            $module ||= $1 if $3 eq $pkg;
-            $in_pkg = $1;
-        }
-        elsif (my($for_pkg, $rhs) = /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
-            $for_pkg ||= $in_pkg or next;
-            $for_pkg =~ s/::$//;
-            $version{$for_pkg} = $rhs;
-        }
-
-        if ($module and $version{$module}) {
-            require Safe;
-            require version;
-            local $^W = 0;
-            my $s = Safe->new;
-            $s->share_from('main', ['*version::']);
-            $s->share_from('version', ['&qv']);
-            $s->reval('$VERSION = ' . $version{$module});
-            $version = $s->reval('$VERSION');
-
-            # Handle version objects
-            ($version = $version->normal) =~ s/^v// if ref($version) eq
-                'version';
-            if ($version{$module} =~ /\bv?(\d+([_.]\d+){2,})/) {
-                my $v = $1;
-                my $q = pack "U*", ($v =~ /\d+/g);
-                $version = $v if $version eq $q;
-            }
-            last;
-        }
-    }
-    close($fh);
-    return $module ? ($module, $version) : ();
-}
-
 # package PAUSE::pmfile;
 sub parse_version {
     my $self = shift;
