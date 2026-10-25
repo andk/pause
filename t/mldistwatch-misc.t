@@ -264,7 +264,7 @@ subtest "check various forms of version" => sub {
   # VVVVVV::Bogus   - utterly busted, give up
   # VVVVVV::Dev     - has an underscore!  do not index
   # VVVVVV::Lax     - just fine!  index it
-  # VVVVVV::VString - version.pm can't handle what we pull out of it
+  # VVVVVV::VString - a bare v-string is refused; only literal strings and numbers count
 
   $result->package_list_ok(
     [
@@ -278,7 +278,7 @@ subtest "check various forms of version" => sub {
 
   $result->email_ok(
     [
-      { subject => 'PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
+      { subject => 'Failed: PAUSE indexer report RJBS/VVVVVV-6.666.tar.gz' },
     ],
   );
 };
@@ -303,15 +303,36 @@ EOT
   my $result = $pause->test_reindex;
   $result->assert_index_updated;
 
+  # Back in the day, assignment of a simple scalar reference to *VERSION was
+  # permitted, but we've backed that out as part of strictifying versions.
+  # Here, we're asserting that the Example package was *not* included.
   $result->package_list_ok([
     { package => 'Globby::Version',           version => '1.234'  },
-    { package => 'Globby::Version::Example',  version => '0.003'  }
   ]);
 
+  # Permissions are granted before the version is checked, so the refused
+  # package still gets them.
   $result->perm_list_ok({
     'Globby::Version' => { f => 'LUNATIC' },
-    'Globby::Version::Example' => { f => 'LUNATIC' },
+    'Globby::Version::Example' => { c => [ 'LUNATIC' ] },
   });
+
+  $result->email_ok(
+    [
+      {
+        subject   => 'Failed: PAUSE indexer report LUNATIC/Globby-Version-1.234.tar.gz',
+        callbacks => [
+          sub {
+            like(
+              $_[0]{email}->object->body_str,
+              qr/version could not be determined/,
+              "report explains the refusal",
+            );
+          },
+        ],
+      },
+    ],
+  );
 };
 
 subtest "check overlong versions" => sub {
@@ -373,6 +394,46 @@ EOT
   $result->logged_event_like(
     qr/error with version/,
     "0x1p-1 is a bad version",
+  );
+};
+
+subtest "version that can't be determined without running code" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+  $pause->upload_author_fake(MONSTER => 'RCS-Version-1.234.tar.gz', {
+    append => [
+      {
+        file => "lib/RCS/Version/Keyword.pm",
+        content => <<'EOT',
+use strict;
+use warnings;
+package RCS::Version::Keyword;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/;
+1;
+EOT
+      }
+    ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  $result->package_list_ok([
+    { package => 'RCS::Version', version => '1.234'  },
+  ]);
+
+  my $explains = sub {
+    my $body = $_[0]{email}->object->body_str;
+    like($body, qr/RCS::Version::Keyword/, "report names the package");
+    like($body, qr/version could not be determined/, "report gives the reason");
+    like($body, qr/q\$Revision: 1\.5 \$/, "report quotes the line");
+  };
+
+  $result->email_ok(
+    [
+      {
+        subject   => 'Failed: PAUSE indexer report MONSTER/RCS-Version-1.234.tar.gz',
+        callbacks => [ $explains ],
+      },
+    ],
   );
 };
 

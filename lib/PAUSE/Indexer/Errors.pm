@@ -308,16 +308,31 @@ pkg_error version_openerr => {
 };
 
 pkg_error version_parse => {
-  header  => 'Not indexed because of version parsing error.',
-  body    => <<~'EOF',
-    The PAUSE indexer was not able to parse the file.
+  header  => 'Not indexed because the version could not be determined.',
+  body    => sub {
+    my ($arg) = @_;
 
-    Note: the indexer is running in a Safe compartment and cannot provide the
-    full functionality of perl in the VERSION line. It is trying hard, but
-    sometime it fails. As a workaround, please consider writing a META.yml
-    that contains a "provides" attribute, or contact the CPAN admins to
-    investigate (yet another) workaround against "Safe" limitations.
-    EOF
+    _assert_args_present(version_parse => $arg, [ qw(line) ]);
+
+    # This line comes from the uploaded file, so we keep it short and printable
+    # before putting it in the report.
+    my $line = $arg->{line} =~ s/[^\x20-\x7e]/?/gr =~ s/\A\s+|\s+\z//gr;
+    $line = substr($line, 0, 200) . '...' if length $line > 200;
+
+    return <<~"EOF";
+      PAUSE does not run any code from your distribution to find a module's
+      version.  The line that sets this module's version is:
+
+        $line
+
+      ...and that isn't a simple assignment of a literal value, so PAUSE can't
+      tell what version it sets.  To fix this, do one of these:
+
+      * assign a literal, like:  our \$VERSION = '1.23';
+      * put the version in the package statement, like:  package Foo::Bar 1.23;
+      * list the package and its version under "provides" in your META file
+      EOF
+  },
 };
 
 pkg_error version_too_long => {

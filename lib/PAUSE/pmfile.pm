@@ -3,7 +3,7 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
-use Safe;
+use JSON::XS ();
 
 use PAUSE::Logger '$Logger';
 
@@ -343,172 +343,156 @@ sub packages_per_pmfile {
     $ppp;
 }
 
-# package PAUSE::pmfile;
-{
-    no strict;
-    sub parse_version_safely {
-        my($parsefile) = @_;
-        my $result;
-        local $/ = "\n";
-        open(my $fh,"<",$parsefile) or die "Could not open '$parsefile': $!";
-        my $inpod = 0;
-        my $package_or_class = 'package';
-        local $_;
-        while (<$fh>) {
-            $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
-            next if $inpod || /^\s*#/;
-            last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
-            chop;
+# These are used to recognize a $VERSION assignment whose value can be known
+# without running it.  The line must be a literal assignment, or it's refused.
+my $VERSION_LHS = qr{
+    # Neither "my" nor "local" can set the package's $VERSION:  a lexical is a
+    # different variable, and a file-level "local" is undone when the require
+    # finishes.  So only "our" is allowed.
+    (?: our )? \s* \(? \s*
+    \$ (?: [\w:']* (?: :: | ' ) )? VERSION
+    \s* \)?
+}x;
 
-=pod
-            # hide in the pod block until 'class' is added to a version bundle
-            if (/^[\s\{;]*use\s(+v?5\.[0-9]+)/) {
-                my $version = $1;
-                my $version_bundle_for_class = version->parse("v5.xx.xx");
-                if (eval { version->parse($version) >= $version_bundle_for_class) {
-                    $package_or_class = 'package|class|role';
-                }
-                next;
-            }
+# plain - single quotes or "q" qlop or double quotes or "qq" qlop: but in all
+#         cases, the quoted content is exact: no interpolation or escaping to
+#         undo; no version can contain a backslash or apostrophe anyway
+# num   - a decimal numeric value, including the weird (to me) .5
+my $VERSION_LITERAL = qr{
+    ' (?<plain> [^'\\]* ) '
+  | " (?<plain> [^"\\\$\@]* ) "
+  | \b q \s* (?: \{ (?<plain> [^{}\\]* ) \}
+               | \( (?<plain> [^()\\]* ) \)
+               | \[ (?<plain> [^\[\]\\]* ) \]
+               | <  (?<plain> [^<>\\]* )  > )
+  | \b qq \s* (?: \{ (?<plain> [^{}\\\$\@]* ) \}
+                | \( (?<plain> [^()\\\$\@]* ) \)
+                | \[ (?<plain> [^\[\]\\\$\@]* ) \]
+                | <  (?<plain> [^<>\\\$\@]* )  > )
+  | (?<num> (?= \.? [0-9] ) (?: 0 | [1-9][0-9_]* )? (?: \. [0-9_]* )? )
+}x;
+
+# call - a call to the version.pm constructor, which we know will be safe to
+#        turn into our own call to version.pm, because we know the argument
+#        must match a VERSION_LITERAL form above
+my $VERSION_LINE = qr{
+    \A
+    (?: \s | [{;] | \b (?: use | no | package ) \b [^;]* ; )*
+    $VERSION_LHS \s* = \s*
+    (?: \$ (?: [\w:']* (?: :: | ' ) )? VERSION \s* = \s* )?
+    (?:
+        (?<call> version \s* -> \s* (?: declare | new | parse ) | (?: version:: )? qv )
+        \s* \( \s* $VERSION_LITERAL \s* \)
+      | \( \s* $VERSION_LITERAL \s* \)
+      | $VERSION_LITERAL
+    )
+    [\s;}]*
+    (?: \# .* )?
+    \z
+}x;
+
+=head2 static_version_from_file
+
+  my $result = PAUSE::pmfile::static_version_from_file($filename);
+
+This finds the line in the file that sets the module's version, the same way
+ExtUtils::MakeMaker does, and works out the version it sets, without
+evaluating anything.  The result is a hashref with one of these keys:
+
+  version - the version found, or the string "undef" if there wasn't one
+  refused - the line setting the version, which wasn't a literal assignment
+  openerr - the error from trying to open the file
+
 =cut
 
-            # use feature 'class'; enables class (and role, though not implemented yet)
-            if (/^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
-                $package_or_class = 'package|class';
-            }
-            if (/^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
-                $package_or_class = 'package|class';
-            }
-            # Object::Pad is special-cased; let's ignore other modules that are too old or less known
-            if (/^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+sub static_version_from_file {
+    my ($parsefile) = @_;
+
+    open(my $fh, "<", $parsefile) or return { openerr => "$!" };
+
+    local $/ = "\n";
+    my $inpod = 0;
+    my $package_or_class = 'package';
+    local $_;
+    while (<$fh>) {
+        $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+        next if $inpod || /^\s*#/;
+        last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
+        chop;
+
+=pod
+        # hide in the pod block until 'class' is added to a version bundle
+        if (/^[\s\{;]*use\s(+v?5\.[0-9]+)/) {
+            my $version = $1;
+            my $version_bundle_for_class = version->parse("v5.xx.xx");
+            if (eval { version->parse($version) >= $version_bundle_for_class) {
                 $package_or_class = 'package|class|role';
             }
+            next;
+        }
+=cut
 
-            if (my ($ver) = /^[\s\{;]*(?:$package_or_class) \s+ \S+ \s+ (\S+) \s* [:;{]/x) {
-              # XXX: should handle this better if version is bogus -- rjbs,
-              # 2014-03-16
-              return $ver if version::is_lax($ver);
-            }
+        # use feature 'class'; enables class (and role, though not implemented yet)
+        if (/^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        if (/^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        # Object::Pad is special-cased; let's ignore other modules that are too old or less known
+        if (/^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+            $package_or_class = 'package|class|role';
+        }
 
-            # We only care about lines that appear to be assignments to, but
-            # not comparisons to, VERSION.
-            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
+        if (my ($ver) = /^[\s\{;]*(?:$package_or_class) \s+ \S+ \s+ (\S+) \s* [:;{]/x) {
+          # XXX: should handle this better if version is bogus -- rjbs,
+          # 2014-03-16
+          return { version => $ver } if version::is_lax($ver);
+        }
 
-            my $current_parsed_line = $_;
-            my $eval = qq{
-          package ExtUtils::MakeMaker::_version;
+        # We only care about lines that appear to be assignments to, but
+        # not comparisons to, VERSION.
+        next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
 
-          local $1$2;
-          \$$2=undef; do {
-              $_
-          }; \$$2
-      };
-            local $^W = 0;
-            $result = eval($eval);
-            # warn "current_parsed_line[$current_parsed_line]\$\@[$@]";
-            if ($@){
-                die +{
-                      eval => $eval,
-                      line => $current_parsed_line,
-                      file => $parsefile,
-                      err => $@,
-                      } if $@;
-            }
-            last;
-        } #;
-        close FH;
-
-        $result = "undef" unless defined $result;
-        return $result;
+        return _static_version_from_line($_);
     }
+
+    return { version => "undef" };
+}
+
+sub _static_version_from_line {
+    my ($line) = @_;
+
+    return { refused => $line } unless $line =~ $VERSION_LINE;
+    my %match = %+;
+
+    my $value = defined $match{plain} ? $match{plain}
+              :                         0 + ($match{num} =~ tr/_//dr);
+
+    return { version => $value } unless $match{call};
+
+    my ($method) = $match{call} =~ /(\w+)\z/;
+    my $object = eval {
+        $method eq 'qv' ? version::qv($value) : version->$method($value);
+    };
+
+    return { refused => $line } unless $object;
+    return { version => $object->numify };
 }
 
 # package PAUSE::pmfile;
 sub parse_version {
-    my $self = shift;
+    my ($self) = @_;
 
-    use strict;
+    my $result = static_version_from_file($self->{PMFILE});
 
-    my $pmfile = $self->{PMFILE};
+    return JSON::XS->new->canonical->encode({ openerr => $result->{openerr} })
+        if exists $result->{openerr};
 
-    my $pmcp = $pmfile;
-    for ($pmcp) {
-        s/([^\\](\\\\)*)@/$1\\@/g; # thanks to Raphael Manfredi for the
-        # solution to escape @s and \
-    }
-    my($v);
-    # $self->disconnect; # no guarantee that the connection survives the fork!
+    return JSON::XS->new->canonical->encode({ refused => $result->{refused} })
+        if exists $result->{refused};
 
-    {
-
-        package main; # seems necessary
-
-        my($pid,$kid);
-        die "Can't fork: $!" unless defined($pid = open($kid, "-|"));
-        if ($pid) {         # parent
-            $v = <$kid>;
-            # warn ">>>>>>>>read v[$v]<<<<<<<<";
-            close $kid;
-        } else {
-            $self->connect->{InactiveDestroy} = 1;
-            my($gnam,$gpw,$gid,$gmem) = getgrnam($PAUSE::Config->{ML_CHOWN_GROUP});
-            die "Could not determine GID of $PAUSE::Config->{ML_CHOWN_GROUP}" unless defined $gid;
-            my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) =
-                getpwnam($PAUSE::Config->{ML_CHOWN_USER});
-            die "Could not determine UID of $PAUSE::Config->{ML_CHOWN_USER}" unless defined $uid;
-            $( = $gid; $) = "$gid $gid";
-            $< = $> = $uid;
-
-            # XXX Limit Resources too
-
-            my($comp) = Safe->new("_pause::mldistwatch");
-            my $eval = qq{
-              local(\$^W) = 0;
-              PAUSE::pmfile::parse_version_safely("$pmcp");
-              };
-            $comp->permit("entereval"); # for MBARBON/Module-Info-0.30.tar.gz
-            $comp->share("*PAUSE::pmfile::parse_version_safely");
-            $comp->share("*version::new");
-            $comp->share("*version::numify");
-            $comp->share_from('main', ['*version::',
-                                        '*Exporter::']);
-            $comp->share_from('version', ['&qv']);
-            $comp->permit(":base_math");
-            # $comp->permit("require"); # no strict!
-            {
-                no strict;
-                local $PAUSE::Config;
-                $v = $comp->reval($eval);
-            }
-            if ($@){ # still in the child process, out of Safe::reval
-                my $err = $@;
-                # warn ">>>>>>>err[$err]<<<<<<<<";
-                if (ref $err) {
-                    if ($err->{line} =~ /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
-                        $v = $comp->reval($2);
-                    }
-                    if ($@) {
-                        warn sprintf("reval failed: err[%s] for eval[%s]",
-                                      JSON::objToJson($err,{pretty => 1}),
-                                      $eval,
-                                    );
-                        $v = JSON::objToJson($err);
-                    }
-                } else {
-                    $v = JSON::objToJson({ openerr => $err });
-                }
-            }
-            if (defined $v) {
-                $v = $v->numify if ref($v) eq 'version';
-            } else {
-                $v = "";
-            }
-            print $v;
-            exit;
-        }
-    }
-
-    return $self->normalize_version($v);
+    return $self->normalize_version($result->{version});
 }
 
 # package PAUSE::pmfile

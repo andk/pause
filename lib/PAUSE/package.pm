@@ -8,6 +8,7 @@ use PAUSE::Logger '$Logger';
 use PAUSE::mldistwatch::Constants;
 use PAUSE::Indexer::Errors;
 use CPAN::DistnameInfo;
+use JSON::XS ();
 
 =comment
 
@@ -275,13 +276,15 @@ sub examine_pkg {
   # Parser problem
 
   if ($pp->{version} && $pp->{version} =~ /^\{.*\}$/) { # JSON parser error
-      my $err = JSON::jsonToObj($pp->{version});
+      my $err = JSON::XS::decode_json($pp->{version});
       if ($err->{openerr}) {
           # TODO: get $err->{openerr} back in here, I guess?
           $ctx->abort_indexing_package($self, PKGERROR('version_openerr'));
       } else {
-          # TODO: get $err->{line} back in here, I guess?
-          $ctx->abort_indexing_package($self, PKGERROR('version_parse'));
+          $ctx->abort_indexing_package(
+            $self,
+            PKGERROR(version_parse => { line => $err->{refused} }),
+          );
       }
   }
 
