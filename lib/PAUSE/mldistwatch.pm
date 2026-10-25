@@ -43,7 +43,6 @@ use PAUSE::Indexer::Errors;
 use PAUSE::MailAddress ();
 use PAUSE::PermsManager ();
 use Process::Status ();
-use Safe;
 use Scalar::Util ();
 use Text::Format;
 
