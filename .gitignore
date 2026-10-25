@@ -7,3 +7,4 @@ mailer.testfile
 privatelib
 cover_db
 docker-compose/tmp/
+*~
