@@ -3,6 +3,7 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
+use Safe;
 
 use PAUSE::Logger '$Logger';
 
