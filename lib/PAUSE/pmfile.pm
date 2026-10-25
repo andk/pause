@@ -461,8 +461,13 @@ sub static_version_from_file {
         }
 
         # We only care about lines that appear to be assignments to, but
-        # not comparisons to, VERSION.
-        next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
+        # not comparisons to, VERSION.  An assignment that appears only in a
+        # trailing comment doesn't count.  Finding the comment is
+        # approximate:  the "#" in $#array is skipped, but a "#" inside a
+        # string earlier on the line would hide the assignment after it.
+        # Neither case appears in the version lines on CPAN today.
+        my $code = s/(?<!\$)#.*//r;
+        next unless $code =~ /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
 
         return _static_version_from_line($_);
     }

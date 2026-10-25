@@ -140,6 +140,21 @@ subtest "finding the line" => sub {
     '2.0',
     'comparisons to $VERSION are not assignments',
   );
+
+  file_version_is(
+    "package Foo;\n\$flag = 1; # note: \$VERSION = 1.0 below\nour \$VERSION = '2.0';\n",
+    '2.0',
+    'assignments in a trailing comment are ignored',
+  );
+
+  file_version_is(
+    "package Foo;\nour \$VERSION = '2.0'; # was: \$VERSION = '1.0'\n",
+    '2.0',
+    'a trailing comment can follow the assignment',
+  );
+
+  # $#array is not a comment, so this is still the version line.
+  version_refused(q{my $last = $#ARGV; our $VERSION = do { 1 };});
 };
 
 subtest "unreadable file" => sub {
