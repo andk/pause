@@ -75,6 +75,11 @@ subtest "version objects" => sub {
   version_is(q{our $VERSION = version->new('1.10');},                    '1.100');
   version_is(q{our $VERSION = version->new(1.10);},                      '1.100');
   version_is(q{our $VERSION = version->parse('1.002003');},              '1.002003');
+
+  # version.pm objects are false when their value is zero.
+  version_is(q{our $VERSION = version->new(0);},         '0.000');
+  version_is(q{our $VERSION = version->declare('0');},   '0.000000');
+  version_is(q{our $VERSION = qv('0.0.0');},             '0.000000');
 };
 
 subtest "lexical or localized \$VERSION" => sub {

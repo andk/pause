@@ -486,7 +486,8 @@ sub _static_version_from_line {
         $method eq 'qv' ? version::qv($value) : version->$method($value);
     };
 
-    return { refused => $line } unless $object;
+    # A version object for 0 is false, so we can't just test its truth.
+    return { refused => $line } unless defined $object;
     return { version => $object->numify };
 }
 
