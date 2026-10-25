@@ -410,7 +410,17 @@ package RCS::Version::Keyword;
 our $VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/;
 1;
 EOT
-      }
+      },
+      {
+        # The refused $VERSION line comes before the package statement with
+        # its own version, which still wins.
+        file => "lib/RCS/Version/Inline.pm",
+        content => <<'EOT',
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/;
+package RCS::Version::Inline 2.000;
+1;
+EOT
+      },
     ],
   });
 
@@ -418,13 +428,16 @@ EOT
 
   $result->package_list_ok([
     { package => 'RCS::Version', version => '1.234'  },
+    { package => 'RCS::Version::Inline', version => '2.000'  },
   ]);
 
   my $explains = sub {
     my $body = $_[0]{email}->object->body_str;
     like($body, qr/RCS::Version::Keyword/, "report names the package");
     like($body, qr/version could not be determined/, "report gives the reason");
-    like($body, qr/q\$Revision: 1\.5 \$/, "report quotes the line");
+    like($body, qr/q\$Revision:\s+1\.5\s+\$/, "report quotes the line");
+    like($body, qr/version: undef\b/, "report shows the version as undef");
+    unlike($body, qr/version: \{/, "report shows no internal error encoding");
   };
 
   $result->email_ok(

@@ -3,7 +3,7 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
-use JSON::XS ();
+use PAUSE::Indexer::Errors;
 
 use PAUSE::Logger '$Logger';
 
@@ -106,21 +106,18 @@ sub examine_fio {
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
 
+    my $file_version;
     unless ($self->version_from_meta_ok($ctx)) {
-        my $version;
-        unless (eval { $version = $self->parse_version; 1 }) {
+        unless (eval { $file_version = $self->parse_version; 1 }) {
           my $error = $@;
           $Logger->log([ "error with version: %s", $error ]);
           return;
         }
 
-        $self->{VERSION} = $version;
-
+        my $version = $file_version->{version};
         my $dist_is_perl = PAUSE::isa_regular_perl($self->{DIO}{DIST});
 
-        if ($self->{VERSION} =~ /^\{.*\}$/) {
-            # JSON error message
-        } elsif ($self->{VERSION} =~ /[_\s]/ && ! $dist_is_perl) {
+        if (defined $version && $version =~ /[_\s]/ && ! $dist_is_perl) {
             # If the pmfile seems to be a dev version, we skip it... but not if
             # it's in perl.  Historical example:  perl-5.18.0 contains POSIX
             # 1.32, but perl-5.20.0 contains 1.38_03.  We would then skip the
@@ -130,14 +127,14 @@ sub examine_fio {
             # We don't need to account for single- versus dual-life, because
             # the check for dual-life packages still applies elsewhere.
             # -- rjbs, 2015-04-18
-            $Logger->log("skipping file because of dev version: $self->{VERSION}");
+            $Logger->log("skipping file because of dev version: $version");
 
             delete $self->{DIO};    # circular reference
             return;
         }
     }
 
-    my ($ppp) = $self->packages_per_pmfile($ctx);
+    my ($ppp) = $self->packages_per_pmfile($ctx, $file_version);
     my @package_names = $self->filter_ppps(sort keys %$ppp);
 
     unless (@package_names) {
@@ -184,12 +181,17 @@ sub version_from_meta_ok {
 
 # package PAUSE::pmfile;
 sub packages_per_pmfile {
-    my ($self, $ctx) = @_;
+    my ($self, $ctx, $file_version) = @_;
 
     my $ppp = {};
     my $pmfile = $self->{PMFILE};
     my $filemtime = $self->{MTIME};
-    my $version = $self->{VERSION};
+
+    # $file_version is the result of parse_version, or undef if the versions
+    # come from META instead.  If it's an error, every package that would have
+    # taken the file's version gets the error instead.
+    my $version       = $file_version && $file_version->{version};
+    my $version_error = $file_version && $file_version->{error};
 
     $DB::single++;
     open my $fh, "<", "$pmfile" or return $ppp;
@@ -311,6 +313,9 @@ sub packages_per_pmfile {
                 } else {
                     if (defined $strict_version){
                         $ppp->{$pkg}{version} = $strict_version ;
+                    } elsif ($version_error) {
+                        $ppp->{$pkg}{version} = "undef";
+                        $ppp->{$pkg}{version_error} = $version_error;
                     } else {
                         $ppp->{$pkg}{version} = defined $version ? $version : "";
                     }
@@ -327,10 +332,15 @@ sub packages_per_pmfile {
                 #### it comes later, it would be nonsense
                 #### to set to "undef". MM_Unix gives us
                 #### the best we can reasonably consider
-                $ppp->{$pkg}{version} =
-                    $version
-                        unless defined $ppp->{$pkg}{version} &&
-                            length($ppp->{$pkg}{version});
+                unless (defined $ppp->{$pkg}{version} &&
+                        length($ppp->{$pkg}{version})) {
+                    if ($version_error) {
+                        $ppp->{$pkg}{version} = "undef";
+                        $ppp->{$pkg}{version_error} = $version_error;
+                    } else {
+                        $ppp->{$pkg}{version} = $version;
+                    }
+                }
             }
             $ppp->{$pkg}{filemtime} = $filemtime;
             $ppp->{$pkg}{pause_reg} = time;
@@ -480,19 +490,31 @@ sub _static_version_from_line {
     return { version => $object->numify };
 }
 
+=head2 parse_version
+
+  my $result = $pmfile->parse_version;
+
+This returns a hashref with exactly one key, either C<version>, holding the
+file's normalized version, or C<error>, holding the package error (from
+PKGERROR) to report for every package that would have taken the file's
+version.
+
+=cut
+
 # package PAUSE::pmfile;
 sub parse_version {
     my ($self) = @_;
 
     my $result = static_version_from_file($self->{PMFILE});
 
-    return JSON::XS->new->canonical->encode({ openerr => $result->{openerr} })
+    # TODO: get $result->{openerr} back in here, I guess?
+    return { error => PKGERROR('version_openerr') }
         if exists $result->{openerr};
 
-    return JSON::XS->new->canonical->encode({ refused => $result->{refused} })
+    return { error => PKGERROR(version_parse => { line => $result->{refused} }) }
         if exists $result->{refused};
 
-    return $self->normalize_version($result->{version});
+    return { version => $self->normalize_version($result->{version}) };
 }
 
 # package PAUSE::pmfile
@@ -504,7 +526,6 @@ sub normalize_version {
     $Logger->log("result of normalize_version: $sdv");
 
     return $v if $v eq "undef";
-    return $v if $v =~ /^\{.*\}$/; # JSON object
     $v =~ s/^\s+//;
     $v =~ s/\s+\z//;
     if ($v =~ /_/) {
