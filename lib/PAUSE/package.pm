@@ -274,15 +274,8 @@ sub examine_pkg {
 
   # Parser problem
 
-  if ($pp->{version} && $pp->{version} =~ /^\{.*\}$/) { # JSON parser error
-      my $err = JSON::jsonToObj($pp->{version});
-      if ($err->{openerr}) {
-          # TODO: get $err->{openerr} back in here, I guess?
-          $ctx->abort_indexing_package($self, PKGERROR('version_openerr'));
-      } else {
-          # TODO: get $err->{line} back in here, I guess?
-          $ctx->abort_indexing_package($self, PKGERROR('version_parse'));
-      }
+  if ($pp->{version_error}) {
+      $ctx->abort_indexing_package($self, $pp->{version_error});
   }
 
   # Sanity checks

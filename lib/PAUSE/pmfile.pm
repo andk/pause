@@ -3,6 +3,7 @@ use warnings;
 package PAUSE::pmfile;
 use vars qw($AUTOLOAD);
 use version (); # to get $version::STRICT
+use PAUSE::Indexer::Errors;
 
 use PAUSE::Logger '$Logger';
 
@@ -105,21 +106,18 @@ sub examine_fio {
     my($filemtime) = (stat $pmfile)[9];
     $self->{MTIME} = $filemtime;
 
+    my $file_version;
     unless ($self->version_from_meta_ok($ctx)) {
-        my $version;
-        unless (eval { $version = $self->parse_version; 1 }) {
+        unless (eval { $file_version = $self->parse_version; 1 }) {
           my $error = $@;
           $Logger->log([ "error with version: %s", $error ]);
           return;
         }
 
-        $self->{VERSION} = $version;
-
+        my $version = $file_version->{version};
         my $dist_is_perl = PAUSE::isa_regular_perl($self->{DIO}{DIST});
 
-        if ($self->{VERSION} =~ /^\{.*\}$/) {
-            # JSON error message
-        } elsif ($self->{VERSION} =~ /[_\s]/ && ! $dist_is_perl) {
+        if (defined $version && $version =~ /[_\s]/ && ! $dist_is_perl) {
             # If the pmfile seems to be a dev version, we skip it... but not if
             # it's in perl.  Historical example:  perl-5.18.0 contains POSIX
             # 1.32, but perl-5.20.0 contains 1.38_03.  We would then skip the
@@ -129,14 +127,14 @@ sub examine_fio {
             # We don't need to account for single- versus dual-life, because
             # the check for dual-life packages still applies elsewhere.
             # -- rjbs, 2015-04-18
-            $Logger->log("skipping file because of dev version: $self->{VERSION}");
+            $Logger->log("skipping file because of dev version: $version");
 
             delete $self->{DIO};    # circular reference
             return;
         }
     }
 
-    my ($ppp) = $self->packages_per_pmfile($ctx);
+    my ($ppp) = $self->packages_per_pmfile($ctx, $file_version);
     my @package_names = $self->filter_ppps(sort keys %$ppp);
 
     unless (@package_names) {
@@ -183,12 +181,17 @@ sub version_from_meta_ok {
 
 # package PAUSE::pmfile;
 sub packages_per_pmfile {
-    my ($self, $ctx) = @_;
+    my ($self, $ctx, $file_version) = @_;
 
     my $ppp = {};
     my $pmfile = $self->{PMFILE};
     my $filemtime = $self->{MTIME};
-    my $version = $self->{VERSION};
+
+    # $file_version is the result of parse_version, or undef if the versions
+    # come from META instead.  If it's an error, every package that would have
+    # taken the file's version gets the error instead.
+    my $version       = $file_version && $file_version->{version};
+    my $version_error = $file_version && $file_version->{error};
 
     $DB::single++;
     open my $fh, "<", "$pmfile" or return $ppp;
@@ -310,6 +313,9 @@ sub packages_per_pmfile {
                 } else {
                     if (defined $strict_version){
                         $ppp->{$pkg}{version} = $strict_version ;
+                    } elsif ($version_error) {
+                        $ppp->{$pkg}{version} = "undef";
+                        $ppp->{$pkg}{version_error} = $version_error;
                     } else {
                         $ppp->{$pkg}{version} = defined $version ? $version : "";
                     }
@@ -326,10 +332,15 @@ sub packages_per_pmfile {
                 #### it comes later, it would be nonsense
                 #### to set to "undef". MM_Unix gives us
                 #### the best we can reasonably consider
-                $ppp->{$pkg}{version} =
-                    $version
-                        unless defined $ppp->{$pkg}{version} &&
-                            length($ppp->{$pkg}{version});
+                unless (defined $ppp->{$pkg}{version} &&
+                        length($ppp->{$pkg}{version})) {
+                    if ($version_error) {
+                        $ppp->{$pkg}{version} = "undef";
+                        $ppp->{$pkg}{version_error} = $version_error;
+                    } else {
+                        $ppp->{$pkg}{version} = $version;
+                    }
+                }
             }
             $ppp->{$pkg}{filemtime} = $filemtime;
             $ppp->{$pkg}{pause_reg} = time;
@@ -342,220 +353,174 @@ sub packages_per_pmfile {
     $ppp;
 }
 
-# package PAUSE::pmfile;
-{
-    no strict;
-    sub parse_version_safely {
-        my($parsefile) = @_;
-        my $result;
-        local $/ = "\n";
-        open(my $fh,"<",$parsefile) or die "Could not open '$parsefile': $!";
-        my $inpod = 0;
-        my $package_or_class = 'package';
-        local $_;
-        while (<$fh>) {
-            $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
-            next if $inpod || /^\s*#/;
-            last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
-            chop;
+# These are used to recognize a $VERSION assignment whose value can be known
+# without running it.  The line must be a literal assignment, or it's refused.
+my $VERSION_LHS = qr{
+    # Neither "my" nor "local" can set the package's $VERSION:  a lexical is a
+    # different variable, and a file-level "local" is undone when the require
+    # finishes.  So only "our" is allowed.
+    (?: our )? \s* \(? \s*
+    \$ (?: [\w:']* (?: :: | ' ) )? VERSION
+    \s* \)?
+}x;
 
-=pod
-            # hide in the pod block until 'class' is added to a version bundle
-            if (/^[\s\{;]*use\s(+v?5\.[0-9]+)/) {
-                my $version = $1;
-                my $version_bundle_for_class = version->parse("v5.xx.xx");
-                if (eval { version->parse($version) >= $version_bundle_for_class) {
-                    $package_or_class = 'package|class|role';
-                }
-                next;
-            }
+# plain - single quotes or "q" qlop or double quotes or "qq" qlop: but in all
+#         cases, the quoted content is exact: no interpolation or escaping to
+#         undo; no version can contain a backslash or apostrophe anyway
+# num   - a decimal numeric value, including the weird (to me) .5
+my $VERSION_LITERAL = qr{
+    ' (?<plain> [^'\\]* ) '
+  | " (?<plain> [^"\\\$\@]* ) "
+  | \b q \s* (?: \{ (?<plain> [^{}\\]* ) \}
+               | \( (?<plain> [^()\\]* ) \)
+               | \[ (?<plain> [^\[\]\\]* ) \]
+               | <  (?<plain> [^<>\\]* )  > )
+  | \b qq \s* (?: \{ (?<plain> [^{}\\\$\@]* ) \}
+                | \( (?<plain> [^()\\\$\@]* ) \)
+                | \[ (?<plain> [^\[\]\\\$\@]* ) \]
+                | <  (?<plain> [^<>\\\$\@]* )  > )
+  | (?<num> (?= \.? [0-9] ) (?: 0 | [1-9][0-9_]* )? (?: \. [0-9_]* )? )
+}x;
+
+# call - a call to the version.pm constructor, which we know will be safe to
+#        turn into our own call to version.pm, because we know the argument
+#        must match a VERSION_LITERAL form above
+my $VERSION_LINE = qr{
+    \A
+    (?: \s | [{;] | \b (?: use | no | package ) \b [^;]* ; )*
+    $VERSION_LHS \s* = \s*
+    (?: \$ (?: [\w:']* (?: :: | ' ) )? VERSION \s* = \s* )?
+    (?:
+        (?<call> version \s* -> \s* (?: declare | new | parse ) | (?: version:: )? qv )
+        \s* \( \s* $VERSION_LITERAL \s* \)
+      | \( \s* $VERSION_LITERAL \s* \)
+      | $VERSION_LITERAL
+    )
+    [\s;}]*
+    (?: \# .* )?
+    \z
+}x;
+
+=head2 static_version_from_file
+
+  my $result = PAUSE::pmfile::static_version_from_file($filename);
+
+This finds the line in the file that sets the module's version, the same way
+ExtUtils::MakeMaker does, and works out the version it sets, without
+evaluating anything.  The result is a hashref with one of these keys:
+
+  version - the version found, or the string "undef" if there wasn't one
+  refused - the line setting the version, which wasn't a literal assignment
+  openerr - the error from trying to open the file
+
 =cut
 
-            # use feature 'class'; enables class (and role, though not implemented yet)
-            if (/^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
-                $package_or_class = 'package|class';
-            }
-            if (/^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
-                $package_or_class = 'package|class';
-            }
-            # Object::Pad is special-cased; let's ignore other modules that are too old or less known
-            if (/^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+sub static_version_from_file {
+    my ($parsefile) = @_;
+
+    open(my $fh, "<", $parsefile) or return { openerr => "$!" };
+
+    local $/ = "\n";
+    my $inpod = 0;
+    my $package_or_class = 'package';
+    local $_;
+    while (<$fh>) {
+        $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+        next if $inpod || /^\s*#/;
+        last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
+        chop;
+
+=pod
+        # hide in the pod block until 'class' is added to a version bundle
+        if (/^[\s\{;]*use\s(+v?5\.[0-9]+)/) {
+            my $version = $1;
+            my $version_bundle_for_class = version->parse("v5.xx.xx");
+            if (eval { version->parse($version) >= $version_bundle_for_class) {
                 $package_or_class = 'package|class|role';
             }
+            next;
+        }
+=cut
 
-            if (my ($ver) = /^[\s\{;]*(?:$package_or_class) \s+ \S+ \s+ (\S+) \s* [:;{]/x) {
-              # XXX: should handle this better if version is bogus -- rjbs,
-              # 2014-03-16
-              return $ver if version::is_lax($ver);
-            }
+        # use feature 'class'; enables class (and role, though not implemented yet)
+        if (/^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        if (/^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
+            $package_or_class = 'package|class';
+        }
+        # Object::Pad is special-cased; let's ignore other modules that are too old or less known
+        if (/^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+            $package_or_class = 'package|class|role';
+        }
 
-            # We only care about lines that appear to be assignments to, but
-            # not comparisons to, VERSION.
-            next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
+        if (my ($ver) = /^[\s\{;]*(?:$package_or_class) \s+ \S+ \s+ (\S+) \s* [:;{]/x) {
+          # XXX: should handle this better if version is bogus -- rjbs,
+          # 2014-03-16
+          return { version => $ver } if version::is_lax($ver);
+        }
 
-            my $current_parsed_line = $_;
-            my $eval = qq{
-          package ExtUtils::MakeMaker::_version;
+        # We only care about lines that appear to be assignments to, but
+        # not comparisons to, VERSION.  An assignment that appears only in a
+        # trailing comment doesn't count.  Finding the comment is
+        # approximate:  the "#" in $#array is skipped, but a "#" inside a
+        # string earlier on the line would hide the assignment after it.
+        # Neither case appears in the version lines on CPAN today.
+        my $code = s/(?<!\$)#.*//r;
+        next unless $code =~ /([\$*])(([\w\:\']*)\bVERSION)\b.*(?<![!><=])\=(?![=>])/;
 
-          local $1$2;
-          \$$2=undef; do {
-              $_
-          }; \$$2
-      };
-            local $^W = 0;
-            $result = eval($eval);
-            # warn "current_parsed_line[$current_parsed_line]\$\@[$@]";
-            if ($@){
-                die +{
-                      eval => $eval,
-                      line => $current_parsed_line,
-                      file => $parsefile,
-                      err => $@,
-                      } if $@;
-            }
-            last;
-        } #;
-        close FH;
-
-        $result = "undef" unless defined $result;
-        return $result;
+        return _static_version_from_line($_);
     }
+
+    return { version => "undef" };
 }
 
-sub _module_version {
-    my $leaf = shift;
-    (my $pkg = $leaf) =~ s/\.pm//;
-    my ($module, $version, $in_pkg, %version);
+sub _static_version_from_line {
+    my ($line) = @_;
 
-    local $_;
-    open(my $fh,"<",$leaf) or return;
-    my $inpod;
+    return { refused => $line } unless $line =~ $VERSION_LINE;
+    my %match = %+;
 
-    while(<$fh>) {
-        $inpod = $1 ne 'cut' if /^=(\w+)/;
-        next if $inpod or /^\s*#/;
+    my $value = defined $match{plain} ? $match{plain}
+              :                         0 + ($match{num} =~ tr/_//dr);
 
-        if(/^\s*package\s+(([\w]+(?:'|::))*([\w]+))/) {
-            $module ||= $1 if $3 eq $pkg;
-            $in_pkg = $1;
-        }
-        elsif (my($for_pkg, $rhs) = /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
-            $for_pkg ||= $in_pkg or next;
-            $for_pkg =~ s/::$//;
-            $version{$for_pkg} = $rhs;
-        }
+    return { version => $value } unless $match{call};
 
-        if ($module and $version{$module}) {
-            require Safe;
-            require version;
-            local $^W = 0;
-            my $s = Safe->new;
-            $s->share_from('main', ['*version::']);
-            $s->share_from('version', ['&qv']);
-            $s->reval('$VERSION = ' . $version{$module});
-            $version = $s->reval('$VERSION');
+    my ($method) = $match{call} =~ /(\w+)\z/;
+    my $object = eval {
+        $method eq 'qv' ? version::qv($value) : version->$method($value);
+    };
 
-            # Handle version objects
-            ($version = $version->normal) =~ s/^v// if ref($version) eq
-                'version';
-            if ($version{$module} =~ /\bv?(\d+([_.]\d+){2,})/) {
-                my $v = $1;
-                my $q = pack "U*", ($v =~ /\d+/g);
-                $version = $v if $version eq $q;
-            }
-            last;
-        }
-    }
-    close($fh);
-    return $module ? ($module, $version) : ();
+    # A version object for 0 is false, so we can't just test its truth.
+    return { refused => $line } unless defined $object;
+    return { version => $object->numify };
 }
+
+=head2 parse_version
+
+  my $result = $pmfile->parse_version;
+
+This returns a hashref with exactly one key, either C<version>, holding the
+file's normalized version, or C<error>, holding the package error (from
+PKGERROR) to report for every package that would have taken the file's
+version.
+
+=cut
 
 # package PAUSE::pmfile;
 sub parse_version {
-    my $self = shift;
+    my ($self) = @_;
 
-    use strict;
+    my $result = static_version_from_file($self->{PMFILE});
 
-    my $pmfile = $self->{PMFILE};
+    # TODO: get $result->{openerr} back in here, I guess?
+    return { error => PKGERROR('version_openerr') }
+        if exists $result->{openerr};
 
-    my $pmcp = $pmfile;
-    for ($pmcp) {
-        s/([^\\](\\\\)*)@/$1\\@/g; # thanks to Raphael Manfredi for the
-        # solution to escape @s and \
-    }
-    my($v);
-    # $self->disconnect; # no guarantee that the connection survives the fork!
+    return { error => PKGERROR(version_parse => { line => $result->{refused} }) }
+        if exists $result->{refused};
 
-    {
-
-        package main; # seems necessary
-
-        my($pid,$kid);
-        die "Can't fork: $!" unless defined($pid = open($kid, "-|"));
-        if ($pid) {         # parent
-            $v = <$kid>;
-            # warn ">>>>>>>>read v[$v]<<<<<<<<";
-            close $kid;
-        } else {
-            $self->connect->{InactiveDestroy} = 1;
-            my($gnam,$gpw,$gid,$gmem) = getgrnam($PAUSE::Config->{ML_CHOWN_GROUP});
-            die "Could not determine GID of $PAUSE::Config->{ML_CHOWN_GROUP}" unless defined $gid;
-            my($uname,$upw,$uid,$ugid,$q,$c,$gcos,$udir,$ushell) =
-                getpwnam($PAUSE::Config->{ML_CHOWN_USER});
-            die "Could not determine UID of $PAUSE::Config->{ML_CHOWN_USER}" unless defined $uid;
-            $( = $gid; $) = "$gid $gid";
-            $< = $> = $uid;
-
-            # XXX Limit Resources too
-
-            my($comp) = Safe->new("_pause::mldistwatch");
-            my $eval = qq{
-              local(\$^W) = 0;
-              PAUSE::pmfile::parse_version_safely("$pmcp");
-              };
-            $comp->permit("entereval"); # for MBARBON/Module-Info-0.30.tar.gz
-            $comp->share("*PAUSE::pmfile::parse_version_safely");
-            $comp->share("*version::new");
-            $comp->share("*version::numify");
-            $comp->share_from('main', ['*version::',
-                                        '*Exporter::']);
-            $comp->share_from('version', ['&qv']);
-            $comp->permit(":base_math");
-            # $comp->permit("require"); # no strict!
-            {
-                no strict;
-                local $PAUSE::Config;
-                $v = $comp->reval($eval);
-            }
-            if ($@){ # still in the child process, out of Safe::reval
-                my $err = $@;
-                # warn ">>>>>>>err[$err]<<<<<<<<";
-                if (ref $err) {
-                    if ($err->{line} =~ /[\$*]([\w\:\']*)\bVERSION\b.*\=(.*)/) {
-                        $v = $comp->reval($2);
-                    }
-                    if ($@) {
-                        warn sprintf("reval failed: err[%s] for eval[%s]",
-                                      JSON::objToJson($err,{pretty => 1}),
-                                      $eval,
-                                    );
-                        $v = JSON::objToJson($err);
-                    }
-                } else {
-                    $v = JSON::objToJson({ openerr => $err });
-                }
-            }
-            if (defined $v) {
-                $v = $v->numify if ref($v) eq 'version';
-            } else {
-                $v = "";
-            }
-            print $v;
-            exit;
-        }
-    }
-
-    return $self->normalize_version($v);
+    return { version => $self->normalize_version($result->{version}) };
 }
 
 # package PAUSE::pmfile
@@ -567,7 +532,6 @@ sub normalize_version {
     $Logger->log("result of normalize_version: $sdv");
 
     return $v if $v eq "undef";
-    return $v if $v =~ /^\{.*\}$/; # JSON object
     $v =~ s/^\s+//;
     $v =~ s/\s+\z//;
     if ($v =~ /_/) {
