@@ -21,7 +21,7 @@ jobs:
   the-tests:
     runs-on: ubuntu-latest
     container:
-      image: perldocker/perl-tester:5.36-slim-bookworm
+      image: perldocker/perl-tester:5.42-slim-trixie
     strategy:
       fail-fast: false
     env:
