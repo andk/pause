@@ -328,6 +328,11 @@ sub examine_dist {
       # XXX Temporarily disabled -- rjbs, 2019-04-27
       # system("$unzipbin -t $MLROOT/$dist");
     }
+
+    # untar decides whether this is a Perl 6 dist while listing the archive,
+    # but nothing did that for zip files, so perl_major_version was undef
+    # for them
+    $self->{PERL_MAJOR_VERSION} = (grep { -f } glob('*/META6.json')) ? 6 : 5;
   } else {
     $ctx->abort_indexing_dist(DISTERROR('not_a_dist'));
   }
@@ -1154,7 +1159,7 @@ sub p6_index_dist {
   my @args = ($c->{name}, $userid, $c->{version}, $dist, PAUSE->_now_string);
   my $ret  = $dbh->do($p6dists, undef, @args);
   pop @args; # we do not use the "now string" in the sprintf below
-  push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+  push @args, ($ret || ''), (defined $ret ? '' : $dbh->errstr);
   $Logger->log([
     "inserted into p6dists: %s", {
       name    => $args[0],
@@ -1174,7 +1179,7 @@ sub p6_index_dist {
   for my $namespace (keys %{$c->{provides} // {}}) {
     @args = ($namespace, $dist);
     $ret  = $dbh->do($p6provides, undef, @args);
-    push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+    push @args, ($ret || ''), (defined $ret ? '' : $dbh->errstr);
     $Logger->log([
       "inserted into p6provides: %s", {
         name    => $args[0],
@@ -1194,13 +1199,22 @@ sub p6_index_dist {
   if ($dist =~ /\.(?:tar\.bz2|tbz)$/) {
     $tar_opt = "tjf";
   }
-  open TARTEST, "$tarbin $tar_opt $MLROOT/$dist |";
+
+  # A Perl 6 dist can be a zip file, but this listing was only ever done with
+  # tar, which fails on a zip and so aborted indexing the whole dist.  "unzip
+  # -Z1" prints one entry name per line, like "tar tf".
+  my $unzipbin = $self->hub->{UNZIPBIN};
+  my $list_cmd = $dist =~ /\.zip$/
+               ? "$unzipbin -Z1 $MLROOT/$dist"
+               : "$tarbin $tar_opt $MLROOT/$dist";
+
+  open TARTEST, "$list_cmd |";
   local $_;
   while (<TARTEST>) {
     if (m:^bin/([^/]+)$:) {
       @args = ($1, $dist);
       $ret  = $dbh->do($p6binaries, undef, @args);
-      push @args, (defined $ret ? '' : $dbh->errstr), ($ret || '');
+      push @args, ($ret || ''), (defined $ret ? '' : $dbh->errstr);
       $Logger->log([
         "inserted into p6binaries: %s", {
           name    => $args[0],
