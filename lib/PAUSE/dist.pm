@@ -195,7 +195,15 @@ sub untar {
     $tar_opt = "-xjf";
   }
 
-  my @cmd = ($tarbin, $ignore_unknown_keyword, $tar_opt, "$MLROOT/$dist");
+  # We extract right into the work directory, so an archive entry for "./" is
+  # an entry for the work directory itself, and tar would apply that entry's
+  # mode and ownership to it.  A "./" entry with mode 0644 left the indexer
+  # unable to chdir back into its work directory, killing the whole run.
+  # --no-overwrite-dir keeps the metadata of directories that already exist.
+  my @cmd = (
+    $tarbin, $ignore_unknown_keyword, '--no-overwrite-dir',
+    $tar_opt, "$MLROOT/$dist",
+  );
   $Logger->log([ "going to untar with: %s", \@cmd ]);
 
   unless (system(@cmd)==0) {
@@ -624,7 +632,10 @@ sub check_multiple_root {
   my ($self, $ctx) = @_;
   my %seen;
   my @top = grep { s|/.*||; !$seen{$_}++ } map { $_ } @{$self->{MANIFOUND}};
-  if (@top > 1) {
+
+  # A single top-level entry has to be a directory.  An archive holding just
+  # Foo.pm is no better than one holding Foo.pm and Bar.pm.
+  if (@top > 1 || (@top == 1 && ! -d $top[0])) {
     $self->{HAS_MULTIPLE_ROOT} = \@top;
     $ctx->abort_indexing_dist(DISTERROR('multiroot'));
   } else {
