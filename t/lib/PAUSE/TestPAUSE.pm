@@ -352,9 +352,8 @@ sub with_our_config {
   $code->($self);
 }
 
-sub test_reindex {
-  my ($self, $arg) = @_;
-  $arg //= {};
+sub _take_pause_action {
+  my ($self, $action) = @_;
 
   $self->with_our_config(sub {
     my $self = shift;
@@ -390,22 +389,11 @@ sub test_reindex {
 
     my $existing_log_events = $self->logger->events->@*;
 
-    if ($arg->{pick}) {
-      my $dbh = PAUSE::dbh();
-      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
-        for @{ $arg->{pick} };
-    }
-
     my $package_file = $self->tmpdir->child(qw(cpan modules 02packages.details.txt.gz));
 
     my $old_package_state = -f $package_file ? $package_file->digest : '';
 
-    PAUSE::mldistwatch->new({
-      sleep => 0,
-      ($arg->{pick} ? (pick => $arg->{pick}) : ()),
-    })->reindex;
-
-    $arg->{after}->($self->tmpdir) if $arg->{after};
+    $action->();
 
     # The first $existing_log_events were already there.  We only care about
     # ones added during the indexer run.
@@ -428,6 +416,38 @@ sub test_reindex {
       updated_02packages => $old_package_state ne $new_package_state,
     });
   });
+}
+
+sub rewrite_indexes {
+  my ($self) = @_;
+
+  my $action = sub {
+    PAUSE::mldistwatch->new({ sleep => 0 })->rewrite_indexes;
+  };
+
+  return $self->_take_pause_action($action);
+}
+
+sub test_reindex {
+  my ($self, $arg) = @_;
+  $arg //= {};
+
+  my $action = sub {
+    if ($arg->{pick}) {
+      my $dbh = PAUSE::dbh();
+      $dbh->do("DELETE FROM distmtimes WHERE dist = ?", undef, $_)
+        for @{ $arg->{pick} };
+    }
+
+    PAUSE::mldistwatch->new({
+      sleep => 0,
+      ($arg->{pick} ? (pick => $arg->{pick}) : ()),
+    })->reindex;
+
+    $arg->{after}->($self->tmpdir) if $arg->{after};
+  };
+
+  return $self->_take_pause_action($action);
 }
 
 sub run_shell {
