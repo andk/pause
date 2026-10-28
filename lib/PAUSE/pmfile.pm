@@ -387,7 +387,7 @@ my $VERSION_LITERAL = qr{
 #        must match a VERSION_LITERAL form above
 my $VERSION_LINE = qr{
     \A
-    (?: \s | [{;] | \b (?: use | no | package ) \b [^;]* ; )*
+    (?: \s | [{;] | \b BEGIN \s* \{ | \b (?: use | no | package ) \b [^;]* ; )*
     $VERSION_LHS \s* = \s*
     (?: \$ (?: [\w:']* (?: :: | ' ) )? VERSION \s* = \s* )?
     (?:

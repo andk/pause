@@ -61,6 +61,12 @@ subtest "surrounding syntax" => sub {
   version_is(q{use vars qw($VERSION); $VERSION = '1.0';},    '1.0');
   version_is(q[{ our $VERSION = '1.0'; }],                   '1.0');
   version_is(q{package Foo; our $VERSION = '1.0';},          '1.0');
+
+  # The old eval-based code got undef for these, because the BEGIN block ran
+  # before its wrapper cleared $VERSION.
+  version_is(q[BEGIN { our $VERSION = '1.0' }],              '1.0');
+  version_is(q[BEGIN { $VERSION = '1.0'; }],                 '1.0');
+  version_is(q[BEGIN{our $VERSION='1.0'}],                   '1.0');
   version_is(
     q{use 5.006; use strict; use warnings; no warnings qw(void); use utf8; our $VERSION = '1.01';},
     '1.01',
@@ -96,7 +102,6 @@ subtest "refused" => sub {
   version_refused(q{our $VERSION = "$x";},    'interpolation');
   version_refused(q{our $VERSION = 'it\'s';}, 'escaped apostrophe');
   version_refused(q{our $VERSION = '1\.0';},  'backslash in single quotes');
-  version_refused(q{BEGIN { our $VERSION = '1.0' }});
   version_refused(q{*VERSION = \'1.0';});
   version_refused(q{our $VERSION = $Other::VERSION;});
   version_refused(q{our $VERSION = '1.0'; $VERSION = eval $VERSION;});
