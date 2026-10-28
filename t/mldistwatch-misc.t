@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use utf8;
+
 use v5.36.0;
 use lib 't/lib';
 use lib 't/privatelib'; # Stub PrivatePAUSE
@@ -797,6 +799,42 @@ subtest "indexer ran, but nothing indexed" => sub {
       },
     ],
   );
+};
+
+subtest "quotes in username" => sub {
+  my $pause = PAUSE::TestPAUSE->init_new;
+
+  my $initial_result = $pause->test_reindex;
+
+  my $dbh = $initial_result->connect_mod_db;
+
+  $dbh->do(
+    "INSERT INTO users (userid, email, fullname, asciiname)
+    VALUES (?, ?, ?, ?)",
+    undef,
+    'PERSON', 'person@example.com', q{R★S"'<xmp>}, q{R*S"'<xmp>},
+  );
+
+  $pause->upload_author_fake(PERSON => 'Not-Very-Meta-1.234.tar.gz', {
+    omitted_files => [ qw( META.yml META.json ) ],
+  });
+
+  my $result = $pause->test_reindex;
+
+  my $email_mime = ($result->deliveries)[0]->{email}->object;
+
+  my ($to) = ($result->deliveries)[0]->{email}->object->header_as_obj('To');
+  my ($cc) = ($result->deliveries)[0]->{email}->object->header_as_obj('Cc');
+
+  my @to_addresses = $to->addresses;
+  is(@to_addresses, 1, "there is one To address");
+  is($to_addresses[0]->address, q{person@example.com}, "To address is right");
+  is($to_addresses[0]->phrase,  q{R★S"'<xmp>},         "To name is right");
+
+  my @cc_addresses = $cc->addresses;
+  is(@cc_addresses, 1, "there is one Cc address");
+  is($cc_addresses[0]->address, q{pause-admin@example.com}, "Cc address is right");
+  is($cc_addresses[0]->phrase,  undef,                      "Cc name is right");
 };
 
 done_testing;

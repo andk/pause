@@ -67,7 +67,7 @@ Sorry, <b>$uri</b> could not be recognized as an uri (}),
                           $@,
                          Mojo::ByteStream->new(qq{\)Please
 try again or report errors to <a href="mailto:}),
-                          $PAUSE::Config->{ADMIN},
+                          $PAUSE::Config->{CONTACT_ADDRESS},
                           Mojo::ByteStream->new(qq{">the administrator</a></p>})]);
     } else {
       require LWP::UserAgent;

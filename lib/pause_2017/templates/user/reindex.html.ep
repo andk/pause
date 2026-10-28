@@ -14,7 +14,7 @@
 
 </ul>
 
-<p>With this form you can tell the indexer to index selected files again. As it is done by a cron job, it may take up to an hour until the indexer actually executes the command. If this doesn't repair the index, please <a href="mailto:<%= $PAUSE::Config->{UPLOAD} %>">email me</a>.</p>
+<p>With this form you can tell the indexer to index selected files again. As it is done by a cron job, it may take up to an hour until the indexer actually executes the command. If this doesn't repair the index, please <a href="mailto:<%= $PAUSE::Config->{CONTACT_ADDRESS} %>">email me</a>.</p>
 
 % if (%$files) {
 %   if ($pause->{mailbody}) {

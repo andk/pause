@@ -24,7 +24,7 @@
 <p>You'll also receive a welcome email like the one below.</p>
 
 <pre class="email_sent">
-From: <%= $PAUSE::Config->{UPLOAD} %>
+From: <%= $PAUSE::Config->{NOREPLY_ADDRESS} %>
 Subject: <%= $pause->{subject_for_user_addition} %>
 
 <%== $pause->{blurb_for_user_addition} %>
@@ -37,7 +37,7 @@ Subject: <%= $pause->{subject_for_user_addition} %>
 %   elsif ($pause->{blurbcopy}) {
 Sending mail to: <%= $pause->{send_to} %>
 <pre class="email_sent">
-From: <%= $PAUSE::Config->{UPLOAD} %>
+From: <%= $PAUSE::Config->{NOREPLY_ADDRESS} %>
 Subject: <%= $pause->{subject} %>
 
 <%== $pause->{blurbcopy} %>

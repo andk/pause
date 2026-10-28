@@ -1,6 +1,7 @@
 package PAUSE::Web::Controller::Admin;
 
 use Mojo::Base "Mojolicious::Controller";
+use PAUSE::Email;
 
 sub email_for_admin {
   my $c = shift;
@@ -156,8 +157,9 @@ sub edit_ml {
     if ($saw_a_change) {
       $pause->{changed} = 1;
       my $mailblurb = $c->render_to_string("email/admin/edit_ml", format => "email");
-      my @to = ($u->{secretemail}||$u->{email}, $mgr->config->mailto_admins);
-      warn "sending to[@to]";
+      my @to = ($u->{secretemail}||$u->{email}, PAUSE::Email->report_email_header_object);
+      warn sprintf "sending to[%s]",
+        join " ", map {; PAUSE::Email->header_value_as_string($_) } @to;
       warn "mailblurb[$mailblurb]";
       my $header = {
                     Subject => "Mailinglist update for $selectedrec->{maillistid}"
@@ -199,8 +201,9 @@ sub change_user_status {
         $pause->{changed} = 1;
         $pause->{new_ustatus} = $new_ustatus;
         my $mailblurb = $c->render_to_string("email/admin/change_user_status", format => "email");
-        my @to = ($u->{secretemail}||$u->{email}, $mgr->config->mailto_admins);
-        warn "sending to[@to]";
+        my @to = ($u->{secretemail}||$u->{email}, PAUSE::Email->report_email_header_object);
+        warn sprintf "sending to[%s]",
+          join " ", map {; PAUSE::Email->header_value_as_string($_) } @to;
         warn "mailblurb[$mailblurb]";
         my $header = {
                       Subject => "User status update for $user"

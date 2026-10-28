@@ -550,7 +550,6 @@ sub _send_email {
     my $substrdistro = substr $distro, 5;
 
     my $pma = PAUSE::MailAddress->new_from_userid($author);
-    my $to = sprintf "%s, %s", $pma->address, $PAUSE::Config->{ADMIN};
     my $failed = "";
 
     if ($status_over_all ne "OK") {
@@ -559,9 +558,10 @@ sub _send_email {
 
     my $email = Email::MIME->create(
         header_str => [
-            To      => $to,
+            To      => $pma->email_header_object,
+            Cc      => PAUSE::Email->report_email_header_object,
             Subject => $failed."PAUSE indexer report $substrdistro",
-            From    => "PAUSE <$PAUSE::Config->{UPLOAD}>",
+            From    => PAUSE::Email->noreply_email_header_object,
         ],
         attributes => {
           charset      => 'utf-8',

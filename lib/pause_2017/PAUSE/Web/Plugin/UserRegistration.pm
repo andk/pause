@@ -1,6 +1,7 @@
 package PAUSE::Web::Plugin::UserRegistration;
 
 use Mojo::Base "Mojolicious::Plugin";
+use PAUSE::Email;
 use PAUSE::Crypt;
 use HTTP::Tiny 0.059;
 use IO::Socket::SSL 1.56;
@@ -93,7 +94,7 @@ sub _send_otp_email {
     };
     my $header_str = join "\n", map {"$_: $header->{$_}"} keys %$header;
     warn "header[$header_str]otpwblurb[$otpwblurb]";
-    $mgr->send_mail_multi( [ $email, $PAUSE::Config->{ADMIN} ], $header, $otpwblurb);
+    $mgr->send_mail_multi( [ $email, PAUSE::Email->report_email_header_object ], $header, $otpwblurb);
 }
 
 sub _send_welcome_email {
