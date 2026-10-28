@@ -520,6 +520,27 @@ sub parse_version {
     return { error => PKGERROR(version_parse => { line => $result->{refused} }) }
         if exists $result->{refused};
 
+    # If the author wrote
+    #
+    #   $VERSION = 0.000001
+    #
+    # ...instead of...
+    #
+    #   $VERSION = '0.000001'
+    #
+    # ...then the static parser numifies the literal, as perl would.  That's
+    # bad, because we lose fidelity.  Sometimes this only means that 1.100
+    # becomes 1.1, but the worse case is when a version like 0.000001 becomes
+    # 1e-06, which can't be turned into a version object with version->new.
+    #
+    # When the version looks like scientific notation, we report it to the
+    # author instead of letting normalize_version die and silently skipping
+    # the file.
+    #
+    # -- rjbs, 2023-04-28
+    return { error => PKGERROR(version_numeric_literal => { version => $result->{version} }) }
+        if $result->{version} =~ /\A[0-9](?:\.[0-9]+)?e[-+]?[0-9]+\z/a;
+
     return { version => $self->normalize_version($result->{version}) };
 }
 
